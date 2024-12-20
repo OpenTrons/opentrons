@@ -1,5 +1,5 @@
 """Pipetting command handling."""
-from typing import Optional, Iterator
+from typing import Optional, Iterator, Tuple
 from typing_extensions import Protocol as TypingProtocol
 from contextlib import contextmanager
 
@@ -44,6 +44,15 @@ class PipettingHandler(TypingProtocol):
         command_note_adder: CommandNoteAdder,
     ) -> float:
         """Set flow-rate and aspirate."""
+
+    async def aspirate_while_tracking(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+        command_note_adder: CommandNoteAdder,
+    ) -> float:
+        """Set flow-rate and aspirate while tracking."""
 
     async def dispense_in_place(
         self,
@@ -99,6 +108,47 @@ class HardwarePipettingHandler(PipettingHandler):
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
         await self._hardware_api.prepare_for_aspirate(mount=hw_mount)
 
+    def get_hw_aspirate_params(
+        self,
+        pipette_id: str,
+        volume: float,
+        command_note_adder: CommandNoteAdder,
+    ) -> Tuple[HardwarePipette, float]:
+        _adjusted_volume = _validate_aspirate_volume(
+            state_view=self._state_view,
+            pipette_id=pipette_id,
+            aspirate_volume=volume,
+            command_note_adder=command_note_adder,
+        )
+        _hw_pipette = self._state_view.pipettes.get_hardware_pipette(
+            pipette_id=pipette_id,
+            attached_pipettes=self._hardware_api.attached_instruments,
+        )
+        return _hw_pipette, _adjusted_volume
+
+    async def aspirate_while_tracking(
+        self,
+        pipette_id: str,
+        volume: float,
+        flow_rate: float,
+        command_note_adder: CommandNoteAdder,
+    ) -> float:
+        """Set flow-rate and aspirate.
+
+        Raises:
+            PipetteOverpressureError, propagated as-is from the hardware controller.
+        """
+        # get mount and config data from state and hardware controller
+        hw_pipette, adjusted_volume = self.get_hw_aspirate_params(
+            pipette_id, volume, command_note_adder
+        )
+        with self._set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
+            await self._hardware_api.aspirate_while_tracking(
+                mount=hw_pipette.mount, volume=adjusted_volume
+            )
+
+        return adjusted_volume
+
     async def aspirate_in_place(
         self,
         pipette_id: str,
@@ -112,15 +162,8 @@ class HardwarePipettingHandler(PipettingHandler):
             PipetteOverpressureError, propagated as-is from the hardware controller.
         """
         # get mount and config data from state and hardware controller
-        adjusted_volume = _validate_aspirate_volume(
-            state_view=self._state_view,
-            pipette_id=pipette_id,
-            aspirate_volume=volume,
-            command_note_adder=command_note_adder,
-        )
-        hw_pipette = self._state_view.pipettes.get_hardware_pipette(
-            pipette_id=pipette_id,
-            attached_pipettes=self._hardware_api.attached_instruments,
+        hw_pipette, adjusted_volume = self.get_hw_aspirate_params(
+            pipette_id, volume, command_note_adder
         )
         with self._set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate(

@@ -11,7 +11,9 @@ from .pipetting_common import (
     FlowRateMixin,
     BaseLiquidHandlingResult,
     aspirate_in_place,
+    aspirate_while_tracking,
     prepare_for_aspirate,
+    IsTrackingMixin,
 )
 from .movement_common import (
     LiquidHandlingWellLocationMixin,
@@ -47,7 +49,11 @@ AspirateCommandType = Literal["aspirate"]
 
 
 class AspirateParams(
-    PipetteIdMixin, AspirateVolumeMixin, FlowRateMixin, LiquidHandlingWellLocationMixin
+    PipetteIdMixin,
+    AspirateVolumeMixin,
+    FlowRateMixin,
+    LiquidHandlingWellLocationMixin,
+    IsTrackingMixin,
 ):
     """Parameters required to aspirate from a specific well."""
 
@@ -158,6 +164,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             well_location=well_location,
             current_well=current_well,
             operation_volume=-params.volume,
+            is_tracking=params.is_tracking,
         )
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):
@@ -165,21 +172,38 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                 public=move_result.public, state_update=state_update
             )
 
-        aspirate_result = await aspirate_in_place(
-            pipette_id=pipette_id,
-            volume=params.volume,
-            flow_rate=params.flowRate,
-            location_if_error={
-                "retryLocation": (
-                    move_result.public.position.x,
-                    move_result.public.position.y,
-                    move_result.public.position.z,
-                )
-            },
-            command_note_adder=self._command_note_adder,
-            pipetting=self._pipetting,
-            model_utils=self._model_utils,
-        )
+        if params.is_tracking:
+            aspirate_result = await aspirate_while_tracking(
+                pipette_id=pipette_id,
+                volume=params.volume,
+                flow_rate=params.flowRate,
+                location_if_error={
+                    "retryLocation": (
+                        move_result.public.position.x,
+                        move_result.public.position.y,
+                        move_result.public.position.z,
+                    )
+                },
+                command_note_adder=self._command_note_adder,
+                pipetting=self._pipetting,
+                model_utils=self._model_utils,
+            )
+        else:
+            aspirate_result = await aspirate_in_place(
+                pipette_id=pipette_id,
+                volume=params.volume,
+                flow_rate=params.flowRate,
+                location_if_error={
+                    "retryLocation": (
+                        move_result.public.position.x,
+                        move_result.public.position.y,
+                        move_result.public.position.z,
+                    )
+                },
+                command_note_adder=self._command_note_adder,
+                pipetting=self._pipetting,
+                model_utils=self._model_utils,
+            )
         state_update.append(aspirate_result.state_update)
         if isinstance(aspirate_result, DefinedErrorData):
             state_update.set_liquid_operated(

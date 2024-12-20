@@ -85,6 +85,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         flow_rate: float,
         in_place: bool,
         is_meniscus: Optional[bool] = None,
+        is_tracking: Optional[bool] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:

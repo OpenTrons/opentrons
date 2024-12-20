@@ -2750,7 +2750,7 @@ class OT3API(
         if not probe_settings:
             probe_settings = deepcopy(self.config.liquid_sense)
 
-        # We need to significatly slow down the 96 channel liquid probe
+        # We need to significantly slow down the 96 channel liquid probe
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             max_plunger_speed = self.config.motion_settings.max_speed_discontinuity[
                 GantryLoad.HIGH_THROUGHPUT
@@ -2963,6 +2963,45 @@ class OT3API(
         return values
 
     AMKey = TypeVar("AMKey")
+
+    async def aspirate_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        distance: float,
+        rate: float,
+        volume: Optional[float] = None,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) using this pipette."""
+        realmount = OT3Mount.from_mount(mount)
+        aspirate_spec = self._pipette_handler.plan_check_aspirate(
+            realmount, volume, rate
+        )
+        if not aspirate_spec:
+            return
+
+        try:
+            await self._backend.set_active_current(
+                {aspirate_spec.axis: aspirate_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, aspirate_spec.acceleration
+                )
+                await self._backend.aspirate_while_tracking(
+                    mount=mount,
+                    distance=distance,
+                    speed=rate,
+                    direction=-1,
+                    # have to actually determine duration here
+                    duration=0.0,
+                )
+        except Exception:
+            self._log.exception("Aspirate failed")
+            aspirate_spec.instr.set_current_volume(0)
+            raise
+        else:
+            aspirate_spec.instr.add_current_volume(aspirate_spec.volume)
 
     @property
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:

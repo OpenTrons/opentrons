@@ -473,6 +473,7 @@ class GeometryView:
         well_location: Optional[WellLocations] = None,
         operation_volume: Optional[float] = None,
         pipette_id: Optional[str] = None,
+        is_tracking: Optional[bool] = False,
     ) -> Point:
         """Given relative well location in a labware, get absolute position."""
         labware_pos = self.get_labware_position(labware_id)
@@ -488,6 +489,7 @@ class GeometryView:
                 well_location=well_location,
                 well_depth=well_depth,
                 operation_volume=operation_volume,
+                is_tracking=is_tracking,
             )
             offset = offset.model_copy(update={"z": offset.z + offset_adjustment})
             self.validate_well_position(
@@ -1411,6 +1413,7 @@ class GeometryView:
         well_location: WellLocations,
         well_depth: float,
         operation_volume: Optional[float] = None,
+        is_tracking: Optional[bool] = False,
     ) -> float:
         """Return a z-axis distance that accounts for well handling height and operation volume.
 
@@ -1423,6 +1426,8 @@ class GeometryView:
             well_location=well_location,
             well_depth=well_depth,
         )
+        if is_tracking:
+            return initial_handling_height
         if isinstance(well_location, PickUpTipWellLocation):
             volume = 0.0
         elif isinstance(well_location.volumeOffset, float):
