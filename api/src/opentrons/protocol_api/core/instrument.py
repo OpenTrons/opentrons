@@ -319,7 +319,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType]):
         dest: List[Tuple[types.Location, WellCoreType]],
         new_tip: TransferTipPolicyV2,
         tiprack_uri: str,
-        trash_location: Union[WellCoreType, types.Location, TrashBin, WasteChute],
+        trash_location: Union[types.Location, TrashBin, WasteChute],
     ) -> None:
         """Transfer a liquid from source to dest according to liquid class properties."""
         ...

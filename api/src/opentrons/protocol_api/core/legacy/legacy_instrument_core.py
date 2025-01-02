@@ -564,7 +564,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
         tiprack_uri: str,
-        trash_location: Union[LegacyWellCore, types.Location, TrashBin, WasteChute],
+        trash_location: Union[types.Location, TrashBin, WasteChute],
     ) -> None:
         """This will never be called because it was added in .."""
         # TODO(spp, 2024-11-20): update the docstring and error to include API version

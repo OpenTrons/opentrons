@@ -482,7 +482,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
         tiprack_uri: str,
-        trash_location: Union[LegacyWellCore, types.Location, TrashBin, WasteChute],
+        trash_location: Union[types.Location, TrashBin, WasteChute],
     ) -> None:
         """Transfer a liquid from source to dest according to liquid class properties."""
         # TODO(spp, 2024-11-20): update the docstring and error to include API version

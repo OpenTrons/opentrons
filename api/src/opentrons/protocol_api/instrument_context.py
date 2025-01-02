@@ -1520,7 +1520,7 @@ class InstrumentContext(publisher.CommandPublisher):
             labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
         ],
         new_tip: TransferTipPolicyV2Type = "once",
-        tip_drop_location: Optional[
+        trash_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
     ) -> InstrumentContext:
@@ -1578,19 +1578,17 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
         _trash_location: Union[types.Location, labware.Well, TrashBin, WasteChute]
-        if tip_drop_location is None:
+        if trash_location is None:
             saved_trash = self.trash_container
             if isinstance(saved_trash, labware.Labware):
                 _trash_location = saved_trash.wells()[0]
             else:
                 _trash_location = saved_trash
         else:
-            _trash_location = tip_drop_location
+            _trash_location = trash_location
 
-        checked_trash_location = (
-            validation.ensure_valid_tip_drop_location_for_transfer_v2(
-                tip_drop_location=_trash_location
-            )
+        checked_trash_location = validation.ensure_valid_trash_location_for_transfer_v2(
+            trash_location=_trash_location
         )
         self._core.transfer_liquid(
             liquid_class=liquid_class,
@@ -1605,11 +1603,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ],
             new_tip=valid_new_tip,
             tiprack_uri=tiprack.uri,
-            trash_location=(
-                checked_trash_location._core
-                if isinstance(checked_trash_location, labware.Well)
-                else checked_trash_location
-            ),
+            trash_location=checked_trash_location,
         )
         return self
 

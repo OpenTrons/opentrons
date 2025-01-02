@@ -910,7 +910,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         dest: List[Tuple[Location, WellCore]],
         new_tip: TransferTipPolicyV2,
         tiprack_uri: str,
-        tip_drop_location: Union[WellCore, Location, TrashBin, WasteChute],
+        trash_location: Union[Location, TrashBin, WasteChute],
     ) -> None:
         """Execute transfer using liquid class properties.
 
@@ -963,16 +963,16 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             # TODO: add aspirate and dispense
 
             if new_tip == TransferTipPolicyV2.ALWAYS:
-                if isinstance(tip_drop_location, (TrashBin, WasteChute)):
+                if isinstance(trash_location, (TrashBin, WasteChute)):
                     self.drop_tip_in_disposal_location(
-                        disposal_location=tip_drop_location,
+                        disposal_location=trash_location,
                         home_after=False,
                         alternate_tip_drop=True,
                     )
-                elif isinstance(tip_drop_location, Location):
+                elif isinstance(trash_location, Location):
                     self.drop_tip(
-                        location=tip_drop_location,
-                        well_core=tip_drop_location.labware.as_well()._core,  # type: ignore[arg-type]
+                        location=trash_location,
+                        well_core=trash_location.labware.as_well()._core,  # type: ignore[arg-type]
                         home_after=False,
                         alternate_drop_location=True,
                     )
@@ -982,7 +982,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         volume: float,
         source: Tuple[Location, WellCore],
         transfer_properties: TransferProperties,
-    ) -> None:
+        transfer_type: tx_comps_executor.TransferType,
+        tip_contents: List[tx_comps_executor.LiquidAndAirGapPair],
+    ) -> tx_comps_executor.LiquidAndAirGapPair:
         """Execute aspiration steps.
 
         1. Submerge
@@ -991,6 +993,8 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         4. Aspirate
         5. Delay- wait inside the liquid
         6. Aspirate retract
+
+        Return: The last liquid and air gap pair in tip.
         """
         aspirate_props = transfer_properties.aspirate
         source_loc, source_well = source
@@ -1002,27 +1006,122 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
         )
         aspirate_location = Location(aspirate_point, labware=source_loc.labware)
-
-        components_executer = tx_comps_executor.TransferComponentsExecutor(
+        if len(tip_contents) > 0:
+            last_liquid_and_airgap_in_tip = tip_contents[-1]
+        else:
+            last_liquid_and_airgap_in_tip = tx_comps_executor.LiquidAndAirGapPair(
+                liquid=0,
+                air_gap=0,
+            )
+        components_executor = tx_comps_executor.TransferComponentsExecutor(
             instrument_core=self,
             transfer_properties=transfer_properties,
             target_location=aspirate_location,
             target_well=source_well,
+            transfer_type=transfer_type,
+            tip_state=tx_comps_executor.TipState(
+                last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
+            ),
         )
-        components_executer.submerge(
-            submerge_properties=aspirate_props.submerge,
-            # Assuming aspirate is not called with *liquid* in the tip
-            # TODO: evaluate if using the current volume to find air gap is not a good idea.
-            air_gap_volume=self.get_current_volume(),
-        )
+        components_executor.submerge(submerge_properties=aspirate_props.submerge)
         # TODO: when aspirating for consolidation, do not perform mix
-        components_executer.mix(mix_properties=aspirate_props.mix)
+        components_executor.mix(
+            mix_properties=aspirate_props.mix, last_dispense_push_out=False
+        )
         # TODO: when aspirating for consolidation, do not preform pre-wet
-        components_executer.pre_wet(
+        components_executor.pre_wet(
             volume=volume,
         )
-        components_executer.aspirate_and_wait(volume=volume)
-        components_executer.retract_after_aspiration(volume=volume)
+        components_executor.aspirate_and_wait(volume=volume)
+        components_executor.retract_after_aspiration(volume=volume)
+        return components_executor.tip_state.last_liquid_and_air_gap_in_tip
+
+    def dispense_liquid_class(
+        self,
+        volume: float,
+        dest: Tuple[Location, WellCore],
+        source: Optional[Tuple[Location, WellCore]],
+        transfer_properties: TransferProperties,
+        transfer_type: tx_comps_executor.TransferType,
+        tip_contents: List[tx_comps_executor.LiquidAndAirGapPair],
+        trash_location: Union[Location, TrashBin, WasteChute],
+    ) -> tx_comps_executor.LiquidAndAirGapPair:
+        """Execute single-dispense steps.
+        1. Move pipette to the ‘submerge’ position with normal speed.
+            - The pipette will move in an arc- move to max z height of labware
+              (if asp & disp are in same labware)
+              or max z height of all labware (if asp & disp are in separate labware)
+        2. Air gap removal:
+            - If dispense location is above the meniscus, DO NOT remove air gap
+              (it will be dispensed along with rest of the liquid later).
+              All other scenarios, remove the air gap by doing a dispense
+            - Flow rate = min(dispenseFlowRate, (airGapByVolume)/sec)
+            - Use the post-dispense delay
+        4. Move to the dispense position at the specified ‘submerge’ speed
+           (even if we might not be moving into the liquid)
+           - Do a delay (submerge delay)
+        6. Dispense:
+            - Dispense at the specified flow rate.
+            - Do a push out as specified ONLY IF there is no mix following the dispense AND the tip is empty.
+            Volume for push out is the volume being dispensed. So if we are dispensing 50uL, use pushOutByVolume[50] as push out volume.
+        7. Delay
+        8. Mix using the same flow rate and delays as specified for asp+disp,
+           with the volume and the number of repetitions specified. Use the delays in asp & disp.
+            - If the dispense position is outside the liquid, then raise error if mix is enabled.
+            - If the user wants to perform a mix then they should specify a dispense position that’s inside the liquid OR do mix() on the wells after transfer.
+            - Do push out at the last dispense.
+        9. Retract
+
+        Return:
+            The last liquid and air gap pair in tip.
+        """
+        dispense_props = transfer_properties.dispense
+        dest_loc, dest_well = dest
+        dispense_point = (
+            tx_comps_executor.absolute_point_from_position_reference_and_offset(
+                well=dest_well,
+                position_reference=dispense_props.position_reference,
+                offset=dispense_props.offset,
+            )
+        )
+        dispense_location = Location(dispense_point, labware=dest_loc.labware)
+        if len(tip_contents) > 0:
+            last_liquid_and_airgap_in_tip = tip_contents[-1]
+        else:
+            last_liquid_and_airgap_in_tip = tx_comps_executor.LiquidAndAirGapPair(
+                liquid=0,
+                air_gap=0,
+            )
+        components_executor = tx_comps_executor.TransferComponentsExecutor(
+            instrument_core=self,
+            transfer_properties=transfer_properties,
+            target_location=dispense_location,
+            target_well=dest_well,
+            transfer_type=transfer_type,
+            tip_state=tx_comps_executor.TipState(
+                last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
+            ),
+        )
+        components_executor.submerge(submerge_properties=dispense_props.submerge)
+        if dispense_props.mix.enabled:
+            push_out_vol = 0.0
+        else:
+            # TODO: if distributing, do a push out only at the last dispense
+            push_out_vol = dispense_props.push_out_by_volume.get_for_volume(volume)
+        components_executor.dispense_and_wait(
+            volume=volume,
+            push_out_override=push_out_vol,
+        )
+        components_executor.mix(
+            mix_properties=dispense_props.mix,
+            last_dispense_push_out=True,
+        )
+        components_executor.retract_after_dispensing(
+            trash_location=trash_location,
+            source_location=source[0] if source else None,
+            source_well=source[1] if source else None,
+        )
+        return components_executor.tip_state.last_liquid_and_air_gap_in_tip
 
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""

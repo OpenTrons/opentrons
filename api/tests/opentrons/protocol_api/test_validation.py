@@ -830,43 +830,47 @@ def test_ensure_valid_flat_wells_list(decoy: Decoy) -> None:
     ) == [target1, target1, target2, target2]
 
 
-def test_ensure_valid_tip_drop_location_for_transfer_v2(
+def test_ensure_valid_trash_location_for_transfer_v2(
     decoy: Decoy,
 ) -> None:
-    """It should check that the tip drop location is valid."""
+    """It should check that the trash location is valid."""
     mock_well = decoy.mock(cls=Well)
     mock_location = Location(point=Point(x=1, y=1, z=1), labware=mock_well)
     mock_trash_bin = decoy.mock(cls=TrashBin)
     mock_waste_chute = decoy.mock(cls=WasteChute)
-    assert (
-        subject.ensure_valid_tip_drop_location_for_transfer_v2(mock_well) == mock_well
+    assert subject.ensure_valid_trash_location_for_transfer_v2(mock_well) == Location(
+        Point(0, 0, 0), labware=mock_well
     )
     assert (
-        subject.ensure_valid_tip_drop_location_for_transfer_v2(mock_location)
+        subject.ensure_valid_trash_location_for_transfer_v2(mock_location)
         == mock_location
     )
     assert (
-        subject.ensure_valid_tip_drop_location_for_transfer_v2(mock_trash_bin)
+        subject.ensure_valid_trash_location_for_transfer_v2(mock_trash_bin)
         == mock_trash_bin
     )
     assert (
-        subject.ensure_valid_tip_drop_location_for_transfer_v2(mock_waste_chute)
+        subject.ensure_valid_trash_location_for_transfer_v2(mock_waste_chute)
         == mock_waste_chute
     )
 
 
-def test_ensure_valid_tip_drop_location_for_transfer_v2_raises(decoy: Decoy) -> None:
-    """It should raise an error for invalid tip drop locations."""
+def test_ensure_valid_trash_location_for_transfer_v2_raises(decoy: Decoy) -> None:
+    """It should raise an error for invalid trash locations."""
     with pytest.raises(TypeError, match="However, it is '\\['a'\\]'"):
-        subject.ensure_valid_tip_drop_location_for_transfer_v2(["a"])  # type: ignore[arg-type]
+        subject.ensure_valid_trash_location_for_transfer_v2(
+            ["a"]  # type: ignore[arg-type]
+        )
 
     mock_labware = decoy.mock(cls=Labware)
     with pytest.raises(TypeError, match=f"However, it is '{mock_labware}'"):
-        subject.ensure_valid_tip_drop_location_for_transfer_v2(mock_labware)  # type: ignore[arg-type]
+        subject.ensure_valid_trash_location_for_transfer_v2(
+            mock_labware  # type: ignore[arg-type]
+        )
 
     with pytest.raises(
         TypeError, match="However, the given location doesn't refer to any well."
     ):
-        subject.ensure_valid_tip_drop_location_for_transfer_v2(
+        subject.ensure_valid_trash_location_for_transfer_v2(
             Location(point=Point(x=1, y=1, z=1), labware=None)
         )

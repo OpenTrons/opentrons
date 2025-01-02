@@ -30,6 +30,7 @@ from opentrons.types import (
     AxisType,
     AxisMapType,
     StringAxisMap,
+    Point,
 )
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -686,20 +687,18 @@ def ensure_valid_flat_wells_list_for_transfer_v2(
         )
 
 
-def ensure_valid_tip_drop_location_for_transfer_v2(
-    tip_drop_location: Union[Location, Well, TrashBin, WasteChute]
-) -> Union[Location, Well, TrashBin, WasteChute]:
-    """Ensure that the tip drop location is valid for v2 transfer."""
+def ensure_valid_trash_location_for_transfer_v2(
+    trash_location: Union[Location, Well, TrashBin, WasteChute]
+) -> Union[Location, TrashBin, WasteChute]:
+    """Ensure that the trash location is valid for v2 transfer."""
     from .labware import Well
 
-    if (
-        isinstance(tip_drop_location, Well)
-        or isinstance(tip_drop_location, TrashBin)
-        or isinstance(tip_drop_location, WasteChute)
-    ):
-        return tip_drop_location
-    elif isinstance(tip_drop_location, Location):
-        _, maybe_well = tip_drop_location.labware.get_parent_labware_and_well()
+    if isinstance(trash_location, TrashBin) or isinstance(trash_location, WasteChute):
+        return trash_location
+    elif isinstance(trash_location, Well):
+        return Location(Point(), labware=trash_location)
+    elif isinstance(trash_location, Location):
+        _, maybe_well = trash_location.labware.get_parent_labware_and_well()
 
         if maybe_well is None:
             raise TypeError(
@@ -709,11 +708,11 @@ def ensure_valid_tip_drop_location_for_transfer_v2(
                 " since that is where a tip is dropped."
                 " However, the given location doesn't refer to any well."
             )
-        return tip_drop_location
+        return trash_location
     else:
         raise TypeError(
             f"If specified, location should be an instance of"
             f" `types.Location` (e.g. the return value from `Well.top()`)"
             f" or `Well` (e.g. `reservoir.wells()[0]`) or an instance of `TrashBin` or `WasteChute`."
-            f" However, it is '{tip_drop_location}'."
+            f" However, it is '{trash_location}'."
         )

@@ -950,7 +950,7 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                     ),
                                 ),
                                 delay=DelayProperties(
-                                    enable=False, params=DelayParams(duration=0)
+                                    enable=True, params=DelayParams(duration=10)
                                 ),
                             ),
                             positionReference=PositionReference.WELL_BOTTOM,
