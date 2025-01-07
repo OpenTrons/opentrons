@@ -228,6 +228,8 @@ async def aspirate_in_place(
 
 async def aspirate_while_tracking(
     pipette_id: str,
+    labware_id: str,
+    well_name: str,
     volume: float,
     flow_rate: float,
     location_if_error: ErrorLocationInfo,
@@ -235,10 +237,12 @@ async def aspirate_while_tracking(
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
 ) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[OverpressureError]:
-    """Execute an aspirate in place microoperation."""
+    """Execute an aspirate while tracking microoperation."""
     try:
         volume_aspirated = await pipetting.aspirate_while_tracking(
             pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
             volume=volume,
             flow_rate=flow_rate,
             command_note_adder=command_note_adder,

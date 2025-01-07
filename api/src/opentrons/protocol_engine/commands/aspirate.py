@@ -175,6 +175,8 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
         if params.is_tracking:
             aspirate_result = await aspirate_while_tracking(
                 pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
                 volume=params.volume,
                 flow_rate=params.flowRate,
                 location_if_error={

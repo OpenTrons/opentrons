@@ -2967,16 +2967,19 @@ class OT3API(
     async def aspirate_while_tracking(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        distance: float,
-        rate: float,
-        volume: Optional[float] = None,
+        z_distance: float,
+        flow_rate: float,
+        volume: float,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette."""
         realmount = OT3Mount.from_mount(mount)
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
-            realmount, volume, rate
+            realmount, volume, flow_rate
         )
+        # what is aspirate_spec.volume for
+        aspirate_duration = volume / flow_rate
+        z_speed = z_distance / aspirate_duration
         if not aspirate_spec:
             return
 
@@ -2989,12 +2992,13 @@ class OT3API(
                     realmount, aspirate_spec.acceleration
                 )
                 await self._backend.aspirate_while_tracking(
-                    mount=mount,
-                    distance=distance,
-                    speed=rate,
+                    mount=realmount,
+                    z_distance=z_distance,
+                    z_speed=z_speed,
+                    plunger_distance=aspirate_spec.plunger_distance,
+                    plunger_speed=aspirate_spec.speed,
                     direction=-1,
-                    # have to actually determine duration here
-                    duration=0.0,
+                    duration=aspirate_duration,
                 )
         except Exception:
             self._log.exception("Aspirate failed")

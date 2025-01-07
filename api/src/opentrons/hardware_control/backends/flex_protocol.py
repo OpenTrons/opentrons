@@ -11,6 +11,8 @@ from typing import (
     Tuple,
     Set,
     TypeVar,
+    Literal,
+    Union,
 )
 from opentrons_shared_data.pipette.types import (
     PipetteName,
@@ -461,4 +463,16 @@ class FlexBackend(Protocol):
         ...
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
+        ...
+
+    async def aspirate_while_tracking(
+        self,
+        mount: OT3Mount,
+        z_distance: float,
+        z_speed: float,
+        plunger_distance: float,
+        plunger_speed: float,
+        direction: Union[Literal[1], Literal[-1]],
+        duration: float,
+    ) -> None:
         ...

@@ -727,8 +727,10 @@ class OT3Controller(FlexBackend):
     async def aspirate_while_tracking(
         self,
         mount: OT3Mount,
-        distance: float,
-        speed: float,
+        z_distance: float,
+        z_speed: float,
+        plunger_distance: float,
+        plunger_speed: float,
         direction: Union[Literal[1], Literal[-1]],
         duration: float,
     ) -> None:
@@ -739,8 +741,10 @@ class OT3Controller(FlexBackend):
                 messenger=self._messenger,
                 tool=tool,
                 head_node=head_node,
-                distance=distance,
-                speed=speed,
+                z_distance=z_distance,
+                z_speed=z_speed,
+                plunger_distance=plunger_distance,
+                plunger_speed=plunger_speed,
                 direction=direction,
                 duration=duration,
             )

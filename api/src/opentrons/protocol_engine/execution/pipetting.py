@@ -48,6 +48,8 @@ class PipettingHandler(TypingProtocol):
     async def aspirate_while_tracking(
         self,
         pipette_id: str,
+        labware_id: str,
+        well_name: str,
         volume: float,
         flow_rate: float,
         command_note_adder: CommandNoteAdder,
@@ -114,6 +116,7 @@ class HardwarePipettingHandler(PipettingHandler):
         volume: float,
         command_note_adder: CommandNoteAdder,
     ) -> Tuple[HardwarePipette, float]:
+        """Get params for hardware aspirate."""
         _adjusted_volume = _validate_aspirate_volume(
             state_view=self._state_view,
             pipette_id=pipette_id,
@@ -129,6 +132,8 @@ class HardwarePipettingHandler(PipettingHandler):
     async def aspirate_while_tracking(
         self,
         pipette_id: str,
+        labware_id: str,
+        well_name: str,
         volume: float,
         flow_rate: float,
         command_note_adder: CommandNoteAdder,
@@ -142,9 +147,18 @@ class HardwarePipettingHandler(PipettingHandler):
         hw_pipette, adjusted_volume = self.get_hw_aspirate_params(
             pipette_id, volume, command_note_adder
         )
+
+        aspirate_z_distance = self._state_view.geometry.get_liquid_handling_z_change(
+            labware_id=labware_id,
+            well_name=well_name,  # make sure the protocol engine actually has the well name atp ?
+            operation_volume=volume,
+        )
         with self._set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate_while_tracking(
-                mount=hw_pipette.mount, volume=adjusted_volume
+                mount=hw_pipette.mount,
+                z_distance=aspirate_z_distance,
+                flow_rate=flow_rate,
+                volume=adjusted_volume,
             )
 
         return adjusted_volume
@@ -345,6 +359,18 @@ class VirtualPipettingHandler(PipettingHandler):
             raise TipNotAttachedError(
                 f"Cannot perform {command_name} without a tip attached"
             )
+
+    async def aspirate_while_tracking(
+        self,
+        pipette_id: str,
+        labware_id: str,
+        well_name: str,
+        volume: float,
+        flow_rate: float,
+        command_note_adder: CommandNoteAdder,
+    ) -> float:
+        """Aspirate while moving the z stage with the liquid meniscus."""
+        return 0.0
 
 
 def create_pipetting_handler(

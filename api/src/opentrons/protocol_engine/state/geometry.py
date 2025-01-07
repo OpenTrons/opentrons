@@ -1406,6 +1406,25 @@ class GeometryView:
 
         return None
 
+    def get_liquid_handling_z_change(
+        self,
+        labware_id: str,
+        well_name: str,
+        operation_volume: float,
+    ) -> float:
+        """Get the change in height from a liquid handling operation."""
+        initial_handling_height = self.get_meniscus_height(
+            labware_id=labware_id, well_name=well_name
+        )
+        final_height = self.get_well_height_after_volume(
+            labware_id=labware_id,
+            well_name=well_name,
+            initial_height=initial_handling_height,
+            volume=operation_volume,
+        )
+        # make sure we handle aspirate and dispense both directions
+        return initial_handling_height - final_height
+
     def get_well_offset_adjustment(
         self,
         labware_id: str,
