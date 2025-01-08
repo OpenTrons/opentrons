@@ -1,6 +1,11 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
-import { ALL, COLUMN, getWellNamePerMultiTip } from '@opentrons/shared-data'
+import {
+  ALL,
+  COLUMN,
+  SINGLE,
+  getWellNamePerMultiTip,
+} from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
@@ -30,12 +35,18 @@ function _wellsForPipette(
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if (pipChannels === 8 || pipChannels === 96) {
     let channels: 8 | 96 = pipChannels
-    if (nozzles === ALL) {
+    if (nozzles === ALL && pipChannels === 8) {
       channels = 96
-    } else if (nozzles === COLUMN || pipChannels === 8) {
+    } else if (
+      (nozzles === COLUMN && pipChannels === 96) ||
+      //  note: backwards logic here to consider the current partial tip ff
+      //  can clean this up with pipChannels === 8 && nozzles === COLUMN
+      //  when single tip pick up is supported
+      (pipChannels === 8 && nozzles !== SINGLE)
+    ) {
       channels = 8
     } else {
-      console.error(`we don't support other 96-channel configurations yet`)
+      console.error(`we don't support other partial tip configurations yet`)
     }
     return wells.reduce((acc: string[], well: string) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(
