@@ -2,16 +2,11 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
-import {
-  Flex,
-  DropdownMenu,
-  SPACING,
-  DropdownOption,
-} from '@opentrons/components'
+import { Flex, DropdownMenu, SPACING } from '@opentrons/components'
 import { getEnablePartialTipSupport } from '../../../../../feature-flags/selectors'
 import { getInitialDeckSetup } from '../../../../../step-forms/selectors'
 import type { PipetteV2Specs } from '@opentrons/shared-data'
-
+import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../types'
 
 interface PartialTipFieldProps extends FieldProps {
@@ -39,7 +34,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
   )
   const noTipracksOnAdapter = tipracksNotOnAdapter.length === 0
 
-  let options: DropdownOption[] = [
+  const options: DropdownOption[] = [
     {
       name: t('all'),
       value: ALL,

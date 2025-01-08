@@ -33,16 +33,13 @@ function _wellsForPipette(
   const pipChannels = pipetteEntity.spec.channels
 
   // `wells` is all the wells that pipette's channel 1 interacts with.
-  if (pipChannels === 8 || pipChannels === 96) {
+  if ((pipChannels === 8 || pipChannels === 96) && nozzles !== SINGLE) {
     let channels: 8 | 96 = pipChannels
     if (nozzles === ALL && pipChannels === 8) {
       channels = 96
     } else if (
       (nozzles === COLUMN && pipChannels === 96) ||
-      //  note: backwards logic here to consider the current partial tip ff
-      //  can clean this up with pipChannels === 8 && nozzles === COLUMN
-      //  when single tip pick up is supported
-      (pipChannels === 8 && nozzles !== SINGLE)
+      pipChannels === 8
     ) {
       channels = 8
     } else {
@@ -131,12 +128,12 @@ function _getSelectedWellsForStep(
         stepArgs.commandCreatorFnName === 'mix' ||
         stepArgs.commandCreatorFnName === 'transfer'
       ) {
-        if (stepArgs.nozzles === ALL) {
+        if (stepArgs.nozzles === ALL && pipetteSpec.channels === 96) {
           channels = 96
         } else if (stepArgs.nozzles === COLUMN) {
           channels = 8
-        } else {
-          channels = pipetteSpec.channels
+        } else if (nozzles !== SINGLE && pipetteSpec.channels === 8) {
+          channels = 8
         }
       }
       const commandWellName = c.params.wellName
@@ -235,33 +232,45 @@ function _getSelectedWellsForSubstep(
     let tipWellSet: string[] = []
     if ('pipette' in stepArgs) {
       if (substeps.multichannel) {
-        const { activeTips } = substeps.multiRows[substepIndex][0]
-        const pipChannels =
-          invariantContext.pipetteEntities[stepArgs.pipette].spec.channels
-        let channels = pipChannels
-        if ('nozzles' in stepArgs) {
-          if (stepArgs.nozzles === ALL) {
+        if ('nozzles' in stepArgs && stepArgs.nozzles !== SINGLE) {
+          const { activeTips } = substeps.multiRows[substepIndex][0]
+          const pipChannels =
+            invariantContext.pipetteEntities[stepArgs.pipette].spec.channels
+          let channels = pipChannels
+          if (stepArgs.nozzles === ALL && pipChannels === 96) {
             channels = 96
-          } else if (stepArgs.nozzles === COLUMN) {
+          } else if (
+            (stepArgs.nozzles === COLUMN && pipChannels === 96) ||
+            pipChannels === 8
+          ) {
             channels = 8
           } else {
             console.error(
-              `we don't support other 96-channel configurations yet`
+              `we don't support other partial tip configurations yet`
             )
           }
-        }
-        // just use first multi row
-        if (
-          activeTips &&
-          activeTips.labwareId === labwareId &&
-          channels !== 1
-        ) {
-          const multiTipWellSet = getWellSetForMultichannel({
-            labwareDef: invariantContext.labwareEntities[labwareId].def,
-            wellName: activeTips.wellName,
-            channels,
-          })
-          if (multiTipWellSet) tipWellSet = multiTipWellSet
+          // just use first multi row
+          if (
+            activeTips &&
+            activeTips.labwareId === labwareId &&
+            channels !== 1
+          ) {
+            const multiTipWellSet = getWellSetForMultichannel({
+              labwareDef: invariantContext.labwareEntities[labwareId].def,
+              wellName: activeTips.wellName,
+              channels,
+            })
+            if (multiTipWellSet) tipWellSet = multiTipWellSet
+          }
+        } else {
+          // single-nozzle pick up
+          const { activeTips } = substeps.multiRows[substepIndex][0]
+          if (
+            activeTips &&
+            activeTips.labwareId === labwareId &&
+            activeTips.wellName
+          )
+            tipWellSet = [activeTips.wellName]
         }
       } else {
         // single-channel
