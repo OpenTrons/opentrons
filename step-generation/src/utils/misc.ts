@@ -298,7 +298,7 @@ export function getWellsForTips(
   // Array of wells corresponding to the tip at each position.
   const wellsForTips =
     channels === 1 ? [well] : getWellNamePerMultiTip(labwareDef, well, channels)
-  console.log('channels from getWellsForTips', channels)
+
   if (!wellsForTips) {
     console.warn(
       channels === 1

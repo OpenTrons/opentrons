@@ -78,7 +78,7 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
   wellTargetPoint: Point,
-  primaryNozzle: string // hardcoding A12 becasue only column pick up supported currently
+  primaryNozzle: string
 ): Point[] => {
   const {
     nozzleMap,

@@ -6,7 +6,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
+import { SINGLE } from '@opentrons/shared-data'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
   getDisabledFields,
@@ -233,12 +233,8 @@ export const getNozzleType = (
   const is8Channel = pipette != null && pipette.spec.channels === 8
   if (is8Channel && nozzles !== SINGLE) {
     return '8-channel'
-  } else if (nozzles === COLUMN) {
-    return COLUMN
-  } else if (nozzles === ALL) {
-    return ALL
-  } else if (nozzles === SINGLE) {
-    return SINGLE
+  } else if (nozzles != null) {
+    return nozzles as NozzleType
   } else {
     return null
   }
