@@ -24,7 +24,6 @@ from typing import (
     KeysView,
     Union,
     Mapping,
-    Literal,
 )
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import gripper_config
@@ -168,7 +167,6 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     liquid_probe,
     check_overpressure,
     grab_pressure,
-    move_plunger_while_tracking_z,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -721,36 +719,6 @@ class OT3Controller(FlexBackend):
             ),
             True,
         )
-
-    @requires_update
-    @requires_estop
-    async def aspirate_while_tracking(
-        self,
-        mount: OT3Mount,
-        z_distance: float,
-        z_speed: float,
-        plunger_distance: float,
-        plunger_speed: float,
-        direction: Union[Literal[1], Literal[-1]],
-        duration: float,
-    ) -> None:
-        head_node = axis_to_node(Axis.by_mount(mount))
-        tool = sensor_node_for_pipette(OT3Mount(mount.value))
-        async with self._monitor_overpressure([tool]):
-            positions = await move_plunger_while_tracking_z(
-                messenger=self._messenger,
-                tool=tool,
-                head_node=head_node,
-                z_distance=z_distance,
-                z_speed=z_speed,
-                plunger_distance=plunger_distance,
-                plunger_speed=plunger_speed,
-                direction=direction,
-                duration=duration,
-            )
-        for node, point in positions.items():
-            self._position.update({node: point.motor_position})
-            self._encoder_position.update({node: point.encoder_position})
 
     @requires_update
     @requires_estop

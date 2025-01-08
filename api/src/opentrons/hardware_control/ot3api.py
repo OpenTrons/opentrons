@@ -126,6 +126,7 @@ from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
     target_position_from_plunger,
+    target_positions_from_plunger_tracking,
     offset_for_mount,
     deck_from_machine,
     machine_from_deck,
@@ -2977,11 +2978,15 @@ class OT3API(
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
             realmount, volume, flow_rate
         )
-        # what is aspirate_spec.volume for
-        aspirate_duration = volume / flow_rate
-        z_speed = z_distance / aspirate_duration
         if not aspirate_spec:
             return
+
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            aspirate_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
 
         try:
             await self._backend.set_active_current(
@@ -2991,14 +2996,10 @@ class OT3API(
                 await self.set_system_constraints_for_plunger_acceleration(
                     realmount, aspirate_spec.acceleration
                 )
-                await self._backend.aspirate_while_tracking(
-                    mount=realmount,
-                    z_distance=z_distance,
-                    z_speed=z_speed,
-                    plunger_distance=aspirate_spec.plunger_distance,
-                    plunger_speed=aspirate_spec.speed,
-                    direction=-1,
-                    duration=aspirate_duration,
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
                 )
         except Exception:
             self._log.exception("Aspirate failed")

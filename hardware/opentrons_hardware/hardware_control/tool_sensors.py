@@ -259,35 +259,6 @@ async def finalize_logs(
         await listener.wait_for_complete()
 
 
-async def move_plunger_while_tracking_z(
-    messenger: CanMessenger,
-    tool: PipetteProbeTarget,
-    head_node: NodeId,
-    z_distance: float,
-    z_speed: float,
-    plunger_distance: float,
-    plunger_speed: float,
-    direction: Union[Literal[1], Literal[-1]],
-    duration: float,
-) -> Dict[NodeId, MotorPositionStatus]:
-    liquid_action_step = create_step(
-        distance={
-            tool: float64(abs(plunger_distance) * direction),
-            head_node: float64(abs(z_distance) * direction)
-        },
-        velocity={
-            tool: float64(abs(plunger_speed) * direction),
-            head_node: float64(abs(z_speed) * direction)
-        },
-        acceleration={},
-        duration=float64(duration),
-        present_nodes=[tool],
-    )
-    runner = MoveGroupRunner(move_groups=[[liquid_action_step]])
-    positions = await runner.run(can_messenger=messenger)
-    return positions
-
-
 async def liquid_probe(
     messenger: CanMessenger,
     tool: PipetteProbeTarget,
