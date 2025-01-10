@@ -223,6 +223,12 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         self._state_view.labware.raise_if_labware_has_labware_on_top(
             labware_id=params.labwareId
         )
+
+        if isinstance(available_new_location, DeckSlotLocation):
+            self._state_view.labware.raise_if_labware_cannot_be_ondeck(
+                labware_id=params.labwareId
+            )
+
         if isinstance(available_new_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_has_labware_on_top(
                 available_new_location.labwareId

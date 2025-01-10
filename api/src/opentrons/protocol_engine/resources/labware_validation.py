@@ -44,6 +44,14 @@ def validate_labware_can_be_stacked(
     return below_labware_load_name in top_labware_definition.stackingOffsetWithLabware
 
 
+def validate_labware_can_be_ondeck(definition: LabwareDefinition) -> bool:
+    """Validate that the labware being loaded onto the deck can sit in a slot."""
+    return (
+        definition.parameters.quirks is None
+        or "stackingOnly" not in definition.parameters.quirks
+    )
+
+
 def validate_gripper_compatible(definition: LabwareDefinition) -> bool:
     """Validate that the labware definition does not have a quirk disallowing movement with gripper."""
     return (

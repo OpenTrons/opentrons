@@ -140,6 +140,9 @@ class LoadLabwareImplementation(
             )
             state_update.set_addressable_area_used(area_name)
         elif isinstance(params.location, DeckSlotLocation):
+            self._state_view.labware.raise_if_labware_cannot_be_ondeck(
+                labware_id=params.labwareId
+            )
             self._state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
                 params.location.slotName.id
             )
