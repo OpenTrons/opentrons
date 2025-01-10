@@ -58,7 +58,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     for t, d in PIPETTE_TESTS.items():
         for m in ["left", "right"]:
             tests.append(CSVLine(f"{m}-{t}", d))  # type: ignore[arg-type]
-    for t, d in GRIPPER_TESTS.items():
+    for t, d in GRIPPER_TESTS.items():  # type: ignore[assignment]
         tests.append(CSVLine(f"gripper-{t}", d))  # type: ignore[arg-type]
     return tests
 

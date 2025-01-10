@@ -1,4 +1,5 @@
 {
+  "commandAnnotations": [],
   "commands": [
     {
       "commandType": "home",
@@ -41584,6 +41585,7 @@
       "location": "offDeck"
     }
   ],
+  "liquidClasses": [],
   "liquids": [
     {
       "description": "Bacterial culture medium (e.g., LB broth)",

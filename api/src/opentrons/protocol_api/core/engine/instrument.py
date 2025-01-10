@@ -1,13 +1,14 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
+
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING, cast, Union
-from opentrons.protocols.api_support.types import APIVersion
-
-from opentrons.types import Location, Mount
+from typing import Optional, TYPE_CHECKING, cast, Union, List
+from opentrons.types import Location, Mount, NozzleConfigurationType, NozzleMapInterface
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine import (
     DeckPoint,
@@ -26,24 +27,25 @@ from opentrons.protocol_engine.types import (
     PRIMARY_NOZZLE_LITERAL,
     NozzleLayoutConfigurationType,
     AddressableOffsetVector,
+    LiquidClassRecord,
 )
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons_shared_data.errors.exceptions import (
+    UnsupportedHardwareCommand,
+)
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
-from opentrons.hardware_control.nozzle_manager import NozzleMap
 from . import overlap_versions, pipette_movement_conflict
 
-from ..instrument import AbstractInstrument
 from .well import WellCore
-
+from ..instrument import AbstractInstrument
 from ...disposal_locations import TrashBin, WasteChute
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
-
+    from opentrons.protocol_api._liquid import LiquidClass
 
 _DISPENSE_VOLUME_VALIDATION_ADDED_IN = APIVersion(2, 17)
 
@@ -86,6 +88,13 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._liquid_presence_detection = bool(
             self._engine_client.state.pipettes.get_liquid_presence_detection(pipette_id)
         )
+        if (
+            self._liquid_presence_detection
+            and not self._pressure_supported_by_pipette()
+        ):
+            raise UnsupportedHardwareCommand(
+                "Pressure sensor not available for this pipette"
+            )
 
     @property
     def pipette_id(self) -> str:
@@ -102,6 +111,19 @@ class InstrumentCore(AbstractInstrument[WellCore]):
     def set_default_speed(self, speed: float) -> None:
         self._engine_client.set_pipette_movement_speed(
             pipette_id=self._pipette_id, speed=speed
+        )
+
+    def air_gap_in_place(self, volume: float, flow_rate: float) -> None:
+        """Aspirate a given volume of air from the current location of the pipette.
+
+        Args:
+            volume: The volume of air to aspirate, in microliters.
+            folw_rate: The flow rate of air into the pipette, in microliters/s
+        """
+        self._engine_client.execute_command(
+            cmd.AirGapInPlaceParams(
+                pipetteId=self._pipette_id, volume=volume, flowRate=flow_rate
+            )
         )
 
     def aspirate(
@@ -724,7 +746,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             self._pipette_id
         )
 
-    def get_nozzle_map(self) -> NozzleMap:
+    def get_nozzle_map(self) -> NozzleMapInterface:
         return self._engine_client.state.tips.get_pipette_nozzle_map(self._pipette_id)
 
     def has_tip(self) -> bool:
@@ -842,10 +864,54 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             )
         )
 
+    def load_liquid_class(
+        self,
+        liquid_class: LiquidClass,
+        pipette_load_name: str,
+        tiprack_uri: str,
+    ) -> str:
+        """Load a liquid class into the engine and return its ID."""
+        transfer_props = liquid_class.get_for(
+            pipette=pipette_load_name, tiprack=tiprack_uri
+        )
+
+        liquid_class_record = LiquidClassRecord(
+            liquidClassName=liquid_class.name,
+            pipetteModel=self.get_model(),  # TODO: verify this is the correct 'model' to use
+            tiprack=tiprack_uri,
+            aspirate=transfer_props.aspirate.as_shared_data_model(),
+            singleDispense=transfer_props.dispense.as_shared_data_model(),
+            multiDispense=transfer_props.multi_dispense.as_shared_data_model()
+            if transfer_props.multi_dispense
+            else None,
+        )
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.LoadLiquidClassParams(
+                liquidClassRecord=liquid_class_record,
+            )
+        )
+        return result.liquidClassId
+
+    def transfer_liquid(
+        self,
+        liquid_class_id: str,
+        volume: float,
+        source: List[WellCore],
+        dest: List[WellCore],
+        new_tip: TransferTipPolicyV2,
+        trash_location: Union[WellCore, Location, TrashBin, WasteChute],
+    ) -> None:
+        """Execute transfer using liquid class properties."""
+
     def retract(self) -> None:
         """Retract this instrument to the top of the gantry."""
         z_axis = self._engine_client.state.pipettes.get_z_axis(self._pipette_id)
         self._engine_client.execute_command(cmd.HomeParams(axes=[z_axis]))
+
+    def _pressure_supported_by_pipette(self) -> bool:
+        return self._engine_client.state.pipettes.get_pipette_supports_pressure(
+            self.pipette_id
+        )
 
     def detect_liquid_presence(self, well_core: WellCore, loc: Location) -> bool:
         labware_id = well_core.labware_id
@@ -922,3 +988,9 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
 
         return result.z_position
+
+    def nozzle_configuration_valid_for_lld(self) -> bool:
+        """Check if the nozzle configuration currently supports LLD."""
+        return self._engine_client.state.pipettes.get_nozzle_configuration_supports_lld(
+            self.pipette_id
+        )

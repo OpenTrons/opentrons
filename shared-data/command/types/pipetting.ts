@@ -20,6 +20,7 @@ export type PipettingRunTimeCommand =
   | VerifyTipPresenceRunTimeCommand
   | LiquidProbeRunTimeCommand
   | TryLiquidProbeRunTimeCommand
+  | AirGapInPlaceRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -39,6 +40,7 @@ export type PipettingCreateCommand =
   | VerifyTipPresenceCreateCommand
   | LiquidProbeCreateCommand
   | TryLiquidProbeCreateCommand
+  | AirGapInPlaceCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -55,6 +57,22 @@ export interface ConfigureForVolumeRunTimeCommand
     ConfigureForVolumeCreateCommand {
   result?: BasicLiquidHandlingResult
 }
+
+export type AirGapInPlaceParams = FlowRateParams &
+  PipetteIdentityParams &
+  VolumeParams
+
+export interface AirGapInPlaceCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'airGapInPlace'
+  params: AirGapInPlaceParams
+}
+
+export interface AirGapInPlaceRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    AirGapInPlaceCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
+
 export interface AspirateCreateCommand extends CommonCommandCreateInfo {
   commandType: 'aspirate'
   params: AspDispAirgapParams

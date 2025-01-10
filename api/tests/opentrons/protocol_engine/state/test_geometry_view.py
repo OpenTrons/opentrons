@@ -1,4 +1,5 @@
 """Test state getters for retrieving geometry views of state."""
+
 import inspect
 import json
 from datetime import datetime
@@ -99,6 +100,14 @@ from ..pipette_fixtures import get_default_nozzle_map
 from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
 from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
 from ...protocol_runner.test_json_translator import _load_labware_definition_data
+
+
+@pytest.fixture
+def available_sensors() -> pipette_definition.AvailableSensorDefinition:
+    """Provide a list of sensors."""
+    return pipette_definition.AvailableSensorDefinition(
+        sensors=["pressure", "capacitive", "environment"]
+    )
 
 
 @pytest.fixture
@@ -249,7 +258,7 @@ def addressable_area_view(
 @pytest.fixture
 def nice_labware_definition() -> LabwareDefinition:
     """Load a nice labware def that won't blow up your terminal."""
-    return LabwareDefinition.parse_obj(
+    return LabwareDefinition.model_validate(
         json.loads(
             load_shared_data("labware/fixtures/2/fixture_12_trough_v2.json").decode(
                 "utf-8"
@@ -261,7 +270,7 @@ def nice_labware_definition() -> LabwareDefinition:
 @pytest.fixture
 def nice_adapter_definition() -> LabwareDefinition:
     """Load a friendly adapter definition."""
-    return LabwareDefinition.parse_obj(
+    return LabwareDefinition.model_validate(
         json.loads(
             load_shared_data(
                 "labware/definitions/2/opentrons_aluminum_flat_bottom_plate/1.json"
@@ -841,8 +850,8 @@ def test_get_all_obstacle_highest_z_with_modules(
     subject: GeometryView,
 ) -> None:
     """It should get the highest Z including modules."""
-    module_1 = LoadedModule.construct(id="module-id-1")  # type: ignore[call-arg]
-    module_2 = LoadedModule.construct(id="module-id-2")  # type: ignore[call-arg]
+    module_1 = LoadedModule.model_construct(id="module-id-1")  # type: ignore[call-arg]
+    module_2 = LoadedModule.model_construct(id="module-id-2")  # type: ignore[call-arg]
 
     decoy.when(mock_labware_view.get_all()).then_return([])
     decoy.when(mock_addressable_area_view.get_all()).then_return([])
@@ -931,7 +940,7 @@ def test_get_highest_z_in_slot_with_single_module(
 ) -> None:
     """It should get the highest Z in slot with just a single module."""
     # Case: Slot has a module that doesn't have any labware on it. Highest z is equal to module height.
-    module_in_slot = LoadedModule.construct(
+    module_in_slot = LoadedModule.model_construct(
         id="only-module",
         model=ModuleModel.THERMOCYCLER_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
@@ -1086,7 +1095,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         location=ModuleLocation(moduleId="module-id"),
         offsetId="offset-id2",
     )
-    module_on_slot = LoadedModule.construct(
+    module_on_slot = LoadedModule.model_construct(
         id="module-id",
         model=ModuleModel.THERMOCYCLER_MODULE_V2,
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
@@ -1974,7 +1983,7 @@ def test_get_relative_well_location(
 
     assert result == WellLocation(
         origin=WellOrigin.TOP,
-        offset=WellOffset.construct(
+        offset=WellOffset.model_construct(
             x=cast(float, pytest.approx(7)),
             y=cast(float, pytest.approx(8)),
             z=cast(float, pytest.approx(9)),
@@ -1999,7 +2008,7 @@ def test_get_relative_liquid_handling_well_location(
 
     assert result == LiquidHandlingWellLocation(
         origin=WellOrigin.MENISCUS,
-        offset=WellOffset.construct(
+        offset=WellOffset.model_construct(
             x=0.0,
             y=0.0,
             z=cast(float, pytest.approx(-2)),
@@ -2449,8 +2458,8 @@ def test_get_slot_item(
     subject: GeometryView,
 ) -> None:
     """It should get items in certain slots."""
-    labware = LoadedLabware.construct(id="cool-labware")  # type: ignore[call-arg]
-    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+    labware = LoadedLabware.model_construct(id="cool-labware")  # type: ignore[call-arg]
+    module = LoadedModule.model_construct(id="cool-module")  # type: ignore[call-arg]
 
     decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
     decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(labware)
@@ -2477,7 +2486,7 @@ def test_get_slot_item_that_is_overflowed_module(
     subject: GeometryView,
 ) -> None:
     """It should return the module that occupies the slot, even if not loaded on it."""
-    module = LoadedModule.construct(id="cool-module")  # type: ignore[call-arg]
+    module = LoadedModule.model_construct(id="cool-module")  # type: ignore[call-arg]
     decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
     decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
     decoy.when(
@@ -2575,6 +2584,7 @@ def test_get_next_drop_tip_location(
     pipette_mount: MountType,
     expected_locations: List[DropTipWellLocation],
     supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+    available_sensors: pipette_definition.AvailableSensorDefinition,
 ) -> None:
     """It should provide the next location to drop tips into within a labware."""
     decoy.when(mock_labware_view.is_fixed_trash(labware_id="abc")).then_return(True)
@@ -2611,6 +2621,14 @@ def test_get_next_drop_tip_location(
                 back_right_corner=Point(x=40, y=20, z=60),
             ),
             lld_settings={},
+            plunger_positions={
+                "top": 0.0,
+                "bottom": 5.0,
+                "blow_out": 19.0,
+                "drop_tip": 20.0,
+            },
+            shaft_ul_per_mm=5.0,
+            available_sensors=available_sensors,
         )
     )
     decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)
@@ -2884,19 +2902,19 @@ def test_check_gripper_labware_tip_collision(
         )
     )
 
-    definition = LabwareDefinition.construct(  # type: ignore[call-arg]
+    definition = LabwareDefinition.model_construct(  # type: ignore[call-arg]
         namespace="hello",
-        dimensions=LabwareDimensions.construct(
+        dimensions=LabwareDimensions.model_construct(
             yDimension=1, zDimension=2, xDimension=3
         ),
         version=1,
-        parameters=LabwareDefinitionParameters.construct(
+        parameters=LabwareDefinitionParameters.model_construct(
             format="96Standard",
             loadName="labware-id",
             isTiprack=True,
             isMagneticModuleCompatible=False,
         ),
-        cornerOffsetFromSlot=CornerOffsetFromSlot.construct(x=1, y=2, z=3),
+        cornerOffsetFromSlot=CornerOffsetFromSlot.model_construct(x=1, y=2, z=3),
         ordering=[],
     )
 

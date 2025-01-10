@@ -209,6 +209,10 @@ export const getPipettingCommandText = ({
       const { flowRate, volume } = command.params
       return t('aspirate_in_place', { volume, flow_rate: flowRate })
     }
+    case 'airGapInPlace': {
+      const { volume } = command.params
+      return t('air_gap_in_place', { volume })
+    }
     default: {
       console.warn(
         'PipettingCommandText encountered a command with an unrecognized commandType: ',

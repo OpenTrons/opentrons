@@ -112,7 +112,7 @@ import opentronsFlex96Tiprack50UlV1Uncasted from '../labware/definitions/2/opent
 import opentronsFlex96TiprackAdapterV1Uncasted from '../labware/definitions/2/opentrons_flex_96_tiprack_adapter/1.json'
 import opentronsFlexDeckRiserV1Uncasted from '../labware/definitions/2/opentrons_flex_deck_riser/1.json'
 import opentronsFlexLidAbsorbancePlateReaderModuleV1Uncasted from '../labware/definitions/2/opentrons_flex_lid_absorbance_plate_reader_module/1.json'
-import opentronsToughPcrAutoSealingLidV1Uncasted from '../labware/definitions/2/opentrons_tough_pcr_auto_sealing_lid/1.json'
+import opentronsToughPcrAutoSealingLidV1Uncasted from '../labware/definitions/3/opentrons_tough_pcr_auto_sealing_lid/1.json'
 import opentronsUniversalFlatAdapterV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter/1.json'
 import opentronsUniversalFlatAdapterCorning384Wellplate112UlFlatV1Uncasted from '../labware/definitions/2/opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json'
 import opentrons96DeepWellTempModAdapterV1Uncasted from '../labware/definitions/2/opentrons_96_deep_well_temp_mod_adapter/1.json'

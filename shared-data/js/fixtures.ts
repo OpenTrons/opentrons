@@ -238,7 +238,7 @@ export function getAddressableAreaNamesFromLoadedModule(
     return [...acc, ...providedAddressableAreas]
   }, [])
 }
-
+// note: we've decided not to translate these strings
 export function getFixtureDisplayName(
   cutoutFixtureId: CutoutFixtureId | null,
   usbPortNumber?: number
@@ -295,7 +295,7 @@ export function getFixtureDisplayName(
   }
 }
 
-const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
+export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_1,
   ADDRESSABLE_AREA_2,
   ADDRESSABLE_AREA_3,
@@ -309,7 +309,7 @@ const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_11,
 ]
 
-const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
+export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
   A3_ADDRESSABLE_AREA,

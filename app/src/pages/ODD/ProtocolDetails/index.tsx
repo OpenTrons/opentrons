@@ -46,7 +46,7 @@ import {
   getPinnedProtocolIds,
   updateConfigValue,
 } from '/app/redux/config'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useRunTimeParameters } from '/app/resources/protocols'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'

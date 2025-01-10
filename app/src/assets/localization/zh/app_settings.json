@@ -1,8 +1,7 @@
 {
   "__dev_internal__enableLabwareCreator": "启用应用实验耗材创建器",
-  "__dev_internal__enableLocalization": "Enable App Localization",
-  "__dev_internal__forceHttpPolling": "强制轮询所有网络请求，而不是使用MQTT",
   "__dev_internal__enableRunNotes": "在协议运行期间显示备注",
+  "__dev_internal__forceHttpPolling": "强制轮询所有网络请求，而不是使用MQTT",
   "__dev_internal__protocolStats": "协议统计",
   "__dev_internal__protocolTimeline": "协议时间线",
   "add_folder_button": "添加实验耗材源文件夹",

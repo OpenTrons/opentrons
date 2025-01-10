@@ -220,28 +220,40 @@ def _get_segment_capacity(segment: WellSegment) -> float:
     section_height = segment.topHeight - segment.bottomHeight
     match segment:
         case SphericalSegment():
-            return _volume_from_height_spherical(
-                target_height=segment.topHeight,
-                radius_of_curvature=segment.radiusOfCurvature,
+            return (
+                _volume_from_height_spherical(
+                    target_height=segment.topHeight,
+                    radius_of_curvature=segment.radiusOfCurvature,
+                )
+                * segment.count
             )
         case CuboidalFrustum():
-            return _volume_from_height_rectangular(
-                target_height=section_height,
-                bottom_length=segment.bottomYDimension,
-                bottom_width=segment.bottomXDimension,
-                top_length=segment.topYDimension,
-                top_width=segment.topXDimension,
-                total_frustum_height=section_height,
+            return (
+                _volume_from_height_rectangular(
+                    target_height=section_height,
+                    bottom_length=segment.bottomYDimension,
+                    bottom_width=segment.bottomXDimension,
+                    top_length=segment.topYDimension,
+                    top_width=segment.topXDimension,
+                    total_frustum_height=section_height,
+                )
+                * segment.count
             )
         case ConicalFrustum():
-            return _volume_from_height_circular(
-                target_height=section_height,
-                total_frustum_height=section_height,
-                bottom_radius=(segment.bottomDiameter / 2),
-                top_radius=(segment.topDiameter / 2),
+            return (
+                _volume_from_height_circular(
+                    target_height=section_height,
+                    total_frustum_height=section_height,
+                    bottom_radius=(segment.bottomDiameter / 2),
+                    top_radius=(segment.topDiameter / 2),
+                )
+                * segment.count
             )
         case SquaredConeSegment():
-            return _volume_from_height_squared_cone(section_height, segment)
+            return (
+                _volume_from_height_squared_cone(section_height, segment)
+                * segment.count
+            )
         case _:
             # TODO: implement volume calculations for truncated circular and rounded rectangular segments
             raise NotImplementedError(
@@ -272,6 +284,7 @@ def height_at_volume_within_section(
     section_height: float,
 ) -> float:
     """Calculate a height within a bounded section according to geometry."""
+    target_volume_relative = target_volume_relative / section.count
     match section:
         case SphericalSegment():
             return _height_from_volume_spherical(
@@ -311,28 +324,40 @@ def volume_at_height_within_section(
     """Calculate a volume within a bounded section according to geometry."""
     match section:
         case SphericalSegment():
-            return _volume_from_height_spherical(
-                target_height=target_height_relative,
-                radius_of_curvature=section.radiusOfCurvature,
+            return (
+                _volume_from_height_spherical(
+                    target_height=target_height_relative,
+                    radius_of_curvature=section.radiusOfCurvature,
+                )
+                * section.count
             )
         case ConicalFrustum():
-            return _volume_from_height_circular(
-                target_height=target_height_relative,
-                total_frustum_height=section_height,
-                bottom_radius=(section.bottomDiameter / 2),
-                top_radius=(section.topDiameter / 2),
+            return (
+                _volume_from_height_circular(
+                    target_height=target_height_relative,
+                    total_frustum_height=section_height,
+                    bottom_radius=(section.bottomDiameter / 2),
+                    top_radius=(section.topDiameter / 2),
+                )
+                * section.count
             )
         case CuboidalFrustum():
-            return _volume_from_height_rectangular(
-                target_height=target_height_relative,
-                total_frustum_height=section_height,
-                bottom_width=section.bottomXDimension,
-                bottom_length=section.bottomYDimension,
-                top_width=section.topXDimension,
-                top_length=section.topYDimension,
+            return (
+                _volume_from_height_rectangular(
+                    target_height=target_height_relative,
+                    total_frustum_height=section_height,
+                    bottom_width=section.bottomXDimension,
+                    bottom_length=section.bottomYDimension,
+                    top_width=section.topXDimension,
+                    top_length=section.topYDimension,
+                )
+                * section.count
             )
         case SquaredConeSegment():
-            return _volume_from_height_squared_cone(target_height_relative, section)
+            return (
+                _volume_from_height_squared_cone(target_height_relative, section)
+                * section.count
+            )
         case _:
             # TODO(cm): this would be the NEST-96 2uL wells referenced in EXEC-712
             # we need to input the math attached to that issue

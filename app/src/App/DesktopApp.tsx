@@ -1,7 +1,7 @@
 import { useState, Fragment } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
-
 import {
   Box,
   COLORS,
@@ -38,68 +38,87 @@ import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { ProtocolTimeline } from '/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { DesktopAppFallback } from './DesktopAppFallback'
+import { ReactQueryDevtools } from './tools'
+import { useFeatureFlag } from '../redux/config'
 
 import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
+  const { t } = useTranslation('top_navigation')
   useSoftwareUpdatePoll()
   const [
     isEmergencyStopModalDismissed,
     setIsEmergencyStopModalDismissed,
   ] = useState<boolean>(false)
 
+  // note for react-scan
+  const enableReactScan = useFeatureFlag('reactScan')
+  // Dynamically import `react-scan` to avoid build errors
+  if (typeof window !== 'undefined' && enableReactScan) {
+    import('react-scan')
+      .then(({ scan }) => {
+        scan({
+          enabled: enableReactScan,
+          log: true,
+        })
+      })
+      .catch(error => {
+        console.error('Failed to load react-scan:', error)
+      })
+  }
+
   const desktopRoutes: RouteProps[] = [
     {
       Component: ProtocolsLanding,
-      name: 'protocols',
+      name: t('protocols'),
       navLinkTo: '/protocols',
       path: '/protocols',
     },
     {
       Component: ProtocolDetails,
-      name: 'Protocol Details',
+      name: t('protocol_details'),
       path: '/protocols/:protocolKey',
     },
     {
       Component: ProtocolTimeline,
-      name: 'Protocol Timeline',
+      name: t('protocol_timeline'),
       path: '/protocols/:protocolKey/timeline',
     },
     {
       Component: Labware,
-      name: 'labware',
+      name: t('labware'),
       navLinkTo: '/labware',
       path: '/labware',
     },
     {
       Component: DevicesLanding,
-      name: 'devices',
+      name: t('devices'),
       navLinkTo: '/devices',
       path: '/devices',
     },
     {
       Component: DeviceDetails,
-      name: 'Device',
+      name: t('device'),
       path: '/devices/:robotName',
     },
     {
       Component: RobotSettings,
-      name: 'Robot Settings',
+      name: t('robot_settings'),
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
     },
     {
       Component: CalibrationDashboard,
-      name: 'Calibration Dashboard',
+      name: t('calibration_dashboard'),
       path: '/devices/:robotName/robot-settings/calibration/dashboard',
     },
     {
       Component: ProtocolRunDetails,
-      name: 'Run Details',
+      name: t('run_details'),
       path: '/devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab?',
     },
     {
       Component: AppSettings,
-      name: 'App Settings',
+      name: t('app_settings'),
       path: '/app-settings/:appSettingsTab?',
     },
   ]
@@ -108,6 +127,7 @@ export const DesktopApp = (): JSX.Element => {
     <NiceModal.Provider>
       <LocalizationProvider>
         <ErrorBoundary FallbackComponent={DesktopAppFallback}>
+          <ReactQueryDevtools />
           <SystemLanguagePreferenceModal />
           <Navbar routes={desktopRoutes} />
           <ToasterOven>

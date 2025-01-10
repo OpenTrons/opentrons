@@ -24,6 +24,7 @@ from .exceptions import (
     LabwareIsTipRackError,
     LabwareIsAdapterError,
     TouchTipDisabledError,
+    TouchTipIncompatibleArgumentsError,
     WellDoesNotExistError,
     PipetteNotLoadedError,
     ModuleNotLoadedError,
@@ -78,6 +79,9 @@ from .exceptions import (
     OperationLocationNotInWellError,
     InvalidDispenseVolumeError,
     StorageLimitReachedError,
+    InvalidLiquidError,
+    LiquidClassDoesNotExistError,
+    LiquidClassRedefinitionError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -107,6 +111,7 @@ __all__ = [
     "LabwareIsTipRackError",
     "LabwareIsAdapterError",
     "TouchTipDisabledError",
+    "TouchTipIncompatibleArgumentsError",
     "WellDoesNotExistError",
     "PipetteNotLoadedError",
     "ModuleNotLoadedError",
@@ -138,6 +143,7 @@ __all__ = [
     "InvalidTargetSpeedError",
     "InvalidBlockVolumeError",
     "InvalidHoldTimeError",
+    "InvalidLiquidError",
     "InvalidWavelengthError",
     "CannotPerformModuleAction",
     "ResumeFromRecoveryNotAllowedError",
@@ -164,4 +170,6 @@ __all__ = [
     "OperationLocationNotInWellError",
     "InvalidDispenseVolumeError",
     "StorageLimitReachedError",
+    "LiquidClassDoesNotExistError",
+    "LiquidClassRedefinitionError",
 ]

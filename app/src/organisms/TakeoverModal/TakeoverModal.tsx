@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -18,12 +17,13 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface TakeoverModalProps {
   title: string
   showConfirmTerminateModal: boolean
-  setShowConfirmTerminateModal: React.Dispatch<React.SetStateAction<boolean>>
+  setShowConfirmTerminateModal: Dispatch<SetStateAction<boolean>>
   confirmTerminate: () => void
   terminateInProgress: boolean
 }

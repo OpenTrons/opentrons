@@ -1,11 +1,12 @@
 """Tip pickup and drop procedures."""
+
 from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import FailedTipStateCheck, InstrumentProbeType
 from opentrons.protocol_engine.errors.exceptions import PickUpTipTipNotAttachedError
-from opentrons.types import Mount
+from opentrons.types import Mount, NozzleConfigurationType
 
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
@@ -22,9 +23,6 @@ from ..errors import (
     TipAttachedError,
     ProtocolEngineError,
 )
-
-from opentrons.hardware_control.nozzle_manager import NozzleConfigurationType
-
 
 PRIMARY_NOZZLE_TO_ENDING_NOZZLE_MAP = {
     "A1": {"COLUMN": "H1", "ROW": "A12"},
@@ -326,8 +324,8 @@ class HardwareTipHandler(TipHandler):
         follow_singular_sensor: Optional[InstrumentProbeType] = None,
     ) -> None:
         """See documentation on abstract base class."""
-        nozzle_configuration = (
-            self._state_view.pipettes.state.nozzle_configuration_by_id[pipette_id]
+        nozzle_configuration = self._state_view.pipettes.get_nozzle_configuration(
+            pipette_id=pipette_id
         )
 
         # Configuration metrics by which tip presence checking is ignored
