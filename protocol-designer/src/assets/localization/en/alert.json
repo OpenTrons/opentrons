@@ -158,6 +158,10 @@
       "POSSIBLE_PIPETTE_COLLISION": {
         "title": "Pipette collisions likely",
         "body": "There is a possibility that the pipette will collide with the adjascent labware or module for partial tip pick up."
+      },
+      "PLATE_READER_LID_CLOSED": {
+        "title": "Absorbance Plate Reader Module lid closed",
+        "body": "This step tries to use labware in the Absorbance Plate Reader. Open the lid before this step."
       }
     },
     "warning": {

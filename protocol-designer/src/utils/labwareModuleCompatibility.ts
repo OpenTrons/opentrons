@@ -160,7 +160,7 @@ export const getLabwareIsCustom = (
 
 // This breaks pattern with other module compatibility checks, but it more exactly mirrors Protocol Engine's logic
 // See api/src/opentrons/protocol_engine/state/labware.py for details
-export const getLabwareCompatibleWithAbsorbanceReader = (
+const _getLabwareCompatibleWithAbsorbanceReader = (
   def: LabwareDefinition2
 ): boolean => {
   return (
@@ -168,6 +168,17 @@ export const getLabwareCompatibleWithAbsorbanceReader = (
     !def.parameters.isTiprack &&
     def.dimensions.zDimension <= PLATE_READER_MAX_LABWARE_Z_MM
   )
+}
+
+export const getLabwareCompatibleWithModule = (
+  def: LabwareDefinition2,
+  moduleType: ModuleType
+): boolean => {
+  return moduleType === ABSORBANCE_READER_TYPE
+    ? _getLabwareCompatibleWithAbsorbanceReader(def)
+    : COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType].includes(
+        def.parameters.loadName
+      )
 }
 
 export const getAdapterLabwareIsAMatch = (

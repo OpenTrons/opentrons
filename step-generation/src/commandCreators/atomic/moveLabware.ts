@@ -1,4 +1,5 @@
 import {
+  ABSORBANCE_READER_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -125,6 +126,11 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
       } else if (initialModuleState.targetSpeed !== null) {
         errors.push(errorCreators.heaterShakerIsShaking())
       }
+    } else if (
+      initialModuleState.type === ABSORBANCE_READER_TYPE &&
+      initialModuleState.lidOpen !== true
+    ) {
+      errors.push(errorCreators.plateReaderLidClosed())
     }
   }
   const destModuleId =
@@ -172,6 +178,10 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
       }
       if (destModuleState.targetSpeed !== null) {
         errors.push(errorCreators.heaterShakerIsShaking())
+      }
+    } else if (destModuleState.type === ABSORBANCE_READER_TYPE) {
+      if (destModuleState.lidOpen !== true) {
+        errors.push(errorCreators.plateReaderLidClosed())
       }
     }
   }

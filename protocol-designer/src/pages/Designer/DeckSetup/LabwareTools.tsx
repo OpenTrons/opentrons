@@ -37,8 +37,7 @@ import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import {
   ADAPTER_96_CHANNEL,
-  getLabwareIsCompatible as _getLabwareIsCompatible,
-  getLabwareCompatibleWithAbsorbanceReader,
+  getLabwareCompatibleWithModule,
 } from '../../../utils/labwareModuleCompatibility'
 import { getHas96Channel } from '../../../utils'
 import { createCustomLabwareDef } from '../../../labware-defs/actions'
@@ -143,9 +142,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
       if (moduleType == null || !getLabwareDefIsStandard(def)) {
         return true
       }
-      return moduleType === ABSORBANCE_READER_TYPE
-        ? getLabwareCompatibleWithAbsorbanceReader(def)
-        : _getLabwareIsCompatible(def, moduleType)
+      return getLabwareCompatibleWithModule(def, moduleType)
     },
     [moduleType]
   )
