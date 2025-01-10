@@ -25,6 +25,7 @@ from opentrons.protocol_api._liquid import LiquidClass
 from ...disposal_locations import TrashBin, WasteChute
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
+from .legacy_labware_core import LegacyLabwareCore
 from .legacy_module_core import LegacyThermocyclerCore, LegacyHeaterShakerCore
 
 if TYPE_CHECKING:
@@ -37,7 +38,7 @@ _PRE_2_2_TIP_DROP_HEIGHT_MM = 10
 """In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
-class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
+class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]):
     """Implementation of the InstrumentContext interface."""
 
     def __init__(
@@ -563,7 +564,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         source: List[Tuple[types.Location, LegacyWellCore]],
         dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
-        tiprack_uri: str,
+        tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         trash_location: Union[types.Location, TrashBin, WasteChute],
     ) -> None:
         """This will never be called because it was added in .."""

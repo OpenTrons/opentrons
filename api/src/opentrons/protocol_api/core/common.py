@@ -19,7 +19,7 @@ from .robot import AbstractRobot
 
 WellCore = AbstractWellCore
 LabwareCore = AbstractLabware[WellCore]
-InstrumentCore = AbstractInstrument[WellCore]
+InstrumentCore = AbstractInstrument[WellCore, LabwareCore]
 ModuleCore = AbstractModuleCore
 TemperatureModuleCore = AbstractTemperatureModuleCore
 MagneticModuleCore = AbstractMagneticModuleCore

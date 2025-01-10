@@ -1950,7 +1950,7 @@ def test_transfer_liquid_delegates_to_engine_core(
     trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
     next_tiprack = decoy.mock(cls=Labware)
     subject.starting_tip = None
-    subject.tip_racks = tip_racks
+    subject._tip_racks = tip_racks
 
     decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
     decoy.when(
@@ -1964,14 +1964,6 @@ def test_transfer_liquid_delegates_to_engine_core(
     )
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(MOCK_MAP)
     decoy.when(mock_instrument_core.get_active_channels()).then_return(2)
-    decoy.when(
-        labware.next_available_tip(
-            starting_tip=None,
-            tip_racks=tip_racks,
-            channels=2,
-            nozzle_map=MOCK_MAP,
-        )
-    ).then_return((next_tiprack, decoy.mock(cls=Well)))
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     decoy.when(
         mock_validation.ensure_valid_trash_location_for_transfer_v2(trash_location)
@@ -1993,7 +1985,7 @@ def test_transfer_liquid_delegates_to_engine_core(
             source=[(Location(Point(), labware=mock_well), mock_well._core)],
             dest=[(Location(Point(), labware=mock_well), mock_well._core)],
             new_tip=TransferTipPolicyV2.ONCE,
-            tiprack_uri="tiprack-uri",
+            tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
             trash_location=trash_location.move(Point(1, 2, 3)),
         )
     )

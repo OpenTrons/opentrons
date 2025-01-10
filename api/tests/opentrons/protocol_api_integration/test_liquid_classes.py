@@ -31,20 +31,17 @@ def test_liquid_class_creation_and_property_fetching(
     # TODO (spp, 2024-10-17): update this to fetch pipette load name from instrument context
     assert (
         water.get_for(
-            pipette_load_name, tiprack.load_name
+            pipette_load_name, tiprack.uri
         ).dispense.flow_rate_by_volume.get_for_volume(1)
         == 50
     )
-    assert (
-        water.get_for(pipette_load_name, tiprack.load_name).aspirate.submerge.speed
-        == 100
-    )
+    assert water.get_for(pipette_load_name, tiprack.uri).aspirate.submerge.speed == 100
 
     with pytest.raises(
         ValueError,
         match="No properties found for non-existent-pipette in water liquid class",
     ):
-        water.get_for("non-existent-pipette", tiprack.load_name)
+        water.get_for("non-existent-pipette", tiprack.uri)
 
     with pytest.raises(AttributeError):
         water.name = "foo"  # type: ignore

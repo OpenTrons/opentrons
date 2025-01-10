@@ -33,6 +33,7 @@ DATA_SUBDIRS = [
     "command",
     "commandAnnotation",
     "liquid",
+    "liquid-class"
 ]
 DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"

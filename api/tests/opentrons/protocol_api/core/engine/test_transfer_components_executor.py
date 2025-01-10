@@ -567,13 +567,7 @@ def test_retract_after_dispense_with_blowout_in_source(
         transfer_properties=sample_transfer_props,
         target_location=Location(Point(1, 1, 1), labware=None),
         target_well=dest_well,
-        tip_state=TipState(
-            ready_to_aspirate=True,
-            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(
-                liquid=0,
-                air_gap=0,
-            ),
-        ),
+        tip_state=TipState(),
         transfer_type=TransferType.ONE_TO_ONE,
     )
     decoy.when(dest_well.get_bottom(0)).then_return(well_bottom_point)

@@ -95,6 +95,12 @@ class SyncClient:
     ) -> commands.LoadLiquidClassResult:
         pass
 
+    @overload
+    def execute_command_without_recovery(
+        self, params: commands.GetNextTipParams
+    ) -> commands.GetNextTipResult:
+        pass
+
     def execute_command_without_recovery(
         self, params: commands.CommandParams
     ) -> commands.CommandResult:

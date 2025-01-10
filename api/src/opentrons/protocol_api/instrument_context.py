@@ -1561,15 +1561,9 @@ class InstrumentContext(publisher.CommandPublisher):
                     " of 'once' or 'always'."
                 )
             else:
-                tiprack = self._last_tip_picked_up_from.parent
+                tip_racks = [self._last_tip_picked_up_from.parent]
         else:
-            # TODO: update this with getNextTip result from engine
-            tiprack, well = labware.next_available_tip(
-                starting_tip=self.starting_tip,
-                tip_racks=self.tip_racks,
-                channels=self.active_channels,
-                nozzle_map=self._core.get_nozzle_map(),
-            )
+            tip_racks = self._tip_racks
         if self.current_volume != 0:
             raise RuntimeError(
                 "A transfer on a liquid class cannot start with liquid already in the tip."
@@ -1602,7 +1596,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 for well in flat_dests_list
             ],
             new_tip=valid_new_tip,
-            tiprack_uri=tiprack.uri,
+            tip_racks=[
+                (types.Location(types.Point(), labware=rack), rack._core)
+                for rack in tip_racks
+            ],
             trash_location=checked_trash_location,
         )
         return self

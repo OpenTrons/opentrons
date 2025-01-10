@@ -202,7 +202,6 @@ TypeOverrides = Mapping[str, Union[float, bool, None]]
 
 OverrideType = Dict[str, Union[Dict[str, QuirkConfig], MutableConfig, str]]
 
-
 PipetteName = Literal[
     "p10_single",
     "p10_multi",
@@ -250,6 +249,31 @@ class PipetteNameType(str, enum.Enum):
     P1000_MULTI_EM = "p1000_multi_em"
     P1000_96 = "p1000_96"
     P200_96 = "p200_96"
+
+
+# Mapping of public Python Protocol API pipette load names
+# to names used by the internal Opentrons system
+# TODO (spp, 2025-01-02): make the API load name a part of the pipette's definition
+PIPETTE_API_NAMES_MAP = {
+    "p10_single": PipetteNameType.P10_SINGLE,
+    "p10_multi": PipetteNameType.P10_MULTI,
+    "p20_single_gen2": PipetteNameType.P20_SINGLE_GEN2,
+    "p20_multi_gen2": PipetteNameType.P20_MULTI_GEN2,
+    "p50_single": PipetteNameType.P50_SINGLE,
+    "p50_multi": PipetteNameType.P50_MULTI,
+    "p300_single": PipetteNameType.P300_SINGLE,
+    "p300_multi": PipetteNameType.P300_MULTI,
+    "p300_single_gen2": PipetteNameType.P300_SINGLE_GEN2,
+    "p300_multi_gen2": PipetteNameType.P300_MULTI_GEN2,
+    "p1000_single": PipetteNameType.P1000_SINGLE,
+    "p1000_single_gen2": PipetteNameType.P1000_SINGLE_GEN2,
+    "flex_1channel_50": PipetteNameType.P50_SINGLE_FLEX,
+    "flex_8channel_50": PipetteNameType.P50_MULTI_FLEX,
+    "flex_1channel_1000": PipetteNameType.P1000_SINGLE_FLEX,
+    "flex_8channel_1000": PipetteNameType.P1000_MULTI_FLEX,
+    "flex_96channel_1000": PipetteNameType.P1000_96,
+    "flex_96channel_200": PipetteNameType.P200_96,
+}
 
 
 # Generic NewType for models because we get new ones frequently and theres

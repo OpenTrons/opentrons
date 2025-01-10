@@ -23,6 +23,7 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
+from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ...disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api._liquid import LiquidClass
@@ -42,7 +43,9 @@ _PRE_2_2_TIP_DROP_HEIGHT_MM = 10
 """In PAPIv2.1 and below, tips are always dropped 10 mm from the bottom of the well."""
 
 
-class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
+class LegacyInstrumentCoreSimulator(
+    AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
+):
     """A simulation of an instrument context."""
 
     def __init__(
@@ -481,7 +484,7 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         source: List[Tuple[types.Location, LegacyWellCore]],
         dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
-        tiprack_uri: str,
+        tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         trash_location: Union[types.Location, TrashBin, WasteChute],
     ) -> None:
         """Transfer a liquid from source to dest according to liquid class properties."""
