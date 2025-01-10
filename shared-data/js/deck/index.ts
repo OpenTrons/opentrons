@@ -1,5 +1,5 @@
-import flexDeckDefV5 from '../../deck/definitions/5/ot3_standard.json'
-import ot2DeckDefV5 from '../../deck/definitions/5/ot2_standard.json'
-import ot2DeckDefShortFixedTrashV5 from '../../deck/definitions/5/ot2_short_trash.json'
+import flexDeckDefV6 from '../../deck/definitions/6/ot3_standard.json'
+import ot2DeckDefV6 from '../../deck/definitions/6/ot2_standard.json'
+import ot2DeckDefShortFixedTrashV5 from '../../deck/definitions/6/ot2_short_trash.json'
 
-export { ot2DeckDefV5, ot2DeckDefShortFixedTrashV5, flexDeckDefV5 }
+export { ot2DeckDefV6, ot2DeckDefShortFixedTrashV6, flexDeckDefV6 }
