@@ -23,7 +23,11 @@
   "liquid_placement": {
     "liquid": "Liquid",
     "volume": "Volume",
-    "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
+    "errors": {
+      "liquid_required": "Define a liquid",
+      "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL",
+      "volume_required": "Define a volume"
+    }
   },
   "pipette_mount_label": {
     "left": "(L)",

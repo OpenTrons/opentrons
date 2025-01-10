@@ -12,7 +12,7 @@ import {
   Flex,
   Icon,
   LiquidIcon,
-  ListItem,
+  ListButton,
   SPACING,
   StyledText,
   TEXT_DECORATION_UNDERLINE,
@@ -98,7 +98,15 @@ export function LiquidCard(props: LiquidCardProps): JSX.Element {
   }
 
   return (
-    <ListItem type="noActive" flexDirection={DIRECTION_COLUMN} key={name}>
+    <ListButton
+      type="noActive"
+      flexDirection={DIRECTION_COLUMN}
+      key={name}
+      onClick={() => {
+        setIsExpanded(prev => !prev)
+      }}
+      padding="0"
+    >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         padding={SPACING.spacing12}
@@ -133,12 +141,7 @@ export function LiquidCard(props: LiquidCardProps): JSX.Element {
                 : null}
             </StyledText>
           </Flex>
-          <Flex
-            cursor={CURSOR_POINTER}
-            onClick={() => {
-              setIsExpanded(prev => !prev)
-            }}
-          >
+          <Flex cursor={CURSOR_POINTER}>
             <Icon
               name={isExpanded ? 'chevron-up' : 'chevron-down'}
               size="2rem"
@@ -162,42 +165,45 @@ export function LiquidCard(props: LiquidCardProps): JSX.Element {
         </Btn>
       </Flex>
       {isExpanded ? (
-        <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-          <Flex gridGap={SPACING.spacing4} color={COLORS.grey60}>
-            <StyledText width="50%" desktopStyle="bodyDefaultRegular">
-              {t('well')}
-            </StyledText>
-            <Flex width="50%">
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('microliters')}
+        <>
+          <Divider borderBottom={`1px solid ${String(COLORS.grey35)}`} />
+          <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+            <Flex gridGap={SPACING.spacing4} color={COLORS.grey60}>
+              <StyledText width="50%" desktopStyle="bodyDefaultRegular">
+                {t('well')}
               </StyledText>
+              <Flex width="50%">
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('microliters')}
+                </StyledText>
+              </Flex>
             </Flex>
-          </Flex>
-          <Divider borderColor={COLORS.grey35} />
-          {info.liquidIndex != null
-            ? fullWellsByLiquid[info.liquidIndex]
-                .sort((a, b) =>
-                  orderedWells.indexOf(b) > orderedWells.indexOf(a) ? -1 : 1
-                )
-                .map((wellName, wellliquidIndex) => {
-                  const volume =
-                    wellContents != null
-                      ? wellContents[wellName].ingreds[liquidIndex].volume
-                      : 0
-                  return (
-                    <>
-                      <WellContents wellName={wellName} volume={volume} />
-                      {wellliquidIndex <
-                      fullWellsByLiquid[liquidIndex].length - 1 ? (
-                        <Divider borderColor={COLORS.grey35} />
-                      ) : null}
-                    </>
+            <Divider borderColor={COLORS.grey35} />
+            {info.liquidIndex != null
+              ? fullWellsByLiquid[info.liquidIndex]
+                  .sort((a, b) =>
+                    orderedWells.indexOf(b) > orderedWells.indexOf(a) ? -1 : 1
                   )
-                })
-            : null}
-        </Flex>
+                  .map((wellName, wellliquidIndex) => {
+                    const volume =
+                      wellContents != null
+                        ? wellContents[wellName].ingreds[liquidIndex].volume
+                        : 0
+                    return (
+                      <>
+                        <WellContents wellName={wellName} volume={volume} />
+                        {wellliquidIndex <
+                        fullWellsByLiquid[liquidIndex].length - 1 ? (
+                          <Divider borderColor={COLORS.grey35} />
+                        ) : null}
+                      </>
+                    )
+                  })
+              : null}
+          </Flex>
+        </>
       ) : null}
-    </ListItem>
+    </ListButton>
   )
 }
 

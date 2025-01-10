@@ -108,11 +108,12 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
     control,
     setValue,
     reset,
-    formState: { touchedFields },
+    formState,
   } = useForm<ToolboxFormValues>({
     defaultValues: getInitialValues(),
   })
 
+  const { errors } = formState
   const selectedLiquidId = watch('selectedLiquidId')
   const volume = watch('volume')
 
@@ -184,15 +185,22 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
     reset()
   }
 
-  let volumeErrors: string | null = null
-  if (Boolean(touchedFields.volume)) {
-    if (volume == null || volume === '0') {
-      volumeErrors = t('generic.error.more_than_zero')
-    } else if (parseInt(volume) > selectedWellsMaxVolume) {
-      volumeErrors = t('form:liquid_placement.volume_exceeded', {
+  const validateVolume = (
+    volume: string | null | undefined
+  ): string | undefined => {
+    if (volume == null || volume === '') {
+      return t('form:liquid_placement.errors.volume_required')
+    }
+    const volumeNumber = parseFloat(volume)
+    if (volumeNumber === 0) {
+      return t('form:generic.error.more_than_zero')
+    }
+    if (volumeNumber > selectedWellsMaxVolume) {
+      return t('form:liquid_placement.errors.volume_exceeded', {
         volume: selectedWellsMaxVolume,
       })
     }
+    return undefined
   }
 
   let wellContents: ContentsByWell | null = null
@@ -301,7 +309,12 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                         name="selectedLiquidId"
                         control={control}
                         rules={{
-                          required: true,
+                          required: {
+                            value: true,
+                            message: t(
+                              'form:liquid_placement.errors.liquid_required'
+                            ),
+                          },
                         }}
                         render={({ field }) => {
                           const fullOptions: DropdownOption[] = liquidSelectionOptions.map(
@@ -337,6 +350,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                               }}
                               onClick={field.onChange}
                               menuPlacement="bottom"
+                              error={errors.selectedLiquidId?.message}
                             />
                           )
                         }}
@@ -354,14 +368,14 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                         name="volume"
                         control={control}
                         rules={{
-                          required: true,
+                          validate: validateVolume,
                         }}
                         render={({ field }) => (
                           <InputField
                             name="volume"
                             units={t('application:units.microliter')}
                             value={volume}
-                            error={volumeErrors}
+                            error={errors.volume?.message}
                             onBlur={field.onBlur}
                             onChange={handleChangeVolume}
                           />
@@ -377,18 +391,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                           {t('shared:cancel')}
                         </StyledText>
                       </Btn>
-                      <PrimaryButton
-                        disabled={
-                          volumeErrors != null ||
-                          volume == null ||
-                          volume === '' ||
-                          selectedLiquidId == null ||
-                          selectedLiquidId === ''
-                        }
-                        type="submit"
-                      >
-                        {t('save')}
-                      </PrimaryButton>
+                      <PrimaryButton type="submit">{t('save')}</PrimaryButton>
                     </Flex>
                   </Flex>
                 </ListItem>
