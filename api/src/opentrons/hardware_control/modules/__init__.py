@@ -62,7 +62,6 @@ __all__ = [
     "AbsorbanceReader",
     "AbsorbanceReaderStatus",
     "AbsorbanceReaderDisconnectedError",
-    "ModuleDisconnectedCallback",
     "FlexStacker",
     "FlexStackerStatus",
     "PlatformState",

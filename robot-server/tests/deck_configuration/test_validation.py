@@ -228,9 +228,9 @@ def test_unrecognized_cutout_fixture() -> None:
                     "magneticBlockV1",
                     "absorbanceReaderV1",
                     "stagingAreaSlotWithMagneticBlockV1",
-                    "flexStackerV1",
-                    "flexStackerV1WithWasteChuteRightAdapterCovered",
-                    "flexStackerV1WithWasteChuteRightAdapterNoCover",
+                    "flexStackerModuleV1",
+                    "flexStackerModuleV1WithWasteChuteRightAdapterCovered",
+                    "flexStackerModuleV1WithWasteChuteRightAdapterNoCover",
                 ]
             ),
         )

@@ -317,6 +317,13 @@ class AbsorbanceReaderStateUpdate:
 
 
 @dataclasses.dataclass
+class FlexStackerStateUpdate:
+    """An update to the Flex Stacker module state."""
+
+    module_id: str
+
+
+@dataclasses.dataclass
 class LiquidClassLoadedUpdate:
     """The state update from loading a liquid class."""
 
@@ -379,6 +386,8 @@ class StateUpdate:
     absorbance_reader_state_update: AbsorbanceReaderStateUpdate | NoChangeType = (
         NO_CHANGE
     )
+
+    flex_stacker_state_update: FlexStackerStateUpdate | NoChangeType = NO_CHANGE
 
     liquid_class_loaded: LiquidClassLoadedUpdate | NoChangeType = NO_CHANGE
 

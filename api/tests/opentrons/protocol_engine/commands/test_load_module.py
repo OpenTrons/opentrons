@@ -13,7 +13,6 @@ from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleModel,
-    ModuleDefinition,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleData
 from opentrons.protocol_engine import ModuleModel as EngineModuleModel
@@ -43,35 +42,71 @@ from opentrons.protocols.api_support.deck_type import (
 )
 
 
+@pytest.mark.parametrize(
+    "module_model,module_def_fixture_name,load_slot_name",
+    [
+        (ModuleModel.TEMPERATURE_MODULE_V2, "tempdeck_v2_def", DeckSlotName.SLOT_D1),
+        (ModuleModel.MAGNETIC_BLOCK_V1, "mag_block_v1_def", DeckSlotName.SLOT_D1),
+        (
+            ModuleModel.THERMOCYCLER_MODULE_V2,
+            "thermocycler_v2_def",
+            # only B1 provides addressable area for thermocycler v2
+            # so we use it here with decoy
+            DeckSlotName.SLOT_B1,
+        ),
+        (
+            ModuleModel.HEATER_SHAKER_MODULE_V1,
+            "heater_shaker_v1_def",
+            DeckSlotName.SLOT_D3,
+        ),
+        (ModuleModel.ABSORBANCE_READER_V1, "abs_reader_v1_def", DeckSlotName.SLOT_D3),
+        (
+            ModuleModel.FLEX_STACKER_MODULE_V1,
+            "flex_stacker_v1_def",
+            DeckSlotName.SLOT_D3,
+        ),
+    ],
+)
 async def test_load_module_implementation(
+    request: pytest.FixtureRequest,
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
-    tempdeck_v2_def: ModuleDefinition,
+    ot3_standard_deck_def: DeckDefinitionV5,
+    module_model: ModuleModel,
+    module_def_fixture_name: str,
+    load_slot_name: DeckSlotName,
 ) -> None:
     """A loadModule command should have an execution implementation."""
+    module_definition = request.getfixturevalue(module_def_fixture_name)
+
+    # Load module function is different for magnetic block v1
+    load_module_func = (
+        equipment.load_magnetic_block
+        if module_model == ModuleModel.MAGNETIC_BLOCK_V1
+        else equipment.load_module
+    )
+
     subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
 
     data = LoadModuleParams(
-        model=ModuleModel.TEMPERATURE_MODULE_V2,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
+        model=module_model,
+        location=DeckSlotLocation(slotName=load_slot_name),
         moduleId="some-id",
     )
 
-    deck_def = load_deck(STANDARD_OT3_DECK, 5)
-
-    decoy.when(state_view.labware.get_deck_definition()).then_return(deck_def)
+    decoy.when(state_view.labware.get_deck_definition()).then_return(
+        ot3_standard_deck_def
+    )
     decoy.when(
-        state_view.addressable_areas.get_cutout_id_by_deck_slot_name(
-            DeckSlotName.SLOT_D1
-        )
-    ).then_return("cutout" + DeckSlotName.SLOT_D1.value)
+        state_view.addressable_areas.get_cutout_id_by_deck_slot_name(load_slot_name)
+    ).then_return("cutout" + load_slot_name.value)
 
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_D1)
+            DeckSlotLocation(slotName=load_slot_name)
         )
-    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_2))
+    ).then_return(DeckSlotLocation(slotName=load_slot_name))
 
     decoy.when(
         state_view.modules.ensure_and_convert_module_fixture_location(
@@ -81,16 +116,16 @@ async def test_load_module_implementation(
     ).then_return(sentinel.addressable_area_provided_by_module)
 
     decoy.when(
-        await equipment.load_module(
-            model=ModuleModel.TEMPERATURE_MODULE_V2,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+        await load_module_func(
+            model=module_model,
+            location=DeckSlotLocation(slotName=load_slot_name),
             module_id="some-id",
         )
     ).then_return(
         LoadedModuleData(
             module_id="module-id",
             serial_number="mod-serial",
-            definition=tempdeck_v2_def,
+            definition=module_definition,
         )
     )
 
@@ -104,147 +139,8 @@ async def test_load_module_implementation(
         public=LoadModuleResult(
             moduleId="module-id",
             serialNumber="mod-serial",
-            model=ModuleModel.TEMPERATURE_MODULE_V2,
-            definition=tempdeck_v2_def,
-        ),
-        state_update=update_types.StateUpdate(
-            addressable_area_used=update_types.AddressableAreaUsedUpdate(
-                addressable_area_name=data.location.slotName.id
-            )
-        ),
-    )
-
-
-async def test_load_module_implementation_mag_block(
-    decoy: Decoy,
-    equipment: EquipmentHandler,
-    state_view: StateView,
-    mag_block_v1_def: ModuleDefinition,
-) -> None:
-    """A loadModule command for mag block should have an execution implementation."""
-    subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
-
-    data = LoadModuleParams(
-        model=ModuleModel.MAGNETIC_BLOCK_V1,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
-        moduleId="some-id",
-    )
-
-    deck_def = load_deck(STANDARD_OT3_DECK, 5)
-
-    decoy.when(state_view.labware.get_deck_definition()).then_return(deck_def)
-    decoy.when(
-        state_view.addressable_areas.get_cutout_id_by_deck_slot_name(
-            DeckSlotName.SLOT_D1
-        )
-    ).then_return("cutout" + DeckSlotName.SLOT_D1.value)
-
-    decoy.when(
-        state_view.geometry.ensure_location_not_occupied(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_D1)
-        )
-    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_2))
-
-    decoy.when(
-        state_view.modules.ensure_and_convert_module_fixture_location(
-            deck_slot=data.location.slotName,
-            model=data.model,
-        )
-    ).then_return(sentinel.addressable_area_provided_by_module)
-
-    decoy.when(
-        await equipment.load_magnetic_block(
-            model=ModuleModel.MAGNETIC_BLOCK_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
-            module_id="some-id",
-        )
-    ).then_return(
-        LoadedModuleData(
-            module_id="module-id",
-            serial_number=None,
-            definition=mag_block_v1_def,
-        )
-    )
-
-    result = await subject.execute(data)
-    decoy.verify(
-        state_view.addressable_areas.raise_if_area_not_in_deck_configuration(
-            sentinel.addressable_area_provided_by_module
-        )
-    )
-    assert result == SuccessData(
-        public=LoadModuleResult(
-            moduleId="module-id",
-            serialNumber=None,
-            model=ModuleModel.MAGNETIC_BLOCK_V1,
-            definition=mag_block_v1_def,
-        ),
-        state_update=update_types.StateUpdate(
-            addressable_area_used=update_types.AddressableAreaUsedUpdate(
-                addressable_area_name=data.location.slotName.id
-            )
-        ),
-    )
-
-
-async def test_load_module_implementation_abs_reader(
-    decoy: Decoy,
-    equipment: EquipmentHandler,
-    state_view: StateView,
-    abs_reader_v1_def: ModuleDefinition,
-) -> None:
-    """A loadModule command for abs reader should have an execution implementation."""
-    subject = LoadModuleImplementation(equipment=equipment, state_view=state_view)
-
-    data = LoadModuleParams(
-        model=ModuleModel.ABSORBANCE_READER_V1,
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-        moduleId="some-id",
-    )
-
-    deck_def = load_deck(STANDARD_OT3_DECK, 5)
-
-    decoy.when(state_view.labware.get_deck_definition()).then_return(deck_def)
-    decoy.when(
-        state_view.addressable_areas.get_cutout_id_by_deck_slot_name(
-            DeckSlotName.SLOT_D3
-        )
-    ).then_return("cutout" + DeckSlotName.SLOT_D3.value)
-
-    decoy.when(
-        state_view.geometry.ensure_location_not_occupied(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_D3)
-        )
-    ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_D3))
-
-    decoy.when(
-        state_view.modules.ensure_and_convert_module_fixture_location(
-            deck_slot=data.location.slotName,
-            model=data.model,
-        )
-    ).then_return(sentinel.addressable_area_name)
-
-    decoy.when(
-        await equipment.load_module(
-            model=ModuleModel.ABSORBANCE_READER_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D3),
-            module_id="some-id",
-        )
-    ).then_return(
-        LoadedModuleData(
-            module_id="module-id",
-            serial_number=None,
-            definition=abs_reader_v1_def,
-        )
-    )
-
-    result = await subject.execute(data)
-    assert result == SuccessData(
-        public=LoadModuleResult(
-            moduleId="module-id",
-            serialNumber=None,
-            model=ModuleModel.ABSORBANCE_READER_V1,
-            definition=abs_reader_v1_def,
+            model=module_model,
+            definition=module_definition,
         ),
         state_update=update_types.StateUpdate(
             addressable_area_used=update_types.AddressableAreaUsedUpdate(

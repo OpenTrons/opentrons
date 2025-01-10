@@ -29,6 +29,7 @@ from .core.common import (
     HeaterShakerCore,
     MagneticBlockCore,
     AbsorbanceReaderCore,
+    FlexStackerCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -1098,3 +1099,34 @@ class AbsorbanceReaderContext(ModuleContext):
         :returns: A dictionary of wavelengths to dictionary of values ordered by well name.
         """
         return self._core.read(filename=export_filename)
+
+
+class FlexStackerContext(ModuleContext):
+    """An object representing a connected Flex Stacker module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.23
+    """
+
+    _core: FlexStackerCore
+
+    @property
+    @requires_version(2, 23)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
+
+    @requires_version(2, 23)
+    def retrieve(self) -> None:
+        """Release and return a labware at the bottom of the labware stack."""
+        self._core.retrieve()
+
+    @requires_version(2, 23)
+    def store(self, labware: Labware) -> None:
+        """Store a labware at the bottom of the labware stack.
+
+        :param labware: The labware object to store.
+        """
+        self._core.store()

@@ -538,7 +538,7 @@ class ModuleModel(str, Enum):
         return model == cls.ABSORBANCE_READER_V1
 
     @classmethod
-    def is_flex_stacker(cls, model: ModuleModel) -> TypeGuard[AbsorbanceReaderModel]:
+    def is_flex_stacker(cls, model: ModuleModel) -> TypeGuard[FlexStackerModuleModel]:
         """Whether a given model is a Flex Stacker.."""
         return model == cls.FLEX_STACKER_MODULE_V1
 

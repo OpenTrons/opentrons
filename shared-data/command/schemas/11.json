@@ -9,7 +9,9 @@
           "type": "string"
         }
       },
-      "required": ["addressableAreaName"],
+      "required": [
+        "addressableAreaName"
+      ],
       "title": "AddressableAreaLocation",
       "type": "object"
     },
@@ -29,7 +31,11 @@
           "type": "number"
         }
       },
-      "required": ["x", "y", "z"],
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
       "title": "AddressableOffsetVector",
       "type": "object"
     },
@@ -39,7 +45,9 @@
         "commandType": {
           "const": "airGapInPlace",
           "default": "airGapInPlace",
-          "enum": ["airGapInPlace"],
+          "enum": [
+            "airGapInPlace"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -57,7 +65,9 @@
           "$ref": "#/$defs/AirGapInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "AirGapInPlaceCreate",
       "type": "object"
     },
@@ -82,7 +92,11 @@
           "type": "number"
         }
       },
-      "required": ["flowRate", "volume", "pipetteId"],
+      "required": [
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "AirGapInPlaceParams",
       "type": "object"
     },
@@ -92,7 +106,9 @@
         "style": {
           "const": "ALL",
           "default": "ALL",
-          "enum": ["ALL"],
+          "enum": [
+            "ALL"
+          ],
           "title": "Style",
           "type": "string"
         }
@@ -106,7 +122,9 @@
         "commandType": {
           "const": "aspirate",
           "default": "aspirate",
-          "enum": ["aspirate"],
+          "enum": [
+            "aspirate"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -124,7 +142,9 @@
           "$ref": "#/$defs/AspirateParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "AspirateCreate",
       "type": "object"
     },
@@ -134,7 +154,9 @@
         "commandType": {
           "const": "aspirateInPlace",
           "default": "aspirateInPlace",
-          "enum": ["aspirateInPlace"],
+          "enum": [
+            "aspirateInPlace"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -152,7 +174,9 @@
           "$ref": "#/$defs/AspirateInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "AspirateInPlaceCreate",
       "type": "object"
     },
@@ -177,7 +201,11 @@
           "type": "number"
         }
       },
-      "required": ["flowRate", "volume", "pipetteId"],
+      "required": [
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "AspirateInPlaceParams",
       "type": "object"
     },
@@ -216,7 +244,13 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "flowRate", "volume", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "AspirateParams",
       "type": "object"
     },
@@ -343,7 +377,9 @@
         "commandType": {
           "const": "blowout",
           "default": "blowout",
-          "enum": ["blowout"],
+          "enum": [
+            "blowout"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -361,7 +397,9 @@
           "$ref": "#/$defs/BlowOutParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "BlowOutCreate",
       "type": "object"
     },
@@ -371,7 +409,9 @@
         "commandType": {
           "const": "blowOutInPlace",
           "default": "blowOutInPlace",
-          "enum": ["blowOutInPlace"],
+          "enum": [
+            "blowOutInPlace"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -389,7 +429,9 @@
           "$ref": "#/$defs/BlowOutInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "BlowOutInPlaceCreate",
       "type": "object"
     },
@@ -408,7 +450,10 @@
           "type": "string"
         }
       },
-      "required": ["flowRate", "pipetteId"],
+      "required": [
+        "flowRate",
+        "pipetteId"
+      ],
       "title": "BlowOutInPlaceParams",
       "type": "object"
     },
@@ -441,13 +486,22 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "flowRate", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "flowRate",
+        "pipetteId"
+      ],
       "title": "BlowOutParams",
       "type": "object"
     },
     "BlowoutLocation": {
       "description": "Location for blowout during a transfer function.",
-      "enum": ["source", "destination", "trash"],
+      "enum": [
+        "source",
+        "destination",
+        "trash"
+      ],
       "title": "BlowoutLocation",
       "type": "string"
     },
@@ -473,7 +527,10 @@
           "description": "Location well or trash entity for blow out."
         }
       },
-      "required": ["location", "flowRate"],
+      "required": [
+        "location",
+        "flowRate"
+      ],
       "title": "BlowoutParams",
       "type": "object"
     },
@@ -491,7 +548,9 @@
           "title": "Params"
         }
       },
-      "required": ["enable"],
+      "required": [
+        "enable"
+      ],
       "title": "BlowoutProperties",
       "type": "object"
     },
@@ -501,7 +560,9 @@
         "commandType": {
           "const": "calibration/calibrateGripper",
           "default": "calibration/calibrateGripper",
-          "enum": ["calibration/calibrateGripper"],
+          "enum": [
+            "calibration/calibrateGripper"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -519,7 +580,9 @@
           "$ref": "#/$defs/CalibrateGripperParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CalibrateGripperCreate",
       "type": "object"
     },
@@ -536,12 +599,17 @@
           "title": "Otherjawoffset"
         }
       },
-      "required": ["jaw"],
+      "required": [
+        "jaw"
+      ],
       "title": "CalibrateGripperParams",
       "type": "object"
     },
     "CalibrateGripperParamsJaw": {
-      "enum": ["front", "rear"],
+      "enum": [
+        "front",
+        "rear"
+      ],
       "title": "CalibrateGripperParamsJaw",
       "type": "string"
     },
@@ -551,7 +619,9 @@
         "commandType": {
           "const": "calibration/calibrateModule",
           "default": "calibration/calibrateModule",
-          "enum": ["calibration/calibrateModule"],
+          "enum": [
+            "calibration/calibrateModule"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -569,7 +639,9 @@
           "$ref": "#/$defs/CalibrateModuleParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CalibrateModuleCreate",
       "type": "object"
     },
@@ -591,7 +663,11 @@
           "description": "The instrument mount used to calibrate the module."
         }
       },
-      "required": ["moduleId", "labwareId", "mount"],
+      "required": [
+        "moduleId",
+        "labwareId",
+        "mount"
+      ],
       "title": "CalibrateModuleParams",
       "type": "object"
     },
@@ -601,7 +677,9 @@
         "commandType": {
           "const": "calibration/calibratePipette",
           "default": "calibration/calibratePipette",
-          "enum": ["calibration/calibratePipette"],
+          "enum": [
+            "calibration/calibratePipette"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -619,7 +697,9 @@
           "$ref": "#/$defs/CalibratePipetteParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CalibratePipetteCreate",
       "type": "object"
     },
@@ -631,7 +711,9 @@
           "description": "Instrument mount to calibrate."
         }
       },
-      "required": ["mount"],
+      "required": [
+        "mount"
+      ],
       "title": "CalibratePipetteParams",
       "type": "object"
     },
@@ -641,7 +723,9 @@
         "commandType": {
           "const": "heaterShaker/closeLabwareLatch",
           "default": "heaterShaker/closeLabwareLatch",
-          "enum": ["heaterShaker/closeLabwareLatch"],
+          "enum": [
+            "heaterShaker/closeLabwareLatch"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -659,7 +743,9 @@
           "$ref": "#/$defs/CloseLabwareLatchParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CloseLabwareLatchCreate",
       "type": "object"
     },
@@ -672,7 +758,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "CloseLabwareLatchParams",
       "type": "object"
     },
@@ -681,25 +769,38 @@
       "properties": {
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
-          "enum": ["A1", "H1", "A12", "H12"],
+          "enum": [
+            "A1",
+            "H1",
+            "A12",
+            "H12"
+          ],
           "title": "Primarynozzle",
           "type": "string"
         },
         "style": {
           "const": "COLUMN",
           "default": "COLUMN",
-          "enum": ["COLUMN"],
+          "enum": [
+            "COLUMN"
+          ],
           "title": "Style",
           "type": "string"
         }
       },
-      "required": ["primaryNozzle"],
+      "required": [
+        "primaryNozzle"
+      ],
       "title": "ColumnNozzleLayoutConfiguration",
       "type": "object"
     },
     "CommandIntent": {
       "description": "Run intent for a given command.\n\nProps:\n    PROTOCOL: the command is part of the protocol run itself.\n    SETUP: the command is part of the setup phase of a run.",
-      "enum": ["protocol", "setup", "fixit"],
+      "enum": [
+        "protocol",
+        "setup",
+        "fixit"
+      ],
       "title": "CommandIntent",
       "type": "string"
     },
@@ -709,7 +810,9 @@
         "commandType": {
           "const": "comment",
           "default": "comment",
-          "enum": ["comment"],
+          "enum": [
+            "comment"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -727,7 +830,9 @@
           "$ref": "#/$defs/CommentParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CommentCreate",
       "type": "object"
     },
@@ -740,7 +845,9 @@
           "type": "string"
         }
       },
-      "required": ["message"],
+      "required": [
+        "message"
+      ],
       "title": "CommentParams",
       "type": "object"
     },
@@ -750,7 +857,9 @@
         "commandType": {
           "const": "configureForVolume",
           "default": "configureForVolume",
-          "enum": ["configureForVolume"],
+          "enum": [
+            "configureForVolume"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -768,7 +877,9 @@
           "$ref": "#/$defs/ConfigureForVolumeParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "ConfigureForVolumeCreate",
       "type": "object"
     },
@@ -792,7 +903,10 @@
           "type": "number"
         }
       },
-      "required": ["pipetteId", "volume"],
+      "required": [
+        "pipetteId",
+        "volume"
+      ],
       "title": "ConfigureForVolumeParams",
       "type": "object"
     },
@@ -802,7 +916,9 @@
         "commandType": {
           "const": "configureNozzleLayout",
           "default": "configureNozzleLayout",
-          "enum": ["configureNozzleLayout"],
+          "enum": [
+            "configureNozzleLayout"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -820,7 +936,9 @@
           "$ref": "#/$defs/ConfigureNozzleLayoutParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "ConfigureNozzleLayoutCreate",
       "type": "object"
     },
@@ -853,7 +971,10 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId", "configurationParams"],
+      "required": [
+        "pipetteId",
+        "configurationParams"
+      ],
       "title": "ConfigureNozzleLayoutParams",
       "type": "object"
     },
@@ -894,7 +1015,11 @@
           "title": "Z"
         }
       },
-      "required": ["x", "y", "z"],
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
       "title": "Coordinate",
       "type": "object"
     },
@@ -904,7 +1029,9 @@
         "commandType": {
           "const": "custom",
           "default": "custom",
-          "enum": ["custom"],
+          "enum": [
+            "custom"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -922,7 +1049,9 @@
           "$ref": "#/$defs/CustomParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CustomCreate",
       "type": "object"
     },
@@ -939,7 +1068,9 @@
         "commandType": {
           "const": "thermocycler/deactivateBlock",
           "default": "thermocycler/deactivateBlock",
-          "enum": ["thermocycler/deactivateBlock"],
+          "enum": [
+            "thermocycler/deactivateBlock"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -957,7 +1088,9 @@
           "$ref": "#/$defs/DeactivateBlockParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DeactivateBlockCreate",
       "type": "object"
     },
@@ -970,7 +1103,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "DeactivateBlockParams",
       "type": "object"
     },
@@ -980,7 +1115,9 @@
         "commandType": {
           "const": "heaterShaker/deactivateHeater",
           "default": "heaterShaker/deactivateHeater",
-          "enum": ["heaterShaker/deactivateHeater"],
+          "enum": [
+            "heaterShaker/deactivateHeater"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -998,7 +1135,9 @@
           "$ref": "#/$defs/DeactivateHeaterParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DeactivateHeaterCreate",
       "type": "object"
     },
@@ -1011,7 +1150,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "DeactivateHeaterParams",
       "type": "object"
     },
@@ -1021,7 +1162,9 @@
         "commandType": {
           "const": "thermocycler/deactivateLid",
           "default": "thermocycler/deactivateLid",
-          "enum": ["thermocycler/deactivateLid"],
+          "enum": [
+            "thermocycler/deactivateLid"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1039,7 +1182,9 @@
           "$ref": "#/$defs/DeactivateLidParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DeactivateLidCreate",
       "type": "object"
     },
@@ -1052,7 +1197,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "DeactivateLidParams",
       "type": "object"
     },
@@ -1062,7 +1209,9 @@
         "commandType": {
           "const": "heaterShaker/deactivateShaker",
           "default": "heaterShaker/deactivateShaker",
-          "enum": ["heaterShaker/deactivateShaker"],
+          "enum": [
+            "heaterShaker/deactivateShaker"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1080,7 +1229,9 @@
           "$ref": "#/$defs/DeactivateShakerParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DeactivateShakerCreate",
       "type": "object"
     },
@@ -1093,7 +1244,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "DeactivateShakerParams",
       "type": "object"
     },
@@ -1103,7 +1256,9 @@
         "commandType": {
           "const": "temperatureModule/deactivate",
           "default": "temperatureModule/deactivate",
-          "enum": ["temperatureModule/deactivate"],
+          "enum": [
+            "temperatureModule/deactivate"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1121,7 +1276,9 @@
           "$ref": "#/$defs/DeactivateTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DeactivateTemperatureCreate",
       "type": "object"
     },
@@ -1134,7 +1291,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "DeactivateTemperatureParams",
       "type": "object"
     },
@@ -1154,7 +1313,11 @@
           "type": "number"
         }
       },
-      "required": ["x", "y", "z"],
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
       "title": "DeckPoint",
       "type": "object"
     },
@@ -1166,7 +1329,9 @@
           "description": "A slot on the robot's deck.\n\nThe plain numbers like `\"5\"` are for the OT-2, and the coordinates like `\"C2\"` are for the Flex.\n\nWhen you provide one of these values, you can use either style. It will automatically be converted to match the robot.\n\nWhen one of these values is returned, it will always match the robot."
         }
       },
-      "required": ["slotName"],
+      "required": [
+        "slotName"
+      ],
       "title": "DeckSlotLocation",
       "type": "object"
     },
@@ -1219,7 +1384,9 @@
           "title": "Duration"
         }
       },
-      "required": ["duration"],
+      "required": [
+        "duration"
+      ],
       "title": "DelayParams",
       "type": "object"
     },
@@ -1237,7 +1404,9 @@
           "title": "Params"
         }
       },
-      "required": ["enable"],
+      "required": [
+        "enable"
+      ],
       "title": "DelayProperties",
       "type": "object"
     },
@@ -1247,7 +1416,9 @@
         "commandType": {
           "const": "magneticModule/disengage",
           "default": "magneticModule/disengage",
-          "enum": ["magneticModule/disengage"],
+          "enum": [
+            "magneticModule/disengage"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1265,7 +1436,9 @@
           "$ref": "#/$defs/DisengageParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DisengageCreate",
       "type": "object"
     },
@@ -1278,7 +1451,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "DisengageParams",
       "type": "object"
     },
@@ -1288,7 +1463,9 @@
         "commandType": {
           "const": "dispense",
           "default": "dispense",
-          "enum": ["dispense"],
+          "enum": [
+            "dispense"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1306,7 +1483,9 @@
           "$ref": "#/$defs/DispenseParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DispenseCreate",
       "type": "object"
     },
@@ -1316,7 +1495,9 @@
         "commandType": {
           "const": "dispenseInPlace",
           "default": "dispenseInPlace",
-          "enum": ["dispenseInPlace"],
+          "enum": [
+            "dispenseInPlace"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1334,7 +1515,9 @@
           "$ref": "#/$defs/DispenseInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DispenseInPlaceCreate",
       "type": "object"
     },
@@ -1364,7 +1547,11 @@
           "type": "number"
         }
       },
-      "required": ["flowRate", "volume", "pipetteId"],
+      "required": [
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "DispenseInPlaceParams",
       "type": "object"
     },
@@ -1408,7 +1595,13 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "flowRate", "volume", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "flowRate",
+        "volume",
+        "pipetteId"
+      ],
       "title": "DispenseParams",
       "type": "object"
     },
@@ -1418,7 +1611,9 @@
         "commandType": {
           "const": "dropTip",
           "default": "dropTip",
-          "enum": ["dropTip"],
+          "enum": [
+            "dropTip"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1436,7 +1631,9 @@
           "$ref": "#/$defs/DropTipParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DropTipCreate",
       "type": "object"
     },
@@ -1446,7 +1643,9 @@
         "commandType": {
           "const": "dropTipInPlace",
           "default": "dropTipInPlace",
-          "enum": ["dropTipInPlace"],
+          "enum": [
+            "dropTipInPlace"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1464,7 +1663,9 @@
           "$ref": "#/$defs/DropTipInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "DropTipInPlaceCreate",
       "type": "object"
     },
@@ -1482,7 +1683,9 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId"],
+      "required": [
+        "pipetteId"
+      ],
       "title": "DropTipInPlaceParams",
       "type": "object"
     },
@@ -1519,7 +1722,11 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId", "labwareId", "wellName"],
+      "required": [
+        "pipetteId",
+        "labwareId",
+        "wellName"
+      ],
       "title": "DropTipParams",
       "type": "object"
     },
@@ -1539,7 +1746,12 @@
     },
     "DropTipWellOrigin": {
       "description": "The origin of a DropTipWellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    DEFAULT: the default drop-tip location of the well,\n        based on pipette configuration and length of the tip.",
-      "enum": ["top", "bottom", "center", "default"],
+      "enum": [
+        "top",
+        "bottom",
+        "center",
+        "default"
+      ],
       "title": "DropTipWellOrigin",
       "type": "string"
     },
@@ -1549,7 +1761,9 @@
         "commandType": {
           "const": "magneticModule/engage",
           "default": "magneticModule/engage",
-          "enum": ["magneticModule/engage"],
+          "enum": [
+            "magneticModule/engage"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1567,7 +1781,9 @@
           "$ref": "#/$defs/EngageParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "EngageCreate",
       "type": "object"
     },
@@ -1585,7 +1801,10 @@
           "type": "string"
         }
       },
-      "required": ["moduleId", "height"],
+      "required": [
+        "moduleId",
+        "height"
+      ],
       "title": "EngageParams",
       "type": "object"
     },
@@ -1595,7 +1814,9 @@
         "commandType": {
           "const": "getNextTip",
           "default": "getNextTip",
-          "enum": ["getNextTip"],
+          "enum": [
+            "getNextTip"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1613,7 +1834,9 @@
           "$ref": "#/$defs/GetNextTipParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "GetNextTipCreate",
       "type": "object"
     },
@@ -1639,7 +1862,10 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId", "labwareIds"],
+      "required": [
+        "pipetteId",
+        "labwareIds"
+      ],
       "title": "GetNextTipParams",
       "type": "object"
     },
@@ -1649,7 +1875,9 @@
         "commandType": {
           "const": "getTipPresence",
           "default": "getTipPresence",
-          "enum": ["getTipPresence"],
+          "enum": [
+            "getTipPresence"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1667,7 +1895,9 @@
           "$ref": "#/$defs/GetTipPresenceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "GetTipPresenceCreate",
       "type": "object"
     },
@@ -1680,7 +1910,9 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId"],
+      "required": [
+        "pipetteId"
+      ],
       "title": "GetTipPresenceParams",
       "type": "object"
     },
@@ -1690,7 +1922,9 @@
         "commandType": {
           "const": "home",
           "default": "home",
-          "enum": ["home"],
+          "enum": [
+            "home"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1708,7 +1942,9 @@
           "$ref": "#/$defs/HomeParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "HomeCreate",
       "type": "object"
     },
@@ -1738,7 +1974,9 @@
         "commandType": {
           "const": "absorbanceReader/initialize",
           "default": "absorbanceReader/initialize",
-          "enum": ["absorbanceReader/initialize"],
+          "enum": [
+            "absorbanceReader/initialize"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1756,7 +1994,9 @@
           "$ref": "#/$defs/InitializeParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "InitializeCreate",
       "type": "object"
     },
@@ -1765,7 +2005,10 @@
       "properties": {
         "measureMode": {
           "description": "Initialize single or multi measurement mode.",
-          "enum": ["single", "multi"],
+          "enum": [
+            "single",
+            "multi"
+          ],
           "title": "Measuremode",
           "type": "string"
         },
@@ -1788,19 +2031,31 @@
           "type": "array"
         }
       },
-      "required": ["moduleId", "measureMode", "sampleWavelengths"],
+      "required": [
+        "moduleId",
+        "measureMode",
+        "sampleWavelengths"
+      ],
       "title": "InitializeParams",
       "type": "object"
     },
     "InstrumentSensorId": {
       "description": "Primary and secondary sensor ids.",
-      "enum": ["primary", "secondary", "both"],
+      "enum": [
+        "primary",
+        "secondary",
+        "both"
+      ],
       "title": "InstrumentSensorId",
       "type": "string"
     },
     "LabwareMovementStrategy": {
       "description": "Strategy to use for labware movement.",
-      "enum": ["usingGripper", "manualMoveWithPause", "manualMoveWithoutPause"],
+      "enum": [
+        "usingGripper",
+        "manualMoveWithPause",
+        "manualMoveWithoutPause"
+      ],
       "title": "LabwareMovementStrategy",
       "type": "string"
     },
@@ -1820,7 +2075,11 @@
           "type": "number"
         }
       },
-      "required": ["x", "y", "z"],
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
       "title": "LabwareOffsetVector",
       "type": "object"
     },
@@ -1908,7 +2167,11 @@
           "title": "Zoffset"
         }
       },
-      "required": ["zOffset", "mmToEdge", "speed"],
+      "required": [
+        "zOffset",
+        "mmToEdge",
+        "speed"
+      ],
       "title": "LiquidClassTouchTipParams",
       "type": "object"
     },
@@ -1929,7 +2192,9 @@
             },
             {
               "const": "operationVolume",
-              "enum": ["operationVolume"],
+              "enum": [
+                "operationVolume"
+              ],
               "type": "string"
             }
           ],
@@ -1947,7 +2212,9 @@
         "commandType": {
           "const": "liquidProbe",
           "default": "liquidProbe",
-          "enum": ["liquidProbe"],
+          "enum": [
+            "liquidProbe"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -1965,7 +2232,9 @@
           "$ref": "#/$defs/LiquidProbeParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "LiquidProbeCreate",
       "type": "object"
     },
@@ -1992,7 +2261,11 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "pipetteId"
+      ],
       "title": "LiquidProbeParams",
       "type": "object"
     },
@@ -2002,7 +2275,9 @@
         "commandType": {
           "const": "loadLabware",
           "default": "loadLabware",
-          "enum": ["loadLabware"],
+          "enum": [
+            "loadLabware"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2020,7 +2295,9 @@
           "$ref": "#/$defs/LoadLabwareParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "LoadLabwareCreate",
       "type": "object"
     },
@@ -2055,7 +2332,9 @@
             },
             {
               "const": "offDeck",
-              "enum": ["offDeck"],
+              "enum": [
+                "offDeck"
+              ],
               "type": "string"
             },
             {
@@ -2076,7 +2355,12 @@
           "type": "integer"
         }
       },
-      "required": ["location", "loadName", "namespace", "version"],
+      "required": [
+        "location",
+        "loadName",
+        "namespace",
+        "version"
+      ],
       "title": "LoadLabwareParams",
       "type": "object"
     },
@@ -2086,7 +2370,9 @@
         "commandType": {
           "const": "loadLid",
           "default": "loadLid",
-          "enum": ["loadLid"],
+          "enum": [
+            "loadLid"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2104,7 +2390,9 @@
           "$ref": "#/$defs/LoadLidParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "LoadLidCreate",
       "type": "object"
     },
@@ -2129,7 +2417,9 @@
             },
             {
               "const": "offDeck",
-              "enum": ["offDeck"],
+              "enum": [
+                "offDeck"
+              ],
               "type": "string"
             },
             {
@@ -2150,7 +2440,12 @@
           "type": "integer"
         }
       },
-      "required": ["location", "loadName", "namespace", "version"],
+      "required": [
+        "location",
+        "loadName",
+        "namespace",
+        "version"
+      ],
       "title": "LoadLidParams",
       "type": "object"
     },
@@ -2160,7 +2455,9 @@
         "commandType": {
           "const": "loadLidStack",
           "default": "loadLidStack",
-          "enum": ["loadLidStack"],
+          "enum": [
+            "loadLidStack"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2178,7 +2475,9 @@
           "$ref": "#/$defs/LoadLidStackParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "LoadLidStackCreate",
       "type": "object"
     },
@@ -2203,7 +2502,9 @@
             },
             {
               "const": "offDeck",
-              "enum": ["offDeck"],
+              "enum": [
+                "offDeck"
+              ],
               "type": "string"
             },
             {
@@ -2229,7 +2530,13 @@
           "type": "integer"
         }
       },
-      "required": ["location", "loadName", "namespace", "version", "quantity"],
+      "required": [
+        "location",
+        "loadName",
+        "namespace",
+        "version",
+        "quantity"
+      ],
       "title": "LoadLidStackParams",
       "type": "object"
     },
@@ -2239,7 +2546,9 @@
         "commandType": {
           "const": "loadLiquidClass",
           "default": "loadLiquidClass",
-          "enum": ["loadLiquidClass"],
+          "enum": [
+            "loadLiquidClass"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2257,7 +2566,9 @@
           "$ref": "#/$defs/LoadLiquidClassParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "LoadLiquidClassCreate",
       "type": "object"
     },
@@ -2274,7 +2585,9 @@
           "description": "The liquid class to store."
         }
       },
-      "required": ["liquidClassRecord"],
+      "required": [
+        "liquidClassRecord"
+      ],
       "title": "LoadLiquidClassParams",
       "type": "object"
     },
@@ -2284,7 +2597,9 @@
         "commandType": {
           "const": "loadLiquid",
           "default": "loadLiquid",
-          "enum": ["loadLiquid"],
+          "enum": [
+            "loadLiquid"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2302,7 +2617,9 @@
           "$ref": "#/$defs/LoadLiquidParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "LoadLiquidCreate",
       "type": "object"
     },
@@ -2321,7 +2638,9 @@
             },
             {
               "const": "EMPTY",
-              "enum": ["EMPTY"],
+              "enum": [
+                "EMPTY"
+              ],
               "type": "string"
             }
           ],
@@ -2337,7 +2656,11 @@
           "type": "object"
         }
       },
-      "required": ["liquidId", "labwareId", "volumeByWell"],
+      "required": [
+        "liquidId",
+        "labwareId",
+        "volumeByWell"
+      ],
       "title": "LoadLiquidParams",
       "type": "object"
     },
@@ -2347,7 +2670,9 @@
         "commandType": {
           "const": "loadModule",
           "default": "loadModule",
-          "enum": ["loadModule"],
+          "enum": [
+            "loadModule"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2365,7 +2690,9 @@
           "$ref": "#/$defs/LoadModuleParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "LoadModuleCreate",
       "type": "object"
     },
@@ -2386,7 +2713,10 @@
           "type": "string"
         }
       },
-      "required": ["model", "location"],
+      "required": [
+        "model",
+        "location"
+      ],
       "title": "LoadModuleParams",
       "type": "object"
     },
@@ -2396,7 +2726,9 @@
         "commandType": {
           "const": "loadPipette",
           "default": "loadPipette",
-          "enum": ["loadPipette"],
+          "enum": [
+            "loadPipette"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2414,7 +2746,9 @@
           "$ref": "#/$defs/LoadPipetteParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "LoadPipetteCreate",
       "type": "object"
     },
@@ -2445,13 +2779,19 @@
           "type": "string"
         }
       },
-      "required": ["pipetteName", "mount"],
+      "required": [
+        "pipetteName",
+        "mount"
+      ],
       "title": "LoadPipetteParams",
       "type": "object"
     },
     "MaintenancePosition": {
       "description": "Maintenance position options.",
-      "enum": ["attachPlate", "attachInstrument"],
+      "enum": [
+        "attachPlate",
+        "attachInstrument"
+      ],
       "title": "MaintenancePosition",
       "type": "string"
     },
@@ -2477,7 +2817,10 @@
           "title": "Volume"
         }
       },
-      "required": ["repetitions", "volume"],
+      "required": [
+        "repetitions",
+        "volume"
+      ],
       "title": "MixParams",
       "type": "object"
     },
@@ -2495,7 +2838,9 @@
           "title": "Params"
         }
       },
-      "required": ["enable"],
+      "required": [
+        "enable"
+      ],
       "title": "MixProperties",
       "type": "object"
     },
@@ -2508,7 +2853,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "ModuleLocation",
       "type": "object"
     },
@@ -2546,7 +2893,11 @@
       "type": "string"
     },
     "MountType": {
-      "enum": ["left", "right", "extension"],
+      "enum": [
+        "left",
+        "right",
+        "extension"
+      ],
       "title": "MountType",
       "type": "string"
     },
@@ -2556,7 +2907,9 @@
         "commandType": {
           "const": "robot/moveAxesRelative",
           "default": "robot/moveAxesRelative",
-          "enum": ["robot/moveAxesRelative"],
+          "enum": [
+            "robot/moveAxesRelative"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2574,7 +2927,9 @@
           "$ref": "#/$defs/MoveAxesRelativeParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveAxesRelativeCreate",
       "type": "object"
     },
@@ -2595,7 +2950,9 @@
           "type": "number"
         }
       },
-      "required": ["axis_map"],
+      "required": [
+        "axis_map"
+      ],
       "title": "MoveAxesRelativeParams",
       "type": "object"
     },
@@ -2605,7 +2962,9 @@
         "commandType": {
           "const": "robot/moveAxesTo",
           "default": "robot/moveAxesTo",
-          "enum": ["robot/moveAxesTo"],
+          "enum": [
+            "robot/moveAxesTo"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2623,7 +2982,9 @@
           "$ref": "#/$defs/MoveAxesToParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveAxesToCreate",
       "type": "object"
     },
@@ -2652,7 +3013,9 @@
           "type": "number"
         }
       },
-      "required": ["axis_map"],
+      "required": [
+        "axis_map"
+      ],
       "title": "MoveAxesToParams",
       "type": "object"
     },
@@ -2662,7 +3025,9 @@
         "commandType": {
           "const": "moveLabware",
           "default": "moveLabware",
-          "enum": ["moveLabware"],
+          "enum": [
+            "moveLabware"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2680,7 +3045,9 @@
           "$ref": "#/$defs/MoveLabwareParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveLabwareCreate",
       "type": "object"
     },
@@ -2710,7 +3077,9 @@
             },
             {
               "const": "offDeck",
-              "enum": ["offDeck"],
+              "enum": [
+                "offDeck"
+              ],
               "type": "string"
             },
             {
@@ -2730,7 +3099,11 @@
           "description": "Whether to use the gripper to perform the labware movement or to perform a manual movement with an option to pause."
         }
       },
-      "required": ["labwareId", "newLocation", "strategy"],
+      "required": [
+        "labwareId",
+        "newLocation",
+        "strategy"
+      ],
       "title": "MoveLabwareParams",
       "type": "object"
     },
@@ -2740,7 +3113,9 @@
         "commandType": {
           "const": "moveRelative",
           "default": "moveRelative",
-          "enum": ["moveRelative"],
+          "enum": [
+            "moveRelative"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2758,7 +3133,9 @@
           "$ref": "#/$defs/MoveRelativeParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveRelativeCreate",
       "type": "object"
     },
@@ -2780,7 +3157,11 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId", "axis", "distance"],
+      "required": [
+        "pipetteId",
+        "axis",
+        "distance"
+      ],
       "title": "MoveRelativeParams",
       "type": "object"
     },
@@ -2790,7 +3171,9 @@
         "commandType": {
           "const": "moveToAddressableArea",
           "default": "moveToAddressableArea",
-          "enum": ["moveToAddressableArea"],
+          "enum": [
+            "moveToAddressableArea"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2808,7 +3191,9 @@
           "$ref": "#/$defs/MoveToAddressableAreaParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveToAddressableAreaCreate",
       "type": "object"
     },
@@ -2818,7 +3203,9 @@
         "commandType": {
           "const": "moveToAddressableAreaForDropTip",
           "default": "moveToAddressableAreaForDropTip",
-          "enum": ["moveToAddressableAreaForDropTip"],
+          "enum": [
+            "moveToAddressableAreaForDropTip"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2836,7 +3223,9 @@
           "$ref": "#/$defs/MoveToAddressableAreaForDropTipParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveToAddressableAreaForDropTipCreate",
       "type": "object"
     },
@@ -2889,7 +3278,10 @@
           "type": "number"
         }
       },
-      "required": ["pipetteId", "addressableAreaName"],
+      "required": [
+        "pipetteId",
+        "addressableAreaName"
+      ],
       "title": "MoveToAddressableAreaForDropTipParams",
       "type": "object"
     },
@@ -2938,7 +3330,10 @@
           "type": "boolean"
         }
       },
-      "required": ["pipetteId", "addressableAreaName"],
+      "required": [
+        "pipetteId",
+        "addressableAreaName"
+      ],
       "title": "MoveToAddressableAreaParams",
       "type": "object"
     },
@@ -2948,7 +3343,9 @@
         "commandType": {
           "const": "moveToCoordinates",
           "default": "moveToCoordinates",
-          "enum": ["moveToCoordinates"],
+          "enum": [
+            "moveToCoordinates"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -2966,7 +3363,9 @@
           "$ref": "#/$defs/MoveToCoordinatesParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveToCoordinatesCreate",
       "type": "object"
     },
@@ -2999,7 +3398,10 @@
           "type": "number"
         }
       },
-      "required": ["pipetteId", "coordinates"],
+      "required": [
+        "pipetteId",
+        "coordinates"
+      ],
       "title": "MoveToCoordinatesParams",
       "type": "object"
     },
@@ -3009,7 +3411,9 @@
         "commandType": {
           "const": "robot/moveTo",
           "default": "robot/moveTo",
-          "enum": ["robot/moveTo"],
+          "enum": [
+            "robot/moveTo"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3027,7 +3431,9 @@
           "$ref": "#/$defs/MoveToParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveToCreate",
       "type": "object"
     },
@@ -3037,7 +3443,9 @@
         "commandType": {
           "const": "calibration/moveToMaintenancePosition",
           "default": "calibration/moveToMaintenancePosition",
-          "enum": ["calibration/moveToMaintenancePosition"],
+          "enum": [
+            "calibration/moveToMaintenancePosition"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3055,7 +3463,9 @@
           "$ref": "#/$defs/MoveToMaintenancePositionParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveToMaintenancePositionCreate",
       "type": "object"
     },
@@ -3072,7 +3482,9 @@
           "description": "Gantry mount to move maintenance position."
         }
       },
-      "required": ["mount"],
+      "required": [
+        "mount"
+      ],
       "title": "MoveToMaintenancePositionParams",
       "type": "object"
     },
@@ -3093,7 +3505,10 @@
           "type": "number"
         }
       },
-      "required": ["mount", "destination"],
+      "required": [
+        "mount",
+        "destination"
+      ],
       "title": "MoveToParams",
       "type": "object"
     },
@@ -3103,7 +3518,9 @@
         "commandType": {
           "const": "moveToWell",
           "default": "moveToWell",
-          "enum": ["moveToWell"],
+          "enum": [
+            "moveToWell"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3121,7 +3538,9 @@
           "$ref": "#/$defs/MoveToWellParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "MoveToWellCreate",
       "type": "object"
     },
@@ -3164,13 +3583,21 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "pipetteId"
+      ],
       "title": "MoveToWellParams",
       "type": "object"
     },
     "MovementAxis": {
       "description": "Axis on which to issue a relative movement.",
-      "enum": ["x", "y", "z"],
+      "enum": [
+        "x",
+        "y",
+        "z"
+      ],
       "title": "MovementAxis",
       "type": "string"
     },
@@ -3363,7 +3790,9 @@
           "type": "string"
         }
       },
-      "required": ["labwareId"],
+      "required": [
+        "labwareId"
+      ],
       "title": "OnLabwareLocation",
       "type": "object"
     },
@@ -3373,7 +3802,9 @@
         "commandType": {
           "const": "heaterShaker/openLabwareLatch",
           "default": "heaterShaker/openLabwareLatch",
-          "enum": ["heaterShaker/openLabwareLatch"],
+          "enum": [
+            "heaterShaker/openLabwareLatch"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3391,7 +3822,9 @@
           "$ref": "#/$defs/OpenLabwareLatchParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "OpenLabwareLatchCreate",
       "type": "object"
     },
@@ -3404,7 +3837,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "OpenLabwareLatchParams",
       "type": "object"
     },
@@ -3414,7 +3849,9 @@
         "commandType": {
           "const": "pickUpTip",
           "default": "pickUpTip",
-          "enum": ["pickUpTip"],
+          "enum": [
+            "pickUpTip"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3432,7 +3869,9 @@
           "$ref": "#/$defs/PickUpTipParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "PickUpTipCreate",
       "type": "object"
     },
@@ -3459,7 +3898,11 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId", "labwareId", "wellName"],
+      "required": [
+        "pipetteId",
+        "labwareId",
+        "wellName"
+      ],
       "title": "PickUpTipParams",
       "type": "object"
     },
@@ -3479,7 +3922,11 @@
     },
     "PickUpTipWellOrigin": {
       "description": "The origin of a PickUpTipWellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well",
-      "enum": ["top", "bottom", "center"],
+      "enum": [
+        "top",
+        "bottom",
+        "center"
+      ],
       "title": "PickUpTipWellOrigin",
       "type": "string"
     },
@@ -3511,7 +3958,12 @@
     },
     "PositionReference": {
       "description": "Positional reference for liquid handling operations.",
-      "enum": ["well-bottom", "well-top", "well-center", "liquid-meniscus"],
+      "enum": [
+        "well-bottom",
+        "well-top",
+        "well-center",
+        "liquid-meniscus"
+      ],
       "title": "PositionReference",
       "type": "string"
     },
@@ -3521,7 +3973,9 @@
         "commandType": {
           "const": "prepareToAspirate",
           "default": "prepareToAspirate",
-          "enum": ["prepareToAspirate"],
+          "enum": [
+            "prepareToAspirate"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3539,7 +3993,9 @@
           "$ref": "#/$defs/PrepareToAspirateParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "PrepareToAspirateCreate",
       "type": "object"
     },
@@ -3552,7 +4008,9 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId"],
+      "required": [
+        "pipetteId"
+      ],
       "title": "PrepareToAspirateParams",
       "type": "object"
     },
@@ -3573,7 +4031,10 @@
           "type": "array"
         }
       },
-      "required": ["steps", "repetitions"],
+      "required": [
+        "steps",
+        "repetitions"
+      ],
       "title": "ProfileCycle",
       "type": "object"
     },
@@ -3591,7 +4052,10 @@
           "type": "number"
         }
       },
-      "required": ["celsius", "holdSeconds"],
+      "required": [
+        "celsius",
+        "holdSeconds"
+      ],
       "title": "ProfileStep",
       "type": "object"
     },
@@ -3612,19 +4076,30 @@
         },
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
-          "enum": ["A1", "H1", "A12", "H12"],
+          "enum": [
+            "A1",
+            "H1",
+            "A12",
+            "H12"
+          ],
           "title": "Primarynozzle",
           "type": "string"
         },
         "style": {
           "const": "QUADRANT",
           "default": "QUADRANT",
-          "enum": ["QUADRANT"],
+          "enum": [
+            "QUADRANT"
+          ],
           "title": "Style",
           "type": "string"
         }
       },
-      "required": ["primaryNozzle", "frontRightNozzle", "backLeftNozzle"],
+      "required": [
+        "primaryNozzle",
+        "frontRightNozzle",
+        "backLeftNozzle"
+      ],
       "title": "QuadrantNozzleLayoutConfiguration",
       "type": "object"
     },
@@ -3634,7 +4109,9 @@
         "commandType": {
           "const": "absorbanceReader/read",
           "default": "absorbanceReader/read",
-          "enum": ["absorbanceReader/read"],
+          "enum": [
+            "absorbanceReader/read"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3652,7 +4129,9 @@
           "$ref": "#/$defs/ReadAbsorbanceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "ReadAbsorbanceCreate",
       "type": "object"
     },
@@ -3670,7 +4149,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "ReadAbsorbanceParams",
       "type": "object"
     },
@@ -3680,7 +4161,9 @@
         "commandType": {
           "const": "reloadLabware",
           "default": "reloadLabware",
-          "enum": ["reloadLabware"],
+          "enum": [
+            "reloadLabware"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3698,7 +4181,9 @@
           "$ref": "#/$defs/ReloadLabwareParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "ReloadLabwareCreate",
       "type": "object"
     },
@@ -3711,7 +4196,9 @@
           "type": "string"
         }
       },
-      "required": ["labwareId"],
+      "required": [
+        "labwareId"
+      ],
       "title": "ReloadLabwareParams",
       "type": "object"
     },
@@ -3802,7 +4289,9 @@
         "commandType": {
           "const": "retractAxis",
           "default": "retractAxis",
-          "enum": ["retractAxis"],
+          "enum": [
+            "retractAxis"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3820,7 +4309,9 @@
           "$ref": "#/$defs/RetractAxisParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "RetractAxisCreate",
       "type": "object"
     },
@@ -3832,7 +4323,9 @@
           "description": "Axis to retract to its home position as quickly as safely possible. The difference between retracting an axis and homing an axis using the home command is that a home will always probe the limit switch and will work as the first motion command a robot will need to execute; On the other hand, retraction will rely on this previously determined  home position to move to it as fast as safely possible. So on the Flex, it will move (fast) the axis to the previously recorded home position and on the OT2, it will move (fast) the axis a safe distance from the previously recorded home position, and then slowly approach the limit switch."
         }
       },
-      "required": ["axis"],
+      "required": [
+        "axis"
+      ],
       "title": "RetractAxisParams",
       "type": "object"
     },
@@ -3922,24 +4415,80 @@
       "title": "RetractDispense",
       "type": "object"
     },
+    "RetrieveCreate": {
+      "description": "A request to execute a Flex Stacker retrieve command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/retrieve",
+          "default": "flexStacker/retrieve",
+          "enum": [
+            "flexStacker/retrieve"
+          ],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/RetrieveParams"
+        }
+      },
+      "required": [
+        "params"
+      ],
+      "title": "RetrieveCreate",
+      "type": "object"
+    },
+    "RetrieveParams": {
+      "description": "Input parameters for a labware retrieval command.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "moduleId"
+      ],
+      "title": "RetrieveParams",
+      "type": "object"
+    },
     "RowNozzleLayoutConfiguration": {
       "description": "Minimum information required for a new nozzle configuration.",
       "properties": {
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
-          "enum": ["A1", "H1", "A12", "H12"],
+          "enum": [
+            "A1",
+            "H1",
+            "A12",
+            "H12"
+          ],
           "title": "Primarynozzle",
           "type": "string"
         },
         "style": {
           "const": "ROW",
           "default": "ROW",
-          "enum": ["ROW"],
+          "enum": [
+            "ROW"
+          ],
           "title": "Style",
           "type": "string"
         }
       },
-      "required": ["primaryNozzle"],
+      "required": [
+        "primaryNozzle"
+      ],
       "title": "RowNozzleLayoutConfiguration",
       "type": "object"
     },
@@ -3949,7 +4498,9 @@
         "commandType": {
           "const": "thermocycler/runExtendedProfile",
           "default": "thermocycler/runExtendedProfile",
-          "enum": ["thermocycler/runExtendedProfile"],
+          "enum": [
+            "thermocycler/runExtendedProfile"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -3967,7 +4518,9 @@
           "$ref": "#/$defs/RunExtendedProfileParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "RunExtendedProfileCreate",
       "type": "object"
     },
@@ -4000,7 +4553,10 @@
           "type": "array"
         }
       },
-      "required": ["moduleId", "profileElements"],
+      "required": [
+        "moduleId",
+        "profileElements"
+      ],
       "title": "RunExtendedProfileParams",
       "type": "object"
     },
@@ -4010,7 +4566,9 @@
         "commandType": {
           "const": "thermocycler/runProfile",
           "default": "thermocycler/runProfile",
-          "enum": ["thermocycler/runProfile"],
+          "enum": [
+            "thermocycler/runProfile"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4028,7 +4586,9 @@
           "$ref": "#/$defs/RunProfileParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "RunProfileCreate",
       "type": "object"
     },
@@ -4054,7 +4614,10 @@
           "type": "array"
         }
       },
-      "required": ["moduleId", "profile"],
+      "required": [
+        "moduleId",
+        "profile"
+      ],
       "title": "RunProfileParams",
       "type": "object"
     },
@@ -4072,7 +4635,10 @@
           "type": "number"
         }
       },
-      "required": ["celsius", "holdSeconds"],
+      "required": [
+        "celsius",
+        "holdSeconds"
+      ],
       "title": "RunProfileStepParams",
       "type": "object"
     },
@@ -4082,7 +4648,9 @@
         "commandType": {
           "const": "savePosition",
           "default": "savePosition",
-          "enum": ["savePosition"],
+          "enum": [
+            "savePosition"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4100,7 +4668,9 @@
           "$ref": "#/$defs/SavePositionParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "SavePositionCreate",
       "type": "object"
     },
@@ -4123,7 +4693,9 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId"],
+      "required": [
+        "pipetteId"
+      ],
       "title": "SavePositionParams",
       "type": "object"
     },
@@ -4133,7 +4705,9 @@
         "commandType": {
           "const": "heaterShaker/setAndWaitForShakeSpeed",
           "default": "heaterShaker/setAndWaitForShakeSpeed",
-          "enum": ["heaterShaker/setAndWaitForShakeSpeed"],
+          "enum": [
+            "heaterShaker/setAndWaitForShakeSpeed"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4151,7 +4725,9 @@
           "$ref": "#/$defs/SetAndWaitForShakeSpeedParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "SetAndWaitForShakeSpeedCreate",
       "type": "object"
     },
@@ -4169,7 +4745,10 @@
           "type": "number"
         }
       },
-      "required": ["moduleId", "rpm"],
+      "required": [
+        "moduleId",
+        "rpm"
+      ],
       "title": "SetAndWaitForShakeSpeedParams",
       "type": "object"
     },
@@ -4179,7 +4758,9 @@
         "commandType": {
           "const": "setRailLights",
           "default": "setRailLights",
-          "enum": ["setRailLights"],
+          "enum": [
+            "setRailLights"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4197,7 +4778,9 @@
           "$ref": "#/$defs/SetRailLightsParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "SetRailLightsCreate",
       "type": "object"
     },
@@ -4210,7 +4793,9 @@
           "type": "boolean"
         }
       },
-      "required": ["on"],
+      "required": [
+        "on"
+      ],
       "title": "SetRailLightsParams",
       "type": "object"
     },
@@ -4220,7 +4805,9 @@
         "commandType": {
           "const": "setStatusBar",
           "default": "setStatusBar",
-          "enum": ["setStatusBar"],
+          "enum": [
+            "setStatusBar"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4238,7 +4825,9 @@
           "$ref": "#/$defs/SetStatusBarParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "SetStatusBarCreate",
       "type": "object"
     },
@@ -4250,7 +4839,9 @@
           "description": "The animation that should be executed on the status bar."
         }
       },
-      "required": ["animation"],
+      "required": [
+        "animation"
+      ],
       "title": "SetStatusBarParams",
       "type": "object"
     },
@@ -4260,7 +4851,9 @@
         "commandType": {
           "const": "thermocycler/setTargetBlockTemperature",
           "default": "thermocycler/setTargetBlockTemperature",
-          "enum": ["thermocycler/setTargetBlockTemperature"],
+          "enum": [
+            "thermocycler/setTargetBlockTemperature"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4278,7 +4871,9 @@
           "$ref": "#/$defs/SetTargetBlockTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "SetTargetBlockTemperatureCreate",
       "type": "object"
     },
@@ -4306,7 +4901,10 @@
           "type": "string"
         }
       },
-      "required": ["moduleId", "celsius"],
+      "required": [
+        "moduleId",
+        "celsius"
+      ],
       "title": "SetTargetBlockTemperatureParams",
       "type": "object"
     },
@@ -4316,7 +4914,9 @@
         "commandType": {
           "const": "thermocycler/setTargetLidTemperature",
           "default": "thermocycler/setTargetLidTemperature",
-          "enum": ["thermocycler/setTargetLidTemperature"],
+          "enum": [
+            "thermocycler/setTargetLidTemperature"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4334,7 +4934,9 @@
           "$ref": "#/$defs/SetTargetLidTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "SetTargetLidTemperatureCreate",
       "type": "object"
     },
@@ -4352,7 +4954,10 @@
           "type": "string"
         }
       },
-      "required": ["moduleId", "celsius"],
+      "required": [
+        "moduleId",
+        "celsius"
+      ],
       "title": "SetTargetLidTemperatureParams",
       "type": "object"
     },
@@ -4509,27 +5114,89 @@
       "properties": {
         "primaryNozzle": {
           "description": "The primary nozzle to use in the layout configuration. This nozzle will update the critical point of the current pipette. For now, this is also the back left corner of your rectangle.",
-          "enum": ["A1", "H1", "A12", "H12"],
+          "enum": [
+            "A1",
+            "H1",
+            "A12",
+            "H12"
+          ],
           "title": "Primarynozzle",
           "type": "string"
         },
         "style": {
           "const": "SINGLE",
           "default": "SINGLE",
-          "enum": ["SINGLE"],
+          "enum": [
+            "SINGLE"
+          ],
           "title": "Style",
           "type": "string"
         }
       },
-      "required": ["primaryNozzle"],
+      "required": [
+        "primaryNozzle"
+      ],
       "title": "SingleNozzleLayoutConfiguration",
       "type": "object"
     },
     "StatusBarAnimation": {
       "description": "Status Bar animation options.",
-      "enum": ["idle", "confirm", "updating", "disco", "off"],
+      "enum": [
+        "idle",
+        "confirm",
+        "updating",
+        "disco",
+        "off"
+      ],
       "title": "StatusBarAnimation",
       "type": "string"
+    },
+    "StoreCreate": {
+      "description": "A request to execute a Flex Stacker store command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/store",
+          "default": "flexStacker/store",
+          "enum": [
+            "flexStacker/store"
+          ],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StoreParams"
+        }
+      },
+      "required": [
+        "params"
+      ],
+      "title": "StoreCreate",
+      "type": "object"
+    },
+    "StoreParams": {
+      "description": "Input parameters for a labware storage command.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the flex stacker.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "moduleId"
+      ],
+      "title": "StoreParams",
+      "type": "object"
     },
     "Submerge": {
       "description": "Shared properties for the submerge function before aspiration or dispense.",
@@ -4561,13 +5228,22 @@
           "title": "Speed"
         }
       },
-      "required": ["positionReference", "offset", "speed", "delay"],
+      "required": [
+        "positionReference",
+        "offset",
+        "speed",
+        "delay"
+      ],
       "title": "Submerge",
       "type": "object"
     },
     "TipPresenceStatus": {
       "description": "Tip presence status reported by a pipette.",
-      "enum": ["present", "absent", "unknown"],
+      "enum": [
+        "present",
+        "absent",
+        "unknown"
+      ],
       "title": "TipPresenceStatus",
       "type": "string"
     },
@@ -4577,7 +5253,9 @@
         "commandType": {
           "const": "touchTip",
           "default": "touchTip",
-          "enum": ["touchTip"],
+          "enum": [
+            "touchTip"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4595,7 +5273,9 @@
           "$ref": "#/$defs/TouchTipParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "TouchTipCreate",
       "type": "object"
     },
@@ -4638,7 +5318,11 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "pipetteId"
+      ],
       "title": "TouchTipParams",
       "type": "object"
     },
@@ -4656,7 +5340,9 @@
           "title": "Params"
         }
       },
-      "required": ["enable"],
+      "required": [
+        "enable"
+      ],
       "title": "TouchTipProperties",
       "type": "object"
     },
@@ -4666,7 +5352,9 @@
         "commandType": {
           "const": "tryLiquidProbe",
           "default": "tryLiquidProbe",
-          "enum": ["tryLiquidProbe"],
+          "enum": [
+            "tryLiquidProbe"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4684,7 +5372,9 @@
           "$ref": "#/$defs/TryLiquidProbeParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "TryLiquidProbeCreate",
       "type": "object"
     },
@@ -4711,7 +5401,11 @@
           "type": "string"
         }
       },
-      "required": ["labwareId", "wellName", "pipetteId"],
+      "required": [
+        "labwareId",
+        "wellName",
+        "pipetteId"
+      ],
       "title": "TryLiquidProbeParams",
       "type": "object"
     },
@@ -4721,7 +5415,9 @@
         "commandType": {
           "const": "unsafe/blowOutInPlace",
           "default": "unsafe/blowOutInPlace",
-          "enum": ["unsafe/blowOutInPlace"],
+          "enum": [
+            "unsafe/blowOutInPlace"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4739,7 +5435,9 @@
           "$ref": "#/$defs/UnsafeBlowOutInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "UnsafeBlowOutInPlaceCreate",
       "type": "object"
     },
@@ -4758,7 +5456,10 @@
           "type": "string"
         }
       },
-      "required": ["flowRate", "pipetteId"],
+      "required": [
+        "flowRate",
+        "pipetteId"
+      ],
       "title": "UnsafeBlowOutInPlaceParams",
       "type": "object"
     },
@@ -4768,7 +5469,9 @@
         "commandType": {
           "const": "unsafe/dropTipInPlace",
           "default": "unsafe/dropTipInPlace",
-          "enum": ["unsafe/dropTipInPlace"],
+          "enum": [
+            "unsafe/dropTipInPlace"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4786,7 +5489,9 @@
           "$ref": "#/$defs/UnsafeDropTipInPlaceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "UnsafeDropTipInPlaceCreate",
       "type": "object"
     },
@@ -4804,7 +5509,9 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId"],
+      "required": [
+        "pipetteId"
+      ],
       "title": "UnsafeDropTipInPlaceParams",
       "type": "object"
     },
@@ -4814,7 +5521,9 @@
         "commandType": {
           "const": "unsafe/engageAxes",
           "default": "unsafe/engageAxes",
-          "enum": ["unsafe/engageAxes"],
+          "enum": [
+            "unsafe/engageAxes"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4832,7 +5541,9 @@
           "$ref": "#/$defs/UnsafeEngageAxesParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "UnsafeEngageAxesCreate",
       "type": "object"
     },
@@ -4848,7 +5559,9 @@
           "type": "array"
         }
       },
-      "required": ["axes"],
+      "required": [
+        "axes"
+      ],
       "title": "UnsafeEngageAxesParams",
       "type": "object"
     },
@@ -4858,7 +5571,9 @@
         "commandType": {
           "const": "unsafe/placeLabware",
           "default": "unsafe/placeLabware",
-          "enum": ["unsafe/placeLabware"],
+          "enum": [
+            "unsafe/placeLabware"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4876,7 +5591,9 @@
           "$ref": "#/$defs/UnsafePlaceLabwareParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "UnsafePlaceLabwareCreate",
       "type": "object"
     },
@@ -4907,7 +5624,10 @@
           "title": "Location"
         }
       },
-      "required": ["labwareURI", "location"],
+      "required": [
+        "labwareURI",
+        "location"
+      ],
       "title": "UnsafePlaceLabwareParams",
       "type": "object"
     },
@@ -4917,7 +5637,9 @@
         "commandType": {
           "const": "unsafe/ungripLabware",
           "default": "unsafe/ungripLabware",
-          "enum": ["unsafe/ungripLabware"],
+          "enum": [
+            "unsafe/ungripLabware"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4935,7 +5657,9 @@
           "$ref": "#/$defs/UnsafeUngripLabwareParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "UnsafeUngripLabwareCreate",
       "type": "object"
     },
@@ -4951,7 +5675,9 @@
         "commandType": {
           "const": "unsafe/updatePositionEstimators",
           "default": "unsafe/updatePositionEstimators",
-          "enum": ["unsafe/updatePositionEstimators"],
+          "enum": [
+            "unsafe/updatePositionEstimators"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -4969,7 +5695,9 @@
           "$ref": "#/$defs/UpdatePositionEstimatorsParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "UpdatePositionEstimatorsCreate",
       "type": "object"
     },
@@ -4985,7 +5713,9 @@
           "type": "array"
         }
       },
-      "required": ["axes"],
+      "required": [
+        "axes"
+      ],
       "title": "UpdatePositionEstimatorsParams",
       "type": "object"
     },
@@ -5005,7 +5735,11 @@
           "type": "number"
         }
       },
-      "required": ["x", "y", "z"],
+      "required": [
+        "x",
+        "y",
+        "z"
+      ],
       "title": "Vec3f",
       "type": "object"
     },
@@ -5015,7 +5749,9 @@
         "commandType": {
           "const": "verifyTipPresence",
           "default": "verifyTipPresence",
-          "enum": ["verifyTipPresence"],
+          "enum": [
+            "verifyTipPresence"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5033,7 +5769,9 @@
           "$ref": "#/$defs/VerifyTipPresenceParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "VerifyTipPresenceCreate",
       "type": "object"
     },
@@ -5055,7 +5793,10 @@
           "type": "string"
         }
       },
-      "required": ["pipetteId", "expectedState"],
+      "required": [
+        "pipetteId",
+        "expectedState"
+      ],
       "title": "VerifyTipPresenceParams",
       "type": "object"
     },
@@ -5065,7 +5806,9 @@
         "commandType": {
           "const": "thermocycler/waitForBlockTemperature",
           "default": "thermocycler/waitForBlockTemperature",
-          "enum": ["thermocycler/waitForBlockTemperature"],
+          "enum": [
+            "thermocycler/waitForBlockTemperature"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5083,7 +5826,9 @@
           "$ref": "#/$defs/WaitForBlockTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "WaitForBlockTemperatureCreate",
       "type": "object"
     },
@@ -5096,7 +5841,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "WaitForBlockTemperatureParams",
       "type": "object"
     },
@@ -5106,7 +5853,9 @@
         "commandType": {
           "const": "waitForDuration",
           "default": "waitForDuration",
-          "enum": ["waitForDuration"],
+          "enum": [
+            "waitForDuration"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5124,7 +5873,9 @@
           "$ref": "#/$defs/WaitForDurationParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "WaitForDurationCreate",
       "type": "object"
     },
@@ -5142,7 +5893,9 @@
           "type": "number"
         }
       },
-      "required": ["seconds"],
+      "required": [
+        "seconds"
+      ],
       "title": "WaitForDurationParams",
       "type": "object"
     },
@@ -5152,7 +5905,9 @@
         "commandType": {
           "const": "thermocycler/waitForLidTemperature",
           "default": "thermocycler/waitForLidTemperature",
-          "enum": ["thermocycler/waitForLidTemperature"],
+          "enum": [
+            "thermocycler/waitForLidTemperature"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5170,7 +5925,9 @@
           "$ref": "#/$defs/WaitForLidTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "WaitForLidTemperatureCreate",
       "type": "object"
     },
@@ -5183,7 +5940,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "WaitForLidTemperatureParams",
       "type": "object"
     },
@@ -5192,7 +5951,10 @@
       "properties": {
         "commandType": {
           "default": "waitForResume",
-          "enum": ["waitForResume", "pause"],
+          "enum": [
+            "waitForResume",
+            "pause"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5210,7 +5972,9 @@
           "$ref": "#/$defs/WaitForResumeParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "WaitForResumeCreate",
       "type": "object"
     },
@@ -5270,7 +6034,12 @@
     },
     "WellOrigin": {
       "description": "Origin of WellLocation offset.\n\nProps:\n    TOP: the top-center of the well\n    BOTTOM: the bottom-center of the well\n    CENTER: the middle-center of the well\n    MENISCUS: the meniscus-center of the well",
-      "enum": ["top", "bottom", "center", "meniscus"],
+      "enum": [
+        "top",
+        "bottom",
+        "center",
+        "meniscus"
+      ],
       "title": "WellOrigin",
       "type": "string"
     },
@@ -5280,7 +6049,9 @@
         "commandType": {
           "const": "robot/closeGripperJaw",
           "default": "robot/closeGripperJaw",
-          "enum": ["robot/closeGripperJaw"],
+          "enum": [
+            "robot/closeGripperJaw"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5298,7 +6069,9 @@
           "$ref": "#/$defs/closeGripperJawParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "closeGripperJawCreate",
       "type": "object"
     },
@@ -5320,7 +6093,9 @@
         "commandType": {
           "const": "robot/openGripperJaw",
           "default": "robot/openGripperJaw",
-          "enum": ["robot/openGripperJaw"],
+          "enum": [
+            "robot/openGripperJaw"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5338,7 +6113,9 @@
           "$ref": "#/$defs/openGripperJawParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "openGripperJawCreate",
       "type": "object"
     },
@@ -5354,7 +6131,9 @@
         "commandType": {
           "const": "absorbanceReader/closeLid",
           "default": "absorbanceReader/closeLid",
-          "enum": ["absorbanceReader/closeLid"],
+          "enum": [
+            "absorbanceReader/closeLid"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5372,7 +6151,9 @@
           "$ref": "#/$defs/opentrons__protocol_engine__commands__absorbance_reader__close_lid__CloseLidParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CloseLidCreate",
       "type": "object"
     },
@@ -5385,7 +6166,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "CloseLidParams",
       "type": "object"
     },
@@ -5395,7 +6178,9 @@
         "commandType": {
           "const": "absorbanceReader/openLid",
           "default": "absorbanceReader/openLid",
-          "enum": ["absorbanceReader/openLid"],
+          "enum": [
+            "absorbanceReader/openLid"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5413,7 +6198,9 @@
           "$ref": "#/$defs/opentrons__protocol_engine__commands__absorbance_reader__open_lid__OpenLidParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "OpenLidCreate",
       "type": "object"
     },
@@ -5426,7 +6213,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "OpenLidParams",
       "type": "object"
     },
@@ -5436,7 +6225,9 @@
         "commandType": {
           "const": "heaterShaker/setTargetTemperature",
           "default": "heaterShaker/setTargetTemperature",
-          "enum": ["heaterShaker/setTargetTemperature"],
+          "enum": [
+            "heaterShaker/setTargetTemperature"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5454,7 +6245,9 @@
           "$ref": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "SetTargetTemperatureCreate",
       "type": "object"
     },
@@ -5472,7 +6265,10 @@
           "type": "string"
         }
       },
-      "required": ["moduleId", "celsius"],
+      "required": [
+        "moduleId",
+        "celsius"
+      ],
       "title": "SetTargetTemperatureParams",
       "type": "object"
     },
@@ -5482,7 +6278,9 @@
         "commandType": {
           "const": "heaterShaker/waitForTemperature",
           "default": "heaterShaker/waitForTemperature",
-          "enum": ["heaterShaker/waitForTemperature"],
+          "enum": [
+            "heaterShaker/waitForTemperature"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5500,7 +6298,9 @@
           "$ref": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "WaitForTemperatureCreate",
       "type": "object"
     },
@@ -5518,7 +6318,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "WaitForTemperatureParams",
       "type": "object"
     },
@@ -5528,7 +6330,9 @@
         "commandType": {
           "const": "temperatureModule/setTargetTemperature",
           "default": "temperatureModule/setTargetTemperature",
-          "enum": ["temperatureModule/setTargetTemperature"],
+          "enum": [
+            "temperatureModule/setTargetTemperature"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5546,7 +6350,9 @@
           "$ref": "#/$defs/opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "SetTargetTemperatureCreate",
       "type": "object"
     },
@@ -5564,7 +6370,10 @@
           "type": "string"
         }
       },
-      "required": ["moduleId", "celsius"],
+      "required": [
+        "moduleId",
+        "celsius"
+      ],
       "title": "SetTargetTemperatureParams",
       "type": "object"
     },
@@ -5574,7 +6383,9 @@
         "commandType": {
           "const": "temperatureModule/waitForTemperature",
           "default": "temperatureModule/waitForTemperature",
-          "enum": ["temperatureModule/waitForTemperature"],
+          "enum": [
+            "temperatureModule/waitForTemperature"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5592,7 +6403,9 @@
           "$ref": "#/$defs/opentrons__protocol_engine__commands__temperature_module__wait_for_temperature__WaitForTemperatureParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "WaitForTemperatureCreate",
       "type": "object"
     },
@@ -5610,7 +6423,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "WaitForTemperatureParams",
       "type": "object"
     },
@@ -5620,7 +6435,9 @@
         "commandType": {
           "const": "thermocycler/closeLid",
           "default": "thermocycler/closeLid",
-          "enum": ["thermocycler/closeLid"],
+          "enum": [
+            "thermocycler/closeLid"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5638,7 +6455,9 @@
           "$ref": "#/$defs/opentrons__protocol_engine__commands__thermocycler__close_lid__CloseLidParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "CloseLidCreate",
       "type": "object"
     },
@@ -5651,7 +6470,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "CloseLidParams",
       "type": "object"
     },
@@ -5661,7 +6482,9 @@
         "commandType": {
           "const": "thermocycler/openLid",
           "default": "thermocycler/openLid",
-          "enum": ["thermocycler/openLid"],
+          "enum": [
+            "thermocycler/openLid"
+          ],
           "title": "Commandtype",
           "type": "string"
         },
@@ -5679,7 +6502,9 @@
           "$ref": "#/$defs/opentrons__protocol_engine__commands__thermocycler__open_lid__OpenLidParams"
         }
       },
-      "required": ["params"],
+      "required": [
+        "params"
+      ],
       "title": "OpenLidCreate",
       "type": "object"
     },
@@ -5692,7 +6517,9 @@
           "type": "string"
         }
       },
-      "required": ["moduleId"],
+      "required": [
+        "moduleId"
+      ],
       "title": "OpenLidParams",
       "type": "object"
     }
@@ -5722,6 +6549,8 @@
       "dispenseInPlace": "#/$defs/DispenseInPlaceCreate",
       "dropTip": "#/$defs/DropTipCreate",
       "dropTipInPlace": "#/$defs/DropTipInPlaceCreate",
+      "flexStacker/retrieve": "#/$defs/RetrieveCreate",
+      "flexStacker/store": "#/$defs/StoreCreate",
       "getNextTip": "#/$defs/GetNextTipCreate",
       "getTipPresence": "#/$defs/GetTipPresenceCreate",
       "heaterShaker/closeLabwareLatch": "#/$defs/CloseLabwareLatchCreate",
@@ -5992,6 +6821,12 @@
     },
     {
       "$ref": "#/$defs/ReadAbsorbanceCreate"
+    },
+    {
+      "$ref": "#/$defs/RetrieveCreate"
+    },
+    {
+      "$ref": "#/$defs/StoreCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"
