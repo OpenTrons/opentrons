@@ -449,7 +449,7 @@ async def create_protocol(  # noqa: C901
         files=[ProtocolFile(name=f.path.name, role=f.role) for f in source.files],
     )
 
-    log.info(f'Created protocol "{protocol_id}" and started analysis "{analysis_id}".')
+    log.info(f'Created protocol "{protocol_id}".')
 
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=data),
@@ -504,6 +504,9 @@ async def _start_new_analysis_if_necessary(
                 new_parameters=analyzer.get_verified_run_time_parameters(),
             )
         ):
+            log.info(
+                f'Starting new analysis "{analysis_id}" for protocol "{protocol_id}".'
+            )
             started_new_analysis = True
             analyses.append(
                 await analyses_manager.start_analysis(
