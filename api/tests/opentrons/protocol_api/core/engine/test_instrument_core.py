@@ -8,6 +8,8 @@ from decoy import Decoy
 from decoy import errors
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
+    PositionReference,
+    Coordinate,
 )
 
 from opentrons_shared_data.pipette.types import PipetteNameType
@@ -15,6 +17,10 @@ from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_api._liquid_properties import TransferProperties
+from opentrons.protocol_api.core.engine import transfer_components_executor
+from opentrons.protocol_api.core.engine.transfer_components_executor import (
+    TransferComponentsExecutor,
+)
 from opentrons.protocol_engine import (
     DeckPoint,
     LoadedPipette,
@@ -88,6 +94,35 @@ def patch_mock_pipette_movement_safety_check(
     mock = decoy.mock(func=pipette_movement_conflict.check_safe_for_pipette_movement)
     monkeypatch.setattr(
         pipette_movement_conflict, "check_safe_for_pipette_movement", mock
+    )
+
+
+@pytest.fixture
+def mock_transfer_components_executor(
+    decoy: Decoy,
+) -> TransferComponentsExecutor:
+    """Get a mocked out TransferComponentsExecutor."""
+    return decoy.mock(cls=TransferComponentsExecutor)
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_transfer_components_executor(
+    decoy: Decoy,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_transfer_components_executor: TransferComponentsExecutor,
+) -> None:
+    """Replace transfer_components_executor functions with mocks."""
+    monkeypatch.setattr(
+        transfer_components_executor,
+        "TransferComponentsExecutor",
+        mock_transfer_components_executor,
+    )
+    monkeypatch.setattr(
+        transfer_components_executor,
+        "absolute_point_from_position_reference_and_offset",
+        decoy.mock(
+            func=transfer_components_executor.absolute_point_from_position_reference_and_offset
+        ),
     )
 
 
@@ -1557,3 +1592,54 @@ def test_load_liquid_class(
         tiprack_uri="opentrons_flex_96_tiprack_50ul",
     )
     assert result == "liquid-class-id"
+
+
+def test_aspirate_liquid_class(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: InstrumentCore,
+    minimal_liquid_class_def2: LiquidClassSchemaV1,
+    mock_transfer_components_executor: TransferComponentsExecutor,
+) -> None:
+    """It should call aspirate sub-steps execution based on liquid class."""
+    source_well = decoy.mock(cls=WellCore)
+    source_location = Location(Point(1, 2, 3), labware=None)
+    test_liquid_class = LiquidClass.create(minimal_liquid_class_def2)
+    test_transfer_properties = test_liquid_class.get_for(
+        "flex_1channel_50", "opentrons_flex_96_tiprack_50ul"
+    )
+    decoy.when(
+        transfer_components_executor.absolute_point_from_position_reference_and_offset(
+            well=source_well,
+            position_reference=PositionReference.WELL_BOTTOM,
+            offset=Coordinate(x=0, y=0, z=-5),
+        )
+    ).then_return(Point(1, 2, 3))
+    decoy.when(
+        transfer_components_executor.TransferComponentsExecutor(
+            instrument_core=subject,
+            transfer_properties=test_transfer_properties,
+            target_location=Location(Point(1, 2, 3), labware=None),
+            target_well=source_well,
+        )
+    ).then_return(mock_transfer_components_executor)
+    decoy.when(
+        mock_engine_client.state.pipettes.get_aspirated_volume("abc123")
+    ).then_return(111)
+    subject.aspirate_liquid_class(
+        volume=123,
+        source=(source_location, source_well),
+        transfer_properties=test_transfer_properties,
+    )
+    decoy.verify(
+        mock_transfer_components_executor.submerge(
+            submerge_properties=test_transfer_properties.aspirate.submerge,
+            air_gap_volume=111,
+        ),
+        mock_transfer_components_executor.mix(
+            mix_properties=test_transfer_properties.aspirate.mix
+        ),
+        mock_transfer_components_executor.pre_wet(volume=123),
+        mock_transfer_components_executor.aspirate_and_wait(volume=123),
+        mock_transfer_components_executor.retract_after_aspiration(volume=123),
+    )

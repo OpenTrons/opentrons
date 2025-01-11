@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Optional, Union, List
+from typing import TYPE_CHECKING, Optional, Union, List, Tuple
 
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -474,23 +474,14 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         """This will never be called because it was added in API 2.15."""
         pass
 
-    def load_liquid_class(
-        self,
-        liquid_class: LiquidClass,
-        pipette_load_name: str,
-        tiprack_uri: str,
-    ) -> str:
-        """This will never be called because it was added in .."""
-        # TODO(spp, 2024-11-20): update the docstring and error to include API version
-        assert False, "load_liquid_class is not supported in legacy context"
-
     def transfer_liquid(
         self,
-        liquid_class_id: str,
+        liquid_class: LiquidClass,
         volume: float,
-        source: List[LegacyWellCore],
-        dest: List[LegacyWellCore],
+        source: List[Tuple[types.Location, LegacyWellCore]],
+        dest: List[Tuple[types.Location, LegacyWellCore]],
         new_tip: TransferTipPolicyV2,
+        tiprack_uri: str,
         trash_location: Union[LegacyWellCore, types.Location, TrashBin, WasteChute],
     ) -> None:
         """Transfer a liquid from source to dest according to liquid class properties."""

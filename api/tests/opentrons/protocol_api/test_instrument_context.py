@@ -1978,14 +1978,6 @@ def test_transfer_liquid_delegates_to_engine_core(
     ).then_return(trash_location.move(Point(1, 2, 3)))
     decoy.when(next_tiprack.uri).then_return("tiprack-uri")
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("pipette-name")
-    decoy.when(
-        mock_instrument_core.load_liquid_class(
-            liquid_class=test_liq_class,
-            pipette_load_name="pipette-name",
-            tiprack_uri="tiprack-uri",
-        )
-    ).then_return("liq-class-id")
-
     subject.transfer_liquid(
         liquid_class=test_liq_class,
         volume=10,
@@ -1996,11 +1988,12 @@ def test_transfer_liquid_delegates_to_engine_core(
     )
     decoy.verify(
         mock_instrument_core.transfer_liquid(
-            liquid_class_id="liq-class-id",
+            liquid_class=test_liq_class,
             volume=10,
-            source=[mock_well._core],
-            dest=[mock_well._core],
+            source=[(Location(Point(), labware=mock_well), mock_well._core)],
+            dest=[(Location(Point(), labware=mock_well), mock_well._core)],
             new_tip=TransferTipPolicyV2.ONCE,
+            tiprack_uri="tiprack-uri",
             trash_location=trash_location.move(Point(1, 2, 3)),
         )
     )

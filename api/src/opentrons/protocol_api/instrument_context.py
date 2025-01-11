@@ -1522,7 +1522,7 @@ class InstrumentContext(publisher.CommandPublisher):
         new_tip: TransferTipPolicyV2Type = "once",
         tip_drop_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
-        ] = None,  # Maybe call this 'tip_drop_location' which is similar to PD
+        ] = None,
     ) -> InstrumentContext:
         """Transfer liquid from source to dest using the specified liquid class properties.
 
@@ -1563,6 +1563,7 @@ class InstrumentContext(publisher.CommandPublisher):
             else:
                 tiprack = self._last_tip_picked_up_from.parent
         else:
+            # TODO: update this with getNextTip result from engine
             tiprack, well = labware.next_available_tip(
                 starting_tip=self.starting_tip,
                 tip_racks=self.tip_racks,
@@ -1591,25 +1592,25 @@ class InstrumentContext(publisher.CommandPublisher):
                 tip_drop_location=_trash_location
             )
         )
-        liquid_class_id = self._core.load_liquid_class(
-            liquid_class=liquid_class,
-            pipette_load_name=self.name,
-            tiprack_uri=tiprack.uri,
-        )
-
         self._core.transfer_liquid(
-            liquid_class_id=liquid_class_id,
+            liquid_class=liquid_class,
             volume=volume,
-            source=[well._core for well in flat_sources_list],
-            dest=[well._core for well in flat_dests_list],
+            source=[
+                (types.Location(types.Point(), labware=well), well._core)
+                for well in flat_sources_list
+            ],
+            dest=[
+                (types.Location(types.Point(), labware=well), well._core)
+                for well in flat_dests_list
+            ],
             new_tip=valid_new_tip,
+            tiprack_uri=tiprack.uri,
             trash_location=(
                 checked_trash_location._core
                 if isinstance(checked_trash_location, labware.Well)
                 else checked_trash_location
             ),
         )
-
         return self
 
     @requires_version(2, 0)
