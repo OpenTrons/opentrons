@@ -400,6 +400,7 @@ class ProtocolContext(CommandPublisher):
         version: Optional[int] = None,
         adapter: Optional[str] = None,
         lid: Optional[str] = None,
+        schema: Optional[int] = None,
     ) -> Labware:
         """Load a labware onto a location.
 
@@ -448,6 +449,8 @@ class ProtocolContext(CommandPublisher):
             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
             lid will use the same namespace as the labware, and the API will
             choose the lid's version automatically.
+        :param schema: If specified, the schema version that will correspond to the
+            labware definition to load by default.
 
                         .. versionadded:: 2.15
         """
@@ -486,6 +489,7 @@ class ProtocolContext(CommandPublisher):
             label=label,
             namespace=namespace,
             version=version,
+            schema=schema,
         )
 
         if lid is not None:

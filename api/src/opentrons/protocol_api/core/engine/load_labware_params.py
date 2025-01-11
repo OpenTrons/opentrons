@@ -34,6 +34,42 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     "corning_24_wellplate_3.4ml_flat": 2,
 }
 
+_APILEVEL_2_21_OT_DEFAULT_VERSIONS: Dict[str, int] = {
+    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": 2,
+    "opentrons_24_tuberack_nest_2ml_screwcap": 2,
+    "opentrons_24_tuberack_nest_1.5ml_screwcap": 2,
+    "nest_1_reservoir_290ml": 2,
+    "opentrons_24_tuberack_nest_2ml_snapcap": 2,
+    "nest_96_wellplate_2ml_deep": 3,
+    "opentrons_24_tuberack_nest_1.5ml_snapcap": 2,
+    "nest_12_reservoir_15ml": 2,
+    "nest_1_reservoir_195ml": 3,
+    "opentrons_24_tuberack_nest_0.5ml_screwcap": 2,
+    "opentrons_96_wellplate_200ul_pcr_full_skirt": 3,
+    "nest_96_wellplate_100ul_pcr_full_skirt": 3,
+    "nest_96_wellplate_200ul_flat": 3,
+    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical": 2,
+    "usascientific_12_reservoir_22ml": 2,
+    "thermoscientificnunc_96_wellplate_2000ul": 2,
+    "usascientific_96_wellplate_2.4ml_deep": 2,
+    "agilent_1_reservoir_290ml": 2,
+    "opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap": 2,
+    "thermoscientificnunc_96_wellplate_1300ul": 2,
+    "corning_12_wellplate_6.9ml_flat": 3,
+    "corning_24_wellplate_3.4ml_flat": 3,
+    "corning_6_wellplate_16.8ml_flat": 3,
+    "corning_48_wellplate_1.6ml_flat": 3,
+    "biorad_96_wellplate_200ul_pcr": 3,
+    "axygen_1_reservoir_90ml": 2,
+    "corning_384_wellplate_112ul_flat": 3,
+    "corning_96_wellplate_360ul_flat": 3,
+    "biorad_384_wellplate_50ul": 3,
+    "appliedbiosystemsmicroamp_384_wellplate_40ul": 2,
+    "opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap": 2,
+    "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical": 2,
+    "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical": 2,
+}
+
 
 class AmbiguousLoadLabwareParamsError(RuntimeError):
     """Error raised when specific labware parameters cannot be found due to multiple matching labware definitions."""
@@ -44,6 +80,8 @@ def resolve(
     namespace: Optional[str],
     version: Optional[int],
     custom_load_labware_params: List[LabwareLoadParams],
+    api_level: Optional[Tuple[int, int]] = None,
+    schema_version: Optional[int] = 2,
 ) -> Tuple[str, int]:
     """Resolve the load labware parameters that best matches any custom labware, or default to opentrons standards
 
@@ -53,6 +91,8 @@ def resolve(
         version: Optionally provided labware definition version
         custom_load_labware_params: List of load labware parameters associated with custom labware that
                                     match given parameters
+        api_level: Current api level.
+        schema_version: The desired labware schema version to draw a definition from.
 
     Returns:
         A tuple of the resolved namespace and version
@@ -79,10 +119,16 @@ def resolve(
         # custom labware matching that namespace, so we will always take this path in
         # that case.
         resolved_namespace = namespace if namespace is not None else OPENTRONS_NAMESPACE
+        api_level = api_level if api_level else (2, 14)
+        schema_version = schema_version if schema_version else 2
         resolved_version = (
             version
             if version is not None
-            else _get_default_version_for_standard_labware(load_name=load_name)
+            else _get_default_version_for_standard_labware(
+                load_name=load_name,
+                current_api_level=api_level,
+                schema_version=schema_version,
+            )
         )
 
     elif len(filtered_custom_params) > 1:
@@ -99,7 +145,15 @@ def resolve(
     return resolved_namespace, resolved_version
 
 
-def _get_default_version_for_standard_labware(load_name: str) -> int:
+def _get_default_version_for_standard_labware(
+    load_name: str,
+    current_api_level: Tuple[int, int] = (2, 14),
+    schema_version: int = 2,
+) -> int:
     # We know the protocol is running at least apiLevel 2.14 by this point because
     # apiLevel 2.13 and below has its own separate code path for resolving labware.
+    if current_api_level >= (2, 21) and schema_version == 3:
+        found_version = _APILEVEL_2_21_OT_DEFAULT_VERSIONS.get(load_name, None)
+        if found_version:
+            return found_version
     return _APILEVEL_2_14_OT_DEFAULT_VERSIONS.get(load_name, 1)

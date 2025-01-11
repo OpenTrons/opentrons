@@ -331,6 +331,7 @@ def test_load_labware(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
+    api_version: APIVersion,
 ) -> None:
     """It should issue a LoadLabware command."""
     decoy.when(
@@ -343,6 +344,8 @@ def test_load_labware(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            api_version,
+            2,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -374,6 +377,7 @@ def test_load_labware(
         label="some_display_name",  # maps to optional display name
         namespace="a_namespace",
         version=456,
+        schema=2,
     )
 
     assert isinstance(result, LabwareCore)
@@ -405,6 +409,7 @@ def test_load_labware_on_staging_slot(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
+    api_version: APIVersion,
 ) -> None:
     """It should issue a LoadLabware command for a labware on a staging slot."""
     decoy.when(
@@ -417,6 +422,8 @@ def test_load_labware_on_staging_slot(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            api_version,
+            3,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -448,6 +455,7 @@ def test_load_labware_on_staging_slot(
         label="some_display_name",  # maps to optional display name
         namespace="a_namespace",
         version=456,
+        schema=3,
     )
 
     assert isinstance(result, LabwareCore)
@@ -479,6 +487,7 @@ def test_load_labware_on_labware(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
+    api_version: APIVersion,
 ) -> None:
     """It should issue a LoadLabware command onto an OnLabware location."""
     mock_labware_core = decoy.mock(cls=LabwareCore)
@@ -494,6 +503,8 @@ def test_load_labware_on_labware(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            api_version,
+            None,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -529,6 +540,7 @@ def test_load_labware_on_labware(
         label="some_display_name",
         namespace="a_namespace",
         version=456,
+        schema=None,
     )
 
     assert isinstance(result, LabwareCore)
@@ -552,6 +564,7 @@ def test_load_labware_off_deck(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     subject: ProtocolCore,
+    api_version: APIVersion,
 ) -> None:
     """It should issue a LoadLabware off deck command."""
     decoy.when(
@@ -564,6 +577,8 @@ def test_load_labware_off_deck(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            api_version,
+            None,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -595,6 +610,7 @@ def test_load_labware_off_deck(
         label="some_display_name",  # maps to optional display name
         namespace="a_namespace",
         version=456,
+        schema=None,
     )
 
     assert isinstance(result, LabwareCore)
@@ -1189,6 +1205,8 @@ def test_load_labware_on_module(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            api_version,
+            None,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -1227,6 +1245,7 @@ def test_load_labware_on_module(
         label="some_display_name",  # maps to optional display name
         namespace="a_namespace",
         version=456,
+        schema=None,
     )
 
     assert isinstance(result, LabwareCore)
@@ -1266,6 +1285,8 @@ def test_load_labware_on_non_connected_module(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            api_version,
+            2,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -1303,6 +1324,7 @@ def test_load_labware_on_non_connected_module(
         label="some_display_name",  # maps to optional display name
         namespace="a_namespace",
         version=456,
+        schema=2,
     )
 
     assert isinstance(result, LabwareCore)

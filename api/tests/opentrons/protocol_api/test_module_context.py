@@ -101,6 +101,7 @@ def test_load_labware(
             namespace="ideal",
             version=101,
             location=mock_core,
+            schema=None,
         )
     ).then_return(mock_labware_core)
 
@@ -149,6 +150,7 @@ def test_load_labware_from_definition(
             version=1337,
             label="Some Display Name",
             location=mock_core,
+            schema=None,
         )
     ).then_return(mock_labware_core)
 
@@ -265,6 +267,7 @@ def test_load_labware_with_adapter(
             namespace="ideal",
             version=101,
             location=mock_adapter_core,
+            schema=None,
         )
     ).then_return(mock_labware_core)
 

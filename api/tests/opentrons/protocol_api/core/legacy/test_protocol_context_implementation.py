@@ -176,6 +176,7 @@ def test_load_labware_off_deck_raises(
             label="cool label",
             namespace="cool namespace",
             version=1337,
+            schema=None,
         )
 
 
@@ -190,6 +191,7 @@ def test_load_labware_on_staging_slot_raises(
             label="cool label",
             namespace="cool namespace",
             version=1337,
+            schema=None,
         )
 
 
@@ -246,6 +248,7 @@ def test_load_labware(
         label="cool label",
         namespace="cool namespace",
         version=1337,
+        schema=None,
     )
 
     assert isinstance(result, LegacyLabwareCore)
@@ -347,6 +350,7 @@ def test_load_labware_on_module(
         label="cool label",
         namespace="cool namespace",
         version=1337,
+        schema=None,
     )
 
     assert isinstance(result, LegacyLabwareCore)
@@ -384,6 +388,7 @@ def test_load_labware_on_labware_raises(
             label="cool label",
             namespace="cool namespace",
             version=1337,
+            schema=None,
         )
 
 

@@ -132,6 +132,7 @@ def test_load_labware(
             namespace="a-namespace",
             version=123,
             location=mock_labware_core,
+            schema=None,
         )
     ).then_return(new_mock_core)
     decoy.when(new_mock_core.get_well_columns()).then_return([])
@@ -141,6 +142,7 @@ def test_load_labware(
         label="a label",
         namespace="a-namespace",
         version=123,
+        schema=None,
     )
 
     assert isinstance(result, Labware)
@@ -175,6 +177,7 @@ def test_load_labware_from_definition(
             version=1337,
             label="a label",
             location=mock_labware_core,
+            schema=None,
         )
     ).then_return(new_mock_core)
 

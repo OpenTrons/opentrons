@@ -211,6 +211,7 @@ class ProtocolCore(
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
+        schema: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
         load_location = self._convert_labware_location(location=location)
@@ -219,7 +220,12 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name,
+            namespace,
+            version,
+            custom_labware_params,
+            self._api_version,
+            schema,
         )
 
         load_result = self._engine_client.execute_command_without_recovery(

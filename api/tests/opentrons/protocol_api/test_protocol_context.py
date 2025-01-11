@@ -431,6 +431,7 @@ def test_load_labware(
             label="some_display_name",
             namespace="some_namespace",
             version=1337,
+            schema=2,
         )
     ).then_return(mock_labware_core)
 
@@ -444,6 +445,7 @@ def test_load_labware(
         label="some_display_name",
         namespace="some_namespace",
         version=1337,
+        schema=2,
     )
 
     assert isinstance(result, Labware)
@@ -472,6 +474,7 @@ def test_load_labware_off_deck(
             label="some_display_name",
             namespace="some_namespace",
             version=1337,
+            schema=None,
         )
     ).then_return(mock_labware_core)
 
@@ -533,6 +536,7 @@ def test_load_labware_on_staging_slot(
             label="some_display_name",
             namespace="some_namespace",
             version=1337,
+            schema=None,
         )
     ).then_return(mock_labware_core)
 
@@ -585,6 +589,7 @@ def test_load_labware_from_definition(
             version=1337,
             location=DeckSlotName.SLOT_1,
             label="Some Display Name",
+            schema=None,
         )
     ).then_return(mock_labware_core)
 
@@ -720,6 +725,7 @@ def test_load_labware_on_adapter(
             label="some_display_name",
             namespace="some_namespace",
             version=1337,
+            schema=None,
         )
     ).then_return(mock_labware_core)
 
@@ -773,6 +779,7 @@ def test_load_labware_with_lid(
             label="some_display_name",
             namespace="some_namespace",
             version=1337,
+            schema=None,
         )
     ).then_return(mock_labware_core)
     decoy.when(mock_lid_core.get_well_columns()).then_return([])

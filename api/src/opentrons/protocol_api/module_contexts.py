@@ -126,6 +126,7 @@ class ModuleContext(CommandPublisher):
         version: Optional[int] = None,
         adapter: Optional[str] = None,
         lid: Optional[str] = None,
+        schema: Optional[int] = None,
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
@@ -180,6 +181,7 @@ class ModuleContext(CommandPublisher):
             namespace=namespace,
             version=version,
             location=load_location,
+            schema=schema,
         )
         if lid is not None:
             if self._api_version < validation.LID_STACK_VERSION_GATE:

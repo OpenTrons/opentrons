@@ -36,7 +36,7 @@ For example, these two ``load_labware()`` commands are equivalent:
 
 .. code-block:: python
 
-    protocol.load_labware("nest_96_wellplate_200ul_flat", "A1")
+    protocol.load_labware("nest_96_wellplate_200ul_flat", "A1", None)
     
 .. versionadded:: 2.15
 

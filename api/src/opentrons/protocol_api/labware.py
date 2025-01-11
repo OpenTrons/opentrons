@@ -547,6 +547,7 @@ class Labware:
         lid: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
+        schema: Optional[int] = None,
     ) -> Labware:
         """Load a compatible labware onto the labware using its load parameters.
 
@@ -563,6 +564,7 @@ class Labware:
             namespace=namespace,
             version=version,
             location=self._core,
+            schema=schema,
         )
 
         labware = Labware(
