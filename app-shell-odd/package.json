@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": ["**"]
+    "nohoist": [
+      "**"
+    ]
   },
   "devDependencies": {
     "@opentrons/app": "link:../app"
@@ -32,7 +34,7 @@
   "dependencies": {
     "@opentrons/discovery-client": "link:../discovery-client",
     "@opentrons/shared-data": "link:../shared-data",
-    "@thi.ng/paths": "1.6.5",
+    "@thi.ng/paths": "5.1.96",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
     "@types/lodash": "^4.14.191",

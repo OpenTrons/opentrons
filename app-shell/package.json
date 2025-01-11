@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": ["**"]
+    "nohoist": [
+      "**"
+    ]
   },
   "devDependencies": {
     "electron-notarize": "^1.2.1",
@@ -34,8 +36,8 @@
     "@opentrons/app": "link:../app",
     "@opentrons/discovery-client": "link:../discovery-client",
     "@opentrons/shared-data": "link:../shared-data",
+    "@thi.ng/paths": "5.1.96",
     "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
-    "@thi.ng/paths": "1.6.5",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
     "@types/lodash": "^4.14.191",

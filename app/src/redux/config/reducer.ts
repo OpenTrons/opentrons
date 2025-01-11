@@ -16,7 +16,7 @@ export function configReducer(
 
     case VALUE_UPDATED: {
       if (state === null) return state
-      return setIn(state, action.payload.path, action.payload.value)
+      return setIn(state, action.payload.path as never, action.payload.value)
     }
   }
 
