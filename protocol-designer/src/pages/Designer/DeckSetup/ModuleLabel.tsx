@@ -71,6 +71,7 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
     <DeckLabelSet
       ref={labelContainerRef}
       deckLabels={[
+        ...labwareInfos,
         {
           text: labelName ?? def?.displayName,
           isSelected,
@@ -78,7 +79,6 @@ export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
           moduleModel: def?.model,
           isZoomed: isZoomed,
         },
-        ...labwareInfos,
       ]}
       x={
         position[0] +

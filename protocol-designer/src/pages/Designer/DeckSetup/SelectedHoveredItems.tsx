@@ -106,29 +106,6 @@ export const SelectedHoveredItems = (
   const labwareInfos: DeckLabelProps[] = []
 
   if (
-    selectedLabwareDefUri != null &&
-    (hoveredLabware == null || hoveredLabware !== selectedLabwareDefUri)
-  ) {
-    const def =
-      defs[selectedLabwareDefUri] ?? customLabwareDefs[selectedLabwareDefUri]
-    const selectedLabwareLabel = {
-      text: def.metadata.displayName,
-      isSelected: true,
-      isLast: hoveredLabware == null && selectedNestedLabwareDefUri == null,
-      isZoomed: true,
-    }
-    labwareInfos.push(selectedLabwareLabel)
-  }
-  if (selectedNestedLabwareDef != null && hoveredLabware == null) {
-    const selectedNestedLabwareLabel = {
-      text: selectedNestedLabwareDef.metadata.displayName,
-      isSelected: true,
-      isLast: hoveredLabware == null,
-      isZoomed: true,
-    }
-    labwareInfos.push(selectedNestedLabwareLabel)
-  }
-  if (
     (hoveredLabware != null ||
       selectedLabwareDefUri === hoveredLabware ||
       selectedNestedLabwareDefUri === hoveredLabware) &&
@@ -141,6 +118,30 @@ export const SelectedHoveredItems = (
       isZoomed: true,
     }
     labwareInfos.push(hoverLabelLabel)
+  }
+
+  if (selectedNestedLabwareDef != null && hoveredLabware == null) {
+    const selectedNestedLabwareLabel = {
+      text: selectedNestedLabwareDef.metadata.displayName,
+      isSelected: true,
+      isLast: hoveredLabware == null,
+      isZoomed: true,
+    }
+    labwareInfos.push(selectedNestedLabwareLabel)
+  }
+  if (
+    selectedLabwareDefUri != null &&
+    (hoveredLabware == null || hoveredLabware !== selectedLabwareDefUri)
+  ) {
+    const def =
+      defs[selectedLabwareDefUri] ?? customLabwareDefs[selectedLabwareDefUri]
+    const selectedLabwareLabel = {
+      text: def.metadata.displayName,
+      isSelected: true,
+      isLast: hoveredLabware == null && selectedNestedLabwareDefUri == null,
+      isZoomed: true,
+    }
+    labwareInfos.push(selectedLabwareLabel)
   }
 
   return (
