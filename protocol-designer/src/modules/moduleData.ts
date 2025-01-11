@@ -326,7 +326,11 @@ export function getNextAvailableModuleSlot(
     const addressableAreaName = stagingAreaAddressableAreaNames.find(
       aa => aa === slot
     )
-    let isSlotEmpty: boolean = getSlotIsEmpty(initialDeckSetup, slot, true)
+    let isSlotEmpty: boolean = getSlotIsEmpty(
+      initialDeckSetup,
+      slot,
+      !isMagneticBlock
+    )
     if (addressableAreaName == null && COLUMN_4_SLOTS.includes(slot)) {
       isSlotEmpty = false
     } else if (

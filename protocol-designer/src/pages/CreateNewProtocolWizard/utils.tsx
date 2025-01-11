@@ -33,7 +33,8 @@ import type { AdditionalEquipment, WizardFormState } from './types'
 const TOTAL_OUTER_SLOTS = 8
 const MIDDLE_SLOT_NUM = 4
 const MAX_MAGNETIC_BLOCK_SLOTS = 12
-
+const TOTAL_OUTER_RIGHT_SLOTS = 4
+const TOTAL_OUTER_LEFT_SLOTS = 4
 export const getNumOptions = (length: number): DropdownOption[] => {
   return Array.from({ length }, (_, i) => ({
     name: `${i + 1}`,
@@ -49,31 +50,37 @@ export const getNumSlotsAvailable = (
   const additionalEquipmentLength = additionalEquipment.filter(
     ae => ae !== 'gripper'
   ).length
+
   const hasTC = Object.values(modules || {}).some(
     module => module.type === THERMOCYCLER_MODULE_TYPE
   )
-  const numStagingAreas = additionalEquipment.filter(ae => ae === 'stagingArea')
-    ?.length
+
+  const numStagingAreas =
+    additionalEquipment.filter(ae => ae === 'stagingArea')?.length || 0
+
   const hasWasteChute = additionalEquipment.some(ae => ae === 'wasteChute')
 
   const magneticBlocks = Object.values(modules || {}).filter(
     module => module.type === MAGNETIC_BLOCK_TYPE
   )
+  const magneticBlockCount = magneticBlocks.length
+
   let filteredModuleLength = modules != null ? Object.keys(modules).length : 0
-  if (magneticBlocks.length > 0) {
-    //  once blocks exceed 4, then we dont' want to subtract the amount available
-    //  because block can go into the center slots where all other modules/trashes can not
-    const numBlocks =
-      magneticBlocks.length >= 4 ? MIDDLE_SLOT_NUM : magneticBlocks.length
-    filteredModuleLength =
-      filteredModuleLength - (type !== 'magneticBlockV1' ? numBlocks : 0)
+  if (magneticBlockCount <= MIDDLE_SLOT_NUM) {
+    // Subtract magnetic blocks directly if their count is ≤ 4
+    filteredModuleLength -= magneticBlockCount
+  } else {
+    // Subtract the excess magnetic blocks beyond 4
+    const extraMagneticBlocks = magneticBlockCount - MIDDLE_SLOT_NUM
+    filteredModuleLength -= extraMagneticBlocks
   }
   if (hasTC) {
-    filteredModuleLength = filteredModuleLength + 1
+    filteredModuleLength += 1
   }
+
   let filteredAdditionalEquipmentLength = additionalEquipmentLength
   if (numStagingAreas >= 1 && hasWasteChute && type !== 'stagingArea') {
-    filteredAdditionalEquipmentLength = filteredAdditionalEquipmentLength - 1
+    filteredAdditionalEquipmentLength -= 1
   }
   switch (type) {
     case 'gripper': {
@@ -99,13 +106,26 @@ export const getNumSlotsAvailable = (
       }
     }
     case 'trashBin':
-    case 'stagingArea':
     case HEATERSHAKER_MODULE_V1:
     case TEMPERATURE_MODULE_V2: {
       return (
         TOTAL_OUTER_SLOTS -
         (filteredModuleLength + filteredAdditionalEquipmentLength)
       )
+    }
+    //  TODO: need to do additional overhaul for this logic
+    //  it mostly works but still some edge cases - seems like it's not properly subtracting mag blocks 
+    //  that go into the 3rd column for the staging area to be added as well
+    case 'stagingArea': {
+      const adjustedModuleLength =
+        filteredModuleLength > 4
+          ? filteredModuleLength - TOTAL_OUTER_LEFT_SLOTS
+          : 0
+
+      const occupiedSlots =
+        adjustedModuleLength + filteredAdditionalEquipmentLength
+
+      return TOTAL_OUTER_RIGHT_SLOTS - occupiedSlots
     }
     case 'wasteChute': {
       const adjustmentForStagingArea = numStagingAreas >= 1 ? 1 : 0
@@ -117,9 +137,13 @@ export const getNumSlotsAvailable = (
       )
     }
     case MAGNETIC_BLOCK_V1: {
+      const filteredAdditionalEquipmentForMagneticBlockLength = additionalEquipment.filter(
+        ae => ae !== 'gripper' && ae !== 'stagingArea'
+      )?.length
       return (
         MAX_MAGNETIC_BLOCK_SLOTS -
-        (filteredModuleLength + filteredAdditionalEquipmentLength)
+        (filteredModuleLength +
+          filteredAdditionalEquipmentForMagneticBlockLength)
       )
     }
   }

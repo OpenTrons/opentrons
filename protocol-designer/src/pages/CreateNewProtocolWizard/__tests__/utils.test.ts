@@ -235,7 +235,78 @@ describe('getNumSlotsAvailable', () => {
     )
     expect(result).toBe(1)
   })
-  it('should return 8 when there are 4 staging area for magnetic block', () => {
+  it('should return 4 when there are 12 magnetic blocks for staging area', () => {
+    const mockModules = {
+      0: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      1: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      2: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      3: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      4: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      5: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      6: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'D2',
+      },
+      7: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      8: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      9: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      10: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      11: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+    } as any
+    const mockAdditionalEquipment: AdditionalEquipment[] = []
+    const result = getNumSlotsAvailable(
+      mockModules,
+      mockAdditionalEquipment,
+      'stagingArea'
+    )
+    expect(result).toBe(4)
+  })
+  it('should return 12 when there are 4 staging area for magnetic block', () => {
     const mockAdditionalEquipment: AdditionalEquipment[] = [
       'stagingArea',
       'stagingArea',
@@ -247,9 +318,9 @@ describe('getNumSlotsAvailable', () => {
       mockAdditionalEquipment,
       MAGNETIC_BLOCK_V1
     )
-    expect(result).toBe(8)
+    expect(result).toBe(12)
   })
-  it('should return 4 when there are 4 modules, 4 staging area for magnetic block', () => {
+  it('should return 8 when there are 4 modules, 4 staging area for magnetic block since magnetic blocks can now go on staging areas', () => {
     const mockModules = {
       0: {
         model: HEATERSHAKER_MODULE_V1,
@@ -278,7 +349,7 @@ describe('getNumSlotsAvailable', () => {
       mockAdditionalEquipment,
       MAGNETIC_BLOCK_V1
     )
-    expect(result).toBe(4)
+    expect(result).toBe(8)
   })
 })
 
