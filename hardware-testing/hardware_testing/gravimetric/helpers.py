@@ -485,6 +485,7 @@ def _load_tipracks(
         )
         for slot in cfg.slots_tiprack
     ]
+    print(f"LOAD TIPRack{use_adapters}")
     for ls in tiprack_load_settings:
         ui.print_info(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
 

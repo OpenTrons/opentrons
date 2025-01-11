@@ -76,8 +76,11 @@ export function ProtocolInstrumentMountItem(
     []
   )
   const [flowType, setFlowType] = useState<string>(FLOWS.ATTACH)
-  const selectedPipette =
-    speccedName === 'p1000_96' ? NINETY_SIX_CHANNEL : SINGLE_MOUNT_PIPETTES
+  const is96ChannelPipette =
+    speccedName === 'p1000_96' || speccedName === 'p200_96'
+  const selectedPipette = is96ChannelPipette
+    ? NINETY_SIX_CHANNEL
+    : SINGLE_MOUNT_PIPETTES
 
   const handleCalibrate: MouseEventHandler = () => {
     setFlowType(FLOWS.CALIBRATE)
@@ -95,7 +98,7 @@ export function ProtocolInstrumentMountItem(
       setShowPipetteWizardFlow(true)
     }
   }
-  const is96ChannelPipette = speccedName === 'p1000_96'
+
   const isAttachedWithCal =
     attachedInstrument != null &&
     attachedInstrument.ok &&

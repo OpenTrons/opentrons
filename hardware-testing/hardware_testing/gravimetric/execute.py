@@ -591,7 +591,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
     assert resources.recorder is not None
     recorder = resources.recorder
     if resources.ctx.is_simulating():
-        start_sim_mass = {50: 15, 200: 200, 1000: 200}
+        start_sim_mass = {20: 5, 50: 15, 200: 200, 1000: 200}
         resources.recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
     os.makedirs(
         f"{resources.test_report.parent}/{resources.test_report._run_id}", exist_ok=True

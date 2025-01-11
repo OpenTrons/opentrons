@@ -70,11 +70,12 @@ GRAVIMETRIC_CFG = {
 
 GRAVIMETRIC_CFG_INCREMENT = {
     50: {
-        1: {50: gravimetric_ot3_p50_single},
+        1: {20: gravimetric_ot3_p50_single, 50: gravimetric_ot3_p50_single},
         8: {50: gravimetric_ot3_p50_multi_50ul_tip_increment},
     },
     200: {
         96: {
+            20: gravimetric_ot3_p200_96,
             50: gravimetric_ot3_p200_96,
             200: gravimetric_ot3_p200_96,
         },
@@ -117,6 +118,7 @@ PIPETTE_MODEL_NAME = {
 PHOTOMETRIC_CFG = {
     50: {
         1: {
+            20: photometric_ot3_p50_single,
             50: photometric_ot3_p50_single,
         },
         8: {
@@ -124,7 +126,11 @@ PHOTOMETRIC_CFG = {
         },
     },
     200: {
-        96: {50: photometric_ot3_p200_96, 200: photometric_ot3_p200_96},
+        96: {
+            20: photometric_ot3_p200_96,
+            50: photometric_ot3_p200_96,
+            200: photometric_ot3_p200_96,
+        },
     },
     1000: {
         1: {
@@ -137,7 +143,11 @@ PHOTOMETRIC_CFG = {
             200: photometric_ot3_p1000_multi,
             1000: photometric_ot3_p1000_multi,
         },
-        96: {50: photometric_ot3_p1000_96, 200: photometric_ot3_p1000_96},
+        96: {
+            20: photometric_ot3_p1000_96,
+            50: photometric_ot3_p1000_96,
+            200: photometric_ot3_p1000_96,
+        },
     },
 }
 
@@ -177,11 +187,11 @@ class RunArgs:
                 "Starting opentrons-robot-server, so we can http GET labware offsets"
             )
             LABWARE_OFFSETS.extend(workarounds.http_get_all_labware_offsets())
-            ui.print_info(f"found {len(LABWARE_OFFSETS)} offsets:")
-            for offset in LABWARE_OFFSETS:
-                ui.print_info(f"\t{offset.createdAt}:")
-                ui.print_info(f"\t\t{offset.definitionUri}")
-                ui.print_info(f"\t\t{offset.vector}")
+            # ui.print_info(f"found {len(LABWARE_OFFSETS)} offsets:")
+            # for offset in LABWARE_OFFSETS:
+            #    ui.print_info(f"\t{offset.createdAt}:")
+            #    ui.print_info(f"\t\t{offset.definitionUri}")
+            #    ui.print_info(f"\t\t{offset.vector}")
         # gather the custom labware (for simulation)
         custom_defs = {}
         if args.simulate:
@@ -572,7 +582,7 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
-    parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
+    parser.add_argument("--tip", type=int, choices=[0, 20, 50, 200, 1000], default=0)
     parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--return-tip", action="store_true")

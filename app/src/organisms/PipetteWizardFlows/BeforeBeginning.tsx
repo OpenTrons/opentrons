@@ -148,7 +148,10 @@ export const BeforeBeginning = (
         const displayName = pipetteDisplayName ?? requiredPipette.pipetteName
         bodyTranslationKey = 'remove_labware'
 
-        if (requiredPipette.pipetteName === 'p1000_96') {
+        if (
+          requiredPipette.pipetteName === 'p1000_96' ||
+          requiredPipette.pipetteName === 'p200_96'
+        ) {
           equipmentList = [
             { ...NINETY_SIX_CHANNEL_PIPETTE, displayName },
             CALIBRATION_PROBE,

@@ -88,30 +88,40 @@ LABWARE_BOTTOM_CLEARANCE = 1.5
 LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
     50: {
         1: {
+            20: {
+                "mount_speed": 5,
+                "plunger_speed": 15,
+                "sensor_threshold_pascals": 15,
+            },
             50: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 15,
                 "sensor_threshold_pascals": 15,
             },
         },
         8: {
             50: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 15,
                 "sensor_threshold_pascals": 15,
             },
         },
     },
     200: {
         96: {
+            20: {
+                "mount_speed": 5,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
+            },
             50: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 5,
                 "sensor_threshold_pascals": 15,
             },
             200: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 5,
                 "sensor_threshold_pascals": 15,
             },
         }
@@ -120,51 +130,56 @@ LIQUID_PROBE_SETTINGS: Dict[int, Dict[int, Dict[int, Dict[str, int]]]] = {
         1: {
             50: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 15,
                 "sensor_threshold_pascals": 15,
             },
             200: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 15,
                 "sensor_threshold_pascals": 15,
             },
             1000: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 15,
                 "sensor_threshold_pascals": 15,
             },
         },
         8: {
             50: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 15,
                 "sensor_threshold_pascals": 15,
             },
             200: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 15,
                 "sensor_threshold_pascals": 15,
             },
             1000: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 15,
                 "sensor_threshold_pascals": 15,
             },
         },
         96: {
+            20: {
+                "mount_speed": 5,
+                "plunger_speed": 5,
+                "sensor_threshold_pascals": 15,
+            },
             50: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 5,
                 "sensor_threshold_pascals": 15,
             },
             200: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 5,
                 "sensor_threshold_pascals": 15,
             },
             1000: {
                 "mount_speed": 5,
-                "plunger_speed": 20,
+                "plunger_speed": 5,
                 "sensor_threshold_pascals": 15,
             },
         },
@@ -194,6 +209,7 @@ def _get_liquid_probe_settings(
 QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     1: {
         50: [  # P50
+            (20, [1.0, 20.0]),
             (50, [1.0, 50.0]),  # T50
         ],
         1000: [  # P1000
@@ -214,10 +230,12 @@ QC_VOLUMES_G: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     },
     96: {
         200: [
+            (20, [0.5, 1.0]),  # T20
             (50, [1.0, 50.0]),  # T50
             (200, [200.0]),  # T200
         ],
         1000: [  # P1000
+            (20, [5.0]),
             (50, [5.0]),  # T50
             (200, [200.0]),  # T200
             (1000, [1000.0]),  # T1000
@@ -279,7 +297,8 @@ QC_VOLUMES_P: Dict[int, Dict[int, List[Tuple[int, List[float]]]]] = {
     },
     96: {
         200: [
-            (50, [1.0, 5.0]),  # T50
+            (20, [1.0, 0.5]),  # T50
+            (50, [50.0]),  # T50
             (200, [200.0]),  # T200
         ],
         1000: [  # P1000
@@ -311,6 +330,11 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
     # channels: [Pipette: [tip: [Volume: (%d, Cv)]]]
     1: {
         50: {  # P50
+            20: {
+                1.0: (5.0, 4.0),
+                10.0: (1.0, 0.5),
+                20.0: (1, 0.4),
+            },
             50: {
                 1.0: (5.0, 4.0),
                 10.0: (1.0, 0.5),
@@ -363,12 +387,16 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
     },
     96: {
         200: {
-            50: {  # T50
+            20: {  # T20
+                0.5: (2.5, 2.0),
                 1.0: (2.5, 2.0),
                 2.0: (2.5, 2.0),
                 3.0: (2.5, 2.0),
                 5.0: (2.5, 2.0),
                 10.0: (3.1, 1.7),
+            },
+            50: {  # T50
+                1.0: (2.5, 2.0),
                 50.0: (1.5, 0.75),
             },
             200: {  # T200
@@ -378,6 +406,14 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
             },
         },
         1000: {  # P1000
+            20: {  # T20
+                1.0: (2.5, 2.0),
+                2.0: (2.5, 2.0),
+                3.0: (2.5, 2.0),
+                5.0: (2.5, 2.0),
+                10.0: (3.1, 1.7),
+                20.0: (3.1, 1.7),
+            },
             50: {  # T50
                 1.0: (2.5, 2.0),
                 2.0: (2.5, 2.0),
