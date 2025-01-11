@@ -215,3 +215,12 @@ class LiquidHandler(
         max_z_dist : maximum depth to probe for liquid
         """
         ...
+
+    async def aspirate_while_tracking(
+        self,
+        mount: MountArgType,
+        z_distance: float,
+        flow_rate: float,
+        volume: float,
+    ) -> None:
+        ...

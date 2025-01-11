@@ -135,6 +135,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         flow_rate: float,
         in_place: bool,
         is_meniscus: Optional[bool] = None,
+        is_tracking: Optional[bool] = False,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -192,6 +193,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                     wellLocation=well_location,
                     volume=volume,
                     flowRate=flow_rate,
+                    is_tracking=is_tracking if is_tracking else False,
                 )
             )
 

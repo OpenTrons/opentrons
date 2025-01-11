@@ -152,6 +152,7 @@ async def move_to_well(
     minimum_z_height: Optional[float] = None,
     speed: Optional[float] = None,
     operation_volume: Optional[float] = None,
+    is_tracking: Optional[bool] = False,
 ) -> MoveToWellOperationReturn:
     """Execute a move to well microoperation."""
     try:
@@ -165,6 +166,7 @@ async def move_to_well(
             minimum_z_height=minimum_z_height,
             speed=speed,
             operation_volume=operation_volume,
+            is_tracking=is_tracking,
         )
     except StallOrCollisionDetectedError as e:
         return DefinedErrorData(

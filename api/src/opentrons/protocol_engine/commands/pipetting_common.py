@@ -63,6 +63,15 @@ class FlowRateMixin(BaseModel):
     )
 
 
+class IsTrackingMixin(BaseModel):
+    """Mixin for the 'is_tracking' field of aspirate commands."""
+
+    is_tracking: bool = Field(
+        False,
+        description="Whether or not the pipette should move with the liquid while aspirating.",
+    )
+
+
 class BaseLiquidHandlingResult(BaseModel):
     """Base properties of a liquid handling result."""
 
@@ -185,6 +194,55 @@ async def aspirate_in_place(
     try:
         volume_aspirated = await pipetting.aspirate_in_place(
             pipette_id=pipette_id,
+            volume=volume,
+            flow_rate=flow_rate,
+            command_note_adder=command_note_adder,
+        )
+    except PipetteOverpressureError as e:
+        return DefinedErrorData(
+            public=OverpressureError(
+                id=model_utils.generate_id(),
+                createdAt=model_utils.get_timestamp(),
+                wrappedErrors=[
+                    ErrorOccurrence.from_failed(
+                        id=model_utils.generate_id(),
+                        createdAt=model_utils.get_timestamp(),
+                        error=e,
+                    )
+                ],
+                errorInfo=location_if_error,
+            ),
+            state_update=StateUpdate().set_fluid_unknown(pipette_id=pipette_id),
+        )
+    else:
+        return SuccessData(
+            public=BaseLiquidHandlingResult(
+                volume=volume_aspirated,
+            ),
+            state_update=StateUpdate().set_fluid_aspirated(
+                pipette_id=pipette_id,
+                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=volume_aspirated),
+            ),
+        )
+
+
+async def aspirate_while_tracking(
+    pipette_id: str,
+    labware_id: str,
+    well_name: str,
+    volume: float,
+    flow_rate: float,
+    location_if_error: ErrorLocationInfo,
+    command_note_adder: CommandNoteAdder,
+    pipetting: PipettingHandler,
+    model_utils: ModelUtils,
+) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[OverpressureError]:
+    """Execute an aspirate while tracking microoperation."""
+    try:
+        volume_aspirated = await pipetting.aspirate_while_tracking(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
             volume=volume,
             flow_rate=flow_rate,
             command_note_adder=command_note_adder,
