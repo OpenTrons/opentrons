@@ -1,7 +1,7 @@
 import range from 'lodash/range'
 import isEmpty from 'lodash/isEmpty'
 import uniq from 'lodash/uniq'
-import { COLUMN } from '@opentrons/shared-data'
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
 import {
   AIR,
   mergeLiquid,
@@ -24,8 +24,13 @@ export function forAspirate(
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
   const isReservoir = labwareDef.metadata.displayCategory === 'reservoir'
-  const channels = nozzles === COLUMN ? 8 : pipetteSpec.channels
-
+  let channels = pipetteSpec.channels
+  if (nozzles === COLUMN) {
+    channels = 8
+  } else if (nozzles === SINGLE) {
+    channels = 1
+  }
+  console.log('for aspirate nozzles', nozzles)
   const { allWellsShared, wellsForTips } = getWellsForTips(
     channels,
     labwareDef,

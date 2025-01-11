@@ -49,3 +49,7 @@ export const getEnableLiquidClasses: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_LIQUID_CLASSES ?? false
 )
+export const getEnablePartialTipSupport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT ?? false
+)

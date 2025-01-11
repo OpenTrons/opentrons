@@ -1,4 +1,4 @@
-import { COLUMN } from '@opentrons/shared-data'
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import type { CommandCreator } from '../../types'
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
@@ -14,6 +14,17 @@ export const configureNozzleLayout: CommandCreator<configureNozzleLayoutArgs> = 
   prevRobotState
 ) => {
   const { pipetteId, nozzles } = args
+  const { pipetteEntities } = invariantContext
+  const channels = pipetteEntities[pipetteId]?.spec.channels
+
+  let primaryNozzle
+  if (nozzles === COLUMN) {
+    primaryNozzle = 'A12'
+  } else if (nozzles === SINGLE && channels === 96) {
+    primaryNozzle = 'H12'
+  } else if (nozzles === SINGLE && channels === 8) {
+    primaryNozzle = 'H1'
+  }
 
   const commands = [
     {
@@ -22,7 +33,7 @@ export const configureNozzleLayout: CommandCreator<configureNozzleLayoutArgs> = 
       params: {
         pipetteId,
         configurationParams: {
-          primaryNozzle: nozzles === COLUMN ? 'A12' : undefined,
+          primaryNozzle,
           style: nozzles,
         },
       },

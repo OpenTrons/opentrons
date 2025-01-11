@@ -9,7 +9,10 @@ import {
   Tabs,
 } from '@opentrons/components'
 import { getTrashOrLabware } from '@opentrons/step-generation'
-import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
+import {
+  getEnablePartialTipSupport,
+  getEnableReturnTip,
+} from '../../../../../../feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -66,11 +69,11 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
+  const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const enableReturnTip = useSelector(getEnableReturnTip)
   const labwares = useSelector(getLabwareEntities)
   const pipettes = useSelector(getPipetteEntities)
   const addFieldNamePrefix = makeAddFieldNamePrefix(tab)
-
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
       ? additionalEquipmentEntities[
@@ -91,6 +94,9 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
   const is96Channel =
     propsForFields.pipette.value != null &&
     pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
+  const is8Channel =
+    propsForFields.pipette.value != null &&
+    pipettes[String(propsForFields.pipette.value)].spec.channels === 8
   const isDisposalLocation =
     additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
       ?.name === 'wasteChute' ||
@@ -143,10 +149,14 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
-      {is96Channel ? (
+      {propsForFields.pipette.value != null &&
+      (is96Channel || (is8Channel && enablePartialTip)) ? (
         <>
           <Divider marginY="0" />
-          <PartialTipField {...propsForFields.nozzles} />
+          <PartialTipField
+            {...propsForFields.nozzles}
+            pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+          />
         </>
       ) : null}
       <Divider marginY="0" />

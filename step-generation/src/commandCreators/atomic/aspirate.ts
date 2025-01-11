@@ -1,4 +1,9 @@
-import { COLUMN, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  ALL,
+  FLEX_ROBOT_TYPE,
+  OT2_ROBOT_TYPE,
+  SINGLE,
+} from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
@@ -112,14 +117,15 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
       })
     )
   }
-
-  const is96Channel =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+  const pipChannels =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels
+  const is96Channel = pipChannels === 96
+  const is8Channel = pipChannels === 8
 
   if (
-    is96Channel &&
-    nozzles === COLUMN &&
+    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
     !getIsSafePipetteMovement(
+      nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,

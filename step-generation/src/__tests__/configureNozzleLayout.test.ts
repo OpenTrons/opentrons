@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { ALL, COLUMN } from '@opentrons/shared-data'
+import { ALL, COLUMN, fixtureP100096V2Specs } from '@opentrons/shared-data'
 import { getSuccessResult } from '../fixtures'
 import { configureNozzleLayout } from '../commandCreators/atomic/configureNozzleLayout'
 
@@ -7,7 +7,9 @@ const getRobotInitialState = (): any => {
   return {}
 }
 
-const invariantContext: any = {}
+const invariantContext: any = {
+  pipetteEntities: { mockPipette: { spec: fixtureP100096V2Specs } },
+}
 const robotInitialState = getRobotInitialState()
 const mockPipette = 'mockPipette'
 

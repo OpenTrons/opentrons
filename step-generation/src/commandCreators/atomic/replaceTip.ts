@@ -3,6 +3,7 @@ import {
   COLUMN,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
+  SINGLE,
 } from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
@@ -45,13 +46,16 @@ const _pickUpTip: CommandCreator<PickUpTipArgs> = (
 ) => {
   const errors: CommandCreatorError[] = []
 
-  const is96Channel =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+  const pipChannels =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels
+  const is96Channel = pipChannels === 96
+  const is8Channel = pipChannels === 8
 
   if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
+    ((is96Channel && args.nozzles !== ALL) ||
+      (is8Channel && args.nozzles === SINGLE)) &&
     !getIsSafePipetteMovement(
+      args.nozzles ?? null,
       prevRobotState,
       invariantContext,
       args.pipette,
@@ -251,7 +255,9 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
 
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
-    channels === 96 && args.nozzles != null && args.nozzles !== stateNozzles
+    (channels === 96 || channels === 8) &&
+    args.nozzles != null &&
+    args.nozzles !== stateNozzles
       ? [
           curryCommandCreator(configureNozzleLayout, {
             nozzles: args.nozzles,

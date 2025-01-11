@@ -35,5 +35,9 @@
   "OT_PD_ENABLE_LIQUID_CLASSES": {
     "title": "Enable liquid classes",
     "description": "Enable liquid classes support"
+  },
+  "OT_PD_ENABLE_PARTIAL_TIP_SUPPORT": {
+    "title": "Enable partial tip support",
+    "description": "Partial tip configurations that are not released yet"
   }
 }

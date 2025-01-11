@@ -9,6 +9,7 @@ import {
   ALL,
   COLUMN,
   OT2_ROBOT_TYPE,
+  SINGLE,
 } from '@opentrons/shared-data'
 import { getCutoutIdByAddressableArea } from '../utils'
 import type { Channels } from '@opentrons/components'
@@ -254,10 +255,12 @@ export const substepTimelineMultiChannel = (
             : null
 
         let numChannels = channels
-        if (nozzles === ALL) {
+        if (nozzles === ALL && channels !== 8) {
           numChannels = 96
         } else if (nozzles === COLUMN) {
           numChannels = 8
+        } else if (nozzles === SINGLE) {
+          numChannels = 1
         }
         const wellsForTips =
           numChannels &&

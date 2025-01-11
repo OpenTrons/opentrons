@@ -1,10 +1,11 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {
-  COLUMN,
   getWellDepth,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  ALL,
+  SINGLE,
 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -86,8 +87,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   } = args
 
   const pipetteData = prevRobotState.pipettes[args.pipette]
-  const is96Channel =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+  const pipChannels =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels
+  const is96Channel = pipChannels === 96
+  const is8Channel = pipChannels === 8
 
   if (!pipetteData) {
     // bail out before doing anything else
@@ -130,9 +133,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   }
 
   if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
+    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
     !getIsSafePipetteMovement(
+      nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,
@@ -147,9 +150,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   }
 
   if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
+    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
     !getIsSafePipetteMovement(
+      nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,
