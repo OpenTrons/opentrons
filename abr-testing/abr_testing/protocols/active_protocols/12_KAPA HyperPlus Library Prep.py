@@ -14,7 +14,7 @@ from opentrons.protocol_api.module_contexts import (
     MagneticBlockContext,
     ThermocyclerContext,
 )
-from typing import List, Tuple, Dict
+from typing import List, Dict, Tuple
 
 metadata = {
     "protocolName": "KAPA HyperPlus Library Preparation",
@@ -39,8 +39,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         default=False,
     )
     helpers.create_disposable_lid_parameter(parameters)
-    helpers.create_tc_lid_deck_riser_parameter(parameters)
     helpers.create_two_pipette_mount_parameters(parameters)
+    helpers.create_tc_lid_deck_riser_parameter(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
     parameters.add_int(
         variable_name="num_samples",
@@ -78,7 +78,7 @@ def run(protocol: ProtocolContext) -> None:
     pipette_1000_mount = protocol.params.pipette_mount_1  # type: ignore[attr-defined]
     pipette_50_mount = protocol.params.pipette_mount_2  # type: ignore[attr-defined]
     deck_riser = protocol.params.deck_riser  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "01")
+    helpers.comment_protocol_version(protocol, "02")
 
     REUSE_ETOH_TIPS = True
     REUSE_RSB_TIPS = (
@@ -95,6 +95,10 @@ def run(protocol: ProtocolContext) -> None:
         trash_tips = False
 
     num_cols = math.ceil(num_samples / 8)
+    unused_lids: List[Labware] = []
+    # Load TC Lids
+    if disposable_lid:
+        unused_lids = helpers.load_disposable_lids(protocol, 5, ["D3"], deck_riser)
 
     # Pre-set parameters
     # sample_vol = 35.0
@@ -121,10 +125,15 @@ def run(protocol: ProtocolContext) -> None:
     temp_mod: TemperatureModuleContext = protocol.load_module(
         helpers.temp_str, "B3"
     )  # type: ignore[assignment]
-    temp_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
-        "armadillo_96_wellplate_200ul_pcr_full_skirt",
-        temp_mod,
-        "Temp Module Reservoir Plate",
+    temp_adapter = temp_mod.load_adapter("opentrons_96_well_aluminum_block")
+    tip_stacker_200 = helpers.load_stacker_module(
+        protocol, "PS241204SZEVT24", "D4", "opentrons_flex_96_tiprack_200ul"
+    )
+    tip_stacker_50 = helpers.load_stacker_module(
+        protocol, "PS241204SZEVT26", "A4", "opentrons_flex_96_tiprack_50ul"
+    )
+    tip_stacker_plates = helpers.load_stacker_module(
+        protocol, "PS241204SZEVT18", "C4", "armadillo_96_wellplate_200ul_pcr_full_skirt"
     )
 
     if not dry_run:
@@ -132,38 +141,36 @@ def run(protocol: ProtocolContext) -> None:
     tc_mod: ThermocyclerContext = protocol.load_module(helpers.tc_str)  # type: ignore[assignment]
     # Just in case
     tc_mod.open_lid()
+    # Unload Armadillo plates
+    FLP_plate = tip_stacker_plates.unload_and_move_labware(magblock)
 
-    FLP_plate = magblock.load_labware(
-        "armadillo_96_wellplate_200ul_pcr_full_skirt", "FLP Plate"
-    )
     samples_flp = FLP_plate.rows()[0][:num_cols]
-
-    sample_plate = protocol.load_labware(
-        "armadillo_96_wellplate_200ul_pcr_full_skirt", "D1", "Sample Plate 1"
-    )
-
-    sample_plate_2 = protocol.load_labware(
-        "armadillo_96_wellplate_200ul_pcr_full_skirt", "B2", "Sample Plate 2"
-    )
+    sample_plate = tip_stacker_plates.unload_and_move_labware("D1")
+    sample_plate_2 = tip_stacker_plates.unload_and_move_labware("B2")
+    temp_plate = tip_stacker_plates.unload_and_move_labware(temp_adapter)
     samples_2 = sample_plate_2.rows()[0][:num_cols]
     samples = sample_plate.rows()[0][:num_cols]
     reservoir = protocol.load_labware(
         "nest_96_wellplate_2ml_deep", "C2", "Beads + Buffer + Ethanol"
     )
-    # Load tipracks
-    tiprack_50_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "A3")
-    tiprack_50_2 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "A2")
+    # Unload tipracks
+    tiprack_50_locations = ["A2", "A3"]
+    tiprack_200_locations = ["C1", "C3"]
+    tipracks_50 = []
+    tipracks_200 = []
 
-    tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "C1")
-    tiprack_200_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "C3")
+    # Unload 50 ul tips
+    for tip_rack_destination_50 in tiprack_50_locations:
+        tip_rack_50 = tip_stacker_50.unload_and_move_labware(tip_rack_destination_50)
+        tipracks_50.append(tip_rack_50)
+    # Unload 200 ul tips
+    for tip_rack_destination_200 in tiprack_200_locations:
+        tip_rack_200 = tip_stacker_200.unload_and_move_labware(tip_rack_destination_200)
+        tipracks_200.append(tip_rack_200)
 
     if trash_tips:
         protocol.load_waste_chute()
 
-    unused_lids: List[Labware] = []
-    # Load TC Lids
-    if disposable_lid:
-        unused_lids = helpers.load_disposable_lids(protocol, 5, ["C4"], deck_riser)
     # Import Global Variables
 
     global tip50
@@ -175,10 +182,10 @@ def run(protocol: ProtocolContext) -> None:
     p200 = protocol.load_instrument(
         "flex_8channel_1000",
         pipette_1000_mount,
-        tip_racks=[tiprack_200_1, tiprack_200_2],
+        tip_racks=tipracks_200,
     )
     p50 = protocol.load_instrument(
-        "flex_8channel_50", pipette_50_mount, tip_racks=[tiprack_50_1, tiprack_50_2]
+        "flex_8channel_50", pipette_50_mount, tip_racks=tipracks_50
     )
 
     # Load Reagent Locations in Reservoirs

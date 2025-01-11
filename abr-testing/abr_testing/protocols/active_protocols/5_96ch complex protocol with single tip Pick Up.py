@@ -130,21 +130,42 @@ def run(protocol: ProtocolContext) -> None:
 
             def reset_labware() -> None:
                 """Reset the labware to the reset location."""
-                protocol.move_labware(
-                    labware_to_move, reset_location, use_gripper=use_gripper
-                )
+                if reset_location in ["C4"] or helpers.get_parent(labware_to_move) in [
+                    "C4"
+                ]:
+                    helpers.move_labware_to_destination(
+                        protocol=protocol,
+                        labware=labware_to_move,
+                        dest=reset_location,
+                        use_gripper=True,
+                        flex_stacker=True,
+                    )
+                else:
+                    protocol.move_labware(
+                        labware_to_move, reset_location, use_gripper=use_gripper
+                    )
 
             if len(move_locations) == 0:
                 return
 
             for location in move_locations:
-                protocol.move_labware(
-                    labware_to_move, location, use_gripper=use_gripper
-                )
+                if location in ["C4"] or helpers.get_parent(labware_to_move) in [
+                    "C4",
+                ]:
+                    helpers.move_labware_to_destination(
+                        protocol=protocol,
+                        labware=labware_to_move,
+                        dest=location,
+                        use_gripper=True,
+                        flex_stacker=True,
+                    )
+                else:
+                    protocol.move_labware(
+                        labware_to_move, location, use_gripper=use_gripper
+                    )
 
                 if reset_after_each_move:
                     reset_labware()
-
             if not reset_after_each_move:
                 reset_labware()
 
@@ -214,7 +235,6 @@ def run(protocol: ProtocolContext) -> None:
                     h_s_adapter,
                 ],  # Module Moves
             ]
-
             run_moves(
                 labware,
                 staging_area_slot_4_move_sequence,
@@ -255,20 +275,28 @@ def run(protocol: ProtocolContext) -> None:
         )
         staging_area_slot_3_moves(dest_pcr_plate, STAGING_AREA_SLOT_3_RESET_LOCATION)
 
-        protocol.move_labware(
-            dest_pcr_plate,
-            STAGING_AREA_SLOT_4_RESET_LOCATION,
+        helpers.move_labware_to_destination(
+            protocol=protocol,
+            labware=dest_pcr_plate,
+            dest=STAGING_AREA_SLOT_4_RESET_LOCATION,
             use_gripper=USING_GRIPPER,
+            flex_stacker=True,
         )
         staging_area_slot_4_moves(dest_pcr_plate, STAGING_AREA_SLOT_4_RESET_LOCATION)
-
         module_locations = [thermocycler] + adapters
         module_moves(dest_pcr_plate, module_locations)
+
         protocol.move_labware(dest_pcr_plate, thermocycler, use_gripper=USING_GRIPPER)
 
     def test_manual_moves() -> None:
         """Test manual moves."""
-        protocol.move_labware(source_reservoir, "D4", use_gripper=USING_GRIPPER)
+        helpers.move_labware_to_destination(
+            protocol=protocol,
+            labware=source_reservoir,
+            dest="D4",
+            use_gripper=USING_GRIPPER,
+            flex_stacker=True,
+        )
 
     def test_pipetting() -> None:
         """Test pipetting."""
@@ -306,7 +334,13 @@ def run(protocol: ProtocolContext) -> None:
             )
             protocol.comment("------------------------------")
             protocol.comment(f"channels {pipette_96_channel.active_channels}")
-            protocol.move_labware(tip_rack_3, "C3", use_gripper=USING_GRIPPER)
+            helpers.move_labware_to_destination(
+                protocol=protocol,
+                labware=tip_rack_3,
+                dest="C3",
+                use_gripper=USING_GRIPPER,
+                flex_stacker=True,
+            )
             for well in list_of_columns:
                 tiprack_well = "A" + str(well)
                 well_name = "A" + str(well)

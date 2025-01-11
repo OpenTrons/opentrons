@@ -57,7 +57,7 @@ def run(protocol: ProtocolContext) -> None:
     single_channel_mount = protocol.params.pipette_mount_1  # type: ignore[attr-defined]
     eight_channel_mount = protocol.params.pipette_mount_2  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "01")
+    helpers.comment_protocol_version(protocol, "02")
 
     MIX_SPEED = heater_shaker_speed
     MIX_SEC = 10
@@ -65,35 +65,33 @@ def run(protocol: ProtocolContext) -> None:
     # if on deck:
     INCUBATION_SPEED = heater_shaker_speed * 0.5
     INCUBATION_MIN = 60
+    # load labware stacker
+    stacker_deep_wells = helpers.load_stacker_module(
+        protocol, "PS241204SZEVT22", "C4", "nest_96_wellplate_2ml_deep"
+    )
     # load labware
-
-    sample_plate_1 = protocol.load_labware(
-        "nest_96_wellplate_2ml_deep", "B2", "sample plate 1"
-    )
-    sample_plate_2 = protocol.load_labware(
-        "nest_96_wellplate_2ml_deep", "C4", "sample plate 2"
-    )
-
+    sample_plate_1 = stacker_deep_wells.unload_and_move_labware("B2")
     wash_res = protocol.load_labware("nest_12_reservoir_15ml", "B1", "wash")
     reagent_res = protocol.load_labware(
         "opentrons_15_tuberack_nest_15ml_conical", "C3", "reagents"
     )
     waste_res = protocol.load_labware("nest_1_reservoir_290ml", "D2", "Liquid Waste")
-
-    tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "B3")
-    tips_sample = protocol.load_labware(
-        "opentrons_flex_96_tiprack_1000ul", "A2", "sample tips"
+    # stacker 1: 1000 ul tips
+    tip_stacker_1000 = helpers.load_stacker_module(
+        protocol, "PS241204SZEVT25", "B4", "opentrons_flex_96_tiprack_1000ul"
     )
+    # Unload tip racks
+    tips = tip_stacker_1000.unload_and_move_labware("B3")
+    tips_sample = tip_stacker_1000.unload_and_move_labware("A2")
     tips_sample_loc = tips_sample.wells()[:95]
-    if READY_FOR_SDSPAGE == 0:
-        tips_elu = protocol.load_labware(
-            "opentrons_flex_96_tiprack_1000ul", "A1", "elution tips"
-        )
-        tips_elu_loc = tips_elu.wells()[:95]
-    tips_reused = protocol.load_labware(
-        "opentrons_flex_96_tiprack_1000ul", "C2", "reused tips"
-    )
+    tips_reused = tip_stacker_1000.unload_and_move_labware("C2")
     tips_reused_loc = tips_reused.wells()[:95]
+    tip_rack_list: List[Labware] = [tips, tips_sample, tips_reused]
+    if READY_FOR_SDSPAGE == 0:
+        tips_elu = tip_stacker_1000.unload_and_move_labware("A1")
+        tips_elu_loc = tips_elu.wells()[:95]
+        tip_rack_list.append(tips_elu)
+
     p1000 = protocol.load_instrument(
         "flex_8channel_1000", eight_channel_mount, tip_racks=[tips]
     )
@@ -103,24 +101,21 @@ def run(protocol: ProtocolContext) -> None:
     h_s: HeaterShakerContext = protocol.load_module(
         helpers.hs_str, "D1"
     )  # type: ignore[assignment]
-    working_plate, h_s_adapter = helpers.load_hs_adapter_and_labware(
-        "nest_96_wellplate_2ml_deep", h_s, "Working Plate"
-    )
+    h_s_adapter = h_s.load_adapter("opentrons_96_deep_well_adapter")
+    h_s.open_labware_latch()
+    working_plate = stacker_deep_wells.unload_and_move_labware(h_s_adapter)
 
     if READY_FOR_SDSPAGE == 0:
         temp: TemperatureModuleContext = protocol.load_module(
             helpers.temp_str, "D3"
         )  # type: ignore[assignment]
-        final_plate, temp_adapter = helpers.load_temp_adapter_and_labware(
-            "nest_96_wellplate_2ml_deep", temp, "Final Plate"
-        )
+        temp_adapter = temp.load_adapter("opentrons_96_deep_well_adapter")
+        final_plate = stacker_deep_wells.unload_and_move_labware(temp_adapter)
     mag: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
-
     # liquids
     samples1 = sample_plate_1.rows()[0][:NUM_COL]  # 1
-    samples2 = sample_plate_2.rows()[0][:NUM_COL]  # 1
     beads = reagent_res.wells()[0]  # 2
     ab = reagent_res.wells()[1]  # 3
     elu = reagent_res.wells()[2]  # 4
@@ -139,7 +134,6 @@ def run(protocol: ProtocolContext) -> None:
         "Elution": [{"well": elu, "volume": 9800.0}],
         "Wash": [{"well": wash, "volume": 1500.0}],
         "Samples 1": [{"well": samples1, "volume": 250.0}],
-        "Samples 2": [{"well": samples2, "volume": 250.0}],
     }
     helpers.find_liquid_height_of_loaded_liquids(
         protocol, liquid_vols_and_wells, p1000_single
@@ -289,11 +283,21 @@ def run(protocol: ProtocolContext) -> None:
 
     run(sample_plate_1)
     # swap plates
-    protocol.move_labware(sample_plate_1, "B4", True)
-    protocol.move_labware(sample_plate_2, "B2", True)
+    helpers.move_labware_to_destination(
+        protocol=protocol,
+        labware=sample_plate_1,
+        dest="B4",
+        use_gripper=True,
+        flex_stacker=True,
+    )
+    sample_plate_2 = stacker_deep_wells.unload_and_move_labware("B2")
+    stacker_deep_wells.move_and_store_labware(sample_plate_1)
+
     run(sample_plate_2)
 
     helpers.clean_up_plates(p1000_single, [wash_res], waste, 1000)
     helpers.find_liquid_height_of_all_wells(protocol, p1000_single, [waste_res["A1"]])
+    # reload tip racks and labware
+    helpers.move_to_stacker_and_store(tip_stacker_1000, tip_rack_list)
     if deactivate_modules_bool:
         helpers.deactivate_modules(protocol)

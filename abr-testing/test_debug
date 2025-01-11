@@ -1,0 +1,42 @@
+Exception raised by protocol
+Traceback (most recent call last):
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\execution\execute_python.py", line 160, in exec_run
+    exec("run(__context)", new_globs)
+  File "<string>", line 1, in <module>
+  File "tc_lid_x_offset_test.py", line 99, in run
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\api_support\util.py", line 389, in _check_version_wrapper
+    return decorated_obj(*args, **kwargs)
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_api\labware.py", line 560, in load_labware
+    labware_core = self._protocol_core.load_labware(
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_api\core\engine\protocol.py", line 225, in load_labware
+    load_result = self._engine_client.execute_command_without_recovery(
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_engine\clients\sync_client.py", line 120, in execute_command_without_recovery
+    return self._transport.execute_command(create_request)
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_engine\clients\transports.py", line 84, in execute_command
+    raise ProtocolCommandFailedError(
+opentrons.protocol_engine.errors.error_occurrence.ProtocolCommandFailedError: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: ValueError: Labware Lid opentrons_tough_pcr_auto_sealing_lid may not be loaded on parent labware Opentrons Flex Deck Riser.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_runner\task_queue.py", line 84, in _run
+    await self._run_func()
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_runner\task_queue.py", line 61, in _do_run
+    await func(*args, **kwargs)
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_runner\protocol_runner.py", line 254, in run_func
+    await self._protocol_executor.execute(
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocol_runner\python_protocol_wrappers.py", line 159, in execute
+    await to_thread.run_sync(
+  File "C:\Users\Rhyann Clarke\.virtualenvs\abr-testing-6acHInfl\lib\site-packages\anyio\to_thread.py", line 33, in run_sync
+    return await get_asynclib().run_sync_in_worker_thread(
+  File "C:\Users\Rhyann Clarke\.virtualenvs\abr-testing-6acHInfl\lib\site-packages\anyio\_backends\_asyncio.py", line 877, in run_sync_in_worker_thread
+    return await future
+  File "C:\Users\Rhyann Clarke\.virtualenvs\abr-testing-6acHInfl\lib\site-packages\anyio\_backends\_asyncio.py", line 807, in run
+    result = context.run(func, *args)
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\execution\execute.py", line 39, in run_protocol
+    exec_run(
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\execution\execute_python.py", line 169, in exec_run
+    _raise_pretty_protocol_error(exception=e, filename=filename)
+  File "c:\users\rhyann clarke\opentrons\api\src\opentrons\protocols\execution\execute_python.py", line 71, in _raise_pretty_protocol_error
+    raise ExceptionInProtocolError(
+opentrons.protocols.execution.errors.ExceptionInProtocolError: ProtocolCommandFailedError [line 99]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): PythonException: ValueError: Labware Lid opentrons_tough_pcr_auto_sealing_lid may not be loaded on parent labware Opentrons Flex Deck Riser.
