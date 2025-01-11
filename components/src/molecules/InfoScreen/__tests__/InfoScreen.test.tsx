@@ -37,5 +37,21 @@ describe('InfoScreen', () => {
     expect(screen.getByLabelText('alert')).toHaveStyle(
       `color: ${COLORS.grey60}`
     )
+    expect(screen.getByTestId('InfoScreen')).toHaveStyle(`height: 100%`)
+  })
+
+  it('should render set height, subContent and backgroundColor', () => {
+    props = {
+      ...props,
+      subContent: 'mock sub content',
+      backgroundColor: COLORS.blue50,
+      height: '10rem',
+    }
+    render(props)
+    screen.getByText('mock sub content')
+    expect(screen.getByTestId('InfoScreen')).toHaveStyle(
+      `background-color: ${COLORS.blue50}`
+    )
+    expect(screen.getByTestId('InfoScreen')).toHaveStyle(`height: 10rem`)
   })
 })
