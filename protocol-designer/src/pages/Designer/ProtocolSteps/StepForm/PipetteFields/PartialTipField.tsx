@@ -47,7 +47,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
       disabled: noTipracksOnAdapter,
       tooltipText: noTipracksOnAdapter
         ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-        : undefined,
+        : null,
     })
     if (enablePartialTip) {
       options.push({
@@ -56,7 +56,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
         disabled: noTipracksOnAdapter,
         tooltipText: noTipracksOnAdapter
           ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-          : undefined,
+          : null,
       })
     }
   } else {

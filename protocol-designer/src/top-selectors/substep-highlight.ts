@@ -34,7 +34,7 @@ function _wellsForPipette(
 
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if ((pipChannels === 8 || pipChannels === 96) && nozzles !== SINGLE) {
-    let channels: 8 | 96 = pipChannels
+    let channels = pipChannels
     if (nozzles === ALL && pipChannels === 8) {
       channels = 96
     } else if (
