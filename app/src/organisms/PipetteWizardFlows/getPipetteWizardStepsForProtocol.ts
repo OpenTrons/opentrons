@@ -413,8 +413,11 @@ export const getPipetteWizardStepsForProtocol = (
 ): PipetteWizardStep[] | null => {
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
   const ninetySixChannelAttached =
-    attachedPipettes[LEFT]?.instrumentName === 'p1000_96'
-  const ninetySixChannelRequested = requiredPipette?.pipetteName === 'p1000_96'
+    attachedPipettes[LEFT]?.instrumentName === 'p1000_96' ||
+    attachedPipettes[LEFT]?.instrumentName === 'p200_96'
+  const ninetySixChannelRequested =
+    requiredPipette?.pipetteName === 'p1000_96' ||
+    requiredPipette?.pipetteName === 'p200_96'
 
   if (requiredPipette == null) {
     //  return empty array if no pipette is required in the protocol

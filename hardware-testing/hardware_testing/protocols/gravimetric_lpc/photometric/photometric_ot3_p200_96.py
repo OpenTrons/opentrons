@@ -6,6 +6,7 @@ metadata = {"protocolName": "photometric-ot3-p200-96"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOTS_TIPRACK = {
+    20: [5, 6, 8, 9, 11],
     50: [5, 6, 8, 9, 11],
     200: [5, 6, 8, 9, 11],
 }
@@ -23,7 +24,7 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument("flex_96channel_200", "left")
     adapters = [
         ctx.load_adapter("opentrons_flex_96_tiprack_adapter", slot)
-        for slot in SLOTS_TIPRACK[50]
+        for slot in SLOTS_TIPRACK[20]
     ]
     for tip_size in SLOTS_TIPRACK.keys():
         tipracks = [

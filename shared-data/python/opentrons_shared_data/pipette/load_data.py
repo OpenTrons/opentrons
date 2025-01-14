@@ -128,7 +128,7 @@ def load_serial_lookup_table() -> Dict[str, str]:
         "eight_channel": "multi",
         "eight_channel_em": "multi_em",
     }
-    _model_shorthand = {"p1000": "p1k", "p300": "p3h"}
+    _model_shorthand = {"p1000": "p1k", "p300": "p3h", "p200": "p2h"}
     for channel_dir in _dirs_in(config_path):
         for model_dir in _dirs_in(channel_dir):
             for version_file in model_dir.iterdir():

@@ -738,5 +738,47 @@
       "opentrons/opentrons_flex_96_tiprack_50ul/1",
       "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
+  },
+  "p200_96": {
+    "displayName": "Flex 96-Channel 200 μL",
+    "displayCategory": "FLEX",
+    "defaultAspirateFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "defaultDispenseFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 7.85,
+      "min": 3,
+      "max": 812,
+      "valuesByApiLevel": {
+        "2.0": 7.85
+      }
+    },
+    "channels": 96,
+    "minVolume": 5,
+    "maxVolume": 200,
+    "smoothieConfigs": {
+      "stepsPerMM": 2133.33,
+      "homePosition": 230.15,
+      "travelDistance": 80
+    },
+    "defaultTipracks": [
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
+    ]
   }
 }
