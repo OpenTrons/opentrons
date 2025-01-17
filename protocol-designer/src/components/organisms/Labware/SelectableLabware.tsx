@@ -67,7 +67,7 @@ export const SelectableLabware = (
     selectedWells: WellGroup
   ) => WellGroup = selectedWells => {
     // Returns PRIMARY WELLS from the selection.
-    if (nozzleType != null && nozzleType !== SINGLE) {
+    if (nozzleType !== null && nozzleType !== SINGLE) {
       const channels = getChannelsFromNozzleType(nozzleType)
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
@@ -101,7 +101,7 @@ export const SelectableLabware = (
     rect
   ) => {
     if (!e.shiftKey) {
-      if (nozzleType != null && nozzleType !== SINGLE) {
+      if (nozzleType !== null && nozzleType !== SINGLE) {
         const channels = getChannelsFromNozzleType(nozzleType)
         const selectedWells = _getWellsFromRect(rect)
         const allWellsForMulti: WellGroup = reduce(
@@ -142,7 +142,7 @@ export const SelectableLabware = (
   }
 
   const handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
-    if (nozzleType != null && nozzleType !== SINGLE) {
+    if (nozzleType !== null && nozzleType !== SINGLE) {
       const channels = getChannelsFromNozzleType(nozzleType)
       const wellSet = getWellSetForMultichannel({
         labwareDef,
@@ -158,7 +158,7 @@ export const SelectableLabware = (
 
   // For rendering, show all wells not just primary wells
   const allSelectedWells =
-    nozzleType != null && nozzleType !== SINGLE
+    nozzleType !== null && nozzleType !== SINGLE
       ? reduce<WellGroup, WellGroup>(
           selectedPrimaryWells,
           (acc, _, wellName): WellGroup => {
