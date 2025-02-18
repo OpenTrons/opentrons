@@ -6,6 +6,7 @@ import type {
   ProtocolAnalysisOutput,
   LabwareDefinition2,
   LoadLidRunTimeCommand,
+  LoadLidStackRunTimeCommand,
 } from '@opentrons/shared-data'
 
 interface LabwareInSlot {
@@ -179,8 +180,9 @@ const getAllLabwareDefinitions = (
   return commands
     .filter((command): command is
       | LoadLabwareRunTimeCommand
-      | LoadLidRunTimeCommand =>
-      ['loadLabware', 'loadLid'].includes(command.commandType)
+      | LoadLidRunTimeCommand
+      | LoadLidStackRunTimeCommand =>
+      ['loadLabware', 'loadLid', 'loadLidStack'].includes(command.commandType)
     )
     .reduce<LabwareWithDef[]>((acc, command) => {
       const labwareId = command.result?.labwareId

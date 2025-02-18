@@ -36,7 +36,7 @@ function getNewLabwareDefinitions(
 const isLoadCommand = (
   command: RunTimeCommand
 ): command is LoadLabwareRunTimeCommand | LoadLidRunTimeCommand =>
-  ['loadLabware', 'loadLid'].includes(command.commandType)
+  ['loadLabware', 'loadLid', 'loadLidStack'].includes(command.commandType)
 
 function getLabwareDefinitionFromCommand(
   command: RunTimeCommand,

@@ -153,7 +153,8 @@ export function getLabwareDefinitionsFromCommands(
   return commands.reduce<LabwareDefinition2[]>((acc, command) => {
     const isLoadingNewDef =
       (command.commandType === 'loadLabware' ||
-        command.commandType === 'loadLid') &&
+        command.commandType === 'loadLid' ||
+        command.commandType === 'loadLidStack') &&
       !acc.some(
         def =>
           command.result?.definition != null &&
