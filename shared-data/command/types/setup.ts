@@ -287,6 +287,7 @@ interface LoadLidStackResult {
   stackLabwareId: string
   labwareIds: string[]
   definition: LabwareDefinition2
+  stackDefinition: LabwareDefinition2
   location: LabwareLocation
   stackLocationSequence?: LabwareLocationSequence
   locationSequences?: LabwareLocationSequence[]

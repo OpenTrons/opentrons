@@ -96,6 +96,10 @@ class LoadLidStackResult(BaseModel):
     location: LoadableLabwareLocation = Field(
         ..., description="The Location that the stack of lid labware has been loaded."
     )
+    stackDefinition: LabwareDefinition | None = Field(
+        None,
+        description="The definition of the lid stack object. Optional for backwards-compatibility.",
+    )
     stackLocationSequence: LabwareLocationSequence | None = Field(
         None,
         description="The location sequence for the lid stack labware object created.",
@@ -189,6 +193,7 @@ class LoadLidStackImplementation(
         return SuccessData(
             public=LoadLidStackResult(
                 stackLabwareId=lid_stack_object.labware_id,
+                stackDefinition=lid_stack_object.definition,
                 labwareIds=loaded_lid_ids_ordered,
                 definition=lid_labware_definition,
                 location=verified_location,
