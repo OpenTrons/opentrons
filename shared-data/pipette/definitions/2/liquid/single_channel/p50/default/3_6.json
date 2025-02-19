@@ -5,11 +5,11 @@
       "uiMaxFlowRate": 57,
       "defaultAspirateFlowRate": {
         "default": 22,
-        "valuesByApiLevel": { "2.14": 35 }
+        "valuesByApiLevel": { "2.14": 22 }
       },
       "defaultDispenseFlowRate": {
         "default": 22,
-        "valuesByApiLevel": { "2.14": 57 }
+        "valuesByApiLevel": { "2.14": 22 }
       },
       "defaultBlowOutFlowRate": {
         "default": 57,
