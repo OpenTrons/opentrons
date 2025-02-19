@@ -4,11 +4,11 @@
     "t20": {
       "uiMaxFlowRate": 57,
       "defaultAspirateFlowRate": {
-        "default": 35,
+        "default": 22,
         "valuesByApiLevel": { "2.14": 35 }
       },
       "defaultDispenseFlowRate": {
-        "default": 57,
+        "default": 22,
         "valuesByApiLevel": { "2.14": 57 }
       },
       "defaultBlowOutFlowRate": {
@@ -64,7 +64,7 @@
           ]
         }
       },
-      "defaultPushOutVolume": 2
+      "defaultPushOutVolume": 3.5
     },
     "t50": {
       "uiMaxFlowRate": 57,
