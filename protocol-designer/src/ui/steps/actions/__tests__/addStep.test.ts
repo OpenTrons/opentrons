@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { addStep } from '../actions'
-import { PRESAVED_STEP_ID } from '../../../../steplist/types'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
 
 describe('addStep', () => {
   it('should dispatch an ADD_STEP action with given stepType and id = PRESAVED_STEP_ID', () => {

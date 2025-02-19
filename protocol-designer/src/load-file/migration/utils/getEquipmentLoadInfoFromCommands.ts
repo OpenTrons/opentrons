@@ -6,7 +6,7 @@ import type {
   LoadPipetteCreateCommand,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { Labware, Modules, Pipettes } from '../../../file-types'
+import type { Labware, Modules, Pipettes } from '/protocol-designer/file-types'
 
 export interface EquipmentLoadInfoFromCommands {
   pipettes: Pipettes

@@ -15,11 +15,11 @@ import {
   StyledText,
   WRAP,
 } from '@opentrons/components'
-import { selectors } from '../../labware-ingred/selectors'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import { getRobotType } from '../../file-data/selectors'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
-import { wellFillFromWellContents } from '../../organisms/LabwareOnDeck/utils'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { wellFillFromWellContents } from '/protocol-designer/organisms/LabwareOnDeck/utils'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, SetStateAction } from 'react'

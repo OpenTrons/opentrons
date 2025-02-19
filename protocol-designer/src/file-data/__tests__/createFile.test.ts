@@ -14,7 +14,7 @@ import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+import { getLoadLiquidCommands } from '/protocol-designer/load-file/migration/utils/getLoadLiquidCommands'
 import {
   createFile,
   createPythonFile,
@@ -31,14 +31,15 @@ import {
   pipetteEntities,
 } from '../__fixtures__/createFile/commonFields'
 import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareEntities,
   PipetteEntities,
-} from '../../../../step-generation/src/types'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+} from '@opentrons/step-generation'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 
-vi.mock('../../load-file/migration/utils/getLoadLiquidCommands')
+vi.mock('/protocol-designer/load-file/migration/utils/getLoadLiquidCommands')
 
 const ajv = new Ajv({
   allErrors: true,

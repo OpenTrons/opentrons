@@ -4,16 +4,16 @@ import { reduxActionToAnalyticsEvent } from '../middleware'
 import {
   getFileMetadata,
   getRobotStateTimeline,
-} from '../../file-data/selectors'
+} from '/protocol-designer/file-data/selectors'
 import {
   getArgsAndErrorsByStepId,
   getPipetteEntities,
   getSavedStepForms,
-} from '../../step-forms/selectors'
-import type { SaveStepFormsMultiAction } from '../../step-forms/actions'
+} from '/protocol-designer/step-forms/selectors'
+import type { SaveStepFormsMultiAction } from '/protocol-designer/step-forms/actions'
 
-vi.mock('../../file-data/selectors')
-vi.mock('../../step-forms/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 
 describe('reduxActionToAnalyticsEvent', () => {
   let fooState: any

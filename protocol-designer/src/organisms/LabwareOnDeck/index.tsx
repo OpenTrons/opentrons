@@ -1,12 +1,12 @@
 import { useSelector } from 'react-redux'
 import { LabwareRender } from '@opentrons/components'
 
-import { selectors } from '../../labware-ingred/selectors'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import * as highlightSelectors from '../../top-selectors/substep-highlight'
-import * as tipContentsSelectors from '../../top-selectors/tip-contents'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import * as highlightSelectors from '/protocol-designer/top-selectors/substep-highlight'
+import * as tipContentsSelectors from '/protocol-designer/top-selectors/tip-contents'
 import { wellFillFromWellContents } from './utils'
-import type { LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
+import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
 
 interface LabwareOnDeckProps {
   labwareOnDeck: LabwareOnDeckType

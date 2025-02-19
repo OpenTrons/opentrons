@@ -15,12 +15,12 @@ import {
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getSlotIdsBlockedBySpanningForThermocycler } from '../../../step-forms'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getStagingAreaAddressableAreas } from '../../../utils'
-import { editSlotInfo } from '../../../labware-ingred/actions'
-import { getRobotType } from '../../../file-data/selectors'
-import { LabwareOnDeck } from '../../../organisms'
+import { getSlotIdsBlockedBySpanningForThermocycler } from '/protocol-designer/step-forms'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getStagingAreaAddressableAreas } from '/protocol-designer/utils'
+import { editSlotInfo } from '/protocol-designer/labware-ingred/actions'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { LabwareOnDeck } from '/protocol-designer/organisms'
 import { getSlotInformation } from '../utils'
 import { HighlightLabware } from '../HighlightLabware'
 import { DeckItemHover } from './DeckItemHover'
@@ -50,7 +50,7 @@ import type {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
-} from '../../../step-forms'
+} from '/protocol-designer/step-forms'
 import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
 

@@ -4,7 +4,7 @@ import type {
   StepIdType,
   BlankForm,
   FormData,
-} from '../../form-types'
+} from '/protocol-designer/form-types'
 interface NewFormArgs {
   stepId: StepIdType
   stepType: StepType

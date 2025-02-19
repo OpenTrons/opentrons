@@ -1,6 +1,6 @@
-import { getProfileFieldErrors } from '../../steplist/fieldLevel'
-import { PROFILE_CYCLE } from '../../form-types'
-import type { ProfileItem } from '../../form-types'
+import { getProfileFieldErrors } from '/protocol-designer/steplist/fieldLevel'
+import { PROFILE_CYCLE } from '/protocol-designer/form-types'
+import type { ProfileItem } from '/protocol-designer/form-types'
 
 const _someFieldsHaveErrors = (item: ProfileItem): boolean => {
   for (const fieldName in item) {

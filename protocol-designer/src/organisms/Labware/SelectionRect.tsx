@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
 import type { ReactNode, MouseEventHandler } from 'react'
-import type { DragRect, GenericRect } from '../../collision-types'
+import type { DragRect, GenericRect } from '/protocol-designer/collision-types'
 
 interface SelectionRectProps {
   onSelectionMove?: (e: MouseEvent, arg: GenericRect) => void

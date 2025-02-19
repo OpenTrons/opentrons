@@ -2,17 +2,20 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { getRobotType } from '../../../../../../file-data/selectors'
-import { CheckboxStepFormField } from '../../../../../../molecules'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { CheckboxStepFormField } from '/protocol-designer/molecules'
 import {
   getAdditionalEquipment,
   getCurrentFormCanBeSaved,
-} from '../../../../../../step-forms/selectors'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+} from '/protocol-designer/step-forms/selectors'
+import {
+  getFormErrorsMappedToField,
+  getFormLevelError,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 import { MoveLabwareField } from './MoveLabwareField'
 import { LabwareLocationField } from './LabwareLocationField'
 
-import type { StepFormProps } from '../../types'
+import type { StepFormProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export function MoveLabwareTools(props: StepFormProps): JSX.Element {
   const { propsForFields, visibleFormErrors } = props

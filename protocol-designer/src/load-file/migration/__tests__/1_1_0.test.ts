@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import each from 'lodash/each'
-import oldProtocol from '../../../../fixtures/protocol/1/doItAll.json'
+import oldProtocol from 'protocol-designer/fixtures/protocol/1/doItAll.json'
 import {
   renameOrderedSteps,
   addInitialDeckSetupStep,

@@ -11,8 +11,8 @@ import {
   getIsTiprack,
   getLabwareDisplayName,
 } from '@opentrons/shared-data'
-import * as stepFormSelectors from '../../step-forms/selectors'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getLabwareLatestSlotFromCurrentStepIndex } from './utils'
 
 import type {
@@ -21,11 +21,11 @@ import type {
 } from '@opentrons/step-generation'
 import type { DropdownOption } from '@opentrons/components'
 import type { RobotType } from '@opentrons/shared-data'
-import type { Selector } from '../../types'
+import type { Selector } from '/protocol-designer/types'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   SavedStepFormState,
-} from '../../step-forms'
+} from '/protocol-designer/step-forms'
 
 export const getLabwareNicknamesById: Selector<
   Record<string, string>

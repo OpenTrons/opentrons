@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 import {
   getDisposalOptions,
   getLabwareOptions,
-} from '../../../../../ui/labware/selectors'
-import { hoverSelection } from '../../../../../ui/steps/actions/actions'
-import { DropdownStepFormField } from '../../../../../molecules'
+} from '/protocol-designer/ui/labware/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+import { DropdownStepFormField } from '/protocol-designer/molecules'
 import type { FieldProps } from '../types'
 
 export function LabwareField(props: FieldProps): JSX.Element {

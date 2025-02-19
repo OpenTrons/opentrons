@@ -13,14 +13,14 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { toggleNewProtocolModal } from '../../navigation/actions'
-import { actions as loadFileActions } from '../../load-file'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { getHasUnsavedChanges } from '../../load-file/selectors'
+import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
+import { actions as loadFileActions } from '/protocol-designer/load-file'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
+import { getHasUnsavedChanges } from '/protocol-designer/load-file/selectors'
 import { SettingsIcon } from '../SettingsIcon'
 
 import type { ChangeEvent } from 'react'
-import type { ThunkDispatch } from '../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 export function Navigation(): JSX.Element | null {
   const { t } = useTranslation(['shared', 'alert'])

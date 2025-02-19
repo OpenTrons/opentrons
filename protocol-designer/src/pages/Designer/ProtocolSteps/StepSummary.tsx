@@ -23,12 +23,12 @@ import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
-} from '../../../step-forms/selectors'
-import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../atoms'
+} from '/protocol-designer/step-forms/selectors'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/atoms'
 import { formatTime } from '../utils'
 
-import type { FormData } from '../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 interface StyledTransProps {
   i18nKey: string

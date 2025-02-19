@@ -1,4 +1,4 @@
-import type { SavedStepFormState } from '../../../step-forms'
+import type { SavedStepFormState } from '/protocol-designer/step-forms'
 export const getMockMoveLiquidStep = (): SavedStepFormState => ({
   move_liquid_step_id: {
     pipette: 'some_pipette_id',

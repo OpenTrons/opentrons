@@ -18,10 +18,10 @@ import {
   THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import wasteChuteImage from '../../assets/images/waste_chute.png'
-import trashBinImage from '../../assets/images/flex_trash_bin.png'
-import stagingAreaImage from '../../assets/images/staging_area.png'
-import { STAGING_AREA_CUTOUTS_ORDERED } from '../../constants'
+import wasteChuteImage from '/protocol-designer/assets/images/waste_chute.png'
+import trashBinImage from '/protocol-designer/assets/images/flex_trash_bin.png'
+import stagingAreaImage from '/protocol-designer/assets/images/staging_area.png'
+import { STAGING_AREA_CUTOUTS_ORDERED } from '/protocol-designer/constants'
 
 import type {
   CutoutId,

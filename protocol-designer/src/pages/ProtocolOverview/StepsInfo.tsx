@@ -11,7 +11,7 @@ import {
   COLORS,
 } from '@opentrons/components'
 
-import type { SavedStepFormState } from '../../step-forms'
+import type { SavedStepFormState } from '/protocol-designer/step-forms'
 
 interface StepsInfoProps {
   savedStepForms: SavedStepFormState

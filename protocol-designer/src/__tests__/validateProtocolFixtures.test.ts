@@ -88,7 +88,7 @@ const getSchemaDefForProtocol = (protocol: any): any => {
 describe('Protocol fixtures should validate under their JSON schemas', () => {
   const fixtureDirsGlobPath = path.join(
     __dirname,
-    '../../fixtures/protocol/**/*.json'
+    '/protocol-designer/fixtures/protocol/**/*.json'
   )
   const fixturePaths = glob.sync(fixtureDirsGlobPath)
 

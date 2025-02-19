@@ -7,7 +7,7 @@ import {
 
 import { getLabwareLiquidState } from '../selectors'
 
-vi.mock('../../labware-defs/utils')
+vi.mock('/protocol-designer/labware-defs/utils')
 
 let labwareEntities: any
 let ingredLocs: any

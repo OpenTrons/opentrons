@@ -10,7 +10,7 @@ import {
   Toast,
   Snackbar,
 } from '@opentrons/components'
-import { uuid } from '../../utils'
+import { uuid } from '/protocol-designer/utils'
 import { KitchenContext } from './KitchenContext'
 
 import type { ReactNode } from 'react'

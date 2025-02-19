@@ -12,14 +12,14 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
-import { getEnableLiquidClasses } from '../../feature-flags/selectors'
-import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/atoms'
+import { getEnableLiquidClasses } from '/protocol-designer/feature-flags/selectors'
+import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
 
 import type {
   AllIngredGroupFields,
   IngredInputs,
-} from '../../labware-ingred/types'
+} from '/protocol-designer/labware-ingred/types'
 
 const getLiquidDescription = (
   liquid: IngredInputs,

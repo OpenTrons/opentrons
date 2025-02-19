@@ -1,13 +1,13 @@
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
 
-import { i18n } from '../../assets/localization'
-import { configureStore } from '../../configureStore'
+import { i18n } from '/protocol-designer/assets/localization'
+import { configureStore } from '/protocol-designer/configureStore'
 import { MaterialsListModal as MaterialsListModalComponent } from '.'
 
 import type { LiquidEntities } from '@opentrons/step-generation'
 import type { Meta, StoryObj } from '@storybook/react'
-import type { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
+import type { LabwareOnDeck, ModuleOnDeck } from '/protocol-designer/step-forms'
 import type { FixtureInList } from '.'
 
 const mockStore = configureStore()

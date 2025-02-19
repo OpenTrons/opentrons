@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
-import { DropdownStepFormField } from '../../../../../molecules'
+import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
+import { DropdownStepFormField } from '/protocol-designer/molecules'
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../types'
 

@@ -21,9 +21,12 @@ import {
   actions as stepsActions,
   getSelectedStepId,
   getWellSelectionLabwareKey,
-} from '../../../../../ui/steps'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import { SelectWellsModal, getMainPagePortalEl } from '../../../../../organisms'
+} from '/protocol-designer/ui/steps'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import {
+  SelectWellsModal,
+  getMainPagePortalEl,
+} from '/protocol-designer/organisms'
 import { getNozzleType } from '../utils'
 
 import type { FieldProps } from '../types'

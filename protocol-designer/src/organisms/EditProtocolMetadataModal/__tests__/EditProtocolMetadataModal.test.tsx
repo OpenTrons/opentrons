@@ -1,14 +1,14 @@
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { EditProtocolMetadataModal } from '..'
-import { selectors as fileSelectors } from '../../../file-data'
+import { selectors as fileSelectors } from '/protocol-designer/file-data'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../file-data')
+vi.mock('/protocol-designer/file-data')
 
 const render = (props: ComponentProps<typeof EditProtocolMetadataModal>) => {
   return renderWithProviders(<EditProtocolMetadataModal {...props} />, {

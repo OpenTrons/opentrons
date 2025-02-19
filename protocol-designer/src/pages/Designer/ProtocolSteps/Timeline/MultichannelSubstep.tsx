@@ -17,7 +17,7 @@ import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
   StepItemSourceDestRow,
   SubstepIdentifier,
-} from '../../../../steplist'
+} from '/protocol-designer/steplist'
 
 interface MultichannelSubstepProps {
   trashName: AdditionalEquipmentName | null

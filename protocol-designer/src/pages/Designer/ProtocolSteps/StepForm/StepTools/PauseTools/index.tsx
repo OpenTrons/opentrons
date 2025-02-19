@@ -21,14 +21,17 @@ import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
-} from '../../../../../../constants'
-import { InputStepFormField, TextAreaField } from '../../../../../../molecules'
-import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
-import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+} from '/protocol-designer/constants'
+import { InputStepFormField, TextAreaField } from '/protocol-designer/molecules'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { selectors as uiModuleSelectors } from '/protocol-designer/ui/modules'
+import {
+  getFormErrorsMappedToField,
+  getFormLevelError,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 
 import type { ChangeEvent } from 'react'
-import type { StepFormProps } from '../../types'
+import type { StepFormProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export function PauseTools(props: StepFormProps): JSX.Element {
   const { propsForFields, visibleFormErrors, setShowFormErrors } = props

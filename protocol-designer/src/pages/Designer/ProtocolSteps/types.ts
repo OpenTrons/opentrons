@@ -1,4 +1,4 @@
-import type { StepFieldName, FormData } from '../../../form-types'
+import type { StepFieldName, FormData } from '/protocol-designer/form-types'
 
 export interface FocusHandlers {
   focusedField: StepFieldName | null

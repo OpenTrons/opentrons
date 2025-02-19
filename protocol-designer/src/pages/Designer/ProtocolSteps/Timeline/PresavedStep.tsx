@@ -1,13 +1,13 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { stepIconsByType } from '../../../../form-types'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { stepIconsByType } from '/protocol-designer/form-types'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   actions as stepsActions,
-} from '../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
 import { StepContainer } from './StepContainer'
 
 interface PresavedStepProps {

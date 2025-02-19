@@ -12,23 +12,23 @@ import {
   getMultiSelectDisabledFields,
   getMultiSelectFieldValues,
   getMultiSelectItemIds,
-} from '../../../../ui/steps/selectors'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { deselectAllSteps } from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/selectors'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { deselectAllSteps } from '/protocol-designer/ui/steps/actions/actions'
 import {
   changeBatchEditField,
   resetBatchEditFieldChanges,
   saveStepFormsMulti,
-} from '../../../../step-forms/actions'
-import { maskField } from '../../../../steplist/fieldLevel'
-import { getBatchEditFormHasUnsavedChanges } from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/actions'
+import { maskField } from '/protocol-designer/steplist/fieldLevel'
+import { getBatchEditFormHasUnsavedChanges } from '/protocol-designer/step-forms/selectors'
 import { makeBatchEditFieldProps } from './utils'
 import { BatchEditMoveLiquidTools } from './BatchEditMoveLiquidTools'
 import { BatchEditMixTools } from './BatchEditMixTools'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { BaseState } from '../../../../types'
+import type { StepFieldName } from '/protocol-designer/steplist/fieldLevel'
+import type { BaseState } from '/protocol-designer/types'
 
 export const BatchEditToolbox = (): JSX.Element | null => {
   const { t } = useTranslation(['tooltip', 'protocol_steps', 'shared'])

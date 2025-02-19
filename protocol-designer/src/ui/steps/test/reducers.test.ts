@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { PRESAVED_STEP_ID } from '../../../steplist/types'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
 import {
   _allReducers,
   SINGLE_STEP_SELECTION_TYPE,
@@ -10,7 +10,7 @@ import {
 import type { SelectMultipleStepsAction } from '../actions/types'
 import type { SelectableItem } from '../reducers'
 
-vi.mock('../../../labware-defs/utils')
+vi.mock('/protocol-designer/labware-defs/utils')
 
 const { collapsedSteps, selectedItem } = _allReducers
 

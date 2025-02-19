@@ -15,19 +15,19 @@ import {
   getAdditionalEquipment,
   getInitialDeckSetup,
   getPipetteEntities,
-} from '../../step-forms/selectors'
-import { getHas96Channel } from '../../utils'
-import { getRobotType } from '../../file-data/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
+} from '/protocol-designer/step-forms/selectors'
+import { getHas96Channel } from '/protocol-designer/utils'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getMainPagePortalEl } from '../Portal'
 import { editPipettes } from './editPipettes'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
 import { PipetteOverview } from './PipetteOverview'
 import { PipetteConfiguration } from './PipetteConfiguration'
 import { usePipetteConfig } from './usePipetteConfig'
 
 import type { PipetteName } from '@opentrons/shared-data'
-import type { ThunkDispatch } from '../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface EditInstrumentsModalProps {
   onClose: () => void

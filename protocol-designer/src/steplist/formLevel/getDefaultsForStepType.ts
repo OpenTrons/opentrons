@@ -6,8 +6,8 @@ import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
-} from '../../constants'
-import type { StepType, StepFieldName } from '../../form-types'
+} from '/protocol-designer/constants'
+import type { StepType, StepFieldName } from '/protocol-designer/form-types'
 export function getDefaultsForStepType(
   stepType: StepType
 ): Record<StepFieldName, any> {

@@ -1,5 +1,5 @@
 import forEach from 'lodash/forEach'
-import type { StepFieldName } from '../../form-types'
+import type { StepFieldName } from '/protocol-designer/form-types'
 export const MAIN_CONTENT_FORCED_SCROLL_CLASSNAME = 'main_content_forced_scroll'
 // scroll to top of all elements with the special class (probably the main page wrapper)
 //

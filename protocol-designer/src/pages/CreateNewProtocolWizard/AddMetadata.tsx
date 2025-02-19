@@ -10,13 +10,13 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { HandleEnter } from '../../atoms/HandleEnter'
-import { TextAreaField } from '../../molecules'
-import { analyticsEvent } from '../../analytics/actions'
-import { ONBOARDING_FLOW_DURATION_EVENT } from '../../analytics/constants'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
+import { TextAreaField } from '/protocol-designer/molecules'
+import { analyticsEvent } from '/protocol-designer/analytics/actions'
+import { ONBOARDING_FLOW_DURATION_EVENT } from '/protocol-designer/analytics/constants'
 import { WizardBody } from './WizardBody'
 
-import type { AnalyticsEvent } from '../../analytics/mixpanel'
+import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type { WizardTileProps } from './types'
 
 const FLEX_METADATA_WIZARD_STEP = 6

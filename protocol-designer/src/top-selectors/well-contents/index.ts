@@ -5,11 +5,14 @@ import min from 'lodash/min'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { timelineFrameBeforeActiveItem } from '../timelineFrames'
-import { getSelectedWells } from '../../well-selection/selectors'
-import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
+import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
+import {
+  getAllWellsForLabware,
+  getMaxVolumes,
+} from '/protocol-designer/constants'
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
 import { getWellContentsAllLabware } from './getWellContentsAllLabware'
@@ -19,8 +22,8 @@ import type {
   WellContents,
   WellContentsByLabware,
   ContentsByWell,
-} from '../../labware-ingred/types'
-import type { Selector } from '../../types'
+} from '/protocol-designer/labware-ingred/types'
+import type { Selector } from '/protocol-designer/types'
 
 export { getWellContentsAllLabware }
 export type { WellContentsByLabware }

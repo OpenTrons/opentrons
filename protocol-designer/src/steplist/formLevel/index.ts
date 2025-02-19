@@ -62,7 +62,7 @@ import {
 } from './warnings'
 
 import type { FormWarning, FormWarningType } from './warnings'
-import type { HydratedFormData, StepType } from '../../form-types'
+import type { HydratedFormData, StepType } from '/protocol-designer/form-types'
 import type { FormError } from './errors'
 import type { ModuleEntities } from '@opentrons/step-generation'
 export { handleFormChange } from './handleFormChange'

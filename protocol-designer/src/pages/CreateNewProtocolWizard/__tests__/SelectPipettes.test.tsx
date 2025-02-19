@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { IncompatibleTipsModal } from '../../../organisms'
-import { createCustomTiprackDef } from '../../../labware-defs/actions'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
+import { IncompatibleTipsModal } from '/protocol-designer/organisms'
+import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
 import { SelectPipettes } from '../SelectPipettes'
 import { getTiprackOptions } from '../utils'
 
@@ -15,10 +15,10 @@ import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { WizardFormState, WizardTileProps } from '../types'
 
-vi.mock('../../../labware-defs/selectors')
-vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../organisms')
-vi.mock('../../../labware-defs/actions')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/organisms')
+vi.mock('/protocol-designer/labware-defs/actions')
 vi.mock('../utils')
 const mockLocation = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = vi.fn()

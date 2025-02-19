@@ -1,5 +1,9 @@
 import last from 'lodash/last'
-import type { StepIdType, FormData, MagnetAction } from '../../../form-types'
+import type {
+  StepIdType,
+  FormData,
+  MagnetAction,
+} from '/protocol-designer/form-types'
 export function getNextDefaultMagnetAction(
   savedForms: Record<StepIdType, FormData>,
   orderedStepIds: StepIdType[]

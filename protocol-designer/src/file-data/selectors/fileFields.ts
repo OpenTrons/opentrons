@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import type { BaseState, Selector } from '../../types'
+import type { BaseState, Selector } from '/protocol-designer/types'
 import type { RootState } from '../reducers'
 import type { FileMetadataFields } from '../types'
 import type { RobotType } from '@opentrons/shared-data'

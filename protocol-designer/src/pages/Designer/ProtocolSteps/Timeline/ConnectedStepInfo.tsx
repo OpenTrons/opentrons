@@ -2,9 +2,9 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
-import * as timelineWarningSelectors from '../../../../top-selectors/timelineWarnings'
-import { selectors as dismissSelectors } from '../../../../dismiss'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
+import * as timelineWarningSelectors from '/protocol-designer/top-selectors/timelineWarnings'
+import { selectors as dismissSelectors } from '/protocol-designer/dismiss'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import {
   actions as stepsActions,
   getHoveredStepId,
@@ -13,19 +13,19 @@ import {
   getSelectedStepId,
   getMultiSelectLastSelected,
   getIsMultiSelectMode,
-} from '../../../../ui/steps'
-import { selectors as fileDataSelectors } from '../../../../file-data'
+} from '/protocol-designer/ui/steps'
+import { selectors as fileDataSelectors } from '/protocol-designer/file-data'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-} from '../../../../organisms'
-import { stepIconsByType } from '../../../../form-types'
+} from '/protocol-designer/organisms'
+import { stepIconsByType } from '/protocol-designer/form-types'
 import {
   hoverOnStep,
   toggleViewSubstep,
-} from '../../../../ui/steps/actions/actions'
-import { getOrderedStepIds } from '../../../../step-forms/selectors'
+} from '/protocol-designer/ui/steps/actions/actions'
+import { getOrderedStepIds } from '/protocol-designer/step-forms/selectors'
 import { StepContainer } from './StepContainer'
 import {
   getMetaSelectedSteps,
@@ -39,10 +39,10 @@ import type { ThunkDispatch } from 'redux-thunk'
 import type {
   HoverOnStepAction,
   SelectMultipleStepsAction,
-} from '../../../../ui/steps'
-import type { StepIdType } from '../../../../form-types'
-import type { BaseState, ThunkAction } from '../../../../types'
-import type { DeleteModalType } from '../../../../organisms'
+} from '/protocol-designer/ui/steps'
+import type { StepIdType } from '/protocol-designer/form-types'
+import type { BaseState, ThunkAction } from '/protocol-designer/types'
+import type { DeleteModalType } from '/protocol-designer/organisms'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType

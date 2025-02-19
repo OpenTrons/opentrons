@@ -2,7 +2,7 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import type { HydratedMoveLiquidFormData } from '../../../form-types'
+import type { HydratedMoveLiquidFormData } from '/protocol-designer/form-types'
 // NOTE: expects that '_checkbox' fields are implemented so that
 // when checkbox is disabled, its dependent fields are hidden
 export function getDisabledFieldsMoveLiquidForm(

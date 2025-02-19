@@ -11,12 +11,12 @@ import {
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../../../molecules'
+} from '/protocol-designer/molecules'
 import {
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
-import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
+} from '/protocol-designer/step-forms/selectors'
+import { getEnableReturnTip } from '/protocol-designer/feature-flags/selectors'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,
@@ -33,14 +33,14 @@ import {
   VolumeField,
   WellSelectionField,
   WellsOrderField,
-} from '../../PipetteFields'
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
   getFormLevelError,
   getLabwareFieldForPositioningField,
-} from '../../utils'
-import type { StepFormProps } from '../../types'
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
+import type { StepFormProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export function MixTools(props: StepFormProps): JSX.Element {
   const {

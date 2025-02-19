@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { getRobotStateAtActiveItem } from '../../../../../top-selectors/labware-locations'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import type { AbsorbanceReaderState } from '@opentrons/step-generation'
 import {
   ABSORBANCE_READER_READ,
   ABSORBANCE_READER_INITIALIZE,
-} from '../../../../../constants'
+} from '/protocol-designer/constants'
 
 export function useAbsorbanceReaderCommandType(
   moduleId: string | null

@@ -1,5 +1,5 @@
 import type { LabwareMovementStrategy } from '@opentrons/shared-data'
-import type { HydratedMoveLabwareFormData } from '../../../form-types'
+import type { HydratedMoveLabwareFormData } from '/protocol-designer/form-types'
 import type { MoveLabwareArgs } from '@opentrons/step-generation'
 
 export const moveLabwareFormToArgs = (

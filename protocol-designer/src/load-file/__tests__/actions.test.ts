@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { createFile } from '../../file-data/selectors/fileCreator'
-import { getFileMetadata } from '../../file-data/selectors/fileFields'
+import { createFile } from '/protocol-designer/file-data/selectors/fileCreator'
+import { getFileMetadata } from '/protocol-designer/file-data/selectors/fileFields'
 import { saveProtocolFile } from '../actions'
 import { saveFile as saveFileUtil } from '../utils'
 
-vi.mock('../../file-data/selectors/fileCreator')
-vi.mock('../../file-data/selectors/fileFields')
+vi.mock('/protocol-designer/file-data/selectors/fileCreator')
+vi.mock('/protocol-designer/file-data/selectors/fileFields')
 vi.mock('../utils')
 
 afterEach(() => {

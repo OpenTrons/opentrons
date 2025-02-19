@@ -5,7 +5,10 @@ import {
 } from '../DefineLiquidsModal/swatchColors'
 import { AIR } from '@opentrons/step-generation'
 import type { WellFill } from '@opentrons/components'
-import type { ContentsByWell, WellContents } from '../../labware-ingred/types'
+import type {
+  ContentsByWell,
+  WellContents,
+} from '/protocol-designer/labware-ingred/types'
 
 const ingredIdsToColor = (
   groupIds: string[],

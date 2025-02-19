@@ -9,12 +9,15 @@ import {
 import {
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+} from '/protocol-designer/molecules'
+import {
+  getFormErrorsMappedToField,
+  getFormLevelError,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 
-import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
-import type { FieldPropsByName } from '../../types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { StepFormErrors } from '/protocol-designer/steplist'
+import type { FieldPropsByName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ThermocyclerStateProps {
   title: string

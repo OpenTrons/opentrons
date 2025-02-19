@@ -4,9 +4,9 @@ import { DeckLabelSet, Flex, POSITION_RELATIVE } from '@opentrons/components'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
-} from '../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
 import type { CoordinateTuple } from '@opentrons/shared-data'
-import type { LabwareOnDeck } from '../../../step-forms'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 
 interface HighlightOffdeckSlotProps {
   labwareOnDeck?: LabwareOnDeck

@@ -22,24 +22,24 @@ import {
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 
-import { getRobotType } from '../../../file-data/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   deleteContainer,
   duplicateLabware,
   openIngredientSelector,
-} from '../../../labware-ingred/actions'
-import { getNextAvailableDeckSlot } from '../../../labware-ingred/utils'
-import { deleteModule } from '../../../modules'
+} from '/protocol-designer/labware-ingred/actions'
+import { getNextAvailableDeckSlot } from '/protocol-designer/labware-ingred/utils'
+import { deleteModule } from '/protocol-designer/modules'
 import {
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
-} from '../../../organisms'
-import { useKitchen } from '../../../organisms/Kitchen/hooks'
-import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+} from '/protocol-designer/organisms'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { deleteDeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
-import { getStagingAreaAddressableAreas } from '../../../utils'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { getStagingAreaAddressableAreas } from '/protocol-designer/utils'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 
 import type { MouseEvent, SetStateAction } from 'react'
 import type {
@@ -49,8 +49,8 @@ import type {
   DeckSlotId,
 } from '@opentrons/shared-data'
 
-import type { LabwareOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
   'D1',

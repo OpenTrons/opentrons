@@ -5,7 +5,7 @@ import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
-} from '../../../constants'
+} from '/protocol-designer/constants'
 import { getDefaultsForStepType } from '..'
 
 describe('getDefaultsForStepType', () => {

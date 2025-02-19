@@ -25,14 +25,14 @@ import {
   DELETE_MULTIPLE_STEP_FORMS,
   DELETE_STEP_FORM,
   getMainPagePortalEl,
-} from '../../../../organisms'
-import { actions as steplistActions } from '../../../../steplist'
+} from '/protocol-designer/organisms'
+import { actions as steplistActions } from '/protocol-designer/steplist'
 import {
   deselectAllSteps,
   populateForm,
-} from '../../../../ui/steps/actions/actions'
-import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../../atoms'
+} from '/protocol-designer/ui/steps/actions/actions'
+import { getMultiSelectItemIds } from '/protocol-designer/ui/steps/selectors'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/atoms'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
@@ -43,8 +43,8 @@ import type {
 } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { IconName } from '@opentrons/components'
-import type { StepIdType } from '../../../../form-types'
-import type { BaseState } from '../../../../types'
+import type { StepIdType } from '/protocol-designer/form-types'
+import type { BaseState } from '/protocol-designer/types'
 
 const STARTING_DECK_STATE = 'Starting deck'
 const FINAL_DECK_STATE = 'Ending deck'

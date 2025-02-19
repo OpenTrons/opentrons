@@ -18,15 +18,21 @@ import {
 import {
   selectDropdownItem,
   selectTerminalItem,
-} from '../../ui/steps/actions/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
-import { generateNewProtocol } from '../../labware-ingred/actions'
-import { DefineLiquidsModal, DesignerNavigation } from '../../organisms'
-import { selectDesignerTab } from '../../file-data/actions'
-import { getDesignerTab, getFileMetadata } from '../../file-data/selectors'
+} from '/protocol-designer/ui/steps/actions/actions'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { generateNewProtocol } from '/protocol-designer/labware-ingred/actions'
+import {
+  DefineLiquidsModal,
+  DesignerNavigation,
+} from '/protocol-designer/organisms'
+import { selectDesignerTab } from '/protocol-designer/file-data/actions'
+import {
+  getDesignerTab,
+  getFileMetadata,
+} from '/protocol-designer/file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
-import { selectors } from '../../labware-ingred/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { OffDeck } from './OffDeck'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
 import { ProtocolSteps } from './ProtocolSteps'

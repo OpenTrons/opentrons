@@ -2,7 +2,7 @@ import { getLabwareDefIsStandard } from '@opentrons/shared-data'
 import {
   COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER,
   getLabwareCompatibleWithModule,
-} from '../../utils/labwareModuleCompatibility'
+} from '/protocol-designer/utils/labwareModuleCompatibility'
 import type { LabwareLocation } from '@opentrons/shared-data'
 import type {
   InvariantContext,

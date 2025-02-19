@@ -12,7 +12,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { WizardBody } from './WizardBody'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
 
 import type { WizardTileProps } from './types'
 

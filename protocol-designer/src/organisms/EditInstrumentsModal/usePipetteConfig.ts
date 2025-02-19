@@ -5,7 +5,7 @@ import type { PipetteMount } from '@opentrons/shared-data'
 import type {
   Gen,
   PipetteType,
-} from '../../pages/CreateNewProtocolWizard/types'
+} from '/protocol-designer/pages/CreateNewProtocolWizard/types'
 
 export interface PipetteConfig {
   page: 'add' | 'overview'

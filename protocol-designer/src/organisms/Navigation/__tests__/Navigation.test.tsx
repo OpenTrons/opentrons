@@ -2,17 +2,17 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getHasUnsavedChanges } from '../../../load-file/selectors'
-import { toggleNewProtocolModal } from '../../../navigation/actions'
-import { SettingsIcon } from '../../SettingsIcon'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getHasUnsavedChanges } from '/protocol-designer/load-file/selectors'
+import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
+import { SettingsIcon } from '/protocol-designer/organisms/SettingsIcon'
 import { Navigation } from '..'
 
-vi.mock('../../SettingsIcon')
-vi.mock('../../../navigation/actions')
-vi.mock('../../../file-data/selectors')
-vi.mock('../../../load-file/selectors')
+vi.mock('/protocol-designer/organisms/SettingsIcon')
+vi.mock('/protocol-designer/navigation/actions')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/load-file/selectors')
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>

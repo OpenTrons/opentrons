@@ -1,4 +1,4 @@
-import type { FormData } from '../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 import type { HydratedFormData } from '../formLevel/errors'
 
 const TIME_DELIMITER = ':'

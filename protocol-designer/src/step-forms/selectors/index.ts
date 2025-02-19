@@ -16,19 +16,19 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
 import {
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
-} from '../../steplist/formLevel'
-import { getProfileFormErrors } from '../../steplist/formLevel/profileErrors'
-import { getMoveLabwareFormErrors } from '../../steplist/formLevel/moveLabwareFormErrors'
-import { getFieldErrors } from '../../steplist/fieldLevel'
+} from '/protocol-designer/steplist/formLevel'
+import { getProfileFormErrors } from '/protocol-designer/steplist/formLevel/profileErrors'
+import { getMoveLabwareFormErrors } from '/protocol-designer/steplist/formLevel/moveLabwareFormErrors'
+import { getFieldErrors } from '/protocol-designer/steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
-import * as featureFlagSelectors from '../../feature-flags/selectors'
+import * as featureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import { denormalizePipetteEntities, getHydratedForm } from '../utils'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
+import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
 import type { ComponentProps } from 'react'
 import type { Selector } from 'reselect'
 import type {
@@ -48,10 +48,10 @@ import type {
   Mount,
   InstrumentInfoProps,
 } from '@opentrons/components'
-import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { FormWarning } from '../../steplist/formLevel'
-import type { BaseState, DeckSlot } from '../../types'
+import type { ProfileFormError } from '/protocol-designer/steplist/formLevel/profileErrors'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
+import type { FormWarning } from '/protocol-designer/steplist/formLevel'
+import type { BaseState, DeckSlot } from '/protocol-designer/types'
 import type {
   FormData,
   HydratedAbsorbanceReaderFormData,
@@ -67,11 +67,11 @@ import type {
   HydratedThermocyclerFormData,
   ProfileItem,
   StepIdType,
-} from '../../form-types'
+} from '/protocol-designer/form-types'
 import type {
   StepArgsAndErrorsById,
   StepFormErrors,
-} from '../../steplist/types'
+} from '/protocol-designer/steplist/types'
 import type {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -94,7 +94,7 @@ import type {
   SavedStepFormState,
   BatchEditFormChangesState,
 } from '../reducers'
-import type { RootState as LabwareIngredRootState } from '../../labware-ingred/reducers'
+import type { RootState as LabwareIngredRootState } from '/protocol-designer/labware-ingred/reducers'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>

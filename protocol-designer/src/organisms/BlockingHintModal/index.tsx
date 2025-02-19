@@ -14,10 +14,10 @@ import {
   SecondaryButton,
   StyledText,
 } from '@opentrons/components'
-import { actions } from '../../tutorial'
+import { actions } from '/protocol-designer/tutorial'
 import { getMainPagePortalEl } from '../Portal'
 import type { ReactNode } from 'react'
-import type { HintKey } from '../../tutorial'
+import type { HintKey } from '/protocol-designer/tutorial'
 
 export interface HintProps {
   hintKey: HintKey

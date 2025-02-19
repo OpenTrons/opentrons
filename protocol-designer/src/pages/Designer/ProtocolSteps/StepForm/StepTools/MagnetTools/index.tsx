@@ -7,19 +7,22 @@ import {
   MAX_ENGAGE_HEIGHT_V2,
   MIN_ENGAGE_HEIGHT_V1,
   MIN_ENGAGE_HEIGHT_V2,
-} from '../../../../../../constants'
+} from '/protocol-designer/constants'
 import {
   getMagnetLabwareEngageHeight,
   getMagneticLabwareOptions,
-} from '../../../../../../ui/modules/selectors'
+} from '/protocol-designer/ui/modules/selectors'
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
-} from '../../../../../../molecules'
-import { getModuleEntities } from '../../../../../../step-forms/selectors'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+} from '/protocol-designer/molecules'
+import { getModuleEntities } from '/protocol-designer/step-forms/selectors'
+import {
+  getFormErrorsMappedToField,
+  getFormLevelError,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 
-import type { StepFormProps } from '../../types'
+import type { StepFormProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export function MagnetTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData, visibleFormErrors } = props

@@ -7,8 +7,8 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { selectDesignerTab } from '../../file-data/actions'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
+import { selectDesignerTab } from '/protocol-designer/file-data/actions'
 
 import type { AlertLevel } from './types'
 

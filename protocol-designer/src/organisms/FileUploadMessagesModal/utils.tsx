@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
-import type { FileUploadMessage } from '../../load-file'
+import type { FileUploadMessage } from '/protocol-designer/load-file'
 
 export interface ModalContents {
   title: string

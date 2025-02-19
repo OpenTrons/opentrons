@@ -20,17 +20,17 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../../../../../atoms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
 import {
   isTimeFormatMinutesSeconds,
   temperatureRangeFieldValue,
-} from '../../../../../../steplist/fieldLevel/errors'
+} from '/protocol-designer/steplist/fieldLevel/errors'
 import {
   maskToFloat,
   maskToInteger,
   maskToTime,
-} from '../../../../../../steplist/fieldLevel/processing'
-import { uuid } from '../../../../../../utils'
+} from '/protocol-designer/steplist/fieldLevel/processing'
+import { uuid } from '/protocol-designer/utils'
 import { getTimeFromString, getStepIndex } from './utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'

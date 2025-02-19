@@ -8,7 +8,7 @@ import type {
   HydratedPauseFormData,
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
-} from '../../../../form-types'
+} from '/protocol-designer/form-types'
 
 describe('form casting', () => {
   it('should cast moveLiquid form fields', () => {

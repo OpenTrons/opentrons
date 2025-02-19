@@ -19,17 +19,17 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { DeckItemHover } from '../DeckSetup/DeckItemHover'
-import { SlotDetailsContainer } from '../../../organisms'
-import { wellFillFromWellContents } from '../../../organisms/LabwareOnDeck/utils'
-import { getRobotType } from '../../../file-data/selectors'
+import { SlotDetailsContainer } from '/protocol-designer/organisms'
+import { wellFillFromWellContents } from '/protocol-designer/organisms/LabwareOnDeck/utils'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
-} from '../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
 import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'

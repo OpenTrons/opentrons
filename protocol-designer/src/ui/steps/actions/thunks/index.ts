@@ -11,20 +11,27 @@ import {
   getUnsavedFormIsPristineHeaterShakerForm,
   getOrderedStepIds,
   getInitialDeckSetup,
-} from '../../../../step-forms/selectors'
-import { changeFormInput } from '../../../../steplist/actions/actions'
-import { PRESAVED_STEP_ID } from '../../../../steplist/types'
-import { PAUSE_UNTIL_TEMP } from '../../../../constants'
-import { uuid } from '../../../../utils'
-import { getMultiSelectLastSelected, getSelectedStepId } from '../../selectors'
+} from '/protocol-designer/step-forms/selectors'
+import { changeFormInput } from '/protocol-designer/steplist/actions/actions'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
+import { PAUSE_UNTIL_TEMP } from '/protocol-designer/constants'
+import { uuid } from '/protocol-designer/utils'
+import {
+  getMultiSelectLastSelected,
+  getSelectedStepId,
+} from '/protocol-designer/ui/steps/selectors'
 import { addStep, selectDropdownItem } from '../actions'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
-} from '../../../../tutorial'
-import * as fileDataSelectors from '../../../../file-data/selectors'
-import type { StepType, StepIdType, FormData } from '../../../../form-types'
-import type { ThunkAction } from '../../../../types'
+} from '/protocol-designer/tutorial'
+import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
+import type {
+  StepType,
+  StepIdType,
+  FormData,
+} from '/protocol-designer/form-types'
+import type { ThunkAction } from '/protocol-designer/types'
 import type {
   DuplicateStepAction,
   DuplicateMultipleStepsAction,

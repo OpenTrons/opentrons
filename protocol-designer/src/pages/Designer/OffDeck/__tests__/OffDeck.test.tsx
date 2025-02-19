@@ -1,16 +1,16 @@
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { OffDeckDetails } from '../OffDeckDetails'
 import { OffDeck } from '..'
 import type * as Components from '@opentrons/components'
 
 vi.mock('../OffDeckDetails')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../labware-defs/selectors')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {

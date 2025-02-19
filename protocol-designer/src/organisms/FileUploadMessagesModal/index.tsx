@@ -8,8 +8,11 @@ import {
   SPACING,
   SecondaryButton,
 } from '@opentrons/components'
-import { getFileUploadMessages } from '../../load-file/selectors'
-import { dismissFileUploadMessage, undoLoadFile } from '../../load-file/actions'
+import { getFileUploadMessages } from '/protocol-designer/load-file/selectors'
+import {
+  dismissFileUploadMessage,
+  undoLoadFile,
+} from '/protocol-designer/load-file/actions'
 import { useFileUploadModalContents } from './utils'
 
 export function FileUploadMessagesModal(): JSX.Element | null {

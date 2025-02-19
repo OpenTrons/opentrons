@@ -3,7 +3,7 @@ import type {
   LoadLabwareCreateCommand,
 } from '@opentrons/shared-data'
 
-import type { MoveLiquidPrefixType } from '../../../resources/types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 export const getMigratedPositionFromTop = (
   labwareDefinitions: {

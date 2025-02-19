@@ -5,7 +5,7 @@ import type {
   ProtocolFile,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { LegacyDismissedWarningState } from '../../dismiss/reducers'
+import type { LegacyDismissedWarningState } from '/protocol-designer/dismiss/reducers'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
 export interface DesignerApplicationDataV8 {

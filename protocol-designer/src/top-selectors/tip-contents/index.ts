@@ -5,13 +5,13 @@ import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
-} from '../../steplist'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { getActiveItem } from '../../ui/steps'
-import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
-import { selectors as fileDataSelectors } from '../../file-data'
+} from '/protocol-designer/steplist'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getActiveItem } from '/protocol-designer/ui/steps'
+import { TERMINAL_ITEM_SELECTION_TYPE } from '/protocol-designer/ui/steps/reducers'
+import { selectors as fileDataSelectors } from '/protocol-designer/file-data'
 import type { WellGroup } from '@opentrons/components'
-import type { Selector } from '../../types'
+import type { Selector } from '/protocol-designer/types'
 export const getMissingTipsByLabwareId: Selector<Record<
   string,
   WellGroup

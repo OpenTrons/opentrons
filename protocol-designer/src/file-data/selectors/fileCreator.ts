@@ -11,13 +11,13 @@ import {
   FLEX_STANDARD_DECKID,
 } from '@opentrons/shared-data'
 
-import { selectors as dismissSelectors } from '../../dismiss'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
-import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
-import { getStepGroups } from '../../step-forms/selectors'
+import { selectors as dismissSelectors } from '/protocol-designer/dismiss'
+import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
+import { selectors as ingredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
+import { swatchColors } from '/protocol-designer/organisms/DefineLiquidsModal/swatchColors'
+import { getStepGroups } from '/protocol-designer/step-forms/selectors'
 import { getFileMetadata, getRobotType } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import {
@@ -51,9 +51,9 @@ import type {
   ProtocolBase,
   ProtocolFile,
 } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { Selector } from '../../types'
-import type { PDMetadata } from '../../file-types'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
+import type { Selector } from '/protocol-designer/types'
+import type { PDMetadata } from '/protocol-designer/file-types'
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // console.assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')

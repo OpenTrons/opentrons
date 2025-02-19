@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { ingredients, ingredLocations } from '../reducers'
 import type { LiquidEntities } from '@opentrons/step-generation'
-vi.mock('../../labware-defs/utils')
+vi.mock('/protocol-designer/labware-defs/utils')
 
 describe('DUPLICATE_LABWARE action', () => {
   it('duplicate ingredient locations from cloned container', () => {

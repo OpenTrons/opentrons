@@ -1,6 +1,9 @@
 import type { Timeline } from '@opentrons/step-generation'
-import type { StepIdType, StepType } from '../../../form-types'
-import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import type { StepIdType, StepType } from '/protocol-designer/form-types'
+import type {
+  TerminalItemId,
+  SubstepIdentifier,
+} from '/protocol-designer/steplist/types'
 interface AddStepPayload {
   id: string
   stepType: StepType

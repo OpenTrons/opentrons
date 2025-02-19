@@ -3,10 +3,10 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-} from '../../../constants'
-import { getOrderedWells } from '../../utils'
+} from '/protocol-designer/constants'
+import { getOrderedWells } from '/protocol-designer/steplist/utils'
 import { getMoveLiquidDelayData } from './getDelayData'
-import { getMatchingTipLiquidSpecs } from '../../../utils'
+import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -14,7 +14,7 @@ import type {
   InnerMixArgs,
 } from '@opentrons/step-generation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { HydratedMoveLiquidFormData } from '../../../form-types'
+import type { HydratedMoveLiquidFormData } from '/protocol-designer/form-types'
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(

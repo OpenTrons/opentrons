@@ -13,7 +13,7 @@ import {
   setLocalStorageItem,
   getLocalStorageItem,
   localStorageAnnouncementKey,
-} from '../../persist'
+} from '/protocol-designer/persist'
 import { useAnnouncements } from './announcements'
 
 interface AnnouncementModalProps {

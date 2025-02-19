@@ -16,14 +16,17 @@ import {
   Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getFileMetadata } from '../../file-data/selectors'
+import { getFileMetadata } from '/protocol-designer/file-data/selectors'
 import {
   selectDropdownItem,
   selectTerminalItem,
-} from '../../ui/steps/actions/actions'
-import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
+} from '/protocol-designer/ui/steps/actions/actions'
+import {
+  LINE_CLAMP_TEXT_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '/protocol-designer/atoms'
 import { useKitchen } from '../Kitchen/hooks'
-import { LiquidButton } from '../../molecules/LiquidButton'
+import { LiquidButton } from '/protocol-designer/molecules/LiquidButton'
 
 import type { StyleProps, TabProps } from '@opentrons/components'
 

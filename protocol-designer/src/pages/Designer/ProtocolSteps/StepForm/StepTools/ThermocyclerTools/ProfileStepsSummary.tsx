@@ -8,11 +8,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getMainPagePortalEl } from '../../../../../../organisms'
+import { getMainPagePortalEl } from '/protocol-designer/organisms'
 import { ThermocyclerProfileModal } from './ThermocyclerProfileModal'
 
-import type { FormData } from '../../../../../../form-types'
-import type { FieldPropsByName } from '../../types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { FieldPropsByName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ProfileStepsSummaryProps {
   formData: FormData

@@ -1,4 +1,4 @@
-import { getOnlyLatestDefs } from '../../../labware-defs'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const v1ModelTov2LoadNameMap = {
   '6-well-plate': 'corning_6_wellplate_16.8ml_flat',

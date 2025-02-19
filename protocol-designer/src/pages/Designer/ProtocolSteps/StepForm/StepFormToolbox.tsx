@@ -16,27 +16,27 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { stepIconsByType } from '../../../../form-types'
+import { stepIconsByType } from '/protocol-designer/form-types'
 import {
   LINK_BUTTON_STYLE,
   LINE_CLAMP_TEXT_STYLE,
   NAV_BAR_HEIGHT_REM,
-} from '../../../../atoms'
-import { FormAlerts } from '../../../../organisms'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { RenameStepModal } from '../../../../organisms/RenameStepModal'
-import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
-import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import { analyticsEvent } from '../../../../analytics/actions'
+} from '/protocol-designer/atoms'
+import { FormAlerts } from '/protocol-designer/organisms'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { RenameStepModal } from '/protocol-designer/organisms/RenameStepModal'
+import { getFormWarningsForSelectedStep } from '/protocol-designer/dismiss/selectors'
+import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import {
   getFormLevelErrorsForUnsavedForm,
   getDynamicFieldFormErrorsForUnsavedForm,
-} from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
 import {
   FORM_ERRORS_EVENT,
   FORM_WARNINGS_EVENT,
-} from '../../../../analytics/constants'
+} from '/protocol-designer/analytics/constants'
 import {
   AbsorbanceReaderTools,
   CommentTools,
@@ -59,10 +59,10 @@ import {
 } from './utils'
 
 import type { ComponentType } from 'react'
-import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import type { FormData, StepType } from '../../../../form-types'
-import type { AnalyticsEvent } from '../../../../analytics/mixpanel'
-import type { FormWarningType } from '../../../../steplist'
+import type { StepFieldName } from '/protocol-designer/steplist/fieldLevel'
+import type { FormData, StepType } from '/protocol-designer/form-types'
+import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
+import type { FormWarningType } from '/protocol-designer/steplist'
 import type {
   FieldPropsByName,
   FocusHandlers,
@@ -72,7 +72,7 @@ import type {
 import {
   hoverSelection,
   selectDropdownItem,
-} from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/actions/actions'
 
 type StepFormMap = {
   [K in StepType]?: ComponentType<StepFormProps> | null

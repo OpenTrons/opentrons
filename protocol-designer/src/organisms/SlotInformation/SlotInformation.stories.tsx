@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { I18nextProvider } from 'react-i18next'
-import { i18n } from '../../assets/localization'
+import { i18n } from '/protocol-designer/assets/localization'
 import { Flex } from '@opentrons/components'
 import { SlotInformation as SlotInformationComponent } from '.'
 

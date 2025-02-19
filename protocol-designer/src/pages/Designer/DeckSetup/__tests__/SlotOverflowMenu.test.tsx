@@ -2,20 +2,20 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { fixture96Plate } from '@opentrons/shared-data'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import {
   deleteContainer,
   duplicateLabware,
   openIngredientSelector,
-} from '../../../../labware-ingred/actions'
-import { deleteModule } from '../../../../modules'
-import { EditNickNameModal } from '../../../../organisms'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
-import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
-import { getNextAvailableDeckSlot } from '../../../../labware-ingred/utils'
+} from '/protocol-designer/labware-ingred/actions'
+import { deleteModule } from '/protocol-designer/modules'
+import { EditNickNameModal } from '/protocol-designer/organisms'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { deleteDeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { getNextAvailableDeckSlot } from '/protocol-designer/labware-ingred/utils'
 import { SlotOverflowMenu } from '../SlotOverflowMenu'
 
 import type { ComponentProps } from 'react'
@@ -24,15 +24,15 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../step-forms/actions/additionalItems')
-vi.mock('../../../../organisms')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../labware-ingred/utils')
-vi.mock('../../../../organisms/Kitchen/hooks')
-vi.mock('../../../../modules')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/step-forms/actions/additionalItems')
+vi.mock('/protocol-designer/organisms')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/labware-ingred/utils')
+vi.mock('/protocol-designer/organisms/Kitchen/hooks')
+vi.mock('/protocol-designer/modules')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

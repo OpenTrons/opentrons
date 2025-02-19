@@ -9,7 +9,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   getModuleDef2,
 } from '@opentrons/shared-data'
-import { getRobotType } from '../../../file-data/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,

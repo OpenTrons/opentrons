@@ -1,4 +1,4 @@
-import type { HydratedHeaterShakerFormData } from '../../../form-types'
+import type { HydratedHeaterShakerFormData } from '/protocol-designer/form-types'
 
 export function getDisabledFieldsHeaterShaker(
   hydratedForm: HydratedHeaterShakerFormData

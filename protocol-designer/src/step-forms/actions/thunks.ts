@@ -1,21 +1,21 @@
-import { createContainer } from '../../labware-ingred/actions'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
-import { uuid } from '../../utils'
-import { changeSavedStepForm } from '../../steplist/actions'
+import { createContainer } from '/protocol-designer/labware-ingred/actions'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { uuid } from '/protocol-designer/utils'
+import { changeSavedStepForm } from '/protocol-designer/steplist/actions'
 
 import type {
   DeckSlotId,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { ThunkAction } from '../../types'
+import type { ThunkAction } from '/protocol-designer/types'
 import type {
   CreateContainerAction,
   RenameLabwareAction,
-} from '../../labware-ingred/actions'
+} from '/protocol-designer/labware-ingred/actions'
 import type { CreateModuleAction } from './modules'
-import type { ChangeSavedStepFormAction } from '../../steplist/actions'
-import type { FormData } from '../../form-types'
+import type { ChangeSavedStepFormAction } from '/protocol-designer/steplist/actions'
+import type { FormData } from '/protocol-designer/form-types'
 
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId

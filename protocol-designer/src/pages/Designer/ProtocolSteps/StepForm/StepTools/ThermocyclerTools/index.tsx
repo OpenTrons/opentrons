@@ -12,7 +12,7 @@ import { ProfileSettings } from './ProfileSettings'
 import { ProfileStepsSummary } from './ProfileStepsSummary'
 import { ThermocyclerState } from './ThermocyclerState'
 
-import type { StepFormProps } from '../../types'
+import type { StepFormProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 type ThermocyclerContentType = 'thermocyclerState' | 'thermocyclerProfile'
 

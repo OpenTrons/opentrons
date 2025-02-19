@@ -119,7 +119,10 @@ module.exports = {
       },
     },
     {
-      files: ['./app/src/**/*.@(ts|tsx)'],
+      files: [
+        './app/src/**/*.@(ts|tsx)',
+        './protocol-designer/src/**/*.@(ts|tsx)',
+      ],
       rules: {
         'import/no-absolute-path': 'off',
       },

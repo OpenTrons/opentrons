@@ -35,23 +35,23 @@ import {
 import {
   actions as stepsActions,
   getIsMultiSelectMode,
-} from '../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
 import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
-} from '../../../../step-forms'
+} from '/protocol-designer/step-forms'
 import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   getMainPagePortalEl,
-} from '../../../../organisms'
-import { getEnableComment } from '../../../../feature-flags/selectors'
+} from '/protocol-designer/organisms'
+import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
 import type { MouseEvent } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../../../types'
-import type { StepType } from '../../../../form-types'
+import type { BaseState } from '/protocol-designer/types'
+import type { StepType } from '/protocol-designer/form-types'
 
 interface AddStepButtonProps {
   hasText: boolean

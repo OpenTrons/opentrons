@@ -32,23 +32,23 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import { LINK_BUTTON_STYLE } from '../../../atoms'
-import { selectors as stepFormSelectors } from '../../../step-forms'
-import { getOnlyLatestDefs } from '../../../labware-defs'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
 import {
   ADAPTER_96_CHANNEL,
   getLabwareCompatibleWithModule,
-} from '../../../utils/labwareModuleCompatibility'
-import { getHas96Channel } from '../../../utils'
-import { createCustomLabwareDef } from '../../../labware-defs/actions'
-import { getRobotType } from '../../../file-data/selectors'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getPipetteEntities } from '../../../step-forms/selectors'
-import { selectors } from '../../../labware-ingred/selectors'
+} from '/protocol-designer/utils/labwareModuleCompatibility'
+import { getHas96Channel } from '/protocol-designer/utils'
+import { createCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import {
   selectLabware,
   selectNestedLabware,
-} from '../../../labware-ingred/actions'
+} from '/protocol-designer/labware-ingred/actions'
 import {
   ALL_ORDERED_CATEGORIES,
   CUSTOM_CATEGORY,
@@ -61,9 +61,9 @@ import {
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../../step-forms'
-import type { ThunkDispatch } from '../../../types'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { CategoryExpand } from './DeckSetupTools'
 
 const STANDARD_X_DIMENSION = 127.75

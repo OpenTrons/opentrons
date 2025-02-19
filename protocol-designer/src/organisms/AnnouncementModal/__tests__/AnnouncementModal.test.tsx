@@ -1,12 +1,15 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
-import { getLocalStorageItem, setLocalStorageItem } from '../../../persist'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '/protocol-designer/persist'
 import { useAnnouncements } from '../announcements'
 import { AnnouncementModal } from '../index'
 
-vi.mock('../../../persist')
+vi.mock('/protocol-designer/persist')
 vi.mock('../announcements')
 
 const render = () => {

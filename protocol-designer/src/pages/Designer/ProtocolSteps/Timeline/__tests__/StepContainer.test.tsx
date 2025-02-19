@@ -1,17 +1,17 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
-import { getUnsavedForm } from '../../../../../step-forms/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getUnsavedForm } from '/protocol-designer/step-forms/selectors'
 import { StepContainer } from '../StepContainer'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../../step-forms/selectors')
-vi.mock('../../../../../ui/steps/actions/actions')
-vi.mock('../../../../../ui/steps/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/ui/steps/actions/actions')
+vi.mock('/protocol-designer/ui/steps/selectors')
 vi.mock('../StepOverflowMenu')
 
 const render = (props: ComponentProps<typeof StepContainer>) => {

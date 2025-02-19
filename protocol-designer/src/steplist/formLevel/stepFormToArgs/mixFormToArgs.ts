@@ -3,11 +3,11 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
-} from '../../../constants'
-import { getOrderedWells } from '../../utils'
+} from '/protocol-designer/constants'
+import { getOrderedWells } from '/protocol-designer/steplist/utils'
 import { getMixDelayData } from './getDelayData'
-import { getMatchingTipLiquidSpecs } from '../../../utils'
-import type { HydratedMixFormData } from '../../../form-types'
+import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
+import type { HydratedMixFormData } from '/protocol-designer/form-types'
 import type { MixArgs } from '@opentrons/step-generation'
 type MixStepArgs = MixArgs
 export const mixFormToArgs = (

@@ -19,7 +19,10 @@
   ],
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "lib",
+    "paths": {
+      "/protocol-designer/*": ["./src/*"]
+    }
   },
   "include": ["typings", "src"]
 }

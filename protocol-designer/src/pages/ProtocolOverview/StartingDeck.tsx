@@ -15,15 +15,15 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { SlotDetailsContainer } from '../../organisms'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
+import { SlotDetailsContainer } from '/protocol-designer/organisms'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../types'
+import type { DeckSlot } from '/protocol-designer/types'
 
 interface StartingDeckProps {
   robotType: RobotType

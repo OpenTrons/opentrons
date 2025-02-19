@@ -23,19 +23,19 @@ import {
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
-import * as labwareIngredActions from '../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { HandleEnter } from '../../atoms/HandleEnter'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
-import { TextAreaField } from '../../molecules'
-import { getEnableLiquidClasses } from '../../feature-flags/selectors'
+import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/atoms'
+import { TextAreaField } from '/protocol-designer/molecules'
+import { getEnableLiquidClasses } from '/protocol-designer/feature-flags/selectors'
 import { swatchColors } from './swatchColors'
 import { LiquidColorPicker } from './LiquidColorPicker'
 import { LiquidClassDropdown } from './LiquidClassDropdown'
 
 import type { Ingredient } from '@opentrons/step-generation'
 import type { ThunkDispatch } from 'redux-thunk'
-import type { BaseState } from '../../types'
+import type { BaseState } from '/protocol-designer/types'
 
 const liquidEditFormSchema: any = Yup.object().shape({
   displayName: Yup.string().required('liquid name is required'),

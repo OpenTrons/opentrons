@@ -5,9 +5,9 @@ import {
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getOnlyLatestDefs } from '../../../labware-defs'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import { ModuleLabel } from './ModuleLabel'
 import { LabwareLabel } from '../LabwareLabel'
 import { FixtureRender } from './FixtureRender'

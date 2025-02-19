@@ -1,8 +1,8 @@
 import { describe, it, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { StepsInfo } from '../StepsInfo'
 
 import type { ComponentProps } from 'react'

@@ -8,11 +8,11 @@ import {
   SPACING,
   SecondaryButton,
 } from '@opentrons/components'
-import { getLabwareUploadMessage } from '../../labware-defs/selectors'
+import { getLabwareUploadMessage } from '/protocol-designer/labware-defs/selectors'
 import {
   dismissLabwareUploadMessage,
   replaceCustomLabwareDef,
-} from '../../labware-defs/actions'
+} from '/protocol-designer/labware-defs/actions'
 import { LabwareUploadModalBody } from './LabwareUploadModalBody'
 
 export function LabwareUploadModal(): JSX.Element | null {

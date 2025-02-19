@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { ALL, COLUMN } from '@opentrons/shared-data'
 import { Flex, DropdownMenu, SPACING } from '@opentrons/components'
-import { getInitialDeckSetup } from '../../../../../step-forms/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import type { FieldProps } from '../types'
 
 export function PartialTipField(props: FieldProps): JSX.Element {

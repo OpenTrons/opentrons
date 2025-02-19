@@ -1,12 +1,15 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getDesignerTab, getFileMetadata } from '../../../file-data/selectors'
-import { generateNewProtocol } from '../../../labware-ingred/actions'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import {
+  getDesignerTab,
+  getFileMetadata,
+} from '/protocol-designer/file-data/selectors'
+import { generateNewProtocol } from '/protocol-designer/labware-ingred/actions'
 import { DeckSetupContainer } from '../DeckSetup'
 import { Designer } from '../index'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
@@ -18,12 +21,12 @@ const mockNavigate = vi.fn()
 
 vi.mock('../OffDeck')
 vi.mock('../ProtocolSteps')
-vi.mock('../../../labware-ingred/actions')
-vi.mock('../../../labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/labware-ingred/selectors')
 vi.mock('../LiquidsOverflowMenu')
 vi.mock('../DeckSetup')
-vi.mock('../../../file-data/selectors')
-vi.mock('../../../top-selectors/labware-locations')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

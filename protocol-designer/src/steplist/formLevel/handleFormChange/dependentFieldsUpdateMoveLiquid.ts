@@ -9,8 +9,8 @@ import {
 import {
   getMinPipetteVolume,
   getPipetteCapacity,
-} from '../../../pipettes/pipetteData'
-import { getWellRatio } from '../../utils'
+} from '/protocol-designer/pipettes/pipetteData'
+import { getWellRatio } from '/protocol-designer/steplist/utils'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
@@ -27,8 +27,8 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { FormData, StepFieldName } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
+import type { FormPatch } from '/protocol-designer/steplist/actions/types'
 
 // TODO: Ian 2019-02-21 import this from a more central place - see #2926
 const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>

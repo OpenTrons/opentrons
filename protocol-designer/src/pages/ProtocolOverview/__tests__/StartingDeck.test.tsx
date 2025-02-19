@@ -3,18 +3,18 @@ import { fireEvent, screen } from '@testing-library/react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { i18n } from '../../../assets/localization'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { SlotDetailsContainer } from '../../../organisms'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { SlotDetailsContainer } from '/protocol-designer/organisms'
 import { StartingDeck } from '../StartingDeck'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../DeckThumbnail')
 vi.mock('OffDeckThumbnail')
-vi.mock('../../../organisms')
-vi.mock('../../../step-forms/selectors')
+vi.mock('/protocol-designer/organisms')
+vi.mock('/protocol-designer/step-forms/selectors')
 
 vi.mock('../DeckThumbnail', () => ({
   DeckThumbnail: vi.fn(() => <div>mock DeckThumbnail</div>),

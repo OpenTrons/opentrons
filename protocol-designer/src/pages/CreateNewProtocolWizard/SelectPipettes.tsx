@@ -33,22 +33,25 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { getAllowAllTipracks } from '../../feature-flags/selectors'
-import { getLabwareDefsByURI } from '../../labware-defs/selectors'
-import { setFeatureFlags } from '../../feature-flags/actions'
-import { createCustomTiprackDef } from '../../labware-defs/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
-import { IncompatibleTipsModal, PipetteInfoItem } from '../../organisms'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
+import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import {
+  IncompatibleTipsModal,
+  PipetteInfoItem,
+} from '/protocol-designer/organisms'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
 import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
 import { getTiprackOptions } from './utils'
-import { HandleEnter } from '../../atoms/HandleEnter'
-import { removeOpentronsPhrases } from '../../utils'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
+import { removeOpentronsPhrases } from '/protocol-designer/utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
-import type { BaseState } from '../../types'
+import type { BaseState } from '/protocol-designer/types'
 import type {
   Gen,
   PipetteInfoByGen,

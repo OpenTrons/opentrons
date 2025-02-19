@@ -13,18 +13,18 @@ import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
   THERMOCYCLER_PROFILE,
-} from '../../constants'
-import { getPipetteCapacity } from '../../pipettes/pipetteData'
-import { canPipetteUseLabware } from '../../utils'
+} from '/protocol-designer/constants'
+import { getPipetteCapacity } from '/protocol-designer/pipettes/pipetteData'
+import { canPipetteUseLabware } from '/protocol-designer/utils'
 import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
 
 import type { ReactNode } from 'react'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 import type { PipetteEntity } from '@opentrons/step-generation'
-import type { StepFieldName } from '../../form-types'
-import type { ModuleEntities } from '../../step-forms'
-import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
+import type { StepFieldName } from '/protocol-designer/form-types'
+import type { ModuleEntities } from '/protocol-designer/step-forms'
+import type { LiquidHandlingTab } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 /*******************
  ** Error Messages **
  ********************/

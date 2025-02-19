@@ -1,20 +1,23 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { AssignLiquidsModal, DesignerNavigation } from '../../../organisms'
-import { LiquidsOverflowMenu } from '../../Designer/LiquidsOverflowMenu'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import {
+  AssignLiquidsModal,
+  DesignerNavigation,
+} from '/protocol-designer/organisms'
+import { LiquidsOverflowMenu } from '/protocol-designer/pages/Designer/LiquidsOverflowMenu'
 import { Liquids } from '..'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../../Designer/LiquidsOverflowMenu')
-vi.mock('../../../organisms')
-vi.mock('../../../labware-ingred/selectors')
+vi.mock('/protocol-designer/pages/Designer/LiquidsOverflowMenu')
+vi.mock('/protocol-designer/organisms')
+vi.mock('/protocol-designer/labware-ingred/selectors')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {

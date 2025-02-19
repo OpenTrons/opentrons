@@ -1,5 +1,5 @@
 import type { CommentArgs } from '@opentrons/step-generation'
-import type { HydratedCommentFormData } from '../../../form-types'
+import type { HydratedCommentFormData } from '/protocol-designer/form-types'
 
 export const commentFormToArgs = (
   hydratedFormData: HydratedCommentFormData

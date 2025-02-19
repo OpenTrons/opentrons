@@ -9,9 +9,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getPipetteEntities } from '../../../../../step-forms/selectors'
-import { getTiprackOptions } from '../../../../../ui/labware/selectors'
-import { DropdownStepFormField } from '../../../../../molecules'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+import { getTiprackOptions } from '/protocol-designer/ui/labware/selectors'
+import { DropdownStepFormField } from '/protocol-designer/molecules'
 import type { FieldProps } from '../types'
 
 interface TiprackFieldProps extends FieldProps {

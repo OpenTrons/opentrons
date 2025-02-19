@@ -1,11 +1,11 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   getOrderedStepIds,
   getUnsavedForm,
-} from '../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
 import { TerminalItemStep } from '../TerminalItemStep'
 import { DraggableSteps } from '../DraggableSteps'
 import { PresavedStep } from '../PresavedStep'
@@ -18,7 +18,7 @@ vi.mock('../AddStepButton')
 vi.mock('../DraggableSteps')
 vi.mock('../PresavedStep')
 vi.mock('../TerminalItemStep')
-vi.mock('../../../../../step-forms/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 const render = (props: ComponentProps<typeof TimelineToolbox>) => {
   return renderWithProviders(<TimelineToolbox {...props} />, {
     i18nInstance: i18n,

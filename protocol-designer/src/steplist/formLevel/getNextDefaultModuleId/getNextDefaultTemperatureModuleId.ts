@@ -1,7 +1,7 @@
 import findKey from 'lodash/findKey'
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import type { ModuleOnDeck } from '../../../step-forms'
-import type { StepIdType, FormData } from '../../../form-types'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
+import type { StepIdType, FormData } from '/protocol-designer/form-types'
 export function getNextDefaultTemperatureModuleId(
   savedForms: Record<StepIdType, FormData>,
   orderedStepIds: StepIdType[],

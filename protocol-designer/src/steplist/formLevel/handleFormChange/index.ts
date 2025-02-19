@@ -10,8 +10,8 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { FormData } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { FormPatch } from '/protocol-designer/steplist/actions/types'
 export function handleFormChange(
   patch: FormPatch,
   rawForm: FormData | null | undefined,

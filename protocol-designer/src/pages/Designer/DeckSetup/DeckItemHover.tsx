@@ -15,7 +15,7 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {

@@ -15,19 +15,22 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
-import { TipPositionModal, ZTipPositionModal } from '../../../../../organisms'
-import { getIsDelayPositionField } from '../../../../../form-types'
-import { getDefaultMmFromEdge } from '../../../../../organisms/TipPositionModal/utils'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
+import {
+  TipPositionModal,
+  ZTipPositionModal,
+} from '/protocol-designer/organisms'
+import { getIsDelayPositionField } from '/protocol-designer/form-types'
+import { getDefaultMmFromEdge } from '/protocol-designer/organisms/TipPositionModal/utils'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 
 import type {
   TipXOffsetFields,
   TipYOffsetFields,
   TipZOffsetFields,
-} from '../../../../../form-types'
-import type { PositionSpecs } from '../../../../../organisms'
+} from '/protocol-designer/form-types'
+import type { PositionSpecs } from '/protocol-designer/organisms'
 import type { FieldPropsByName } from '../types'
-import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 interface PositionFieldProps {
   prefix: MoveLiquidPrefixType
   propsForFields: FieldPropsByName

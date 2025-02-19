@@ -14,14 +14,17 @@ import {
   StyledText,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
-import { selectors } from '../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import { getSelectedWells } from '../../well-selection/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
-import { deselectWells, selectWells } from '../../well-selection/actions'
-import { NAV_BAR_HEIGHT_REM } from '../../atoms'
+import {
+  deselectWells,
+  selectWells,
+} from '/protocol-designer/well-selection/actions'
+import { NAV_BAR_HEIGHT_REM } from '/protocol-designer/atoms'
 import { LiquidToolbox } from './LiquidToolbox'
 
 import type { WellGroup } from '@opentrons/components'

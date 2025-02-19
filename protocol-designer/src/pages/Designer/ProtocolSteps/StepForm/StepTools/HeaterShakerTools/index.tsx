@@ -8,15 +8,18 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getHeaterShakerLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+import { getHeaterShakerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-import type { StepFormProps } from '../../types'
+} from '/protocol-designer/molecules'
+import {
+  getFormErrorsMappedToField,
+  getFormLevelError,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
+import type { StepFormProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export function HeaterShakerTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData, visibleFormErrors } = props

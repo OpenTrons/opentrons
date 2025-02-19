@@ -2,12 +2,12 @@ import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SPACING } from '@opentrons/components'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import { getMatchingTipLiquidSpecs } from '../../../../../utils'
-import { InputStepFormField } from '../../../../../molecules'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getMatchingTipLiquidSpecs } from '/protocol-designer/utils'
+import { InputStepFormField } from '/protocol-designer/molecules'
 
 import type { FieldProps } from '../types'
-import type { FlowRateType } from '../../../../../resources/types'
+import type { FlowRateType } from '/protocol-designer/resources/types'
 
 interface FlowRateFieldProps extends FieldProps {
   flowRateType: FlowRateType

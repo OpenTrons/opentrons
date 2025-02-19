@@ -1,10 +1,10 @@
-import { getTimeFromForm } from '../../utils/getTimeFromForm'
+import { getTimeFromForm } from '/protocol-designer/steplist/utils/getTimeFromForm'
 import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
-} from '../../../constants'
-import type { HydratedPauseFormData } from '../../../form-types'
+} from '/protocol-designer/constants'
+import type { HydratedPauseFormData } from '/protocol-designer/form-types'
 import type {
   WaitForTemperatureArgs,
   PauseArgs,

@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { removeHint } from '../../../tutorial/actions'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { removeHint } from '/protocol-designer/tutorial/actions'
 import { BlockingHintModal } from '..'
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../tutorial/actions')
+vi.mock('/protocol-designer/tutorial/actions')
 
 const render = (props: ComponentProps<typeof BlockingHintModal>) => {
   return renderWithProviders(<BlockingHintModal {...props} />, {

@@ -20,8 +20,8 @@ import {
 import {
   getSavedStepForms,
   getUnsavedForm,
-} from '../../../step-forms/selectors'
-import { getEnableHotKeysDisplay } from '../../../feature-flags/selectors'
+} from '/protocol-designer/step-forms/selectors'
+import { getEnableHotKeysDisplay } from '/protocol-designer/feature-flags/selectors'
 import {
   getIsMultiSelectMode,
   getSelectedSubstep,
@@ -29,7 +29,7 @@ import {
   getHoveredStepId,
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
-} from '../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../OffDeck'
 import { SubStepsToolbox } from './Timeline'
@@ -39,8 +39,8 @@ import { BatchEditToolbox } from './BatchEditToolbox'
 import {
   getDesignerTab,
   getRobotStateTimeline,
-} from '../../../file-data/selectors'
-import { TimelineAlerts } from '../../../organisms'
+} from '/protocol-designer/file-data/selectors'
+import { TimelineAlerts } from '/protocol-designer/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'

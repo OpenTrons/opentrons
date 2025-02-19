@@ -1,9 +1,9 @@
 import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import uniq from 'lodash/uniq'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getDefaultsForStepType } from '/protocol-designer/steplist/formLevel/getDefaultsForStepType'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
 
 import { getLabwareOnModule } from '../modules/utils'
 import {
@@ -23,15 +23,18 @@ import {
   getPipetteDifferentDisabledFields,
   getLabwareDisabledFields,
 } from './utils'
-import type { BaseState, Selector } from '../../types'
-import type { SubstepIdentifier, TerminalItemId } from '../../steplist/types'
+import type { BaseState, Selector } from '/protocol-designer/types'
+import type {
+  SubstepIdentifier,
+  TerminalItemId,
+} from '/protocol-designer/steplist/types'
 import type {
   CountPerStepType,
   FormData,
   StepFieldName,
   StepIdType,
   StepType,
-} from '../../form-types'
+} from '/protocol-designer/form-types'
 import type {
   SelectableItem,
   StepsState,

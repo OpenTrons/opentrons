@@ -19,13 +19,13 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
-import one from '../../assets/images/onboarding_animation_1.webm'
-import two from '../../assets/images/onboarding_animation_2.webm'
-import three from '../../assets/images/onboarding_animation_3.webm'
-import four from '../../assets/images/onboarding_animation_4.webm'
-import five from '../../assets/images/onboarding_animation_5.webm'
-import six from '../../assets/images/onboarding_animation_6.webm'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import one from '/protocol-designer/assets/images/onboarding_animation_1.webm'
+import two from '/protocol-designer/assets/images/onboarding_animation_2.webm'
+import three from '/protocol-designer/assets/images/onboarding_animation_3.webm'
+import four from '/protocol-designer/assets/images/onboarding_animation_4.webm'
+import five from '/protocol-designer/assets/images/onboarding_animation_5.webm'
+import six from '/protocol-designer/assets/images/onboarding_animation_6.webm'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
 
 import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
@@ -44,15 +44,15 @@ interface WizardBodyProps {
 
 const OT2_GIFS: Record<number, string> = {
   2: new URL(
-    '../../assets/images/onboarding_animation_ot2_2.gif',
+    '/protocol-designer/assets/images/onboarding_animation_ot2_2.gif',
     import.meta.url
   ).href,
   3: new URL(
-    '../../assets/images/onboarding_animation_ot2_3.gif',
+    '/protocol-designer/assets/images/onboarding_animation_ot2_3.gif',
     import.meta.url
   ).href,
   4: new URL(
-    '../../assets/images/onboarding_animation_ot2_4.gif',
+    '/protocol-designer/assets/images/onboarding_animation_ot2_4.gif',
     import.meta.url
   ).href,
 }

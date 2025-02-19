@@ -15,7 +15,7 @@ import { migrateFile as migrateFileEightTwo } from './8_2_0'
 import { migrateFile as migrateFileEightTwoPointTwo } from './8_2_2'
 import { migrateFile as migrateFileEightFive } from './8_5_0'
 
-import type { PDProtocolFile } from '../../file-types'
+import type { PDProtocolFile } from '/protocol-designer/file-types'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 type Version = string

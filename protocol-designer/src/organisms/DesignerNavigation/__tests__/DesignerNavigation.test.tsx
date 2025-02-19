@@ -1,10 +1,10 @@
 import { screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi } from 'vitest'
 
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
-import { getFileMetadata } from '../../../file-data/selectors'
-import { LiquidButton } from '../../../molecules'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { getFileMetadata } from '/protocol-designer/file-data/selectors'
+import { LiquidButton } from '/protocol-designer/molecules'
 
 import { DesignerNavigation } from '..'
 
@@ -12,8 +12,8 @@ import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { TabProps } from '@opentrons/components'
 
-vi.mock('../../../file-data/selectors')
-vi.mock('../../../molecules/LiquidButton')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/molecules/LiquidButton')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {

@@ -1,11 +1,11 @@
 import { getIsTiprack } from '@opentrons/shared-data'
-import { getLabwarePythonName, uuid } from '../../utils'
-import { getLabwareEntities } from '../../step-forms/selectors'
-import { selectors as labwareDefSelectors } from '../../labware-defs'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { getLabwarePythonName, uuid } from '/protocol-designer/utils'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
-import { getRobotType } from '../../file-data/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import type { LabwareEntities } from '@opentrons/step-generation'
 import {
   selectNestedLabware,
@@ -18,7 +18,7 @@ import type {
   ModuleOnDeck,
   NormalizedLabware,
   NormalizedLabwareById,
-} from '../../step-forms'
+} from '/protocol-designer/step-forms'
 import type {
   CreateContainerArgs,
   CreateContainerAction,
@@ -29,7 +29,7 @@ import type {
   SelectFixtureAction,
   DeleteContainerAction,
 } from './actions'
-import type { ThunkAction } from '../../types'
+import type { ThunkAction } from '/protocol-designer/types'
 import type { Fixture } from '../types'
 
 export interface RenameLabwareAction {

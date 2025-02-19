@@ -5,20 +5,20 @@ import {
   fixture_96_plate,
   fixture_tiprack_10_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
-import { getLabwareDefsByURI } from '../../labware-defs/selectors'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
-import { getLabwareNicknamesById } from '../../ui/labware/selectors'
-import { uuid } from '../../utils'
-import { getRobotType } from '../../file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { uuid } from '/protocol-designer/utils'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { renameLabware, createContainer } from '../actions'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../labware-defs/selectors')
-vi.mock('../../step-forms/selectors')
-vi.mock('../../ui/labware/selectors')
-vi.mock('../../file-data/selectors')
-vi.mock('../../utils')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/ui/labware/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/utils')
 vi.mock('../utils')
 
 const middlewares = [thunk]

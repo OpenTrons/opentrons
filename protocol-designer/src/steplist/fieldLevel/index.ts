@@ -37,8 +37,8 @@ import {
   MAX_HEATER_SHAKER_DURATION_SECONDS,
   MIN_TC_PROFILE_VOLUME,
   MAX_TC_PROFILE_VOLUME,
-} from '../../constants'
-import { getStagingAreaAddressableAreas } from '../../utils'
+} from '/protocol-designer/constants'
+import { getStagingAreaAddressableAreas } from '/protocol-designer/utils'
 import type {
   LabwareEntity,
   PipetteEntity,
@@ -48,7 +48,7 @@ import type {
   AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 import type { ValueMasker, ValueCaster } from './processing'
-import type { StepFieldName } from '../../form-types'
+import type { StepFieldName } from '/protocol-designer/form-types'
 import type {
   AddressableAreaName,
   CutoutId,

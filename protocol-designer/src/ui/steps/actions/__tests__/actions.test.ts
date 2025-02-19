@@ -3,10 +3,10 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { when } from 'vitest-when'
-import * as utils from '../../../../utils'
-import * as stepFormSelectors from '../../../../step-forms/selectors'
-import { getRobotStateTimeline } from '../../../../file-data/selectors'
-import { getMultiSelectLastSelected } from '../../selectors'
+import * as utils from '/protocol-designer/utils'
+import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+import { getMultiSelectLastSelected } from '/protocol-designer/ui/steps/selectors'
 import { selectAllSteps, deselectAllSteps } from '../actions'
 import {
   duplicateStep,
@@ -16,9 +16,10 @@ import {
 } from '../thunks'
 import type { Timeline, RobotState } from '@opentrons/step-generation/src/types'
 
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../selectors')
-vi.mock('../../../../file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/ui/steps/selectors')
 
 const mockStore = configureMockStore([thunk])
 

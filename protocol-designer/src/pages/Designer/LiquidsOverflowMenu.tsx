@@ -19,12 +19,12 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
-import { getLiquidEntities } from '../../step-forms/selectors'
-import * as labwareIngredActions from '../../labware-ingred/actions'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/atoms'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
+import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
 
 import type { MouseEvent, RefObject } from 'react'
-import type { ThunkDispatch } from '../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const NAV_HEIGHT = '64px'
 

@@ -20,23 +20,23 @@ import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
-} from '../../steplist'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { getActiveItem } from '../../ui/steps'
-import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
-import { selectors as fileDataSelectors } from '../../file-data'
-import { getRobotType } from '../../file-data/selectors'
+} from '/protocol-designer/steplist'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getActiveItem } from '/protocol-designer/ui/steps'
+import { TERMINAL_ITEM_SELECTION_TYPE } from '/protocol-designer/ui/steps/reducers'
+import { selectors as fileDataSelectors } from '/protocol-designer/file-data'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
   getAdditionalEquipmentEntities,
-} from '../../step-forms/selectors'
-import { getIsAdapter } from '../../utils'
+} from '/protocol-designer/step-forms/selectors'
+import { getIsAdapter } from '/protocol-designer/utils'
 import type { CutoutId, AddressableAreaName } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
-import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
-import type { Selector } from '../../types'
+import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
+import type { Selector } from '/protocol-designer/types'
 
 interface Option {
   name: string

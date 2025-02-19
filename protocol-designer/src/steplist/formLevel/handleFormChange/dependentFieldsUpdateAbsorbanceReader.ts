@@ -1,9 +1,9 @@
 import pick from 'lodash/pick'
-import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '../../../constants'
+import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '/protocol-designer/constants'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
-import type { FormData, StepFieldName } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
+import type { FormPatch } from '/protocol-designer/steplist/actions/types'
 
 const getDefaultFields = (...fields: StepFieldName[]): FormPatch =>
   pick(getDefaultsForStepType('absorbanceReader'), fields)

@@ -13,15 +13,15 @@ import {
   getAirGapData,
   getMixData,
 } from '../moveLiquidFormToArgs'
-import { getOrderedWells } from '../../../utils'
-import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
+import { getOrderedWells } from '/protocol-designer/steplist/utils'
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '/protocol-designer/constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedMoveLiquidFormData,
   PathOption,
-} from '../../../../form-types'
+} from '/protocol-designer/form-types'
 
-vi.mock('../../../utils')
+vi.mock('/protocol-designer/steplist/utils')
 vi.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests

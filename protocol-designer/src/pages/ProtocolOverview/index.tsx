@@ -25,22 +25,22 @@ import {
   getAdditionalEquipmentEntities,
   getInitialDeckSetup,
   getLiquidEntities,
-} from '../../step-forms/selectors'
-import { selectors as fileSelectors } from '../../file-data'
-import { selectors as stepFormSelectors } from '../../step-forms'
-import { actions as loadFileActions } from '../../load-file'
+} from '/protocol-designer/step-forms/selectors'
+import { selectors as fileSelectors } from '/protocol-designer/file-data'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { actions as loadFileActions } from '/protocol-designer/load-file'
 import {
   getEnablePythonExport,
   getEnableTimelineScrubber,
-} from '../../feature-flags/selectors'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { MaterialsListModal } from '../../organisms/MaterialsListModal'
-import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../atoms'
-import { useBlockingHint } from '../../organisms/BlockingHintModal/useBlockingHint'
+} from '/protocol-designer/feature-flags/selectors'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { MaterialsListModal } from '/protocol-designer/organisms/MaterialsListModal'
+import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '/protocol-designer/atoms'
+import { useBlockingHint } from '/protocol-designer/organisms/BlockingHintModal/useBlockingHint'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
-} from '../../organisms'
+} from '/protocol-designer/organisms'
 import { getWarningContent } from './UnusedModalContent'
 import { ProtocolMetadata } from './ProtocolMetadata'
 import { InstrumentsInfo } from './InstrumentsInfo'
@@ -54,7 +54,7 @@ import {
 } from './utils'
 import { ScrubberContainer } from './ScrubberContainer'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { ThunkDispatch } from '../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const DATE_ONLY_FORMAT = 'MMMM dd, yyyy'
 const DATETIME_FORMAT = 'MMMM dd, yyyy | h:mm a'

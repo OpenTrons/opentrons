@@ -5,11 +5,14 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { InputStepFormField } from '../../../../../../molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+import { InputStepFormField } from '/protocol-designer/molecules'
+import {
+  getFormErrorsMappedToField,
+  getFormLevelError,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 
-import type { StepFormErrors } from '../../../../../../steplist'
-import type { FieldPropsByName } from '../../types'
+import type { StepFormErrors } from '/protocol-designer/steplist'
+import type { FieldPropsByName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ProfileSettingsProps {
   propsForFields: FieldPropsByName

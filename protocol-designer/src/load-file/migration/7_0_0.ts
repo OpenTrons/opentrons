@@ -1,7 +1,7 @@
 import mapValues from 'lodash/mapValues'
-import { uuid } from '../../utils'
-import { getOnlyLatestDefs } from '../../labware-defs'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { uuid } from '/protocol-designer/utils'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
+import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
 import type {
   LabwareDefinition2,

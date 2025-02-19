@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
-import { getProfileFieldErrors } from '../../steplist/fieldLevel'
+import { getProfileFieldErrors } from '/protocol-designer/steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 
-vi.mock('../../steplist/fieldLevel')
+vi.mock('/protocol-designer/steplist/fieldLevel')
 
 describe('getProfileItemsHaveErrors', () => {
   const testCases = [

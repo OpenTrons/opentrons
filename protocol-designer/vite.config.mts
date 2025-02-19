@@ -68,13 +68,15 @@ export default defineConfig(
           '@opentrons/step-generation': path.resolve(
             '../step-generation/src/index.ts'
           ),
+          // allow us to use alias in protocol-designer
+          '/protocol-designer/': path.resolve('./src/') + '/',
         },
       },
       server: {
         port: 5178,
         watch: {
           ignored: ['**/cypress/downloads/**'],
-        }
+        },
       },
     }
   }

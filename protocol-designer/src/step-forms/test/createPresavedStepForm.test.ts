@@ -13,7 +13,7 @@ import { getStateAndContextTempTCModules } from '@opentrons/step-generation'
 import {
   DEFAULT_DELAY_SECONDS,
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
-} from '../../constants'
+} from '/protocol-designer/constants'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
 

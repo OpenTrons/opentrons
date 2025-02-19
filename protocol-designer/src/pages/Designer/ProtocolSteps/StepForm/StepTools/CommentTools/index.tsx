@@ -6,9 +6,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { TextAreaField } from '../../../../../../molecules'
+import { TextAreaField } from '/protocol-designer/molecules'
 import type { ChangeEvent } from 'react'
-import type { StepFormProps } from '../../types'
+import type { StepFormProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export function CommentTools(props: StepFormProps): JSX.Element {
   const { t, i18n } = useTranslation('form')

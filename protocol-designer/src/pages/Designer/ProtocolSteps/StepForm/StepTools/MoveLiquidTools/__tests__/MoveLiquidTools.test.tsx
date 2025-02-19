@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 
 import { SingleStepMoveLiquidTools } from '../SingleStepMoveLiquidTools'
 import { MultipleStepsMoveLiquidTools } from '../MultipleStepsMoveLiquidTools'
@@ -9,9 +9,9 @@ import { MultipleStepsMoveLiquidTools } from '../MultipleStepsMoveLiquidTools'
 import { MoveLiquidTools } from '../'
 
 import type { ComponentProps } from 'react'
-import type { FieldPropsByName } from '../../../types'
-import type { FormData } from '../../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../../steplist'
+import type { FieldPropsByName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { StepFormErrors } from '/protocol-designer/steplist'
 
 vi.mock('../SingleStepMoveLiquidTools')
 vi.mock('../MultipleStepsMoveLiquidTools')

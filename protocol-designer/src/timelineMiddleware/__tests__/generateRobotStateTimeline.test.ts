@@ -11,9 +11,9 @@ import {
 import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
 import { generateRobotStateTimeline } from '../generateRobotStateTimeline'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { StepArgsAndErrorsById } from '../../steplist'
+import type { StepArgsAndErrorsById } from '/protocol-designer/steplist'
 
-vi.mock('../../labware-defs/utils')
+vi.mock('/protocol-designer/labware-defs/utils')
 
 describe('generateRobotStateTimeline', () => {
   it('performs eager tip dropping', () => {

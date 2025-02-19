@@ -23,23 +23,23 @@ import {
 } from '@opentrons/shared-data'
 import { Box, COLORS } from '@opentrons/components'
 
-import { actions as fileActions } from '../../load-file'
-import { uuid } from '../../utils'
-import * as labwareDefSelectors from '../../labware-defs/selectors'
-import * as labwareDefActions from '../../labware-defs/actions'
-import * as labwareIngredActions from '../../labware-ingred/actions'
-import { actions as steplistActions } from '../../steplist'
+import { actions as fileActions } from '/protocol-designer/load-file'
+import { uuid } from '/protocol-designer/utils'
+import * as labwareDefSelectors from '/protocol-designer/labware-defs/selectors'
+import * as labwareDefActions from '/protocol-designer/labware-defs/actions'
+import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
+import { actions as steplistActions } from '/protocol-designer/steplist'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   STAGING_AREA_CUTOUTS_ORDERED,
-} from '../../constants'
-import { actions as stepFormActions } from '../../step-forms'
-import { createModuleWithNoSlot } from '../../modules'
+} from '/protocol-designer/constants'
+import { actions as stepFormActions } from '/protocol-designer/step-forms'
+import { createModuleWithNoSlot } from '/protocol-designer/modules'
 import {
   createDeckFixture,
   toggleIsGripperRequired,
-} from '../../step-forms/actions/additionalItems'
-import { getNewProtocolModal } from '../../navigation/selectors'
+} from '/protocol-designer/step-forms/actions/additionalItems'
+import { getNewProtocolModal } from '/protocol-designer/navigation/selectors'
 import { SelectRobot } from './SelectRobot'
 import { SelectPipettes } from './SelectPipettes'
 import { SelectGripper } from './SelectGripper'
@@ -51,12 +51,12 @@ import { getTrashSlot } from './utils'
 import type { Dispatch, SetStateAction } from 'react'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { NormalizedPipette } from '@opentrons/step-generation'
-import type { BaseState } from '../../types'
+import type { BaseState } from '/protocol-designer/types'
 import type {
   FormPipette,
   FormPipettesByMount,
   PipetteOnDeck,
-} from '../../step-forms'
+} from '/protocol-designer/step-forms'
 import type {
   ModuleModel,
   ModuleType,

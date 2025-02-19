@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { getMoveLabwareOptions } from '../../../../../../ui/labware/selectors'
-import { DropdownStepFormField } from '../../../../../../molecules'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import type { FieldProps } from '../../types'
+import { getMoveLabwareOptions } from '/protocol-designer/ui/labware/selectors'
+import { DropdownStepFormField } from '/protocol-designer/molecules'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export function MoveLabwareField(props: FieldProps): JSX.Element {
   const options = useSelector(getMoveLabwareOptions)

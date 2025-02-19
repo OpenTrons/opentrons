@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import {
   FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -9,11 +9,11 @@ import {
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 import { Module } from '@opentrons/components'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getInitialDeckSetup } from '../../../../step-forms/selectors'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { getDesignerTab } from '../../../../file-data/selectors'
-import { LabwareOnDeck } from '../../../../organisms'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getDesignerTab } from '/protocol-designer/file-data/selectors'
+import { LabwareOnDeck } from '/protocol-designer/organisms'
 import { FixtureRender } from '../FixtureRender'
 import { SelectedHoveredItems } from '../SelectedHoveredItems'
 
@@ -21,12 +21,12 @@ import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../step-forms/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../FixtureRender')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../organisms')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/organisms')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {

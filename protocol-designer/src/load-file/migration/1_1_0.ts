@@ -4,15 +4,15 @@ import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
-import { getLegacyLabwareDef } from '../../labware-defs'
+import { getLegacyLabwareDef } from '/protocol-designer/labware-defs'
 import type {
   FileLabware,
   FilePipette,
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV1'
 import type { PipetteName } from '@opentrons/shared-data'
-import type { FormPatch } from '../../steplist/actions'
-import type { FormData } from '../../form-types'
+import type { FormPatch } from '/protocol-designer/steplist/actions'
+import type { FormData } from '/protocol-designer/form-types'
 
 export interface PDMetadata {
   pipetteTiprackAssignments: Record<string, string>

@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux'
-import { getLabwareEntities } from '../../step-forms/selectors'
-import { getHoveredStepLabware } from '../../ui/steps'
-import { getDesignerTab } from '../../file-data/selectors'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import { getHoveredStepLabware } from '/protocol-designer/ui/steps'
+import { getDesignerTab } from '/protocol-designer/file-data/selectors'
 import { LabwareLabel } from './LabwareLabel'
 import type { CoordinateTuple } from '@opentrons/shared-data'
-import type { LabwareOnDeck } from '../../step-forms'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 
 interface HighlightLabwareProps {
   labwareOnDeck: LabwareOnDeck

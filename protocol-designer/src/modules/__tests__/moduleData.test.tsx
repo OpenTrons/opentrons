@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { getNextAvailableModuleSlot } from '../moduleData'
-import type { InitialDeckSetup } from '../../step-forms'
+import type { InitialDeckSetup } from '/protocol-designer/step-forms'
 
 describe('getNextAvailableModuleSlot', () => {
   it('renders slot D2 when it is the magnetic block', () => {

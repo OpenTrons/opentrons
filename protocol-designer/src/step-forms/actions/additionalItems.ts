@@ -1,4 +1,4 @@
-import { uuid } from '../../utils'
+import { uuid } from '/protocol-designer/utils'
 
 export interface ToggleIsGripperRequiredAction {
   type: 'TOGGLE_IS_GRIPPER_REQUIRED'

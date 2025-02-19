@@ -6,16 +6,16 @@ import {
   getInitialRobotState,
   getRobotStateTimeline,
   getRobotType,
-} from '../../file-data/selectors'
-import { uuid } from '../../utils'
+} from '/protocol-designer/file-data/selectors'
+import { uuid } from '/protocol-designer/utils'
 import {
   getInitialDeckSetup,
   getInvariantContext,
   getLiquidEntities,
-} from '../../step-forms/selectors'
-import { getLabwareNicknamesById } from '../../ui/labware/selectors'
-import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
-import { getLoadCommands } from '../../file-data/selectors/utils'
+} from '/protocol-designer/step-forms/selectors'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { selectors as ingredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { getLoadCommands } from '/protocol-designer/file-data/selectors/utils'
 import type {
   AddressableAreaName,
   CompletedProtocolAnalysis,

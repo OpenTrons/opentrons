@@ -10,8 +10,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getPipetteEntities } from '../../../../../step-forms/selectors'
-import { SelectWellsModal, getMainPagePortalEl } from '../../../../../organisms'
+import { getPipetteEntities } from '/protocol-designer/step-forms/selectors'
+import {
+  SelectWellsModal,
+  getMainPagePortalEl,
+} from '/protocol-designer/organisms'
 import { getNozzleType } from '../utils'
 
 import type { FieldProps } from '../types'

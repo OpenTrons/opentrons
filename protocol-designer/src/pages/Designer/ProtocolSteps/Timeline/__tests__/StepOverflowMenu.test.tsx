@@ -1,24 +1,24 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import {
   getMultiSelectItemIds,
   actions as stepsActions,
-} from '../../../../../ui/steps'
-import { analyticsEvent } from '../../../../../analytics/actions'
+} from '/protocol-designer/ui/steps'
+import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import {
   getCurrentFormHasUnsavedChanges,
   getCurrentFormIsPresaved,
   getPipetteEntities,
   getSavedStepForms,
   getUnsavedForm,
-} from '../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
 import {
   hoverOnStep,
   toggleViewSubstep,
-} from '../../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/actions/actions'
 import { StepOverflowMenu } from '../StepOverflowMenu'
 
 import type { ComponentProps } from 'react'
@@ -29,13 +29,13 @@ const mockCancel = vi.fn()
 const mockId = 'mockId'
 const mockId96 = '96MockId'
 
-vi.mock('../../../../../ui/steps')
-vi.mock('../../../../../step-forms/selectors')
-vi.mock('../../../../../ui/steps/actions/actions')
-vi.mock('../../../../../ui/steps/actions/thunks')
-vi.mock('../../../../../steplist/actions')
-vi.mock('../../../../../feature-flags/selectors')
-vi.mock('../../../../../analytics/actions')
+vi.mock('/protocol-designer/ui/steps')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/ui/steps/actions/actions')
+vi.mock('/protocol-designer/ui/steps/actions/thunks')
+vi.mock('/protocol-designer/steplist/actions')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/analytics/actions')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {

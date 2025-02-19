@@ -2,19 +2,19 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
 import { FLEX_ROBOT_TYPE, fixture12Trough } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { LabwareOnDeck } from '../../../organisms'
-import { getRobotType } from '../../../file-data/selectors'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { LabwareOnDeck } from '/protocol-designer/organisms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { DeckThumbnail } from '../DeckThumbnail'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
 
-vi.mock('../../../organisms')
-vi.mock('../../../file-data/selectors')
-vi.mock('../../../step-forms/selectors')
+vi.mock('/protocol-designer/organisms')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {

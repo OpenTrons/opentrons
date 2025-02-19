@@ -11,22 +11,22 @@ import {
   Toolbox,
 } from '@opentrons/components'
 
-import { NAV_BAR_HEIGHT_REM } from '../../../../atoms'
+import { NAV_BAR_HEIGHT_REM } from '/protocol-designer/atoms'
 import {
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,
   actions as steplistActions,
-} from '../../../../steplist'
-import { actions as stepsActions } from '../../../../ui/steps'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getUnsavedForm } from '../../../../step-forms/selectors'
+} from '/protocol-designer/steplist'
+import { actions as stepsActions } from '/protocol-designer/ui/steps'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { getUnsavedForm } from '/protocol-designer/step-forms/selectors'
 import { TerminalItemStep } from './TerminalItemStep'
 import { AddStepButton } from './AddStepButton'
 import { PresavedStep } from './PresavedStep'
 import { DraggableSteps } from './DraggableSteps'
 
-import type { StepIdType } from '../../../../form-types'
-import type { ThunkDispatch } from '../../../../types'
+import type { StepIdType } from '/protocol-designer/form-types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const SIDEBAR_MIN_WIDTH_FOR_ICON = 179
 interface TimelineToolboxProps {

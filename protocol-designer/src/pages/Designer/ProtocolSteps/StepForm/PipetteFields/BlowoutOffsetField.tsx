@@ -12,8 +12,8 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { ZTipPositionModal } from '../../../../../organisms'
-import { getLabwareEntities } from '../../../../../step-forms/selectors'
+import { ZTipPositionModal } from '/protocol-designer/organisms'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 import type { FieldProps } from '../types'
 
 interface BlowoutOffsetFieldProps extends FieldProps {

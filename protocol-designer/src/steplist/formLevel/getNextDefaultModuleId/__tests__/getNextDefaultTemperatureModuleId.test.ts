@@ -9,8 +9,8 @@ import {
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { getNextDefaultTemperatureModuleId } from '../getNextDefaultTemperatureModuleId'
-import type { FormData, StepIdType } from '../../../../form-types'
-import type { ModuleOnDeck } from '../../../../step-forms'
+import type { FormData, StepIdType } from '/protocol-designer/form-types'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
 
 const getThermocycler = () => ({
   id: 'tcId',

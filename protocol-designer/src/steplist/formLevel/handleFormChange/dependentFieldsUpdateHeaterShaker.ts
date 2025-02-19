@@ -1,6 +1,6 @@
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
-import type { FormData } from '../../../form-types'
-import type { FormPatch } from '../../actions/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { FormPatch } from '/protocol-designer/steplist/actions/types'
 
 const updatePatchOnSetShakeChange = (
   patch: FormPatch,

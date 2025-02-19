@@ -11,9 +11,9 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { getSavedStepForms } from '../../../../step-forms/selectors'
+import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
 
-import type { ProfileStepItem } from '../../../../form-types'
+import type { ProfileStepItem } from '/protocol-designer/form-types'
 import type { ThermocyclerCycleType } from '../StepForm/StepTools/ThermocyclerTools/ThermocyclerCycle'
 import type { ThermocyclerStepType } from '../StepForm/StepTools/ThermocyclerTools/ThermocyclerStep'
 

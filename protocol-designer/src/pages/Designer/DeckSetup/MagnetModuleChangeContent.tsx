@@ -5,7 +5,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { KnowledgeLink } from '../../../organisms'
+import { KnowledgeLink } from '/protocol-designer/organisms'
 
 export function MagnetModuleChangeContent(): JSX.Element {
   const { t } = useTranslation('starting_deck_state')

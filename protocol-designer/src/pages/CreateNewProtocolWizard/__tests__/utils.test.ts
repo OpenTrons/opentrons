@@ -19,7 +19,7 @@ import {
 import { getNumSlotsAvailable, getTrashSlot } from '../utils'
 
 import type { AdditionalEquipment, WizardFormState } from '../types'
-import type { FormPipettesByMount } from '../../../step-forms'
+import type { FormPipettesByMount } from '/protocol-designer/step-forms'
 
 let MOCK_FORM_STATE = {
   fields: {

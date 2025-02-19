@@ -9,7 +9,7 @@ import type { LabwareDefByDefURI } from '../types'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,
-  '../../../../shared-data/labware/fixtures/2/*.json'
+  '/protocol-designer/shared-data/labware/fixtures/2/*.json'
 )
 const allLabware: LabwareDefByDefURI = glob
   .sync(LABWARE_FIXTURE_PATTERN)
@@ -28,7 +28,7 @@ export const getOnlyLatestDefs = vi.fn(() => allLabware)
 
 const LEGACY_LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,
-  '../../../../shared-data/labware/fixtures/1/*.json'
+  '/protocol-designer/shared-data/labware/fixtures/1/*.json'
 )
 const legacyLabwareDefs: LabwareDefinition1[] = glob
   .sync(LEGACY_LABWARE_FIXTURE_PATTERN)

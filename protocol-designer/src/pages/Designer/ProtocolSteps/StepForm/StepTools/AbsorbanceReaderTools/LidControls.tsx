@@ -5,9 +5,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { ToggleStepFormField } from '../../../../../../molecules'
+import { ToggleStepFormField } from '/protocol-designer/molecules'
 
-import type { FieldProps } from '../../types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface LidControlsProps {
   fieldProps: FieldProps

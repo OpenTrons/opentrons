@@ -7,20 +7,20 @@ import {
   HEATERSHAKER_MODULE_V1,
   fixture96Plate,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
-import { deleteContainer } from '../../../../labware-ingred/actions'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { deleteModule } from '../../../../modules'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { deleteModule } from '/protocol-designer/modules'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
-} from '../../../../step-forms/selectors'
-import { getRobotType } from '../../../../file-data/selectors'
-import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getDismissedHints } from '../../../../tutorial/selectors'
-import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
+} from '/protocol-designer/step-forms/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { deleteDeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getDismissedHints } from '/protocol-designer/tutorial/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { DeckSetupTools } from '../DeckSetupTools'
 import { LabwareTools } from '../LabwareTools'
 
@@ -28,16 +28,16 @@ import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../LabwareTools')
-vi.mock('../../../../feature-flags/selectors')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../modules')
-vi.mock('../../../../step-forms/actions/additionalItems')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../tutorial/selectors')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../organisms/Kitchen/hooks')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/top-selectors/labware-locations')
+vi.mock('/protocol-designer/labware-ingred/actions')
+vi.mock('/protocol-designer/modules')
+vi.mock('/protocol-designer/step-forms/actions/additionalItems')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/tutorial/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/organisms/Kitchen/hooks')
 const render = (props: ComponentProps<typeof DeckSetupTools>) => {
   return renderWithProviders(<DeckSetupTools {...props} />, {
     i18nInstance: i18n,

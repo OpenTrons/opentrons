@@ -1,5 +1,5 @@
 import mapValues from 'lodash/mapValues'
-import { castField } from '../../../steplist/fieldLevel'
+import { castField } from '/protocol-designer/steplist/fieldLevel'
 import { mixFormToArgs } from './mixFormToArgs'
 import { pauseFormToArgs } from './pauseFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
@@ -23,7 +23,7 @@ import type {
   HydratedPauseFormData,
   HydratedThermocyclerFormData,
   HydratedFormData,
-} from '../../../form-types'
+} from '/protocol-designer/form-types'
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators

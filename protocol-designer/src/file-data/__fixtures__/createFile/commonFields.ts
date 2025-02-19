@@ -11,10 +11,10 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { DismissedWarningState } from '../../../dismiss/reducers'
-import type { IngredientsState } from '../../../labware-ingred/reducers'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
-import type { FileMetadataFields } from '../../types'
+import type { DismissedWarningState } from '/protocol-designer/dismiss/reducers'
+import type { IngredientsState } from '/protocol-designer/labware-ingred/reducers'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
+import type { FileMetadataFields } from '/protocol-designer/file-data/types'
 
 const fixture96Plate = fixture_96_plate as LabwareDefinition2
 const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2

@@ -1,5 +1,5 @@
 import { getPositionFromSlotId } from '@opentrons/shared-data'
-import { getStagingAreaAddressableAreas } from '../../utils'
+import { getStagingAreaAddressableAreas } from '/protocol-designer/utils'
 import type {
   AdditionalEquipmentName,
   DeckSlot,
@@ -13,7 +13,7 @@ import type {
   AllTemporalPropertiesForTimelineFrame,
   LabwareOnDeck,
   ModuleOnDeck,
-} from '../../step-forms'
+} from '/protocol-designer/step-forms'
 import type { Fixture } from './DeckSetup/constants'
 
 interface AdditionalEquipment {

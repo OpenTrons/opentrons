@@ -15,9 +15,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../Portal'
-import { actions, selectors as fileSelectors } from '../../file-data'
-import { TextAreaField } from '../../molecules'
-import type { FileMetadataFields } from '../../file-data'
+import {
+  actions,
+  selectors as fileSelectors,
+} from '/protocol-designer/file-data'
+import { TextAreaField } from '/protocol-designer/molecules'
+import type { FileMetadataFields } from '/protocol-designer/file-data'
 
 interface EditProtocolMetadataModalProps {
   onClose: () => void

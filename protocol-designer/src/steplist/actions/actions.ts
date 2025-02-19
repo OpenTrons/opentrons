@@ -1,12 +1,12 @@
-import { getOrderedStepIds } from '../../step-forms/selectors'
+import { getOrderedStepIds } from '/protocol-designer/step-forms/selectors'
 import { getNextNonTerminalItemId } from '../utils'
-import type { ThunkAction } from '../../types'
-import type { StepIdType, FormData } from '../../form-types'
+import type { ThunkAction } from '/protocol-designer/types'
+import type { StepIdType, FormData } from '/protocol-designer/form-types'
 import type { ChangeFormPayload } from './types'
 import type {
   ClearSelectedItemAction,
   SelectMultipleStepsAction,
-} from '../../ui/steps'
+} from '/protocol-designer/ui/steps'
 export interface ChangeSavedStepFormAction {
   type: 'CHANGE_SAVED_STEP_FORM'
   payload: ChangeFormPayload

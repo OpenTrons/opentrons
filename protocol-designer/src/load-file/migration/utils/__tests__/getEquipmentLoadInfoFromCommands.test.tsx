@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import doItAllV7 from '../../../../../fixtures/protocol/7/doItAllV7.json'
+import doItAllV7 from 'protocol-designer/fixtures/protocol/7/doItAllV7.json'
 import { getEquipmentLoadInfoFromCommands } from '../getEquipmentLoadInfoFromCommands'
 import type { CreateCommand, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { EquipmentLoadInfoFromCommands } from '../getEquipmentLoadInfoFromCommands'

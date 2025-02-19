@@ -28,13 +28,13 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
-import { getRobotType } from '../../../file-data/selectors'
-import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { SlotDetailsContainer } from '../../../organisms'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
-import { selectors } from '../../../labware-ingred/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getDisableModuleRestrictions } from '/protocol-designer/feature-flags/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getHasGen1MultiChannelPipette } from '/protocol-designer/step-forms'
+import { SlotDetailsContainer } from '/protocol-designer/organisms'
+import { selectZoomedIntoSlot } from '/protocol-designer/labware-ingred/actions'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { DECK_SETUP_TOOLS_WIDTH_REM, DeckSetupTools } from './DeckSetupTools'
 import {

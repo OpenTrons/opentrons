@@ -3,7 +3,7 @@ import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
-import { getPDMetadata } from '../../file-types'
+import { getPDMetadata } from '/protocol-designer/file-types'
 import type { Reducer } from 'redux'
 import type {
   SingleLabwareLiquidState,
@@ -13,13 +13,13 @@ import type {
   LiquidEntity,
 } from '@opentrons/step-generation'
 import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
-import type { Action, DeckSlot } from '../../types'
+import type { Action, DeckSlot } from '/protocol-designer/types'
 import type {
   DisplayLabware,
   ZoomedIntoSlotInfoState,
   GenerateNewProtocolState,
 } from '../types'
-import type { LoadFileAction } from '../../load-file'
+import type { LoadFileAction } from '/protocol-designer/load-file'
 import type {
   RemoveWellsContentsAction,
   CreateContainerAction,

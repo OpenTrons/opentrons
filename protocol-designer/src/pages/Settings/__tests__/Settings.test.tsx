@@ -1,24 +1,26 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { AnnouncementModal } from '../../../organisms'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getHasOptedIn } from '../../../analytics/selectors'
-import { getFeatureFlagData } from '../../../feature-flags/selectors'
-import { getCanClearHintDismissals } from '../../../tutorial/selectors'
-import { clearAllHintDismissals } from '../../../tutorial/actions'
-import { optIn } from '../../../analytics/actions'
-import { setFeatureFlags } from '../../../feature-flags/actions'
+
+import { AnnouncementModal } from '/protocol-designer/organisms'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getHasOptedIn } from '/protocol-designer/analytics/selectors'
+import { getFeatureFlagData } from '/protocol-designer/feature-flags/selectors'
+import { getCanClearHintDismissals } from '/protocol-designer/tutorial/selectors'
+import { clearAllHintDismissals } from '/protocol-designer/tutorial/actions'
+import { optIn } from '/protocol-designer/analytics/actions'
+import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
+
 import { Settings } from '..'
 
-vi.mock('../../../organisms')
-vi.mock('../../../feature-flags/actions')
-vi.mock('../../../analytics/actions')
-vi.mock('../../../tutorial/actions')
-vi.mock('../../../tutorial/selectors')
-vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../analytics/selectors')
+vi.mock('/protocol-designer/organisms')
+vi.mock('/protocol-designer/feature-flags/actions')
+vi.mock('/protocol-designer/analytics/actions')
+vi.mock('/protocol-designer/tutorial/actions')
+vi.mock('/protocol-designer/tutorial/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/analytics/selectors')
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>

@@ -1,13 +1,13 @@
 import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
-import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { i18n } from '../../../../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import { CommentTools } from '..'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../../../../molecules/TextAreaField/index', () => {
+vi.mock('/protocol-designer/molecules/TextAreaField/index', () => {
   return {
     TextAreaField: vi.fn(() => <div>mock TextAreaField</div>),
   }

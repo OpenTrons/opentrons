@@ -5,7 +5,7 @@ import {
   FIXED_TRASH_ID,
 } from '@opentrons/step-generation'
 import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
-import { THERMOCYCLER_STATE } from '../../constants'
+import { THERMOCYCLER_STATE } from '/protocol-designer/constants'
 import { generateSubstepItem } from '../generateSubstepItem'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -13,7 +13,7 @@ import type {
   RobotState,
   InvariantContext,
   ThermocyclerStateStepArgs,
-} from '../../../../step-generation/src/types'
+} from '@opentrons/step-generation'
 import type { StepArgsAndErrors, LabwareNamesByModuleId } from '../types'
 
 describe('generateSubstepItem', () => {

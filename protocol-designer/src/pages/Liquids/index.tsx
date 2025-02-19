@@ -10,8 +10,8 @@ import {
   AssignLiquidsModal,
   DefineLiquidsModal,
   DesignerNavigation,
-} from '../../organisms'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+} from '/protocol-designer/organisms'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { LiquidsOverflowMenu } from '../Designer/LiquidsOverflowMenu'
 
 export function Liquids(): JSX.Element {

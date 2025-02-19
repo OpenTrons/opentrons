@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { migrateFile } from '../8_0_0'
-import _oldDoItAllProtocol from '../../../../fixtures/protocol/7/doItAllV7.json'
+import _oldDoItAllProtocol from 'protocol-designer/fixtures/protocol/7/doItAllV7.json'
 import type { ProtocolFileV7 } from '@opentrons/shared-data'
 
-vi.mock('../../../labware-defs')
+vi.mock('/protocol-designer/labware-defs')
 
 const oldDoItAllProtocol = (_oldDoItAllProtocol as unknown) as ProtocolFileV7<any>
 

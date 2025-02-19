@@ -15,8 +15,8 @@ import type {
   ModuleOnDeck,
   LabwareOnDeck,
   InitialDeckSetup,
-} from '../../step-forms/types'
-import type { SavedStepFormState } from '../../step-forms'
+} from '/protocol-designer/step-forms/types'
+import type { SavedStepFormState } from '/protocol-designer/step-forms'
 
 export function getModuleOnDeckByType(
   initialDeckSetup: InitialDeckSetup,

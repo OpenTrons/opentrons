@@ -12,17 +12,23 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
-import { GRIPPER_LOCATION, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
-import { getPDMetadata } from '../../file-types'
+import { rootReducer as labwareDefsRootReducer } from '/protocol-designer/labware-defs'
+import {
+  GRIPPER_LOCATION,
+  INITIAL_DECK_SETUP_STEP_ID,
+} from '/protocol-designer/constants'
+import { getPDMetadata } from '/protocol-designer/file-types'
 import {
   getDefaultsForStepType,
   handleFormChange,
-} from '../../steplist/formLevel'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import { getLabwareOnModule } from '../../ui/modules/utils'
-import { getLabwarePythonName, getModulePythonName } from '../../utils'
+} from '/protocol-designer/steplist/formLevel'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
+import { getLabwareIsCompatible } from '/protocol-designer/utils/labwareModuleCompatibility'
+import { getLabwareOnModule } from '/protocol-designer/ui/modules/utils'
+import {
+  getLabwarePythonName,
+  getModulePythonName,
+} from '/protocol-designer/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import {
   _getPipetteEntitiesRootState,
@@ -43,10 +49,10 @@ import type {
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
 import type { PipetteName } from '@opentrons/shared-data'
-import type { RootState as LabwareDefsRootState } from '../../labware-defs'
-import type { LoadFileAction } from '../../load-file'
-import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
+import type { RootState as LabwareDefsRootState } from '/protocol-designer/labware-defs'
+import type { LoadFileAction } from '/protocol-designer/load-file'
+import type { SaveStepFormAction } from '/protocol-designer/ui/steps/actions/thunks'
+import type { ReplaceCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
 import type {
   CreateDeckFixtureAction,
   DeleteDeckFixtureAction,
@@ -73,8 +79,12 @@ import type {
   PopulateFormAction,
   ReorderStepsAction,
   FormPatch,
-} from '../../steplist/actions'
-import type { FormData, StepIdType, StepType } from '../../form-types'
+} from '/protocol-designer/steplist/actions'
+import type {
+  FormData,
+  StepIdType,
+  StepType,
+} from '/protocol-designer/form-types'
 import type {
   CreateContainerAction,
   DeleteContainerAction,
@@ -82,7 +92,7 @@ import type {
   EditMultipleLabwareAction,
   RenameStepAction,
   SwapSlotContentsAction,
-} from '../../labware-ingred/actions'
+} from '/protocol-designer/labware-ingred/actions'
 import type {
   AddStepAction,
   DuplicateStepAction,
@@ -91,19 +101,19 @@ import type {
   SelectStepAction,
   SelectTerminalItemAction,
   SelectMultipleStepsAction,
-} from '../../ui/steps/actions/types'
-import type { Action } from '../../types'
-import type { PipetteLoadInfo } from '../../file-types'
+} from '/protocol-designer/ui/steps/actions/types'
+import type { Action } from '/protocol-designer/types'
+import type { PipetteLoadInfo } from '/protocol-designer/file-types'
 import type {
   AdditionalEquipmentLocationUpdate,
   LocationUpdate,
-} from '../../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
+} from '/protocol-designer/load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
 import type {
   NormalizedLabware,
   NormalizedLabwareById,
   ModuleEntities,
 } from '../types'
-import type { EditMultipleModulesAction } from '../../modules'
+import type { EditMultipleModulesAction } from '/protocol-designer/modules'
 
 type FormState = FormData | null
 const unsavedFormInitialState = null

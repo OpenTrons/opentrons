@@ -4,24 +4,24 @@ import {
   fixture96Plate,
   fixtureP1000SingleV2Specs,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getAllWellContentsForActiveItem } from '/protocol-designer/top-selectors/well-contents'
 import {
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../step-forms/selectors'
-import { SelectableLabware } from '../../Labware/SelectableLabware'
+} from '/protocol-designer/step-forms/selectors'
+import { SelectableLabware } from '/protocol-designer/organisms/Labware/SelectableLabware'
 import { SelectWellsModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
-vi.mock('../../../step-forms/selectors')
-vi.mock('../../../labware-ingred/selectors')
-vi.mock('../../../top-selectors/well-contents')
-vi.mock('../../Labware/SelectableLabware')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/top-selectors/well-contents')
+vi.mock('/protocol-designer/organisms/Labware/SelectableLabware')
 
 const render = (props: ComponentProps<typeof SelectWellsModal>) => {
   return renderWithProviders(<SelectWellsModal {...props} />, {

@@ -32,14 +32,14 @@ import {
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { getRobotType } from '../../../file-data/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   createDeckFixture,
   deleteDeckFixture,
-} from '../../../step-forms/actions/additionalItems'
-import { getSavedStepForms } from '../../../step-forms/selectors'
-import { deleteModule } from '../../../modules'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+} from '/protocol-designer/step-forms/actions/additionalItems'
+import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
+import { deleteModule } from '/protocol-designer/modules'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import {
   createContainer,
   deleteContainer,
@@ -49,18 +49,18 @@ import {
   selectModule,
   selectNestedLabware,
   selectZoomedIntoSlot,
-} from '../../../labware-ingred/actions'
-import { getEnableMutlipleTempsOT2 } from '../../../feature-flags/selectors'
-import { useBlockingHint } from '../../../organisms/BlockingHintModal/useBlockingHint'
-import { selectors } from '../../../labware-ingred/selectors'
-import { useKitchen } from '../../../organisms/Kitchen/hooks'
-import { getDismissedHints } from '../../../tutorial/selectors'
-import { LINK_BUTTON_STYLE, NAV_BAR_HEIGHT_REM } from '../../../atoms'
+} from '/protocol-designer/labware-ingred/actions'
+import { getEnableMutlipleTempsOT2 } from '/protocol-designer/feature-flags/selectors'
+import { useBlockingHint } from '/protocol-designer/organisms/BlockingHintModal/useBlockingHint'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { getDismissedHints } from '/protocol-designer/tutorial/selectors'
+import { LINK_BUTTON_STYLE, NAV_BAR_HEIGHT_REM } from '/protocol-designer/atoms'
 import {
   createContainerAboveModule,
   createModuleEntityAndChangeForm,
-} from '../../../step-forms/actions/thunks'
-import { ConfirmDeleteStagingAreaModal } from '../../../organisms'
+} from '/protocol-designer/step-forms/actions/thunks'
+import { ConfirmDeleteStagingAreaModal } from '/protocol-designer/organisms'
 import { getSlotInformation } from '../utils'
 import { ALL_ORDERED_CATEGORIES, FIXTURES, MOAM_MODELS } from './constants'
 import { LabwareTools } from './LabwareTools'
@@ -68,7 +68,7 @@ import { MagnetModuleChangeContent } from './MagnetModuleChangeContent'
 import { getModuleModelsBySlot, getDeckErrors } from './utils'
 
 import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
-import type { ThunkDispatch } from '../../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { Fixture } from './constants'
 import type { ModuleModelExtended } from './utils'
 

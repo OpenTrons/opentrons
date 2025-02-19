@@ -14,7 +14,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import { getStagingAreaAddressableAreas } from '../../../utils'
+import { getStagingAreaAddressableAreas } from '/protocol-designer/utils'
 import {
   FLEX_MODULE_MODELS,
   OT2_MODULE_MODELS,
@@ -32,12 +32,12 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../../../labware-defs'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   InitialDeckSetup,
   LabwareOnDeck,
-} from '../../../step-forms'
+} from '/protocol-designer/step-forms'
 import type { Fixture } from './constants'
 
 const OT2_TC_SLOTS = ['7', '8', '10', '11']

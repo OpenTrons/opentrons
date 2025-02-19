@@ -1,6 +1,6 @@
 import { it, describe, expect } from 'vitest'
 import { heaterShakerFormToArgs } from '../heaterShakerFormToArgs'
-import type { HydratedHeaterShakerFormData } from '../../../../form-types'
+import type { HydratedHeaterShakerFormData } from '/protocol-designer/form-types'
 
 describe('heaterShakerFormToArgs', () => {
   it('returns heater shaker command creator when temp, shaking, and timer is specified', () => {

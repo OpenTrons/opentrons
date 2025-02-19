@@ -16,10 +16,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getOnlyLatestDefs } from '../../../labware-defs'
-import { selectors } from '../../../labware-ingred/selectors'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { selectZoomedIntoSlot } from '/protocol-designer/labware-ingred/actions'
 import { DeckSetupTools } from '../DeckSetup/DeckSetupTools'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'

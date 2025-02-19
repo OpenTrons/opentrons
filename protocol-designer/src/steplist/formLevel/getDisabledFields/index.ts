@@ -7,7 +7,7 @@ import type {
   HydratedHeaterShakerFormData,
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
-} from '../../../form-types'
+} from '/protocol-designer/form-types'
 
 function _getDisabledFields(hydratedForm: HydratedFormData): Set<string> {
   switch (hydratedForm.stepType) {

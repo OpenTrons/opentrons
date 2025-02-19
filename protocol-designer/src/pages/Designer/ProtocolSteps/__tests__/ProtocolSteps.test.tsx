@@ -1,42 +1,42 @@
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import {
   getSavedStepForms,
   getUnsavedForm,
-} from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
 import {
   getSelectedStepId,
   getSelectedSubstep,
   getSelectedTerminalItemId,
-} from '../../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
 import {
   getDesignerTab,
   getRobotStateTimeline,
-} from '../../../../file-data/selectors'
-import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
-import { DeckSetupContainer } from '../../DeckSetup'
-import { OffDeck } from '../../OffDeck'
+} from '/protocol-designer/file-data/selectors'
+import { getEnableHotKeysDisplay } from '/protocol-designer/feature-flags/selectors'
+import { DeckSetupContainer } from '/protocol-designer/pages/Designer/DeckSetup'
+import { OffDeck } from '/protocol-designer/pages/Designer/OffDeck'
 import { SubStepsToolbox } from '../Timeline'
 import { DraggableSidebar } from '../DraggableSidebar'
 import { ProtocolSteps } from '..'
 
-import type { SavedStepFormState } from '../../../../step-forms'
+import type { SavedStepFormState } from '/protocol-designer/step-forms'
 
-vi.mock('../../OffDeck')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../ui/steps/selectors')
-vi.mock('../../../../ui/labware/selectors')
+vi.mock('/protocol-designer/pages/Designer/OffDeck')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/ui/steps/selectors')
+vi.mock('/protocol-designer/ui/labware/selectors')
 vi.mock('../StepForm')
-vi.mock('../../DeckSetup')
+vi.mock('/protocol-designer/pages/Designer/DeckSetup')
 vi.mock('../StepSummary.tsx')
 vi.mock('../Timeline')
 vi.mock('../DraggableSidebar')
-vi.mock('../../../../feature-flags/selectors')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../organisms/Alerts')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/organisms/Alerts')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {
     i18nInstance: i18n,

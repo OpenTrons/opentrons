@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { DeckLabelSet } from '@opentrons/components'
-import { getDesignerTab } from '../../file-data/selectors'
+import { getDesignerTab } from '/protocol-designer/file-data/selectors'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,

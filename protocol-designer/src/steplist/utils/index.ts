@@ -1,6 +1,6 @@
 import { mergeWhen } from './mergeWhen'
 import { getOrderedWells } from './orderWells'
-import type { StepIdType } from '../../form-types'
+import type { StepIdType } from '/protocol-designer/form-types'
 export { mergeWhen, getOrderedWells }
 
 export type WellRatio = 'n:n' | '1:many' | 'many:1'

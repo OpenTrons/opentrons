@@ -3,7 +3,7 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
 } from '@opentrons/shared-data'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type {
   PipetteName,
   PipetteV2Specs,
@@ -12,8 +12,8 @@ import type {
 import type {
   Gen,
   PipetteType,
-} from '../../pages/CreateNewProtocolWizard/types'
-import type { PipetteOnDeck } from '../../step-forms'
+} from '/protocol-designer/pages/CreateNewProtocolWizard/types'
+import type { PipetteOnDeck } from '/protocol-designer/step-forms'
 
 export interface PipetteSections {
   type: PipetteType

@@ -7,8 +7,8 @@ import {
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type { ReactNode } from 'react'
-import type { ModuleOnDeck, PipetteOnDeck } from '../../step-forms'
-import type { HintKey } from '../../tutorial'
+import type { ModuleOnDeck, PipetteOnDeck } from '/protocol-designer/step-forms'
+import type { HintKey } from '/protocol-designer/tutorial'
 import type { Fixture } from './index'
 
 interface MissingContent {

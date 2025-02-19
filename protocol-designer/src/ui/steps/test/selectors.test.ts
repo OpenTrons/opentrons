@@ -4,7 +4,7 @@ import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
   START_TERMINAL_ITEM_ID,
-} from '../../../steplist/types'
+} from '/protocol-designer/steplist/types'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   MULTI_STEP_SELECTION_TYPE,
@@ -23,14 +23,14 @@ import {
 } from '../selectors'
 import { getMockMoveLiquidStep, getMockMixStep } from '../__fixtures__'
 
-import * as utils from '../../modules/utils'
+import * as utils from '/protocol-designer/ui/modules/utils'
 
 import type { MoveLabwareArgs } from '@opentrons/step-generation'
-import type { FormData } from '../../../form-types'
-import type { StepArgsAndErrorsById } from '../../../steplist/types'
-import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
+import type { FormData } from '/protocol-designer/form-types'
+import type { StepArgsAndErrorsById } from '/protocol-designer/steplist/types'
+import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
-vi.mock('../../modules/utils')
+vi.mock('/protocol-designer/modules/utils')
 
 function createArgsForStepId(
   stepId: string,

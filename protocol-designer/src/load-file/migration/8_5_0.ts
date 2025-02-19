@@ -1,5 +1,5 @@
 import floor from 'lodash/floor'
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import { swatchColors } from '/protocol-designer/organisms/DefineLiquidsModal/swatchColors'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
@@ -9,7 +9,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { Ingredients } from '@opentrons/step-generation'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
-import type { PDMetadata } from '../../file-types'
+import type { PDMetadata } from '/protocol-designer/file-types'
 
 export const migrateFile = (
   appData: ProtocolFile<DesignerApplicationData>

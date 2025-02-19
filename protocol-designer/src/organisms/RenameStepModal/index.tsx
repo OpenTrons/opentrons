@@ -16,12 +16,12 @@ import {
   InputField,
 } from '@opentrons/components'
 
-import { TextAreaField } from '../../molecules'
-import { capitalizeFirstLetter } from '../../pages/Designer/ProtocolSteps/StepForm/utils'
+import { TextAreaField } from '/protocol-designer/molecules'
+import { capitalizeFirstLetter } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 import { getMainPagePortalEl } from '../Portal'
-import { renameStep } from '../../labware-ingred/actions'
+import { renameStep } from '/protocol-designer/labware-ingred/actions'
 
-import type { FormData } from '../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 const MAX_STEP_NAME_LENGTH = 60
 interface RenameStepModalProps {

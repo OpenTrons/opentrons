@@ -17,20 +17,20 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { AnnouncementModal, DOC_URL } from '../../organisms'
+import { AnnouncementModal, DOC_URL } from '/protocol-designer/organisms'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
-} from '../../analytics'
+} from '/protocol-designer/analytics'
 import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
-} from '../../tutorial'
-import { ToggleButton } from '../../atoms/ToggleButton'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { actions as featureFlagActions } from '../../feature-flags'
-import { getFeatureFlagData } from '../../feature-flags/selectors'
-import type { FlagTypes } from '../../feature-flags'
+} from '/protocol-designer/tutorial'
+import { ToggleButton } from '/protocol-designer/atoms/ToggleButton'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
+import { actions as featureFlagActions } from '/protocol-designer/feature-flags'
+import { getFeatureFlagData } from '/protocol-designer/feature-flags/selectors'
+import type { FlagTypes } from '/protocol-designer/feature-flags'
 
 const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
 const EULA_URL = 'https://opentrons.com/eula'

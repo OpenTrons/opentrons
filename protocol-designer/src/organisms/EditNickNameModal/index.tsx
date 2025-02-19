@@ -14,11 +14,11 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
 import { getMainPagePortalEl } from '../Portal'
-import { renameLabware } from '../../labware-ingred/actions'
-import { HandleEnter } from '../../atoms/HandleEnter'
-import type { ThunkDispatch } from '../../types'
+import { renameLabware } from '/protocol-designer/labware-ingred/actions'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 const MAX_NICK_NAME_LENGTH = 115
 interface EditNickNameModalProps {

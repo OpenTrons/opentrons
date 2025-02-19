@@ -11,10 +11,10 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
-import { hydrateField } from '../../steplist/fieldLevel'
-import { getCutoutIdByAddressableArea } from '../../utils'
-import type { LabwareDefByDefURI } from '../../labware-defs'
+import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '/protocol-designer/constants'
+import { hydrateField } from '/protocol-designer/steplist/fieldLevel'
+import { getCutoutIdByAddressableArea } from '/protocol-designer/utils'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -33,8 +33,8 @@ import type {
   PipetteEntities,
   InvariantContext,
 } from '@opentrons/step-generation'
-import type { DeckSlot } from '../../types'
-import type { FormData, HydratedFormData } from '../../form-types'
+import type { DeckSlot } from '/protocol-designer/types'
+import type { FormData, HydratedFormData } from '/protocol-designer/form-types'
 import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,

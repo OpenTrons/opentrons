@@ -18,14 +18,14 @@ import {
   Tag,
 } from '@opentrons/components'
 
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
-import { getEnableLiquidClasses } from '../../feature-flags/selectors'
-import { removeWellsContents } from '../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { getLabwareEntities } from '../../step-forms/selectors'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/atoms'
+import { getEnableLiquidClasses } from '/protocol-designer/feature-flags/selectors'
+import { removeWellsContents } from '/protocol-designer/labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 
-import type { SelectedContainerId } from '../../labware-ingred/reducers'
+import type { SelectedContainerId } from '/protocol-designer/labware-ingred/reducers'
 import type { LiquidInfo } from './LiquidToolbox'
 
 interface LiquidCardProps {

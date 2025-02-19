@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { WizardBody } from './WizardBody'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
 import type { WizardTileProps } from './types'
 
 export function SelectRobot(props: WizardTileProps): JSX.Element {

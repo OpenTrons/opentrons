@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { DropdownStepFormField } from '../../../../../molecules'
-import { getEquippedPipetteOptions } from '../../../../../step-forms/selectors'
+import { DropdownStepFormField } from '/protocol-designer/molecules'
+import { getEquippedPipetteOptions } from '/protocol-designer/step-forms/selectors'
 import type { FieldProps } from '../types'
 
 export const PipetteField = (props: FieldProps): JSX.Element => {

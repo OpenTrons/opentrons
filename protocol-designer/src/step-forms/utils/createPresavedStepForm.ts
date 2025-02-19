@@ -14,12 +14,12 @@ import {
   getNextDefaultTemperatureModuleId,
   getNextDefaultThermocyclerModuleId,
   handleFormChange,
-} from '../../steplist/formLevel'
+} from '/protocol-designer/steplist/formLevel'
 import {
   getModuleOnDeckByType,
   getMagnetLabwareEngageHeight,
-} from '../../ui/modules/utils'
-import { maskField } from '../../steplist/fieldLevel'
+} from '/protocol-designer/ui/modules/utils'
+import { maskField } from '/protocol-designer/steplist/fieldLevel'
 import type {
   PipetteEntities,
   LabwareEntities,
@@ -28,15 +28,19 @@ import type {
   AdditionalEquipmentEntities,
   AbsorbanceReaderState,
 } from '@opentrons/step-generation'
-import type { FormData, StepType, StepIdType } from '../../form-types'
+import type {
+  FormData,
+  StepType,
+  StepIdType,
+} from '/protocol-designer/form-types'
 import type { InitialDeckSetup } from '../types'
-import type { FormPatch } from '../../steplist/actions/types'
+import type { FormPatch } from '/protocol-designer/steplist/actions/types'
 import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
 import {
   ABSORBANCE_READER_READ,
   ABSORBANCE_READER_INITIALIZE,
   ABSORBANCE_READER_LID,
-} from '../../constants'
+} from '/protocol-designer/constants'
 
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType

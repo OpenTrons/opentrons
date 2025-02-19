@@ -19,26 +19,26 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getLiquidEntities } from '../../step-forms/selectors'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import * as fieldProcessors from '../../steplist/fieldLevel/processing'
-import * as labwareIngredActions from '../../labware-ingred/actions'
-import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
-import { getSelectedWells } from '../../well-selection/selectors'
-import { getLabwareNicknamesById } from '../../ui/labware/selectors'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
+import * as fieldProcessors from '/protocol-designer/steplist/fieldLevel/processing'
+import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
+import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
+import { getSelectedWells } from '/protocol-designer/well-selection/selectors'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import {
   removeWellsContents,
   setWellContents,
-} from '../../labware-ingred/actions'
-import { deselectAllWells } from '../../well-selection/actions'
+} from '/protocol-designer/labware-ingred/actions'
+import { deselectAllWells } from '/protocol-designer/well-selection/actions'
 import { DefineLiquidsModal } from '../DefineLiquidsModal'
 import { LiquidCard } from './LiquidCard'
 
 import type { ChangeEvent } from 'react'
 import type { DropdownOption } from '@opentrons/components'
-import type { ContentsByWell } from '../../labware-ingred/types'
+import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 
 export interface LiquidInfo {
   name: string

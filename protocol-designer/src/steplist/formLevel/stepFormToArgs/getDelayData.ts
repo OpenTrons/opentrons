@@ -1,11 +1,11 @@
-import { getDefaultMmFromEdge } from '../../../organisms/TipPositionModal/utils'
+import { getDefaultMmFromEdge } from '/protocol-designer/organisms/TipPositionModal/utils'
 import type { InnerDelayArgs } from '@opentrons/step-generation'
 import type {
   DelayCheckboxFields,
   DelaySecondFields,
   HydratedMoveLiquidFormData,
   HydratedMixFormData,
-} from '../../../form-types'
+} from '/protocol-designer/form-types'
 export function getMoveLiquidDelayData(
   hydratedFormData: HydratedMoveLiquidFormData,
   checkboxField: DelayCheckboxFields,

@@ -26,8 +26,8 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getRobotType } from '../../file-data/selectors'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 
 import type { Dispatch, SetStateAction } from 'react'

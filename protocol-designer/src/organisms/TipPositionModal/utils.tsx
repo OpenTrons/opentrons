@@ -1,12 +1,12 @@
 import floor from 'lodash/floor'
 import round from 'lodash/round'
-import { getIsTouchTipField } from '../../form-types'
+import { getIsTouchTipField } from '/protocol-designer/form-types'
 import {
   DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-} from '../../constants'
+} from '/protocol-designer/constants'
 import { DECIMALS_ALLOWED, TOO_MANY_DECIMALS } from './constants'
-import type { StepFieldName } from '../../form-types'
+import type { StepFieldName } from '/protocol-designer/form-types'
 
 export function getDefaultMmFromEdge(args: { name: StepFieldName }): number {
   const { name } = args

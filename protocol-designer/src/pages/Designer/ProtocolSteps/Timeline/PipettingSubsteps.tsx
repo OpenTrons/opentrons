@@ -4,12 +4,12 @@ import { MultichannelSubstep } from './MultichannelSubstep'
 import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
-} from '../../../../steplist'
+} from '/protocol-designer/steplist'
 import { useSelector } from 'react-redux'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
-} from '../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
 
 interface PipettingSubstepsProps {
   substeps: SourceDestSubstepItem

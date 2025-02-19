@@ -6,9 +6,9 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
-import { getUnoccupiedSlotForTrash } from '../../../step-forms'
-import { getCutoutIdByAddressableArea } from '../../../utils'
-import { GRIPPER_LOCATION } from '../../../constants'
+import { getUnoccupiedSlotForTrash } from '/protocol-designer/step-forms'
+import { getCutoutIdByAddressableArea } from '/protocol-designer/utils'
+import { GRIPPER_LOCATION } from '/protocol-designer/constants'
 import type {
   AddressableAreaName,
   CreateCommand,
@@ -18,7 +18,7 @@ import type {
   MoveToAddressableAreaForDropTipCreateCommand,
   RobotType,
 } from '@opentrons/shared-data'
-import type { SavedStepFormState } from '../../../step-forms'
+import type { SavedStepFormState } from '/protocol-designer/step-forms'
 
 export type LocationUpdate = Record<string, string>
 

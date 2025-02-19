@@ -23,28 +23,31 @@ import {
   FlowRateField,
   PositionField,
   WellsOrderField,
-} from '../../PipetteFields'
-import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields'
+import { getEnableLiquidClasses } from '/protocol-designer/feature-flags/selectors'
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
+} from '/protocol-designer/molecules'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
-} from '../../../../../../step-forms/selectors'
+} from '/protocol-designer/step-forms/selectors'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
   getFormLevelError,
   getLabwareFieldForPositioningField,
-} from '../../utils'
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
-import type { FormData, StepFieldName } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
+import type {
+  FieldPropsByName,
+  LiquidHandlingTab,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
+import type { StepFormErrors } from '/protocol-designer/steplist'
 
 const addPrefix = (prefix: string) => (fieldName: string): StepFieldName =>
   `${prefix}_${fieldName}`

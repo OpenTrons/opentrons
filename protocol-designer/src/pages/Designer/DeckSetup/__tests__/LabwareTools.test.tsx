@@ -7,31 +7,31 @@ import {
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../../assets/localization'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import {
   getInitialDeckSetup,
   getPermittedTipracks,
   getPipetteEntities,
-} from '../../../../step-forms/selectors'
-import { getHas96Channel } from '../../../../utils'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { createCustomLabwareDef } from '../../../../labware-defs/actions'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { getRobotType } from '../../../../file-data/selectors'
+} from '/protocol-designer/step-forms/selectors'
+import { getHas96Channel } from '/protocol-designer/utils'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { createCustomLabwareDef } from '/protocol-designer/labware-defs/actions'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { LabwareTools } from '../LabwareTools'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 
-vi.mock('../../../../utils')
-vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../feature-flags/selectors')
-vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../labware-defs/actions')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../labware-ingred/actions')
+vi.mock('/protocol-designer/utils')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-defs/actions')
+vi.mock('/protocol-designer/labware-ingred/actions')
 
 const render = (props: ComponentProps<typeof LabwareTools>) => {
   return renderWithProviders(<LabwareTools {...props} />, {

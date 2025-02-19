@@ -4,8 +4,11 @@ import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
-import { FIXED_TRASH_ID, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { uuid } from '/protocol-designer/utils'
+import {
+  FIXED_TRASH_ID,
+  INITIAL_DECK_SETUP_STEP_ID,
+} from '/protocol-designer/constants'
 // NOTE: this migration bump adds load commands (loadLiquid, loadModule, loadPipette, loadLabware), modifies both pipette
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount

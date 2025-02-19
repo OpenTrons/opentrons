@@ -6,15 +6,15 @@ import {
   getUnsavedFormIsPristineHeaterShakerForm,
   getUnsavedFormIsPristineSetTempForm,
 } from '../selectors'
-import { getFieldErrors } from '../../steplist/fieldLevel'
+import { getFieldErrors } from '/protocol-designer/steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import type {
   FormData,
   HydratedPauseFormData,
   HydratedThermocyclerFormData,
-} from '../../form-types'
+} from '/protocol-designer/form-types'
 
-vi.mock('../../steplist/fieldLevel')
+vi.mock('/protocol-designer/steplist/fieldLevel')
 vi.mock('../utils/getProfileItemsHaveErrors')
 
 beforeEach(() => {

@@ -14,7 +14,7 @@ import {
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
-} from '../../../ui/steps/selectors'
+} from '/protocol-designer/ui/steps/selectors'
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
 import type { DeckSetupTabType } from '../types'
 

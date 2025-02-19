@@ -26,18 +26,18 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { getRobotType } from '../../file-data/selectors'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { HandleEnter } from '../../atoms/HandleEnter'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
+import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/atoms'
 import { getMainPagePortalEl } from '../Portal'
 
 import type {
   AdditionalEquipmentName,
   LiquidEntities,
 } from '@opentrons/step-generation'
-import type { LabwareOnDeck, ModuleOnDeck } from '../../step-forms'
+import type { LabwareOnDeck, ModuleOnDeck } from '/protocol-designer/step-forms'
 
 // ToDo (kk:09/04/2024) this should be removed when break-point is set up
 const MODAL_MIN_WIDTH = '37.125rem'

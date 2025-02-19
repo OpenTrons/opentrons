@@ -3,9 +3,9 @@ import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
-} from '../../../../constants'
+} from '/protocol-designer/constants'
 import { pauseFormToArgs } from '../pauseFormToArgs'
-import type { HydratedPauseFormData } from '../../../../form-types'
+import type { HydratedPauseFormData } from '/protocol-designer/form-types'
 
 describe('pauseFormToArgs', () => {
   it('returns waitForTemperature command creator when form specifies pause until temp', () => {

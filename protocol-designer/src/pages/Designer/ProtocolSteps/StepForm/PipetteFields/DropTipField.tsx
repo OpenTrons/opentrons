@@ -4,10 +4,10 @@ import { useSelector } from 'react-redux'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
-} from '../../../../../step-forms/selectors'
-import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
-import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
-import { DropdownStepFormField } from '../../../../../molecules'
+} from '/protocol-designer/step-forms/selectors'
+import { getAllTiprackOptions } from '/protocol-designer/ui/labware/selectors'
+import { getEnableReturnTip } from '/protocol-designer/feature-flags/selectors'
+import { DropdownStepFormField } from '/protocol-designer/molecules'
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../types'
 

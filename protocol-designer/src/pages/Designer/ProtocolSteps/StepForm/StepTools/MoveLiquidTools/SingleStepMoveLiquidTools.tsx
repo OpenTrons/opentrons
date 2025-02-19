@@ -6,9 +6,12 @@ import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getPipetteEntities,
-} from '../../../../../../step-forms/selectors'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
+} from '/protocol-designer/step-forms/selectors'
+import {
+  getFormErrorsMappedToField,
+  getFormLevelError,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
+import { getEnableReturnTip } from '/protocol-designer/feature-flags/selectors'
 
 import {
   ChangeTipField,
@@ -22,11 +25,11 @@ import {
   TipWellSelectionField,
   VolumeField,
   WellSelectionField,
-} from '../../PipetteFields'
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields'
 
-import type { FieldPropsByName } from '../../types'
-import type { FormData } from '../../../../../../form-types'
-import type { StepFormErrors } from '../../../../../../steplist'
+import type { FieldPropsByName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type { StepFormErrors } from '/protocol-designer/steplist'
 
 interface SingleStepMoveLiquidToolsProps {
   propsForFields: FieldPropsByName

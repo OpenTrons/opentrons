@@ -17,23 +17,23 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { AnnouncementModal } from '../../organisms'
-import { actions as loadFileActions } from '../../load-file'
-import { getFileMetadata } from '../../file-data/selectors'
-import { toggleNewProtocolModal } from '../../navigation/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
-import { getHasOptedIn } from '../../analytics/selectors'
-import { useAnnouncements } from '../../organisms/AnnouncementModal/announcements'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
+import { AnnouncementModal } from '/protocol-designer/organisms'
+import { actions as loadFileActions } from '/protocol-designer/load-file'
+import { getFileMetadata } from '/protocol-designer/file-data/selectors'
+import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { getHasOptedIn } from '/protocol-designer/analytics/selectors'
+import { useAnnouncements } from '/protocol-designer/organisms/AnnouncementModal/announcements'
 import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
   setLocalStorageItem,
-} from '../../persist'
-import welcomeImage from '../../assets/images/welcome_page.png'
+} from '/protocol-designer/persist'
+import welcomeImage from '/protocol-designer/assets/images/welcome_page.png'
 
 import type { ChangeEvent, ComponentProps } from 'react'
-import type { ThunkDispatch } from '../../types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 export function Landing(): JSX.Element {
   const { t } = useTranslation('shared')

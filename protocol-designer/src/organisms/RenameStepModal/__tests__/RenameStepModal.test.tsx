@@ -1,14 +1,14 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
-import { PAUSE_UNTIL_RESUME } from '../../../constants'
-import { renameStep } from '../../../labware-ingred/actions'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { PAUSE_UNTIL_RESUME } from '/protocol-designer/constants'
+import { renameStep } from '/protocol-designer/labware-ingred/actions'
 import { RenameStepModal } from '..'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../labware-ingred/actions')
+vi.mock('/protocol-designer/labware-ingred/actions')
 
 const render = (props: ComponentProps<typeof RenameStepModal>) => {
   return renderWithProviders(<RenameStepModal {...props} />, {

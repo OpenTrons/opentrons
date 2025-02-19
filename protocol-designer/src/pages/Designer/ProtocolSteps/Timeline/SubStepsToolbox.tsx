@@ -8,19 +8,19 @@ import {
   StyledText,
   Toolbox,
 } from '@opentrons/components'
-import { getSubsteps } from '../../../../file-data/selectors'
-import { getHoveredSubstep } from '../../../../ui/steps'
+import { getSubsteps } from '/protocol-designer/file-data/selectors'
+import { getHoveredSubstep } from '/protocol-designer/ui/steps'
 import {
   hoverOnStep,
   hoverOnSubstep,
   toggleViewSubstep,
-} from '../../../../ui/steps/actions/actions'
-import { THERMOCYCLER_PROFILE } from '../../../../constants'
-import { getSavedStepForms } from '../../../../step-forms/selectors'
+} from '/protocol-designer/ui/steps/actions/actions'
+import { THERMOCYCLER_PROFILE } from '/protocol-designer/constants'
+import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
 import { PipettingSubsteps } from './PipettingSubsteps'
 import { ThermocyclerProfileSubsteps } from './ThermocyclerProfileSubsteps'
-import type { SubstepIdentifier } from '../../../../steplist'
-import type { HoverOnSubstepAction } from '../../../../ui/steps'
+import type { SubstepIdentifier } from '/protocol-designer/steplist'
+import type { HoverOnSubstepAction } from '/protocol-designer/ui/steps'
 
 interface SubStepsToolboxProps {
   stepId: string

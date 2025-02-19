@@ -7,14 +7,14 @@ import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
-} from '../../steplist/types'
+} from '/protocol-designer/steplist/types'
 import {
   SINGLE_STEP_SELECTION_TYPE,
   TERMINAL_ITEM_SELECTION_TYPE,
-} from '../../ui/steps/reducers'
+} from '/protocol-designer/ui/steps/reducers'
 import type { CommandsAndRobotState } from '@opentrons/step-generation'
-import type { StepIdType } from '../../form-types'
-import type { HoverableItem } from '../../ui/steps/reducers'
+import type { StepIdType } from '/protocol-designer/form-types'
+import type { HoverableItem } from '/protocol-designer/ui/steps/reducers'
 
 const initialRobotState: any = 'fake initial robot state'
 const initialFrame: any = {

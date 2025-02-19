@@ -24,8 +24,8 @@ import {
   MAGNETIC_BLOCK_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { uuid } from '/protocol-designer/utils'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
 import { ModuleDiagram } from './ModuleDiagram'
 import { WizardBody } from './WizardBody'
 import {
@@ -35,12 +35,12 @@ import {
   OT2_SUPPORTED_MODULE_MODELS,
 } from './constants'
 import { getNumOptions, getNumSlotsAvailable } from './utils'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
 import { PDListItemCustomize as ListItemCustomize } from '../CreateNewProtocolWizard/PDListItemCustomize'
 
 import type { DropdownBorder } from '@opentrons/components'
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
-import type { FormModule, FormModules } from '../../step-forms'
+import type { FormModule, FormModules } from '/protocol-designer/step-forms'
 import type { WizardTileProps } from './types'
 
 export function SelectModules(props: WizardTileProps): JSX.Element | null {

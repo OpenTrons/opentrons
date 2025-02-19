@@ -4,10 +4,10 @@ import {
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getOnlyLatestDefs } from '../../../labware-defs'
-import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getOnlyLatestDefs } from '/protocol-designer/labware-defs'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { ModuleLabel } from './ModuleLabel'
 import { FixtureRender } from './FixtureRender'
 import { SelectedLabwareRender } from './SelectedLabwareRender'

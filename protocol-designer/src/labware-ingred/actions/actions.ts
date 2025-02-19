@@ -1,8 +1,8 @@
 import { createAction } from 'redux-actions'
-import { getLiquidEntities } from '../../step-forms/selectors'
+import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import { selectors } from '../selectors'
-import type { StepFieldName } from '../../form-types'
-import type { DeckSlot, ThunkAction } from '../../types'
+import type { StepFieldName } from '/protocol-designer/form-types'
+import type { DeckSlot, ThunkAction } from '/protocol-designer/types'
 import type { Fixture, IngredInputs } from '../types'
 import type {
   CutoutId,

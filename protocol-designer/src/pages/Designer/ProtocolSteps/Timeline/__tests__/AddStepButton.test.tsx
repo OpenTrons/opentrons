@@ -10,21 +10,21 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import { renderWithProviders } from '../../../../../__testing-utils__'
-import { i18n } from '../../../../../assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
 import { AddStepButton } from '../AddStepButton'
-import { getEnableComment } from '../../../../../feature-flags/selectors'
+import { getEnableComment } from '/protocol-designer/feature-flags/selectors'
 import {
   getCurrentFormIsPresaved,
   getInitialDeckSetup,
-} from '../../../../../step-forms/selectors'
-import { getIsMultiSelectMode } from '../../../../../ui/steps'
+} from '/protocol-designer/step-forms/selectors'
+import { getIsMultiSelectMode } from '/protocol-designer/ui/steps'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../../feature-flags/selectors')
-vi.mock('../../../../../ui/steps')
-vi.mock('../../../../../step-forms/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/ui/steps')
+vi.mock('/protocol-designer/step-forms/selectors')
 
 const render = (props: ComponentProps<typeof AddStepButton>) => {
   return renderWithProviders(<AddStepButton {...props} />, {

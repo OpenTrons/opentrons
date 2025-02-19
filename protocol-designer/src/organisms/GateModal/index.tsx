@@ -14,7 +14,7 @@ import {
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
-} from '../../analytics'
+} from '/protocol-designer/analytics'
 
 const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
 const EULA_URL = 'https://opentrons.com/eula'

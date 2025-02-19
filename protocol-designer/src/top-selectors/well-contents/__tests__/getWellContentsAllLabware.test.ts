@@ -12,7 +12,7 @@ import type {
 } from '@opentrons/step-generation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../labware-defs/utils')
+vi.mock('/protocol-designer/labware-defs/utils')
 
 describe('getWellContentsAllLabware', () => {
   const container1MaxVolume = fixture_96_plate.wells.A1.totalLiquidVolume

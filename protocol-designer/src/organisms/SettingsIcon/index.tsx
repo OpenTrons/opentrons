@@ -11,7 +11,7 @@ import {
   Icon,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { getFileMetadata } from '../../file-data/selectors'
+import { getFileMetadata } from '/protocol-designer/file-data/selectors'
 
 export const SettingsIcon = (): JSX.Element => {
   const location = useLocation()

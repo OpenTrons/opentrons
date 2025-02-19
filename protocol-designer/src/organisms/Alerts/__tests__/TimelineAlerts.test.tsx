@@ -1,14 +1,14 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getRobotStateTimeline } from '../../../file-data/selectors'
-import { selectDesignerTab } from '../../../file-data/actions'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
+import { selectDesignerTab } from '/protocol-designer/file-data/actions'
 import { TimelineAlerts } from '../TimelineAlerts'
 
-vi.mock('../../../file-data/selectors')
-vi.mock('../../../file-data/actions')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/file-data/actions')
 
 const render = () => {
   return renderWithProviders(<TimelineAlerts />, {

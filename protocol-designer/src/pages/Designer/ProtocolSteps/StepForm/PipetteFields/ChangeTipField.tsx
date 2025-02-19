@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { DropdownStepFormField } from '../../../../../molecules'
+import { DropdownStepFormField } from '/protocol-designer/molecules'
 import { getDisabledChangeTipOptions } from './utils'
 import type { ChangeTipOptions } from '@opentrons/step-generation'
 import type { FieldProps } from '../types'

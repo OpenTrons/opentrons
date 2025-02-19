@@ -22,25 +22,25 @@ import {
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
 } from '../selectors'
-import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
-import { moveDeckItem } from '../../labware-ingred/actions'
+import { handleFormChange } from '/protocol-designer/steplist/formLevel/handleFormChange'
+import { moveDeckItem } from '/protocol-designer/labware-ingred/actions'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
-} from '../../constants'
-import { PRESAVED_STEP_ID } from '../../steplist/types'
+} from '/protocol-designer/constants'
+import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import { getLabwareIsCompatible } from '/protocol-designer/utils/labwareModuleCompatibility'
 
 import type { ModuleEntity } from '@opentrons/step-generation'
-import type { DeckSlot } from '../../types'
-import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
+import type { DeckSlot } from '/protocol-designer/types'
+import type { DeleteContainerAction } from '/protocol-designer/labware-ingred/actions/actions'
 import type {
   ChangeFormInputAction,
   DeleteMultipleStepsAction,
-} from '../../steplist/actions'
-import type { FormData, StepType } from '../../form-types'
+} from '/protocol-designer/steplist/actions'
+import type { FormData, StepType } from '/protocol-designer/form-types'
 import type {
   SavedStepFormsActions,
   UnsavedFormActions,
@@ -64,19 +64,19 @@ import type {
   SelectMultipleStepsAction,
   SelectStepAction,
   SelectTerminalItemAction,
-} from '../../ui/steps'
+} from '/protocol-designer/ui/steps'
 import type {
   ChangeBatchEditFieldAction,
   SaveStepFormsMultiAction,
   ResetBatchEditFieldChangesAction,
 } from '../actions'
 
-vi.mock('../../labware-defs/utils')
+vi.mock('/protocol-designer/labware-defs/utils')
 vi.mock('../selectors')
-vi.mock('../../steplist/formLevel/handleFormChange')
+vi.mock('/protocol-designer/steplist/formLevel/handleFormChange')
 vi.mock('../utils/createPresavedStepForm')
-vi.mock('../../utils/labwareModuleCompatibility')
-vi.mock('../../utils')
+vi.mock('/protocol-designer/utils/labwareModuleCompatibility')
+vi.mock('/protocol-designer/utils')
 
 afterEach(() => {
   vi.clearAllMocks()

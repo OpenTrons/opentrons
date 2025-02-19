@@ -7,7 +7,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { RobotType } from '@opentrons/shared-data'
-import type { InitialDeckSetup, SavedStepFormState } from '../../step-forms'
+import type {
+  InitialDeckSetup,
+  SavedStepFormState,
+} from '/protocol-designer/step-forms'
 
 function resolveSlotLocation(
   modules: InitialDeckSetup['modules'],

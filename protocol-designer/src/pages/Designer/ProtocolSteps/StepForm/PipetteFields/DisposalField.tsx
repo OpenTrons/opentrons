@@ -1,19 +1,19 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
-import { getMaxDisposalVolumeForMultidispense } from '../../../../../steplist/formLevel/handleFormChange/utils'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import { selectors as uiLabwareSelectors } from '../../../../../ui/labware'
+import { getMaxDisposalVolumeForMultidispense } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import { selectors as uiLabwareSelectors } from '/protocol-designer/ui/labware'
 import {
   CheckboxExpandStepFormField,
   DropdownStepFormField,
   InputStepFormField,
-} from '../../../../../molecules'
+} from '/protocol-designer/molecules'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { FlowRateField } from './FlowRateField'
 import { BlowoutOffsetField } from './BlowoutOffsetField'
 
-import type { PathOption, StepType } from '../../../../../form-types'
+import type { PathOption, StepType } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../types'
 
 interface DisposalFieldProps {

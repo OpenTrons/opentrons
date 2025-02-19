@@ -1,7 +1,7 @@
 import mapValues from 'lodash/mapValues'
 import map from 'lodash/map'
 import reduce from 'lodash/reduce'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
+import { getLoadLiquidCommands } from '/protocol-designer/load-file/migration/utils/getLoadLiquidCommands'
 import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
 import type {
   AddressableAreaName,
@@ -25,7 +25,7 @@ import type {
   ModuleEntity,
   LabwareEntity,
 } from '@opentrons/step-generation'
-import type { Labware, Modules, Pipettes } from '../../file-types'
+import type { Labware, Modules, Pipettes } from '/protocol-designer/file-types'
 
 interface MappedPipettes {
   [pipetteId: string]: { name: PipetteName }

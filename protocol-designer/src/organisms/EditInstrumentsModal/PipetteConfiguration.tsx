@@ -29,27 +29,27 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
-import { getLabwareDefsByURI } from '../../labware-defs/selectors'
-import { getAllowAllTipracks } from '../../feature-flags/selectors'
-import { setFeatureFlags } from '../../feature-flags/actions'
-import { createCustomTiprackDef } from '../../labware-defs/actions'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
+import { setFeatureFlags } from '/protocol-designer/feature-flags/actions'
+import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
 import { getShouldShowPipetteType, getTiprackOptions } from './utils'
-import { removeOpentronsPhrases } from '../../utils'
+import { removeOpentronsPhrases } from '/protocol-designer/utils'
 import {
   PIPETTE_GENS,
   PIPETTE_TYPES,
   PIPETTE_VOLUMES,
-} from '../../pages/CreateNewProtocolWizard/constants'
+} from '/protocol-designer/pages/CreateNewProtocolWizard/constants'
 
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
-import type { PipetteOnDeck } from '../../step-forms'
+import type { PipetteOnDeck } from '/protocol-designer/step-forms'
 import type {
   Gen,
   PipetteInfoByGen,
   PipetteInfoByType,
   PipetteType,
-} from '../../pages/CreateNewProtocolWizard/types'
-import type { ThunkDispatch } from '../../types'
+} from '/protocol-designer/pages/CreateNewProtocolWizard/types'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { PipetteConfig } from './usePipetteConfig'
 
 interface PipetteConfigurationProps {

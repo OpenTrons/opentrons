@@ -5,12 +5,12 @@ import {
 } from '@opentrons/shared-data'
 import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 import { mixFormToArgs } from '../mixFormToArgs'
-import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../../constants'
-import { getOrderedWells } from '../../../utils'
-import type { HydratedMixFormData } from '../../../../form-types'
+import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '/protocol-designer/constants'
+import { getOrderedWells } from '/protocol-designer/steplist/utils'
+import type { HydratedMixFormData } from '/protocol-designer/form-types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-vi.mock('../../../utils')
+vi.mock('/protocol-designer/steplist/utils')
 
 let hydratedForm: HydratedMixFormData
 const labwareDef = fixture_96_plate as LabwareDefinition2

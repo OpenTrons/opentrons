@@ -20,7 +20,7 @@ import type {
   PipetteEntities,
   LabwareEntities,
 } from '@opentrons/step-generation'
-import type { FormData } from '../../../../form-types'
+import type { FormData } from '/protocol-designer/form-types'
 
 const fixtureTiprack10ul = fixture_tiprack_10_ul as LabwareDefinition2
 const fixtureTiprack300ul = fixture_tiprack_300_ul as LabwareDefinition2

@@ -1,22 +1,22 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { screen, fireEvent } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { loadProtocolFile } from '../../../load-file/actions'
-import { getFileMetadata } from '../../../file-data/selectors'
-import { toggleNewProtocolModal } from '../../../navigation/actions'
-import { useKitchen } from '../../../organisms/Kitchen/hooks'
-import { useAnnouncements } from '../../../organisms/AnnouncementModal/announcements'
-import { getHasOptedIn } from '../../../analytics/selectors'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { loadProtocolFile } from '/protocol-designer/load-file/actions'
+import { getFileMetadata } from '/protocol-designer/file-data/selectors'
+import { toggleNewProtocolModal } from '/protocol-designer/navigation/actions'
+import { useKitchen } from '/protocol-designer/organisms/Kitchen/hooks'
+import { useAnnouncements } from '/protocol-designer/organisms/AnnouncementModal/announcements'
+import { getHasOptedIn } from '/protocol-designer/analytics/selectors'
 import { Landing } from '../index'
 
-vi.mock('../../../load-file/actions')
-vi.mock('../../../file-data/selectors')
-vi.mock('../../../navigation/actions')
-vi.mock('../../../organisms/AnnouncementModal/announcements')
-vi.mock('../../../organisms/Kitchen/hooks')
-vi.mock('../../../analytics/selectors')
+vi.mock('/protocol-designer/load-file/actions')
+vi.mock('/protocol-designer/file-data/selectors')
+vi.mock('/protocol-designer/navigation/actions')
+vi.mock('/protocol-designer/organisms/AnnouncementModal/announcements')
+vi.mock('/protocol-designer/organisms/Kitchen/hooks')
+vi.mock('/protocol-designer/analytics/selectors')
 
 const mockMakeSnackbar = vi.fn()
 const mockEatToast = vi.fn()

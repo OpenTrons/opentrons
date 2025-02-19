@@ -7,30 +7,30 @@ import {
   getSelectedTerminalItemId,
   getIsMultiSelectMode,
   actions as stepsActions,
-} from '../../../../ui/steps'
+} from '/protocol-designer/ui/steps'
 import {
   getCurrentFormIsPresaved,
   getCurrentFormHasUnsavedChanges,
-} from '../../../../step-forms/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
+} from '/protocol-designer/step-forms/selectors'
+import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-} from '../../../../organisms'
+} from '/protocol-designer/organisms'
 import {
   deselectAllSteps,
   hoverOnStep,
   toggleViewSubstep,
-} from '../../../../ui/steps/actions/actions'
+} from '/protocol-designer/ui/steps/actions/actions'
 import { StepContainer } from './StepContainer'
 
 import type {
   SelectTerminalItemAction,
   HoverOnTerminalItemAction,
-} from '../../../../ui/steps'
-import type { TerminalItemId } from '../../../../steplist'
-import type { ThunkDispatch } from '../../../../types'
+} from '/protocol-designer/ui/steps'
+import type { TerminalItemId } from '/protocol-designer/steplist'
+import type { ThunkDispatch } from '/protocol-designer/types'
 
 export interface TerminalItemStepProps {
   id: TerminalItemId

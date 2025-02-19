@@ -17,8 +17,8 @@ import {
   InputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getIsTouchTipField } from '../../form-types'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { getIsTouchTipField } from '/protocol-designer/form-types'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
 import { getMainPagePortalEl } from '../Portal'
 import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
 import * as utils from './utils'
@@ -26,8 +26,8 @@ import { TipPositionTopView } from './TipPositionTopView'
 import { TipPositionSideView } from './TipPositionSideView'
 
 import type { ChangeEvent } from 'react'
-import type { StepFieldName } from '../../form-types'
-import type { MoveLiquidPrefixType } from '../../resources/types'
+import type { StepFieldName } from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {

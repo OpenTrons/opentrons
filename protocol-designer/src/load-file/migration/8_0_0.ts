@@ -5,8 +5,8 @@ import {
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
-import { uuid } from '../../utils'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { uuid } from '/protocol-designer/utils'
+import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
 import type {
   ProtocolFileV7,
   MoveToAddressableAreaCreateCommand,

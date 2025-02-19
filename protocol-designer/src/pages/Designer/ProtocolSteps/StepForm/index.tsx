@@ -4,32 +4,32 @@ import { connect } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { actions } from '../../../../steplist'
-import { actions as stepsActions } from '../../../../ui/steps'
+import { actions } from '/protocol-designer/steplist'
+import { actions as stepsActions } from '/protocol-designer/ui/steps'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
-} from '../../../../step-forms'
+} from '/protocol-designer/step-forms'
 import {
   AutoAddPauseUntilTempStepModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
-} from '../../../../organisms'
-import { maskField } from '../../../../steplist/fieldLevel'
-import { getInvariantContext } from '../../../../step-forms/selectors'
+} from '/protocol-designer/organisms'
+import { maskField } from '/protocol-designer/steplist/fieldLevel'
+import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getDirtyFields, makeSingleEditFieldProps } from './utils'
 import { StepFormToolbox } from './StepFormToolbox'
 
 import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
-import type { BaseState, ThunkDispatch } from '../../../../types'
+import type { BaseState, ThunkDispatch } from '/protocol-designer/types'
 import type {
   FormData,
   StepFieldName,
   StepIdType,
-} from '../../../../form-types'
+} from '/protocol-designer/form-types'
 
 interface StateProps {
   canSave: boolean

@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { EditNickNameModal } from '..'
-import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { renameLabware } from '../../../labware-ingred/actions'
+import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
+import { renameLabware } from '/protocol-designer/labware-ingred/actions'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../ui/labware/selectors')
-vi.mock('../../../labware-ingred/actions')
+vi.mock('/protocol-designer/ui/labware/selectors')
+vi.mock('/protocol-designer/labware-ingred/actions')
 
 const render = (props: ComponentProps<typeof EditNickNameModal>) => {
   return renderWithProviders(<EditNickNameModal {...props} />, {

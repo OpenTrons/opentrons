@@ -16,7 +16,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import type {
   CoordinateTuple,
   DeckSlotId,

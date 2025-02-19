@@ -6,14 +6,17 @@ import {
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import { getStagingAreaAddressableAreas } from '../../utils'
+import { getStagingAreaAddressableAreas } from '/protocol-designer/utils'
 import type {
   AddressableAreaName,
   CreateCommand,
   CutoutId,
   RobotType,
 } from '@opentrons/shared-data'
-import type { InitialDeckSetup, SavedStepFormState } from '../../step-forms'
+import type {
+  InitialDeckSetup,
+  SavedStepFormState,
+} from '/protocol-designer/step-forms'
 
 interface AdditionalEquipment {
   [additionalEquipmentId: string]: {

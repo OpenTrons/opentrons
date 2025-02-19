@@ -1,7 +1,10 @@
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
-import { getPipetteCapacity } from '../../../pipettes/pipetteData'
+import {
+  getWellSetForMultichannel,
+  canPipetteUseLabware,
+} from '/protocol-designer/utils'
+import { getPipetteCapacity } from '/protocol-designer/pipettes/pipetteData'
 import type {
   LabwareDefinition2,
   PipetteChannels,
@@ -10,8 +13,12 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
-import type { FormPatch } from '../../actions/types'
-import type { FormData, PathOption, StepFieldName } from '../../../form-types'
+import type { FormPatch } from '/protocol-designer/steplist/actions/types'
+import type {
+  FormData,
+  PathOption,
+  StepFieldName,
+} from '/protocol-designer/form-types'
 export function chainPatchUpdaters(
   initialPatch: FormPatch,
   fns: Array<(arg0: FormPatch) => FormPatch>

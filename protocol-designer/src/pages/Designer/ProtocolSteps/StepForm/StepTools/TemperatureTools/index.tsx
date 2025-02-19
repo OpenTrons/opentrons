@@ -7,15 +7,18 @@ import {
   Flex,
   SPACING,
 } from '@opentrons/components'
-import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selectors'
+import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+import { getTemperatureLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
-} from '../../../../../../molecules'
-import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
+} from '/protocol-designer/molecules'
+import {
+  getFormErrorsMappedToField,
+  getFormLevelError,
+} from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 
-import type { StepFormProps } from '../../types'
+import type { StepFormProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 export function TemperatureTools(props: StepFormProps): JSX.Element {
   const { propsForFields, formData, visibleFormErrors } = props

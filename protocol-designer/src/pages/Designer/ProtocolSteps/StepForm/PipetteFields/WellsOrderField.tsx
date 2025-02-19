@@ -12,11 +12,11 @@ import {
   Icon,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { WellOrderModal } from '../../../../../organisms'
+import { WellOrderModal } from '/protocol-designer/organisms'
 
 import type { FieldProps } from '../types'
-import type { WellOrderOption } from '../../../../../form-types'
-import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+import type { WellOrderOption } from '/protocol-designer/form-types'
+import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 export interface WellsOrderFieldProps {
   prefix: MoveLiquidPrefixType

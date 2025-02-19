@@ -12,28 +12,28 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { selectors as stepFormSelectors } from '../../../../../step-forms'
-import SINGLE_IMAGE from '../../../../../assets/images/path_single_transfers.svg'
-import MULTI_DISPENSE_IMAGE from '../../../../../assets/images/path_multi_dispense.svg'
-import MULTI_ASPIRATE_IMAGE from '../../../../../assets/images/path_multi_aspirate.svg'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import SINGLE_IMAGE from '/protocol-designer/assets/images/path_single_transfers.svg'
+import MULTI_DISPENSE_IMAGE from '/protocol-designer/assets/images/path_multi_dispense.svg'
+import MULTI_ASPIRATE_IMAGE from '/protocol-designer/assets/images/path_multi_aspirate.svg'
 import { getDisabledPathMap } from './utils'
 
 import type { ChangeEvent, ReactNode } from 'react'
-import type { PathOption } from '../../../../../form-types'
+import type { PathOption } from '/protocol-designer/form-types'
 import type { FieldProps } from '../types'
 import type { DisabledPathMap, ValuesForPath } from './utils'
 
 const PATH_ANIMATION_IMAGES = {
   single: new URL(
-    '../../../../../assets/images/path_single.gif',
+    '/protocol-designer/assets/images/path_single.gif',
     import.meta.url
   ).href,
   multiAspirate: new URL(
-    '../../../../../assets/images/path_multiAspirate.gif',
+    '/protocol-designer/assets/images/path_multiAspirate.gif',
     import.meta.url
   ).href,
   multiDispense: new URL(
-    '../../../../../assets/images/path_multiDispense.gif',
+    '/protocol-designer/assets/images/path_multiDispense.gif',
     import.meta.url
   ).href,
 }

@@ -1,16 +1,16 @@
 import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../../../__testing-utils__'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import {
   FLEX_ROBOT_TYPE,
   TEMPERATURE_MODULE_V2,
   getDeckDefFromRobotType,
 } from '@opentrons/shared-data'
 import { LabwareRender, Module } from '@opentrons/components'
-import { selectors } from '../../../../labware-ingred/selectors'
-import { getCustomLabwareDefsByURI } from '../../../../labware-defs/selectors'
-import { getDesignerTab } from '../../../../file-data/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getCustomLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { getDesignerTab } from '/protocol-designer/file-data/selectors'
 import { FixtureRender } from '../FixtureRender'
 import { HoveredItems } from '../HoveredItems'
 
@@ -18,9 +18,9 @@ import type { ComponentProps } from 'react'
 import type * as OpentronsComponents from '@opentrons/components'
 
 vi.mock('../FixtureRender')
-vi.mock('../../../../labware-ingred/selectors')
-vi.mock('../../../../labware-defs/selectors')
-vi.mock('../../../../file-data/selectors')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {

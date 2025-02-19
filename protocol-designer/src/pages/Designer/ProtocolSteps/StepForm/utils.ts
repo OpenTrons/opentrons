@@ -7,18 +7,18 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 import { ALL, COLUMN } from '@opentrons/shared-data'
-import { getFieldErrors } from '../../../../steplist/fieldLevel'
+import { getFieldErrors } from '/protocol-designer/steplist/fieldLevel'
 import {
   getDisabledFields,
   getDefaultsForStepType,
-} from '../../../../steplist/formLevel'
-import { i18n } from '../../../../assets/localization'
-import { PROFILE_CYCLE } from '../../../../form-types'
+} from '/protocol-designer/steplist/formLevel'
+import { i18n } from '/protocol-designer/assets/localization'
+import { PROFILE_CYCLE } from '/protocol-designer/form-types'
 import type { PipetteEntity } from '@opentrons/step-generation'
 import type { DropdownOption } from '@opentrons/components'
-import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
-import type { FormWarning } from '../../../../steplist/formLevel/warnings'
-import type { StepFormErrors } from '../../../../steplist/types'
+import type { ProfileFormError } from '/protocol-designer/steplist/formLevel/profileErrors'
+import type { FormWarning } from '/protocol-designer/steplist/formLevel/warnings'
+import type { StepFormErrors } from '/protocol-designer/steplist/types'
 import type {
   FormData,
   ProfileItem,
@@ -26,9 +26,9 @@ import type {
   StepType,
   PathOption,
   HydratedFormData,
-} from '../../../../form-types'
-import type { FormError } from '../../../../steplist/formLevel'
-import type { NozzleType } from '../../../../types'
+} from '/protocol-designer/form-types'
+import type { FormError } from '/protocol-designer/steplist/formLevel'
+import type { NozzleType } from '/protocol-designer/types'
 import type { FieldProps, FieldPropsByName, FocusHandlers } from './types'
 
 export function getBlowoutLocationOptionsForForm(args: {

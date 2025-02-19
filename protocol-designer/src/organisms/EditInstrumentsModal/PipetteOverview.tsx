@@ -21,23 +21,23 @@ import {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { PipetteInfoItem } from '../PipetteInfoItem'
-import { changeSavedStepForm } from '../../steplist/actions'
-import { deletePipettes } from '../../step-forms/actions'
-import { deleteContainer } from '../../labware-ingred/actions'
-import { toggleIsGripperRequired } from '../../step-forms/actions/additionalItems'
+import { changeSavedStepForm } from '/protocol-designer/steplist/actions'
+import { deletePipettes } from '/protocol-designer/step-forms/actions'
+import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
+import { toggleIsGripperRequired } from '/protocol-designer/step-forms/actions/additionalItems'
 import { getSectionsFromPipetteName } from './utils'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { INITIAL_DECK_SETUP_STEP_ID } from '/protocol-designer/constants'
+import { LINK_BUTTON_STYLE } from '/protocol-designer/atoms'
 
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   PipetteOnDeck,
-} from '../../step-forms'
-import type { ThunkDispatch } from '../../types'
+} from '/protocol-designer/step-forms'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { PipetteConfig } from './usePipetteConfig'
-import { getAdditionalEquipmentEntities } from '../../step-forms/selectors'
+import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
 
 interface Gripper {
   name: AdditionalEquipmentName

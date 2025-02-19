@@ -1,5 +1,8 @@
-import { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../../../constants'
-import { PROFILE_STEP } from '../../../form-types'
+import {
+  THERMOCYCLER_STATE,
+  THERMOCYCLER_PROFILE,
+} from '/protocol-designer/constants'
+import { PROFILE_STEP } from '/protocol-designer/form-types'
 import type {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
@@ -8,7 +11,7 @@ import type {
   HydratedThermocyclerFormData,
   ProfileItem,
   ProfileStepItem,
-} from '../../../form-types'
+} from '/protocol-designer/form-types'
 type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
 
 const _flattenProfileSteps = (args: {

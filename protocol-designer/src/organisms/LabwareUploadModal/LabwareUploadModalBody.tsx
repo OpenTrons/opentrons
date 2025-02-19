@@ -5,7 +5,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import type { LabwareUploadMessage } from '../../labware-defs'
+import type { LabwareUploadMessage } from '/protocol-designer/labware-defs'
 
 export function LabwareUploadModalBody(props: {
   message: LabwareUploadMessage

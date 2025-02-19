@@ -9,7 +9,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '/protocol-designer/atoms/HandleEnter'
 import { getMainPagePortalEl } from '../Portal'
 
 interface ConfirmDeleteStagingAreaModalProps {

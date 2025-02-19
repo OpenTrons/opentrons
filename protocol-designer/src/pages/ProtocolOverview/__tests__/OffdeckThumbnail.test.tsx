@@ -2,22 +2,22 @@ import { describe, it, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { FLEX_ROBOT_TYPE, fixture12Trough } from '@opentrons/shared-data'
 import { screen } from '@testing-library/react'
-import { i18n } from '../../../assets/localization'
-import { renderWithProviders } from '../../../__testing-utils__'
-import { getRobotType } from '../../../file-data/selectors'
-import { selectors } from '../../../labware-ingred/selectors'
-import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
+import { i18n } from '/protocol-designer/assets/localization'
+import { renderWithProviders } from '/protocol-designer/__testing-utils__'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { getAllWellContentsForActiveItem } from '/protocol-designer/top-selectors/well-contents'
 import { OffDeckThumbnail } from '../OffdeckThumbnail'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
 
-vi.mock('../../../top-selectors/well-contents')
-vi.mock('../../../labware-ingred/selectors')
-vi.mock('../../../step-forms/selectors')
-vi.mock('../../../file-data/selectors')
+vi.mock('/protocol-designer/top-selectors/well-contents')
+vi.mock('/protocol-designer/labware-ingred/selectors')
+vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof Components>()
   return {

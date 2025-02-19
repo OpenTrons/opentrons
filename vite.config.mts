@@ -64,6 +64,7 @@ export default defineConfig({
         './step-generation/src/index.ts'
       ),
       '/app/': path.resolve('./app/src/') + '/',
+      '/protocol-designer/': path.resolve('./protocol-designer/src/') + '/',
     },
   },
 })

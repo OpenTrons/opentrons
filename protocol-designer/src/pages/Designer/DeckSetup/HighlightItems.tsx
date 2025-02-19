@@ -11,13 +11,13 @@ import {
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
-import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
-} from '../../../ui/steps/selectors'
-import { getDesignerTab } from '../../../file-data/selectors'
-import { getIsAdapter } from '../../../utils'
+} from '/protocol-designer/ui/steps/selectors'
+import { getDesignerTab } from '/protocol-designer/file-data/selectors'
+import { getIsAdapter } from '/protocol-designer/utils'
 import { LabwareLabel } from '../LabwareLabel'
 import { ModuleLabel } from './ModuleLabel'
 import { FixtureRender } from './FixtureRender'
@@ -30,7 +30,7 @@ import type {
   AddressableAreaName,
   CoordinateTuple,
 } from '@opentrons/shared-data'
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
+import type { LabwareOnDeck, ModuleOnDeck } from '/protocol-designer/step-forms'
 import type { Fixture } from './constants'
 
 interface HighlightItemsProps {

@@ -7,8 +7,8 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
-import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../labware/selectors'
 import {
   getModuleLabwareOptions,
@@ -18,8 +18,8 @@ import {
   getModulesOnDeckByType,
 } from './utils'
 import type { DropdownOption } from '@opentrons/components'
-import type { Selector } from '../../types'
-import type { LabwareNamesByModuleId } from '../../steplist/types'
+import type { Selector } from '/protocol-designer/types'
+import type { LabwareNamesByModuleId } from '/protocol-designer/steplist/types'
 
 export const getLabwareNamesByModuleId: Selector<LabwareNamesByModuleId> = createSelector(
   getInitialDeckSetup,
