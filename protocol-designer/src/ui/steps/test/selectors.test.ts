@@ -517,6 +517,26 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: -1,
           isIndeterminate: false,
         },
+        aspirate_retract_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_submerge_delay_seconds: {
           isIndeterminate: false,
           value: undefined,
@@ -585,6 +605,26 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_touchTip_mmFromTop: {
           value: -1,
           isIndeterminate: false,
+        },
+        dispense_retract_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_y_position: {
+          isIndeterminate: false,
+          value: undefined,
         },
         dispense_submerge_delay_seconds: {
           isIndeterminate: false,
@@ -797,6 +837,26 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        aspirate_retract_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         // dispense settings
         dispense_labware: {
           isIndeterminate: true,
@@ -848,6 +908,26 @@ describe('_getSavedMultiSelectFieldValues', () => {
         dispense_touchTip_mmFromTop: {
           isIndeterminate: false,
           value: -1,
+        },
+        dispense_retract_delay_seconds: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_speed: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_y_position: {
+          isIndeterminate: false,
+          value: undefined,
         },
         dispense_submerge_delay_seconds: {
           isIndeterminate: false,

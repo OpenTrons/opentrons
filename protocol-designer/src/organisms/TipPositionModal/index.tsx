@@ -232,13 +232,15 @@ export function TipPositionModal(
       parseInt(yValue) < PERCENT_RANGE_TO_SHOW_WARNING * yMinWidth)
   const isZValueAtBottom = zValue != null && zValue === '0'
 
+  const prefixTitle = prefix.includes('retract') ? 'retract' : prefix
+
   return createPortal(
     <Modal
       marginLeft="0"
       type="info"
       width="37.125rem"
       closeOnOutsideClick
-      title={t('shared:tip_position', { prefix })}
+      title={t('shared:tip_position', { prefix: prefixTitle })}
       onClose={handleCancel}
       footer={
         <Flex

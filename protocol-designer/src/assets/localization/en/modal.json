@@ -103,7 +103,9 @@
       "dispense_touchTip_mmFromTop": "Change from where in the well the robot performs the touch tip.",
       "mix_touchTip_mmFromTop": "Change from where in the well the robot performs the touch tip.",
       "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating.",
-      "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing."
+      "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing.",
+      "aspirate_retract_mmFromBottom": "Change where in the well the robot retracts the tip to.",
+      "dispense_retract_mmFromBottom": "Change where in the well the robot retracts the tip from."
     },
     "field_titles": {
       "z_position": "Z position",

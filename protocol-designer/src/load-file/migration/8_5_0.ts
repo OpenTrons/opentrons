@@ -96,6 +96,10 @@ export const migrateFile = (
                     matchingDispenseLabwareWellDepth,
                   1
                 ),
+          aspirate_retract_delay_seconds: null,
+          dispense_retract_delay_seconds: null,
+          aspirate_retract_speed: null,
+          dispense_retract_speed: null,
           aspirate_submerge_delay_seconds: null,
           dispense_submerge_delay_seconds: null,
           aspirate_submerge_speed: null,

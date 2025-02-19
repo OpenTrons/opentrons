@@ -86,6 +86,8 @@
   "protocol_timeline": "Protocol timeline",
   "rename": "Rename",
   "rename_error": "Oops! Your step name is too long.",
+  "retract": "Retract",
+  "retract_speed": "Retract speed",
   "save_errors": "{{stepType}} has been saved with {{numErrors}} error(s)",
   "save_no_errors": "{{stepType}} has been saved",
   "save_warnings": "{{stepType}} has been saved with {{numWarnings}} warning(s)",
@@ -147,5 +149,6 @@
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",
   "well_position": "Well position: X {{x}} Y {{y}} Z {{z}} (mm)",
+  "well_position_xyz": "Well position (x,y,z): {{x}}mm, {{y}}mm, {{z}}mm",
   "unknown_module": "Unknown module"
 }

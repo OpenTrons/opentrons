@@ -36,6 +36,7 @@ interface PositionFieldProps {
   yField?: TipYOffsetFields
   labwareId?: string | null
   padding?: string
+  isWhiteButton?: boolean | null
 }
 
 export function PositionField(props: PositionFieldProps): JSX.Element {
@@ -47,6 +48,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     yField,
     prefix,
     padding = `0 ${SPACING.spacing16}`,
+    isWhiteButton,
   } = props
   const {
     name: zName,
@@ -163,6 +165,8 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     )
   }
 
+  const isRetract = prefix.includes('retract') ?? false
+
   return (
     <>
       <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
@@ -176,13 +180,15 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
         >
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {i18n.format(
-              t('protocol_steps:tip_position', { prefix }),
+              t('protocol_steps:tip_position', {
+                prefix: isRetract ? 'retract' : prefix,
+              }),
               'capitalize'
             )}
           </StyledText>
           <ListButton
             padding={SPACING.spacing12}
-            type="noActive"
+            type={isWhiteButton ?? false ? 'onColor' : 'noActive'}
             onClick={() => {
               handleOpen(true)
             }}
@@ -190,19 +196,28 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             testId={`PositionField_ListButton_${prefix}`}
           >
-            <Icon name="tip-position" size="1.25rem" />
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('protocol_steps:well_position', {
-                x:
-                  propsForFields[xField].value != null
-                    ? Number(propsForFields[xField].value)
-                    : 0,
-                y:
-                  propsForFields[yField].value != null
-                    ? Number(propsForFields[yField].value)
-                    : 0,
-                z: zValue,
-              })}
+            {!(isWhiteButton ?? false) && (
+              <Icon name="tip-position" size="1.25rem" />
+            )}
+            <StyledText
+              desktopStyle={isRetract ? 'captionRegular' : 'bodyDefaultRegular'}
+            >
+              {t(
+                isRetract
+                  ? 'protocol_steps:well_position_xyz'
+                  : 'protocol_steps:well_position',
+                {
+                  x:
+                    propsForFields[xField].value != null
+                      ? Number(propsForFields[xField].value)
+                      : 0,
+                  y:
+                    propsForFields[yField].value != null
+                      ? Number(propsForFields[yField].value)
+                      : 0,
+                  z: zValue,
+                }
+              )}
             </StyledText>
           </ListButton>
         </Flex>

@@ -16,7 +16,7 @@ const meta: Meta<typeof ListButtonComponent> = {
     type: {
       control: {
         type: 'select',
-        options: ['noActive', 'success', 'warning'],
+        options: ['noActive', 'success', 'warning', 'onColor'],
       },
     },
   },

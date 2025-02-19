@@ -17,6 +17,8 @@ export function getDefaultMmFromEdge(args: { name: StepFieldName }): number {
     case 'dispense_delay_mmFromBottom':
     case 'aspirate_delay_mmFromBottom':
     case 'aspirate_mmFromBottom':
+    case 'aspirate_retract_mmFromBottom':
+    case 'dispense_retract_mmFromBottom':
       return DEFAULT_MM_OFFSET_FROM_BOTTOM
 
     default:
