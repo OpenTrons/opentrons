@@ -1,5 +1,7 @@
 /** Utility functions for Python code generation. */
 
+import type { WellLocation } from '@opentrons/shared-data/command/types/support'
+
 /** The variable name for the ProtocolContext object in the run() function.
  * Our docs call it `protocol`, which is slightly misleading since the object is not
  * the protocol itself, but we'll try to stay consistent with the docs.
@@ -68,4 +70,50 @@ export function formatPyDict(dict: Record<string, any>): string {
         .join(',\n')
     )},\n}`
   }
+}
+
+/** Render a WellLocation to Python.
+ * Append the returned string to a Python well reference to get the wellLocation relative to the well.
+ */
+export function formatPyWellLocation(wellLocation?: WellLocation): string {
+  const { x, y, z } = wellLocation?.offset || {}
+  // Generating Python for well location is a bit annoying because the PAPI is not
+  // homogenous. Here, emitZ is a flag that indicates if we still need to emit code
+  // for the z-offset:
+  let emitZ = !!z
+
+  let origin = wellLocation?.origin
+  // Seth says that if there's an offset but no origin, use `top` as the origin.
+  if (!origin && (x || y || z)) {
+    origin = 'top'
+  }
+
+  let python = ''
+  if (origin) {
+    python += ((): string => {
+      // TypeScript checks that we've handled all the cases
+      switch (origin) {
+        case 'top':
+          emitZ = false
+          return `.top(${z ? `z=${z}` : ''})`
+        case 'bottom':
+          emitZ = false
+          return `.bottom(${z ? `z=${z}` : ''})`
+        case 'center':
+          return '.center()' // center() doesn't allow z-offset
+        case 'meniscus':
+          emitZ = false
+          return `.meniscus(${z ? `z=${z}` : ''})`
+      }
+    })()
+  }
+  if (x || y || emitZ) {
+    const args = [
+      ...(x ? [`x=${x}`] : []),
+      ...(y ? [`y=${y}`] : []),
+      ...(emitZ ? [`z=${z}`] : []),
+    ]
+    python += `.move(types.Point(${args.join(', ')}))`
+  }
+  return python
 }

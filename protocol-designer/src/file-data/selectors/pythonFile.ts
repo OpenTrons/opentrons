@@ -30,7 +30,7 @@ const PAPI_VERSION = '2.23' // latest version from api/src/opentrons/protocols/a
 export function pythonImports(): string {
   return [
     'from contextlib import nullcontext as pd_step',
-    'from opentrons import protocol_api',
+    'from opentrons import protocol_api, types',
   ].join('\n')
 }
 

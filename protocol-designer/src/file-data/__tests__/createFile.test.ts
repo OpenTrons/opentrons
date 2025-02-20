@@ -117,7 +117,7 @@ describe('createFile selector', () => {
     expect(result).toBe(
       `
 from contextlib import nullcontext as pd_step
-from opentrons import protocol_api
+from opentrons import protocol_api, types
 
 metadata = {
     "protocolName": "Test Protocol",
