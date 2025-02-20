@@ -49,6 +49,7 @@ describe('LeftColumnLabwareInfo', () => {
       expect.objectContaining({
         headline: 'MOCK_TITLE',
         infoProps: {
+          layout: 'default',
           type: 'location',
           labwareName: 'MOCK_LW_NAME',
           labwareNickname: 'MOCK_LW_NICKNAME',

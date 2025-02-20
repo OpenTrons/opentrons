@@ -35,6 +35,7 @@ export function LeftColumnLabwareInfo({
     <InterventionContent
       headline={title}
       infoProps={{
+        layout: 'default',
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',
