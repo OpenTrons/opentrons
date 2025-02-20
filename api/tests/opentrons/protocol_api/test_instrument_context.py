@@ -1948,6 +1948,7 @@ def test_transfer_liquid_delegates_to_engine_core(
         dest=[mock_well],
         new_tip="never",
         trash_location=trash_location,
+        return_tip=True,
     )
     decoy.verify(
         mock_instrument_core.transfer_liquid(
@@ -1958,6 +1959,7 @@ def test_transfer_liquid_delegates_to_engine_core(
             new_tip=TransferTipPolicyV2.ONCE,
             tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
             trash_location=trash_location.move(Point(1, 2, 3)),
+            return_tip=True,
         )
     )
 
@@ -2178,6 +2180,7 @@ def test_distribute_liquid_delegates_to_engine_core(
         dest=[mock_well],
         new_tip="never",
         trash_location=trash_location,
+        return_tip=True,
     )
     decoy.verify(
         mock_instrument_core.distribute_liquid(
@@ -2188,6 +2191,7 @@ def test_distribute_liquid_delegates_to_engine_core(
             new_tip=TransferTipPolicyV2.ONCE,
             tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
             trash_location=trash_location.move(Point(1, 2, 3)),
+            return_tip=True,
         )
     )
 
@@ -2433,6 +2437,7 @@ def test_consolidate_liquid_delegates_to_engine_core(
         dest=mock_well,
         new_tip="never",
         trash_location=trash_location,
+        return_tip=True,
     )
     decoy.verify(
         mock_instrument_core.consolidate_liquid(
@@ -2443,5 +2448,6 @@ def test_consolidate_liquid_delegates_to_engine_core(
             new_tip=TransferTipPolicyV2.ONCE,
             tip_racks=[(Location(Point(), labware=tip_racks[0]), tip_racks[0]._core)],
             trash_location=trash_location.move(Point(1, 2, 3)),
+            return_tip=True,
         )
     )

@@ -517,6 +517,7 @@ class LegacyInstrumentCoreSimulator(
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "transfer_liquid is not supported in legacy context"
@@ -530,6 +531,7 @@ class LegacyInstrumentCoreSimulator(
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "distribute_liquid is not supported in legacy context"
@@ -543,6 +545,7 @@ class LegacyInstrumentCoreSimulator(
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "consolidate_liquid is not supported in legacy context"

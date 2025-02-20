@@ -1528,6 +1528,7 @@ class InstrumentContext(publisher.CommandPublisher):
         trash_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
+        return_tip: bool = False,
     ) -> InstrumentContext:
         """Transfer liquid from source to dest using the specified liquid class properties.
 
@@ -1599,6 +1600,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 for rack in tip_racks
             ],
             trash_location=checked_trash_location,
+            return_tip=return_tip,
         )
         return self
 
@@ -1615,6 +1617,7 @@ class InstrumentContext(publisher.CommandPublisher):
         trash_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
+        return_tip: bool = False,
     ) -> InstrumentContext:
         """
         Distribute liquid from a single source to multiple destinations
@@ -1678,6 +1681,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 for rack in tip_racks
             ],
             trash_location=checked_trash_location,
+            return_tip=return_tip,
         )
         return self
 
@@ -1694,6 +1698,7 @@ class InstrumentContext(publisher.CommandPublisher):
         trash_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
+        return_tip: bool = False,
     ) -> InstrumentContext:
         """
         Consolidate liquid from multiple sources to a single destination
@@ -1765,6 +1770,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 for rack in tip_racks
             ],
             trash_location=checked_trash_location,
+            return_tip=return_tip,
         )
         return self
 
