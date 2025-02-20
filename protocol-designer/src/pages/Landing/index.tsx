@@ -8,7 +8,6 @@ import {
   COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
-  EndUserAgreementFooter,
   Flex,
   INFO_TOAST,
   JUSTIFY_CENTER,
@@ -18,6 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LINK_BUTTON_STYLE } from '../../atoms'
+import { EndUserAgreementFooter } from '../../molecules'
 import { AnnouncementModal } from '../../organisms'
 import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'
