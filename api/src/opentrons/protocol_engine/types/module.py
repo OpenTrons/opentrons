@@ -258,3 +258,10 @@ class ModuleOffsetData:
 
     moduleOffsetVector: ModuleOffsetVector
     location: DeckSlotLocation
+
+
+class StackerFillEmptyStrategy(str, Enum):
+    """Strategy to use for filling or emptying a stacker."""
+
+    MANUAL_WITH_PAUSE = "manualWithPause"
+    LOGICAL = "logical"

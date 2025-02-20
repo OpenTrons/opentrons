@@ -1832,6 +1832,78 @@
       "title": "DropTipWellOrigin",
       "type": "string"
     },
+    "EmptyCreate": {
+      "description": "A request to execute a Flex Stacker empty command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/empty",
+          "default": "flexStacker/empty",
+          "enum": ["flexStacker/empty"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/EmptyParams"
+        }
+      },
+      "required": ["params"],
+      "title": "EmptyCreate",
+      "type": "object"
+    },
+    "EmptyParams": {
+      "description": "The parameters defining how a stacker should be emptied.",
+      "properties": {
+        "count": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The new count of labware in the pool. If None, default to an empty pool. If this number is larger than the amount of labware currently in the pool, default to the smaller amount. Do not use the value in the parameters as an outside observer; instead, use the count value from the results.",
+          "title": "Count"
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The message to display on connected clients during a manualWithPause strategy empty.",
+          "title": "Message"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "strategy": {
+          "$ref": "#/$defs/StackerFillEmptyStrategy",
+          "description": "How to empty the stacker. If manualWithPause, pause the protocol until the client sends an interaction, and mark the labware pool as empty thereafter. If logical, do not pause but immediately apply the specified count."
+        }
+      },
+      "required": ["moduleId", "strategy"],
+      "title": "EmptyParams",
+      "type": "object"
+    },
     "EngageCreate": {
       "description": "A request to create a Magnetic Module engage command.",
       "properties": {
@@ -2078,6 +2150,78 @@
       },
       "required": ["pipetteId", "labwareId", "wellName"],
       "title": "EvotipUnsealPipetteParams",
+      "type": "object"
+    },
+    "FillCreate": {
+      "description": "A request to execute a Flex Stacker fill command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/fill",
+          "default": "flexStacker/fill",
+          "enum": ["flexStacker/fill"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/FillParams"
+        }
+      },
+      "required": ["params"],
+      "title": "FillCreate",
+      "type": "object"
+    },
+    "FillParams": {
+      "description": "The parameters defining how a stacker should be filled.",
+      "properties": {
+        "count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How full the labware pool should now be. If None, default to the maximum amount of the currently-configured labware the pool can hold. If this number is larger than the maximum the pool can hold, it will be clamped to the maximum. If this number is smaller than the current amount of labware the pool holds, it will be clamped to that minimum. Do not use the value in the parameters as an outside observer; instead, use the count value from the results.",
+          "title": "Count"
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The message to display on connected clients during a manualWithPause strategy fill.",
+          "title": "Message"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "strategy": {
+          "$ref": "#/$defs/StackerFillEmptyStrategy",
+          "description": "How to fill the stacker. If manualWithPause, pause the protocol until the client sends an interaction, and apply the new specified count thereafter. If logical, do not pause but immediately apply the specified count."
+        }
+      },
+      "required": ["moduleId", "strategy"],
+      "title": "FillParams",
       "type": "object"
     },
     "GetNextTipCreate": {
@@ -4864,6 +5008,7 @@
         },
         "initialCount": {
           "description": "The number of labware that should be initially stored in the stacker. This number will be silently clamped to the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker.",
+          "minimum": 0,
           "title": "Initialcount",
           "type": "integer"
         },
@@ -5163,6 +5308,12 @@
       "required": ["primaryNozzle"],
       "title": "SingleNozzleLayoutConfiguration",
       "type": "object"
+    },
+    "StackerFillEmptyStrategy": {
+      "description": "Strategy to use for filling or emptying a stacker.",
+      "enum": ["manualWithPause", "logical"],
+      "title": "StackerFillEmptyStrategy",
+      "type": "string"
     },
     "StackerStoredLabwareDetails": {
       "description": "The parameters defining a labware to be stored in the stacker.",
@@ -6456,6 +6607,8 @@
       "evotipSealPipette": "#/$defs/EvotipSealPipetteCreate",
       "evotipUnsealPipette": "#/$defs/EvotipUnsealPipetteCreate",
       "flexStacker/configure": "#/$defs/ConfigureCreate",
+      "flexStacker/empty": "#/$defs/EmptyCreate",
+      "flexStacker/fill": "#/$defs/FillCreate",
       "flexStacker/retrieve": "#/$defs/RetrieveCreate",
       "flexStacker/setStoredlabware": "#/$defs/SetStoredLabwareCreate",
       "flexStacker/store": "#/$defs/StoreCreate",
@@ -6756,6 +6909,12 @@
     },
     {
       "$ref": "#/$defs/SetStoredLabwareCreate"
+    },
+    {
+      "$ref": "#/$defs/FillCreate"
+    },
+    {
+      "$ref": "#/$defs/EmptyCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"

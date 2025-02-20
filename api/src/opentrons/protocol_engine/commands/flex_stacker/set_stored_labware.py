@@ -47,6 +47,7 @@ class SetStoredLabwareParams(BaseModel):
             "The number of labware that should be initially stored in the stacker. This number will be silently clamped to "
             "the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker."
         ),
+        ge=0,
     )
     primaryLabware: StackerStoredLabwareDetails = Field(
         ...,
