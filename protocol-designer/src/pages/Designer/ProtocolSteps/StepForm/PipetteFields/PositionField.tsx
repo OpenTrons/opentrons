@@ -20,6 +20,7 @@ import { getIsDelayPositionField } from '../../../../../form-types'
 import { getDefaultMmFromEdge } from '../../../../../organisms/TipPositionModal/utils'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
+import type { ListButtonType } from '@opentrons/components'
 import type {
   TipXOffsetFields,
   TipYOffsetFields,
@@ -36,6 +37,8 @@ interface PositionFieldProps {
   yField?: TipYOffsetFields
   labwareId?: string | null
   padding?: string
+  showButton?: boolean
+  listButtonType?: ListButtonType
 }
 
 export function PositionField(props: PositionFieldProps): JSX.Element {
@@ -47,6 +50,8 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     yField,
     prefix,
     padding = `0 ${SPACING.spacing16}`,
+    showButton = false,
+    listButtonType = 'noActive',
   } = props
   const {
     name: zName,
@@ -167,7 +172,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     <>
       <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
       {isModalOpen ? modal : null}
-      {yField != null && xField != null ? (
+      {(yField != null && xField != null) || showButton ? (
         <Flex
           {...targetProps}
           padding={padding}
@@ -182,7 +187,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
           </StyledText>
           <ListButton
             padding={SPACING.spacing12}
-            type="noActive"
+            type={listButtonType}
             onClick={() => {
               handleOpen(true)
             }}
@@ -192,17 +197,21 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
           >
             <Icon name="tip-position" size="1.25rem" />
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('protocol_steps:well_position', {
-                x:
-                  propsForFields[xField].value != null
-                    ? Number(propsForFields[xField].value)
-                    : 0,
-                y:
-                  propsForFields[yField].value != null
-                    ? Number(propsForFields[yField].value)
-                    : 0,
-                z: zValue,
-              })}
+              {xField != null && yField != null
+                ? t('protocol_steps:well_position', {
+                    x:
+                      propsForFields[xField]?.value != null
+                        ? Number(propsForFields[xField]?.value)
+                        : 0,
+                    y:
+                      propsForFields[yField]?.value != null
+                        ? Number(propsForFields[yField]?.value)
+                        : 0,
+                    z: zValue,
+                  })
+                : t('protocol_steps:well_position_z_only', {
+                    z: zValue,
+                  })}
             </StyledText>
           </ListButton>
         </Flex>
@@ -215,8 +224,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
           }
           disabled={disabled}
           readOnly
-          onClick={() => {
+          onClick={e => {
             handleOpen(false)
+            e.stopPropagation()
           }}
           value={String(zValue)}
           isIndeterminate={isIndeterminate}

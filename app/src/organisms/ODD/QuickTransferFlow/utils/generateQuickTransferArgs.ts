@@ -376,9 +376,13 @@ export function generateQuickTransferArgs(
     aspirateAirGapVolume: quickTransferState.airGapAspirate ?? null,
     dispenseAirGapVolume: quickTransferState.airGapDispense ?? null,
     touchTipAfterAspirate: quickTransferState.touchTipAspirate != null,
+    touchTipAfterAspirateSpeed:
+      quickTransferState.touchTipAspirateSpeed ?? null,
     touchTipAfterAspirateOffsetMmFromTop,
     touchTipAfterDispense: quickTransferState.touchTipDispense != null,
     touchTipAfterDispenseOffsetMmFromTop,
+    touchTipAfterDispenseSpeed:
+      quickTransferState.touchTipDispenseSpeed ?? null,
     dropTipLocation,
     aspirateXOffset: 0,
     aspirateYOffset: 0,

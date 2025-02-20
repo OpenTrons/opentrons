@@ -147,5 +147,6 @@
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",
   "well_position": "Well position: X {{x}} Y {{y}} Z {{z}} (mm)",
+  "well_position_z_only": "Well position: Z {{z}} (mm)",
   "unknown_module": "Unknown module"
 }

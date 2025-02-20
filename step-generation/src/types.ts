@@ -217,6 +217,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterAspirate: boolean
   /** Optional offset for touch tip after aspirate (if null, use PD default) */
   touchTipAfterAspirateOffsetMmFromTop: number
+  /** Optional speed for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterAspirateSpeed: number | null
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions
   /** Delay after every aspirate */
@@ -241,6 +243,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromTop: number
+  /** Optional speed for touch tip after dispense (if null, use PD default) */
+  touchTipAfterDispenseSpeed: number | null
   /** Flow rate in uL/sec for all dispenses */
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */

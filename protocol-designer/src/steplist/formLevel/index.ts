@@ -48,6 +48,8 @@ import {
   wavelengthOutOfRange,
   referenceWavelengthOutOfRange,
   absorbanceReaderModuleIdRequired,
+  aspirateTouchTipSpeedRequired,
+  dispenseTouchTipSpeedRequired,
 } from './errors'
 
 import {
@@ -149,7 +151,9 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       dispenseAirGapVolumeRequired,
       blowoutLocationRequired,
       aspirateWellsRequired,
-      dispenseWellsRequired
+      dispenseWellsRequired,
+      aspirateTouchTipSpeedRequired,
+      dispenseTouchTipSpeedRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,

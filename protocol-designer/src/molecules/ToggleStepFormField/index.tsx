@@ -45,7 +45,7 @@ export function ToggleStepFormField(
     <>
       <ListButton
         type="noActive"
-        padding={SPACING.spacing16}
+        padding={SPACING.spacing12}
         onClick={() => {
           if (!isDisabled) {
             toggleUpdateValue(!toggleValue)

@@ -130,12 +130,16 @@ export const moveLiquidFormToArgs = (
   const touchTipAfterAspirateOffsetMmFromTop =
     hydratedFormData.aspirate_touchTip_mmFromTop ??
     DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterAspirateSpeed =
+    hydratedFormData.aspirate_touchTip_speed ?? 200
   const touchTipAfterDispense = Boolean(
     hydratedFormData.dispense_touchTip_checkbox
   )
   const touchTipAfterDispenseOffsetMmFromTop =
     hydratedFormData.dispense_touchTip_mmFromTop ??
     DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterDispenseSpeed =
+    hydratedFormData.aspirate_touchTip_speed ?? 200
   const mixBeforeAspirate = getMixData(
     hydratedFormData,
     'aspirate_mix_checkbox',
@@ -215,8 +219,10 @@ export const moveLiquidFormToArgs = (
     dispenseAirGapVolume,
     touchTipAfterAspirate,
     touchTipAfterAspirateOffsetMmFromTop,
+    touchTipAfterAspirateSpeed,
     touchTipAfterDispense,
     touchTipAfterDispenseOffsetMmFromTop,
+    touchTipAfterDispenseSpeed,
     description: hydratedFormData.stepDetails,
     name: hydratedFormData.stepName,
     //  TODO(jr, 7/26/24): wire up wellNames

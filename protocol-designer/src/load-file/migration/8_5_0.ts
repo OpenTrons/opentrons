@@ -100,6 +100,8 @@ export const migrateFile = (
           dispense_submerge_delay_seconds: null,
           aspirate_submerge_speed: null,
           dispense_submerge_speed: null,
+          aspirate_touchTip_speed: null,
+          dispense_touchTip_speed: null,
         },
       }
     }

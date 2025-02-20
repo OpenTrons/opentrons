@@ -76,8 +76,9 @@ export function BlowoutOffsetField(
           onClick={
             disabled
               ? undefined
-              : () => {
+              : e => {
                   setModalOpen(true)
+                  e.stopPropagation()
                 }
           }
           value={String(value)}

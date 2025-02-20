@@ -315,6 +315,9 @@
       "touchTip": {
         "label": "touch tip"
       },
+      "touchTip_speed": {
+        "label": "Touch tip speed"
+      },
       "useGripper": {
         "label": "use gripper",
         "toggleOff": "Move labware manually (protocol will pause and prompt)",
