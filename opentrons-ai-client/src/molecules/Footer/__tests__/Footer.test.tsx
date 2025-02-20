@@ -10,17 +10,18 @@ const render = (): ReturnType<typeof renderWithProviders> => {
   })
 }
 
+const currentYear = new Date().getFullYear()
 describe('Footer', () => {
   it('should render Footer component', () => {
     render()
-    screen.getByText('Privacy Policy')
+    screen.getByText('Privacy policy')
     screen.getByText('End user license agreement')
-    screen.getByText('Copyright © 2024 Opentrons')
+    screen.getByText(`Copyright © ${currentYear} Opentrons`)
   })
 
-  it('should have a link to the Privacy Policy', () => {
+  it('should have a link to the Privacy policy', () => {
     render()
-    const privacyPolicy = screen.getByText('Privacy Policy')
+    const privacyPolicy = screen.getByText('Privacy policy')
     expect(privacyPolicy).toHaveAttribute(
       'href',
       'https://insights.opentrons.com/hubfs/Legal%20Documentation/Opentrons-Labworks-Privacy-Policy-5-4-23.docx-1.pdf'
