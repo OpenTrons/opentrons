@@ -20,7 +20,7 @@ import type {
   CommandV8Mixin,
   CreateCommand,
   CutoutId,
-  LabwareV2Mixin,
+  LabwareMixin,
   LiquidV1Mixin,
   LoadLabwareCreateCommand,
   LoadPipetteCreateCommand,
@@ -222,8 +222,8 @@ export function createQuickTransferFile(
     return { ...acc, [entity.labwareDefURI]: entity.def }
   }, {})
 
-  const labwareV2Mixin: LabwareV2Mixin = {
-    labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2',
+  const labwareMixin: LabwareMixin = {
+    labwareDefinitionSchemaId: '', // Deliberate empty string. See schema documentation.
     labwareDefinitions,
   }
 
@@ -244,7 +244,7 @@ export function createQuickTransferFile(
   const protocolContents = JSON.stringify({
     ...protocolBase,
     ...flexDeckSpec,
-    ...labwareV2Mixin,
+    ...labwareMixin,
     ...liquidV1Mixin,
     ...commandv8Mixin,
     ...commandAnnotionaV1Mixin,

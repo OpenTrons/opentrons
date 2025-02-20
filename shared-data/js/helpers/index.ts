@@ -6,6 +6,7 @@ import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import type {
   DeckDefinition,
   LabwareDefinition2,
+  LabwareDefinition3,
   ModuleModel,
   RobotType,
   ThermalAdapterName,
@@ -41,10 +42,13 @@ export * from './formatRunTimeParameterMinMax'
 export * from './orderRuntimeParameterRangeOptions'
 export * from './sortRunTimeParameters'
 
-export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
-  def?.namespace === OPENTRONS_LABWARE_NAMESPACE
+export const getLabwareDefIsStandard = (
+  def: LabwareDefinition2 | LabwareDefinition3
+): boolean => def?.namespace === OPENTRONS_LABWARE_NAMESPACE
 
-export const getLabwareDefURI = (def: LabwareDefinition2): string =>
+export const getLabwareDefURI = (
+  def: LabwareDefinition2 | LabwareDefinition3
+): string =>
   constructLabwareDefURI(
     def.namespace,
     def.parameters.loadName,
@@ -78,7 +82,7 @@ export const RETIRED_LABWARE = [
 ]
 
 export const getLabwareDisplayName = (
-  labwareDef: LabwareDefinition2
+  labwareDef: LabwareDefinition2 | LabwareDefinition3
 ): string => {
   const { displayName } = labwareDef.metadata
 
@@ -92,7 +96,9 @@ export const getLabwareDisplayName = (
   return displayName
 }
 
-export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
+export const getTiprackVolume = (
+  labwareDef: LabwareDefinition2 | LabwareDefinition3
+): number => {
   console.assert(
     labwareDef.parameters.isTiprack,
     `getTiprackVolume expected a tiprack labware ${getLabwareDefURI(
@@ -109,7 +115,7 @@ export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
 }
 
 export function getLabwareHasQuirk(
-  labwareDef: LabwareDefinition2,
+  labwareDef: LabwareDefinition2 | LabwareDefinition3,
   quirk: string
 ): boolean {
   const quirks = labwareDef.parameters.quirks
@@ -186,7 +192,7 @@ export function splitWellsOnColumn(sortedArray: string[]): string[][] {
 }
 
 export const getWellDepth = (
-  labwareDef: LabwareDefinition2,
+  labwareDef: LabwareDefinition2 | LabwareDefinition3,
   well: string
 ): number => labwareDef.wells[well].depth
 
@@ -194,7 +200,7 @@ export const getWellDepth = (
 // Assumes all wells have same offset because multi-offset not yet supported.
 // TODO: Ian 2019-07-13 return {[string: well]: offset} to support multi-offset
 export const getWellsDepth = (
-  labwareDef: LabwareDefinition2,
+  labwareDef: LabwareDefinition2 | LabwareDefinition3,
   wells: string[]
 ): number => {
   const offsets = wells.map(well => getWellDepth(labwareDef, well))
@@ -213,7 +219,7 @@ export const getWellsDepth = (
 }
 
 export const getWellDimension = (
-  labwareDef: LabwareDefinition2,
+  labwareDef: LabwareDefinition2 | LabwareDefinition3,
   wells: string[],
   position: 'x' | 'y'
 ): number => {
@@ -322,7 +328,7 @@ export const getAreSlotsAdjacent = (
   getAreSlotsVerticallyAdjacent(slotNameA, slotNameB)
 
 export const getIsLabwareAboveHeight = (
-  labwareDef: LabwareDefinition2,
+  labwareDef: LabwareDefinition2 | LabwareDefinition3,
   height: number
 ): boolean => labwareDef.dimensions.zDimension > height
 

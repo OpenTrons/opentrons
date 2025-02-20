@@ -32,12 +32,12 @@ describe('check that all fixtures can validate', () => {
     ...protocolFixtures7,
     ...protocolFixtures8,
   ]
-  protocolPaths.forEach(protocolPath =>
+  protocolPaths.forEach(protocolPath => {
     it(`${path.relative(relRoot, protocolPath)}`, () => {
       const protocol = require(protocolPath)
       return validate(protocol)
     })
-  )
+  })
 })
 
 describe('test that mutating v8 fixtures causes failure', () => {

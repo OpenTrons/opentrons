@@ -257,7 +257,7 @@
     "model": "OT-2 Standard",
     "deckId": "ot2_standard"
   },
-  "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
+  "labwareDefinitionSchemaId": "",
   "labwareDefinitions": {
     "opentrons/opentrons_96_tiprack_10ul/1": {
       "ordering": [

@@ -15,7 +15,7 @@ import type {
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand as CreateCommandV8,
-  LabwareV2Mixin,
+  LabwareMixin,
   LiquidV1Mixin,
   LoadPipetteCreateCommand,
   OT2RobotMixin,
@@ -180,8 +180,8 @@ export const migrateFile = (
     },
   }
 
-  const labwareV2Mixin: LabwareV2Mixin = {
-    labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2',
+  const labwareMixin: LabwareMixin = {
+    labwareDefinitionSchemaId: '', // Deliberate empty string. See schema documentation.
     labwareDefinitions: {
       ...appData.labwareDefinitions,
     },
@@ -205,7 +205,7 @@ export const migrateFile = (
   return {
     ...protocolBase,
     ...deckStructure,
-    ...labwareV2Mixin,
+    ...labwareMixin,
     ...liquidV1Mixin,
     ...commandv8Mixin,
     ...commandAnnotionaV1Mixin,

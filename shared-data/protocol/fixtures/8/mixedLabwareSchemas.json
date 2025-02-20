@@ -1,0 +1,124 @@
+{
+  "$otSharedSchema": "#/protocol/schemas/8",
+  "schemaVersion": 8,
+  "metadata": {
+    "protocolName": "Simple test protocol",
+    "author": "engineering <engineering@opentrons.com>",
+    "description": "A short test protocol",
+    "created": 1223131231,
+    "tags": ["unitTest"]
+  },
+  "robot": {
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
+  },
+  "liquidSchemaId": "opentronsLiquidSchemaV1",
+  "liquids": {},
+  "labwareDefinitionSchemaId": "",
+  "labwareDefinitions": {
+    "labware-in-schema-2": {
+      "ordering": [["A1"]],
+      "metadata": {
+        "displayCategory": "reservoir",
+        "displayVolumeUnits": "mL",
+        "displayName": "Labware in Schema 2",
+        "tags": []
+      },
+      "schemaVersion": 2,
+      "version": 1,
+      "namespace": "opentrons",
+      "dimensions": {
+        "xDimension": 172.86,
+        "yDimension": 165.86,
+        "zDimension": 82
+      },
+      "parameters": {
+        "format": "trough",
+        "isTiprack": false,
+        "loadName": "labware_in_schema_2",
+        "isMagneticModuleCompatible": false,
+        "quirks": []
+      },
+      "wells": {
+        "A1": {
+          "shape": "rectangular",
+          "yDimension": 165.67,
+          "xDimension": 107.11,
+          "totalLiquidVolume": 1100000,
+          "depth": 77,
+          "x": 82.84,
+          "y": 53.56,
+          "z": 5
+        }
+      },
+      "brand": {
+        "brand": "Opentrons"
+      },
+      "groups": [
+        {
+          "wells": ["A1"],
+          "metadata": {}
+        }
+      ],
+      "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    },
+    "labware-in-schema-3": {
+      "ordering": [["A1"]],
+      "metadata": {
+        "displayCategory": "reservoir",
+        "displayVolumeUnits": "mL",
+        "displayName": "Labware in Schema 3",
+        "tags": []
+      },
+      "schemaVersion": 3,
+      "version": 1,
+      "namespace": "opentrons",
+      "dimensions": {
+        "xDimension": 172.86,
+        "yDimension": 165.86,
+        "zDimension": 82
+      },
+      "parameters": {
+        "format": "trough",
+        "isTiprack": false,
+        "loadName": "labware_in_schema_3",
+        "isMagneticModuleCompatible": false,
+        "quirks": []
+      },
+      "wells": {
+        "A1": {
+          "shape": "rectangular",
+          "yDimension": 165.67,
+          "xDimension": 107.11,
+          "totalLiquidVolume": 1100000,
+          "depth": 77,
+          "x": 82.84,
+          "y": 53.56,
+          "z": 5
+        }
+      },
+      "brand": {
+        "brand": "Opentrons"
+      },
+      "groups": [
+        {
+          "wells": ["A1"],
+          "metadata": {}
+        }
+      ],
+      "cornerOffsetFromSlot": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    }
+  },
+  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commands": [],
+  "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",
+  "commandAnnotations": []
+}

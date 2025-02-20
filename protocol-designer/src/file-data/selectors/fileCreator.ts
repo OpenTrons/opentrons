@@ -44,7 +44,7 @@ import type {
   CommandAnnotationV1Mixin,
   CommandV8Mixin,
   CreateCommand,
-  LabwareV2Mixin,
+  LabwareMixin,
   LiquidV1Mixin,
   OT2RobotMixin,
   OT3RobotMixin,
@@ -233,8 +233,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     const deckStructure =
       robotType === FLEX_ROBOT_TYPE ? flexDeckSpec : ot2DeckSpec
 
-    const labwareV2Mixin: LabwareV2Mixin = {
-      labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2',
+    const labwareMixin: LabwareMixin = {
+      labwareDefinitionSchemaId: '', // Deliberate empty string. See schema documentation.
       labwareDefinitions,
     }
 
@@ -297,7 +297,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     return {
       ...protocolBase,
       ...deckStructure,
-      ...labwareV2Mixin,
+      ...labwareMixin,
       ...liquidV1Mixin,
       ...commandv8Mixin,
       ...commandAnnotionaV1Mixin,

@@ -11,6 +11,7 @@ import commandSchema7 from '../command/schemas/7.json'
 import commandAnnotationSchema1 from '../commandAnnotation/schemas/1.json'
 import liquidSchema1 from '../liquid/schemas/1.json'
 import labwareSchema2 from '../labware/schemas/2.json'
+import labwareSchema3 from '../labware/schemas/3.json'
 
 import protocolSchema8 from '../protocol/schemas/8.json'
 import protocolSchema7 from '../protocol/schemas/7.json'
@@ -154,39 +155,21 @@ const validateLabware8 = (
   toValidate: ProtocolSchemas.ProtocolStructureV8
 ): Promise<ProtocolSchemas.ProtocolFileV8['labwareDefinitions']> =>
   new Promise((resolve, reject) => {
-    const requestedSchema = toValidate.labwareDefinitionSchemaId
-    switch (requestedSchema) {
-      case 'opentronsLabwareSchemaV2':
-        resolve(labwareSchema2)
-        break
-      default:
-        // eslint-disable-next-line prefer-promise-reject-errors
-        reject([
-          {
-            keyword: 'Invalid labware schema requested',
-            dataPath: requestedSchema,
-            schemaPath: '#/properties/labwareSchemaId',
-            params: { allowedValues: ['opentronsLabwareSchemaV2'] },
-          },
-        ])
+    const generatedSchema = {
+      type: 'object',
+      patternProperties: {
+        '.+': { anyOf: [labwareSchema2, labwareSchema3] },
+      },
     }
-  }).then(
-    schema =>
-      new Promise((resolve, reject) => {
-        const generatedSchema = {
-          type: 'object',
-          patternProperties: { '.+': schema },
-        }
-        const labwareAjv = new Ajv({ allErrors: true, jsonPointers: true })
-        const validateLabware = labwareAjv.compile(generatedSchema)
-        const ok = validateLabware(toValidate.labwareDefinitions)
-        if (ok == null || ok === false) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject(validateLabware.errors)
-        }
-        resolve(toValidate.labwareDefinitions)
-      })
-  )
+    const labwareAjv = new Ajv({ allErrors: true, jsonPointers: true })
+    const validateLabware = labwareAjv.compile(generatedSchema)
+    const ok = validateLabware(toValidate.labwareDefinitions)
+    if (ok == null || ok === false) {
+      // eslint-disable-next-line prefer-promise-reject-errors
+      reject(validateLabware.errors)
+    }
+    resolve(toValidate.labwareDefinitions)
+  })
 
 const validate8 = (toValidate: any): Promise<ProtocolSchemas.ProtocolFileV8> =>
   new Promise<ProtocolSchemas.ProtocolStructureV8>((resolve, reject) => {

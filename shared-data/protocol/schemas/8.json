@@ -111,7 +111,7 @@
     },
 
     "labwareDefinitionSchemaId": {
-      "description": "The schema to use for labware definitions.",
+      "description": "This should be the empty string, for historical reasons. This was formerly the labware schema version of the objects in `labwareDefinitions`, but that imposed an unnecessary restriction of using the same labware schema version for all labware. The schema version is now declared per-definition, inside the definition.",
       "type": "string"
     },
 

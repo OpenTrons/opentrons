@@ -452,7 +452,7 @@
     "model": "OT-3 Standard",
     "deckId": "ot3_standard"
   },
-  "labwareDefinitionSchemaId": "opentronsLabwareSchemaV2",
+  "labwareDefinitionSchemaId": "",
   "labwareDefinitions": {
     "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
       "ordering": [

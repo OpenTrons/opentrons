@@ -1,6 +1,7 @@
 import type {
   CreateCommand,
   LabwareDefinition2,
+  LabwareDefinition3,
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
@@ -16,7 +17,7 @@ export interface EquipmentLoadInfoFromCommands {
 export const getEquipmentLoadInfoFromCommands = (
   commands: CreateCommand[],
   labwareDefinitions: {
-    [definitionId: string]: LabwareDefinition2
+    [definitionId: string]: LabwareDefinition2 | LabwareDefinition3
   }
 ): EquipmentLoadInfoFromCommands => {
   const loadPipetteCommands = commands.filter(

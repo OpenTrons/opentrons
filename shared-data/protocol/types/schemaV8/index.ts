@@ -7,7 +7,11 @@ import type {
   RunTimeParameter,
 } from '../../../js'
 import type { CommandAnnotation } from '../../../commandAnnotation/types'
-import type { LabwareDefinition2, RobotType } from '../../../js/types'
+import type {
+  LabwareDefinition2,
+  LabwareDefinition3,
+  RobotType,
+} from '../../../js/types'
 import type { RunTimeCommand } from '../schemaV8'
 
 export * from '../../../command/types'
@@ -44,10 +48,10 @@ export interface LabwareStructure {
   }
 }
 
-export interface LabwareV2Mixin {
-  labwareDefinitionSchemaId: 'opentronsLabwareSchemaV2'
+export interface LabwareMixin {
+  labwareDefinitionSchemaId: string
   labwareDefinitions: {
-    [definitionId: string]: LabwareDefinition2
+    [definitionId: string]: LabwareDefinition2 | LabwareDefinition3
   }
 }
 
@@ -113,7 +117,7 @@ export type ProtocolFile<
   DesignerApplicationData = {}
 > = ProtocolBase<DesignerApplicationData> &
   (OT2RobotMixin | OT3RobotMixin) &
-  LabwareV2Mixin &
+  LabwareMixin &
   LiquidV1Mixin &
   (CommandV8Mixin | CommandV9Mixin) &
   CommandAnnotationV1Mixin

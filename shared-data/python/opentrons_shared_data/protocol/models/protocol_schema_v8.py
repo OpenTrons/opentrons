@@ -46,7 +46,7 @@ class ProtocolSchemaV8(BaseModel):
     robot: Robot
     liquidSchemaId: Literal["opentronsLiquidSchemaV1"]
     liquids: Dict[str, Liquid]
-    labwareDefinitionSchemaId: Literal["opentronsLabwareSchemaV2"]
+    labwareDefinitionSchemaId: str
     labwareDefinitions: Dict[str, LabwareDefinition]
     commandSchemaId: CommandSchemaId
     commands: List[Command]
