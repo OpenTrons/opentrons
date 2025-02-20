@@ -7,7 +7,8 @@ from typing import Optional
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
-    Parameters as LabwareParameters,
+    LabwareDefinition2,
+    Parameters2 as LabwareDefinition2Parameters,
 )
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
@@ -32,7 +33,7 @@ from ..pipette_fixtures import (
     get_default_nozzle_map,
 )
 
-_tip_rack_parameters = LabwareParameters.model_construct(isTiprack=True)  # type: ignore[call-arg]
+_tip_rack_parameters = LabwareDefinition2Parameters.model_construct(isTiprack=True)  # type: ignore[call-arg]
 
 
 @pytest.fixture
@@ -50,7 +51,7 @@ def subject() -> TipStore:
 @pytest.fixture
 def labware_definition() -> LabwareDefinition:
     """Get a labware definition value object."""
-    return LabwareDefinition.model_construct(  # type: ignore[call-arg]
+    return LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         ordering=[
             ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
             ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
@@ -95,7 +96,7 @@ def _dummy_command() -> commands.Command:
 
 @pytest.mark.parametrize(
     "labware_definition",
-    [LabwareDefinition.model_construct(ordering=[], parameters=_tip_rack_parameters)],  # type: ignore[call-arg]
+    [LabwareDefinition2.model_construct(ordering=[], parameters=_tip_rack_parameters)],  # type: ignore[call-arg]
 )
 def test_get_next_tip_returns_none(
     load_labware_action: actions.SucceedCommandAction,
@@ -926,9 +927,9 @@ def test_handle_pipette_config_action(
 @pytest.mark.parametrize(
     "labware_definition",
     [
-        LabwareDefinition.model_construct(  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
             ordering=[["A1"]],
-            parameters=LabwareParameters.model_construct(isTiprack=False),  # type: ignore[call-arg]
+            parameters=LabwareDefinition2Parameters.model_construct(isTiprack=False),  # type: ignore[call-arg]
         )
     ],
 )

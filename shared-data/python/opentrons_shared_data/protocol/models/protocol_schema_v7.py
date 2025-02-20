@@ -2,7 +2,7 @@ from pydantic import ConfigDict, BaseModel, Field
 from typing import Any, List, Optional, Dict, Union
 from typing_extensions import Literal
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 from .shared_models import (
     Liquid,
@@ -85,7 +85,7 @@ class ProtocolSchemaV7(BaseModel):
     metadata: Metadata
     robot: Robot
     liquids: Optional[Dict[str, Liquid]] = None
-    labwareDefinitions: Dict[str, LabwareDefinition]
+    labwareDefinitions: Dict[str, LabwareDefinition2]
     commands: List[Command]
     commandAnnotations: Optional[List[CommandAnnotation]] = None
     designerApplication: Optional[DesignerApplication] = None

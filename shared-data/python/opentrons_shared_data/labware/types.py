@@ -88,23 +88,21 @@ class LabwareDimensions(TypedDict):
     xDimension: float
 
 
-class CircularWellDefinition2(TypedDict):
-    shape: CircularType
+class _WellCommon2(TypedDict):
     depth: float
     totalLiquidVolume: float
     x: float
     y: float
     z: float
+
+
+class CircularWellDefinition2(_WellCommon2, TypedDict):
+    shape: CircularType
     diameter: float
 
 
-class RectangularWellDefinition2(TypedDict):
+class RectangularWellDefinition2(_WellCommon2, TypedDict):
     shape: RectangularType
-    depth: float
-    totalLiquidVolume: float
-    x: float
-    y: float
-    z: float
     xDimension: float
     yDimension: float
 
@@ -112,12 +110,24 @@ class RectangularWellDefinition2(TypedDict):
 WellDefinition2 = CircularWellDefinition2 | RectangularWellDefinition2
 
 
-class CircularWellDefinition3(CircularWellDefinition2, TypedDict):
-    geometryDefinitionId: NotRequired[str]
-
-
-class RectangularWellDefinition3(RectangularWellDefinition2, TypedDict):
+class _WellCommon3(TypedDict):
+    depth: float
+    totalLiquidVolume: float
+    x: float
+    y: float
+    z: float
     geometryDefinitionId: NotRequired[str | None]
+
+
+class CircularWellDefinition3(_WellCommon3, TypedDict):
+    shape: CircularType
+    diameter: float
+
+
+class RectangularWellDefinition3(_WellCommon3, TypedDict):
+    shape: RectangularType
+    xDimension: float
+    yDimension: float
 
 
 WellDefinition3 = CircularWellDefinition3 | RectangularWellDefinition3
@@ -174,12 +184,12 @@ class LabwareDefinition3(TypedDict):
     gripperOffsets: NotRequired[dict[str, GripperOffsets]]
     gripForce: NotRequired[float]
     gripHeightFromLabwareBottom: NotRequired[float]
+    stackLimit: NotRequired[int]
     # The innerLabwareGeometry dict values are not currently modeled in these
     # TypedDict-based bindings. The only code that cares about them
     # currentlyuses our Pydantic-based bindings instead.
     innerLabwareGeometry: NotRequired[dict[str, object] | None]
     compatibleParentLabware: NotRequired[list[str]]
-    stackLimit: NotRequired[int]
 
 
 LabwareDefinition = LabwareDefinition2 | LabwareDefinition3

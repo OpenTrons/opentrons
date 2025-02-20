@@ -7,15 +7,18 @@ from __future__ import annotations
 
 from enum import Enum
 from math import sqrt, asin
+from typing import Final
 from numpy import pi, trapz
 from functools import cached_property
 
 from pydantic import (
     ConfigDict,
     BaseModel,
+    Discriminator,
     Field,
     StrictInt,
     StrictFloat,
+    TypeAdapter,
 )
 from typing_extensions import Annotated, Literal
 
@@ -95,7 +98,7 @@ class Metadata(BaseModel):
     tags: list[str] | None = None
 
 
-class Parameters(BaseModel):
+class Parameters2(BaseModel):
     format: Literal["96Standard", "384Standard", "trough", "irregular", "trash"]
     quirks: list[str] | None = None
     isTiprack: bool
@@ -104,6 +107,9 @@ class Parameters(BaseModel):
     loadName: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
     isMagneticModuleCompatible: bool
     magneticModuleEngageHeight: _NonNegativeNumber | None = None
+
+
+class Parameters3(Parameters2, BaseModel):
     isDeckSlotCompatible: bool | None = None
 
 
@@ -113,19 +119,58 @@ class Dimensions(BaseModel):
     xDimension: _NonNegativeNumber
 
 
-class WellDefinition(BaseModel):
+class _WellCommon2(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     depth: _NonNegativeNumber
+    totalLiquidVolume: _NonNegativeNumber
     x: _NonNegativeNumber
     y: _NonNegativeNumber
     z: _NonNegativeNumber
+
+
+class CircularWellDefinition2(_WellCommon2, BaseModel):
+    shape: Literal["circular"]
+    diameter: _NonNegativeNumber
+
+
+class RectangularWellDefinition2(_WellCommon2, BaseModel):
+    shape: Literal["rectangular"]
+    xDimension: _NonNegativeNumber
+    yDimension: _NonNegativeNumber
+
+
+WellDefinition2 = Annotated[
+    CircularWellDefinition2 | RectangularWellDefinition2, Field(discriminator="shape")
+]
+
+
+class _WellCommon3(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    depth: _NonNegativeNumber
     totalLiquidVolume: _NonNegativeNumber
-    xDimension: _NonNegativeNumber | None = None
-    yDimension: _NonNegativeNumber | None = None
-    diameter: _NonNegativeNumber | None = None
-    shape: Literal["rectangular", "circular"]
+    x: _NonNegativeNumber
+    y: _NonNegativeNumber
+    z: _NonNegativeNumber
     geometryDefinitionId: str | None = None
+
+
+class CircularWellDefinition3(_WellCommon3, BaseModel):
+    shape: Literal["circular"]
+    diameter: _NonNegativeNumber
+
+
+class RectangularWellDefinition3(_WellCommon3, BaseModel):
+    shape: Literal["rectangular"]
+    xDimension: _NonNegativeNumber
+    yDimension: _NonNegativeNumber
+
+
+WellDefinition3 = Annotated[
+    CircularWellDefinition3 | RectangularWellDefinition3,
+    Discriminator("shape"),
+]
 
 
 class SphericalSegment(BaseModel):
@@ -430,7 +475,7 @@ WellSegment = Annotated[
     | SquaredConeSegment
     | RoundedCuboidSegment
     | SphericalSegment,
-    Field(discriminator="shape"),
+    Discriminator("shape"),
 ]
 
 
@@ -438,24 +483,57 @@ class InnerWellGeometry(BaseModel):
     sections: list[WellSegment]
 
 
-class LabwareDefinition(BaseModel):
-    schemaVersion: Literal[1, 2, 3]
+class LabwareDefinition2(BaseModel):
+    # todo(mm, 2025-02-18): Is it correct to accept schemaVersion==1 here?
+    schemaVersion: Literal[1, 2]
     version: Annotated[int, Field(ge=1)]
     namespace: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
     metadata: Metadata
     brand: BrandData
-    parameters: Parameters
-    ordering: list[list[str]]
+    parameters: Parameters2
     cornerOffsetFromSlot: Vector
+    ordering: list[list[str]]
     dimensions: Dimensions
-    wells: dict[str, WellDefinition]
+    wells: dict[str, WellDefinition2]
     groups: list[Group]
-    allowedRoles: list[LabwareRole] = Field(default_factory=list)
     stackingOffsetWithLabware: dict[str, Vector] = Field(default_factory=dict)
     stackingOffsetWithModule: dict[str, Vector] = Field(default_factory=dict)
+    allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
-    gripHeightFromLabwareBottom: float | None = None
     gripForce: float | None = None
-    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
+    gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
+
+
+class LabwareDefinition3(BaseModel):
+    schemaVersion: Literal[3]
+    version: Annotated[int, Field(ge=1)]
+    namespace: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
+    metadata: Metadata
+    brand: BrandData
+    parameters: Parameters3
+    cornerOffsetFromSlot: Vector
+    ordering: list[list[str]]
+    dimensions: Dimensions
+    wells: dict[str, WellDefinition3]
+    groups: list[Group]
+    stackingOffsetWithLabware: dict[str, Vector] = Field(default_factory=dict)
+    stackingOffsetWithModule: dict[str, Vector] = Field(default_factory=dict)
+    allowedRoles: list[LabwareRole] = Field(default_factory=list)
+    gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
+    gripForce: float | None = None
+    gripHeightFromLabwareBottom: float | None = None
+    stackLimit: int | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
     compatibleParentLabware: list[str] | None = None
+
+
+LabwareDefinition = Annotated[
+    LabwareDefinition2 | LabwareDefinition3,
+    Discriminator("schemaVersion"),
+]
+
+
+labware_definition_type_adapter: Final = TypeAdapter[LabwareDefinition](
+    LabwareDefinition
+)

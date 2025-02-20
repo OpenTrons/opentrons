@@ -5,7 +5,10 @@ from datetime import datetime
 from decoy import Decoy
 
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    labware_definition_type_adapter,
+)
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import EngineStatus, types as pe_types
@@ -21,7 +24,7 @@ from robot_server.runs.router.labware_router import (
     get_run_loaded_labware_definitions,
 )
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition as SD_LabwareDefinition,
+    LabwareDefinition2 as SD_LabwareDefinition2,
 )
 
 
@@ -50,7 +53,7 @@ def run() -> Run:
 @pytest.fixture()
 def labware_definition(minimal_labware_def: LabwareDefDict) -> LabwareDefinition:
     """Create a labware definition fixture."""
-    return LabwareDefinition.model_validate(minimal_labware_def)
+    return labware_definition_type_adapter.validate_python(minimal_labware_def)
 
 
 async def test_add_labware_offsets(
@@ -195,8 +198,8 @@ async def test_get_run_labware_definition(
         mock_run_data_manager.get_run_loaded_labware_definitions(run_id="run-id")
     ).then_return(
         [
-            SD_LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
-            SD_LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
+            SD_LabwareDefinition2.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+            SD_LabwareDefinition2.model_construct(namespace="test_2"),  # type: ignore[call-arg]
         ]
     )
 
@@ -205,7 +208,7 @@ async def test_get_run_labware_definition(
     )
 
     assert result.content.data == [
-        SD_LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
-        SD_LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
+        SD_LabwareDefinition2.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+        SD_LabwareDefinition2.model_construct(namespace="test_2"),  # type: ignore[call-arg]
     ]
     assert result.status_code == 200

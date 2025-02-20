@@ -12,10 +12,10 @@ from typing import (
     Sequence,
     Tuple,
     NamedTuple,
-    cast,
     Union,
     overload,
 )
+from typing_extensions import assert_never
 
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -23,8 +23,12 @@ from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     LabwareDefinition,
+    LabwareDefinition2,
     LabwareRole,
-    WellDefinition,
+    WellDefinition2,
+    WellDefinition3,
+    CircularWellDefinition2,
+    RectangularWellDefinition2,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
@@ -89,6 +93,9 @@ _RIGHT_SIDE_SLOTS = {
 
 # The max height of the labware that can fit in a plate reader
 _PLATE_READER_MAX_LABWARE_Z_MM = 16
+
+
+_WellDefinition = WellDefinition2 | WellDefinition3
 
 
 class LabwareLoadParams(NamedTuple):
@@ -574,7 +581,7 @@ class LabwareView:
         self,
         labware_id: str,
         well_name: Optional[str] = None,
-    ) -> WellDefinition:
+    ) -> WellDefinition2 | WellDefinition3:
         """Get a well's definition by labware and well name.
 
         If `well_name` is omitted, the first well in the labware
@@ -596,21 +603,29 @@ class LabwareView:
     ) -> InnerWellGeometry:
         """Get a well's inner geometry by labware and well name."""
         labware_def = self.get_definition(labware_id)
-        if labware_def.innerLabwareGeometry is None:
+        if (
+            isinstance(labware_def, LabwareDefinition2)
+            or labware_def.innerLabwareGeometry is None
+        ):
             raise errors.IncompleteLabwareDefinitionError(
                 message=f"No innerLabwareGeometry found in labware definition for labware_id: {labware_id}."
             )
         well_def = self.get_well_definition(labware_id, well_name)
-        well_id = well_def.geometryDefinitionId
-        if well_id is None:
+        # Assert for type-checking. We expect the well definitions from schema *3*, specifically.
+        # This should always pass because we exclude LabwareDefinition2 above.
+        assert not isinstance(
+            well_def, (RectangularWellDefinition2, CircularWellDefinition2)
+        )
+        geometry_id = well_def.geometryDefinitionId
+        if geometry_id is None:
             raise errors.IncompleteWellDefinitionError(
                 message=f"No geometryDefinitionId found in well definition for well: {well_name} in labware_id: {labware_id}"
             )
         else:
-            well_geometry = labware_def.innerLabwareGeometry.get(well_id)
+            well_geometry = labware_def.innerLabwareGeometry.get(geometry_id)
             if well_geometry is None:
                 raise errors.IncompleteLabwareDefinitionError(
-                    message=f"No innerLabwareGeometry found in labware definition for well_id: {well_id} in labware_id: {labware_id}"
+                    message=f"No innerLabwareGeometry found in labware definition for well_id: {geometry_id} in labware_id: {labware_id}"
                 )
             return well_geometry
 
@@ -629,12 +644,13 @@ class LabwareView:
         """
         well_definition = self.get_well_definition(labware_id, well_name)
 
-        if well_definition.diameter is not None:
+        if well_definition.shape == "circular":
             x_size = y_size = well_definition.diameter
+        elif well_definition.shape == "rectangular":
+            x_size = well_definition.xDimension
+            y_size = well_definition.yDimension
         else:
-            # If diameter is None we know these values will be floats
-            x_size = cast(float, well_definition.xDimension)
-            y_size = cast(float, well_definition.yDimension)
+            assert_never(well_definition.shape)
 
         return x_size, y_size, well_definition.depth
 
@@ -1167,7 +1183,7 @@ class LabwareView:
         )
 
     @staticmethod
-    def _max_x_of_well(well_defn: WellDefinition) -> float:
+    def _max_x_of_well(well_defn: _WellDefinition) -> float:
         if well_defn.shape == "rectangular":
             return well_defn.x + (well_defn.xDimension or 0) / 2
         elif well_defn.shape == "circular":
@@ -1176,7 +1192,7 @@ class LabwareView:
             return well_defn.x
 
     @staticmethod
-    def _min_x_of_well(well_defn: WellDefinition) -> float:
+    def _min_x_of_well(well_defn: _WellDefinition) -> float:
         if well_defn.shape == "rectangular":
             return well_defn.x - (well_defn.xDimension or 0) / 2
         elif well_defn.shape == "circular":
@@ -1185,7 +1201,7 @@ class LabwareView:
             return 0
 
     @staticmethod
-    def _max_y_of_well(well_defn: WellDefinition) -> float:
+    def _max_y_of_well(well_defn: _WellDefinition) -> float:
         if well_defn.shape == "rectangular":
             return well_defn.y + (well_defn.yDimension or 0) / 2
         elif well_defn.shape == "circular":
@@ -1194,7 +1210,7 @@ class LabwareView:
             return 0
 
     @staticmethod
-    def _min_y_of_well(well_defn: WellDefinition) -> float:
+    def _min_y_of_well(well_defn: _WellDefinition) -> float:
         if well_defn.shape == "rectangular":
             return well_defn.y - (well_defn.yDimension or 0) / 2
         elif well_defn.shape == "circular":
@@ -1203,7 +1219,7 @@ class LabwareView:
             return 0
 
     @staticmethod
-    def _max_z_of_well(well_defn: WellDefinition) -> float:
+    def _max_z_of_well(well_defn: _WellDefinition) -> float:
         return well_defn.z + well_defn.depth
 
     def get_well_bbox(self, labware_definition: LabwareDefinition) -> Dimensions:

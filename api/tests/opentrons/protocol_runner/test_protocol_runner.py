@@ -8,7 +8,7 @@ from decoy import Decoy, matchers
 from pathlib import Path
 from typing import List, cast, Union, Type
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefinitionTypedDict,
 )
@@ -361,7 +361,7 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
     json_translator: JsonTranslator,
 ) -> None:
     """It should run a protocol to completion."""
-    labware_definition = LabwareDefinition.model_construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition2.model_construct()  # type: ignore[call-arg]
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
@@ -467,7 +467,7 @@ async def test_load_json_runner(
     json_protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
 ) -> None:
     """It should load a JSON protocol file."""
-    labware_definition = LabwareDefinition.model_construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition2.model_construct()  # type: ignore[call-arg]
 
     json_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -601,7 +601,7 @@ async def test_load_legacy_python(
     python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based Python protocol."""
-    labware_definition = LabwareDefinition.model_construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition2.model_construct()  # type: ignore[call-arg]
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
@@ -752,7 +752,7 @@ async def test_load_legacy_json(
     python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
-    labware_definition = LabwareDefinition.model_construct()  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition2.model_construct()  # type: ignore[call-arg]
 
     legacy_protocol_source = ProtocolSource(
         directory=Path("/dev/null"),

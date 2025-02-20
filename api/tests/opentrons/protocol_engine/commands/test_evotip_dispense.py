@@ -16,7 +16,10 @@ from opentrons.protocol_engine.execution import (
     MovementHandler,
 )
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    labware_definition_type_adapter,
+)
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.evotip_dispense import (
     EvotipDispenseParams,
@@ -34,7 +37,7 @@ from opentrons_shared_data.labware import load_definition
 def evotips_definition() -> LabwareDefinition:
     """A fixturee of the evotips definition."""
     # TODO (chb 2025-01-29): When we migrate all labware to v3 we can clean this up
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("evotips_opentrons_96_labware", 1)
     )
 

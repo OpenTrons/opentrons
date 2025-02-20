@@ -2,7 +2,7 @@
 
 
 from decoy import Decoy
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 from opentrons.protocol_api.core.engine import stringify as subject
 from opentrons.protocol_engine.clients.sync_client import SyncClient
@@ -18,8 +18,8 @@ from opentrons.types import DeckSlotName
 
 def _make_dummy_labware_definition(
     decoy: Decoy, display_name: str
-) -> LabwareDefinition:
-    mock = decoy.mock(cls=LabwareDefinition)
+) -> LabwareDefinition2:
+    mock = decoy.mock(cls=LabwareDefinition2)
     decoy.when(mock.metadata.displayName).then_return(display_name)
     return mock
 

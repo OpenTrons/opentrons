@@ -660,7 +660,7 @@ class GeometryView:
 
         return TipGeometry(
             length=effective_length,
-            diameter=well_def.diameter,  # type: ignore[arg-type]
+            diameter=well_def.diameter,
             # TODO(mc, 2020-11-12): WellDefinition type says totalLiquidVolume
             #  is a float, but hardware controller expects an int
             volume=int(well_def.totalLiquidVolume),

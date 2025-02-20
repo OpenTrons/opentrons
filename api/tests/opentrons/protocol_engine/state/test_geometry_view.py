@@ -22,17 +22,23 @@ from opentrons.protocol_engine.state.update_types import (
 from opentrons_shared_data import get_shared_data_root, load_shared_data
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.types import Point, DeckSlotName, MountType, StagingSlotName
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.labware_definition import (
+    CuboidalFrustum,
+    InnerWellGeometry,
+    LabwareDefinition,
+    LabwareDefinition2,
     Dimensions as LabwareDimensions,
-    Parameters as LabwareDefinitionParameters,
+    Parameters2 as LabwareDefinition2Parameters,
+    RectangularWellDefinition3,
+    SphericalSegment,
     Vector as LabwareDefinitionVector,
     ConicalFrustum,
+    labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware import load_definition as load_labware_definition
 
@@ -116,7 +122,36 @@ from .inner_geometry_test_params import INNER_WELL_GEOMETRY_TEST_PARAMS
 from ..pipette_fixtures import get_default_nozzle_map
 from ..mock_circular_frusta import TEST_EXAMPLES as CIRCULAR_TEST_EXAMPLES
 from ..mock_rectangular_frusta import TEST_EXAMPLES as RECTANGULAR_TEST_EXAMPLES
-from ...protocol_runner.test_json_translator import _load_labware_definition_data
+
+
+_TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
+    sections=[
+        CuboidalFrustum(
+            shape="cuboidal",
+            topXDimension=7.6,
+            topYDimension=8.5,
+            bottomXDimension=5.6,
+            bottomYDimension=6.5,
+            topHeight=45,
+            bottomHeight=20,
+        ),
+        CuboidalFrustum(
+            shape="cuboidal",
+            topXDimension=5.6,
+            topYDimension=6.5,
+            bottomXDimension=4.5,
+            bottomYDimension=4.0,
+            topHeight=20,
+            bottomHeight=10,
+        ),
+        SphericalSegment(
+            shape="spherical",
+            radiusOfCurvature=6,
+            topHeight=10,
+            bottomHeight=0.0,
+        ),
+    ],
+)
 
 
 @pytest.fixture
@@ -275,7 +310,7 @@ def addressable_area_view(
 @pytest.fixture
 def nice_labware_definition() -> LabwareDefinition:
     """Load a nice labware def that won't blow up your terminal."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         json.loads(
             load_shared_data("labware/fixtures/2/fixture_12_trough_v2.json").decode(
                 "utf-8"
@@ -287,7 +322,7 @@ def nice_labware_definition() -> LabwareDefinition:
 @pytest.fixture
 def nice_adapter_definition() -> LabwareDefinition:
     """Load a friendly adapter definition."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         json.loads(
             load_shared_data(
                 "labware/definitions/2/opentrons_aluminum_flat_bottom_plate/1.json"
@@ -1734,11 +1769,8 @@ def test_get_well_position_with_meniscus_and_literal_volume_offset(
             probed_volume=None,
         )
     )
-    labware_def = _load_labware_definition_data()
-    assert labware_def.innerLabwareGeometry is not None
-    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
-        inner_well_def
+        _TEST_INNER_WELL_GEOMETRY
     )
     decoy.when(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
@@ -1808,11 +1840,8 @@ def test_get_well_position_with_meniscus_and_float_volume_offset(
             probed_volume=None,
         )
     )
-    labware_def = _load_labware_definition_data()
-    assert labware_def.innerLabwareGeometry is not None
-    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
-        inner_well_def
+        _TEST_INNER_WELL_GEOMETRY
     )
     decoy.when(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
@@ -1881,11 +1910,8 @@ def test_get_well_position_raises_validation_error(
             probed_volume=None,
         )
     )
-    labware_def = _load_labware_definition_data()
-    assert labware_def.innerLabwareGeometry is not None
-    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
-        inner_well_def
+        _TEST_INNER_WELL_GEOMETRY
     )
     decoy.when(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
@@ -1952,11 +1978,8 @@ def test_get_meniscus_height(
             probed_volume=None,
         )
     )
-    labware_def = _load_labware_definition_data()
-    assert labware_def.innerLabwareGeometry is not None
-    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
-        inner_well_def
+        _TEST_INNER_WELL_GEOMETRY
     )
     decoy.when(
         mock_pipette_view.get_current_tip_lld_settings(pipette_id="pipette-id")
@@ -2123,6 +2146,7 @@ def test_get_nominal_tip_geometry(
     )
 
     assert result.length == 100
+    assert well_def.shape == "circular"  # For type checking, required for `.diameter`.
     assert result.diameter == well_def.diameter
     assert result.volume == well_def.totalLiquidVolume
 
@@ -2943,13 +2967,13 @@ def test_check_gripper_labware_tip_collision(
         )
     )
 
-    definition = LabwareDefinition.model_construct(  # type: ignore[call-arg]
+    definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         namespace="hello",
         dimensions=LabwareDimensions.model_construct(
             yDimension=1, zDimension=2, xDimension=3
         ),
         version=1,
-        parameters=LabwareDefinitionParameters.model_construct(
+        parameters=LabwareDefinition2Parameters.model_construct(
             format="96Standard",
             loadName="labware-id",
             isTiprack=True,
@@ -3383,17 +3407,11 @@ def test_validate_dispense_volume_into_well_meniscus(
     subject: GeometryView,
 ) -> None:
     """It should raise an InvalidDispenseVolumeError if too much volume is specified."""
-    labware_def = _load_labware_definition_data()
-    assert labware_def.wells is not None
-    well_def = labware_def.wells["A1"]
-    assert labware_def.innerLabwareGeometry is not None
-    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
-
     decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
-        well_def
+        RectangularWellDefinition3.model_construct(totalLiquidVolume=1100000)  # type: ignore[call-arg]
     )
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "A1")).then_return(
-        inner_well_def
+        _TEST_INNER_WELL_GEOMETRY
     )
     probe_time = datetime.now()
     decoy.when(mock_well_view.get_last_liquid_update("labware-id", "A1")).then_return(
@@ -3427,20 +3445,11 @@ def test_get_latest_volume_information(
 ) -> None:
     """It should raise an InvalidDispenseVolumeError if too much volume is specified."""
     # Setup
-    labware_def = _load_labware_definition_data()
-    assert labware_def.wells is not None
-    well_def = labware_def.wells["A1"]
-    assert labware_def.innerLabwareGeometry is not None
-    inner_well_def = labware_def.innerLabwareGeometry["welldefinition1111"]
-
     load_time = datetime.min
     probe_time = datetime.now()
 
-    decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
-        well_def
-    )
     decoy.when(mock_labware_view.get_well_geometry("labware-id", "A1")).then_return(
-        inner_well_def
+        _TEST_INNER_WELL_GEOMETRY
     )
     ten_ul_height = subject.get_well_height_at_volume(
         labware_id="labware-id", well_name="A1", volume=10.0
@@ -3570,13 +3579,15 @@ def test_get_well_height_at_volume(
         def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
-        _labware_def = LabwareDefinition.model_validate(
+        _labware_def = labware_definition_type_adapter.validate_python(
             json.loads(load_shared_data(def_path).decode("utf-8"))
         )
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert labware_def.innerLabwareGeometry is not None
+    assert (
+        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
+    )
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -3634,13 +3645,15 @@ def test_get_well_volume_at_height(
         def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
-        _labware_def = LabwareDefinition.model_validate(
+        _labware_def = labware_definition_type_adapter.validate_python(
             json.loads(load_shared_data(def_path).decode("utf-8"))
         )
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert labware_def.innerLabwareGeometry is not None
+    assert (
+        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
+    )
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -4042,7 +4055,7 @@ def test_get_location_sequence_stacker_hopper(
         pytest.param([], 0, id="empty-list"),
         pytest.param(
             [
-                LabwareDefinition.model_validate(
+                labware_definition_type_adapter.validate_python(
                     load_labware_definition(
                         "corning_96_wellplate_360ul_flat", version=2
                     )
@@ -4053,12 +4066,12 @@ def test_get_location_sequence_stacker_hopper(
         ),
         pytest.param(
             [
-                LabwareDefinition.model_validate(
+                labware_definition_type_adapter.validate_python(
                     load_labware_definition(
                         "opentrons_flex_tiprack_lid", version=1, schema=3
                     )
                 ),
-                LabwareDefinition.model_validate(
+                labware_definition_type_adapter.validate_python(
                     load_labware_definition(
                         "opentrons_flex_96_tiprack_1000ul", version=1
                     )

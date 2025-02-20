@@ -6,7 +6,11 @@ abstract away rough edges until we can improve those underlying interfaces.
 import logging
 from anyio import to_thread
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition3,
+    labware_definition_type_adapter,
+)
 
 from opentrons.protocols.labware import get_labware_definition
 
@@ -45,7 +49,7 @@ class LabwareDataProvider:
     def _get_labware_definition_sync(
         load_name: str, namespace: str, version: int
     ) -> LabwareDefinition:
-        return LabwareDefinition.model_validate(
+        return labware_definition_type_adapter.validate_python(
             get_labware_definition(load_name, namespace, version)
         )
 
@@ -73,15 +77,30 @@ class LabwareDataProvider:
         labware_definition: LabwareDefinition,
         nominal_fallback: float,
     ) -> float:
-        try:
-            return instr_cal.load_tip_length_for_pipette(
-                pipette_serial, labware_definition
-            ).tip_length
-
-        except TipLengthCalNotFound as e:
-            message = (
-                f"No calibrated tip length found for {pipette_serial},"
-                f" using nominal fallback value of {nominal_fallback}"
+        if isinstance(labware_definition, LabwareDefinition3):
+            # FIXME(mm, 2025-02-19): This needs to be resolved for v8.4.0.
+            # Tip length calibration internals don't yet support schema 3 because
+            # it's probably an incompatible change at the filesystem level
+            # (not downgrade-safe), and because robot-server's calibration sessions
+            # are built atop opentrons.protocol_api.core.legacy, which does not (yet?)
+            # support labware schema 3.
+            # https://opentrons.atlassian.net/browse/EXEC-1230
+            log.warning(
+                f"Tip rack"
+                f" {labware_definition.namespace}/{labware_definition.parameters.loadName}/{labware_definition.version}"
+                f" has schema 3, so tip length calibration is currently unsupported."
+                f" Using nominal fallback of {nominal_fallback}."
             )
-            log.debug(message, exc_info=e)
             return nominal_fallback
+        else:
+            try:
+                return instr_cal.load_tip_length_for_pipette(
+                    pipette_serial, labware_definition
+                ).tip_length
+            except TipLengthCalNotFound as e:
+                message = (
+                    f"No calibrated tip length found for {pipette_serial},"
+                    f" using nominal fallback value of {nominal_fallback}"
+                )
+                log.debug(message, exc_info=e)
+                return nominal_fallback
