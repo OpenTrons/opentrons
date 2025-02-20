@@ -30,7 +30,7 @@
   },
   "parameters": {
     "format": "irregular",
-    "quirks": ["stackingMaxFive"],
+    "quirks": [],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_tough_pcr_auto_sealing_lid"
@@ -77,6 +77,7 @@
       "z": 34
     }
   },
+  "stackLimit": 5,
   "gripForce": 15,
   "gripHeightFromLabwareBottom": 7.91,
   "gripperOffsets": {

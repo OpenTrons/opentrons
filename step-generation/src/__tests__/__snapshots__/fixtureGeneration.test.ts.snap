@@ -9251,7 +9251,7 @@ exports[`snapshot tests > makeContext 1`] = `
                 },
                 "defaultFlowAcceleration": 16000,
                 "defaultPushOutVolume": 20,
-                "defaultReturnTipHeight": 0.2,
+                "defaultReturnTipHeight": 0.71,
                 "defaultTipLength": 95.6,
                 "dispense": {
                   "default": {
@@ -9427,7 +9427,7 @@ exports[`snapshot tests > makeContext 1`] = `
                 },
                 "defaultFlowAcceleration": 16000,
                 "defaultPushOutVolume": 5,
-                "defaultReturnTipHeight": 0.2,
+                "defaultReturnTipHeight": 0.6,
                 "defaultTipLength": 58.35,
                 "dispense": {
                   "default": {
@@ -9578,7 +9578,7 @@ exports[`snapshot tests > makeContext 1`] = `
                 },
                 "defaultFlowAcceleration": 16000,
                 "defaultPushOutVolume": 7,
-                "defaultReturnTipHeight": 0.2,
+                "defaultReturnTipHeight": 0.6,
                 "defaultTipLength": 57.9,
                 "dispense": {
                   "default": {

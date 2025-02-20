@@ -1,4 +1,5 @@
 {
+  "commandAnnotations": [],
   "commands": [
     {
       "commandType": "home",
@@ -10838,9 +10839,9 @@
         "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
           },
           "origin": "default"
         },
@@ -10850,7 +10851,7 @@
         "position": {
           "x": 178.38,
           "y": 395.38,
-          "z": 90.88
+          "z": 42.12400000000001
         }
       },
       "startedAt": "TIMESTAMP",
@@ -11355,9 +11356,9 @@
         "pipetteId": "UUID",
         "wellLocation": {
           "offset": {
-            "x": 0,
-            "y": 0,
-            "z": 0
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
           },
           "origin": "default"
         },
@@ -11367,7 +11368,7 @@
         "position": {
           "x": 178.38,
           "y": 395.38,
-          "z": 90.88
+          "z": 42.12400000000001
         }
       },
       "startedAt": "TIMESTAMP",
@@ -15386,6 +15387,7 @@
       "location": "offDeck"
     }
   ],
+  "liquidClasses": [],
   "liquids": [
     {
       "description": "High Quality H₂O",

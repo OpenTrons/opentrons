@@ -37,6 +37,7 @@ export function TipSelection(props: TipSelectionProps): JSX.Element {
         relevantActiveNozzleLayout
       )}
       allowSelect={allowTipSelection}
+      allowMultiDrag={false}
     />
   )
 }

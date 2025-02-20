@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import reduce from 'lodash/reduce'
+import pick from 'lodash/pick'
 
 import { COLORS, Labware, RobotCoordinateSpace } from '@opentrons/components'
 import {
@@ -29,6 +30,8 @@ interface WellSelectionProps {
   pipetteNozzleDetails?: NozzleLayoutDetails
   /* Whether highlighting and selectWells() updates are permitted. */
   allowSelect?: boolean
+  /* Whether selecting more than the channel count of well locations is permitted. */
+  allowMultiDrag?: boolean
 }
 
 export function WellSelection(props: WellSelectionProps): JSX.Element {
@@ -40,6 +43,7 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     channels,
     pipetteNozzleDetails,
     allowSelect = true,
+    allowMultiDrag = true,
   } = props
   const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
 
@@ -61,16 +65,21 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
           })
           if (!wellSet) {
             return acc
+          } else if (allowMultiDrag) {
+            return { ...acc, [wellSet[0]]: null }
+          } else {
+            return { [wellSet[0]]: null }
           }
-          return { ...acc, [wellSet[0]]: null }
         },
         {}
       )
       return primaryWells
+    } else {
+      // single-channel or ingred selection mode
+      return allowMultiDrag
+        ? selectedWells
+        : pick(selectedWells, Object.keys(selectedWells)[0])
     }
-
-    // single-channel or ingred selection mode
-    return selectedWells
   }
 
   const _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {

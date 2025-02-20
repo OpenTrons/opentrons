@@ -338,7 +338,14 @@
       "description": "Allowed behaviors and usage of a labware in a protocol.",
       "items": {
         "type": "string",
-        "enum": ["labware", "adapter", "fixture", "maintenance", "lid"]
+        "enum": [
+          "labware",
+          "adapter",
+          "fixture",
+          "maintenance",
+          "lid",
+          "system"
+        ]
       }
     },
     "stackingOffsetWithLabware": {
@@ -384,6 +391,10 @@
     "gripHeightFromLabwareBottom": {
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+    },
+    "stackLimit": {
+      "type": "number",
+      "description": "The limit representing the maximum stack size for a given labware."
     }
   }
 }

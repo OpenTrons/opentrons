@@ -21,7 +21,7 @@ import type { State, Dispatch } from '/app/redux/types'
 const STATUS_REFRESH_MS = 5000
 
 export function ConnectViaEthernet(): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const dispatch = useDispatch<Dispatch>()

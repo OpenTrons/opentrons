@@ -1,4 +1,3 @@
-import type * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
@@ -6,6 +5,7 @@ import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { SelectAuthenticationType } from '../../NetworkSettings'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SetSettingOption } from '../types'
 
@@ -13,7 +13,7 @@ interface RobotSettingsSelectAuthenticationTypeProps {
   handleWifiConnect: () => void
   selectedAuthType: WifiSecurityType
   setCurrentOption: SetSettingOption
-  setSelectedAuthType: React.Dispatch<React.SetStateAction<WifiSecurityType>>
+  setSelectedAuthType: Dispatch<SetStateAction<WifiSecurityType>>
 }
 
 /**
@@ -25,12 +25,12 @@ export function RobotSettingsSelectAuthenticationType({
   setCurrentOption,
   setSelectedAuthType,
 }: RobotSettingsSelectAuthenticationTypeProps): JSX.Element {
-  const { i18n, t } = useTranslation('device_settings')
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
-        buttonText={i18n.format(t('continue'), 'capitalize')}
+        buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         header={t('select_a_security_type')}
         onClickBack={() => {
           setCurrentOption('RobotSettingsWifi')
