@@ -269,9 +269,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   }
 
   const handleContinue = (): void => {
-    if (isMultiStepToolbox && toolboxStep === 0) {
+    if (isMultiStepToolbox && toolboxStep < 2) {
       if (!isErrorOnCurrentPage) {
-        setToolboxStep(1)
+        setToolboxStep(prevStep => prevStep + 1)
         setShowFormErrors(false)
       } else {
         setShowFormErrors(true)
@@ -299,7 +299,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         subHeader={
           isMultiStepToolbox ? (
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {t('shared:part', { current: toolboxStep + 1, max: 2 })}
+              {t('shared:part', { current: toolboxStep + 1, max: 3 })}
             </StyledText>
           ) : null
         }
@@ -330,7 +330,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         closeButton={<Icon size="2rem" name="close" />}
         confirmButton={
           <Flex gridGap={SPACING.spacing8}>
-            {isMultiStepToolbox && toolboxStep === 1 ? (
+            {isMultiStepToolbox && toolboxStep >= 1 ? (
               <SecondaryButton
                 width="100%"
                 onClick={() => {
@@ -343,7 +343,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               </SecondaryButton>
             ) : null}
             <PrimaryButton onClick={handleContinue} width="100%">
-              {isMultiStepToolbox && toolboxStep === 0
+              {isMultiStepToolbox && toolboxStep < 2
                 ? i18n.format(t('shared:continue'), 'capitalize')
                 : t('shared:save')}
             </PrimaryButton>

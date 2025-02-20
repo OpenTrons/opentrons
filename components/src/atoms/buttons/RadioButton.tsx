@@ -81,6 +81,10 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
       : isSelected
       ? COLORS.white
       : COLORS.grey60};
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   `
 
   const getButtonStyle = (

@@ -3,9 +3,11 @@
   "all": "All",
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",
+  "apply_liquid_classes": "Apply liquid class settings for this transfer",
   "aspirate_labware": "Source labware",
   "aspirate": "Aspirate",
   "aspirated": "Aspirated",
+  "assigned_liquid": "Assigned to {{liquidName}}",
   "batch_edit_steps": "Batch edit steps",
   "batch_edit": "Batch edit",
   "batch_edits_saved": "Batch edits saved",
@@ -47,6 +49,14 @@
   "heater_shaker_settings": "Heater-Shaker Settings",
   "in": "in",
   "into": "into",
+  "liquid_classes": {
+    "water": "Aqueous",
+    "water_subtext": "Deionized water",
+    "glycerol": "Viscous",
+    "glycerol_subtext": "50% glycerol",
+    "ethanol": "Volatile",
+    "ethanol_subtext": "80% ethanol"
+  },
   "magnetic_module": {
     "disengage": "<semiBoldText>{{module}}</semiBoldText><text>disengaged</text>",
     "engage": "<semiBoldText>{{module}}</semiBoldText><text>engaged to</text><tag/>"
@@ -73,6 +83,7 @@
   "multiAspirate": "Consolidate path",
   "multiDispense": "Distribute path",
   "new_location": "New location",
+  "no_liquid_class": "Don't use a liquid class",
   "no_tiprack": "No tiprack available",
   "off_deck": "Off-Deck",
   "pause": {
