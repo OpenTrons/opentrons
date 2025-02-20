@@ -156,7 +156,14 @@ class LabwareDefinition2(TypedDict):
     stackLimit: NotRequired[int]
 
 
-class LabwareDefinition3(TypedDict):
+# Class to mix in the "$otSharedSchema" key. This cannot be defined with the normal
+# TypedDict class syntax because it contains a dollar sign.
+_OTSharedSchemaMixin = TypedDict(
+    "_OTSharedSchemaMixin", {"$otSharedSchema": Literal["#/labware/schemas/3"]}
+)
+
+
+class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     schemaVersion: Literal[3]
     version: int
     namespace: str

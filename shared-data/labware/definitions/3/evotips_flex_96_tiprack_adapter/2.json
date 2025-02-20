@@ -37,5 +37,6 @@
     "x": -14.25,
     "y": -3.5,
     "z": 0
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

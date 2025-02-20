@@ -441,6 +441,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "$otSharedSchema",
     "schemaVersion",
     "version",
     "namespace",
@@ -454,6 +455,10 @@
     "groups"
   ],
   "properties": {
+    "$otSharedSchema": {
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension.",
+      "enum": ["#/labware/schemas/3"]
+    },
     "schemaVersion": {
       "description": "Which schema version a labware is using",
       "type": "number",

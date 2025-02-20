@@ -1055,5 +1055,6 @@
       "y": 0,
       "z": 76.78
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

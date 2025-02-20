@@ -323,5 +323,6 @@
     "conicalWell": {
       "sections": []
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

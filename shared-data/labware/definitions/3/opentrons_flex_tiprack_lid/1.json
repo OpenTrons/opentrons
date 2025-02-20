@@ -112,5 +112,6 @@
         "z": 50.0
       }
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

@@ -439,6 +439,18 @@ class InnerWellGeometry(BaseModel):
 
 
 class LabwareDefinition(BaseModel):
+    model_config = {
+        # `"extra": "allow"` gives us lossless preservation of the $otSharedSchema field
+        # (which should always be omitted in schema 2 and always be present in schema 3)
+        # across parse/serialize round trips. Pydantic doesn't seem to have a good way
+        # of doing that when the $otSharedSchema field is declared explicitly on this
+        # model.
+        #
+        # Splitting this model into separate ones for schemas 2 and 3 would also solve this.
+        "extra": "allow"
+    }
+
+    # $otSharedSchema deliberately omitted for now. See `"extra": "allow"` in model_config.
     schemaVersion: Literal[1, 2, 3]
     version: Annotated[int, Field(ge=1)]
     namespace: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
