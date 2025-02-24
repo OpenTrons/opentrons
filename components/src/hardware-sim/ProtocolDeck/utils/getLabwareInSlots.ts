@@ -22,6 +22,7 @@ interface LabwareWithDef {
   labwareNickName: string | null
 }
 
+// do we need to add
 export const getInitialAndMovedLabwareInSlots = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 ): LabwareInSlot[] => {
@@ -104,6 +105,7 @@ export const getInitialAndMovedLabwareInSlots = (
     }, topMostLabwareInSlots)
 }
 
+// do we need to add lids to this one
 export const getTopMostLabwareInSlots = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 ): LabwareInSlot[] => {
@@ -177,12 +179,11 @@ const getAllLabwareDefinitions = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 ): LabwareWithDef[] => {
   const { commands } = protocolAnalysis
-  return commands
+  const lidAndLabware: LabwareWithDef[] = commands
     .filter((command): command is
       | LoadLabwareRunTimeCommand
-      | LoadLidRunTimeCommand
-      | LoadLidStackRunTimeCommand =>
-      ['loadLabware', 'loadLid', 'loadLidStack'].includes(command.commandType)
+      | LoadLidRunTimeCommand =>
+      ['loadLabware', 'loadLid'].includes(command.commandType)
     )
     .reduce<LabwareWithDef[]>((acc, command) => {
       const labwareId = command.result?.labwareId
@@ -216,4 +217,32 @@ const getAllLabwareDefinitions = (
         },
       ]
     }, [])
+
+  const lidStacks: LabwareWithDef[] = commands
+    .filter(
+      (command): command is LoadLidStackRunTimeCommand =>
+        command.commandType === 'loadLidStack'
+    )
+    .reduce<LabwareWithDef[]>((acc, command) => {
+      const lidStackObjects: LabwareWithDef[] = []
+      const labwareDef = command.result?.definition
+      if (labwareDef == null) {
+        console.warn(
+          `expected to find labware def for lid stack ${String(
+            command.result?.stackLabwareId
+          )} fromm command id ${String(command.id)} but could not`
+        )
+        return acc
+      }
+      command.result?.labwareIds.forEach(labwareId => {
+        lidStackObjects.push({
+          labwareId: labwareId,
+          labwareDef: labwareDef,
+          labwareNickName: null,
+        })
+      })
+      return [...acc, ...lidStackObjects]
+    }, [])
+
+  return { ...lidAndLabware, ...lidStacks }
 }

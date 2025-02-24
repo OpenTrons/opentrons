@@ -32,9 +32,15 @@ export const getLabwareRenderInfo = (
       ['loadLabware', 'loadLid', 'loadLidStack'].includes(command.commandType)
     )
     .reduce((acc, command) => {
-      const labwareId = command.result?.labwareId
+      const labwareId =
+        command.commandType === 'loadLidStack'
+          ? command.result?.labwareIds[0]
+          : command.result?.labwareId
       const location = command.params.location
-      const displayName = command.params.displayName ?? null
+      const displayName =
+        command.commandType === 'loadLabware'
+          ? command.params?.displayName ?? null
+          : null
       const labwareDef = command.result?.definition
       if (
         location === 'offDeck' ||
