@@ -12,6 +12,10 @@
     "A1": [-8.0, -22.0, -259.15]
   },
   "lldSettings": {
+    "t20": {
+      "minHeight": 1.5,
+      "minVolume": 0
+    },
     "t50": {
       "minHeight": 1.0,
       "minVolume": 0

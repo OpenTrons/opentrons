@@ -39,6 +39,10 @@
     "H1": [-8.0, -79.0, -259.15]
   },
   "lldSettings": {
+    "t20": {
+      "minHeight": 1.5,
+      "minVolume": 0
+    },
     "t50": {
       "minHeight": 1.0,
       "minVolume": 0

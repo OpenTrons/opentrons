@@ -293,6 +293,10 @@
     "H12": [63.0, -88.5, -259.15]
   },
   "lldSettings": {
+    "t20": {
+      "minHeight": 1.5,
+      "minVolume": 0
+    },
     "t50": {
       "minHeight": 1.5,
       "minVolume": 0
