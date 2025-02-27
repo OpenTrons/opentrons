@@ -141,6 +141,13 @@ class AbstractFlexStackerDriver(Protocol):
         :return: True if door is closed, False otherwise
         """
         ...
+    
+    async def get_installation_detected(self) -> bool:
+        """Get whether or not installation is detected.
+
+        :return: True if installation is detected, False otherwise
+        """
+        ...
 
     async def move_in_mm(
         self, axis: StackerAxis, distance: float, params: MoveParams | None = None
