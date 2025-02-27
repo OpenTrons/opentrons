@@ -167,14 +167,16 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         if not match:
             raise ValueError(f"Incorrect Response for door closed: {response}")
         return bool(int(match.group(1)))
-    
+
     @classmethod
     def parse_installation_detected(cls, response: str) -> bool:
         """Parse install detection."""
         _RE = re.compile(rf"^{GCODE.GET_INSTALL_DETECTED} I:(\d)$")
         match = _RE.match(response)
         if not match:
-            raise ValueError(f"Incorrect Response for installation detected: {response}")
+            raise ValueError(
+                f"Incorrect Response for installation detected: {response}"
+            )
         return bool(int(match.group(1)))
 
     @classmethod
@@ -640,7 +642,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             GCODE.GET_DOOR_SWITCH.build_command()
         )
         return self.parse_door_closed(response)
-    
+
     async def get_installation_detected(self) -> bool:
         """Get whether or not installation is detected.
 

@@ -141,7 +141,7 @@ class AbstractFlexStackerDriver(Protocol):
         :return: True if door is closed, False otherwise
         """
         ...
-    
+
     async def get_installation_detected(self) -> bool:
         """Get whether or not installation is detected.
 
