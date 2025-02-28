@@ -283,6 +283,11 @@ export function ProtocolDetails(
         command.commandType === 'loadLabware' &&
         command.result?.definition.parameters.format !== 'trash'
     ) ?? []
+  const loadLidStackCommands =
+    mostRecentAnalysis?.commands.filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLidStack'
+    ) ?? []
 
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
@@ -331,7 +336,10 @@ export function ProtocolDetails(
 
   const contentsByTabName = {
     labware: (
-      <ProtocolLabwareDetails requiredLabwareDetails={loadLabwareCommands} />
+      <ProtocolLabwareDetails
+        requiredLabwareDetails={loadLabwareCommands}
+        requiredLidStackDetails={loadLidStackCommands}
+      />
     ),
     robot_config: (
       <RobotConfigurationDetails

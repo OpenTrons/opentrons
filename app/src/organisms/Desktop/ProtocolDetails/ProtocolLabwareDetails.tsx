@@ -26,15 +26,17 @@ import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 import type { MouseEventHandler } from 'react'
 import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
+import { LoadLidStackRunTimeCommand } from '@opentrons/shared-data'
 
 interface ProtocolLabwareDetailsProps {
   requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null
+  requiredLidStackDetails: LoadLidStackRunTimeCommand[] | null
 }
 
 export const ProtocolLabwareDetails = (
   props: ProtocolLabwareDetailsProps
 ): JSX.Element => {
-  const { requiredLabwareDetails } = props
+  const { requiredLabwareDetails, requiredLidStackDetails } = props
   const { t } = useTranslation('protocol_details')
 
   const labwareDetails =
@@ -55,6 +57,29 @@ export const ProtocolLabwareDetails = (
             .values(),
         ]
       : []
+  const lidDetails =
+    requiredLidStackDetails != null
+      ? [
+          ...requiredLidStackDetails
+            .reduce((acc, lidStack) => {
+              console.log('lid stack details', lidStack)
+              if (lidStack.result?.definition == null) return acc
+              else if (!acc.has(getLabwareDefURI(lidStack.result.definition))) {
+                acc.set(getLabwareDefURI(lidStack.result.definition), {
+                  ...lidStack,
+                  quantity: 0,
+                })
+              }
+              acc.get(getLabwareDefURI(lidStack.result?.definition)).quantity +=
+                lidStack.result?.labwareIds.length
+              return acc
+            }, new Map())
+            .values(),
+        ]
+      : []
+  console.log('lid details', lidDetails)
+
+  const combinedDetails = labwareDetails.concat(lidDetails)
 
   return (
     <>
@@ -78,7 +103,7 @@ export const ProtocolLabwareDetails = (
               {t('quantity')}
             </StyledText>
           </Flex>
-          {labwareDetails?.map((labware, index) => (
+          {combinedDetails?.map((labware, index) => (
             <ProtocolLabwareDetailItem
               key={index}
               namespace={labware.params.namespace}
