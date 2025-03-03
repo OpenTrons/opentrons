@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union, Any
 from typing_extensions import Literal
-
+import numpy
 
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
@@ -150,6 +150,14 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                 volume_added *= self._state_view.geometry.get_nozzles_per_well(
                     labware_id, well_name, params.pipetteId
                 )
+            # The current volume won't be none since it passed validation
+            current_volume = (
+                self._state_view.pipettes.get_aspirated_volume(params.pipetteId) or 0.0
+            )
+            auto_blowout = numpy.isclose(current_volume - params.volume, 0)
+            ready = (
+                params.pushOut == 0 if params.pushOut is not None else not auto_blowout
+            )
             return SuccessData(
                 public=DispenseResult(
                     volume=dispense_result.public.volume,
@@ -158,7 +166,8 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                 state_update=(
                     StateUpdate.reduce(
                         move_result.state_update, dispense_result.state_update
-                    ).set_liquid_operated(
+                    )
+                    .set_liquid_operated(
                         labware_id=labware_id,
                         well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
                             labware_id, well_name, params.pipetteId
@@ -166,6 +175,9 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
                         volume_added=volume_added
                         if volume_added is not None
                         else CLEAR,
+                    )
+                    .set_pipette_ready_to_aspireate(
+                        pipette_id=params.pipetteId, ready_to_aspirate=ready
                     )
                 ),
             )

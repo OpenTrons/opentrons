@@ -138,6 +138,9 @@ class LoadPipetteImplementation(
             config=loaded_pipette.static_config,
         )
         state_update.set_fluid_unknown(pipette_id=loaded_pipette.pipette_id)
+        state_update.set_pipette_ready_to_aspireate(
+            pipette_id=loaded_pipette.pipette_id, ready_to_aspirate=False
+        ),
 
         return SuccessData(
             public=LoadPipetteResult(pipetteId=loaded_pipette.pipette_id),
