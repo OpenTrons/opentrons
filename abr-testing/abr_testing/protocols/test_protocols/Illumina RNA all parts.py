@@ -1,4 +1,5 @@
 """Illumina RNA Enrichment 96x Flex Stacker."""
+
 from opentrons.protocol_api import ProtocolContext, ParameterContext, OFF_DECK
 from opentrons import types
 from opentrons.protocol_api import COLUMN, ALL, Labware
@@ -228,7 +229,7 @@ def run(protocol: ProtocolContext) -> None:
     )  # type: ignore[assignment]
     stacker_200_1.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_200ul",
-        lid="opentrons_flex_tiprack_lid"
+        lid="opentrons_flex_tiprack_lid",
         count=6,
     )
     tiprack_A3_adapter = protocol.load_adapter(
@@ -245,7 +246,7 @@ def run(protocol: ProtocolContext) -> None:
     )  # type: ignore[assignment]
     stacker_200_2.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_200ul",
-        lid="opentrons_flex_tiprack_lid"
+        lid="opentrons_flex_tiprack_lid",
         count=6,
     )
     lids = protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "B3", 5)
@@ -256,7 +257,7 @@ def run(protocol: ProtocolContext) -> None:
     )  # type: ignore[assignment]
     stacker_50_1.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_50ul",
-        lid="opentrons_flex_tiprack_lid"
+        lid="opentrons_flex_tiprack_lid",
         count=6,
     )
     if ONDECK_TEMP:
@@ -283,8 +284,8 @@ def run(protocol: ProtocolContext) -> None:
     )  # type: ignore[assignment]
     stacker_50_2.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_50ul",
-         lid="opentrons_flex_tiprack_lid",
-        quantity=6,
+        lid="opentrons_flex_tiprack_lid",
+        count=6,
     )
     TRASH = protocol.load_waste_chute()
     LW_reservoir = protocol.load_labware(
