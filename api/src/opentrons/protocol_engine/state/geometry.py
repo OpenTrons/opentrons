@@ -554,21 +554,6 @@ class GeometryView:
             z=labware_pos.z + offset.z + well_def.z,
         )
 
-    def get_nominal_well_position(
-        self,
-        labware_id: str,
-        well_name: str,
-    ) -> Point:
-        """Get the well position without calibration offsets."""
-        parent_pos = self.get_labware_parent_nominal_position(labware_id)
-        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
-        well_def = self._labware.get_well_definition(labware_id, well_name)
-        return Point(
-            x=parent_pos.x + origin_offset.x + well_def.x,
-            y=parent_pos.y + origin_offset.y + well_def.y,
-            z=parent_pos.z + origin_offset.z + well_def.z + well_def.depth,
-        )
-
     def get_relative_well_location(
         self,
         labware_id: str,

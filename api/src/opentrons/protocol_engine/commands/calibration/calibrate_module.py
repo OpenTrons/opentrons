@@ -75,7 +75,7 @@ class CalibrateModuleImplementation(
         # NOTE (ba, 2023-03-31): There are two wells for calibration labware definitions
         # well A1 represents the location calibration square center relative to the adapters bottom-left corner
         # well B1 represents the location of the calibration square probe point relative to the adapters bottom-left corner.
-        nominal_position = self._state_view.geometry.get_nominal_well_position(
+        nominal_position = self._state_view.geometry.get_well_position(
             labware_id=params.labwareId, well_name="B1"
         )
 

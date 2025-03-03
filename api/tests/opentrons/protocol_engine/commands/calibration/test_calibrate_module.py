@@ -54,25 +54,19 @@ async def test_calibrate_module_implementation(
         mount=MountType.LEFT,
     )
 
-    decoy.when(subject._state_view.modules.get_serial_number(module_id)).then_return(
+    decoy.when(state_view.modules.get_serial_number(module_id)).then_return(
         "TC1234abcd"
     )
 
-    decoy.when(subject._state_view.modules.get_location(module_id)).then_return(
-        location
-    )
-    decoy.when(
-        subject._state_view.modules.get_module_calibration_offset(module_id)
-    ).then_return(
+    decoy.when(state_view.modules.get_location(module_id)).then_return(location)
+    decoy.when(state_view.modules.get_module_calibration_offset(module_id)).then_return(
         ModuleOffsetData(
             moduleOffsetVector=ModuleOffsetVector(x=0, y=0, z=0),
             location=location,
         )
     )
     decoy.when(
-        subject._state_view.geometry.get_nominal_well_position(
-            labware_id=labware_id, well_name="B1"
-        )
+        state_view.geometry.get_well_position(labware_id=labware_id, well_name="B1")
     ).then_return(Point(x=3, y=2, z=1))
     decoy.when(
         await calibration.calibrate_module(
