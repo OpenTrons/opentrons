@@ -10,7 +10,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Metadata,
     DisplayCategory,
     BrandData,
-    Vector as SD_Labware_Vector,
+    Vector3D as SD_Labware_Vector,
     Dimensions,
     Group,
     GroupMetadata,

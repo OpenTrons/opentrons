@@ -391,6 +391,9 @@ def test_module_load_labware(ctx_with_tempdeck: papi.ProtocolContext) -> None:
     mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
     assert mod.labware is None
     lw = mod.load_labware(labware_name)
+    assert (
+        labware_def["schemaVersion"] == 2
+    )  # For the presence of ["cornerOffsetFromSlot"].
     lw_offset = Point(
         labware_def["cornerOffsetFromSlot"]["x"],
         labware_def["cornerOffsetFromSlot"]["y"],

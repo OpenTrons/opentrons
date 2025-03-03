@@ -34,7 +34,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters2 as LabwareDefinition2Parameters,
     RectangularWellDefinition3,
     SphericalSegment,
-    Vector as LabwareDefinitionVector,
+    Vector3D as LabwareDefinitionVector3D,
     ConicalFrustum,
     labware_definition_type_adapter,
 )
@@ -641,6 +641,9 @@ def test_get_labware_origin_position(
     ).then_return(Point(1, 2, 3))
 
     expected_parent = Point(1, 2, 3)
+    assert (
+        well_plate_def.schemaVersion == 2
+    )  # For the presence of cornerOffsetFromSlot.
     expected_offset = Point(
         x=well_plate_def.cornerOffsetFromSlot.x,
         y=well_plate_def.cornerOffsetFromSlot.y,
@@ -684,6 +687,7 @@ def test_get_labware_highest_z(
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
+    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
     assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3)
 
 
@@ -747,6 +751,7 @@ def test_get_module_labware_highest_z(
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
+    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
     assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
 
 
@@ -986,6 +991,7 @@ def test_get_highest_z_in_slot_with_single_labware(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
+    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
     expected_highest_z = well_plate_def.dimensions.zDimension + 3 + 3
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
@@ -1119,6 +1125,7 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
+    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
     expected_highest_z = (
         slot_pos.z + well_plate_def.dimensions.zDimension - 6 + 30 - 9 + 13 + 3
     )
@@ -1230,6 +1237,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
+    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
     expected_highest_z = (
         slot_pos.z + 60 + 30 - 3.3 + well_plate_def.dimensions.zDimension - 6 + 3
     )
@@ -1324,6 +1332,9 @@ def test_get_labware_position(
 
     position = subject.get_labware_position(labware_id="labware-id")
 
+    assert (
+        well_plate_def.schemaVersion == 2
+    )  # For the presence of cornerOffsetFromSlot.
     assert position == Point(
         x=slot_pos[0] + well_plate_def.cornerOffsetFromSlot.x + 1,
         y=slot_pos[1] + well_plate_def.cornerOffsetFromSlot.y - 2,
@@ -3022,7 +3033,7 @@ def test_check_gripper_labware_tip_collision(
             isTiprack=True,
             isMagneticModuleCompatible=False,
         ),
-        cornerOffsetFromSlot=LabwareDefinitionVector.model_construct(x=1, y=2, z=3),
+        cornerOffsetFromSlot=LabwareDefinitionVector3D.model_construct(x=1, y=2, z=3),
         ordering=[],
     )
 

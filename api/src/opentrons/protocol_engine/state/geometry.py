@@ -2,6 +2,7 @@
 
 from logging import getLogger
 import enum
+from typing_extensions import assert_type
 from numpy import array, dot, double as npdouble
 from numpy.typing import NDArray
 from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict, Set
@@ -17,7 +18,11 @@ from opentrons.types import (
 
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
+)
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount, LabwareUri
@@ -439,15 +444,29 @@ class GeometryView:
         )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
-        """Get the position of the labware's origin, without calibration."""
-        slot_pos = self.get_labware_parent_position(labware_id)
-        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
+        """Get the deck coordinates of a labware's origin.
 
-        return Point(
-            x=slot_pos.x + origin_offset.x,
-            y=slot_pos.y + origin_offset.y,
-            z=slot_pos.z + origin_offset.z,
-        )
+        This includes module calibration but excludes the calibration of the given labware.
+        """
+        slot_front_left = self.get_labware_parent_position(labware_id)
+        definition = self._labware.get_definition(labware_id)
+
+        if isinstance(definition, LabwareDefinition2):
+            slot_front_left_to_labware_front_left = Point(
+                definition.cornerOffsetFromSlot.x,
+                definition.cornerOffsetFromSlot.y,
+                definition.cornerOffsetFromSlot.z,
+            )
+            return slot_front_left + slot_front_left_to_labware_front_left
+        else:
+            assert_type(definition, LabwareDefinition3)
+            # todo(mm, 2025-03-03): This needs more work to correctly handle labware schema 3.
+            # This is currently assuming the labware's wells are in quadrant I and the
+            # labware sits as far in the -x, -y direction as the slot allows. We instead
+            # need to have the labware sit in the -x, +y direction (depending on the slot
+            # and labware's locating features) and allow for the labware's wells to be
+            # in quadrant IV.
+            return slot_front_left
 
     def get_labware_position(self, labware_id: str) -> Point:
         """Get the calibrated origin of the labware."""
@@ -608,8 +627,7 @@ class GeometryView:
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
         labware_pos = self.get_labware_position(lw_data.id)
-        definition = self._labware.get_definition(lw_data.id)
-        z_dim = definition.dimensions.zDimension
+        z_dim = self._labware.get_dimensions(labware_id=lw_data.id).z
         height_over_labware: float = 0
         if isinstance(lw_data.location, ModuleLocation):
             # Note: when calculating highest z of stacked labware, height-over-labware
@@ -2098,15 +2116,20 @@ class GeometryView:
         if len(definitions) == 0:
             return 0
         if len(definitions) == 1:
-            return definitions[0].dimensions.zDimension
+            return self._labware.get_dimensions(labware_definition=definitions[0]).z
         total_height = 0.0
         upper_def: LabwareDefinition = definitions[0]
         for lower_def in definitions[1:]:
             overlap = self._labware.get_labware_overlap_offsets(
                 upper_def, lower_def.parameters.loadName
             ).z
-            total_height += upper_def.dimensions.zDimension - overlap
+            total_height += (
+                self._labware.get_dimensions(labware_definition=upper_def).z - overlap
+            )
             upper_def = lower_def
+        return (
+            total_height + self._labware.get_dimensions(labware_definition=upper_def).z
+        )
         return total_height + upper_def.dimensions.zDimension
 
     def get_height_of_stacker_labware_pool(self, module_id: str) -> float:

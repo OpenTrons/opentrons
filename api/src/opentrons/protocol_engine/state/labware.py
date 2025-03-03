@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from typing_extensions import assert_never
+from typing_extensions import assert_never, assert_type
 
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -24,6 +24,7 @@ from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
+    LabwareDefinition3,
     LabwareRole,
     WellDefinition2,
     WellDefinition3,
@@ -848,13 +849,31 @@ class LabwareView:
             assert labware_id is not None  # From our @overloads.
             labware_definition = self.get_definition(labware_id)
 
-        dims = labware_definition.dimensions
-
-        return Dimensions(
-            x=dims.xDimension,
-            y=dims.yDimension,
-            z=dims.zDimension,
-        )
+        if isinstance(labware_definition, LabwareDefinition2):
+            return Dimensions(
+                x=labware_definition.dimensions.xDimension,
+                y=labware_definition.dimensions.yDimension,
+                z=labware_definition.dimensions.zDimension,
+            )
+        else:
+            assert_type(labware_definition, LabwareDefinition3)
+            back_left_bottom = labware_definition.extents.total.backLeftBottom
+            front_right_top = labware_definition.extents.total.frontRightTop
+            right, front, top = (
+                front_right_top.x,
+                front_right_top.y,
+                front_right_top.z,
+            )
+            left, back, bottom = (
+                back_left_bottom.x,
+                back_left_bottom.y,
+                back_left_bottom.z,
+            )
+            return Dimensions(
+                x=right - left,
+                y=back - front,
+                z=top - bottom,
+            )
 
     def get_labware_overlap_offsets(
         self, definition: LabwareDefinition, below_labware_name: str
@@ -1084,7 +1103,10 @@ class LabwareView:
                 f"Cannot move '{load_name}' into plate reader because the"
                 f" labware contains {number_of_wells} wells where 96 wells is expected."
             )
-        elif labware_definition.dimensions.zDimension > _PLATE_READER_MAX_LABWARE_Z_MM:
+        elif (
+            self.get_dimensions(labware_definition=labware_definition).z
+            > _PLATE_READER_MAX_LABWARE_Z_MM
+        ):
             raise errors.LabwareMovementNotAllowedError(
                 f"Cannot move '{load_name}' into plate reader because the"
                 f" maximum allowed labware height is {_PLATE_READER_MAX_LABWARE_Z_MM}mm."

@@ -5,7 +5,7 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
     LabwareRole,
-    Vector,
+    Vector3D,
     Parameters2,
 )
 
@@ -65,13 +65,13 @@ def test_validate_definition_is_adapter(
     [
         (
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-                stackingOffsetWithLabware={"labware123": Vector(x=4, y=5, z=6)}
+                stackingOffsetWithLabware={"labware123": Vector3D(x=4, y=5, z=6)}
             ),
             True,
         ),
         (
             LabwareDefinition2.model_construct(  # type: ignore[call-arg]
-                stackingOffsetWithLabware={"labwareXYZ": Vector(x=4, y=5, z=6)}
+                stackingOffsetWithLabware={"labwareXYZ": Vector3D(x=4, y=5, z=6)}
             ),
             False,
         ),

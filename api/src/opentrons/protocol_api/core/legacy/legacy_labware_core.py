@@ -1,7 +1,6 @@
 from typing import List, Optional, Dict
 
 from opentrons.calibration_storage import helpers
-from opentrons.protocols.geometry.labware_geometry import LabwareGeometry
 from opentrons.protocols.api_support.tip_tracker import TipTracker
 
 from opentrons.types import DeckSlotName, Location, Point, NozzleMapInterface
@@ -12,6 +11,7 @@ from ..._liquid import Liquid
 from ..labware import AbstractLabware, LabwareLoadParams
 from .legacy_well_core import LegacyWellCore
 from .well_geometry import WellGeometry
+from ._labware_geometry import LabwareGeometry
 
 
 # URIs of labware whose definitions accidentally specify an engage height

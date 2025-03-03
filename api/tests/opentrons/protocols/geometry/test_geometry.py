@@ -174,6 +174,7 @@ def test_no_labware_loc(deck: Deck) -> None:
     check_arc_basic(no_from_well, no_well, lw1.wells()[1].top())
 
     no_from_well_height = no_from_well[0][0].z
+    assert labware_def["schemaVersion"] == 2  # For presence of ["dimensions"].
     lw_height_expected = labware_def["dimensions"]["zDimension"] + 5.0
     assert no_from_well_height == lw_height_expected
 
