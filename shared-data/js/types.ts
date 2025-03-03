@@ -111,12 +111,17 @@ export interface LabwareDimensions {
   zDimension: number
 }
 
-export interface Coordinates {
+export interface Vector2D {
+  x: number
+  y: number
+}
+export interface Vector3D {
   x: number
   y: number
   z: number
 }
-export type LabwareOffset = Coordinates
+
+export type LabwareOffset = Vector3D
 
 // 1. Valid pipette type for a container (i.e. is there multi channel access?)
 // 2. Is the container a tiprack?
@@ -235,6 +240,21 @@ export interface LabwareWellGroup {
   brand?: LabwareBrand
 }
 
+export interface AxisAlignedBoundingBox2D {
+  backLeft: Vector2D
+  frontRight: Vector2D
+}
+
+export interface AxisAlignedBoundingBox3D {
+  backLeftBottom: Vector3D
+  frontRightTop: Vector3D
+}
+
+export interface Extents {
+  total: AxisAlignedBoundingBox3D
+  footprint: AxisAlignedBoundingBox2D
+}
+
 export type LabwareRoles =
   | 'labware'
   | 'adapter'
@@ -268,8 +288,7 @@ export interface LabwareDefinition3 {
   schemaVersion: 3
   namespace: string
   metadata: LabwareMetadata
-  dimensions: LabwareDimensions
-  cornerOffsetFromSlot: LabwareOffset
+  extents: Extents
   parameters: LabwareParameters
   brand: LabwareBrand
   ordering: string[][]
@@ -279,6 +298,7 @@ export interface LabwareDefinition3 {
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
+  locatableFeatures: Record<string, { coordinates: Vector3D }>
 }
 
 export interface LabwareDefByDefURI {
@@ -468,9 +488,9 @@ export interface ModuleLayer {
 export interface ModuleDefinition {
   moduleType: ModuleType
   model: ModuleModel
-  labwareOffset: Coordinates
+  labwareOffset: Vector3D
   dimensions: ModuleDimensions
-  cornerOffsetFromSlot: Coordinates
+  cornerOffsetFromSlot: Vector3D
   calibrationPoint: ModuleCalibrationPoint
   displayName: string
   quirks: string[]
@@ -746,13 +766,13 @@ interface BlowoutProperties {
 }
 interface Submerge {
   positionReference: PositionReference
-  offset: Coordinates
+  offset: Vector3D
   speed: number
   delay: DelayProperties
 }
 interface BaseRetract {
   positionReference: PositionReference
-  offset: Coordinates
+  offset: Vector3D
   speed: number
   airGapByVolume: LiquidHandlingPropertyByVolume
   touchTip: TouchTipProperties
@@ -766,7 +786,7 @@ interface BaseLiquidHandlingProperties<RetractType> {
   submerge: Submerge
   retract: RetractType
   positionReference: PositionReference
-  offset: Coordinates
+  offset: Vector3D
   flowRateByVolume: LiquidHandlingPropertyByVolume
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties

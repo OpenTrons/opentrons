@@ -7,7 +7,7 @@ import {
 
 import type {
   LoadedPipette,
-  Coordinates,
+  Vector3D,
   CreateCommand,
 } from '@opentrons/shared-data'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
@@ -24,7 +24,7 @@ export interface UseHandleConfirmPositionResult {
   handleConfirmLwFinalPosition: (
     offsetLocationDetails: OffsetLocationDetails,
     pipette: LoadedPipette
-  ) => Promise<Coordinates | null>
+  ) => Promise<Vector3D | null>
 }
 
 export function useHandleConfirmLwFinalPosition({
@@ -34,7 +34,7 @@ export function useHandleConfirmLwFinalPosition({
   const handleConfirmLwFinalPosition = (
     offsetLocationDetails: OffsetLocationDetails,
     pipette: LoadedPipette
-  ): Promise<Coordinates | null> => {
+  ): Promise<Vector3D | null> => {
     const confirmCommands: CreateCommand[] = [
       ...savePositionCommands(pipette.id),
       ...retractPipetteAxesSequentiallyCommands(pipette),

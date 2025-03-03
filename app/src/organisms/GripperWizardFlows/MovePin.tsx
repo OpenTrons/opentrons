@@ -25,13 +25,13 @@ import calibratingFrontJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_
 import calibratingRearJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_REAR_JAW.webm'
 
 import type { ReactNode } from 'react'
-import type { Coordinates } from '@opentrons/shared-data'
+import type { Vector3D } from '@opentrons/shared-data'
 import type { CreateMaintenanceCommand } from '/app/resources/runs'
 import type { GripperWizardStepProps, MovePinStep } from './types'
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
-  setFrontJawOffset: (offset: Coordinates) => void
-  frontJawOffset: Coordinates | null
+  setFrontJawOffset: (offset: Vector3D) => void
+  frontJawOffset: Vector3D | null
   isExiting: boolean
   createRunCommand: CreateMaintenanceCommand
 }
@@ -98,7 +98,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                     setErrorMessage(data.error?.detail ?? null)
                   }
                   if (jaw === 'front' && data?.result?.jawOffset != null) {
-                    setFrontJawOffset(data.result.jawOffset as Coordinates)
+                    setFrontJawOffset(data.result.jawOffset as Vector3D)
                   }
                   createRunCommand({
                     maintenanceRunId,

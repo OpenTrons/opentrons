@@ -45,7 +45,7 @@ import type {
   RunStatus,
 } from '@opentrons/api-client'
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
-import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
+import type { Vector3D, CreateCommand } from '@opentrons/shared-data'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -242,7 +242,7 @@ export const GripperWizard = (
   const { t } = useTranslation('gripper_wizard_flows')
   const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
-  const [frontJawOffset, setFrontJawOffset] = useState<Coordinates | null>(null)
+  const [frontJawOffset, setFrontJawOffset] = useState<Vector3D | null>(null)
 
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]

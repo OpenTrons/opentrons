@@ -6,7 +6,7 @@ import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client
 import { moveRelativeCommand } from './commands'
 import { selectActivePipette } from '/app/redux/protocol-runs'
 
-import type { Coordinates } from '@opentrons/shared-data'
+import type { Vector3D } from '@opentrons/shared-data'
 import type {
   Axis,
   Jog,
@@ -46,7 +46,7 @@ export function useHandleJog({
       axis: Axis,
       dir: Sign,
       step: StepSize,
-      onSuccess?: (position: Coordinates | null) => void
+      onSuccess?: (position: Vector3D | null) => void
     ): Promise<void> => {
       return new Promise<void>((resolve, reject) => {
         if (pipetteId != null) {
@@ -58,7 +58,7 @@ export function useHandleJog({
           })
             .then(data => {
               onSuccess?.(
-                (data?.data?.result?.position ?? null) as Coordinates | null
+                (data?.data?.result?.position ?? null) as Vector3D | null
               )
               resolve()
             })
@@ -98,7 +98,7 @@ export function useHandleJog({
       axis: Axis,
       dir: Sign,
       step: StepSize,
-      onSuccess?: (position: Coordinates | null) => void
+      onSuccess?: (position: Vector3D | null) => void
     ): void => {
       setJogQueue(prevQueue => {
         if (prevQueue.length < MAX_QUEUED_JOGS) {

@@ -1,9 +1,9 @@
-import type { Coordinates } from '../types'
+import type { Vector3D } from '../types'
 
 export function getVectorDifference(
-  pointA: Coordinates,
-  pointB: Coordinates
-): Coordinates {
+  pointA: Vector3D,
+  pointB: Vector3D
+): Vector3D {
   return {
     x: pointA.x - pointB.x,
     y: pointA.y - pointB.y,

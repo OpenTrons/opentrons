@@ -14,7 +14,7 @@ import type {
   VectorOffset,
 } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
-import type { Coordinates, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { Vector3D, LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LPCFlowType,
   LPCLabwareInfo,
@@ -57,7 +57,7 @@ export const selectSelectedLwInitialPosition = (
 export interface SelectOffsetsToApplyResult {
   definitionUri: string
   location: LegacyLabwareOffsetLocation
-  vector: Coordinates
+  vector: Vector3D
 }
 
 export const selectSelectedLabwareFlowType = (

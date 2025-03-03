@@ -15,7 +15,7 @@ import { BaseDeck } from '../BaseDeck'
 import type {
   LoadedLabware,
   LoadedModule,
-  Coordinates,
+  Vector3D,
   LabwareDefinition2,
   LabwareLocation,
   RobotType,
@@ -30,7 +30,7 @@ const getModulePosition = (
   deckDef: DeckDefinition,
   moduleId: string,
   loadedModules: LoadedModule[]
-): Coordinates | null => {
+): Vector3D | null => {
   const loadedModule = loadedModules.find(m => m.id === moduleId)
   if (loadedModule == null) return null
   const modSlot = deckDef.locations.addressableAreas.find(
@@ -63,7 +63,7 @@ function getLabwareCoordinates({
   location: LabwareLocation
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
-}): Coordinates | null {
+}): Vector3D | null {
   if (location === 'offDeck' || location === 'systemLocation') {
     return null
   } else if ('labwareId' in location) {

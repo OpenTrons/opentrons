@@ -2,7 +2,7 @@ import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type { AddressableAreaName } from '../../deck'
 import type { WellLocation } from './support'
 import type {
-  Coordinates,
+  Vector3D,
   MotorAxes,
   MotorAxis,
   GantryMount,
@@ -44,7 +44,7 @@ export interface MoveRelativeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveRelativeCreateCommand {
   result?: {
-    position: Coordinates
+    position: Vector3D
   }
 }
 export interface SavePositionCreateCommand extends CommonCommandCreateInfo {
@@ -56,7 +56,7 @@ export interface SavePositionRunTimeCommand
     SavePositionCreateCommand {
   result?: {
     positionId: string
-    position: Coordinates
+    position: Vector3D
   }
 }
 export interface HomeCreateCommand extends CommonCommandCreateInfo {

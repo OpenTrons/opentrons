@@ -1,5 +1,5 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
-import type { MotorAxis, Coordinates, MotorAxes } from '../../../../js/types'
+import type { MotorAxis, Vector3D, MotorAxes } from '../../../../js/types'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'
@@ -37,7 +37,7 @@ export interface MoveRelativeRunTimeCommand
   extends CommonCommandRunTimeInfo,
     MoveRelativeCreateCommand {
   result?: {
-    position: Coordinates
+    position: Vector3D
   }
 }
 export interface SavePositionCreateCommand extends CommonCommandCreateInfo {
@@ -49,7 +49,7 @@ export interface SavePositionRunTimeCommand
     SavePositionCreateCommand {
   result?: {
     positionId: string
-    position: Coordinates
+    position: Vector3D
   }
 }
 export interface HomeCreateCommand extends CommonCommandCreateInfo {

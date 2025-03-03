@@ -33,7 +33,7 @@ import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 
 import type {
   CompletedProtocolAnalysis,
-  Coordinates,
+  Vector3D,
   CreateCommand,
   DropTipCreateCommand,
   RobotType,
@@ -120,7 +120,7 @@ export const LabwarePositionCheckComponent = (
     (
       state: {
         workingOffsets: WorkingOffset[]
-        tipPickUpOffset: Coordinates | null
+        tipPickUpOffset: Vector3D | null
       },
       action: RegisterPositionAction
     ) => {
@@ -267,7 +267,7 @@ export const LabwarePositionCheckComponent = (
     axis: Axis,
     dir: Sign,
     step: StepSize,
-    onSuccess?: (position: Coordinates | null) => void
+    onSuccess?: (position: Vector3D | null) => void
   ): void => {
     const pipetteId = 'pipetteId' in currentStep ? currentStep.pipetteId : null
     if (pipetteId != null) {
@@ -281,9 +281,7 @@ export const LabwarePositionCheckComponent = (
         timeout: JOG_COMMAND_TIMEOUT,
       })
         .then(data => {
-          onSuccess?.(
-            (data?.data?.result?.position ?? null) as Coordinates | null
-          )
+          onSuccess?.((data?.data?.result?.position ?? null) as Vector3D | null)
         })
         .catch((e: Error) => {
           setFatalError(`error issuing jog command: ${e.message}`)
