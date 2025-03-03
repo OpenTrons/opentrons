@@ -332,6 +332,7 @@ class VirtualPipettingHandler(PipettingHandler):
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Virtually prepare to aspirate (no-op)."""
+        self._validate_tip_attached(pipette_id=pipette_id, command_name="aspirate")
 
     async def aspirate_in_place(
         self,
