@@ -111,9 +111,9 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             pipette_id=pipette_id,
         )
 
-        ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
-            pipette_id=pipette_id
-        )
+        ready_to_aspirate = self._state_view.pipettes.get_ready_to_aspirate(
+            pipette_id
+        ) and self._pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)
 
         current_well = None
 
