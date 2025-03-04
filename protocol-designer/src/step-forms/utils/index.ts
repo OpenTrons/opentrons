@@ -11,9 +11,9 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
-import { getCutoutIdByAddressableArea } from '../../utils'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
   AddressableAreaName,

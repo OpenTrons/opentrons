@@ -3,6 +3,7 @@ import pick from 'lodash/pick'
 import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
+  getCutoutIdByAddressableArea,
 } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
@@ -10,7 +11,6 @@ import {
   COLUMN,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { getCutoutIdByAddressableArea } from '../utils'
 import type { Channels } from '@opentrons/components'
 import type {
   AddressableAreaName,
