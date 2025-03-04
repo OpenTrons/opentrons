@@ -4,7 +4,6 @@ import round from 'lodash/round'
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   COLORS,
   DeckFromLayers,
   DIRECTION_COLUMN,
@@ -32,7 +31,6 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { SlotDetailsContainer } from '../../../organisms'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupDetails } from './DeckSetupDetails'
@@ -43,6 +41,7 @@ import {
   useDeckSetupWindowBreakPoint,
   zoomInOnCoordinate,
 } from './utils'
+import { HoverSlotDetailsContainer } from './HoverSlotDetailsContainer'
 
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
@@ -74,24 +73,6 @@ const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
 ]
 export const lightFill = COLORS.grey35
 export const darkFill = COLORS.grey60
-const LEFT_SLOTS = [
-  'A1',
-  'A2',
-  'B1',
-  'B2',
-  'C1',
-  'C2',
-  'D1',
-  'D2',
-  '1',
-  '2',
-  '4',
-  '5',
-  '7',
-  '8',
-  '10',
-  '11',
-]
 
 export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   const { tab } = props
@@ -234,6 +215,8 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
         height="100%"
         flexDirection={DIRECTION_COLUMN}
         padding={containerPadding}
+        justifyContent={JUSTIFY_CENTER}
+        position="relative"
       >
         <Flex
           width="100%"
@@ -242,21 +225,21 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
           justifyContent={JUSTIFY_CENTER}
           gridGap={SPACING.spacing12}
         >
-          {zoomIn.slot == null && tab === 'startingDeck' ? (
-            <Box width="20%">
-              {hoverSlot != null &&
-              breakPointSize !== 'small' &&
-              LEFT_SLOTS.includes(hoverSlot) ? (
-                <SlotDetailsContainer robotType={robotType} slot={hoverSlot} />
-              ) : null}
-            </Box>
-          ) : null}
           <Flex
-            width="100%"
+            width={robotType === OT2_ROBOT_TYPE ? '78.5%' : '65%'}
             height="100%"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
+            position="relative"
           >
+            {/* Overlay Slot Details Container */}
+            {hoverSlot !== null && breakPointSize !== 'small' ? (
+              <HoverSlotDetailsContainer
+                hoverSlot={hoverSlot}
+                robotType={robotType}
+              />
+            ) : null}
+
             <RobotCoordinateSpaceWithRef
               height="100%"
               width={
@@ -398,34 +381,25 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
               )}
             </RobotCoordinateSpaceWithRef>
           </Flex>
-          {zoomIn.slot == null && tab === 'startingDeck' ? (
-            <Box width="20%">
-              {hoverSlot != null &&
-              breakPointSize !== 'small' &&
-              !LEFT_SLOTS.includes(hoverSlot) ? (
-                <SlotDetailsContainer robotType={robotType} slot={hoverSlot} />
-              ) : null}
-            </Box>
-          ) : null}
         </Flex>
+        {zoomIn.slot != null && zoomIn.cutout != null ? (
+          <DeckSetupTools
+            onDeckProps={{
+              setHoveredFixture,
+              setHoveredModule,
+            }}
+            onCloseClick={() => {
+              dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
+              animateZoom({
+                targetViewBox: initialViewBox,
+                viewBox,
+                setViewBox,
+              })
+            }}
+            setHoveredLabware={setHoveredLabware}
+          />
+        ) : null}
       </Flex>
-      {zoomIn.slot != null && zoomIn.cutout != null ? (
-        <DeckSetupTools
-          onDeckProps={{
-            setHoveredFixture,
-            setHoveredModule,
-          }}
-          onCloseClick={() => {
-            dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
-            animateZoom({
-              targetViewBox: initialViewBox,
-              viewBox,
-              setViewBox,
-            })
-          }}
-          setHoveredLabware={setHoveredLabware}
-        />
-      ) : null}
     </>
   )
 }
