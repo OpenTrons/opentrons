@@ -863,7 +863,7 @@ class StateUpdate:
         )
         return self
 
-    def set_pipette_ready_to_aspireate(
+    def set_pipette_ready_to_aspirate(
         self, pipette_id: str, ready_to_aspirate: bool
     ) -> Self:
         """Set the ready to aspirate state for a pipette."""

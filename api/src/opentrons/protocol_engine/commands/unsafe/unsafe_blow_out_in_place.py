@@ -69,7 +69,7 @@ class UnsafeBlowOutInPlaceImplementation(
         )
         state_update = update_types.StateUpdate()
         state_update.set_fluid_empty(pipette_id=params.pipetteId)
-        state_update.set_pipette_ready_to_aspireate(
+        state_update.set_pipette_ready_to_aspirate(
             pipette_id=params.pipetteId, ready_to_aspirate=False
         )
         return SuccessData(
