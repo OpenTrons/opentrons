@@ -12,6 +12,7 @@ export const engageMagnet: CommandCreator<EngageMagnetParams> = (
   prevRobotState
 ) => {
   const { moduleId, height } = args
+  const { moduleEntities } = invariantContext
   const commandType = 'magneticModule/engage'
 
   if (moduleId === null) {
@@ -21,9 +22,12 @@ export const engageMagnet: CommandCreator<EngageMagnetParams> = (
   }
 
   assert(
-    invariantContext.moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
-    `expected module ${moduleId} to be magdeck, got ${invariantContext.moduleEntities[moduleId]?.type}`
+    moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
+    `expected module ${moduleId} to be magdeck, got ${moduleEntities[moduleId]?.type}`
   )
+
+  const pythonName = moduleEntities[moduleId].pythonName
+
   return {
     commands: [
       {
@@ -35,5 +39,6 @@ export const engageMagnet: CommandCreator<EngageMagnetParams> = (
         },
       },
     ],
+    python: `${pythonName}.engage(height_from_base=${height})`,
   }
 }
