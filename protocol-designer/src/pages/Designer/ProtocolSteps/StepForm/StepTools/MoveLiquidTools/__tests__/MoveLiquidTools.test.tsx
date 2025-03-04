@@ -1,10 +1,12 @@
 import { describe, it, beforeEach, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 
+import { getEnableLiquidClasses } from '../../../../../../../feature-flags/selectors'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
 
 import { FirstStepMoveLiquidTools } from '../FirstStepMoveLiquidTools'
 import { SecondStepsMoveLiquidTools } from '../SecondStepsMoveLiquidTools'
+import { LiquidClassesStepMoveLiquidTools } from '../LiquidClassesStepMoveLiquidTools'
 
 import { MoveLiquidTools } from '../'
 
@@ -12,9 +14,13 @@ import type { ComponentProps } from 'react'
 import type { FieldPropsByName } from '../../../types'
 import type { FormData } from '../../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../../steplist'
+import { getLiquidEntities } from '../../../../../../../step-forms/selectors'
 
+vi.mock('../../../../../../../feature-flags/selectors')
+vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../FirstStepMoveLiquidTools')
 vi.mock('../SecondStepsMoveLiquidTools')
+vi.mock('../LiquidClassesStepMoveLiquidTools')
 
 const render = (props: ComponentProps<typeof MoveLiquidTools>) => {
   return renderWithProviders(<MoveLiquidTools {...props} />)
@@ -34,9 +40,14 @@ describe('MoveLiquidTools', () => {
       focusHandlers: {} as any,
       showFormErrors: false,
     }
+    vi.mocked(getEnableLiquidClasses).mockReturnValue(false)
+    vi.mocked(getLiquidEntities).mockReturnValue({})
 
     vi.mocked(FirstStepMoveLiquidTools).mockReturnValue(
       <div>mock FirstStepMoveLiquidTools</div>
+    )
+    vi.mocked(LiquidClassesStepMoveLiquidTools).mockReturnValue(
+      <div>mock LiquidClassesStepMoveLiquidTools</div>
     )
     vi.mocked(SecondStepsMoveLiquidTools).mockReturnValue(
       <div>mock SecondStepsMoveLiquidTools</div>
@@ -52,5 +63,12 @@ describe('MoveLiquidTools', () => {
     props.toolboxStep = 1
     render(props)
     screen.getByText('mock SecondStepsMoveLiquidTools')
+  })
+
+  it('renders LiquidClassesStepMoveLiquidTools when feature flag is on', () => {
+    vi.mocked(getEnableLiquidClasses).mockReturnValue(true)
+    props.toolboxStep = 1
+    render(props)
+    screen.getByText('mock LiquidClassesStepMoveLiquidTools')
   })
 })

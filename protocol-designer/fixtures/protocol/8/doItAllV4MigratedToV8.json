@@ -232,6 +232,7 @@
           "disposalVolume_volume": "20",
           "dropTip_location": "20fc9833-0363-4216-85ae-d0ec0e658beb:trashBin",
           "liquidClassesSupported": false,
+          "transfer_liquid_classes_setting": null,
           "nozzles": null,
           "path": "single",
           "pipette": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
