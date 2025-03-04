@@ -154,9 +154,9 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
             current_volume = (
                 self._state_view.pipettes.get_aspirated_volume(params.pipetteId) or 0.0
             )
-            auto_blowout = numpy.isclose(current_volume - params.volume, 0)
+            auto_pushout = numpy.isclose(current_volume - params.volume, 0)
             ready = (
-                params.pushOut == 0 if params.pushOut is not None else not auto_blowout
+                params.pushOut == 0 if params.pushOut is not None else not auto_pushout
             )
             return SuccessData(
                 public=DispenseResult(
