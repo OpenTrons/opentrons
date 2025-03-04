@@ -14,7 +14,7 @@
   },
   "overlay": {
     "slot": {
-      "drag_to_new_slot": "Drag To New Slot",
+      "drag_to_new_slot": "Drag to new slot",
       "place_here": "Place here",
       "swap_labware": "Swap labware"
     }
