@@ -835,7 +835,7 @@ class PipetteView:
         """Get the plunger position provided for the given pipette id."""
         return self.get_config(pipette_id).plunger_positions[position_name]
 
-    def get_ready_to_aspirate(self, pipette_id: str) -> float:
+    def get_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get if the provided pipette is ready to aspirate for the given pipette id."""
         try:
             return self._state.ready_to_aspirate_by_id[pipette_id]
