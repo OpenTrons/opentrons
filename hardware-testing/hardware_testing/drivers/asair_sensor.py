@@ -98,7 +98,7 @@ def BuildAsairSensor(
                     ui.print_info(f"Trying to connect to env sensor on port {port}")
                     sensor = AsairSensor.connect(port)
                     ser_id = sensor.get_serial()
-                    if len(ser_id) > 1:
+                    if len(ser_id) == 8:
                         ui.print_info(f"Found env sensor {ser_id} on port {port}")
                         return sensor
                 except:  # noqa: E722
@@ -156,7 +156,7 @@ class AsairSensor(AsairSensorBase):
             )
             raise SerialException(error_msg)
 
-    def get_reading(self) -> Reading:
+    def get_reading(self, retries: int = 5) -> Reading:
         """Get a reading."""
         data_packet = "{}0300000002{}".format(
             self._sensor_address, crc_reading[self._sensor_address]
@@ -184,10 +184,14 @@ class AsairSensor(AsairSensorBase):
 
         except (IndexError, ValueError) as e:
             log.exception("Bad value read")
+            if retries > 0:
+                return self.get_reading(retries=retries - 1)
             raise AsairSensorError(str(e))
         except SerialException:
             log.exception("Communication error")
             error_msg = "Asair Sensor not connected. Check if port number is correct."
+            if retries > 0:
+                return self.get_reading(retries=retries - 1)
             raise AsairSensorError(error_msg)
 
     def get_serial(self) -> str:
