@@ -23,6 +23,8 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
+from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+
 from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ...disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
@@ -578,7 +580,7 @@ class LegacyInstrumentCoreSimulator(
 
     def liquid_probe_without_recovery(
         self, well_core: WellCore, loc: types.Location
-    ) -> float:
+    ) -> LiquidTrackingType:
         """This will never be called because it was added in API 2.20."""
         assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"
 

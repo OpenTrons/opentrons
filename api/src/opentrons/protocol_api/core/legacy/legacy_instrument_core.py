@@ -22,6 +22,8 @@ from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api._liquid import LiquidClass
 
+from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+
 from ...disposal_locations import TrashBin, WasteChute
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
@@ -686,7 +688,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
 
     def liquid_probe_without_recovery(
         self, well_core: WellCore, loc: types.Location
-    ) -> float:
+    ) -> LiquidTrackingType:
         """This will never be called because it was added in API 2.20."""
         assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"
 

@@ -770,7 +770,11 @@ def absolute_point_from_position_reference_and_offset(
         case PositionReference.WELL_CENTER:
             reference_point = well.get_center()
         case PositionReference.LIQUID_MENISCUS:
-            reference_point = well.get_meniscus()
+            meniscus_point = well.get_meniscus()
+            if not isinstance(meniscus_point, Point):
+                reference_point = well.get_center()
+            else:
+                reference_point = meniscus_point
         case _:
             raise ValueError(f"Unknown position reference {position_reference}")
     return reference_point + Point(offset.x, offset.y, offset.z)

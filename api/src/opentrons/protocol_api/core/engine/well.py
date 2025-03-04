@@ -1,13 +1,18 @@
 """ProtocolEngine-based Well core implementations."""
-from typing import Optional
+from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
+
+from opentrons.types import Point
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.util import UnsupportedAPIError
-from opentrons.types import Point
+from opentrons.protocol_engine.types.liquid_level_detection import (
+    SimulatedProbeResult,
+    LiquidTrackingType,
+)
 
 from . import point_calculations
 from . import stringify
@@ -135,9 +140,13 @@ class WellCore(AbstractWellCore):
             well_location=WellLocation(origin=WellOrigin.CENTER),
         )
 
-    def get_meniscus(self) -> Point:
+    def get_meniscus(self) -> Union[Point, SimulatedProbeResult]:
         """Get the coordinate of the well's meniscus."""
-        return self.get_bottom(self.current_liquid_height())
+        current_liquid_height = self.current_liquid_height()
+        if isinstance(current_liquid_height, float):
+            return self.get_bottom(z_offset=current_liquid_height)
+        else:
+            return current_liquid_height
 
     def load_liquid(
         self,
@@ -173,7 +182,7 @@ class WellCore(AbstractWellCore):
     def estimate_liquid_height_after_pipetting(
         self,
         operation_volume: float,
-    ) -> float:
+    ) -> LiquidTrackingType:
         """Return an estimate of liquid height after pipetting without raising an error."""
         labware_id = self.labware_id
         well_name = self._name
@@ -186,7 +195,7 @@ class WellCore(AbstractWellCore):
         )
         return projected_final_height
 
-    def current_liquid_height(self) -> float:
+    def current_liquid_height(self) -> LiquidTrackingType:
         """Return the current liquid height within a well."""
         labware_id = self.labware_id
         well_name = self._name
@@ -194,7 +203,7 @@ class WellCore(AbstractWellCore):
             labware_id=labware_id, well_name=well_name
         )
 
-    def get_liquid_volume(self) -> float:
+    def get_liquid_volume(self) -> LiquidTrackingType:
         """Return the current volume in a well."""
         labware_id = self.labware_id
         well_name = self._name
