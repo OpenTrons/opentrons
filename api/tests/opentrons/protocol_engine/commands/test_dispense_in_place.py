@@ -124,6 +124,9 @@ async def test_dispense_in_place_implementation(
                     well_names=["A3", "A4"],
                     volume_added=68,
                 ),
+                ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                    pipette_id="pipette-id-abc", ready_to_aspirate=True
+                ),
             ),
         )
     else:
@@ -132,7 +135,10 @@ async def test_dispense_in_place_implementation(
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
                     pipette_id="pipette-id-abc", volume=42
-                )
+                ),
+                ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                    pipette_id="pipette-id-abc", ready_to_aspirate=True
+                ),
             ),
         )
 

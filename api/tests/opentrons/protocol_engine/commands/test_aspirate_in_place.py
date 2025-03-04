@@ -124,6 +124,9 @@ async def test_aspirate_in_place_implementation(
     ).then_return(True)
 
     decoy.when(
+        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
+    ).then_return(True)
+    decoy.when(
         await pipetting.aspirate_in_place(
             pipette_id="pipette-id-abc",
             volume=123,
@@ -191,6 +194,9 @@ async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
         )
     ).then_return(False)
 
+    decoy.when(
+        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
+    ).then_return(False)
     with pytest.raises(
         PipetteNotReadyToAspirateError,
         match="Pipette cannot aspirate in place because of a previous blow out."
@@ -204,6 +210,7 @@ async def test_aspirate_raises_volume_error(
     decoy: Decoy,
     pipetting: PipettingHandler,
     subject: AspirateInPlaceImplementation,
+    state_store: StateStore,
     mock_command_note_adder: CommandNoteAdder,
     gantry_mover: GantryMover,
 ) -> None:
@@ -215,6 +222,7 @@ async def test_aspirate_raises_volume_error(
     )
     decoy.when(await gantry_mover.get_position("abc")).then_return(Point(x=1, y=2, z=3))
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
+    decoy.when(state_store.pipettes.get_ready_to_aspirate("abc")).then_return(True)
 
     decoy.when(
         await pipetting.aspirate_in_place(
@@ -288,6 +296,7 @@ async def test_overpressure_error(
         True
     )
 
+    decoy.when(state_store.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
     decoy.when(
         await pipetting.aspirate_in_place(
             pipette_id=pipette_id,

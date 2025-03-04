@@ -145,6 +145,10 @@ class DispenseWhileTrackingImplementation(
             else:
                 return dispense_result
         else:
+            ready = params.pushOut is None or params.pushOut == 0
+            dispense_result.state_update.set_pipette_ready_to_aspireate(
+                pipette_id=params.pipetteId, ready_to_aspirate=ready
+            )
             if (
                 isinstance(current_location, CurrentWell)
                 and current_location.pipette_id == params.pipetteId

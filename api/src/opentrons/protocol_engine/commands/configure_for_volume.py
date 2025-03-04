@@ -74,6 +74,9 @@ class ConfigureForVolumeImplementation(
             config=pipette_result.static_config,
             serial_number=pipette_result.serial_number,
         )
+        state_update.set_pipette_ready_to_aspireate(
+            pipette_result.pipette_id, ready_to_aspirate=False
+        )
 
         return SuccessData(
             public=ConfigureForVolumeResult(),

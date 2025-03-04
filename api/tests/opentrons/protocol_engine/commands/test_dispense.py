@@ -133,6 +133,9 @@ async def test_dispense_implementation(
             pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
                 pipette_id="pipette-id-abc123", volume=42
             ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id-abc123", ready_to_aspirate=True
+            ),
         ),
     )
 

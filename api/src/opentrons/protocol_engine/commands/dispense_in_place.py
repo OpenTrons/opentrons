@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union, Any
 from typing_extensions import Literal
+import numpy
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
 
@@ -119,6 +120,17 @@ class DispenseInPlaceImplementation(
             else:
                 return result
         else:
+            # The current volume won't be none since it passed validation
+            current_volume = (
+                self._state_view.pipettes.get_aspirated_volume(params.pipetteId) or 0.0
+            )
+            auto_blowout = numpy.isclose(current_volume - params.volume, 0)
+            ready = (
+                params.pushOut == 0 if params.pushOut is not None else not auto_blowout
+            )
+            result.state_update.set_pipette_ready_to_aspireate(
+                pipette_id=params.pipetteId, ready_to_aspirate=ready
+            )
             if (
                 isinstance(current_location, CurrentWell)
                 and current_location.pipette_id == params.pipetteId

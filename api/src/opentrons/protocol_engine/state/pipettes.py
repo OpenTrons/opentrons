@@ -125,6 +125,7 @@ class PipetteState:
     flow_rates_by_id: Dict[str, FlowRates]
     nozzle_configuration_by_id: Dict[str, NozzleMap]
     liquid_presence_detection_by_id: Dict[str, bool]
+    ready_to_aspirate_by_id: Dict[str, bool]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -145,6 +146,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             flow_rates_by_id={},
             nozzle_configuration_by_id={},
             liquid_presence_detection_by_id={},
+            ready_to_aspirate_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -156,6 +158,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._update_pipette_nozzle_map(state_update)
             self._update_tip_state(state_update)
             self._update_volumes(state_update)
+            self._update_ready_for_aspirate(state_update)
 
         if isinstance(action, SetPipetteMovementSpeedAction):
             self._state.movement_speed_by_id[action.pipette_id] = action.speed
@@ -174,6 +177,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
             self._state.movement_speed_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
+            self._state.ready_to_aspirate_by_id[pipette_id] = False
 
     def _update_tip_state(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_tip_state != update_types.NO_CHANGE:
@@ -313,6 +317,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.nozzle_configuration_by_id[
                 state_update.pipette_nozzle_map.pipette_id
             ] = state_update.pipette_nozzle_map.nozzle_map
+
+    def _update_ready_for_aspirate(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
+        if state_update.ready_to_aspirate != update_types.NO_CHANGE:
+            self._state.ready_to_aspirate_by_id[
+                state_update.ready_to_aspirate.pipette_id
+            ] = state_update.ready_to_aspirate.ready_to_aspirate
 
     def _update_volumes(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_aspirated_fluid == update_types.NO_CHANGE:
@@ -822,3 +834,12 @@ class PipetteView:
     ) -> float:
         """Get the plunger position provided for the given pipette id."""
         return self.get_config(pipette_id).plunger_positions[position_name]
+
+    def get_ready_to_aspirate(self, pipette_id: str) -> float:
+        """Get if the provided pipette is ready to aspirate for the given pipette id."""
+        try:
+            return self._state.ready_to_aspirate_by_id[pipette_id]
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to determine if pipette ready to aspirate."
+            ) from e

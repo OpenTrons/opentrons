@@ -83,8 +83,8 @@ class AspirateInPlaceImplementation(
             PipetteNotReadyToAspirateError: pipette plunger is not ready.
         """
         ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
-            pipette_id=params.pipetteId,
-        )
+            pipette_id=params.pipetteId
+        ) and self._state_view.pipettes.get_ready_to_aspirate(params.pipetteId)
         if not ready_to_aspirate:
             raise PipetteNotReadyToAspirateError(
                 "Pipette cannot aspirate in place because of a previous blow out."
