@@ -5792,7 +5792,7 @@
         }
       },
       "result": {
-        "liquidClassId": "3f7cb75e-17de-4db2-868b-16b8e24fe4a6"
+        "liquidClassId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -5806,9 +5806,9 @@
       "notes": [],
       "params": {
         "labwareIds": [
-          "aa2de81a-a1d0-4be1-8efa-c63c81dcd06a",
-          "b773c4b1-305e-4b17-96c3-8dc34ae49dfb",
-          "ef0d6e06-0387-4fde-938d-76aa16af6ecd"
+          "UUID",
+          "UUID",
+          "UUID"
         ],
         "pipetteId": "UUID"
       },
@@ -6603,7 +6603,7 @@
         }
       },
       "result": {
-        "liquidClassId": "f24f85fc-3ca0-426a-8f83-9886d0c695e6"
+        "liquidClassId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -6617,9 +6617,9 @@
       "notes": [],
       "params": {
         "labwareIds": [
-          "aa2de81a-a1d0-4be1-8efa-c63c81dcd06a",
-          "b773c4b1-305e-4b17-96c3-8dc34ae49dfb",
-          "ef0d6e06-0387-4fde-938d-76aa16af6ecd"
+          "UUID",
+          "UUID",
+          "UUID"
         ],
         "pipetteId": "UUID"
       },
@@ -7472,7 +7472,7 @@
         }
       },
       "result": {
-        "liquidClassId": "f30bec8c-9aa7-45d1-a290-02342520f6f2"
+        "liquidClassId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -7486,9 +7486,9 @@
       "notes": [],
       "params": {
         "labwareIds": [
-          "aa2de81a-a1d0-4be1-8efa-c63c81dcd06a",
-          "b773c4b1-305e-4b17-96c3-8dc34ae49dfb",
-          "ef0d6e06-0387-4fde-938d-76aa16af6ecd"
+          "UUID",
+          "UUID",
+          "UUID"
         ],
         "pipetteId": "UUID"
       },
@@ -8044,7 +8044,7 @@
           "speed": 35
         }
       },
-      "liquidClassId": "3f7cb75e-17de-4db2-868b-16b8e24fe4a6",
+      "liquidClassId": "UUID",
       "liquidClassName": "water",
       "multiDispense": {
         "conditioningByVolume": [
@@ -8355,7 +8355,7 @@
           "speed": 35
         }
       },
-      "liquidClassId": "f24f85fc-3ca0-426a-8f83-9886d0c695e6",
+      "liquidClassId": "UUID",
       "liquidClassName": "ethanol_80",
       "multiDispense": {
         "conditioningByVolume": [
@@ -8694,7 +8694,7 @@
           "speed": 4
         }
       },
-      "liquidClassId": "f30bec8c-9aa7-45d1-a290-02342520f6f2",
+      "liquidClassId": "UUID",
       "liquidClassName": "glycerol_50",
       "multiDispense": {
         "conditioningByVolume": [

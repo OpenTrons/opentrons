@@ -10832,7 +10832,7 @@
         }
       },
       "result": {
-        "liquidClassId": "4dd2c270-f9e6-4eef-85ed-b1a2145d4016"
+        "liquidClassId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -10846,13 +10846,13 @@
       "notes": [],
       "params": {
         "labwareIds": [
-          "07bf5ec9-b871-4c14-b617-0b908ac3005f",
-          "2cf9f8c5-7f39-49e9-a8b1-40bfb2753427",
-          "66a9a1f1-a6d6-446a-a41e-2bc925279770",
-          "75208d90-dc3b-4d90-b036-a41784f65fbc",
-          "777f2cc4-4e21-44f8-bacd-d7892f50d57c",
-          "786752cd-a8a5-462a-956b-185686db2629",
-          "a1f041bc-6ea9-4cbe-859b-70bbc49db606"
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID"
         ],
         "pipetteId": "UUID"
       },
@@ -12328,7 +12328,7 @@
         }
       },
       "result": {
-        "liquidClassId": "1161d4e4-3d66-4771-ac2d-cf7059a4a854"
+        "liquidClassId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12342,13 +12342,13 @@
       "notes": [],
       "params": {
         "labwareIds": [
-          "07bf5ec9-b871-4c14-b617-0b908ac3005f",
-          "2cf9f8c5-7f39-49e9-a8b1-40bfb2753427",
-          "66a9a1f1-a6d6-446a-a41e-2bc925279770",
-          "75208d90-dc3b-4d90-b036-a41784f65fbc",
-          "777f2cc4-4e21-44f8-bacd-d7892f50d57c",
-          "786752cd-a8a5-462a-956b-185686db2629",
-          "a1f041bc-6ea9-4cbe-859b-70bbc49db606"
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID"
         ],
         "pipetteId": "UUID"
       },
@@ -14016,7 +14016,7 @@
         }
       },
       "result": {
-        "liquidClassId": "5bea0d44-c161-4604-be8d-09fe7037848f"
+        "liquidClassId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -14030,13 +14030,13 @@
       "notes": [],
       "params": {
         "labwareIds": [
-          "07bf5ec9-b871-4c14-b617-0b908ac3005f",
-          "2cf9f8c5-7f39-49e9-a8b1-40bfb2753427",
-          "66a9a1f1-a6d6-446a-a41e-2bc925279770",
-          "75208d90-dc3b-4d90-b036-a41784f65fbc",
-          "777f2cc4-4e21-44f8-bacd-d7892f50d57c",
-          "786752cd-a8a5-462a-956b-185686db2629",
-          "a1f041bc-6ea9-4cbe-859b-70bbc49db606"
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID",
+          "UUID"
         ],
         "pipetteId": "UUID"
       },
@@ -16092,7 +16092,7 @@
           "speed": 35
         }
       },
-      "liquidClassId": "4dd2c270-f9e6-4eef-85ed-b1a2145d4016",
+      "liquidClassId": "UUID",
       "liquidClassName": "water",
       "multiDispense": {
         "conditioningByVolume": [
@@ -16403,7 +16403,7 @@
           "speed": 35
         }
       },
-      "liquidClassId": "1161d4e4-3d66-4771-ac2d-cf7059a4a854",
+      "liquidClassId": "UUID",
       "liquidClassName": "ethanol_80",
       "multiDispense": {
         "conditioningByVolume": [
@@ -16738,7 +16738,7 @@
           "speed": 4
         }
       },
-      "liquidClassId": "5bea0d44-c161-4604-be8d-09fe7037848f",
+      "liquidClassId": "UUID",
       "liquidClassName": "glycerol_50",
       "multiDispense": {
         "conditioningByVolume": [
