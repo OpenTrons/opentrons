@@ -98,7 +98,10 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
                 ? t('both_mounts')
                 : t('left_mount')
             }
-            subButtonLabel={leftPipetteSpecs.displayName}
+            buttonSubLabel={{
+              label: leftPipetteSpecs.displayName,
+              align: 'vertical',
+            }}
           />
         ) : null}
         {rightPipetteSpecs != null ? (
@@ -109,7 +112,10 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
             }}
             buttonValue={RIGHT}
             buttonLabel={t('right_mount')}
-            subButtonLabel={rightPipetteSpecs.displayName}
+            buttonSubLabel={{
+              label: rightPipetteSpecs.displayName,
+              align: 'vertical',
+            }}
           />
         ) : null}
       </Flex>

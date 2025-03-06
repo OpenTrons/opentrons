@@ -179,7 +179,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                   },
                 }
                 return (
-                  <ListItem type="noActive" key={ae}>
+                  <ListItem type="default" key={ae}>
                     <ListItemCustomize
                       linkText={t('remove')}
                       onClick={() => {

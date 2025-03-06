@@ -31,7 +31,7 @@ export function PipetteInfoItem(props: PipetteInfoItemProps): JSX.Element {
   const is96Channel = pipetteName === 'p1000_96'
 
   return (
-    <ListItem type="noActive">
+    <ListItem type="default">
       <Flex
         padding={SPACING.spacing12}
         justifyContent={JUSTIFY_SPACE_BETWEEN}

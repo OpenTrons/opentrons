@@ -43,7 +43,7 @@ describe('absorbanceReaderCloseRead compound command creator', () => {
           id: ABSORBANCE_READER_MODULE_ID,
           type: ABSORBANCE_READER_TYPE,
           model: ABSORBANCE_READER_V1,
-          pythonName: 'mockPythonName',
+          pythonName: 'mock_absorbance_plate_reader_1',
         },
       },
       additionalEquipmentEntities: {
@@ -79,12 +79,12 @@ describe('absorbanceReaderCloseRead compound command creator', () => {
     )
     vi.mocked(absorbanceReaderStateGetter).mockReturnValue(null)
 
-    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors).toHaveLength(2)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'MISSING_MODULE',
     })
   })
-  it.only('should emit close and read commands without fileName param', () => {
+  it('should emit close and read commands without fileName param', () => {
     vi.mocked(absorbanceReaderStateGetter).mockReturnValue({
       initialization: {},
     } as AbsorbanceReaderState)
@@ -110,8 +110,11 @@ describe('absorbanceReaderCloseRead compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_absorbance_plate_reader_1.close_lid()\nmock_absorbance_plate_reader_1.read()'
+    )
   })
-  it.only('should emit close and read commands with fileName param', () => {
+  it('should emit close and read commands with fileName param', () => {
     vi.mocked(absorbanceReaderStateGetter).mockReturnValue({
       initialization: {},
     } as AbsorbanceReaderState)
@@ -142,5 +145,8 @@ describe('absorbanceReaderCloseRead compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `mock_absorbance_plate_reader_1.close_lid()\nmock_absorbance_plate_reader_1.read(export_filename="${ABSORBANCE_READER_OUTPUT_PATH}")`
+    )
   })
 })

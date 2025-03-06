@@ -97,7 +97,7 @@ export function InstrumentsInfo({
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
+        <ListItem type="default" key={`ProtocolOverview_robotType`}>
           <ListItemDescriptor
             type="large"
             description={
@@ -119,7 +119,7 @@ export function InstrumentsInfo({
             }
           />
         </ListItem>
-        <ListItem type="noActive" key={`ProtocolOverview_left`}>
+        <ListItem type="default" key={`ProtocolOverview_left`}>
           <ListItemDescriptor
             type="large"
             description={
@@ -136,7 +136,7 @@ export function InstrumentsInfo({
           />
         </ListItem>
         {!has96Channel ? (
-          <ListItem type="noActive" key={`ProtocolOverview_right`}>
+          <ListItem type="default" key={`ProtocolOverview_right`}>
             <ListItemDescriptor
               type="large"
               description={
@@ -154,7 +154,7 @@ export function InstrumentsInfo({
           </ListItem>
         ) : null}
         {robotType === FLEX_ROBOT_TYPE ? (
-          <ListItem type="noActive" key={`ProtocolOverview_gripper`}>
+          <ListItem type="default" key={`ProtocolOverview_gripper`}>
             <ListItemDescriptor
               type="large"
               description={

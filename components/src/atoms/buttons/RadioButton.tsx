@@ -4,18 +4,28 @@ import { COLORS, BORDERS } from '../../helix-design-system'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import {
   ALIGN_CENTER,
+  ALIGN_START,
   CURSOR_DEFAULT,
   CURSOR_NOT_ALLOWED,
   CURSOR_POINTER,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   Icon,
+  JUSTIFY_SPACE_BETWEEN,
   StyledText,
-} from '../../index'
+} from '../..'
 
 import type { ChangeEventHandler, ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
+
+export interface RadioButtonSubLabel {
+  /* Optional subtext */
+  label: ReactNode
+  /* The alignment relative to the primary label. Defaults to horizontal if unspecified. */
+  align?: 'horizontal' | 'vertical'
+}
 
 interface RadioButtonProps extends StyleProps {
   buttonLabel: string | ReactNode
@@ -26,7 +36,6 @@ interface RadioButtonProps extends StyleProps {
   isSelected?: boolean
   largeDesktopBorderRadius?: boolean
   radioButtonType?: 'large' | 'small'
-  subButtonLabel?: string
   id?: string
   maxLines?: number
   //  used for mouseEnter and mouseLeave
@@ -34,12 +43,14 @@ interface RadioButtonProps extends StyleProps {
   setHovered?: () => void
   // TODO wire up the error state for the radio button
   error?: string | null
+  buttonSubLabel?: RadioButtonSubLabel
 }
 
 // used for ODD and helix
 export function RadioButton(props: RadioButtonProps): JSX.Element {
   const {
     buttonLabel,
+    buttonSubLabel,
     buttonValue,
     onChange,
     disabled = false,
@@ -47,7 +58,6 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     isSelected = false,
     largeDesktopBorderRadius = false,
     radioButtonType = 'large',
-    subButtonLabel,
     id = typeof buttonLabel === 'string'
       ? buttonLabel
       : `RadioButtonId_${buttonValue}`,
@@ -73,14 +83,6 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     &:active {
       background-color: ${disabled ? COLORS.grey35 : COLORS.blue60};
     }
-  `
-
-  const SUBBUTTON_LABEL_STYLE = css`
-    color: ${disabled
-      ? COLORS.grey50
-      : isSelected
-      ? COLORS.white
-      : COLORS.grey60};
   `
 
   const getButtonStyle = (
@@ -128,33 +130,47 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
               data-testid={`icon_${iconName}`}
             />
           ) : null}
-          {typeof buttonLabel === 'string' ? (
-            <StyledText
-              oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
-              desktopStyle={
-                isLarge ? 'bodyDefaultSemiBold' : 'bodyDefaultRegular'
-              }
-            >
-              {buttonLabel}
-            </StyledText>
-          ) : (
-            buttonLabel
-          )}
-        </Flex>
-        {subButtonLabel != null ? (
-          <Flex css={SUBBUTTON_LABEL_STYLE}>
-            <StyledText
-              oddStyle={isLarge ? 'level4HeaderRegular' : 'bodyTextRegular'}
-              desktopStyle="bodyDefaultRegular"
-            >
-              {subButtonLabel}
-            </StyledText>
+          <Flex css={copyContainerStyle(buttonSubLabel)}>
+            {typeof buttonLabel === 'string' ? (
+              <StyledText
+                oddStyle={isLarge ? 'level4HeaderSemiBold' : 'bodyTextRegular'}
+                desktopStyle={
+                  isLarge ? 'bodyDefaultSemiBold' : 'bodyDefaultRegular'
+                }
+              >
+                {buttonLabel}
+              </StyledText>
+            ) : (
+              buttonLabel
+            )}
+            {buttonSubLabel && (
+              <StyledText
+                color={COLORS.grey60}
+                oddStyle="bodyTextRegular"
+                desktopStyle="bodyDefaultRegular"
+              >
+                {buttonSubLabel.label}
+              </StyledText>
+            )}
           </Flex>
-        ) : null}
+        </Flex>
       </SettingButtonLabel>
     </RadioButtonWrapper>
   )
 }
+
+const copyContainerStyle = (
+  buttonSubLabel: RadioButtonSubLabel | undefined
+): FlattenSimpleInterpolation => css`
+  flex-direction: ${buttonSubLabel?.align === 'vertical'
+    ? DIRECTION_COLUMN
+    : DIRECTION_ROW};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  align-items: ${buttonSubLabel?.align === 'vertical'
+    ? ALIGN_START
+    : ALIGN_CENTER};
+  width: ${buttonSubLabel != null ? '100%' : ''};
+`
 
 const DISABLED_BUTTON_STYLE = css`
   background-color: ${COLORS.grey35};

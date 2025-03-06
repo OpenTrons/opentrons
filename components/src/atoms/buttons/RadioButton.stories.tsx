@@ -15,6 +15,18 @@ const meta: Meta<typeof RadioButtonComponent> = {
       },
       defaultValue: 'large',
     },
+    buttonSubLabel: {
+      control: 'object',
+      description:
+        'Optional subtext configuration object with text and alignment.',
+      table: {
+        type: {
+          summary: 'RadioButtonSubLabel',
+          detail:
+            '{ buttonSubLabel: string, align?: "horizontal" | "vertical" }',
+        },
+      },
+    },
   },
   parameters: VIEWPORT.touchScreenViewport,
   args: {
@@ -32,4 +44,35 @@ export const RadioButton: Story = {
     disabled: false,
     isSelected: false,
   },
+  name: 'Basic RadioButton',
+}
+
+export const RadioButtonWithHorizontalSubLabel: Story = {
+  args: {
+    buttonLabel: 'Button text',
+    buttonValue: 2,
+    disabled: false,
+    isSelected: false,
+    radioButtonType: 'large',
+    buttonSubLabel: {
+      label: 'Horizontal subtext',
+      align: 'horizontal',
+    },
+  },
+  name: 'With Horizontal Subtext',
+}
+
+export const RadioButtonWithVerticalSubLabel: Story = {
+  args: {
+    buttonLabel: 'Button text',
+    buttonValue: 3,
+    disabled: false,
+    isSelected: false,
+    radioButtonType: 'large',
+    buttonSubLabel: {
+      label: 'Vertical subtext',
+      align: 'vertical',
+    },
+  },
+  name: 'With Vertical Subtext',
 }

@@ -135,7 +135,7 @@ export function Settings(): JSX.Element {
               <ListItem
                 padding={SPACING.spacing16}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                type="noActive"
+                type="default"
               >
                 <Flex flexDirection={DIRECTION_COLUMN}>
                   <StyledText desktopStyle="bodyDefaultSemiBold">
@@ -181,7 +181,7 @@ export function Settings(): JSX.Element {
               <ListItem
                 padding={SPACING.spacing16}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                type="noActive"
+                type="default"
               >
                 <Flex flexDirection={DIRECTION_COLUMN}>
                   <StyledText desktopStyle="bodyDefaultSemiBold">
@@ -216,7 +216,7 @@ export function Settings(): JSX.Element {
                   key={flag}
                   padding={SPACING.spacing16}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  type="noActive"
+                  type="default"
                   alignItems={ALIGN_CENTER}
                 >
                   <Flex flexDirection={DIRECTION_COLUMN}>
@@ -248,7 +248,7 @@ export function Settings(): JSX.Element {
               <ListItem
                 padding={SPACING.spacing16}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
-                type="noActive"
+                type="default"
                 gridGap={SPACING.spacing40}
               >
                 <Flex flexDirection={DIRECTION_COLUMN}>
@@ -311,7 +311,7 @@ export function Settings(): JSX.Element {
                 {t('shared:developer_ff')}
               </StyledText>
               <ListItem
-                type="noActive"
+                type="default"
                 padding={SPACING.spacing16}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 flexDirection={DIRECTION_COLUMN}

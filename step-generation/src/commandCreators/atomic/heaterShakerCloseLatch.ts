@@ -6,6 +6,7 @@ export const heaterShakerCloseLatch: CommandCreator<ModuleOnlyParams> = (
   invariantContext,
   prevRobotState
 ) => {
+  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
   return {
     commands: [
       {
@@ -16,5 +17,6 @@ export const heaterShakerCloseLatch: CommandCreator<ModuleOnlyParams> = (
         },
       },
     ],
+    python: `${pythonName}.close_labware_latch()`,
   }
 }

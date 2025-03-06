@@ -213,7 +213,7 @@ export function PipetteOverview({
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
             {gripper != null ? (
-              <ListItem type="noActive">
+              <ListItem type="default">
                 <Flex
                   padding={SPACING.spacing12}
                   justifyContent={JUSTIFY_SPACE_BETWEEN}

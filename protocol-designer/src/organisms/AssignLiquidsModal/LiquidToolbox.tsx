@@ -292,7 +292,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                   flexDirection={DIRECTION_COLUMN}
                   gridGap={SPACING.spacing8}
                 >
-                  <ListItem type={showBadFormState ? 'error' : 'noActive'}>
+                  <ListItem type={showBadFormState ? 'error' : 'default'}>
                     <Flex
                       padding={SPACING.spacing12}
                       gridGap={SPACING.spacing12}

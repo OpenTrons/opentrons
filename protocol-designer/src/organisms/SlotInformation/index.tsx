@@ -78,7 +78,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         {liquids.length > 1 ? (
-          <ListItem type="noActive" width="max-content">
+          <ListItem type="default" width="max-content">
             <ListItemDescriptor
               changeFlexDirection={
                 breakPointSize === 'medium' &&
@@ -157,7 +157,7 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
   const pathLocation = useLocation()
 
   return (
-    <ListItem type="noActive">
+    <ListItem type="default">
       <ListItemDescriptor
         changeFlexDirection={
           breakPointSize === 'medium' && pathLocation.pathname === '/designer'

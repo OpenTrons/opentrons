@@ -28,7 +28,7 @@ describe('absorbanceReaderOpenLid', () => {
       id: moduleId,
       type: ABSORBANCE_READER_TYPE,
       model: ABSORBANCE_READER_V1,
-      pythonName: 'mockPythonName',
+      pythonName: 'mock_absorbance_plate_reader_1',
     }
     invariantContext.additionalEquipmentEntities = {
       gripperId: {
@@ -68,6 +68,7 @@ describe('absorbanceReaderOpenLid', () => {
           },
         },
       ],
+      python: 'mock_absorbance_plate_reader_1.open_lid()',
     })
   })
   it('creates returns error if bad module state', () => {

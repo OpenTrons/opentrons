@@ -195,7 +195,7 @@ function IntializationEditor(props: InitializationEditorProps): JSX.Element {
     const wavelength = i <= wavelengths.length ? wavelengths[i] : null
     wavelengthItems.push(
       <ListItem
-        type="noActive"
+        type="default"
         padding={SPACING.spacing12}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}

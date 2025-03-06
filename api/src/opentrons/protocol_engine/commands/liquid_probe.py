@@ -23,6 +23,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 
 from ..types import DeckPoint
+from ..types.liquid_level_detection import LiquidTrackingType
 from .pipetting_common import (
     LiquidNotFoundError,
     PipetteIdMixin,
@@ -80,7 +81,7 @@ class TryLiquidProbeParams(_CommonParams):
 class LiquidProbeResult(DestinationPositionResult):
     """Result data from the execution of a `liquidProbe` command."""
 
-    z_position: float = Field(
+    z_position: LiquidTrackingType = Field(
         ..., description="The Z coordinate, in mm, of the found liquid in deck space."
     )
     # New fields should use camelCase. z_position is snake_case for historical reasons.
@@ -89,7 +90,7 @@ class LiquidProbeResult(DestinationPositionResult):
 class TryLiquidProbeResult(DestinationPositionResult):
     """Result data from the execution of a `tryLiquidProbe` command."""
 
-    z_position: float | SkipJsonSchema[None] = Field(
+    z_position: Union[LiquidTrackingType, SkipJsonSchema[None]] = Field(
         ...,
         description=(
             "The Z coordinate, in mm, of the found liquid in deck space."
@@ -116,8 +117,7 @@ class _ExecuteCommonResult(NamedTuple):
     # If the probe succeeded, the z_pos that it returned.
     # Or, if the probe found no liquid, the error representing that,
     # so calling code can propagate those details up.
-    z_pos_or_error: float | PipetteLiquidNotFoundError | PipetteOverpressureError
-
+    z_pos_or_error: LiquidTrackingType | PipetteLiquidNotFoundError | PipetteOverpressureError
     state_update: update_types.StateUpdate
     deck_point: DeckPoint
 
@@ -303,12 +303,13 @@ class LiquidProbeImplementation(
             )
         else:
             try:
-                well_volume: float | update_types.ClearType = (
-                    self._state_view.geometry.get_well_volume_at_height(
-                        labware_id=params.labwareId,
-                        well_name=params.wellName,
-                        height=z_pos_or_error,
-                    )
+                well_volume: Union[
+                    LiquidTrackingType,
+                    update_types.ClearType,
+                ] = self._state_view.geometry.get_well_volume_at_height(
+                    labware_id=params.labwareId,
+                    well_name=params.wellName,
+                    height=z_pos_or_error,
                 )
             except IncompleteLabwareDefinitionError:
                 well_volume = update_types.CLEAR
@@ -370,7 +371,10 @@ class TryLiquidProbeImplementation(
             z_pos_or_error, (PipetteLiquidNotFoundError, PipetteOverpressureError)
         ):
             z_pos = None
-            well_volume: float | update_types.ClearType = update_types.CLEAR
+            well_volume: Union[
+                LiquidTrackingType,
+                update_types.ClearType,
+            ] = update_types.CLEAR
         else:
             z_pos = z_pos_or_error
             try:
@@ -387,7 +391,6 @@ class TryLiquidProbeImplementation(
             volume=well_volume,
             last_probed=self._model_utils.get_timestamp(),
         )
-
         return SuccessData(
             public=TryLiquidProbeResult(
                 z_position=z_pos,

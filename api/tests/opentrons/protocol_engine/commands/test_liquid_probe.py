@@ -33,6 +33,7 @@ from opentrons.protocol_engine.state.pipettes import (
 from opentrons.protocol_engine.state import update_types
 from opentrons.types import MountType, Point
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
+from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
 from opentrons.protocol_engine.commands.liquid_probe import (
     LiquidProbeParams,
@@ -51,6 +52,7 @@ from opentrons.protocol_engine.execution import (
     PipettingHandler,
     GantryMover,
 )
+from opentrons.protocol_engine.execution.pipetting import VirtualPipettingHandler
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 from ..pipette_fixtures import get_default_nozzle_map
@@ -119,6 +121,24 @@ def subject(
         gantry_mover=gantry_mover,
         model_utils=model_utils,
     )
+
+
+async def test_virtual_liquid_probe(
+    decoy: Decoy,
+) -> None:
+    """Check that VirtualPipettingHandler::liquid_probe_in_place returns a SimulatedProbeResult."""
+    mock_state_view = decoy.mock(cls=StateView)
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    location = WellLocation(origin=WellOrigin.BOTTOM, offset=WellOffset(x=0, y=0, z=1))
+
+    liquid_probe_result = await subject.liquid_probe_in_place(
+        pipette_id="abc",
+        labware_id="123",
+        well_name="A3",
+        well_location=location,
+    )
+    assert isinstance(liquid_probe_result, SimulatedProbeResult)
 
 
 async def test_liquid_probe_implementation(

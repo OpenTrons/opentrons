@@ -94,7 +94,7 @@ export function MaterialsListModal({
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               {fixtures.length > 0
                 ? fixtures.map(fixture => (
-                    <ListItem type="noActive" key={fixture.id}>
+                    <ListItem type="default" key={fixture.id}>
                       <ListItemDescriptor
                         type="large"
                         description={
@@ -131,7 +131,7 @@ export function MaterialsListModal({
                     return slot.replace('cutout', '')
                   }
                   return (
-                    <ListItem type="noActive" key={`hardware${id}`}>
+                    <ListItem type="default" key={`hardware${id}`}>
                       <ListItemDescriptor
                         type="large"
                         description={
@@ -194,7 +194,7 @@ export function MaterialsListModal({
                     deckLabelSlot = 'Off-deck'
                   }
                   return (
-                    <ListItem type="noActive" key={`labware_${lw.id}`}>
+                    <ListItem type="default" key={`labware_${lw.id}`}>
                       <ListItemDescriptor
                         type="large"
                         description={
@@ -260,7 +260,7 @@ export function MaterialsListModal({
                       return null
                     } else {
                       return (
-                        <ListItem type="noActive" key={`liquid_${id}`}>
+                        <ListItem type="default" key={`liquid_${id}`}>
                           <ListItemDescriptor
                             type="large"
                             description={

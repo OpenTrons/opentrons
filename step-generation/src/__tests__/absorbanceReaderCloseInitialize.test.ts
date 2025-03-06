@@ -43,7 +43,7 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
           id: ABSORBANCE_READER_MODULE_ID,
           type: ABSORBANCE_READER_TYPE,
           model: ABSORBANCE_READER_V1,
-          pythonName: 'mockPythonName',
+          pythonName: 'mock_absorbance_plate_reader_1',
         },
       },
       additionalEquipmentEntities: {
@@ -90,7 +90,7 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
     )
 
     const result = absorbanceReaderCloseInitialize(
-      absorbanceReaderCloseInitializeArgs,
+      { ...absorbanceReaderCloseInitializeArgs, referenceWavelength: 450 },
       invariantContext,
       robotState
     )
@@ -110,9 +110,15 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
           moduleId: 'absorbanceReaderModuleId',
           sampleWavelengths: [450],
           measureMode: 'single',
+          referenceWavelength: 450,
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_absorbance_plate_reader_1.close_lid()
+mock_absorbance_plate_reader_1.initialize("single", [450], reference_wavelength=450)`.trimStart()
+    )
   })
   it('should emit close and intalize commands if multi mode', () => {
     absorbanceReaderCloseInitializeArgs = {
@@ -148,5 +154,10 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_absorbance_plate_reader_1.close_lid()
+mock_absorbance_plate_reader_1.initialize("multi", [450, 600])`.trimStart()
+    )
   })
 })

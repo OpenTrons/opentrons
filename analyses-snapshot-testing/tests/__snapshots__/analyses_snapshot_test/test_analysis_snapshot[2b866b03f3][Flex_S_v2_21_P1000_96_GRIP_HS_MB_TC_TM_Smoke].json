@@ -11165,7 +11165,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11358,7 +11358,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11458,7 +11458,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11886,7 +11886,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12468,7 +12468,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12657,7 +12657,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12846,7 +12846,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12946,7 +12946,7 @@
           "y": 181.24,
           "z": 18.0
         },
-        "z_position": 14.95
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -13513,7 +13513,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -13751,7 +13751,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -13851,7 +13851,7 @@
           "y": 181.24,
           "z": 18.0
         },
-        "z_position": 14.95
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

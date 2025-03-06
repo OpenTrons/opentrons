@@ -61,7 +61,7 @@ export function ProtocolMetadata({
           const [title, value] = Object.entries(info)[0]
 
           return (
-            <ListItem type="noActive" key={`ProtocolOverview_${title}`}>
+            <ListItem type="default" key={`ProtocolOverview_${title}`}>
               <ListItemDescriptor
                 type="large"
                 description={
@@ -86,7 +86,7 @@ export function ProtocolMetadata({
             </ListItem>
           )
         })}
-        <ListItem type="noActive" key="ProtocolOverview_robotVersion">
+        <ListItem type="default" key="ProtocolOverview_robotVersion">
           <ListItemDescriptor
             type="large"
             description={

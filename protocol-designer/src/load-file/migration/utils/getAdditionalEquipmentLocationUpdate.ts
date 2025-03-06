@@ -5,9 +5,12 @@ import {
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS, uuid } from '@opentrons/step-generation'
+import {
+  COLUMN_4_SLOTS,
+  uuid,
+  getCutoutIdByAddressableArea,
+} from '@opentrons/step-generation'
 import { getUnoccupiedSlotForTrash } from '../../../step-forms'
-import { getCutoutIdByAddressableArea } from '../../../utils'
 import { GRIPPER_LOCATION } from '../../../constants'
 import type {
   AddressableAreaName,

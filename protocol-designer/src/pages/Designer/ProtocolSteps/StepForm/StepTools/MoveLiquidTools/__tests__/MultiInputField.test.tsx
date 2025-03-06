@@ -50,7 +50,7 @@ describe('MultiInputField', () => {
     render(props)
     screen.getByText('Retract')
     screen.getByTestId('information_icon')
-    const listItem = screen.getByTestId('ListItem_noActive')
+    const listItem = screen.getByTestId('ListItem_default')
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.grey20}`)
     screen.getAllByText('mock InputStepFormField')
     expect(screen.queryByText('mock PositionField')).not.toBeInTheDocument()

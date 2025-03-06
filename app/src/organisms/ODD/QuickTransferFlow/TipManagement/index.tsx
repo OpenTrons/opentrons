@@ -77,7 +77,7 @@ export function TipManagement(props: TipManagementProps): JSX.Element | null {
       {selectedSetting == null
         ? displayItems.map(displayItem => (
             <ListItem
-              type="noActive"
+              type="default"
               key={displayItem.option}
               onClick={displayItem.onClick}
             >

@@ -431,12 +431,12 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       height="100%"
     >
       {stepSummaryContent != null ? (
-        <ListItem type="noActive">
+        <ListItem type="default">
           <Flex padding={SPACING.spacing12}>{stepSummaryContent}</Flex>
         </ListItem>
       ) : null}
       {stepDetails != null && stepDetails !== '' ? (
-        <ListItem type="noActive">
+        <ListItem type="default">
           <Flex padding={SPACING.spacing12}>
             <StyledText
               desktopStyle="bodyDefaultRegular"

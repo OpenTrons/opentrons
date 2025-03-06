@@ -117,6 +117,12 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     _height_from_volume_rectangular,
     _volume_from_height_circular,
     _volume_from_height_rectangular,
+    find_height_at_well_volume,
+    find_volume_at_well_height,
+)
+from opentrons.protocol_engine.types.liquid_level_detection import (
+    SimulatedProbeResult,
+    LiquidTrackingType,
 )
 from .inner_geometry_test_params import INNER_WELL_GEOMETRY_TEST_PARAMS
 from ..pipette_fixtures import get_default_nozzle_map
@@ -3609,6 +3615,8 @@ def test_get_well_height_at_volume(
     found_height_top = subject.get_well_height_at_volume(
         labware_id=labware_id, well_name=well_name, volume=input_volume_top
     )
+    assert isinstance(found_height_bottom, float)
+    assert isinstance(found_height_top, float)
     assert isclose(found_height_bottom, expected_height_from_bottom_mm, rel_tol=0.01)
     vol_2_expected_height_from_bottom = (
         subject.get_well_height(labware_id=labware_id, well_name=well_name)
@@ -3681,6 +3689,8 @@ def test_get_well_volume_at_height(
         well_name=well_name,
         height=vol_2_input_height_from_bottom,
     )
+    assert isinstance(found_volume_bottom, float)
+    assert isinstance(found_volume_top, float)
     assert isclose(found_volume_bottom, expected_volume_bottom, rel_tol=0.01)
     assert isclose(found_volume_top, expected_volume_top, rel_tol=0.01)
 
@@ -4089,3 +4099,49 @@ def test_get_height_of_labware_stack(
 ) -> None:
     """It should correctly calculate the height of labware stacks."""
     assert subject.get_height_of_labware_stack(definition_list) == height
+
+
+@pytest.mark.parametrize("initial_liquid_height", [5.6, SimulatedProbeResult()])
+def test_virtual_get_well_height_after_liquid_handling_no_error(
+    decoy: Decoy,
+    subject: GeometryView,
+    mock_labware_view: LabwareView,
+    initial_liquid_height: LiquidTrackingType,
+) -> None:
+    """Make sure SimulatedLiquidProbe doesn't change geometry behavior."""
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "B2")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+    operation_volume = 1000.0
+
+    result_estimate = subject.get_well_height_after_liquid_handling_no_error(
+        labware_id="labware-id",
+        well_name="B2",
+        initial_height=initial_liquid_height,
+        volume=operation_volume,
+    )
+    #  make sure that math operations involving SimulatedProbeResult return the same instance of
+    #  SimulatedProbeResult
+    if isinstance(initial_liquid_height, SimulatedProbeResult):
+        assert result_estimate == initial_liquid_height
+
+
+@pytest.mark.parametrize("target_height_volume", [5.6, SimulatedProbeResult()])
+def test_virtual_find_height_and_volume(
+    decoy: Decoy,
+    target_height_volume: LiquidTrackingType,
+) -> None:
+    """Make sure geometry math helpers return the expected liquid tracking type."""
+    height_estimate = find_height_at_well_volume(
+        target_volume=target_height_volume,
+        well_geometry=_TEST_INNER_WELL_GEOMETRY,
+    )
+
+    volume_estimate = find_volume_at_well_height(
+        target_height=target_height_volume, well_geometry=_TEST_INNER_WELL_GEOMETRY
+    )
+
+    #  make sure that math operations involving SimulatedProbeResult return the same instance of
+    #  SimulatedProbeResult
+    if isinstance(target_height_volume, SimulatedProbeResult):
+        assert height_estimate == volume_estimate == target_height_volume

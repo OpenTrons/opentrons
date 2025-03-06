@@ -117,7 +117,7 @@ export function DropdownStepFormField(
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {title}
           </StyledText>
-          <ListItem type="noActive">
+          <ListItem type="default">
             <Flex
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}

@@ -1,7 +1,7 @@
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { DIRECTION_COLUMN } from '../../styles'
 import { Flex } from '../../primitives'
-import { LegacyStyledText } from '../StyledText'
+import { StyledText } from '../StyledText'
 import { ListItemDescriptor } from './ListItemChildren/ListItemDescriptor'
 import { ListItem as ListItemComponent, ListItemCustomize } from '.'
 import exampleImage from '../../images/labware/measurement-guide/images/spacing/spacing-well-rectangular@3x.png'
@@ -15,7 +15,17 @@ const meta: Meta<typeof ListItemComponent> = {
     type: {
       control: {
         type: 'select',
-        options: ['error', 'noActive', 'success', 'warning'],
+        options: [
+          'error',
+          'default',
+          'success',
+          'warning',
+          'unavailable',
+          'defaultOnColor',
+          'successOnColor',
+          'warningOnColor',
+          'errorOnColor',
+        ],
       },
     },
   },
@@ -28,18 +38,18 @@ type Story = StoryObj<typeof ListItemComponent>
 
 export const ListItem: Story = {
   args: {
-    type: 'noActive',
+    type: 'default',
     children: (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <LegacyStyledText as="p">
+        <StyledText as="p">
           Slot Component: Replace me using the component panel.
-        </LegacyStyledText>
-        <LegacyStyledText as="p">
+        </StyledText>
+        <StyledText as="p">
           Slot Component: Replace me using the component panel.
-        </LegacyStyledText>
-        <LegacyStyledText as="p">
+        </StyledText>
+        <StyledText as="p">
           Slot Component: Replace me using the component panel.
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     ),
   },
@@ -47,7 +57,7 @@ export const ListItem: Story = {
 
 export const ListItemDescriptorDefault: Story = {
   args: {
-    type: 'noActive',
+    type: 'default',
     children: (
       <ListItemDescriptor
         type="large"
@@ -60,7 +70,7 @@ export const ListItemDescriptorDefault: Story = {
 
 export const ListItemDescriptorMini: Story = {
   args: {
-    type: 'noActive',
+    type: 'default',
     children: (
       <ListItemDescriptor
         type="default"
@@ -70,6 +80,26 @@ export const ListItemDescriptorMini: Story = {
     ),
   },
 }
+
+export const ListItemOnColorVariants: Story = {
+  render: args => (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <ListItemComponent type="defaultOnColor">
+        <StyledText as="p">Default on Color Variant</StyledText>
+      </ListItemComponent>
+      <ListItemComponent type="successOnColor">
+        <StyledText as="p">Success on Color Variant</StyledText>
+      </ListItemComponent>
+      <ListItemComponent type="warningOnColor">
+        <StyledText as="p">Warning on Color Variant</StyledText>
+      </ListItemComponent>
+      <ListItemComponent type="errorOnColor">
+        <StyledText as="p">Error on Color Variant</StyledText>
+      </ListItemComponent>
+    </Flex>
+  ),
+}
+
 const dropdownProps: DropdownMenuProps = {
   filterOptions: [
     { name: '1', value: '1' },
@@ -81,7 +111,7 @@ const dropdownProps: DropdownMenuProps = {
 }
 export const ListItemCustomizeImage: Story = {
   args: {
-    type: 'noActive',
+    type: 'default',
     children: (
       <ListItemCustomize
         header="Header"

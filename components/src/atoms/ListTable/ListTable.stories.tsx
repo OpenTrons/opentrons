@@ -1,4 +1,6 @@
-import { Flex, Tag, VIEWPORT } from '@opentrons/components'
+import { css } from 'styled-components'
+
+import { Flex, VIEWPORT } from '@opentrons/components'
 
 import { ListTable as ListTableComponent } from '.'
 
@@ -37,17 +39,9 @@ const Template: Story<ListTableStoryProps> = args => {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const renderRows = () => {
     return Array.from({ length: tagCount }, (_, i) => {
-      const iconName = i % 2 === 0 ? 'alert-circle' : 'check-circle'
-      const iconPosition = i % 2 === 0 ? 'left' : 'right'
-
       return (
         <Flex key={`tag-${i}`} width="100%">
-          <Tag
-            text={`Tag ${i + 1}`}
-            type="default"
-            iconName={iconName}
-            iconPosition={iconPosition}
-          />
+          <Flex css={CHILD_STYLE}>Child Component</Flex>
         </Flex>
       )
     })
@@ -68,3 +62,9 @@ export const ListTableNoHeader = Template.bind({})
 ListTableNoHeader.args = {
   tagCount: 3,
 }
+
+const CHILD_STYLE = css`
+  width: 100%;
+  background-color: #a864ff10;
+  border: 2px dashed #a864ff;
+`

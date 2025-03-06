@@ -2,8 +2,21 @@
 
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING, cast, Union, List, Tuple, NamedTuple
-from opentrons.types import Location, Mount, NozzleConfigurationType, NozzleMapInterface
+from typing import (
+    Optional,
+    TYPE_CHECKING,
+    cast,
+    Union,
+    List,
+    Tuple,
+    NamedTuple,
+)
+from opentrons.types import (
+    Location,
+    Mount,
+    NozzleConfigurationType,
+    NozzleMapInterface,
+)
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
@@ -31,6 +44,7 @@ from opentrons.protocol_engine.types import (
     LiquidClassRecord,
     NextTipInfo,
 )
+from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
@@ -2051,9 +2065,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
 
+    # TODO(cm, 3.4.25): decide whether to allow users to try and do math on a potential SimulatedProbeResult
     def liquid_probe_without_recovery(
         self, well_core: WellCore, loc: Location
-    ) -> float:
+    ) -> LiquidTrackingType:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
         well_location = WellLocation(
@@ -2069,7 +2084,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
 
         self._protocol_core.set_last_location(location=loc, mount=self.get_mount())
-
         return result.z_position
 
     def nozzle_configuration_valid_for_lld(self) -> bool:

@@ -67,7 +67,7 @@ export function LiquidDefinitions({
           Object.values(allIngredientGroupFields).map((liquid, index) => {
             return (
               <ListItem
-                type="noActive"
+                type="default"
                 key={`${liquid.displayName}_${liquid.displayColor}_${index}`}
               >
                 <ListItemDescriptor

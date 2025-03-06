@@ -255,7 +255,7 @@ export function SelectModules(props: WizardTileProps): JSX.Element | null {
                         ),
                       }
                       return (
-                        <ListItem type="noActive" key={`${module.model}`}>
+                        <ListItem type="default" key={`${module.model}`}>
                           <ListItemCustomize
                             dropdown={
                               MOAM_MODULE_TYPES.includes(module.type) &&
