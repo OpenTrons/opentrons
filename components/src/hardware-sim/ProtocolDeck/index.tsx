@@ -131,7 +131,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
         protocolAnalysis?.commands.some(
           command =>
             command.commandType === 'loadLidStack' &&
-            command.result.labwareIds.includes(labwareId)
+            command.result?.labwareIds.includes(labwareId)
         )
 
       return {
