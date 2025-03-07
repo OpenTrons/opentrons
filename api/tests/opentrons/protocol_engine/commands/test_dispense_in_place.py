@@ -147,6 +147,74 @@ async def test_dispense_in_place_implementation(
 
 
 @pytest.mark.parametrize(
+    "asp_volume, dispense_volume, push_out, expected",
+    [
+        (50.0, 50.0, None, False),
+        (50.0, 50.0, 0.0, True),
+        (100.0, 50.0, None, True),
+    ],
+)
+async def test_dispense_in_place_is_ready_response(
+    decoy: Decoy,
+    gantry_mover: GantryMover,
+    pipetting: PipettingHandler,
+    state_view: StateView,
+    subject: DispenseInPlaceImplementation,
+    asp_volume: float,
+    dispense_volume: float,
+    push_out: Optional[float],
+    expected: bool,
+) -> None:
+    """It should dispense in place."""
+    data = DispenseInPlaceParams(
+        pipetteId="pipette-id-abc",
+        volume=dispense_volume,
+        flowRate=456,
+        pushOut=push_out,
+    )
+    decoy.when(pipetting.get_state_view()).then_return(state_view)
+    decoy.when(state_view.pipettes.get_aspirated_volume("pipette-id-abc")).then_return(
+        asp_volume
+    )
+
+    decoy.when(
+        await pipetting.dispense_in_place(
+            pipette_id="pipette-id-abc",
+            volume=dispense_volume,
+            flow_rate=456,
+            push_out=push_out,
+            is_full_dispense=dispense_volume == asp_volume,
+            correction_volume=0,
+        )
+    ).then_return(dispense_volume)
+
+    decoy.when(state_view.pipettes.get_current_location()).then_return(None)
+    decoy.when(
+        state_view.pipettes.get_liquid_dispensed_by_ejecting_volume(
+            pipette_id="pipette-id-abc", volume=dispense_volume
+        )
+    ).then_return(dispense_volume)
+
+    decoy.when(await gantry_mover.get_position("pipette-id-abc")).then_return(
+        Point(1, 2, 3)
+    )
+
+    result = await subject.execute(data)
+
+    assert result == SuccessData(
+        public=DispenseInPlaceResult(volume=dispense_volume),
+        state_update=update_types.StateUpdate(
+            pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
+                pipette_id="pipette-id-abc", volume=dispense_volume
+            ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id-abc", ready_to_aspirate=expected
+            ),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
     "location,stateupdateLabware,stateupdateWell",
     [
         (
