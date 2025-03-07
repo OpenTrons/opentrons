@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Dict, Optional, Mapping
+from typing import Dict, Optional, Mapping, Literal
 
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -49,7 +49,18 @@ DFU_PID = "df11"
 MAX_TRAVEL = {
     StackerAxis.X: 194.0,
     StackerAxis.Z: 139.5,
-    StackerAxis.L: 23.0,
+    StackerAxis.L: 22.0,
+}
+
+FAST_HOME_OFFSETS = {
+    StackerAxis.X: {
+        Direction.EXTEND: 5.0,
+        Direction.RETRACT: 5.0,
+    },
+    StackerAxis.Z: {
+        Direction.EXTEND: 5.0,
+        Direction.RETRACT: 8.0,
+    },
 }
 
 # The offset in mm to subtract from MAX_TRAVEL when moving an axis before we home.
