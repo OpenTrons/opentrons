@@ -57,7 +57,6 @@ NUMBER_OF_BINS = 128
 STALLGUARD_CONFIG = {
     StackerAxis.X: StallGuardParams(StackerAxis.X, True, 2),
     StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 2),
-    StackerAxis.L: StallGuardParams(StackerAxis.L, True, 2),
 }
 
 STACKER_MOTION_CONFIG = {
@@ -66,15 +65,15 @@ STACKER_MOTION_CONFIG = {
             StackerAxis.X,
             max_speed=10.0,  # mm/s
             acceleration=100.0,  # mm/s^2
-            max_speed_discont=40,  # mm/s
+            max_speed_discont=10.0,  # mm/s
             current=1.5,  # mAmps
         ),
         "move": MoveParams(
             StackerAxis.X,
             max_speed=200.0,
             acceleration=1500.0,
-            max_speed_discont=40,
-            current=1.0,
+            max_speed_discont=40.0,
+            current=1.5,
         ),
     },
     StackerAxis.Z: {
@@ -82,14 +81,14 @@ STACKER_MOTION_CONFIG = {
             StackerAxis.Z,
             max_speed=10.0,
             acceleration=100.0,
-            max_speed_discont=40,
+            max_speed_discont=10.0,
             current=1.5,
         ),
         "move": MoveParams(
             StackerAxis.Z,
-            max_speed=200.0,
+            max_speed=150.0,
             acceleration=500.0,
-            max_speed_discont=40,
+            max_speed_discont=25.0,
             current=1.5,
         ),
     },
@@ -97,16 +96,16 @@ STACKER_MOTION_CONFIG = {
         "home": MoveParams(
             StackerAxis.L,
             max_speed=100.0,
-            acceleration=800.0,
-            max_speed_discont=40,
-            current=0.8,
+            acceleration=500.0,
+            max_speed_discont=100.0,
+            current=1.5,
         ),
         "move": MoveParams(
             StackerAxis.L,
             max_speed=100.0,
-            acceleration=800.0,
-            max_speed_discont=40,
-            current=0.6,
+            acceleration=500.0,
+            max_speed_discont=100.0,
+            current=1.5,
         ),
     },
 }
@@ -399,6 +398,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         self, axis: StackerAxis, enable: bool, threshold: int
     ) -> bool:
         """Enables and sets the stallguard threshold for the given axis motor."""
+        assert axis != StackerAxis.L, "Stallguard not supported for L axis"
         if not -64 < threshold < 63:
             raise ValueError(
                 f"Threshold value ({threshold}) should be between -64 and 63."

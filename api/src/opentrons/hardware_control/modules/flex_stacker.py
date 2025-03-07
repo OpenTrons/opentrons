@@ -47,8 +47,8 @@ DFU_PID = "df11"
 
 # Maximum distance in mm the axis can travel.
 MAX_TRAVEL = {
-    StackerAxis.X: 192.5,
-    StackerAxis.Z: 136.0,
+    StackerAxis.X: 194.0,
+    StackerAxis.Z: 139.5,
     StackerAxis.L: 23.0,
 }
 
