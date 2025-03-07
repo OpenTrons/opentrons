@@ -116,7 +116,7 @@ def run(protocol_context):
         liquid_class=water_class,
         volume=volume,
         source=water_source.wells_by_name()[SOURCE_WELL],
-        dest=[target_1.wells_by_name()[TARGET_WELL],target_2.wells_by_name()[TARGET_WELL]],
+        dest=[target_1.wells_by_name()[TARGET_WELL], target_2.wells_by_name()[TARGET_WELL]],
         new_tip=new_tip,
         trash_location=trash,
     )
@@ -125,7 +125,7 @@ def run(protocol_context):
         liquid_class=ethanol_class,
         volume=volume,
         source=ethanol_source.wells_by_name()[SOURCE_WELL],
-        dest=[target_1.wells_by_name()[TARGET_WELL],target_2.wells_by_name()[TARGET_WELL]],
+        dest=[target_1.wells_by_name()[TARGET_WELL], target_2.wells_by_name()[TARGET_WELL]],
         new_tip=new_tip,
         trash_location=trash,
     )
@@ -134,7 +134,7 @@ def run(protocol_context):
         liquid_class=glycerol_class,
         volume=volume,
         source=glycerol_source.wells_by_name()[SOURCE_WELL],
-        dest=[target_1.wells_by_name()[TARGET_WELL],target_2.wells_by_name()[TARGET_WELL]],
+        dest=[target_1.wells_by_name()[TARGET_WELL], target_2.wells_by_name()[TARGET_WELL]],
         new_tip=new_tip,
         trash_location=trash,
     )
