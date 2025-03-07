@@ -190,7 +190,7 @@ async def _execute_common(  # noqa: C901
             well_location=params.wellLocation,
         )
     except PipetteLiquidNotFoundError as exception:
-        move_result.state_update.set_pipette_ready_to_aspireate(
+        move_result.state_update.set_pipette_ready_to_aspirate(
             pipette_id=pipette_id, ready_to_aspirate=True
         )
         return _ExecuteCommonResult(
@@ -226,7 +226,7 @@ async def _execute_common(  # noqa: C901
             ),
         )
     else:
-        move_result.state_update.set_pipette_ready_to_aspireate(
+        move_result.state_update.set_pipette_ready_to_aspirate(
             pipette_id=pipette_id, ready_to_aspirate=True
         )
         return _ExecuteCommonResult(

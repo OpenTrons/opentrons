@@ -90,7 +90,7 @@ class BlowOutInPlaceImplementation(
             return result
         return SuccessData(
             public=BlowOutInPlaceResult(),
-            state_update=result.state_update.set_pipette_ready_to_aspireate(
+            state_update=result.state_update.set_pipette_ready_to_aspirate(
                 pipette_id=params.pipetteId, ready_to_aspirate=False
             ),
         )

@@ -115,7 +115,7 @@ class BlowOutImplementation(AbstractCommandImpl[BlowOutParams, _ExecuteReturn]):
                 public=BlowOutResult(position=move_result.public.position),
                 state_update=StateUpdate.reduce(
                     move_result.state_update, blow_out_result.state_update
-                ).set_pipette_ready_to_aspireate(
+                ).set_pipette_ready_to_aspirate(
                     pipette_id=params.pipetteId, ready_to_aspirate=False
                 ),
             )
