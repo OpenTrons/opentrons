@@ -122,8 +122,7 @@ class FlexStacker(mod_abc.AbstractModule):
         )
 
         # Enable stallguard
-        for axis in StackerAxis:
-            config = STALLGUARD_CONFIG[axis]
+        for axis, config in STALLGUARD_CONFIG.items():
             await driver.set_stallguard_threshold(
                 axis, config.enabled, config.threshold
             )
