@@ -192,6 +192,23 @@ def target_position_from_plunger(
     return all_axes_pos
 
 
+def target_positions_from_plunger_tracking(
+    mount: Union[Mount, OT3Mount],
+    plunger_delta: float,
+    z_delta: float,
+    current_position: Dict[Axis, float],
+) -> "OrderedDict[Axis, float]":
+    """Create a target position for machine axes including plungers.
+
+    The x/y axes remain constant but the plunger and Z move to create a tracking action.
+    """
+    all_axes_pos = target_position_from_plunger(mount, plunger_delta, current_position)
+    z_ax = Axis.by_mount(mount)
+    all_axes_pos[z_ax] = current_position[z_ax] + z_delta
+    # all_axes_pos[z_ax] = 95.405
+    return all_axes_pos
+
+
 def deck_point_from_machine_point(
     machine_point: Point, attitude: AttitudeMatrix, offset: Point
 ) -> Point:

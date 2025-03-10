@@ -122,6 +122,17 @@ class LiquidHandler(
         """
         ...
 
+    async def aspirate_while_tracking(
+        self,
+        mount: MountArgType,
+        z_distance: float,
+        flow_rate: float,
+        volume: float,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) using this pipette."""
+        ...
+
     async def dispense(
         self,
         mount: MountArgType,
@@ -141,6 +152,18 @@ class LiquidHandler(
             speed = rate * dispense_speed
         correction_volume : Correction volume in uL for the specified dispense volume
         """
+        ...
+
+    async def dispense_while_tracking(
+        self,
+        mount: MountArgType,
+        z_distance: float,
+        flow_rate: float,
+        volume: float,
+        push_out: Optional[float],
+    ) -> None:
+        """
+        Dispense a volume of liquid (in microliters/uL) using this pipette."""
         ...
 
     async def blow_out(
