@@ -473,3 +473,74 @@ def test_handle_unknown(
             )
         )
     assert subject.search([SearchFilter(id="id-a")]) == [outgoing_offset]
+
+
+class SimulatedStore:
+    """A model of the subject's intended behavior.
+
+    Unlike the real subject, this may be inefficient and non-persistent.
+    The goal here is to be correct and simple.
+    """
+
+    def __init__(self) -> None:
+        self._entries: list[StoredLabwareOffset] = []
+
+    def add(self, offset: IncomingStoredLabwareOffset) -> None:  # noqa: D102
+        self._entries.append(
+            StoredLabwareOffset(
+                id=offset.id,
+                createdAt=offset.createdAt,
+                definitionUri=offset.definitionUri,
+                locationSequence=offset.locationSequence,
+                vector=offset.vector,
+            )
+        )
+
+    def get_all(self) -> list[StoredLabwareOffset]:  # noqa: D102
+        return self._entries
+
+    def search(  # noqa: D102
+        self, filters: Sequence[SearchFilter]
+    ) -> list[StoredLabwareOffset]:
+        deduplicated_matching_ids = set[str]().union(
+            *(self._get_ids_matching_filter(filter) for filter in filters)
+        )
+        deduplicated_and_ordered_matches = [
+            entry for entry in self._entries if entry.id in deduplicated_matching_ids
+        ]
+        return deduplicated_and_ordered_matches
+
+    def delete(self, offset_id: str) -> None:  # noqa: D102
+        matching_indices = [
+            index
+            for index, element in enumerate(self._entries)
+            if element.id == offset_id
+        ]
+        if len(matching_indices) == 0:
+            pass
+        else:
+            assert len(matching_indices) == 1  # IDs are assumed to be unique.
+            del self._entries[matching_indices[0]]
+
+    def delete_all(self) -> None:  # noqa: D102
+        self._entries.clear()
+
+    def _get_ids_matching_filter(self, filter: SearchFilter) -> list[str]:
+        def is_match(offset: StoredLabwareOffset) -> bool:
+            return (
+                (filter.id == DO_NOT_FILTER or offset.id == filter.id)
+                and (
+                    filter.definitionUri == DO_NOT_FILTER
+                    or offset.definitionUri == filter.definitionUri
+                )
+                and (
+                    filter.locationSequence == DO_NOT_FILTER
+                    or offset.locationSequence == filter.locationSequence
+                )
+            )
+
+        matches = [entry.id for entry in self._entries if is_match(entry)]
+        if filter.mostRecentOnly:
+            matches = matches[-1:]
+
+        return matches
