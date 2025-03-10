@@ -521,6 +521,11 @@ export const useAnnouncements = (): Announcement[] => {
                     {t('announcements.dragDropAndHotFix.body7')}
                   </StyledText>
                 </li>
+                <li>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('announcements.dragDropAndHotFix.body8')}
+                  </StyledText>
+                </li>
               </ul>
             </Flex>
           </Flex>
