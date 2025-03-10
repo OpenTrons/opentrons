@@ -648,7 +648,9 @@ async def _fixture_check_pressure(
     )
     results.append(r)
     # dispense
-    await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol], is_full_dispense=True)
+    await api.dispense(
+        mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol], is_full_dispense=True
+    )
     r, _ = await _read_pressure_and_check_results(
         api,
         pip_channels,
