@@ -462,7 +462,7 @@ async def _aspirate_and_look_for_droplets(
         leak_test_passed = _get_operator_answer_to_question("did it pass? no leaking?")
     print("dispensing back into reservoir")
     await api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
-    await api.dispense(mount, pipette_volume)
+    await api.dispense(mount, pipette_volume, is_full_dispense=True)
     await api.blow_out(mount)
     await api.move_rel(mount, Point(z=ASPIRATE_SUBMERGE_MM))
     return leak_test_passed
@@ -648,7 +648,7 @@ async def _fixture_check_pressure(
     )
     results.append(r)
     # dispense
-    await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol])
+    await api.dispense(mount, PRESSURE_FIXTURE_ASPIRATE_VOLUME[pip_vol], is_full_dispense=True)
     r, _ = await _read_pressure_and_check_results(
         api,
         pip_channels,
@@ -1125,7 +1125,7 @@ async def _test_diagnostics_pressure(
     if not api.is_simulator:
         _get_operator_answer_to_question('REMOVE your finger, enter "y" when ready')
     print("moving plunger back down to BOTTOM position")
-    await api.dispense(mount)
+    await api.dispense(mount, is_full_dispense=True)
     await api.prepare_for_aspirate(mount)
 
     await _drop_tip_in_trash(api, mount)
