@@ -22,7 +22,6 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-  AIR_GAP_META,
   blowoutInPlaceHelper,
   makeMoveToWellHelper,
   makeAirGapAfterAspirateHelper,
