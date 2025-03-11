@@ -198,9 +198,13 @@ def target_positions_from_plunger_tracking(
     z_delta: float,
     current_position: Dict[Axis, float],
 ) -> "OrderedDict[Axis, float]":
-    """Create a target position for machine axes including plungers.
+    """Create a target position for machine axes including plungers for dynamic liquid tracking.
 
     The x/y axes remain constant but the plunger and Z move to create a tracking action.
+
+    plunger_delta: the distance the plunger should move- should be determined based on desired
+    volume to aspirate/dispense.
+    z_delta: the distance to move the z axis- should be determined based on volume and well geometry.
     """
     all_axes_pos = target_position_from_plunger(mount, plunger_delta, current_position)
     z_ax = Axis.by_mount(mount)

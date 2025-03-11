@@ -2999,11 +2999,17 @@ class OT3API(
         self,
         mount: Union[top_types.Mount, OT3Mount],
         z_distance: float,
-        flow_rate: float,
         volume: float,
+        flow_rate: float = 1.0,
     ) -> None:
         """
-        Aspirate a volume of liquid (in microliters/uL) using this pipette."""
+        Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during apsiration.
+        :param volume: The volume of liquid to be aspirated.
+        :param flow_rate: The flow rate to aspirate with.
+        """
         realmount = OT3Mount.from_mount(mount)
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
             realmount, volume, flow_rate
@@ -3040,12 +3046,18 @@ class OT3API(
         self,
         mount: Union[top_types.Mount, OT3Mount],
         z_distance: float,
-        flow_rate: float,
         volume: float,
         push_out: Optional[float],
+        flow_rate: float = 1.0,
     ) -> None:
         """
-        Dispense a volume of liquid (in microliters/uL) using this pipette."""
+        Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during dispensing.
+        :param volume: The volume of liquid to be dispensed.
+        :param flow_rate: The flow rate to dispense with.
+        """
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
             realmount, volume, flow_rate, push_out

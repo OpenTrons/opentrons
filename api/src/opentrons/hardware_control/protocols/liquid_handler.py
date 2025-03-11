@@ -126,8 +126,8 @@ class LiquidHandler(
         self,
         mount: MountArgType,
         z_distance: float,
-        flow_rate: float,
         volume: float,
+        flow_rate: float = 1.0,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette."""
@@ -158,9 +158,9 @@ class LiquidHandler(
         self,
         mount: MountArgType,
         z_distance: float,
-        flow_rate: float,
         volume: float,
         push_out: Optional[float],
+        flow_rate: float = 1.0,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette."""
