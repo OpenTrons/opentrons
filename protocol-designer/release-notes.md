@@ -12,19 +12,21 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.4.3!**
 
-This release includes feature improvements and bug fixes.
+This release adds support for drag and drop labware in Protocol Designer, and includes feature improvements and bug fixes.
+
+When editing your protocol starting deck, click and drag to move any individual piece of labware to a new slot.
 
 ### Improvements
 
-- Click and drag to move individual pieces of labware on the protocol starting deck.
-- Protocol Designer now supports the Opentrons 96 Deep Well Temperature Module adapter.
-- To avoid deck conflicts with features like the trash bin, add one of each module in protocol setup. Click **Edit protocol** and **Protocol starting deck** to add and edit multiple modules as needed.
+- To avoid deck conflicts with fixtures like the trash bin, add only one of each module in protocol setup. Click **Edit protocol** and **Protocol starting deck** to add and edit multiple modules as needed.
+- See your protocol starting deck edits more easily with module highlighting when moving labware or editing a module step.
 
 ### Bug Fixes
 
-- Protocol Designer always redirects to the protocol overview when you import an existing protocol.
-- Protocol Designer displays an error when transferring liquid or adding a Flex gripper move step with off-deck labware, or adding a liquid volume that exceeds the well limit in a transfer step.
-- Protocol Designer avoids crashes and unknown errors when tip racks, labware, or modules aren't assigned to a transfer or module step.
+- Protocol Designer always redirects to the protocol overview when you import an existing protocol from the home or settings page.
+- When tip racks, labware, or modules aren't assigned to a transfer or module step, improved error recovery in Protocol Designer avoids a crash or unknown error.
+- Protocol Designer displays an error for transfer or Flex gripper move steps with off-deck labware, and when a transfer volume exceeds the well limit.
+- Touch tip is no longer available during a dispense into the trash bin.
 
 Running a protocol created in Protocol Designer now requires Opentrons App version 8.3.0 or newer.
 
