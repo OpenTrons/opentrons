@@ -39,3 +39,4 @@ export type HandleLwSubstep =
   | 'handle-lw/details'
   | 'handle-lw/edit-offset/prepare-labware'
   | 'handle-lw/edit-offset/check-labware'
+  | 'handle-lw/edit-offset/success'

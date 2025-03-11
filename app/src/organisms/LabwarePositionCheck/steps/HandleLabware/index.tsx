@@ -31,7 +31,8 @@ function HandleLabwareContent(props: LPCWizardContentProps): JSX.Element {
 
     // The core edit flow for updating an offset for a singular labware geometry.
     case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
-    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW: {
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS: {
       return <EditOffset {...props} />
     }
 

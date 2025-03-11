@@ -127,10 +127,11 @@ export const closeLPC = (runId: string): FinishLPCAction => ({
 })
 
 export const proceedEditOffsetSubstep = (
-  runId: string
+  runId: string,
+  isOnDevice?: boolean
 ): ProceedHandleLwSubstepAction => ({
   type: PROCEED_HANDLE_LW_SUBSTEP,
-  payload: { runId },
+  payload: { runId, isOnDevice },
 })
 
 export const goBackEditOffsetSubstep = (
