@@ -5,12 +5,14 @@ import type {
   HostConfig,
   LabwareOffsetLocationSequenceComponent,
 } from '../types'
-import type { StoredLabwareOffset } from './types'
+import type { ANY_LOCATION, StoredLabwareOffset } from './types'
 import type { VectorOffset } from '../runs'
 
 export interface StoredLabwareOffsetCreate {
   definitionUri: string
-  locationSequence: LabwareOffsetLocationSequenceComponent[]
+  locationSequence:
+    | LabwareOffsetLocationSequenceComponent[]
+    | typeof ANY_LOCATION
   vector: VectorOffset
 }
 
