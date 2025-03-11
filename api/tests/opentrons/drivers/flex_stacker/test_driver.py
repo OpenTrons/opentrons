@@ -1,9 +1,9 @@
 import base64
-from typing import Generator, Dict, List
+from typing import Generator, Dict, List, Any
 import pytest
 from binascii import Error as BinError
 from decoy import Decoy
-from mock import AsyncMock
+from mock import AsyncMock, MagicMock
 from opentrons.drivers.asyncio.communication.serial_connection import (
     AsyncResponseSerialConnection,
 )
@@ -14,6 +14,7 @@ from opentrons.drivers.flex_stacker.driver import (
     FlexStackerDriver,
 )
 from opentrons.drivers.flex_stacker import types
+from opentrons.drivers.flex_stacker.errors import MotorStallDetected
 
 
 @pytest.fixture
@@ -24,6 +25,7 @@ def connection() -> AsyncMock:
 @pytest.fixture
 def subject(connection: AsyncMock) -> FlexStackerDriver:
     connection.send_command.return_value = ""
+    connection._serial = MagicMock()
     return FlexStackerDriver(connection)
 
 
@@ -280,6 +282,34 @@ async def test_move_in_mm(subject: FlexStackerDriver, connection: AsyncMock) -> 
 
     move_to = types.GCODE.MOVE_TO.build_command().add_float("X", 10)
     connection.send_command.assert_any_call(move_to, timeout=FS_MOVE_TIMEOUT)
+    connection.reset_mock()
+
+
+@pytest.mark.parametrize(
+    "command,command_args",
+    [
+        ("home_axis", (types.StackerAxis.X, types.Direction.EXTEND)),
+        ("move_to_limit_switch", (types.StackerAxis.X, types.Direction.EXTEND)),
+        ("move_in_mm", (types.StackerAxis.X, 10)),
+    ],
+)
+async def test_move_stall(
+    subject: FlexStackerDriver,
+    connection: AsyncMock,
+    command: str,
+    command_args: list[Any],
+) -> None:
+    """It should handle motor stall exceptions during move commands."""
+    # raise a motor stall detected exception
+    connection.send_command.side_effect = MotorStallDetected(
+        port="port", response="response", command="move command"
+    )
+
+    response = await subject.__getattribute__(command)(*command_args)
+
+    connection.send_command.assert_called_once()
+    # Verify we got a stall error result
+    assert response == types.MoveResult.STALL_ERROR
     connection.reset_mock()
 
 

@@ -3,11 +3,12 @@ import re
 import base64
 from typing import List, Optional
 
-from opentrons.drivers.asyncio.communication.errors import MotorStall, NoResponse
+from opentrons.drivers.asyncio.communication.errors import NoResponse
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
 from .abstract import AbstractFlexStackerDriver
+from .errors import StackerErrorCodes, MotorStallDetected
 from .types import (
     GCODE,
     LEDPattern,
@@ -306,6 +307,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             loop=loop,
             error_keyword=FS_ERROR_KEYWORD,
             async_error_ack=FS_ASYNC_ERROR_ACK,
+            error_codes=StackerErrorCodes,
         )
         return cls(connection)
 
@@ -643,7 +645,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             resp = await self._connection.send_command(command, timeout=FS_MOVE_TIMEOUT)
             if not re.match(rf"^{GCODE.MOVE_TO}$", resp):
                 raise ValueError(f"Incorrect Response for move to: {resp}")
-        except MotorStall:
+        except MotorStallDetected:
             self.reset_serial_buffers()
             return MoveResult.STALL_ERROR
         return MoveResult.NO_ERROR
@@ -660,7 +662,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             resp = await self._connection.send_command(command, timeout=FS_MOVE_TIMEOUT)
             if not re.match(rf"^{GCODE.MOVE_TO_SWITCH}$", resp):
                 raise ValueError(f"Incorrect Response for move to switch: {resp}")
-        except MotorStall:
+        except MotorStallDetected:
             self.reset_serial_buffers()
             return MoveResult.STALL_ERROR
         return MoveResult.NO_ERROR
@@ -670,7 +672,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         command = GCODE.HOME_AXIS.build_command().add_int(axis.name, direction.value)
         try:
             resp = await self._connection.send_command(command, timeout=FS_MOVE_TIMEOUT)
-        except MotorStall:
+        except MotorStallDetected:
             self.reset_serial_buffers()
             return MoveResult.STALL_ERROR
         if not re.match(rf"^{GCODE.HOME_AXIS}$", resp):

@@ -22,6 +22,7 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
+  AIR_GAP_META,
   blowoutInPlaceHelper,
   makeMoveToWellHelper,
   makeAirGapAfterAspirateHelper,
@@ -1236,10 +1237,11 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'airGapInPlace',
           key: expect.any(String),
+
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -1330,9 +1332,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -1596,9 +1598,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -1943,9 +1945,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -2036,9 +2038,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -2317,9 +2319,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -2477,6 +2479,7 @@ describe('consolidate single-channel', () => {
             },
           },
         },
+
         {
           commandType: 'prepareToAspirate',
           key: expect.any(String),
@@ -2930,6 +2933,7 @@ describe('consolidate single-channel', () => {
             },
           },
         },
+
         {
           commandType: 'prepareToAspirate',
           key: expect.any(String),
@@ -3096,6 +3100,7 @@ describe('consolidate single-channel', () => {
             },
           },
         },
+
         {
           commandType: 'airGapInPlace',
           key: expect.any(String),

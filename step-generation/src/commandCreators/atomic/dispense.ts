@@ -43,10 +43,10 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     labwareId,
     wellName,
     flowRate,
+    isAirGap,
     wellLocation,
     nozzles,
     tipRack,
-    isAirGap,
   } = args
   const actionName = 'dispense'
   const labwareState = prevRobotState.labware
