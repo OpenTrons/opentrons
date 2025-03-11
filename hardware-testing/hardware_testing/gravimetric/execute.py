@@ -891,6 +891,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
                 resources.ctx, resources.pipette, cfg, location=first_tip_location
             )
             resources.pipette._retract()
+            for i in range(5):
+                resources.pipette.aspirate()
+                resources.pipette.dispense(push_out=0)
+            resources.pipette.prepare_to_aspirate()
             ui.print_info("moving to scale")
         if cfg.jog or not cfg.lld_every_tip:
             liq_height = _get_liquid_height(
