@@ -52,15 +52,30 @@ _NonNegativeNumber = _StrictNonNegativeInt | _StrictNonNegativeFloat
 """Non-negative JSON number type, written to preserve lack of decimal point."""
 
 
-class Vector(BaseModel):
+class Vector2D(BaseModel):
+    x: _Number
+    y: _Number
+
+
+class Vector3D(BaseModel):
     x: _Number
     y: _Number
     z: _Number
 
 
+class AxisAlignedBoundingBox2D(BaseModel):
+    backLeft: Vector2D
+    frontRight: Vector2D
+
+
+class AxisAlignedBoundingBox3D(BaseModel):
+    backLeftBottom: Vector3D
+    frontRightTop: Vector3D
+
+
 class GripperOffsets(BaseModel):
-    pickUpOffset: Vector
-    dropOffset: Vector
+    pickUpOffset: Vector3D
+    dropOffset: Vector3D
 
 
 class BrandData(BaseModel):
@@ -483,6 +498,11 @@ class InnerWellGeometry(BaseModel):
     sections: Annotated[list[WellSegment], Field(min_length=1)]
 
 
+class Extents(BaseModel):
+    total: AxisAlignedBoundingBox3D
+    footprint: AxisAlignedBoundingBox2D
+
+
 class LabwareDefinition2(BaseModel):
     schemaVersion: Literal[2]
     version: Annotated[int, Field(ge=1)]
@@ -490,13 +510,13 @@ class LabwareDefinition2(BaseModel):
     metadata: Metadata
     brand: BrandData
     parameters: Parameters2
-    cornerOffsetFromSlot: Vector
+    cornerOffsetFromSlot: Vector3D
     ordering: list[list[str]]
     dimensions: Dimensions
     wells: dict[str, WellDefinition2]
     groups: list[Group]
-    stackingOffsetWithLabware: dict[str, Vector] = Field(default_factory=dict)
-    stackingOffsetWithModule: dict[str, Vector] = Field(default_factory=dict)
+    stackingOffsetWithLabware: dict[str, Vector3D] = Field(default_factory=dict)
+    stackingOffsetWithModule: dict[str, Vector3D] = Field(default_factory=dict)
     allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
@@ -514,13 +534,12 @@ class LabwareDefinition3(BaseModel):
     metadata: Metadata
     brand: BrandData
     parameters: Parameters3
-    cornerOffsetFromSlot: Vector
     ordering: list[list[str]]
-    dimensions: Dimensions
+    extents: Extents
     wells: dict[str, WellDefinition3]
     groups: list[Group]
-    stackingOffsetWithLabware: dict[str, Vector] = Field(default_factory=dict)
-    stackingOffsetWithModule: dict[str, Vector] = Field(default_factory=dict)
+    stackingOffsetWithLabware: dict[str, Vector3D] = Field(default_factory=dict)
+    stackingOffsetWithModule: dict[str, Vector3D] = Field(default_factory=dict)
     allowedRoles: list[LabwareRole] = Field(default_factory=list)
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
