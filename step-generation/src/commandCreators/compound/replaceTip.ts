@@ -226,7 +226,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   if (isTrashBin) {
     commandCreators = [
       curryCommandCreator(dropTipInTrash, {
-        pipetteId: args.pipette,
+        pipetteId: pipette,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {
