@@ -1,4 +1,5 @@
 import reduce from 'lodash/reduce'
+import { useEffect } from 'react'
 
 import { COLUMN } from '@opentrons/shared-data'
 import { COLORS } from '@opentrons/components'
@@ -12,7 +13,7 @@ import { SingleLabware } from './SingleLabware'
 import { WellTooltip } from './WellTooltip'
 import { SelectionRect } from './SelectionRect'
 
-import { useEffect, type ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import type {
   WellMouseEvent,
   WellGroup,
@@ -198,8 +199,7 @@ export const SelectableLabware = (
 
   useEffect(() => {
     updateHighlightedWells({})
-  },[])
-
+  }, [])
 
   return (
     <SelectionRect
