@@ -187,6 +187,23 @@ describe('ProtocolDetails', () => {
     screen.getByRole('heading', { name: 'creation method' })
     screen.getByText('Protocol Designer 6.0')
   })
+  it('renders the protocol creation method for py protocol made in PD', () => {
+    render({
+      mostRecentAnalysis: {
+        ...mockMostRecentAnalysis,
+        createdAt,
+        metadata: {
+          ...mockMostRecentAnalysis.metadata,
+          protocolDesigner: '8.0.0',
+        },
+        config: {
+          ...mockMostRecentAnalysis.config,
+        },
+      },
+    })
+    screen.getByRole('heading', { name: 'creation method' })
+    screen.getByText('Protocol Designer 8.0')
+  })
   it('renders the last analyzed date', () => {
     render({
       mostRecentAnalysis: {
