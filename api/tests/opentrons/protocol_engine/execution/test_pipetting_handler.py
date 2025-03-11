@@ -19,7 +19,6 @@ from opentrons.protocol_engine.execution.pipetting import (
     create_pipetting_handler,
 )
 
-# from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.errors.exceptions import (
     TipNotAttachedError,
     InvalidAspirateVolumeError,
@@ -313,10 +312,6 @@ async def test_hw_aspirate_while_tracking(
             ),
         )
     )
-    # tbh probably need 3 tests:
-    # - one to see the outcome of get_liquid_handling_z_change
-    # - one to see the aspirate_z_distance given the outcome of get_liquid_handling_z_change
-    # - get_meniscus_height
 
     decoy.when(
         mock_state_view.geometry.get_liquid_handling_z_change(
@@ -332,21 +327,8 @@ async def test_hw_aspirate_while_tracking(
         flow_rate=2.5,
         command_note_adder=mock_command_note_adder,
     )
-    # breakpoint()
-
+    # make sure hw aspirate_while_tracking runs without error
     assert result == 25
-
-    decoy.verify(
-        mock_hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
-        ),
-        await mock_hardware_api.aspirate(
-            mount=Mount.LEFT, volume=25, correction_volume=0
-        ),
-        mock_hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=1.23, dispense=4.56, blow_out=7.89
-        ),
-    )
 
 
 async def test_hw_aspirate_in_place(

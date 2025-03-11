@@ -2542,7 +2542,6 @@ class InstrumentContext(publisher.CommandPublisher):
             well = target.well
             if target.location:
                 move_to_location = target.location
-                # raise ValueError(f"location = {target.location}")
                 meniscus_tracking = target.location.meniscus_tracking
 
             else:

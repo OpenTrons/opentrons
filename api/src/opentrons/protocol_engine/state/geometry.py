@@ -1803,8 +1803,6 @@ class GeometryView:
         initial_handling_height = self.get_meniscus_height(
             labware_id=labware_id, well_name=well_name
         )
-        # initial_handling_height = 11.whatever
-        # hardcode initial handling height to match dltr
         final_height = self.get_well_height_after_liquid_handling(
             labware_id=labware_id,
             well_name=well_name,
@@ -1817,9 +1815,6 @@ class GeometryView:
             raise errors.LiquidHeightUnknownError(
                 "liquid handling z change can only be found using real height and volume inputs."
             )
-        # raise ValueError(
-        # f"new branch\n liquid handling height = {initial_handling_height, final_height}, volume = {operation_volume}"
-        # )
         return final_height - initial_handling_height
 
     def get_well_offset_adjustment(
@@ -1917,8 +1912,6 @@ class GeometryView:
         well_name: str,
     ) -> LiquidTrackingType:
         """Returns stored meniscus height in specified well."""
-        # breakpoint()
-        # return 25.0
         last_updated = self._wells.get_last_liquid_update(labware_id, well_name)
         if last_updated is None:
             raise errors.LiquidHeightUnknownError(
@@ -1933,7 +1926,6 @@ class GeometryView:
             and well_liquid.probed_height.height is not None
             and well_liquid.probed_height.last_probed == last_updated
         ):
-            # maybe j make sure its at probed height ?
             return well_liquid.probed_height.height
         elif (
             well_liquid.loaded_volume is not None

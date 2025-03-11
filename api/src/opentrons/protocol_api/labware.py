@@ -263,7 +263,7 @@ class Well:
 
     @requires_version(2, 21)
     def meniscus(
-        self, target: Literal["beginning", "end", "dynamic_meniscus"], z: float = 0.0
+        self, target: Literal["start", "end", "dynamic"], z: float = 0.0
     ) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and

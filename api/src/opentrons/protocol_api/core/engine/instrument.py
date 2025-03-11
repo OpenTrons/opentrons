@@ -331,7 +331,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 absolute_point=location.point,
                 meniscus_tracking=meniscus_tracking,
             )
-            # raise ValueError(f"well location = {well_location}")
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
