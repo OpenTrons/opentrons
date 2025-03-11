@@ -762,18 +762,20 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance.
 
+        Both ``volume`` and ``height`` are optional, but if you want to specify only
+        ``height`` you must do it as a keyword argument:
+        ``pipette.air_gap(height=2)``. If you call ``air_gap`` with a single,
+        unnamed argument, it will always be interpreted as a volume.
+
         .. note::
 
-            Both ``volume`` and ``height`` are optional, but if you want to specify only
-            ``height`` you must do it as a keyword argument:
-            ``pipette.air_gap(height=2)``. If you call ``air_gap`` with a single,
-            unnamed argument, it will always be interpreted as a volume.
-
-        .. TODO: restore this as a note block for 2.22 docs
-           Before API version 2.22, this function was implemented as an aspirate, and
+           In API version 2.21 and earlier, this function was implemented as an aspirate, and
            dispensing into a well would add the air gap volume to the liquid tracked in
-           the well. At or above API version 2.22, air gap volume is not counted as liquid
+           the well. In API version 2.22 and later, air gap volume is not tracked as liquid
            when dispensing into a well.
+
+        .. versionchanged:: 2.22
+            No longer implemented as an aspirate.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
