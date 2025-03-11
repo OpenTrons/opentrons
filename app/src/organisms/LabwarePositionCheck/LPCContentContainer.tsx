@@ -12,6 +12,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   SecondaryButton,
+  Box,
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
@@ -19,7 +20,11 @@ import { StepMeter } from '/app/atoms/StepMeter'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useSelector } from 'react-redux'
-import { selectStepInfo } from '/app/redux/protocol-runs'
+import {
+  LPC_STEP,
+  selectCurrentStep,
+  selectStepInfo,
+} from '/app/redux/protocol-runs'
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getModalPortalEl } from '/app/App/portal'
 import { getIsOnDevice } from '/app/redux/config'
@@ -101,15 +106,19 @@ export function LPCContentContainer(
 // TOME TODO: Think through the button props for here. It's not the secondary button
 // unfortunately.
 function DesktopFooterContent({
+  runId,
   buttonText,
   buttonIsDisabled,
   tertiaryBtnProps,
   onClickButton,
 }: Omit<LPCContentContainerProps, 'children'>): JSX.Element {
+  const step = useSelector(selectCurrentStep(runId))
+  const showHelpLink = step !== LPC_STEP.LPC_COMPLETE
+
   return (
     <Flex css={DESKTOP_FOOTER_CONTENT_CONTAINER}>
       {/* TODO(jh, 03-11-25): Update the link/styling after Product/Design provide input. */}
-      <NeedHelpLink />
+      {showHelpLink ? <NeedHelpLink /> : <Box />}
       <Flex css={DESKTOP_FOOTER_BTN_CONTAINER}>
         {tertiaryBtnProps != null && (
           <SecondaryButton onClick={tertiaryBtnProps.onClick}>

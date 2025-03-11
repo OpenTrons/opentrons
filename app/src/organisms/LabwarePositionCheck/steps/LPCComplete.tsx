@@ -28,8 +28,10 @@ export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
       contentStyle={CHILDREN_CONTAINER_STYLE}
     >
       <Flex css={CONTENT_CONTAINER}>
-        <img src={SuccessIcon} alt="Success Icon" />
-        <StyledText oddStyle="level3HeaderBold">{t('lpc_complete')}</StyledText>
+        <img src={SuccessIcon} css={IMAGE_STYLE} alt="Success Icon" />
+        <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
+          {t('lpc_complete')}
+        </StyledText>
       </Flex>
     </LPCContentContainer>
   )
@@ -52,4 +54,15 @@ const CONTENT_CONTAINER = css`
   align-items: ${ALIGN_CENTER};
   padding: ${SPACING.spacing40};
   gap: ${SPACING.spacing24};
+`
+
+const IMAGE_STYLE = css`
+  width: 10.625rem;
+  height: 8.813rem;
+
+  // The default image size.
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 15.688rem;
+    height: 13rem;
+  }
 `
