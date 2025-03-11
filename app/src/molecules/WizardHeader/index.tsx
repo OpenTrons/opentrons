@@ -22,6 +22,7 @@ interface WizardHeaderProps {
   totalSteps?: number | null
   currentStep?: number | null
   exitDisabled?: boolean
+  hideStepText?: boolean
 }
 
 const EXIT_BUTTON_STYLE = css`
@@ -77,7 +78,14 @@ const STEP_TEXT_STYLE = css`
 `
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const { totalSteps, currentStep, title, onExit, exitDisabled } = props
+  const {
+    totalSteps,
+    currentStep,
+    hideStepText,
+    title,
+    onExit,
+    exitDisabled,
+  } = props
   const { t } = useTranslation('shared')
 
   return (
@@ -91,7 +99,10 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
             {title}
           </LegacyStyledText>
 
-          {currentStep != null && totalSteps != null && currentStep > 0 ? (
+          {!hideStepText &&
+          currentStep != null &&
+          totalSteps != null &&
+          currentStep > 0 ? (
             <LegacyStyledText css={STEP_TEXT_STYLE}>
               {t('step', { current: currentStep, max: totalSteps })}
             </LegacyStyledText>

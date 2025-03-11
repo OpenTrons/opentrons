@@ -1,4 +1,5 @@
 import { css } from 'styled-components'
+import { createPortal } from 'react-dom'
 
 import {
   DIRECTION_COLUMN,
@@ -6,6 +7,11 @@ import {
   RESPONSIVENESS,
   SPACING,
   POSITION_FIXED,
+  ModalShell,
+  PrimaryButton,
+  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_CENTER,
+  SecondaryButton,
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
@@ -14,11 +20,21 @@ import { StepMeter } from '/app/atoms/StepMeter'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useSelector } from 'react-redux'
 import { selectStepInfo } from '/app/redux/protocol-runs'
+import { WizardHeader } from '/app/molecules/WizardHeader'
+import { getModalPortalEl } from '/app/App/portal'
+import { getIsOnDevice } from '/app/redux/config'
+import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 
+import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import type { ChildNavigationProps } from '/app/organisms/ODD/ChildNavigation'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+
+interface LPCContentContainerTertiaryBtnProps {
+  onClick: () => void
+  text: ReactNode
+}
 
 type LPCContentContainerProps = LPCWizardContentProps &
   Partial<ChildNavigationProps> & {
@@ -26,33 +42,94 @@ type LPCContentContainerProps = LPCWizardContentProps &
     header: string
     /* An optional style override for the content container. */
     contentStyle?: FlattenSimpleInterpolation
+    /* The desktop button the left of the primary button. */
+    tertiaryBtnProps?: LPCContentContainerTertiaryBtnProps
   }
 
-export function LPCContentContainer({
-  children,
-  runId,
-  contentStyle,
-  ...rest
-}: LPCContentContainerProps): JSX.Element {
+export function LPCContentContainer(
+  props: LPCContentContainerProps
+): JSX.Element {
+  const { runId, children, contentStyle, ...rest } = props
+  const { commandUtils } = rest
   const { currentStepIndex, totalStepCount } = useSelector(
     selectStepInfo(runId)
   )
+  const isOnDevice = useSelector(getIsOnDevice)
+  const showDesktopFooter = !commandUtils.isRobotMoving
 
   return (
-    <Flex css={CONTAINER_STYLE}>
-      <Flex css={FIXED_HEADER_STYLE}>
-        <StepMeter
-          totalSteps={totalStepCount}
-          currentStep={currentStepIndex + 1}
-        />
-        <ChildNavigation {...rest} css={CHILD_NAV_STYLE} />
+    <>
+      {isOnDevice ? (
+        <Flex css={ODD_CONTAINER_STYLE}>
+          <Flex css={FIXED_HEADER_STYLE}>
+            <StepMeter
+              totalSteps={totalStepCount}
+              currentStep={currentStepIndex + 1}
+            />
+            <ChildNavigation {...rest} css={CHILD_NAV_STYLE} />
+          </Flex>
+          <Flex css={contentStyle ?? ODD_CHILDREN_CONTAINER_STYLE}>
+            {children}
+          </Flex>
+        </Flex>
+      ) : (
+        createPortal(
+          <ModalShell
+            css={DESKTOP_CONTAINER_STYLE}
+            header={
+              <WizardHeader
+                title={rest.header}
+                onExit={commandUtils.headerCommands.handleNavToDetachProbe}
+                currentStep={currentStepIndex + 1}
+                totalSteps={totalStepCount}
+                hideStepText={true}
+              />
+            }
+          >
+            <Flex css={DESKTOP_CHILDREN_CONTAINER_STYLE}>
+              {children}
+              {showDesktopFooter && <DesktopFooterContent {...props} />}
+            </Flex>
+          </ModalShell>,
+          getModalPortalEl()
+        )
+      )}
+    </>
+  )
+}
+
+// TOME TODO: Think through the button props for here. It's not the secondary button
+// unfortunately.
+function DesktopFooterContent({
+  buttonText,
+  buttonIsDisabled,
+  tertiaryBtnProps,
+  onClickButton,
+}: Omit<LPCContentContainerProps, 'children'>): JSX.Element {
+  return (
+    <Flex css={DESKTOP_FOOTER_CONTENT_CONTAINER}>
+      {/* TODO(jh, 03-11-25): Update the link/styling after Product/Design provide input. */}
+      <NeedHelpLink />
+      <Flex css={DESKTOP_FOOTER_BTN_CONTAINER}>
+        {tertiaryBtnProps != null && (
+          <SecondaryButton onClick={tertiaryBtnProps.onClick}>
+            {tertiaryBtnProps.text}
+          </SecondaryButton>
+        )}
+        <PrimaryButton disabled={buttonIsDisabled} onClick={onClickButton}>
+          {buttonText}
+        </PrimaryButton>
       </Flex>
-      <Flex css={contentStyle ?? CHILDREN_CONTAINER_STYLE}>{children}</Flex>
     </Flex>
   )
 }
 
-const CONTAINER_STYLE = css`
+const DESKTOP_CONTAINER_STYLE = css`
+  height: 28.125rem;
+  width: 47rem;
+`
+
+const ODD_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   height: 100vh;
 `
@@ -66,11 +143,19 @@ const FIXED_HEADER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
 `
 
+const DESKTOP_CHILDREN_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  padding: ${SPACING.spacing24};
+  gap: ${SPACING.spacing24};
+  height: 24.125rem;
+  overflow-y: auto;
+`
+
 // TODO(jh, 02-05-25): Investigate whether we can remove the position: fixed styling from ChildNav.
 const CHILD_NAV_STYLE = css`
   margin-top: ${SPACING.spacing8};
 `
-const CHILDREN_CONTAINER_STYLE = css`
+const ODD_CHILDREN_CONTAINER_STYLE = css`
   margin-top: 7.75rem;
   flex-direction: ${DIRECTION_COLUMN};
   height: 100%;
@@ -81,4 +166,17 @@ const CHILDREN_CONTAINER_STYLE = css`
       ${SPACING.spacing60};
     gap: ${SPACING.spacing40};
   }
+`
+
+const DESKTOP_FOOTER_CONTENT_CONTAINER = css`
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  align-items: ${ALIGN_CENTER};
+  gap: ${SPACING.spacing8};
+  margin-top: auto;
+`
+
+const DESKTOP_FOOTER_BTN_CONTAINER = css`
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  align-items: ${ALIGN_CENTER};
+  gap: ${SPACING.spacing8};
 `
