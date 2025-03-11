@@ -11,9 +11,9 @@ import {
   selectActivePipetteChannelCount,
 } from '/app/redux/protocol-runs'
 
-import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
+import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -97,7 +97,7 @@ describe('DetachProbe', () => {
     render(props, 1)
 
     const video = screen.getByTestId('probe-video')
-    expect(video).toHaveAttribute('src', attachProbe1)
+    expect(video).toHaveAttribute('src', detachProbe1)
     expect(video).toHaveAttribute('autoplay')
     expect(video).toHaveAttribute('loop')
   })
@@ -106,20 +106,20 @@ describe('DetachProbe', () => {
     render(props, 8)
 
     const video = screen.getByTestId('probe-video')
-    expect(video).toHaveAttribute('src', attachProbe8)
+    expect(video).toHaveAttribute('src', detachProbe8)
   })
 
   it('displays correct video for 96-channel pipette', () => {
     render(props, 96)
 
     const video = screen.getByTestId('probe-video')
-    expect(video).toHaveAttribute('src', attachProbe96)
+    expect(video).toHaveAttribute('src', detachProbe96)
   })
 
   it('falls back to single-channel video for unexpected channel count', () => {
     render(props, 42)
 
     const video = screen.getByTestId('probe-video')
-    expect(video).toHaveAttribute('src', attachProbe1)
+    expect(video).toHaveAttribute('src', detachProbe1)
   })
 })
