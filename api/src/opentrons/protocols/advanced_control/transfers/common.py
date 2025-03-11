@@ -74,9 +74,9 @@ def expand_for_volume_constraints(
         yield volume, target
 
 
-def _split_volume(volume: float, max_volume: float) -> List[float]:
+def _split_volume_equally(volume: float, max_volume: float) -> List[float]:
     """
-    Splits a given volume into a list of volumes that will are all less than or equal to max volume.
+    Splits a given volume into a list of volumes that are all less than or equal to max volume.
 
     If volume provided is more than the max volume, the volumes will be split evenly.
     """
@@ -95,5 +95,5 @@ def expand_for_volume_constraints_for_liquid_classes(
     """Split a sequence of proposed transfers to keep each under the max volume, splitting larger ones equally."""
     assert max_volume > 0
     for volume, target in zip(volumes, targets):
-        for split_volume in _split_volume(volume, max_volume):
+        for split_volume in _split_volume_equally(volume, max_volume):
             yield split_volume, target
