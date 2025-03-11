@@ -108,6 +108,7 @@ export function useCommandTextString(
     case 'loadPipette':
     case 'loadModule':
     case 'loadLiquid':
+    case 'loadLiquidClass':
       return {
         kind: 'generic',
         commandText: utils.getLoadCommandText(fullParams),
@@ -228,6 +229,12 @@ export function useCommandTextString(
           ...fullParams,
           command,
         }),
+      }
+
+    case 'getNextTip':
+      return {
+        kind: 'generic',
+        commandText: t('get_next_tip'),
       }
 
     case 'moveToAddressableArea':
