@@ -1,5 +1,7 @@
 import { css } from 'styled-components'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   DIRECTION_COLUMN,
@@ -19,8 +21,8 @@ import { StepMeter } from '/app/atoms/StepMeter'
 // TODO(jh, 02-05-25): Move ChildNavigation to molecules.
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { useSelector } from 'react-redux'
 import {
+  HANDLE_LW_SUBSTEP,
   LPC_STEP,
   selectCurrentStep,
   selectStepInfo,
@@ -41,12 +43,10 @@ interface LPCContentContainerTertiaryBtnProps {
   text: ReactNode
 }
 
-// TOME TODO: Exit button behavior on LPC complete in the header should just exit, not
-//  redo the flow again (if this happens). It seems a bit jank when doing detach and other flows, too.
-
 export type LPCContentContainerProps = LPCWizardContentProps &
   Partial<ChildNavigationProps> & {
     children: JSX.Element
+    /* The ODD view header. The desktop header is hard-coded. */
     header: string
     /* An optional style override for the content container. */
     contentStyle?: FlattenSimpleInterpolation
@@ -59,13 +59,27 @@ export type LPCContentContainerProps = LPCWizardContentProps &
 export function LPCContentContainer(
   props: LPCContentContainerProps
 ): JSX.Element {
+  const { t } = useTranslation('labware_position_check')
   const { runId, children, contentStyle, containerStyle, ...rest } = props
   const { commandUtils } = rest
-  const { currentStepIndex, totalStepCount } = useSelector(
+  const { currentStepIndex, totalStepCount, currentSubstep } = useSelector(
     selectStepInfo(runId)
   )
+  const step = useSelector(selectCurrentStep(runId))
   const isOnDevice = useSelector(getIsOnDevice)
   const showDesktopFooter = !commandUtils.isRobotMoving
+
+  const handleExit = (): void => {
+    if (
+      step !== LPC_STEP.DETACH_PROBE &&
+      step !== LPC_STEP.LPC_COMPLETE &&
+      commandUtils.errorMessage == null
+    ) {
+      commandUtils.headerCommands.handleNavToDetachProbe()
+    } else {
+      void commandUtils.handleCloseNoHome()
+    }
+  }
 
   return (
     <>
@@ -76,7 +90,11 @@ export function LPCContentContainer(
               totalSteps={totalStepCount}
               currentStep={currentStepIndex + 1}
             />
-            <ChildNavigation {...rest} css={CHILD_NAV_STYLE} />
+            <ChildNavigation
+              {...rest}
+              css={CHILD_NAV_STYLE}
+              buttonIsDisabled={rest.buttonIsDisabled}
+            />
           </Flex>
           <Flex css={contentStyle ?? ODD_CHILDREN_CONTAINER_STYLE}>
             {children}
@@ -88,8 +106,13 @@ export function LPCContentContainer(
             css={containerStyle ?? DESKTOP_CONTAINER_STYLE}
             header={
               <WizardHeader
-                title={rest.header}
-                onExit={commandUtils.headerCommands.handleNavToDetachProbe}
+                title={t('labware_position_check_title')}
+                onExit={
+                  commandUtils.isRobotMoving ||
+                  currentSubstep === HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
+                    ? undefined
+                    : handleExit
+                }
                 currentStep={currentStepIndex + 1}
                 totalSteps={totalStepCount}
                 hideStepText={true}
@@ -118,7 +141,10 @@ function DesktopFooterContent({
   onClickButton,
 }: Omit<LPCContentContainerProps, 'children'>): JSX.Element {
   const step = useSelector(selectCurrentStep(runId))
-  const showHelpLink = step !== LPC_STEP.LPC_COMPLETE
+  const { currentSubstep } = useSelector(selectStepInfo(runId))
+  const showHelpLink =
+    step !== LPC_STEP.LPC_COMPLETE &&
+    currentSubstep !== HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
 
   return (
     <Flex css={DESKTOP_FOOTER_CONTENT_CONTAINER}>
