@@ -43,13 +43,17 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
       onClickButton={() => {
         proceedStep()
       }}
+      tertiaryBtnProps={{ onClick: goBackLastStep, text: t('cancel') }}
       onClickBack={goBackLastStep}
     >
       <TwoColumn>
         <DescriptionContent
           headline={t('detach_probe')}
           message={
-            <StyledText oddStyle="bodyTextRegular">
+            <StyledText
+              oddStyle="bodyTextRegular"
+              desktopStyle="bodyDefaultRegular"
+            >
               <Trans
                 t={t}
                 i18nKey="store_probe"
