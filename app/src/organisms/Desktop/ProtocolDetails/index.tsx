@@ -301,7 +301,7 @@ export function ProtocolDetails(
     } else {
       if ('protocolDesigner' in metadata) {
         return t('protocol_designer_version', {
-          version: parseInt(metadata.protocolDesigner).toFixed(1),
+          version: parseInt(metadata.protocolDesigner as string).toFixed(1),
         })
       } else {
         return t('python_api_version', {
