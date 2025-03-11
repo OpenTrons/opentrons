@@ -148,6 +148,7 @@ describe('consolidate single-channel', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
+      //  drop tip from return tip
       {
         commandType: 'moveToAddressableArea',
         key: expect.any(String),
@@ -174,6 +175,7 @@ describe('consolidate single-channel', () => {
       dispenseHelper('B1', 100),
       makeMoveToWellHelper('B1', DEST_LABWARE),
       ...makeAirGapHelper(5),
+      //   drop tip at end
       {
         commandType: 'moveToAddressableArea',
         key: expect.any(String),

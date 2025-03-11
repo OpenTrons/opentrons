@@ -142,6 +142,7 @@ describe('pick up tip if no tip on pipette', () => {
 
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
+      //   drop tip from return tip
       {
         commandType: 'moveToAddressableArea',
         key: expect.any(String),
@@ -169,6 +170,7 @@ describe('pick up tip if no tip on pipette', () => {
       dispenseHelper('B2', 30),
       makeMoveToWellHelper('B2', 'destPlateId'),
       ...makeAirGapHelper(5),
+      //   drop tip at end
       {
         commandType: 'moveToAddressableArea',
         key: expect.any(String),
