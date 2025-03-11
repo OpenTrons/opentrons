@@ -194,7 +194,7 @@ describe('ProtocolDetails', () => {
         createdAt,
         metadata: {
           ...mockMostRecentAnalysis.metadata,
-          protocolDesigner: '8.0.0',
+          protocolDesigner: '8.11.22',
         },
         config: {
           ...mockMostRecentAnalysis.config,
