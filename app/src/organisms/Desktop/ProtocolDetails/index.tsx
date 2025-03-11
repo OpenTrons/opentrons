@@ -311,11 +311,6 @@ export function ProtocolDetails(
       }
     }
   }
-  console.log(
-    'config',
-    mostRecentAnalysis?.config,
-    mostRecentAnalysis?.metadata
-  )
 
   const creationMethod =
     mostRecentAnalysis != null
