@@ -50,7 +50,20 @@
       "type": "string",
       "pattern": "^[a-z0-9._]+$"
     },
-    "vector": {
+    "vector2D": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "vector3D": {
       "type": "object",
       "additionalProperties": false,
       "required": ["x", "y", "z"],
@@ -66,16 +79,46 @@
         }
       }
     },
+    "axisAlignedBoundingBox2D": {
+      "type": "object",
+      "required": ["backLeft", "frontRight"],
+      "additionalProperties": false,
+      "properties": {
+        "backLeft": {
+          "description": "The back-left (-x, +y) corner.",
+          "$ref": "#/definitions/vector2D"
+        },
+        "frontRight": {
+          "description": "The front-right (+x, -y) corner.",
+          "$ref": "#/definitions/vector2D"
+        }
+      }
+    },
+    "axisAlignedBoundingBox3D": {
+      "type": "object",
+      "required": ["backLeftBottom", "frontRightTop"],
+      "additionalProperties": false,
+      "properties": {
+        "backLeftBottom": {
+          "description": "The back-left-bottom (-x, +y, -z) corner.",
+          "$ref": "#/definitions/vector3D"
+        },
+        "frontRightTop": {
+          "description": "The front-right-top (+x, -y, +z) corner.",
+          "$ref": "#/definitions/vector3D"
+        }
+      }
+    },
     "pickUpAndDropOffsets": {
       "type": "object",
       "required": ["pickUpOffset", "dropOffset"],
       "properties": {
         "pickUpOffset": {
-          "$ref": "#/definitions/vector",
+          "$ref": "#/definitions/vector3D",
           "description": "Offset added to calculate pick-up coordinates."
         },
         "dropOffset": {
-          "$ref": "#/definitions/vector",
+          "$ref": "#/definitions/vector3D",
           "description": "Offset added to calculate drop coordinates."
         }
       }
@@ -449,9 +492,8 @@
     "metadata",
     "brand",
     "parameters",
-    "cornerOffsetFromSlot",
     "ordering",
-    "dimensions",
+    "extents",
     "wells",
     "groups"
   ],
@@ -569,24 +611,19 @@
         }
       }
     },
-    "cornerOffsetFromSlot": {
-      "description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware bounding box. Used for labware that spans multiple slots. For labware that does not span multiple slots, x/y/z should all be zero.",
-      "$ref": "#/definitions/vector"
-    },
-    "dimensions": {
+    "extents": {
+      "description": "The outer dimensions of the labware.",
       "type": "object",
+      "required": ["total", "footprint"],
       "additionalProperties": false,
-      "description": "Outer dimensions of a labware",
-      "required": ["xDimension", "yDimension", "zDimension"],
       "properties": {
-        "yDimension": {
-          "$ref": "#/definitions/positiveNumber"
+        "total": {
+          "description": "The all-encompassing outer dimensions of the labware.",
+          "$ref": "#/definitions/axisAlignedBoundingBox3D"
         },
-        "zDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "xDimension": {
-          "$ref": "#/definitions/positiveNumber"
+        "footprint": {
+          "description": "The outer dimensions of the labware where it meets the deck.",
+          "$ref": "#/definitions/axisAlignedBoundingBox2D"
         }
       }
     },
@@ -662,14 +699,14 @@
       "type": "object",
       "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
       "additionalProperties": {
-        "$ref": "#/definitions/vector"
+        "$ref": "#/definitions/vector3D"
       }
     },
     "stackingOffsetWithModule": {
       "type": "object",
       "description": "Supported module that can be stacked upon, with overlap height between labware and module.",
       "additionalProperties": {
-        "$ref": "#/definitions/vector"
+        "$ref": "#/definitions/vector3D"
       }
     },
     "stackLimit": {
