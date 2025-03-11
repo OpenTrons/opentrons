@@ -5,7 +5,7 @@ import { RadioButton as RadioButtonComponent } from './RadioButton'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof RadioButtonComponent> = {
-  title: 'Library/Atoms/Buttons/RadioButton',
+  title: 'Helix/Atoms/Buttons/RadioButton',
   component: RadioButtonComponent,
   argTypes: {
     radioButtonType: {

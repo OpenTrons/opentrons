@@ -6,7 +6,7 @@ import { DeckInfoLabel } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof DeckInfoLabel> = {
-  title: 'Library/Molecules/DeckInfoLabel',
+  title: 'Helix/Molecules/DeckInfoLabel',
   argTypes: {
     iconName: {
       control: {

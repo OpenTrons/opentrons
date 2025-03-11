@@ -7,7 +7,7 @@ import { LargeButton } from './LargeButton'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof LargeButton> = {
-  title: 'Library/Atoms/Buttons/LargeButton',
+  title: 'Helix/Atoms/Buttons/LargeButton',
   component: LargeButton,
   argTypes: {
     onClick: { action: 'clicked' },

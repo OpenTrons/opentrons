@@ -145,11 +145,14 @@ export function denormalizePipetteEntities(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
         )
       }
+      const is96Channel = spec.channels === 96
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,
         tiprackLabwareDef: pipette.tiprackDefURI.map(def => labwareDefs[def]),
-        pythonName: `pipette_${pipetteLocationUpdate[pipetteId]}`,
+        pythonName: is96Channel
+          ? 'pipette'
+          : `pipette_${pipetteLocationUpdate[pipetteId]}`,
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },

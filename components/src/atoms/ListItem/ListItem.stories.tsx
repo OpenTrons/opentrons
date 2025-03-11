@@ -9,7 +9,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import type { DropdownMenuProps } from '../../molecules'
 
 const meta: Meta<typeof ListItemComponent> = {
-  title: 'Library/Atoms/ListItem',
+  title: 'ListItem',
   component: ListItemComponent,
   argTypes: {
     type: {

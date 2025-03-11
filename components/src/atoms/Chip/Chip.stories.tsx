@@ -5,7 +5,7 @@ import { Chip as ChipComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ChipComponent> = {
-  title: 'Library/Atoms/Chip',
+  title: 'Helix/Atoms/Chip',
   argTypes: {
     type: {
       options: ['error', 'info', 'neutral', 'success', 'warning'],

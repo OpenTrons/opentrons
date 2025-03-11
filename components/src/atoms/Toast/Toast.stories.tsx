@@ -9,7 +9,7 @@ import { LegacyStyledText } from '../StyledText'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Atoms/Toast',
+  title: 'Helix/Atoms/Toast',
   component: Toast,
 } as Meta
 

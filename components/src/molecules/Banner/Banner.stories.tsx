@@ -4,7 +4,7 @@ import { Banner } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Banner> = {
-  title: 'Library/Molecules/Banner',
+  title: 'Helix/Molecules/Banner',
   component: Banner,
 }
 

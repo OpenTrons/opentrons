@@ -10,7 +10,7 @@ import { StyledText } from '../..'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ListButtonComponent> = {
-  title: 'Library/Atoms/ListButton',
+  title: 'Helix/Atoms/ListButton',
   component: ListButtonComponent,
   argTypes: {
     type: {

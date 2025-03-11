@@ -1,9 +1,4 @@
 import {
-  FLEX_ROBOT_TYPE,
-  getDeckDefFromRobotType,
-  OT2_ROBOT_TYPE,
-} from '@opentrons/shared-data'
-import {
   aspirateInPlace,
   blowOutInPlace,
   dispenseInPlace,
@@ -13,158 +8,149 @@ import {
 } from '../commandCreators/atomic'
 import { ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
-import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
+import { getTrashBinAddressableAreaName } from './misc'
 import type {
   RobotState,
   InvariantContext,
   CurriedCommandCreator,
 } from '../types'
 
-export type MovableTrashCommandsTypes =
-  | 'airGap'
-  | 'blowOut'
-  | 'dispense'
-  | 'dropTip'
-  | 'moveToWell'
+/** Helper fn for movable trash commands for dispense, aspirate, air_gap, drop_tip and blow_out commands */
 
-interface MovableTrashCommandArgs {
-  type: MovableTrashCommandsTypes
+export function airGapInMovableTrash(args: {
+  pipetteId: string
+  volume: number
+  flowRate: number
+  invariantContext: InvariantContext
+  prevRobotState: RobotState
+}): CurriedCommandCreator[] {
+  const { pipetteId, invariantContext, volume, flowRate } = args
+  const offset = ZERO_OFFSET
+  const addressableAreaName = getTrashBinAddressableAreaName(
+    invariantContext.additionalEquipmentEntities
+  )
+  if (addressableAreaName == null) {
+    console.error('could not getTrashBinAddressableAreaName for airGap')
+    return []
+  }
+  return [
+    curryCommandCreator(moveToAddressableArea, {
+      pipetteId,
+      addressableAreaName,
+      offset,
+    }),
+    curryCommandCreator(aspirateInPlace, {
+      pipetteId,
+      volume,
+      flowRate,
+    }),
+  ]
+}
+
+export function dropTipInMovableTrash(args: {
   pipetteId: string
   invariantContext: InvariantContext
-  prevRobotState?: RobotState
-  volume?: number
-  flowRate?: number
-}
-/** Helper fn for movable trash commands for dispense, aspirate, air_gap, drop_tip and blow_out commands */
-export const movableTrashCommandsUtil = (
-  args: MovableTrashCommandArgs
-): CurriedCommandCreator[] => {
-  const {
-    pipetteId,
-    type,
-    invariantContext,
-    prevRobotState,
-    volume,
-    flowRate,
-  } = args
-  const offset = ZERO_OFFSET
-  const trash = Object.values(
+  prevRobotState: RobotState
+}): CurriedCommandCreator[] {
+  const { pipetteId, invariantContext, prevRobotState } = args
+  const addressableAreaName = getTrashBinAddressableAreaName(
     invariantContext.additionalEquipmentEntities
-  ).find(aE => aE.name === 'trashBin')
-  const trashLocation = trash != null ? (trash.location as CutoutId) : null
-
-  const deckDef = getDeckDefFromRobotType(
-    trashLocation === ('cutout12' as CutoutId)
-      ? OT2_ROBOT_TYPE
-      : FLEX_ROBOT_TYPE
   )
-  let cutouts: Record<CutoutId, AddressableAreaName[]> | null = null
-  if (deckDef.robot.model === FLEX_ROBOT_TYPE) {
-    cutouts =
-      deckDef.cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
-      )?.providesAddressableAreas ?? null
-  } else if (deckDef.robot.model === OT2_ROBOT_TYPE) {
-    cutouts =
-      deckDef.cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id === 'fixedTrashSlot'
-      )?.providesAddressableAreas ?? null
-  }
-
-  let inPlaceCommands: CurriedCommandCreator[] = []
-
-  const addressableAreaName =
-    trashLocation != null && cutouts != null
-      ? cutouts[trashLocation]?.[0] ?? null
-      : null
-
   if (addressableAreaName == null) {
-    console.error(
-      `expected to find addressableAreaName with trashLocation ${trashLocation} but could not`
-    )
-  } else {
-    switch (type) {
-      case 'airGap': {
-        inPlaceCommands =
-          flowRate != null && volume != null
-            ? [
-                curryCommandCreator(moveToAddressableArea, {
-                  pipetteId,
-                  addressableAreaName,
-                  offset,
-                }),
-                curryCommandCreator(aspirateInPlace, {
-                  pipetteId,
-                  volume,
-                  flowRate,
-                }),
-              ]
-            : []
-
-        break
-      }
-      case 'dropTip': {
-        inPlaceCommands =
-          prevRobotState != null && !prevRobotState.tipState.pipettes[pipetteId]
-            ? []
-            : [
-                curryCommandCreator(moveToAddressableAreaForDropTip, {
-                  pipetteId,
-                  addressableAreaName,
-                }),
-                curryCommandCreator(dropTipInPlace, {
-                  pipetteId,
-                }),
-              ]
-
-        break
-      }
-      case 'dispense': {
-        inPlaceCommands =
-          flowRate != null && volume != null
-            ? [
-                curryCommandCreator(moveToAddressableArea, {
-                  pipetteId,
-                  addressableAreaName,
-                  offset,
-                }),
-                curryCommandCreator(dispenseInPlace, {
-                  pipetteId,
-                  volume,
-                  flowRate,
-                }),
-              ]
-            : []
-        break
-      }
-      case 'blowOut': {
-        inPlaceCommands =
-          flowRate != null
-            ? [
-                curryCommandCreator(moveToAddressableArea, {
-                  pipetteId,
-                  addressableAreaName,
-                  offset,
-                }),
-                curryCommandCreator(blowOutInPlace, {
-                  pipetteId,
-                  flowRate,
-                }),
-              ]
-            : []
-        break
-      }
-      case 'moveToWell': {
-        inPlaceCommands = [
-          curryCommandCreator(moveToAddressableArea, {
-            pipetteId,
-            addressableAreaName,
-            offset,
-          }),
-        ]
-      }
-    }
+    console.error('could not getTrashBinAddressableAreaName for dropTip')
+    return []
   }
+  if (!prevRobotState.tipState.pipettes[pipetteId]) {
+    return []
+  }
+  return [
+    curryCommandCreator(moveToAddressableAreaForDropTip, {
+      pipetteId,
+      addressableAreaName,
+    }),
+    curryCommandCreator(dropTipInPlace, {
+      pipetteId,
+    }),
+  ]
+}
 
-  return inPlaceCommands
+export function dispenseInMovableTrash(args: {
+  pipetteId: string
+  volume: number
+  flowRate: number
+  invariantContext: InvariantContext
+  prevRobotState: RobotState
+}): CurriedCommandCreator[] {
+  const { pipetteId, invariantContext, volume, flowRate } = args
+  const offset = ZERO_OFFSET
+  const addressableAreaName = getTrashBinAddressableAreaName(
+    invariantContext.additionalEquipmentEntities
+  )
+  if (addressableAreaName == null) {
+    console.error('could not getTrashBinAddressableAreaName for dispense')
+    return []
+  }
+  return [
+    curryCommandCreator(moveToAddressableArea, {
+      pipetteId,
+      addressableAreaName,
+      offset,
+    }),
+    curryCommandCreator(dispenseInPlace, {
+      pipetteId,
+      volume,
+      flowRate,
+    }),
+  ]
+}
+
+export function blowOutInMovableTrash(args: {
+  pipetteId: string
+  flowRate: number
+  invariantContext: InvariantContext
+  prevRobotState: RobotState
+}): CurriedCommandCreator[] {
+  const { pipetteId, invariantContext, flowRate } = args
+  const offset = ZERO_OFFSET
+  const addressableAreaName = getTrashBinAddressableAreaName(
+    invariantContext.additionalEquipmentEntities
+  )
+  if (addressableAreaName == null) {
+    console.error('could not getTrashBinAddressableAreaName for blowOut')
+    return []
+  }
+  return [
+    curryCommandCreator(moveToAddressableArea, {
+      pipetteId,
+      addressableAreaName,
+      offset,
+    }),
+    curryCommandCreator(blowOutInPlace, {
+      pipetteId,
+      flowRate,
+    }),
+  ]
+}
+
+export function moveToMovableTrash(args: {
+  pipetteId: string
+  invariantContext: InvariantContext
+  prevRobotState: RobotState
+}): CurriedCommandCreator[] {
+  const { pipetteId, invariantContext } = args
+  const offset = ZERO_OFFSET
+  const addressableAreaName = getTrashBinAddressableAreaName(
+    invariantContext.additionalEquipmentEntities
+  )
+  if (addressableAreaName == null) {
+    console.error('could not getTrashBinAddressableAreaName for moveTo')
+    return []
+  }
+  return [
+    curryCommandCreator(moveToAddressableArea, {
+      pipetteId,
+      addressableAreaName,
+      offset,
+    }),
+  ]
 }

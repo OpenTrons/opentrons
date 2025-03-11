@@ -4,7 +4,7 @@ import { MenuItem as MenuItemComponent } from './MenuItem'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof MenuItemComponent> = {
-  title: 'Library/Atoms/MenuItem',
+  title: 'Helix/Atoms/MenuItem',
   component: MenuItemComponent,
   parameters: VIEWPORT.touchScreenViewport,
 }

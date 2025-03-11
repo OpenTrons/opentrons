@@ -7,7 +7,7 @@ import { Modal as ModalComponent } from './Modal'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ModalComponent> = {
-  title: 'Library/Molecules/modals/Modal',
+  title: 'Helix/Molecules/Modal',
   component: ModalComponent,
 }
 export default meta
