@@ -405,7 +405,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
         dropTipCommand = wasteChuteCommandsUtil({
           type: 'dropTip',
           pipetteId: args.pipette,
-          prevRobotState,
           addressableAreaName: addressableAreaNameWasteChute,
         })
       }

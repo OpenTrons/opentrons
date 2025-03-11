@@ -567,7 +567,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             dropTipCommand = wasteChuteCommandsUtil({
               type: 'dropTip',
               pipetteId: args.pipette,
-              prevRobotState,
               addressableAreaName: addressableAreaNameWasteChute,
             })
           }

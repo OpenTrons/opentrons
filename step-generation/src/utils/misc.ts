@@ -394,7 +394,6 @@ export const blowoutUtil = (args: {
       type: 'blowOut',
       flowRate,
       addressableAreaName,
-      prevRobotState,
     })
   } else {
     return blowOutInMovableTrash({
@@ -624,7 +623,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       pipetteId,
       volume,
       flowRate,
-      prevRobotState,
       addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
     })
   } else {
@@ -803,7 +801,6 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       pipetteId,
       volume,
       flowRate,
-      prevRobotState,
       addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
     })
   } else {

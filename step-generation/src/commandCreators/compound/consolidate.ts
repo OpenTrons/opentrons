@@ -490,7 +490,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         dropTipCommand = wasteChuteCommandsUtil({
           type: 'dropTip',
           pipetteId: args.pipette,
-          prevRobotState,
           addressableAreaName: addressableAreaNameWasteChute,
         })
       }

@@ -129,6 +129,8 @@ describe('pick up tip if no tip on pipette', () => {
       },
     }
 
+    robotStateWithTip.tipState.pipettes.p300SingleId = true
+
     noTipArgs = {
       ...noTipArgs,
       changeTip: 'always',
@@ -140,11 +142,54 @@ describe('pick up tip if no tip on pipette', () => {
 
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 30),
       dispenseHelper('B2', 30),
       makeMoveToWellHelper('B2', 'destPlateId'),
       ...makeAirGapHelper(5),
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
     ])
   })
 

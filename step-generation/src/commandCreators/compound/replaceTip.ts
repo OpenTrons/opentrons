@@ -212,7 +212,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
         type: 'dropTip',
         pipetteId: pipette,
         addressableAreaName: addressableAreaNameWasteChute,
-        prevRobotState,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {

@@ -3,15 +3,15 @@ import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { curryCommandCreator } from '../utils'
 import { wasteChuteCommandsUtil } from '../utils/wasteChuteCommandsUtil'
-import type { PipetteEntities } from '../types'
+import { dropTipInWasteChute } from '../commandCreators'
 import {
   airGapInPlace,
   blowOutInPlace,
   dispenseInPlace,
-  dropTipInPlace,
   moveToAddressableArea,
   prepareToAspirate,
 } from '../commandCreators/atomic'
+import type { PipetteEntities } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 vi.mock('../utils/curryCommandCreator')
@@ -85,27 +85,16 @@ describe('wasteChuteCommandsUtil', () => {
     wasteChuteCommandsUtil({
       ...args,
       type: 'dropTip',
-      prevRobotState: {
-        ...args.prevRobotState,
-        tipState: { pipettes: { [mockId]: true } } as any,
-      },
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(
-      moveToAddressableArea,
-      mockMoveToAddressableAreaParams
-    )
-    expect(curryCommandCreator).toHaveBeenCalledWith(dropTipInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(dropTipInWasteChute, {
       pipetteId: mockId,
+      addressableAreaName: mockAddressableAreaName,
     })
   })
   it('returns correct commands for air gap/aspirate in place', () => {
     wasteChuteCommandsUtil({
       ...args,
       type: 'airGap',
-      prevRobotState: {
-        ...args.prevRobotState,
-        tipState: { pipettes: { [mockId]: true } } as any,
-      },
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
