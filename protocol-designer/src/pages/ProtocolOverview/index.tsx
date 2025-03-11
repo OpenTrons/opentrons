@@ -9,7 +9,6 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  EndUserAgreementFooter,
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -36,6 +35,7 @@ import {
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../atoms'
+import { EndUserAgreementFooter } from '../../molecules'
 import { useBlockingHint } from '../../organisms/BlockingHintModal/useBlockingHint'
 import {
   EditProtocolMetadataModal,

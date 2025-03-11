@@ -16,10 +16,11 @@ import {
 } from '@opentrons/shared-data'
 import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
 import {
-  aspirate,
+  airGapInPlace,
   dispense,
   moveToAddressableArea,
   moveToWell,
+  prepareToAspirate,
 } from '../commandCreators/atomic'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -701,10 +702,8 @@ interface AirGapArgs {
   destWell: string | null
   flowRate: number
   offsetFromBottomMm: number
-  tipRack: string
   pipetteId: string
   volume: number
-  nozzles: NozzleConfigurationStyle | null
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
@@ -721,11 +720,9 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     flowRate,
     offsetFromBottomMm,
     pipetteId,
-    tipRack,
     sourceId,
     sourceWell,
     volume,
-    nozzles,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -750,12 +747,10 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       })
 
       commands = [
-        curryCommandCreator(aspirate, {
-          pipetteId: pipetteId,
-          volume,
+        curryCommandCreator(moveToWell, {
+          pipetteId,
           labwareId: dispenseAirGapLabware,
           wellName: dispenseAirGapWell,
-          flowRate,
           wellLocation: {
             origin: 'bottom',
             offset: {
@@ -764,20 +759,23 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
               y: 0,
             },
           },
-          isAirGap: true,
-          tipRack,
-          nozzles,
+        }),
+        curryCommandCreator(prepareToAspirate, {
+          pipetteId,
+        }),
+        curryCommandCreator(airGapInPlace, {
+          pipetteId,
+          volume,
+          flowRate,
         }),
       ]
       //  when aspirating out of multi wells for consolidate
     } else {
       commands = [
-        curryCommandCreator(aspirate, {
-          pipetteId: pipetteId,
-          volume,
+        curryCommandCreator(moveToWell, {
+          pipetteId,
           labwareId: destinationId,
           wellName: destWell,
-          flowRate,
           wellLocation: {
             origin: 'bottom',
             offset: {
@@ -786,9 +784,14 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
               y: 0,
             },
           },
-          isAirGap: true,
-          tipRack,
-          nozzles,
+        }),
+        curryCommandCreator(prepareToAspirate, {
+          pipetteId,
+        }),
+        curryCommandCreator(airGapInPlace, {
+          pipetteId,
+          volume,
+          flowRate,
         }),
       ]
     }

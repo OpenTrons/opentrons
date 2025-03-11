@@ -22,7 +22,7 @@ import {
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { DeckItemHover } from '../DeckSetup/DeckItemHover'
+import { OffDeckControls } from './OffDeckControls'
 import { SlotDetailsContainer } from '../../../organisms'
 import { wellFillFromWellContents } from '../../../organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../../file-data/selectors'
@@ -36,8 +36,8 @@ import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { DeckSetupTabType } from '../types'
 
 const OFF_DECK_MAP_WIDTH = '41.625rem'
-const OFF_DECK_MAP_HEIGHT = '45.5rem'
-const OFF_DECK_MAP_HEIGHT_FOR_STEP = '31.4rem'
+const OFF_DECK_MAP_HEIGHT = '44rem'
+const OFF_DECK_MAP_HEIGHT_FOR_STEP = '30.3rem'
 const ZERO_SLOT_POSITION: CoordinateTuple = [0, 0, 0]
 interface OffDeckDetailsProps extends DeckSetupTabType {
   addLabware: () => void
@@ -159,14 +159,14 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
                         )}
                       />
 
-                      <DeckItemHover
+                      <OffDeckControls
                         hover={hoverSlot}
                         setShowMenuListForId={setShowMenuListForId}
                         menuListId={menuListId}
                         setHover={setHoverSlot}
                         slotBoundingBox={xyzDimensions}
                         slotPosition={ZERO_SLOT_POSITION}
-                        itemId={lw.id}
+                        labwareId={lw.id}
                         tab={tab}
                       />
                     </>

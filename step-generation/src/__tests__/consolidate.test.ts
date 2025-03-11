@@ -22,8 +22,9 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
-  AIR_GAP_META,
   blowoutInPlaceHelper,
+  makeMoveToWellHelper,
+  makeAirGapAfterAspirateHelper,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type {
@@ -33,16 +34,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
 
-const airGapHelper = makeAirGapHelper({
-  wellLocation: {
-    origin: 'bottom',
-    offset: {
-      z: 11.54,
-      x: 0,
-      y: 0,
-    },
-  },
-})
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -161,7 +152,8 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A1', 50),
       aspirateHelper('A2', 50),
       dispenseHelper('B1', 100),
-      airGapHelper('B1', 5, { labwareId: 'destPlateId' }),
+      makeMoveToWellHelper('B1', DEST_LABWARE),
+      ...makeAirGapHelper(5),
     ])
   })
 
@@ -852,24 +844,28 @@ describe('consolidate single-channel', () => {
 
       aspirateHelper('A1', 100),
       ...delayWithOffset('A1', SOURCE_LABWARE),
-      airGapHelper('A1', 5),
+      makeMoveToWellHelper('A1'),
+      makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       aspirateHelper('A2', 100),
       ...delayWithOffset('A2', SOURCE_LABWARE),
-      airGapHelper('A2', 5),
+      makeMoveToWellHelper('A2'),
+      makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       dispenseHelper('B1', 210),
 
       aspirateHelper('A3', 100),
       ...delayWithOffset('A3', SOURCE_LABWARE),
-      airGapHelper('A3', 5),
+      makeMoveToWellHelper('A3'),
+      makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       aspirateHelper('A4', 100),
       ...delayWithOffset('A4', SOURCE_LABWARE),
-      airGapHelper('A4', 5),
+      makeMoveToWellHelper('A4'),
+      makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       dispenseHelper('B1', 210),
@@ -1010,18 +1006,22 @@ describe('consolidate single-channel', () => {
       pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 100),
-      airGapHelper('A1', 5),
+      makeMoveToWellHelper('A1'),
+      makeAirGapAfterAspirateHelper(5),
 
       aspirateHelper('A2', 100),
-      airGapHelper('A2', 5),
+      makeMoveToWellHelper('A2'),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 210),
 
       aspirateHelper('A3', 100),
-      airGapHelper('A3', 5),
+      makeMoveToWellHelper('A3'),
+      makeAirGapAfterAspirateHelper(5),
 
       aspirateHelper('A4', 100),
-      airGapHelper('A4', 5),
+      makeMoveToWellHelper('A4'),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 210),
     ])
@@ -1044,22 +1044,26 @@ describe('consolidate single-channel', () => {
       pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 150),
-      airGapHelper('A1', 5),
+      makeMoveToWellHelper('A1'),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A2', 150),
-      airGapHelper('A2', 5),
+      makeMoveToWellHelper('A2'),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A3', 150),
-      airGapHelper('A3', 5),
+      makeMoveToWellHelper('A3'),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A4', 150),
-      airGapHelper('A4', 5),
+      makeMoveToWellHelper('A4'),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
     ])
@@ -1213,12 +1217,10 @@ describe('consolidate single-channel', () => {
         },
         // Air Gap: after aspirating from A1
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
@@ -1229,7 +1231,16 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+
+          params: {
             flowRate: 2.1,
+            pipetteId: 'p300SingleId',
+            volume: 31,
           },
         },
         {
@@ -1300,12 +1311,10 @@ describe('consolidate single-channel', () => {
         },
         // Aspirate > air gap: after aspirating from A2
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
@@ -1316,7 +1325,15 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
             flowRate: 2.1,
+            pipetteId: 'p300SingleId',
+            volume: 31,
           },
         },
         {
@@ -1560,12 +1577,10 @@ describe('consolidate single-channel', () => {
         },
         // Aspirate > air gap: after aspirating from A3
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
@@ -1576,7 +1591,15 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
             flowRate: 2.1,
+            pipetteId: 'p300SingleId',
+            volume: 31,
           },
         },
         {
@@ -1703,14 +1726,12 @@ describe('consolidate single-channel', () => {
         },
         // Dispense > air gap in dest well
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
             wellName: 'B1',
-            flowRate: 2.1,
             wellLocation: {
               origin: 'bottom',
               offset: {
@@ -1719,7 +1740,22 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
             volume: 35,
+            flowRate: 2.1,
           },
         },
         {
@@ -1888,12 +1924,10 @@ describe('consolidate single-channel', () => {
         },
         // Air Gap: after aspirating from A1
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
@@ -1904,7 +1938,15 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
             flowRate: 2.1,
+            pipetteId: 'p300SingleId',
+            volume: 31,
           },
         },
         {
@@ -1975,12 +2017,10 @@ describe('consolidate single-channel', () => {
         },
         // Aspirate > air gap: after aspirating from A2
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
@@ -1991,7 +2031,15 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
             flowRate: 2.1,
+            pipetteId: 'p300SingleId',
+            volume: 31,
           },
         },
         {
@@ -2250,12 +2298,10 @@ describe('consolidate single-channel', () => {
         },
         // Aspirate > air gap: after aspirating from A3
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
@@ -2266,7 +2312,15 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
             flowRate: 2.1,
+            pipetteId: 'p300SingleId',
+            volume: 31,
           },
         },
         {
@@ -2408,14 +2462,12 @@ describe('consolidate single-channel', () => {
         },
         // Dispense > air gap in dest well
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             labwareId: 'destPlateId',
             wellName: 'B1',
-            flowRate: 2.1,
             wellLocation: {
               origin: 'bottom',
               offset: {
@@ -2424,7 +2476,23 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
             volume: 35,
+            flowRate: 2.1,
           },
         },
         {
@@ -2590,12 +2658,10 @@ describe('consolidate single-channel', () => {
         },
         // Air Gap: after aspirating from A1
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
@@ -2606,6 +2672,14 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 31,
             flowRate: 2.1,
           },
         },
@@ -2677,12 +2751,10 @@ describe('consolidate single-channel', () => {
         },
         // Aspirate > air gap: after aspirating from A2
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
@@ -2693,6 +2765,14 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 31,
             flowRate: 2.1,
           },
         },
@@ -2836,8 +2916,7 @@ describe('consolidate single-channel', () => {
 
         // Change tip is "always" so we can Dispense > Air Gap here
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2851,6 +2930,21 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
             volume: 35,
             flowRate: 2.1,
           },
@@ -2989,12 +3083,10 @@ describe('consolidate single-channel', () => {
         },
         // Aspirate > air gap: after aspirating from A3
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
-            volume: 31,
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
@@ -3005,6 +3097,15 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+            volume: 31,
             flowRate: 2.1,
           },
         },
@@ -3147,8 +3248,7 @@ describe('consolidate single-channel', () => {
         },
         // Dispense > air gap in dest well
         {
-          commandType: 'aspirate',
-          meta: AIR_GAP_META,
+          commandType: 'moveToWell',
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -3162,6 +3262,20 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
+          commandType: 'airGapInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
             volume: 35,
             flowRate: 2.1,
           },

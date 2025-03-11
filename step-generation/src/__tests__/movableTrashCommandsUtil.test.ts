@@ -8,12 +8,13 @@ import {
   dropTipInMovableTrash,
 } from '../utils/movableTrashCommandsUtil'
 import {
-  aspirateInPlace,
+  airGapInPlace,
   blowOutInPlace,
   dispenseInPlace,
   dropTipInPlace,
   moveToAddressableArea,
   moveToAddressableAreaForDropTip,
+  prepareToAspirate,
 } from '../commandCreators/atomic'
 import type { PipetteEntities } from '../types'
 
@@ -111,7 +112,10 @@ describe('movableTrashCommandsUtil', () => {
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreator).toHaveBeenCalledWith(aspirateInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(prepareToAspirate, {
+      pipetteId: mockId,
+    })
+    expect(curryCommandCreator).toHaveBeenCalledWith(airGapInPlace, {
       pipetteId: mockId,
       volume: 10,
       flowRate: 10,

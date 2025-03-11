@@ -1,5 +1,6 @@
 import {
   ALIGN_CENTER,
+  Btn,
   COLORS,
   Check,
   DIRECTION_COLUMN,
@@ -22,6 +23,7 @@ interface CheckboxExpandStepFormFieldProps {
   children?: ReactNode
   tooltipText?: string | null
   disabled?: boolean
+  testId?: string
 }
 export function CheckboxExpandStepFormField(
   props: CheckboxExpandStepFormFieldProps
@@ -34,6 +36,7 @@ export function CheckboxExpandStepFormField(
     title,
     tooltipText,
     disabled = false,
+    testId,
   } = props
 
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -59,14 +62,23 @@ export function CheckboxExpandStepFormField(
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
           >
-            <StyledText desktopStyle="bodyDefaultRegular" {...targetProps}>
-              {title}
-            </StyledText>
-            <Check
-              color={COLORS.blue50}
-              isChecked={isChecked}
-              disabled={disabled}
-            />
+            <>
+              <StyledText desktopStyle="bodyDefaultRegular" {...targetProps}>
+                {title}
+              </StyledText>
+              <Btn
+                data-testid={testId}
+                onClick={() => {
+                  checkboxUpdateValue(!checkboxValue)
+                }}
+              >
+                <Check
+                  color={COLORS.blue50}
+                  isChecked={isChecked}
+                  disabled={disabled}
+                />
+              </Btn>
+            </>
           </Flex>
           {children}
         </Flex>

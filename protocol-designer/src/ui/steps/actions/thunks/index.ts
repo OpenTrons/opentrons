@@ -1,5 +1,6 @@
 import last from 'lodash/last'
 import {
+  ABSORBANCE_READER_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -105,6 +106,26 @@ export const addAndSelectStep: (arg: {
         selectDropdownItem({
           selection: {
             id: hsId,
+            text: 'Selected',
+            field: '1',
+          },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'absorbanceReader') {
+    const abosrbanceReaderModules = Object.entries(modules).filter(
+      ([, module]) => module.type === ABSORBANCE_READER_TYPE
+    )
+    const absorbanceReaderId =
+      abosrbanceReaderModules.length === 1
+        ? abosrbanceReaderModules[0][0]
+        : null
+    if (abosrbanceReaderModules != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: {
+            id: absorbanceReaderId,
             text: 'Selected',
             field: '1',
           },

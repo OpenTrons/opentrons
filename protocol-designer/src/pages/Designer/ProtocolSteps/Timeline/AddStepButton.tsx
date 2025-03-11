@@ -1,3 +1,4 @@
+import { last } from 'lodash'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
@@ -26,26 +27,34 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  getIsTiprack,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { OFFDECK } from '../../../../constants'
+import { getEnableComment } from '../../../../feature-flags/selectors'
 import {
-  actions as stepsActions,
-  getIsMultiSelectMode,
-} from '../../../../ui/steps'
-import {
-  selectors as stepFormSelectors,
-  getIsModuleOnDeck,
-} from '../../../../step-forms'
+  getInitialRobotState,
+  getRobotStateTimeline,
+} from '../../../../file-data/selectors'
 import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   getMainPagePortalEl,
 } from '../../../../organisms'
-import { getEnableComment } from '../../../../feature-flags/selectors'
+import {
+  selectors as stepFormSelectors,
+  getIsModuleOnDeck,
+} from '../../../../step-forms'
+import { getLabwareEntities } from '../../../../step-forms/selectors'
+import {
+  actions as stepsActions,
+  getIsMultiSelectMode,
+} from '../../../../ui/steps'
+import { getIsAdapterFromDef } from '../../../../utils'
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
 import type { MouseEvent } from 'react'
@@ -84,7 +93,23 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
   const [enqueuedStepType, setEnqueuedStepType] = useState<StepType | null>(
     null
   )
-
+  const labwareEntities = useSelector(getLabwareEntities)
+  const { timeline } = useSelector(getRobotStateTimeline)
+  const initialTimeline = useSelector(getInitialRobotState)
+  const lastTimelineFrame =
+    timeline.length > 0 ? last(timeline)?.robotState : initialTimeline
+  const labwareAtLastState = lastTimelineFrame?.labware ?? {}
+  const isLabwarePresentForLiquidHandling = Object.entries(
+    labwareAtLastState
+  ).some(([labwareId, { slot }]) => {
+    const labwareDef = labwareEntities[labwareId]?.def
+    return (
+      labwareDef != null &&
+      slot !== OFFDECK &&
+      !getIsTiprack(labwareDef) &&
+      !getIsAdapterFromDef(labwareDef)
+    )
+  })
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
   > => [
@@ -105,8 +130,8 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
   > = {
     comment: enableComment,
     moveLabware: true,
-    moveLiquid: true,
-    mix: true,
+    moveLiquid: isLabwarePresentForLiquidHandling,
+    mix: isLabwarePresentForLiquidHandling,
     pause: true,
     magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
     temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),

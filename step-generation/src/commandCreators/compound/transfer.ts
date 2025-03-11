@@ -22,6 +22,7 @@ import {
   getHasWasteChute,
 } from '../../utils'
 import {
+  airGapInPlace,
   aspirate,
   configureForVolume,
   delay,
@@ -400,12 +401,10 @@ export const transfer: CommandCreator<TransferArgs> = (
           const airGapAfterAspirateCommands =
             aspirateAirGapVolume && destinationWell != null
               ? [
-                  curryCommandCreator(aspirate, {
+                  curryCommandCreator(moveToWell, {
                     pipetteId: args.pipette,
-                    volume: aspirateAirGapVolume,
                     labwareId: args.sourceLabware,
                     wellName: sourceWell,
-                    flowRate: aspirateFlowRateUlSec,
                     wellLocation: {
                       origin: 'bottom',
                       offset: {
@@ -414,9 +413,11 @@ export const transfer: CommandCreator<TransferArgs> = (
                         y: 0,
                       },
                     },
-                    isAirGap: true,
-                    tipRack,
-                    nozzles: args.nozzles,
+                  }),
+                  curryCommandCreator(airGapInPlace, {
+                    pipetteId: args.pipette,
+                    volume: aspirateAirGapVolume,
+                    flowRate: aspirateFlowRateUlSec,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -545,8 +546,6 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
                     offsetFromBottomMm: airGapOffsetDestWell,
-                    tipRack,
-                    nozzles: args.nozzles,
                   }),
                   ...(aspirateDelay != null
                     ? [

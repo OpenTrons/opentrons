@@ -1,6 +1,7 @@
 export * from './CheckboxExpandStepFormField'
 export * from './CheckboxStepFormField'
 export * from './DropdownStepFormField'
+export * from './EndUserAgreementFooter'
 export * from './InputStepFormField'
 export * from './LiquidButton'
 export * from './TextAreaField'
