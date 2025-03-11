@@ -23,18 +23,18 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   // No-op if there is no tip
   if (!prevRobotState.tipState.pipettes[pipetteId]) {
     commandCreators = []
+  } else {
+    commandCreators = [
+      curryCommandCreator(moveToAddressableArea, {
+        pipetteId,
+        addressableAreaName,
+        offset,
+      }),
+      curryCommandCreator(dropTipInPlace, {
+        pipetteId,
+      }),
+    ]
   }
-
-  commandCreators = [
-    curryCommandCreator(moveToAddressableArea, {
-      pipetteId,
-      addressableAreaName,
-      offset,
-    }),
-    curryCommandCreator(dropTipInPlace, {
-      pipetteId,
-    }),
-  ]
   return reduceCommandCreators(
     commandCreators,
     invariantContext,
