@@ -89,9 +89,9 @@ LocationLabware = Union[
 
 
 class MeniscusTrackingTarget(enum.Enum):
-    BEGINNING = "beginning"
+    START = "start"
     END = "end"
-    DYNAMIC_MENISCUS = "dynamic_meniscus"
+    DYNAMIC = "dynamic"
 
     def __str__(self) -> str:
         return self.name
