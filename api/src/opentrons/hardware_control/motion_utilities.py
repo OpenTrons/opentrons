@@ -205,7 +205,6 @@ def target_positions_from_plunger_tracking(
     all_axes_pos = target_position_from_plunger(mount, plunger_delta, current_position)
     z_ax = Axis.by_mount(mount)
     all_axes_pos[z_ax] = current_position[z_ax] + z_delta
-    # all_axes_pos[z_ax] = 95.405
     return all_axes_pos
 
 

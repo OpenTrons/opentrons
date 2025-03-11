@@ -3010,14 +3010,12 @@ class OT3API(
         )
         if not aspirate_spec:
             return
-            # need to test target_positions_from_plunger_tracking
         target_pos = target_positions_from_plunger_tracking(
             realmount,
             aspirate_spec.plunger_distance,
             z_distance,
             self._current_position,
         )
-        # raise ValueError(f"target pos = {target_pos}\n speed = {aspirate_spec.speed}") # check the speed also ?
         try:
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
@@ -3037,7 +3035,6 @@ class OT3API(
             raise
         else:
             aspirate_spec.instr.add_current_volume(aspirate_spec.volume)
-        # raise ValueError(f"stop here")
 
     async def dispense_while_tracking(
         self,
