@@ -1,18 +1,25 @@
 import * as React from 'react'
-
-import { ListButton as ListButtonComponent } from './index'
+import { STYLE_PROPS } from '../../primitives'
 import {
   ListButtonAccordion,
   ListButtonAccordionContainer,
   ListButtonRadioButton,
 } from './ListButtonChildren/index'
 import { StyledText } from '../..'
+import { ListButton as ListButtonComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof ListButtonComponent> = {
   title: 'Helix/Atoms/ListButton',
   component: ListButtonComponent,
   argTypes: {
+    // Disable all StyleProps
+    ...Object.fromEntries(
+      [...STYLE_PROPS, 'as', 'ref', 'theme', 'forwardedAs'].map(prop => [
+        prop,
+        { table: { disable: true } },
+      ])
+    ),
     type: {
       control: {
         type: 'select',
