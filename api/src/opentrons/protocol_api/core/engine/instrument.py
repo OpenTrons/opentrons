@@ -228,7 +228,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             if dynamic_liquid_tracking:
 
-                
                 self._engine_client.execute_command(
                     cmd.AspirateWhileTrackingParams(
                         pipetteId=self._pipette_id,

@@ -13,6 +13,7 @@ from opentrons.types import (
     DeckSlotName,
     StagingSlotName,
     MountType,
+    MeniscusTrackingTarget,
 )
 
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
@@ -567,23 +568,26 @@ class GeometryView:
         labware_id: str,
         well_name: str,
         absolute_point: Point,
-        is_meniscus: Optional[bool] = None,
-    ) -> LiquidHandlingWellLocation:
-        """Given absolute position, get relative location of a well in a labware.
-
-        If is_meniscus is True, absolute_point will hold the z-offset in its z field.
-        """
-        if is_meniscus:
-            return LiquidHandlingWellLocation(
+        meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
+    ) -> Tuple[LiquidHandlingWellLocation, bool]:
+        """Given absolute position, get relative location of a well in a labware."""
+        dynamic_liquid_tracking = False
+        if meniscus_tracking:
+            location = LiquidHandlingWellLocation(
                 origin=WellOrigin.MENISCUS,
                 offset=WellOffset(x=0, y=0, z=absolute_point.z),
             )
+            if meniscus_tracking == MeniscusTrackingTarget.END:
+                location.volumeOffset = "operationVolume"
+            elif meniscus_tracking == MeniscusTrackingTarget.DYNAMIC:
+                dynamic_liquid_tracking = True
         else:
             well_absolute_point = self.get_well_position(labware_id, well_name)
             delta = absolute_point - well_absolute_point
-            return LiquidHandlingWellLocation(
+            location = LiquidHandlingWellLocation(
                 offset=WellOffset(x=delta.x, y=delta.y, z=delta.z)
             )
+        return location, dynamic_liquid_tracking
 
     def get_relative_pick_up_tip_well_location(
         self,
@@ -1789,6 +1793,35 @@ class GeometryView:
         else:  # Off deck
             return None
 
+    def get_liquid_handling_z_change(
+        self,
+        labware_id: str,
+        well_name: str,
+        operation_volume: float,
+    ) -> float:
+        """Get the change in height from a liquid handling operation."""
+        initial_handling_height = self.get_meniscus_height(
+            labware_id=labware_id, well_name=well_name
+        )
+        # initial_handling_height = 11.whatever
+        # hardcode initial handling height to match dltr
+        final_height = self.get_well_height_after_liquid_handling(
+            labware_id=labware_id,
+            well_name=well_name,
+            initial_height=initial_handling_height,
+            volume=operation_volume,
+        )
+        if isinstance(initial_handling_height, SimulatedProbeResult) or isinstance(
+            final_height, SimulatedProbeResult
+        ):
+            raise errors.LiquidHeightUnknownError(
+                "liquid handling z change can only be found using real height and volume inputs."
+            )
+        # raise ValueError(
+        # f"new branch\n liquid handling height = {initial_handling_height, final_height}, volume = {operation_volume}"
+        # )
+        return final_height - initial_handling_height
+
     def get_well_offset_adjustment(
         self,
         labware_id: str,
@@ -1809,7 +1842,6 @@ class GeometryView:
             well_location=well_location,
             well_depth=well_depth,
         )
-
         # if we're tracking a MENISCUS origin, and targeting either the beginning
         #   position of the liquid or doing dynamic tracking, return the initial height
         if (
@@ -1885,6 +1917,8 @@ class GeometryView:
         well_name: str,
     ) -> LiquidTrackingType:
         """Returns stored meniscus height in specified well."""
+        # breakpoint()
+        # return 25.0
         last_updated = self._wells.get_last_liquid_update(labware_id, well_name)
         if last_updated is None:
             raise errors.LiquidHeightUnknownError(
@@ -1899,6 +1933,7 @@ class GeometryView:
             and well_liquid.probed_height.height is not None
             and well_liquid.probed_height.last_probed == last_updated
         ):
+            # maybe j make sure its at probed height ?
             return well_liquid.probed_height.height
         elif (
             well_liquid.loaded_volume is not None

@@ -10,7 +10,11 @@ from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 from opentrons.types import Point
 from opentrons.hardware_control import API as HardwareAPI
 
-from opentrons.protocol_engine.execution import PipettingHandler, GantryMover
+from opentrons.protocol_engine.execution import (
+    PipettingHandler,
+    GantryMover,
+    MovementHandler,
+)
 from opentrons.protocol_engine.commands.aspirate_while_tracking import (
     AspirateWhileTrackingParams,
     AspirateWhileTrackingResult,
@@ -62,6 +66,7 @@ def subject(
     mock_command_note_adder: CommandNoteAdder,
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
+    movement: MovementHandler,
 ) -> AspirateWhileTrackingImplementation:
     """Get the impelementation subject."""
     return AspirateWhileTrackingImplementation(
@@ -71,6 +76,7 @@ def subject(
         command_note_adder=mock_command_note_adder,
         model_utils=model_utils,
         gantry_mover=gantry_mover,
+        movement=movement,
     )
 
 
