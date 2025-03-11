@@ -92,13 +92,6 @@ class DelayProperties:
     _enabled: bool
     _duration: Optional[float]
 
-    def __post_init__(self) -> None:
-        """Validate state after initialization."""
-        if self._duration is not None:
-            self.duration = self._duration
-        if self._enabled is not None:
-            self.enabled = self._enabled
-
     @property
     def enabled(self) -> bool:
         return self._enabled
@@ -136,17 +129,6 @@ class TouchTipProperties:
     _z_offset: Optional[float]
     _mm_to_edge: Optional[float]
     _speed: Optional[float]
-
-    def __post_init__(self) -> None:
-        """Validate state after initialization."""
-        if self._enabled is not None:
-            self.enabled = self._enabled
-        if self._z_offset is not None:
-            self.z_offset = self._z_offset
-        if self._mm_to_edge is not None:
-            self.mm_to_edge = self._mm_to_edge
-        if self._speed is not None:
-            self.speed = self._speed
 
     @property
     def enabled(self) -> bool:
