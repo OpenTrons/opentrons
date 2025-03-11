@@ -5,15 +5,12 @@ import {
   airGapInMovableTrash,
   blowOutInMovableTrash,
   dispenseInMovableTrash,
-  dropTipInMovableTrash,
 } from '../utils/movableTrashCommandsUtil'
 import {
   airGapInPlace,
   blowOutInPlace,
   dispenseInPlace,
-  dropTipInPlace,
   moveToAddressableArea,
-  moveToAddressableAreaForDropTip,
   prepareToAspirate,
 } from '../commandCreators/atomic'
 import type { PipetteEntities } from '../types'
@@ -79,25 +76,6 @@ describe('movableTrashCommandsUtil', () => {
       pipetteId: mockId,
 
       flowRate: 10,
-    })
-  })
-  it('returns correct commands for drop tip', () => {
-    dropTipInMovableTrash({
-      ...args,
-      prevRobotState: {
-        ...args.prevRobotState,
-        tipState: { pipettes: { [mockId]: true } } as any,
-      },
-    })
-    expect(curryCommandCreator).toHaveBeenCalledWith(
-      moveToAddressableAreaForDropTip,
-      {
-        pipetteId: mockId,
-        addressableAreaName: 'movableTrashA3',
-      }
-    )
-    expect(curryCommandCreator).toHaveBeenCalledWith(dropTipInPlace, {
-      pipetteId: mockId,
     })
   })
   it('returns correct commands for aspirate in place (air gap)', () => {

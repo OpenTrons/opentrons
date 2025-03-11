@@ -8,7 +8,7 @@ import {
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { dropTipInMovableTrash } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInTrash } from './dropTipInTrash'
 import {
   blowoutUtil,
   curryCommandCreator,
@@ -572,11 +572,9 @@ export const transfer: CommandCreator<TransferArgs> = (
             })
           }
           if (isTrashBin) {
-            dropTipCommand = dropTipInMovableTrash({
-              pipetteId: args.pipette,
-              invariantContext,
-              prevRobotState,
-            })
+            dropTipCommand = [
+              curryCommandCreator(dropTipInTrash, { pipetteId: args.pipette }),
+            ]
           }
 
           // if using dispense > air gap, drop or change the tip at the end
