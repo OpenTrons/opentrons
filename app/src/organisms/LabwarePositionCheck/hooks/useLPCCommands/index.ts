@@ -75,7 +75,11 @@ export function useLPCCommands(
 
   const applyLPCOffsetsUtils = useApplyLPCOffsets({ ...props, setErrorMessage })
   const buildLPCOffsets = useBuildOffsetsToApply({ ...props, setErrorMessage })
-  const handleJogUtils = useHandleJog({ ...props, setErrorMessage })
+  const handleJogUtils = useHandleJog({
+    ...props,
+    setErrorMessage,
+    chainLPCCommands,
+  })
   const handleConditionalCleanupUtils = useHandleClose(props)
   const handleProbeCommands = useHandleProbeCommands({
     ...props,

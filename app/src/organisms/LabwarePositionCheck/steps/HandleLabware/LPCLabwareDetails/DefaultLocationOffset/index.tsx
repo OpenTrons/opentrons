@@ -11,12 +11,15 @@ import {
   ALIGN_CENTER,
   COLORS,
   BORDERS,
+  RESPONSIVENESS,
+  DISPLAY_NONE,
 } from '@opentrons/components'
 
 import {
   proceedEditOffsetSubstep,
   selectMostRecentVectorOffsetForLwWithOffsetDetails,
   selectSelectedLwDefaultOffsetDetails,
+  selectSelectedLwDisplayName,
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
@@ -42,6 +45,7 @@ export function DefaultLocationOffset(
       defaultOffsetDetails
     )
   )
+  const selectedLwName = useSelector(selectSelectedLwDisplayName(runId))
 
   const handleLaunchEditOffset = (): void => {
     dispatch(
@@ -64,28 +68,50 @@ export function DefaultLocationOffset(
 
   return (
     <Flex css={CONTAINER_STYLE}>
-      <Flex css={BUTTON_ALL_CONTENT_STYLE}>
-        <Flex css={BUTTON_LEFT_CONTENT_STYLE}>
-          <StyledText oddStyle="level4HeaderSemiBold">
-            {t('default_labware_offset')}
-          </StyledText>
-          <Flex>
-            <OffsetTag {...buildOffsetTagProps()} />
+      <StyledText css={DESKTOP_ONLY} desktopStyle="headingSmallBold">
+        {selectedLwName}
+      </StyledText>
+      <Flex css={OFFSET_CONTAINER_STYLE}>
+        <Flex css={BUTTON_ALL_CONTENT_STYLE}>
+          <Flex css={BUTTON_LEFT_CONTENT_STYLE}>
+            <StyledText oddStyle="level4HeaderSemiBold">
+              {t('default_labware_offset')}
+            </StyledText>
+            <Flex>
+              <OffsetTag {...buildOffsetTagProps()} />
+            </Flex>
           </Flex>
+          <ManageDefaultOffsetBtn
+            isMissingDefaultOffset={mostRecentOffset == null}
+            onClick={handleLaunchEditOffset}
+          />
         </Flex>
-        <ManageDefaultOffsetBtn
-          isMissingDefaultOffset={mostRecentOffset == null}
-          onClick={handleLaunchEditOffset}
-        />
       </Flex>
     </Flex>
   )
 }
 
 const CONTAINER_STYLE = css`
-  background-color: ${COLORS.grey35};
-  padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.borderRadius8};
+  flex-direction: ${DIRECTION_COLUMN};
+  gap: ${SPACING.spacing16};
+`
+
+const DESKTOP_ONLY = css`
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    display: ${DISPLAY_NONE};
+  }
+`
+
+const OFFSET_CONTAINER_STYLE = css`
+  background-color: ${COLORS.grey20};
+  padding: ${SPACING.spacing12};
+  border-radius: ${BORDERS.borderRadius4};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    background-color: ${COLORS.grey35};
+    padding: ${SPACING.spacing16} ${SPACING.spacing24};
+    border-radius: ${BORDERS.borderRadius8};
+  }
 `
 
 const BUTTON_ALL_CONTENT_STYLE = css`

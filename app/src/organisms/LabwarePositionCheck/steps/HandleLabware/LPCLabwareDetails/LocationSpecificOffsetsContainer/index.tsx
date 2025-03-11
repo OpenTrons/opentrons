@@ -9,6 +9,7 @@ import {
   getLabwareDisplayLocation,
   DIRECTION_COLUMN,
   ListTable,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -60,7 +61,10 @@ export function LocationSpecificOffsetsContainer(
 
   return (
     <Flex css={LOCATION_SPECIFIC_CONTAINER_STYLE}>
-      <StyledText oddStyle="level4HeaderSemiBold">
+      <StyledText
+        oddStyle="level4HeaderSemiBold"
+        desktopStyle="bodyLargeSemiBold"
+      >
         {t('applied_location_offsets')}
       </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -86,5 +90,9 @@ export function LocationSpecificOffsetsContainer(
 
 const LOCATION_SPECIFIC_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
-  grid-gap: ${SPACING.spacing24};
+  gap: ${SPACING.spacing16};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing24};
+  }
 `

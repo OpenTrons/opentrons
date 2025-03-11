@@ -72,6 +72,7 @@ export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
       buttonText={t('confirm_placement')}
       onClickButton={handleConfirmPlacement}
       onClickBack={goBackSubstep}
+      tertiaryBtnProps={{ text: t('go_back'), onClick: goBackSubstep }}
     >
       <TwoColumn>
         <PlaceItemInstruction {...props} />

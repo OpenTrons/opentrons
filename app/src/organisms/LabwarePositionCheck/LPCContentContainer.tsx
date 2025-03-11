@@ -41,12 +41,17 @@ interface LPCContentContainerTertiaryBtnProps {
   text: ReactNode
 }
 
-type LPCContentContainerProps = LPCWizardContentProps &
+// TOME TODO: Exit button behavior on LPC complete in the header should just exit, not
+//  redo the flow again (if this happens). It seems a bit jank when doing detach and other flows, too.
+
+export type LPCContentContainerProps = LPCWizardContentProps &
   Partial<ChildNavigationProps> & {
     children: JSX.Element
     header: string
     /* An optional style override for the content container. */
     contentStyle?: FlattenSimpleInterpolation
+    /* An optional style override for the container. */
+    containerStyle?: FlattenSimpleInterpolation
     /* The desktop button the left of the primary button. */
     tertiaryBtnProps?: LPCContentContainerTertiaryBtnProps
   }
@@ -54,7 +59,7 @@ type LPCContentContainerProps = LPCWizardContentProps &
 export function LPCContentContainer(
   props: LPCContentContainerProps
 ): JSX.Element {
-  const { runId, children, contentStyle, ...rest } = props
+  const { runId, children, contentStyle, containerStyle, ...rest } = props
   const { commandUtils } = rest
   const { currentStepIndex, totalStepCount } = useSelector(
     selectStepInfo(runId)
@@ -65,7 +70,7 @@ export function LPCContentContainer(
   return (
     <>
       {isOnDevice ? (
-        <Flex css={ODD_CONTAINER_STYLE}>
+        <Flex css={containerStyle ?? ODD_CONTAINER_STYLE}>
           <Flex css={FIXED_HEADER_STYLE}>
             <StepMeter
               totalSteps={totalStepCount}
@@ -80,7 +85,7 @@ export function LPCContentContainer(
       ) : (
         createPortal(
           <ModalShell
-            css={DESKTOP_CONTAINER_STYLE}
+            css={containerStyle ?? DESKTOP_CONTAINER_STYLE}
             header={
               <WizardHeader
                 title={rest.header}
@@ -91,7 +96,7 @@ export function LPCContentContainer(
               />
             }
           >
-            <Flex css={DESKTOP_CHILDREN_CONTAINER_STYLE}>
+            <Flex css={contentStyle ?? DESKTOP_CHILDREN_CONTAINER_STYLE}>
               {children}
               {showDesktopFooter && <DesktopFooterContent {...props} />}
             </Flex>
