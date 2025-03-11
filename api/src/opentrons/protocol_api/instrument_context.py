@@ -2089,7 +2089,7 @@ class InstrumentContext(publisher.CommandPublisher):
         From API version 2.15 to 2.22, this property returned an internal name for Flex
         pipettes. (e.g., ``"p1000_single_flex"``).
 
-        ..
+        .. TODO uncomment when 2.23 is ready
           In API version 2.23 and later, this property returns the Python Protocol API
           :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
           ``"flex_1channel_1000"``).
