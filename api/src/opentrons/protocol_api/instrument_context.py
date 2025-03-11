@@ -1535,6 +1535,8 @@ class InstrumentContext(publisher.CommandPublisher):
         """Transfer liquid from source to dest using the specified liquid class properties.
 
         TODO: Add args description.
+
+        :meta private:
         """
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
@@ -1543,9 +1545,9 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             current_volume=self.current_volume,
-            trash_location=trash_location
-            if trash_location is not None
-            else self.trash_container,
+            trash_location=(
+                trash_location if trash_location is not None else self.trash_container
+            ),
         )
         if len(transfer_args.sources_list) != len(transfer_args.destinations_list):
             raise ValueError(
@@ -1595,6 +1597,8 @@ class InstrumentContext(publisher.CommandPublisher):
         using the specified liquid class properties.
 
         TODO: Add args description.
+
+        :meta private:
         """
         if not isinstance(source, labware.Well):
             raise ValueError(f"Source should be a single Well but received {source}.")
@@ -1606,9 +1610,9 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             current_volume=self.current_volume,
-            trash_location=trash_location
-            if trash_location is not None
-            else self.trash_container,
+            trash_location=(
+                trash_location if trash_location is not None else self.trash_container
+            ),
         )
         if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
             raise RuntimeError(
@@ -1653,6 +1657,8 @@ class InstrumentContext(publisher.CommandPublisher):
         using the specified liquid class properties.
 
         TODO: Add args description.
+
+        :meta private:
         """
         if not isinstance(dest, labware.Well):
             raise ValueError(
@@ -1665,9 +1671,9 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             current_volume=self.current_volume,
-            trash_location=trash_location
-            if trash_location is not None
-            else self.trash_container,
+            trash_location=(
+                trash_location if trash_location is not None else self.trash_container
+            ),
         )
         if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
             raise RuntimeError(
@@ -2078,11 +2084,15 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def name(self) -> str:
         """
-        The name string for the pipette (e.g., ``"p300_single"``).
+        The name string for the pipette.
 
-        From API v2.15 to v2.22, this property returned an internal name for Flex pipettes.
-        From API v2.23 onwards, this behavior is fixed so that this property returns
-        the Python Protocol API load names of Flex pipettes.
+        From API version 2.15 to 2.22, this property returned an internal name for Flex
+        pipettes. (e.g., ``"p1000_single_flex"``).
+
+        .. TODO uncomment when 2.23 is ready
+          In API version 2.23 and later, this property returns the Python Protocol API
+          :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
+          ``"flex_1channel_1000"``).
         """
         return self._core.get_pipette_name()
 
