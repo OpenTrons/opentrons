@@ -91,7 +91,7 @@ async def test_extend_cycle(
                 0,
                 HOME_CURRENT,
             )
-        except Exception as e:
+        except Exception:
             pass
         # If limit switch is triggered, we did not stall
         if await stacker._driver.get_limit_switch(TEST_AXIS, Direction.EXTEND):
@@ -150,7 +150,7 @@ async def test_retract_cycle(
                 0,
                 HOME_CURRENT,
             )
-        except Exception as e:
+        except Exception:
             pass
         # If limit switch is triggered, we did not stall
         if await stacker._driver.get_limit_switch(TEST_AXIS, Direction.RETRACT):
@@ -185,7 +185,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
                 extend_data[trial] = dist
                 if not extend:
                     ui.print_error(
-                        f"Z Axis extend failed at speed {speed} mm/s, current {current} A, Distance {dist} mm"
+                        f"Z Axis extend failed at speed {speed} mm/s, "
+                        f"current {current} A, Distance {dist} mm"
                     )
                     failures += 1
                     trial += 1
@@ -196,7 +197,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
                 retract_data[trial] = dist
                 if not retract:
                     ui.print_error(
-                        f"Z Axis retract failed at speed {speed} mm/s, current {current} A, Distance {dist} mm"
+                        f"Z Axis retract failed at speed {speed} mm/s, "
+                        f"current {current} A, Distance {dist} mm"
                     )
                     failures += 1
                 trial += 1
