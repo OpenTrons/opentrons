@@ -2,13 +2,11 @@
 
 from datetime import datetime
 import textwrap
-from typing import Annotated, Literal, Sequence
+from typing import Annotated, Literal
 
 import fastapi
 from pydantic.json_schema import SkipJsonSchema
 from server_utils.fastapi_utils.light_router import LightRouter
-
-from opentrons.protocol_engine import ModuleModel
 
 from robot_server.labware_offsets.models import LabwareOffsetNotFound
 from robot_server.service.dependencies import (
@@ -32,12 +30,8 @@ from .store import (
 from .fastapi_dependencies import get_labware_offset_store
 from .models import (
     SearchCreate,
-    SearchFilter,
     StoredLabwareOffset,
     StoredLabwareOffsetCreate,
-    StoredLabwareOffsetLocationSequenceComponents,
-    DO_NOT_FILTER,
-    DoNotFilterType,
 )
 
 
@@ -140,14 +134,11 @@ async def get_labware_offsets(  # noqa: D103
     ] = "unlimited",
 ) -> PydanticResponse[SimpleMultiBody[StoredLabwareOffset]]:
     if cursor not in (0, None) or page_length != "unlimited":
-        # todo(mm, 2024-12-06): We effectively have two result-set-limiting mechanisms
-        # on this endpoint: (1) cursor+page_length, and (2) filter.mostRecentOnly.
-        # Is it worthwhile to have both?
         raise NotImplementedError(
             "Pagination not currently supported on this endpoint."
         )
 
-    result_data = store.search()
+    result_data = store.get_all()
 
     meta = MultiBodyMeta.model_construct(
         # todo(mm, 2024-12-06): Update this when cursor+page_length are supported.
@@ -184,7 +175,7 @@ async def search_labware_offsets(  # noqa: D103
         fastapi.Body(),
     ],
 ) -> PydanticResponse[SimpleMultiBody[StoredLabwareOffset]]:
-    result_data = _search(store, request_body.data.filters)
+    result_data = store.search(request_body.data.filters)
 
     meta = MultiBodyMeta.model_construct(
         # This needs to be updated if this endpoint ever supports cursor+pageLength.
@@ -233,55 +224,3 @@ async def delete_all_labware_offsets(  # noqa: D103
 ) -> PydanticResponse[SimpleEmptyBody]:
     store.delete_all()
     return await PydanticResponse.create(SimpleEmptyBody.model_construct())
-
-
-def _search(
-    store: LabwareOffsetStore, filters: Sequence[SearchFilter]
-) -> list[StoredLabwareOffset]:
-    # todo(mm, 2025-03-06): This would probably be more efficient in SQL.
-    result: list[StoredLabwareOffset] = []
-    for filter in filters:
-        result.extend(_search_single_filter(store, filter))
-    result.sort(key=lambda element: element.createdAt)
-    return result
-
-
-def _search_single_filter(
-    store: LabwareOffsetStore, filter: SearchFilter
-) -> list[StoredLabwareOffset]:
-    # todo(mm, 2025-03-06): This lossily converts a location sequence, used in the HTTP
-    # API, to a triad of location fields, used in the LabwareOffsetStore.search() API.
-    # In the underlying SQL, locations are represented as sequences. We should change
-    # the LabwareOffsetStore.search() API to use sequences so we can avoid this lossy
-    # conversion.
-    loc_components: Sequence[StoredLabwareOffsetLocationSequenceComponents] = (
-        filter.locationSequence if filter.locationSequence != DO_NOT_FILTER else []
-    )
-    location_definition_uri_filter: str | DoNotFilterType = next(
-        (c.labwareUri for c in loc_components if c.kind == "onLabware"), DO_NOT_FILTER
-    )
-    location_module_model_filter: ModuleModel | DoNotFilterType = next(
-        (c.moduleModel for c in loc_components if c.kind == "onModule"), DO_NOT_FILTER
-    )
-    location_addressable_area_filter: str | DoNotFilterType = next(
-        (
-            c.addressableAreaName
-            for c in loc_components
-            if c.kind == "onAddressableArea"
-        ),
-        DO_NOT_FILTER,
-    )
-
-    result = store.search(
-        id_filter=filter.id,
-        definition_uri_filter=filter.definitionUri,
-        location_definition_uri_filter=location_definition_uri_filter,
-        location_module_model_filter=location_module_model_filter,
-        location_addressable_area_filter=location_addressable_area_filter,
-    )
-
-    # todo(mm, 2025-03-06): This is inefficient to do in Python. Move to SQL.
-    if filter.mostRecentOnly:
-        result = result[-1:]
-
-    return result

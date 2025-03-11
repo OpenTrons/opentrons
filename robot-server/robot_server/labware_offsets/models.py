@@ -25,8 +25,8 @@ class _DoNotFilter(enum.Enum):
 DO_NOT_FILTER: Final = _DoNotFilter.DO_NOT_FILTER
 """A sentinel value for when a filter should not be applied.
 
-This is different from filtering on `None`, which returns only entries where the
-value is equal to `None`.
+We use this instead of `None` to avoid confusion when it looks like `None` might have
+some other meaning, like "filter for entries that are equal to the value `None`".
 """
 
 
@@ -35,6 +35,12 @@ DoNotFilterType: TypeAlias = Literal[_DoNotFilter.DO_NOT_FILTER]
 
 Unfortunately, mypy doesn't let us write `Literal[DO_NOT_FILTER]`. Use this instead.
 """
+
+
+ANY_LOCATION: Final = "anyLocation"
+
+
+AnyLocation: TypeAlias = Literal["anyLocation"]
 
 
 class UnknownLabwareOffsetLocationSequenceComponent(BaseModel):
@@ -63,9 +69,15 @@ class StoredLabwareOffsetCreate(BaseModel):
 
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
 
-    locationSequence: Sequence[StoredLabwareOffsetLocationSequenceComponents] = Field(
+    locationSequence: Sequence[
+        StoredLabwareOffsetLocationSequenceComponents
+    ] | AnyLocation = Field(
         ...,
-        description="Where the labware is located on the robot.",
+        description=(
+            "Where the labware is located on the robot."
+            " The special value `anyLocation` means this offset applies to any labware"
+            " with a matching `definitionUri`, regardless of its location."
+        ),
         min_length=1,
     )
     vector: LabwareOffsetVector = Field(
@@ -84,9 +96,15 @@ class StoredLabwareOffset(BaseModel):
     createdAt: datetime = Field(..., description="When this labware offset was added.")
 
     definitionUri: str = Field(..., description="The URI for the labware's definition.")
-    locationSequence: Sequence[ReturnedLabwareOffsetLocationSequenceComponents] = Field(
+    locationSequence: Sequence[
+        ReturnedLabwareOffsetLocationSequenceComponents
+    ] | AnyLocation = Field(
         ...,
-        description="Where the labware is located on the robot. Can represent all locations, but may not be present for older runs.",
+        description=(
+            "Where the labware is located on the robot."
+            " The special value `anyLocation` means this offset applies to any labware"
+            " with a matching `definitionUri`, regardless of its location."
+        ),
         min_length=1,
     )
 
@@ -115,7 +133,10 @@ class SearchFilter(BaseModel):  # noqa: D101 - more docs are in SearchCreate.
         ),
     ] = DO_NOT_FILTER
     locationSequence: Annotated[
-        Sequence[StoredLabwareOffsetLocationSequenceComponents]
+        Annotated[
+            Sequence[StoredLabwareOffsetLocationSequenceComponents], Field(min_length=1)
+        ]
+        | AnyLocation
         | SkipJsonSchema[DoNotFilterType],
         Field(
             description=(
