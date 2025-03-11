@@ -612,7 +612,7 @@ def ensure_boolean(value: bool) -> bool:
 
 def ensure_float(value: Union[int, float]) -> float:
     """Ensure value is a float (or an integer) and return it as a float."""
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
+    if not isinstance(value, (int, float)):
         raise ValueError("Value must be a floating point number.")
     return float(value)
 
@@ -627,42 +627,21 @@ def ensure_positive_float(value: Union[int, float]) -> float:
     return float_value
 
 
-def ensure_positive_and_not_zero_float(value: Union[int, float]) -> float:
-    """Ensure value is a positive and real float value or zero."""
-    float_value = ensure_float(value)
-    if isnan(float_value) or isinf(float_value):
-        raise ValueError("Value must be a defined, non-infinite number.")
-    if float_value <= 0:
-        raise ValueError("Value must be a positive int.")
-    return float_value
-
-
 def ensure_positive_int(value: int) -> int:
     """Ensure value is a positive integer."""
-    if isinstance(value, bool) or not isinstance(value, int):
+    if not isinstance(value, int):
         raise ValueError("Value must be an integer.")
     if value < 0:
         raise ValueError("Value must be a positive integer.")
     return value
 
 
-def ensure_positive_and_not_zero_int(value: int) -> int:
-    """Ensure value is a positive integer or zero."""
-    if isinstance(value, bool) or not isinstance(value, int):
-        raise ValueError("Value must be an integer.")
-    if value <= 0:
-        raise ValueError("Value must be a positive integer and not = 0.")
-    return value
-
-
 def validate_coordinates(value: Sequence[float]) -> Tuple[float, float, float]:
     """Ensure value is a valid sequence of 3 floats and return a tuple of 3 floats."""
-    if not hasattr(value, "__len__"):
-        raise ValueError(f"Coordinates must be a sequence, got {type(value).__name__}")
     if len(value) != 3:
         raise ValueError("Coordinates must be a sequence of exactly three numbers")
     if not all(isinstance(v, (float, int)) for v in value):
-        raise ValueError("All values in coordinates must be floats or integers.")
+        raise ValueError("All values in coordinates must be floats.")
     return float(value[0]), float(value[1]), float(value[2])
 
 
