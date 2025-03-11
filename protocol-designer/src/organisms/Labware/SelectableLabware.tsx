@@ -12,7 +12,7 @@ import { SingleLabware } from './SingleLabware'
 import { WellTooltip } from './WellTooltip'
 import { SelectionRect } from './SelectionRect'
 
-import type { ComponentProps } from 'react'
+import { useEffect, type ComponentProps } from 'react'
 import type {
   WellMouseEvent,
   WellGroup,
@@ -195,6 +195,11 @@ export const SelectableLabware = (
       wellFillWithLiq[wellName] = wellFill[wellName]
     })
   }
+
+  useEffect(() => {
+    updateHighlightedWells({})
+  },[])
+
 
   return (
     <SelectionRect

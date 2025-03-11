@@ -1,8 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { css } from 'styled-components'
 
 import type { ReactNode, MouseEventHandler } from 'react'
 import type { DragRect, GenericRect } from '../../collision-types'
+
+const blueColor = '#5fd8ee'
+const blueColorAlpha = '#5fd8ee4d'
 
 interface SelectionRectProps {
   onSelectionMove?: (e: MouseEvent, arg: GenericRect) => void
@@ -53,8 +56,8 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
           width={width * xScale}
           height={height * yScale}
           css={css`
-            fill: #5fd8ee alpha(0.3);
-            stroke: #5fd8ee;
+            fill: ${blueColorAlpha};
+            stroke: ${blueColor};
             stroke-width: 0.4;
           `}
         />
@@ -64,11 +67,11 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     return (
       <div
         css={css`
-          background-color: #5fd8ee alpha(0.3);
+          background-color: ${blueColorAlpha};
           position: fixed;
           z-index: 1000;
           border-radius: 0;
-          border: 1px solid #5fd8ee;
+          border: 1px solid ${blueColor};
         `}
         style={{
           left: left + 'px',
@@ -90,34 +93,40 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
     }
   }
 
-  const handleDrag = (e: MouseEvent): void => {
-    setPositions(prevPositions => {
-      if (prevPositions) {
-        const nextRect = {
-          ...prevPositions,
-          xDynamic: e.clientX,
-          yDynamic: e.clientY,
+  const handleDrag = useCallback(
+    (e: MouseEvent): void => {
+      setPositions(prevPositions => {
+        if (prevPositions !== null) {
+          const nextRect = {
+            ...prevPositions,
+            xDynamic: e.clientX,
+            yDynamic: e.clientY,
+          }
+          const rect = getRect(nextRect)
+          onSelectionMove && onSelectionMove(e, rect)
+
+          return nextRect
         }
-        const rect = getRect(nextRect)
-        onSelectionMove && onSelectionMove(e, rect)
+        return prevPositions
+      })
+    },
+    [onSelectionMove]
+  )
 
-        return nextRect
+  const handleMouseUp = useCallback(
+    (e: MouseEvent): void => {
+      if (!(e instanceof MouseEvent)) {
+        return
       }
-      return prevPositions
-    })
-  }
-
-  const handleMouseUp = (e: MouseEvent): void => {
-    if (!(e instanceof MouseEvent)) {
-      return
-    }
-    const finalRect = positions && getRect(positions)
-    setPositions(prevPositions => {
-      return prevPositions === positions ? null : prevPositions
-    })
-    // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
-    onSelectionDone && finalRect && onSelectionDone(e, finalRect)
-  }
+      const finalRect = positions !== null && getRect(positions)
+      setPositions(prevPositions => {
+        return prevPositions === positions ? null : prevPositions
+      })
+      // call onSelectionDone callback with {x0, x1, y0, y1} of final selection rectangle
+      onSelectionDone && finalRect && onSelectionDone(e, finalRect)
+    },
+    [onSelectionDone, positions]
+  )
 
   const handleMouseDown: MouseEventHandler = e => {
     setPositions({
@@ -145,7 +154,7 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
       }}
     >
       {children}
-      {positions && renderRect(positions)}
+      {positions !== null && renderRect(positions)}
     </g>
   ) : (
     <div
@@ -154,7 +163,7 @@ export function SelectionRect(props: SelectionRectProps): JSX.Element {
         parentRef.current = ref
       }}
     >
-      {positions && renderRect(positions)}
+      {positions !== null && renderRect(positions)}
       {children}
     </div>
   )
