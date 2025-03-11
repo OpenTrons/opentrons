@@ -15,8 +15,18 @@ import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 
 export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
-  const { proceedStep, goBackLastStep } = props
+  const { proceedStep, goBackLastStep, commandUtils } = props
   const { t } = useTranslation('labware_position_check')
+
+  const handleGoBack = (): void => {
+    void commandUtils
+      .toggleRobotMoving(true)
+      .then(() => commandUtils.home())
+      .then(() => {
+        goBackLastStep()
+      })
+      .then(() => commandUtils.toggleRobotMoving(false))
+  }
 
   const channelCount = useSelector(selectActivePipetteChannelCount(props.runId))
 
@@ -43,8 +53,8 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
       onClickButton={() => {
         proceedStep()
       }}
-      tertiaryBtnProps={{ onClick: goBackLastStep, text: t('cancel') }}
-      onClickBack={goBackLastStep}
+      tertiaryBtnProps={{ onClick: handleGoBack, text: t('cancel') }}
+      onClickBack={handleGoBack}
     >
       <TwoColumn>
         <DescriptionContent
