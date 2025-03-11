@@ -109,7 +109,6 @@ class DelayProperties:
 
     @duration.setter
     def duration(self, new_duration: float) -> None:
-        """Duration may be zero and positive."""
         validated_duration = validation.ensure_positive_float(new_duration)
         self._duration = validated_duration
 
@@ -169,8 +168,7 @@ class TouchTipProperties:
 
     @speed.setter
     def speed(self, new_speed: float) -> None:
-        """Speed may not be zero or negative."""
-        validated_speed = validation.ensure_positive_and_not_zero_float(new_speed)
+        validated_speed = validation.ensure_positive_float(new_speed)
         self._speed = validated_speed
 
     def _get_shared_data_params(self) -> Optional[SharedDataTouchTipParams]:
@@ -219,9 +217,7 @@ class MixProperties:
 
     @repetitions.setter
     def repetitions(self, new_repetitions: int) -> None:
-        validated_repetitions = validation.ensure_positive_and_not_zero_int(
-            new_repetitions
-        )
+        validated_repetitions = validation.ensure_positive_int(new_repetitions)
         self._repetitions = validated_repetitions
 
     @property
@@ -230,7 +226,7 @@ class MixProperties:
 
     @volume.setter
     def volume(self, new_volume: float) -> None:
-        validated_volume = validation.ensure_positive_and_not_zero_float(new_volume)
+        validated_volume = validation.ensure_positive_float(new_volume)
         self._volume = validated_volume
 
     def _get_shared_data_params(self) -> Optional[SharedDataMixParams]:
@@ -587,7 +583,6 @@ def _build_delay_properties(
         duration = delay_properties.params.duration
     else:
         duration = None
-
     return DelayProperties(_enabled=delay_properties.enable, _duration=duration)
 
 
