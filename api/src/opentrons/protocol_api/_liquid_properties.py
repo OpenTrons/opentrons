@@ -587,6 +587,7 @@ def _build_delay_properties(
         duration = delay_properties.params.duration
     else:
         duration = None
+
     return DelayProperties(_enabled=delay_properties.enable, _duration=duration)
 
 

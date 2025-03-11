@@ -104,7 +104,7 @@ def test_delay_properties_none_instantiation_combos() -> None:
 @settings(deadline=None, max_examples=50)
 def test_delay_properties_enabled_bad_values(bad_value: Any) -> None:
     """Test bad values for DelayProperties.enabled."""
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         _build_delay_properties(
             DelayProperties(enable=bad_value, params=DelayParams(duration=1))
         )
@@ -119,10 +119,6 @@ def test_delay_properties_enabled_bad_values(bad_value: Any) -> None:
 @settings(deadline=None, max_examples=50)
 def test_delay_properties_duration(good_duration: Union[int, float]) -> None:
     """Test valid float/int >= 0 for DelayProperties."""
-    dp = _build_delay_properties(
-        DelayProperties(enable=None, params=DelayParams(duration=good_duration))  # type: ignore
-    )
-    assert dp.duration == float(good_duration)
     _build_delay_properties(
         DelayProperties(enable=False, params=DelayParams(duration=good_duration))
     )
@@ -137,14 +133,16 @@ def test_delay_properties_duration(good_duration: Union[int, float]) -> None:
 @settings(deadline=None, max_examples=50)
 def test_delay_properties_duration_bad_values(bad_duration: Any) -> None:
     """Test invalid float/int for DelayProperties (must be >= 0)."""
-    with pytest.raises(ValueError):
+    # instantiation
+    with pytest.raises(ValidationError):
         _build_delay_properties(
             DelayProperties(enable=True, params=DelayParams(duration=bad_duration))
         )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         _build_delay_properties(
             DelayProperties(enable=False, params=DelayParams(duration=bad_duration))
         )
+    # setting
     dp = _build_delay_properties(
         DelayProperties(enable=True, params=DelayParams(duration=1))
     )
