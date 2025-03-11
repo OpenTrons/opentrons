@@ -95,6 +95,9 @@ def test_hw_get_is_ready_to_aspirate(
         aspirated_volume
     )
     decoy.when(
+        mock_state_view.pipettes.get_ready_to_aspirate("pipette-id")
+    ).then_return(ready_to_aspirate)
+    decoy.when(
         mock_state_view.pipettes.get_hardware_pipette("pipette-id", {})
     ).then_return(
         HardwarePipette(
@@ -162,7 +165,11 @@ async def test_hw_dispense_in_place(
     )
 
     result = await hardware_subject.dispense_in_place(
-        pipette_id="pipette-id", volume=25, flow_rate=2.5, push_out=None
+        pipette_id="pipette-id",
+        volume=25,
+        flow_rate=2.5,
+        push_out=None,
+        is_full_dispense=True,
     )
 
     assert result == 25
@@ -213,7 +220,11 @@ async def test_hw_dispense_in_place_raises_invalid_push_out(
 
     with pytest.raises(InvalidPushOutVolumeError):
         await hardware_subject.dispense_in_place(
-            pipette_id="pipette-id", volume=25, flow_rate=2.5, push_out=-7
+            pipette_id="pipette-id",
+            volume=25,
+            flow_rate=2.5,
+            push_out=-7,
+            is_full_dispense=True,
         )
 
 
@@ -376,7 +387,11 @@ async def test_virtual_dispense_in_place(
     )
 
     result = await subject.dispense_in_place(
-        pipette_id="pipette-id", volume=3, flow_rate=5, push_out=None
+        pipette_id="pipette-id",
+        volume=3,
+        flow_rate=5,
+        push_out=None,
+        is_full_dispense=True,
     )
     assert result == 3
 
@@ -391,17 +406,17 @@ async def test_virtual_dispense_in_place_raises_invalid_push_out(
         TipGeometry(length=1, diameter=2, volume=3)
     )
 
-    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
-        TipGeometry(length=1, diameter=2, volume=3)
-    )
-
     with pytest.raises(InvalidPushOutVolumeError):
         await subject.dispense_in_place(
-            pipette_id="pipette-id", volume=3, flow_rate=5, push_out=-7
+            pipette_id="pipette-id",
+            volume=3,
+            flow_rate=5,
+            push_out=-7,
+            is_full_dispense=False,
         )
 
 
-async def test_virtual_dispense_in_place_raises_no_tip(
+async def test_virtual_dispense_in_place_raises_invalid_volume(
     decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should raise an InvalidDispenseVolumeError."""
@@ -417,7 +432,11 @@ async def test_virtual_dispense_in_place_raises_no_tip(
 
     with pytest.raises(InvalidDispenseVolumeError):
         await subject.dispense_in_place(
-            pipette_id="pipette-id", volume=3, flow_rate=5, push_out=7
+            pipette_id="pipette-id",
+            volume=3,
+            flow_rate=5,
+            push_out=7,
+            is_full_dispense=False,
         )
 
 
@@ -456,7 +475,7 @@ async def test_virtual_dispense_validate_tip_attached(
         TipNotAttachedError, match="Cannot perform dispense without a tip attached"
     ):
         await subject.dispense_in_place(
-            "pipette-id", volume=20, flow_rate=1, push_out=None
+            "pipette-id", volume=20, flow_rate=1, push_out=None, is_full_dispense=False
         )
 
 
@@ -585,11 +604,19 @@ async def test_dispense_volume_validation(
     for subject in [virtual_subject, hardware_subject]:
         assert (
             await subject.dispense_in_place(
-                pipette_id="pipette-id", volume=ok_volume, flow_rate=5, push_out=7
+                pipette_id="pipette-id",
+                volume=ok_volume,
+                flow_rate=5,
+                push_out=7,
+                is_full_dispense=True,
             )
             == expected_adjusted_volume
         )
         with pytest.raises(InvalidDispenseVolumeError):
             await subject.dispense_in_place(
-                pipette_id="pipette-id", volume=not_ok_volume, flow_rate=5, push_out=7
+                pipette_id="pipette-id",
+                volume=not_ok_volume,
+                flow_rate=5,
+                push_out=7,
+                is_full_dispense=True,
             )

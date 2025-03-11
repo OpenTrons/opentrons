@@ -2099,6 +2099,7 @@ class OT3API(
         rate: float = 1.0,
         push_out: Optional[float] = None,
         correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""
@@ -2108,6 +2109,7 @@ class OT3API(
             volume=volume,
             rate=rate,
             push_out=push_out,
+            is_full_dispense=is_full_dispense,
             correction_volume=correction_volume,
         )
         if not dispense_spec:

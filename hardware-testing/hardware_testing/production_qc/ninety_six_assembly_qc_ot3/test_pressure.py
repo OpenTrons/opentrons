@@ -156,7 +156,7 @@ async def run(
 
         # DISPENSE-Pa
         dispense_pa = 0.0
-        await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME)
+        await api.dispense(OT3Mount.LEFT, ASPIRATE_VOLUME, is_full_dispense=True)
         if not api.is_simulator:
             try:
                 dispense_pa = await _read_from_sensor(

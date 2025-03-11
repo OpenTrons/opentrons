@@ -239,6 +239,14 @@ class PipetteTipStateUpdate:
 
 
 @dataclasses.dataclass
+class PipetteAspirateReadyUpdate:
+    """Update pipette ready state."""
+
+    pipette_id: str
+    ready_to_aspirate: bool
+
+
+@dataclasses.dataclass
 class TipsUsedUpdate:
     """Represents an update that marks tips in a tip rack as used."""
 
@@ -459,6 +467,8 @@ class StateUpdate:
     files_added: FilesAddedUpdate | NoChangeType = NO_CHANGE
 
     addressable_area_used: AddressableAreaUsedUpdate | NoChangeType = NO_CHANGE
+
+    ready_to_aspirate: PipetteAspirateReadyUpdate | NoChangeType = NO_CHANGE
 
     def append(self, other: Self) -> Self:
         """Apply another `StateUpdate` "on top of" this one.
@@ -850,5 +860,14 @@ class StateUpdate:
                 self.flex_stacker_state_update, module_id
             ),
             pool_count=count,
+        )
+        return self
+
+    def set_pipette_ready_to_aspirate(
+        self, pipette_id: str, ready_to_aspirate: bool
+    ) -> Self:
+        """Set the ready to aspirate state for a pipette."""
+        self.ready_to_aspirate = PipetteAspirateReadyUpdate(
+            pipette_id=pipette_id, ready_to_aspirate=ready_to_aspirate
         )
         return self
