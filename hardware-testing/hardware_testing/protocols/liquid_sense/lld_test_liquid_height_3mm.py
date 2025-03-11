@@ -401,7 +401,7 @@ def _test_for_finding_liquid_height(  # noqa: C901
                         # NOTE: only use new, dry tips to probe
                         if not ctx.is_simulating():
                             _src_meniscus_height = (
-                                liquid_pipette.measure_liquid_height(src_well)  # type: ignore[assignment] # noqa:E501
+                                liquid_pipette.measure_liquid_height(src_well)  # type: ignore[assignment] # noqa: E501
                                 - src_well.bottom().point.z
                             )
                     else:

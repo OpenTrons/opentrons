@@ -8,34 +8,15 @@
     "MODULE_INCOMPATIBLE_LABWARE_SWAP": "Swapping labware not possible due to module incompatibility",
     "LABWARE_INCOMPATIBLE_WITH_ADAPTER": "Labware incompatible with this adapter"
   },
-  "header": {
-    "end": "Click on labware to inspect the result of your protocol"
-  },
   "off_deck": {
     "slideout_title": "Off-deck labware",
     "slideout_empty_state": "There is currently no off-deck labware in this step of the protocol"
   },
   "overlay": {
-    "name_labware": {
-      "nickname_placeholder": "Add a nickname?",
-      "add_liquids": "Add Liquids",
-      "leave_empty": "Leave Empty"
-    },
-    "edit": {
-      "name_and_liquids": "Name & Liquids",
-      "duplicate": "Duplicate",
-      "delete": "Delete"
-    },
-    "browse": {
-      "view_liquids": "View Liquids"
-    },
     "slot": {
-      "add_labware": "Add Labware",
-      "drag_to_new_slot": "Drag To New Slot",
-      "place_here": "Place Here",
-      "add_adapter_or_labware": "Add Labware or Adapter",
-      "add_adapter": "Add adapter"
+      "drag_to_new_slot": "Drag to new slot",
+      "place_here": "Place here",
+      "swap_labware": "Swap labware"
     }
-  },
-  "inactive_deck": "hover on a step to see deck state"
+  }
 }

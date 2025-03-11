@@ -93,7 +93,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
                       ? TYPOGRAPHY.textAlignLeft
                       : TYPOGRAPHY.textAlignRight
                   }
-                  css={LINE_CLAMP_TEXT_STYLE(2)}
+                  css={LINE_CLAMP_TEXT_STYLE(2, true)}
                 >
                   {liquids.join(', ')}
                 </StyledText>
@@ -171,7 +171,7 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
                 ? TYPOGRAPHY.textAlignLeft
                 : TYPOGRAPHY.textAlignRight
             }
-            css={LINE_CLAMP_TEXT_STYLE(3)}
+            css={LINE_CLAMP_TEXT_STYLE(3, true)}
           >
             {stackInformation ?? t('none')}
           </StyledText>

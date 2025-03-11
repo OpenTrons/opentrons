@@ -6,7 +6,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
-  AIR_GAP_META,
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
   delayCommand,
@@ -27,6 +26,8 @@ import {
   SOURCE_LABWARE,
   makeDispenseAirGapHelper,
   makeMoveToWellHelper,
+  makeAirGapAfterAspirateHelper,
+  AIR_GAP_META,
 } from '../fixtures'
 import { FIXED_TRASH_ID } from '../constants'
 import {
@@ -143,7 +144,7 @@ describe('pick up tip if no tip on pipette', () => {
       aspirateHelper('A1', 30),
       dispenseHelper('B2', 30),
       makeMoveToWellHelper('B2', 'destPlateId'),
-      makeAirGapHelper(5),
+      ...makeAirGapHelper(5),
     ])
   })
 
@@ -836,12 +837,12 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         aspirateHelper('A1', 295),
         makeMoveToWellHelper('A1'),
-        makeAirGapHelper(5),
+        makeAirGapAfterAspirateHelper(5),
         dispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 295),
         aspirateHelper('A1', 55),
         makeMoveToWellHelper('A1'),
-        makeAirGapHelper(5),
+        makeAirGapAfterAspirateHelper(5),
         dispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 55),
       ])
@@ -858,12 +859,13 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         aspirateHelper('A1', 150),
         makeMoveToWellHelper('A1'),
-        makeAirGapHelper(5),
+        makeAirGapAfterAspirateHelper(5),
         dispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 150),
+
         aspirateHelper('A1', 150),
         makeMoveToWellHelper('A1'),
-        makeAirGapHelper(5),
+        makeAirGapAfterAspirateHelper(5),
         dispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 150),
       ])
@@ -882,7 +884,7 @@ describe('advanced options', () => {
         aspirateHelper('A1', 295),
         ...delayWithOffset('A1', SOURCE_LABWARE),
         makeMoveToWellHelper('A1'),
-        makeAirGapHelper(5),
+        makeAirGapAfterAspirateHelper(5),
         delayCommand(12),
 
         dispenseAirGapHelper('B1', 5),
@@ -891,7 +893,7 @@ describe('advanced options', () => {
         aspirateHelper('A1', 55),
         ...delayWithOffset('A1', SOURCE_LABWARE),
         makeMoveToWellHelper('A1'),
-        makeAirGapHelper(5),
+        makeAirGapAfterAspirateHelper(5),
         delayCommand(12),
 
         dispenseAirGapHelper('B1', 5),
@@ -911,7 +913,7 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         aspirateHelper('A1', 295),
         makeMoveToWellHelper('A1'),
-        makeAirGapHelper(5),
+        makeAirGapAfterAspirateHelper(5),
 
         dispenseAirGapHelper('B1', 5),
         delayCommand(12),
@@ -921,7 +923,7 @@ describe('advanced options', () => {
 
         aspirateHelper('A1', 55),
         makeMoveToWellHelper('A1'),
-        makeAirGapHelper(5),
+        makeAirGapAfterAspirateHelper(5),
 
         dispenseAirGapHelper('B1', 5),
         delayCommand(12),
@@ -1803,6 +1805,13 @@ describe('advanced options', () => {
           },
         },
         {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
@@ -1862,7 +1871,6 @@ describe('advanced options', () => {
         },
         {
           commandType: 'dispense',
-
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1916,7 +1924,6 @@ describe('advanced options', () => {
         },
         {
           commandType: 'dispense',
-
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2517,6 +2524,14 @@ describe('advanced options', () => {
             },
           },
         },
+
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
         {
           commandType: 'airGapInPlace',
           key: expect.any(String),
@@ -2780,8 +2795,8 @@ describe('advanced options', () => {
         // dispense
         {
           commandType: 'dispense',
-          key: expect.any(String),
           meta: AIR_GAP_META,
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -3260,6 +3275,14 @@ describe('advanced options', () => {
             },
           },
         },
+
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
         {
           commandType: 'airGapInPlace',
           key: expect.any(String),
@@ -3694,6 +3717,13 @@ describe('advanced options', () => {
           },
         },
         {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
@@ -4056,6 +4086,13 @@ describe('advanced options', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
           },
         },
         {

@@ -10,16 +10,16 @@ import {
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInMovableTrash } from '../../utils/movableTrashCommandsUtil'
 import {
   curryCommandCreator,
   reduceCommandCreators,
   blowoutUtil,
   wasteChuteCommandsUtil,
+  getDispenseAirGapLocation,
   getIsSafePipetteMovement,
   getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
-  getDispenseAirGapLocation,
 } from '../../utils'
 import {
   airGapInPlace,
@@ -29,6 +29,7 @@ import {
   dispense,
   dropTip,
   moveToWell,
+  prepareToAspirate,
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
@@ -255,9 +256,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   y: 0,
                 },
               },
+              isAirGap: true,
               nozzles,
               tipRack: args.tipRack,
-              isAirGap: true,
             }),
             ...(dispenseDelay != null
               ? [
@@ -346,6 +347,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           }),
         ]
       }
+
       const {
         dispenseAirGapLabware,
         dispenseAirGapWell,
@@ -374,6 +376,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     y: 0,
                   },
                 },
+              }),
+              curryCommandCreator(prepareToAspirate, {
+                pipetteId: args.pipette,
               }),
               curryCommandCreator(airGapInPlace, {
                 pipetteId: args.pipette,
@@ -405,8 +410,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         })
       }
       if (isTrashBin) {
-        dropTipCommand = movableTrashCommandsUtil({
-          type: 'dropTip',
+        dropTipCommand = dropTipInMovableTrash({
           pipetteId: args.pipette,
           prevRobotState,
           invariantContext,
