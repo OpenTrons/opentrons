@@ -32,7 +32,6 @@ import {
   selectActivePipette,
   selectIsSelectedLwTipRack,
   selectSelectedLwOverview,
-  setFinalPosition,
   goBackEditOffsetSubstep,
   proceedEditOffsetSubstep,
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
@@ -54,11 +53,19 @@ import type {
 import type { State } from '/app/redux/types'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
-export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
-  const { runId, commandUtils, contentHeader } = props
+interface CheckLabwareProps extends EditOffsetContentProps {
+  handleAddConfirmedWorkingVector: () => void
+}
+
+export function CheckLabware(props: CheckLabwareProps): JSX.Element {
+  const {
+    runId,
+    commandUtils,
+    contentHeader,
+    handleAddConfirmedWorkingVector,
+  } = props
   const {
     toggleRobotMoving,
-    handleConfirmLwFinalPosition,
     handleJog,
     resetJog,
     handleResetLwModulesOnDeck,
@@ -87,7 +94,6 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
   const [joggedPosition, setJoggedPosition] = useState<VectorOffset>(
     workingInitialOffset
   )
-
   const [showOddJogControls, setShowOddJogControls] = useState(false)
 
   const liveOffset = getVectorSum(
@@ -133,21 +139,11 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
     })
 
   const handleProceed = (): void => {
-    void toggleRobotMoving(true)
-      .then(() => handleConfirmLwFinalPosition(offsetLocationDetails, pipette))
-      .then(position => {
-        dispatch(
-          setFinalPosition(runId, {
-            labwareUri: selectedLwInfo.uri,
-            location: offsetLocationDetails,
-            position,
-          })
-        )
-      })
-      .then(() => {
-        dispatch(proceedEditOffsetSubstep(runId))
-      })
-      .finally(() => toggleRobotMoving(false))
+    if (isOnDevice) {
+      handleAddConfirmedWorkingVector()
+    } else {
+      dispatch(proceedEditOffsetSubstep(runId, isOnDevice))
+    }
   }
 
   const handleGoBack = (): void => {

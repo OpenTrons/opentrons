@@ -5,7 +5,8 @@ import type { HandleLwSubstep, LPCWizardState } from '../../../types'
 // Handles proceed to next substep for the "handle labware" core LPC flow.
 // Certain steps require special state updates.
 export function proceedToNextHandleLwSubstep(
-  state: LPCWizardState
+  state: LPCWizardState,
+  isOnDevice?: boolean
 ): LPCWizardState {
   const currentSubstep = state.steps.currentSubstep
   const selectedLw = state.labwareInfo.selectedLabware
@@ -21,10 +22,18 @@ export function proceedToNextHandleLwSubstep(
         return HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
       case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
         return HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
-      case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
+      case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW: {
+        if (isOnDevice) {
+          return HANDLE_LW_SUBSTEP.DETAILS
+        } else {
+          return HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
+        }
+      }
+      case HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS:
         return HANDLE_LW_SUBSTEP.DETAILS
     }
   }
+  console.log('=>(handleLwSubstep.ts:36) getNextSubStep()', getNextSubStep())
 
   if (getNextSubStep() === HANDLE_LW_SUBSTEP.LIST) {
     return {
@@ -89,6 +98,8 @@ export function goBackToPreviousHandleLwSubstep(
         return HANDLE_LW_SUBSTEP.DETAILS
       case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
         return HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
+      case HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS:
+        return HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
     }
   }
 

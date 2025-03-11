@@ -80,7 +80,7 @@ export interface ApplyWorkingOffsetsAction {
 
 export interface ProceedHandleLwSubstepAction {
   type: 'PROCEED_HANDLE_LW_SUBSTEP'
-  payload: { runId: string }
+  payload: { runId: string; isOnDevice?: boolean }
 }
 
 export interface GoBackHandleLwSubstepAction {

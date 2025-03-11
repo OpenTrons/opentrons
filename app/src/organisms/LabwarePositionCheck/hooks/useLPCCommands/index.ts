@@ -27,6 +27,7 @@ import type { UseHandleResetLwModulesOnDeckResult } from './useHandleResetLwModu
 import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
 import type { UseBuildOffsetsToApplyResult } from './useBuildOffsetsToApply'
 import type { UseHandleValidMoveToMaintenancePositionResult } from './useHandleValidMoveToMaintenancePosition'
+import { fullHomeCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/commands'
 
 export interface UseLPCCommandsProps extends LPCWizardFlexProps {}
 
@@ -44,6 +45,7 @@ export type UseLPCCommandsResult = UseApplyLPCOffsetsResult &
     errorMessage: string | null
     isRobotMoving: boolean
     toggleRobotMoving: (isMoving: boolean) => Promise<void>
+    home: () => Promise<void>
   }
 
 // Consolidates all command handlers and handler state for injection into LPC.
@@ -113,6 +115,8 @@ export function useLPCCommands(
         setIsRobotMoving(isMoving)
         resolve()
       }),
+    home: () =>
+      chainLPCCommands(fullHomeCommands(), false).then(() => Promise.resolve()),
     ...applyLPCOffsetsUtils,
     ...buildLPCOffsets,
     ...handleJogUtils,
