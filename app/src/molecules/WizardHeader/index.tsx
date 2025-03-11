@@ -13,6 +13,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { StepMeter } from '/app/atoms/StepMeter'
 
@@ -60,14 +61,7 @@ const HEADER_CONTAINER_STYLE = css`
     border-radius: ${BORDERS.borderRadius16};
   }
 `
-const HEADER_TEXT_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize22};
-    font-weight: ${TYPOGRAPHY.fontWeightBold};
-    line-height: ${TYPOGRAPHY.lineHeight28};
-  }
-`
+
 const STEP_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.grey60};
@@ -92,12 +86,12 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
     <Box css={BOX_STYLE}>
       <Flex css={HEADER_CONTAINER_STYLE}>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <LegacyStyledText
-            css={HEADER_TEXT_STYLE}
-            marginRight={SPACING.spacing8}
+          <StyledText
+            desktopStyle="bodyLargeSemiBold"
+            oddStyle="bodyTextSemiBold"
           >
             {title}
-          </LegacyStyledText>
+          </StyledText>
 
           {!hideStepText &&
           currentStep != null &&

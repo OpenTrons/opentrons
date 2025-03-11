@@ -1,5 +1,4 @@
 import { Tag } from '@opentrons/components'
-
 import { useTranslation } from 'react-i18next'
 
 export interface OffsetTagDefaultKindProps {
@@ -25,16 +24,23 @@ export type OffsetTagProps =
 export function OffsetTag(props: OffsetTagProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 
+  // Ensure we never display "-0.0"
+  const formatCoordinate = (value: number): string => {
+    const formatted = value.toFixed(1)
+    return formatted === '-0.0' ? '0.0' : formatted
+  }
+
   const buildCopy = (): string => {
     switch (props.kind) {
       case 'default':
         return t('default')
       case 'vector': {
         const { x, y, z } = props
+
         return t('offset_values', {
-          x: x.toFixed(1),
-          y: y.toFixed(1),
-          z: z.toFixed(1),
+          x: formatCoordinate(x),
+          y: formatCoordinate(y),
+          z: formatCoordinate(z),
         })
       }
       case 'noOffset':
