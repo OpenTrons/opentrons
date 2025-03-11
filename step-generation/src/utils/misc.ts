@@ -16,7 +16,7 @@ import {
 } from '@opentrons/shared-data'
 import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
 import {
-  airGapInPlace,
+  aspirate,
   dispense,
   moveToAddressableArea,
   moveToWell,
@@ -701,8 +701,10 @@ interface AirGapArgs {
   destWell: string | null
   flowRate: number
   offsetFromBottomMm: number
+  tipRack: string
   pipetteId: string
   volume: number
+  nozzles: NozzleConfigurationStyle | null
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
@@ -719,9 +721,11 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     flowRate,
     offsetFromBottomMm,
     pipetteId,
+    tipRack,
     sourceId,
     sourceWell,
     volume,
+    nozzles,
   } = args
 
   const trashOrLabware = getTrashOrLabware(
@@ -746,10 +750,12 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       })
 
       commands = [
-        curryCommandCreator(moveToWell, {
-          pipetteId,
+        curryCommandCreator(aspirate, {
+          pipetteId: pipetteId,
+          volume,
           labwareId: dispenseAirGapLabware,
           wellName: dispenseAirGapWell,
+          flowRate,
           wellLocation: {
             origin: 'bottom',
             offset: {
@@ -758,20 +764,20 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
               y: 0,
             },
           },
-        }),
-        curryCommandCreator(airGapInPlace, {
-          pipetteId,
-          volume,
-          flowRate,
+          isAirGap: true,
+          tipRack,
+          nozzles,
         }),
       ]
       //  when aspirating out of multi wells for consolidate
     } else {
       commands = [
-        curryCommandCreator(moveToWell, {
-          pipetteId,
+        curryCommandCreator(aspirate, {
+          pipetteId: pipetteId,
+          volume,
           labwareId: destinationId,
           wellName: destWell,
+          flowRate,
           wellLocation: {
             origin: 'bottom',
             offset: {
@@ -780,11 +786,9 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
               y: 0,
             },
           },
-        }),
-        curryCommandCreator(airGapInPlace, {
-          pipetteId,
-          volume,
-          flowRate,
+          isAirGap: true,
+          tipRack,
+          nozzles,
         }),
       ]
     }
