@@ -179,7 +179,7 @@ async def test_hw_dispense_in_place(
             mount=Mount.RIGHT, aspirate=None, dispense=2.5, blow_out=None
         ),
         await mock_hardware_api.dispense(
-            mount=Mount.RIGHT, volume=25, push_out=None, correction_volume=0
+            mount=Mount.RIGHT, volume=25, push_out=None, correction_volume=0, is_full_dispense=True
         ),
         mock_hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=1.23, dispense=4.56, blow_out=7.89
