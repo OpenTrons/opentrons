@@ -17,6 +17,7 @@ from typing import (
     Set,
     TYPE_CHECKING,
     Any,
+    Dict,
 )
 from typing_extensions import Literal
 from itertools import chain, tee
@@ -468,10 +469,17 @@ def position_log(records: Iterator[MoveComplete]) -> Iterator[PositionLogEntry]:
         )
 
 
-Operation = Literal["print-positions", "print-errors", "plot-positions", "print-motion"]
+Operation = Literal[
+    "print-positions",
+    "print-errors",
+    "plot-positions",
+    "print-motion",
+    "print-durations",
+]
 OPERATIONS: List[Operation] = [
     "print-positions",
     "print-motion",
+    "print-durations",
     "print-errors",
     "plot-positions",
 ]
@@ -517,6 +525,38 @@ def _print_motion(
             )
 
 
+def _print_durations(records_to_check: Iterator[RecordTypeVar]) -> None:
+    t0: Optional[datetime] = None
+    accumulated_duration = 0.0
+    previous_move_group = {"time": 0.0, "duration": 0.0}
+    print("START TIME (sec)," "OBSERVED DURATION (sec)," "MOTION DURATION (sec)")
+    for record in records_to_check:
+        if isinstance(record, MoveCommand) and record.dest == NodeId.pipette_left:
+            accumulated_duration += record.duration
+        elif isinstance(record, ExecuteCommand):
+            if t0 is None:
+                t0 = record.date
+            new_move_group = {
+                "time": (record.date - t0).total_seconds(),
+                "duration": accumulated_duration,
+            }
+            if previous_move_group["duration"] > 0:
+                _prev_move_group_duration_plus_delay = (
+                    new_move_group["time"] - previous_move_group["time"]
+                )
+                print(
+                    f'{previous_move_group["time"]},'
+                    f"{_prev_move_group_duration_plus_delay},"
+                    f'{previous_move_group["duration"]}'
+                )
+                assert (
+                    previous_move_group["duration"]
+                    < _prev_move_group_duration_plus_delay
+                )
+            previous_move_group = new_move_group
+            accumulated_duration = 0.0
+
+
 def _print_errors(
     records_to_check: Iterator[RecordTypeVar],
     nodes: Set[NodeId],
@@ -544,6 +584,8 @@ def main(
         _print_positions(records_to_check, nodes, annotate_errors)
     elif operation == "print-motion":
         _print_motion(records_to_check, nodes, annotate_errors)
+    elif operation == "print-durations":
+        _print_durations(records_to_check)
     elif operation == "print-errors":
         _print_errors(records_to_check, nodes, annotate_errors)
     elif operation == "plot-positions":
