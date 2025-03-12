@@ -11,6 +11,7 @@ import {
   OFFSET_KIND_DEFAULT,
   RESET_OFFSET_TO_DEFAULT,
   RESET_TO_DEFAULT,
+  SET_FINAL_POSITION,
 } from '/app/redux/protocol-runs'
 
 import type {
@@ -62,10 +63,13 @@ export function updateOffsetsForURI(
       )
 
       // Update location-specific offsets if they match the new default offset.
-      const updatedLocationSpecificOffsetDetails = updateLocationSpecificDetailsBasedOnDefault(
-        lwDetails.locationSpecificOffsetDetails,
-        updatedDefaultOffsetDetails
-      )
+      const updatedLocationSpecificOffsetDetails =
+        action.type === SET_FINAL_POSITION
+          ? updateLocationSpecificDetailsBasedOnDefault(
+              lwDetails.locationSpecificOffsetDetails,
+              updatedDefaultOffsetDetails
+            )
+          : lwDetails.locationSpecificOffsetDetails
 
       return {
         ...lwDetails,
@@ -276,24 +280,19 @@ function updateLocationSpecificOffsetDetails(
           mostValidVector
         )
 
-        // TOME TODO: Seems that if the adjusted = EXISTING working, it doesn't go back.
-
         // Get current default vector for comparison.
         const currentDefaultVector =
           lwDetails.defaultOffsetDetails.workingOffset?.confirmedVector ??
           lwDetails.defaultOffsetDetails.existingOffset?.vector ??
           null
-        console.log(
-          '=>(updateOffsetsForURI.ts:286) currentDefaultVector',
-          currentDefaultVector
-        )
-
-        if (
+        const newVectorEqualsDefaultVector =
+          type === SET_FINAL_POSITION &&
           vectorEqualsDefault(
             newWorkingDetail.confirmedVector,
             currentDefaultVector
           )
-        ) {
+
+        if (newVectorEqualsDefaultVector) {
           // If we have an existing offset, mark it for reset.
           if (relevantDetail?.existingOffset != null) {
             return [

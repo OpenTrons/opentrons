@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
 import {
@@ -14,7 +14,11 @@ import {
 } from '@opentrons/components'
 
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { goBackEditOffsetSubstep } from '/app/redux/protocol-runs'
+import {
+  clearSelectedLabwareWorkingOffsets,
+  goBackEditOffsetSubstep,
+  selectSelectedLwOverview,
+} from '/app/redux/protocol-runs'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -28,6 +32,12 @@ export function UnsavedOffsetsDesktop(
   const { t } = useTranslation('labware_position_check')
   const { toggleShowUnsavedOffsetsDesktop, runId } = props
   const dispatch = useDispatch()
+  const uri = useSelector(selectSelectedLwOverview(runId))?.uri ?? ''
+
+  const onGoBack = (): void => {
+    dispatch(clearSelectedLabwareWorkingOffsets(runId, uri))
+    dispatch(goBackEditOffsetSubstep(runId))
+  }
 
   return (
     <LPCContentContainer
@@ -39,7 +49,7 @@ export function UnsavedOffsetsDesktop(
         onClick: toggleShowUnsavedOffsetsDesktop,
       }}
       buttonText={t('confirm')}
-      onClickButton={() => dispatch(goBackEditOffsetSubstep(runId))}
+      onClickButton={onGoBack}
     >
       <Flex css={CONTAINER_STYLE}>
         <Icon name="alert-circle" css={ICON_STYLE} />
