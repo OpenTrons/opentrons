@@ -1,11 +1,10 @@
 import { createPortal } from 'react-dom'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
+  StyledText,
   ModalShell,
   SPACING,
   TYPOGRAPHY,
@@ -40,16 +39,9 @@ export function LPCJogControlsOdd({
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       header={
-        <LegacyStyledText
-          as="h4"
-          css={css`
-            font-weight: ${TYPOGRAPHY.fontWeightBold};
-            font-size: ${TYPOGRAPHY.fontSize28};
-            line-height: ${TYPOGRAPHY.lineHeight36};
-          `}
-        >
+        <StyledText oddStyle="level4HeaderSemiBold">
           {t('move_to_a1_position')}
-        </LegacyStyledText>
+        </StyledText>
       }
       footer={
         <SmallButton

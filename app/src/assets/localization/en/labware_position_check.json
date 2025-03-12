@@ -49,6 +49,7 @@
   "exit_screen_go_back": "Go back to labware position check",
   "exit_screen_subtitle": "If you exit now, all labware offsets will be discarded. This cannot be undone.",
   "exit_screen_title": "Exit before completing Labware Position Check?",
+  "failed_to_save_final_position": "Failed to save final position",
   "get_labware_offset_data": "Get Labware Offset Data",
   "install_probe": "<block>Take the calibration probe from its storage location. Ensure the collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle as far as it can go. Twist the collar to lock the probe.</block><block>Test that the probe is secure by gently pulling it back and forth. It should be firmly in place.</block>",
   "jog_controls_adjustment": "Need to make an adjustment?",

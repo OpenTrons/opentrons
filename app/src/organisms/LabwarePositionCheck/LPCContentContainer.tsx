@@ -57,6 +57,7 @@ const CONTAINER_STYLE = css`
   height: 100vh;
 `
 
+// TODO(jh, 03-12-25): This should be a fixed value in components.
 const FIXED_HEADER_STYLE = css`
   position: ${POSITION_FIXED};
   top: 0;

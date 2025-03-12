@@ -24,6 +24,7 @@ import levelProbeWithLabware from '/app/assets/images/lpc_level_probe_with_labwa
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
+// TODO(jh, 03-12-25): Standardize viewboxes.
 const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 
 export function LPCLabwareJogRender({

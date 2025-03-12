@@ -7,65 +7,21 @@ import type { HandleLwSubstep, LPCWizardState } from '../../../types'
 export function proceedToNextHandleLwSubstep(
   state: LPCWizardState
 ): LPCWizardState {
-  const currentSubstep = state.steps.currentSubstep
-  const selectedLw = state.labwareInfo.selectedLabware
+  const nextSubstep = getNextHandleLwSubstep(state.steps.currentSubstep)
 
-  // Note that this is a closed loop.
-  const getNextSubStep = (): HandleLwSubstep | null => {
-    switch (currentSubstep) {
-      case null:
-        return HANDLE_LW_SUBSTEP.LIST
-      case HANDLE_LW_SUBSTEP.LIST:
-        return HANDLE_LW_SUBSTEP.DETAILS
-      case HANDLE_LW_SUBSTEP.DETAILS:
-        return HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
-      case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
-        return HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
-      case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
-        return HANDLE_LW_SUBSTEP.DETAILS
-    }
-  }
-
-  if (getNextSubStep() === HANDLE_LW_SUBSTEP.LIST) {
-    return {
-      ...state,
-      labwareInfo: {
-        ...state.labwareInfo,
-        selectedLabware: null,
-      },
-      steps: { ...state.steps, currentSubstep: getNextSubStep() },
-    }
-  } else if (getNextSubStep() === HANDLE_LW_SUBSTEP.DETAILS) {
-    if (selectedLw == null) {
-      console.error('Cannot proceed substep if labware is not set.')
-      return state
-    } else {
-      return {
-        ...state,
-        labwareInfo: {
-          ...state.labwareInfo,
-          selectedLabware: {
-            ...selectedLw,
-            offsetLocationDetails: null,
-          },
-        },
-        steps: { ...state.steps, currentSubstep: getNextSubStep() },
-      }
-    }
+  // Handle different transitions based on the next substep.
+  if (nextSubstep === HANDLE_LW_SUBSTEP.LIST) {
+    return handleTransitionToList(state)
+  } else if (nextSubstep === HANDLE_LW_SUBSTEP.DETAILS) {
+    return handleTransitionToDetails(state)
   } else if (
-    getNextSubStep() === HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW &&
-    selectedLw?.offsetLocationDetails == null
+    nextSubstep === HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW &&
+    state.labwareInfo.selectedLabware?.offsetLocationDetails == null
   ) {
-    console.error('Cannot proceed substep if details are not set.')
-    return {
-      ...state,
-      steps: { ...state.steps, currentSubstep: getNextSubStep() },
-    }
+    console.error('Cannot proceed substep.')
+    return updateCurrentSubstep(state, nextSubstep)
   } else {
-    return {
-      ...state,
-      steps: { ...state.steps, currentSubstep: getNextSubStep() },
-    }
+    return updateCurrentSubstep(state, nextSubstep)
   }
 }
 
@@ -74,56 +30,104 @@ export function proceedToNextHandleLwSubstep(
 export function goBackToPreviousHandleLwSubstep(
   state: LPCWizardState
 ): LPCWizardState {
-  const currentSubstep = state.steps.currentSubstep
+  const prevSubstep = getPreviousHandleLwSubstep(state.steps.currentSubstep)
 
-  // Note that this is a closed loop.
-  const getPrevSubStep = (): HandleLwSubstep | null => {
-    switch (currentSubstep) {
-      case null:
-        return HANDLE_LW_SUBSTEP.LIST
-      case HANDLE_LW_SUBSTEP.LIST:
-        return HANDLE_LW_SUBSTEP.LIST
-      case HANDLE_LW_SUBSTEP.DETAILS:
-        return HANDLE_LW_SUBSTEP.LIST
-      case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
-        return HANDLE_LW_SUBSTEP.DETAILS
-      case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
-        return HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
-    }
+  // Handle different transitions based on the previous substep
+  if (prevSubstep === HANDLE_LW_SUBSTEP.LIST) {
+    return handleTransitionToList(state)
+  } else if (prevSubstep === HANDLE_LW_SUBSTEP.DETAILS) {
+    return handleTransitionToDetails(state)
+  } else {
+    return updateCurrentSubstep(state, prevSubstep)
   }
+}
 
-  if (getPrevSubStep() === HANDLE_LW_SUBSTEP.LIST) {
+// Get the next substep in the flow.
+function getNextHandleLwSubstep(
+  currentSubstep: HandleLwSubstep | null
+): HandleLwSubstep | null {
+  switch (currentSubstep) {
+    case null:
+      return HANDLE_LW_SUBSTEP.LIST
+    case HANDLE_LW_SUBSTEP.LIST:
+      return HANDLE_LW_SUBSTEP.DETAILS
+    case HANDLE_LW_SUBSTEP.DETAILS:
+      return HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
+      return HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
+      return HANDLE_LW_SUBSTEP.DETAILS
+  }
+}
+
+// Get the previous substep in the flow.
+function getPreviousHandleLwSubstep(
+  currentSubstep: HandleLwSubstep | null
+): HandleLwSubstep | null {
+  switch (currentSubstep) {
+    case null:
+      return HANDLE_LW_SUBSTEP.LIST
+    case HANDLE_LW_SUBSTEP.LIST:
+      return HANDLE_LW_SUBSTEP.LIST
+    case HANDLE_LW_SUBSTEP.DETAILS:
+      return HANDLE_LW_SUBSTEP.LIST
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
+      return HANDLE_LW_SUBSTEP.DETAILS
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
+      return HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
+  }
+}
+
+// Handle transition to "List" substep.
+function handleTransitionToList(state: LPCWizardState): LPCWizardState {
+  return {
+    ...state,
+    labwareInfo: {
+      ...state.labwareInfo,
+      selectedLabware: null,
+    },
+    steps: {
+      ...state.steps,
+      currentSubstep: HANDLE_LW_SUBSTEP.LIST,
+    },
+  }
+}
+
+// Handle transition to "Details" substep.
+function handleTransitionToDetails(state: LPCWizardState): LPCWizardState {
+  const selectedLw = state.labwareInfo.selectedLabware
+
+  if (selectedLw == null) {
+    console.error('Cannot proceed/go back to details substep.')
+    return state
+  } else {
     return {
       ...state,
       labwareInfo: {
         ...state.labwareInfo,
-        selectedLabware: null,
-      },
-      steps: { ...state.steps, currentSubstep: getPrevSubStep() },
-    }
-  } else if (getPrevSubStep() === HANDLE_LW_SUBSTEP.DETAILS) {
-    const selectedLw = state.labwareInfo.selectedLabware
-
-    if (selectedLw == null) {
-      console.error('Cannot go back substep if labware is not set.')
-      return state
-    } else {
-      return {
-        ...state,
-        labwareInfo: {
-          ...state.labwareInfo,
-          selectedLabware: {
-            ...selectedLw,
-            offsetLocationDetails: null,
-          },
+        selectedLabware: {
+          ...selectedLw,
+          offsetLocationDetails: null,
         },
-        steps: { ...state.steps, currentSubstep: getPrevSubStep() },
-      }
+      },
+      steps: {
+        ...state.steps,
+        currentSubstep: HANDLE_LW_SUBSTEP.DETAILS,
+      },
     }
-  } else {
-    return {
-      ...state,
-      steps: { ...state.steps, currentSubstep: getPrevSubStep() },
-    }
+  }
+}
+
+// The simple/default update substep state case.
+function updateCurrentSubstep(
+  state: LPCWizardState,
+  substep: HandleLwSubstep | null
+): LPCWizardState {
+  return {
+    ...state,
+    steps: {
+      ...state.steps,
+      currentSubstep: substep,
+    },
   }
 }
