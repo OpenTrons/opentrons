@@ -30,7 +30,7 @@ export function forAspirate(
   } else if (nozzles === SINGLE) {
     channels = 1
   }
-  console.log('for aspirate nozzles', nozzles)
+
   const { allWellsShared, wellsForTips } = getWellsForTips(
     channels,
     labwareDef,

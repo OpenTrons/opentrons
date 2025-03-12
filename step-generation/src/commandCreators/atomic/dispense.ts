@@ -117,16 +117,10 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
       )
     }
   }
-<<<<<<< HEAD
 
-  const is96Channel =
-    invariantContext.pipetteEntities[pipetteId]?.spec.channels === 96
-=======
-  const pipChannels =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels
+  const pipChannels = invariantContext.pipetteEntities[pipetteId]?.spec.channels
   const is96Channel = pipChannels === 96
   const is8Channel = pipChannels === 8
->>>>>>> b54ac77286 (add full support for single partial tip with the primary nozzle being the default)
 
   if (
     ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
