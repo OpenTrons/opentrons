@@ -8,6 +8,7 @@ import {
 import { ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { getTrashBinAddressableAreaName } from './misc'
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   RobotState,
   InvariantContext,
@@ -25,13 +26,20 @@ export function airGapInMovableTrash(args: {
 }): CurriedCommandCreator[] {
   const { pipetteId, invariantContext, volume, flowRate } = args
   const offset = ZERO_OFFSET
-  const addressableAreaName = getTrashBinAddressableAreaName(
+  const trash = Object.values(
     invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for airGap')
+  ).find(aE => aE.name === 'trashBin')
+  const trashLocation = trash?.location as CutoutId
+
+  if (trashLocation == null) {
+    console.error(
+      `could not find trashLocation in airGapInMovableTrash with entity ${trash?.name}`
+    )
     return []
   }
+
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
   return [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
@@ -58,13 +66,18 @@ export function dispenseInMovableTrash(args: {
 }): CurriedCommandCreator[] {
   const { pipetteId, invariantContext, volume, flowRate } = args
   const offset = ZERO_OFFSET
-  const addressableAreaName = getTrashBinAddressableAreaName(
+  const trash = Object.values(
     invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for dispense')
+  ).find(aE => aE.name === 'trashBin')
+  const trashLocation = trash?.location as CutoutId
+
+  if (trashLocation == null) {
+    console.error(`could not find trashLocation with entity ${trash?.name}`)
     return []
   }
+
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
   return [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
@@ -87,13 +100,20 @@ export function blowOutInMovableTrash(args: {
 }): CurriedCommandCreator[] {
   const { pipetteId, invariantContext, flowRate } = args
   const offset = ZERO_OFFSET
-  const addressableAreaName = getTrashBinAddressableAreaName(
+  const trash = Object.values(
     invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for blowOut')
+  ).find(aE => aE.name === 'trashBin')
+  const trashLocation = trash?.location as CutoutId
+
+  if (trashLocation == null) {
+    console.error(
+      `could not find trashLocation in blowOutInMovableTrash with entity ${trash?.name}`
+    )
     return []
   }
+
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
   return [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
@@ -114,13 +134,20 @@ export function moveToMovableTrash(args: {
 }): CurriedCommandCreator[] {
   const { pipetteId, invariantContext } = args
   const offset = ZERO_OFFSET
-  const addressableAreaName = getTrashBinAddressableAreaName(
+  const trash = Object.values(
     invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for moveTo')
+  ).find(aE => aE.name === 'trashBin')
+  const trashLocation = trash?.location as CutoutId
+
+  if (trashLocation == null) {
+    console.error(
+      `could not find trashLocation in moveToMovableTrash with entity ${trash?.name}`
+    )
     return []
   }
+
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
   return [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,

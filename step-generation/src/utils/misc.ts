@@ -119,33 +119,23 @@ export function getWasteChuteAddressableAreaNamePip(
 }
 
 export function getTrashBinAddressableAreaName(
-  additionalEquipmentEntities: AdditionalEquipmentEntities
-): AddressableAreaName | null {
-  const trash = Object.values(additionalEquipmentEntities).find(
-    aE => aE.name === 'trashBin'
-  )
-  const trashLocation = trash != null ? (trash.location as CutoutId) : null
-
+  trashLocation: CutoutId
+): AddressableAreaName {
   const deckDef = getDeckDefFromRobotType(
     trashLocation === ('cutout12' as CutoutId)
       ? OT2_ROBOT_TYPE
       : FLEX_ROBOT_TYPE
   )
   let cutouts: Record<CutoutId, AddressableAreaName[]> | null = null
+
   if (deckDef.robot.model === FLEX_ROBOT_TYPE) {
     cutouts =
       deckDef.cutoutFixtures.find(
         cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
       )?.providesAddressableAreas ?? null
-  } else if (deckDef.robot.model === OT2_ROBOT_TYPE) {
-    cutouts =
-      deckDef.cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id === 'fixedTrashSlot'
-      )?.providesAddressableAreas ?? null
   }
-  return trashLocation != null && cutouts != null
-    ? cutouts[trashLocation]?.[0] ?? null
-    : null
+  //  assume trash location is the fixedTrash for OT-2 if cutouts is null
+  return cutouts != null ? cutouts[trashLocation]?.[0] : 'fixedTrash'
 }
 
 export function getTrashOrLabware(

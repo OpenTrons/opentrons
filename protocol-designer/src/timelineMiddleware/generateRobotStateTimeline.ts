@@ -14,6 +14,7 @@ import {
 import { commandCreatorFromStepArgs } from '../file-data/helpers'
 import type { StepArgsAndErrorsById } from '../steplist/types'
 import type * as StepGeneration from '@opentrons/step-generation'
+import type { CutoutId } from '@opentrons/shared-data'
 
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
@@ -85,10 +86,10 @@ export const generateRobotStateTimeline = (
         const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
           pipetteSpec.channels
         )
-
-        const addressableAreaNameTrashBin = getTrashBinAddressableAreaName(
+        const trash = Object.values(
           invariantContext.additionalEquipmentEntities
-        )
+        ).find(aE => aE.name === 'trashBin')
+        const trashLocation = trash?.location as CutoutId
 
         let dropTipCommands = [
           curryCommandCreator(dropTip, {
@@ -108,7 +109,11 @@ export const generateRobotStateTimeline = (
             }),
           ]
         }
-        if (isTrashBin && addressableAreaNameTrashBin != null) {
+        if (isTrashBin && trashLocation != null) {
+          const addressableAreaNameTrashBin = getTrashBinAddressableAreaName(
+            trashLocation
+          )
+
           dropTipCommands = [
             curryCommandCreator(moveToAddressableAreaForDropTip, {
               pipetteId,

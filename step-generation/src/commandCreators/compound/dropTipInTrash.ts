@@ -6,7 +6,7 @@ import {
 import { moveToAddressableAreaForDropTip } from '../atomic/moveToAddressableAreaForDropTip'
 import { dropTipInPlace } from '../atomic/dropTipInPlace'
 import type { CurriedCommandCreator, CommandCreator } from '../../types'
-import type { DropTipInPlaceParams } from '@opentrons/shared-data'
+import type { CutoutId, DropTipInPlaceParams } from '@opentrons/shared-data'
 
 export const dropTipInTrash: CommandCreator<DropTipInPlaceParams> = (
   args,
@@ -15,12 +15,18 @@ export const dropTipInTrash: CommandCreator<DropTipInPlaceParams> = (
 ) => {
   const { pipetteId } = args
   let commandCreators: CurriedCommandCreator[] = []
-  const addressableAreaName = getTrashBinAddressableAreaName(
+  const trash = Object.values(
     invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for dropTip')
+  ).find(aE => aE.name === 'trashBin')
+  const trashLocation = trash?.location as CutoutId
+
+  if (trashLocation == null) {
+    console.error(
+      `could not find trashLocation in dropTipInTrash with entity ${trash?.name}`
+    )
   } else if (prevRobotState.tipState.pipettes[pipetteId]) {
+    const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
     commandCreators = [
       curryCommandCreator(moveToAddressableAreaForDropTip, {
         pipetteId,
