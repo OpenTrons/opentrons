@@ -10,7 +10,7 @@ import {
   LPCComplete,
 } from '/app/organisms/LabwarePositionCheck/steps'
 import { LPCRobotInMotion } from './LPCRobotInMotion'
-import { LPCErrorModal } from './LPCErrorModal'
+import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
 import {
   useLPCCommands,
@@ -88,7 +88,7 @@ function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
     )
   }
   if (errorMessage != null) {
-    return <LPCErrorModal {...props} />
+    return <LPCFatalError {...props} />
   }
   if (unableToDetect) {
     return <LPCProbeNotAttached {...props} />

@@ -137,12 +137,14 @@ function DesktopFooterContent({
   tertiaryBtnProps,
   onClickButton,
   primaryBtnAlert,
+  commandUtils,
 }: Omit<LPCContentContainerProps, 'children'>): JSX.Element {
   const step = useSelector(selectCurrentStep(runId))
   const { currentSubstep } = useSelector(selectStepInfo(runId))
   const showHelpLink =
     step !== LPC_STEP.LPC_COMPLETE &&
-    currentSubstep !== HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
+    currentSubstep !== HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS &&
+    commandUtils.errorMessage == null
 
   return (
     <Flex css={DESKTOP_FOOTER_CONTENT_CONTAINER}>
