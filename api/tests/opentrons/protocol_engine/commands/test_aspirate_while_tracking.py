@@ -4,8 +4,6 @@ from datetime import datetime
 
 import pytest
 from decoy import Decoy, matchers
-from mock import AsyncMock, patch
-from typing import Iterator
 
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
@@ -17,7 +15,6 @@ from opentrons.protocol_engine.execution import (
     GantryMover,
     MovementHandler,
 )
-from opentrons.protocol_engine.commands.movement_common import move_to_well
 from opentrons.protocol_engine.commands.aspirate_while_tracking import (
     AspirateWhileTrackingParams,
     AspirateWhileTrackingResult,
@@ -39,7 +36,6 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     DeckPoint,
-    WellLocation,
 )
 from opentrons.protocol_engine.state import update_types
 

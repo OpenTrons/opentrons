@@ -191,14 +191,13 @@ class HardwarePipettingHandler(PipettingHandler):
             raise InvalidLiquidHeightFound(
                 "Aspirate distance must be a float in Hardware pipetting handler."
             )
-        # uncomment this when hw control pr gets merged
-        # with self._set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
-        #     await self._hardware_api.aspirate_while_tracking(
-        #         mount=hw_pipette.mount,
-        #         z_distance=aspirate_z_distance,
-        #         flow_rate=flow_rate,
-        #         volume=adjusted_volume,
-        #     )
+        with self._set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
+            await self._hardware_api.aspirate_while_tracking(
+                mount=hw_pipette.mount,
+                z_distance=aspirate_z_distance,
+                flow_rate=flow_rate,
+                volume=adjusted_volume,
+            )
         return adjusted_volume
 
     async def dispense_while_tracking(
@@ -226,15 +225,14 @@ class HardwarePipettingHandler(PipettingHandler):
             raise InvalidLiquidHeightFound(
                 "Dispense distance must be a float in Hardware pipetting handler."
             )
-        # uncomment this when hw control pr gets merged
-        # with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
-        #     await self._hardware_api.dispense_while_tracking(
-        #         mount=hw_pipette.mount,
-        #         z_distance=dispense_z_distance,
-        #         flow_rate=flow_rate,
-        #         volume=adjusted_volume,
-        #         push_out=push_out,
-        #     )
+        with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
+            await self._hardware_api.dispense_while_tracking(
+                mount=hw_pipette.mount,
+                z_distance=dispense_z_distance,
+                flow_rate=flow_rate,
+                volume=adjusted_volume,
+                push_out=push_out,
+            )
         return adjusted_volume
 
     async def aspirate_in_place(
