@@ -13,6 +13,7 @@ pyserial = "==3.5"
 types-pytz = "*"
 paramiko = "*"
 types-paramiko = "*"
+Pillow = "==9.4.0"
 
 [dev-packages]
 atomicwrites = "==1.4.1"

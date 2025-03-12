@@ -1,6 +1,7 @@
 """Data for hardware-testing."""
 from datetime import datetime
 import os
+from PIL import Image
 from pathlib import Path
 from subprocess import check_output
 from time import time
@@ -139,3 +140,38 @@ def insert_data_to_file(
 def convert_list_to_csv_line(elements: List[Any]) -> str:
     """Convert list of something into CSV line."""
     return ",".join(str(elements))
+
+
+def jpg_to_pdf_letter(input_jpg: str, output_pdf: str) -> None:
+    # Define letter size in pixels at 72 DPI
+    LETTER_SIZE = (612, 792)  # 8.5 x 11 inches at 72 DPI
+
+    # Open and process the image
+    image = Image.open(input_jpg).convert("RGB")
+    new_image = Image.new("RGB", LETTER_SIZE, (255, 255, 255))  # White background
+    image.thumbnail(LETTER_SIZE)  # Scale while keeping aspect ratio
+
+    # Center the image on the page
+    x_offset = (LETTER_SIZE[0] - image.width) // 2
+    y_offset = (LETTER_SIZE[1] - image.height) // 2
+    new_image.paste(image, (x_offset, y_offset))
+
+    # If the PDF already exists, append new page
+    if os.path.exists(output_pdf):
+        existing_pdf = Image.open(output_pdf)
+        existing_pages = []
+
+        try:
+            while True:
+                existing_pages.append(existing_pdf.copy())  # Store existing pages
+                existing_pdf.seek(len(existing_pages))  # Move to next page
+        except EOFError:
+            pass  # End of pages reached
+
+        existing_pages.append(new_image)  # Add new page
+        existing_pages[0].save(
+            output_pdf, save_all=True, append_images=existing_pages[1:]
+        )
+    else:
+        # First image creates the new PDF
+        new_image.save(output_pdf, "PDF")
