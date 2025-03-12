@@ -28,7 +28,7 @@ vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../step-forms/actions/additionalItems')
-vi.mock('../../../../organisms')
+vi.mock('../../../../components/organisms')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-ingred/utils')
 vi.mock('../../../../components/organisms/Kitchen/hooks')
@@ -97,7 +97,7 @@ describe('SlotOverflowMenu', () => {
       },
     })
     vi.mocked(EditNickNameModal).mockReturnValue(
-      <div>mockEditNickNameModal</div>
+      <div>mock EditNickNameModal</div>
     )
     vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({})
     vi.mocked(getNextAvailableDeckSlot).mockReturnValue('A1')
@@ -120,7 +120,7 @@ describe('SlotOverflowMenu', () => {
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
-    screen.getByText('mockEditNickNameModal')
+    screen.getByText('mock EditNickNameModal')
     fireEvent.click(screen.getByRole('button', { name: 'Add liquid' }))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()

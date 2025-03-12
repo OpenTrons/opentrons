@@ -18,9 +18,9 @@ import { SelectWellsModal } from '..'
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
-vi.mock('../../../step-forms/selectors')
-vi.mock('../../../labware-ingred/selectors')
-vi.mock('../../../top-selectors/well-contents')
+vi.mock('../../../../step-forms/selectors')
+vi.mock('../../../../labware-ingred/selectors')
+vi.mock('../../../../top-selectors/well-contents')
 vi.mock('../../Labware/SelectableLabware')
 
 const render = (props: ComponentProps<typeof SelectWellsModal>) => {

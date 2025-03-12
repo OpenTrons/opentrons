@@ -13,7 +13,7 @@ import type { ComponentProps } from 'react'
 
 vi.mock('../DeckThumbnail')
 vi.mock('../OffDeckThumbnail')
-vi.mock('../../../organisms')
+vi.mock('../../../components/organisms')
 vi.mock('../../../step-forms/selectors')
 
 vi.mock('../DeckThumbnail', () => ({

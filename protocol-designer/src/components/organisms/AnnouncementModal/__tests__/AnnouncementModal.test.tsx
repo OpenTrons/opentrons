@@ -6,7 +6,7 @@ import { getLocalStorageItem, setLocalStorageItem } from '../../../../persist'
 import { useAnnouncements } from '../announcements'
 import { AnnouncementModal } from '../index'
 
-vi.mock('../../../persist')
+vi.mock('../../../../persist')
 vi.mock('../announcements')
 
 const render = () => {

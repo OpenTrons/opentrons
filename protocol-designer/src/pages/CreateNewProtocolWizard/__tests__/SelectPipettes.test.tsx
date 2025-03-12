@@ -17,7 +17,7 @@ import type { WizardFormState, WizardTileProps } from '../types'
 
 vi.mock('../../../labware-defs/selectors')
 vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../organisms')
+vi.mock('../../../components/organisms')
 vi.mock('../../../labware-defs/actions')
 vi.mock('../utils')
 const mockLocation = vi.fn()

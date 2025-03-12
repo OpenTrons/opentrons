@@ -8,9 +8,9 @@ import {
   POSITION_RELATIVE,
   StyledText,
 } from '@opentrons/components'
-import BOTTOM_LAYER from '../../assets/images/tip_side_bottom_layer.svg'
-import MID_LAYER from '../../assets/images/tip_side_mid_layer.svg'
-import TOP_LAYER from '../../assets/images/tip_side_top_layer.svg'
+import BOTTOM_LAYER from '../../../assets/images/tip_side_bottom_layer.svg'
+import MID_LAYER from '../../../assets/images/tip_side_mid_layer.svg'
+import TOP_LAYER from '../../../assets/images/tip_side_top_layer.svg'
 
 const WELL_HEIGHT_PIXELS = 71
 const PIXEL_DECIMALS = 2
