@@ -14,7 +14,12 @@ import {
   OT2_ROBOT_TYPE,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
+import {
+  airGapInWasteChute,
+  blowoutInWasteChute,
+  dispenseInWasteChute,
+  reduceCommandCreators,
+} from './index'
 import {
   airGapInPlace,
   dispense,
@@ -333,7 +338,6 @@ export const blowoutUtil = (args: {
   offsetFromTopMm: number
   invariantContext: InvariantContext
   destWell: BlowoutParams['wellName'] | null
-  prevRobotState: RobotState
 }): CurriedCommandCreator[] => {
   const {
     pipette,
@@ -345,11 +349,8 @@ export const blowoutUtil = (args: {
     flowRate,
     offsetFromTopMm,
     invariantContext,
-    prevRobotState,
   } = args
   if (!blowoutLocation) return []
-  const channels = invariantContext.pipetteEntities[pipette].spec.channels
-  const addressableAreaName = getWasteChuteAddressableAreaNamePip(channels)
 
   const trashOrLabware = getTrashOrLabware(
     invariantContext.labwareEntities,
@@ -389,17 +390,14 @@ export const blowoutUtil = (args: {
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    return wasteChuteCommandsUtil({
+    return blowoutInWasteChute({
       pipetteId: pipette,
-      type: 'blowOut',
       flowRate,
-      addressableAreaName,
-      prevRobotState,
+      invariantContext,
     })
   } else {
     return blowOutInMovableTrash({
       pipetteId: pipette,
-      prevRobotState,
       invariantContext,
       flowRate,
     })
@@ -616,16 +614,11 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    const pipetteChannels =
-      invariantContext.pipetteEntities[pipetteId].spec.channels
-
-    commands = wasteChuteCommandsUtil({
-      type: 'dispense',
+    commands = dispenseInWasteChute({
       pipetteId,
       volume,
       flowRate,
-      prevRobotState,
-      addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
+      invariantContext,
     })
   } else {
     commands = dispenseInMovableTrash({
@@ -633,7 +626,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       volume,
       flowRate,
       invariantContext,
-      prevRobotState,
     })
   }
 
@@ -689,7 +681,6 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
     commands = moveToMovableTrash({
       pipetteId,
       invariantContext,
-      prevRobotState,
     })
   }
 
@@ -796,15 +787,11 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       ]
     }
   } else if (trashOrLabware === 'wasteChute') {
-    const pipetteChannels =
-      invariantContext.pipetteEntities[pipetteId].spec.channels
-    commands = wasteChuteCommandsUtil({
-      type: 'airGap',
+    commands = airGapInWasteChute({
       pipetteId,
       volume,
       flowRate,
-      prevRobotState,
-      addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
+      invariantContext,
     })
   } else {
     commands = airGapInMovableTrash({
@@ -812,7 +799,6 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       volume,
       flowRate,
       invariantContext,
-      prevRobotState,
     })
   }
 

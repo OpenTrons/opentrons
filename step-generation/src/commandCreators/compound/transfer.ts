@@ -14,11 +14,9 @@ import {
   curryCommandCreator,
   airGapHelper,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
 } from '../../utils'
 import {
@@ -40,6 +38,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,
@@ -178,10 +177,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       null &&
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'trashBin'
-
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    pipetteSpec.channels
-  )
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -530,7 +525,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             flowRate: blowoutFlowRateUlSec,
             offsetFromTopMm: blowoutOffsetFromTopMm,
             invariantContext,
-            prevRobotState,
           })
 
           const airGapAfterDispenseCommands =
@@ -564,12 +558,11 @@ export const transfer: CommandCreator<TransferArgs> = (
             }),
           ]
           if (isWasteChute) {
-            dropTipCommand = wasteChuteCommandsUtil({
-              type: 'dropTip',
-              pipetteId: args.pipette,
-              prevRobotState,
-              addressableAreaName: addressableAreaNameWasteChute,
-            })
+            dropTipCommand = [
+              curryCommandCreator(dropTipInWasteChute, {
+                pipetteId: args.pipette,
+              }),
+            ]
           }
           if (isTrashBin) {
             dropTipCommand = [
