@@ -67,11 +67,11 @@ export function Tag(props: TagProps): JSX.Element {
   `
 
   const ICON_STYLE = css`
-    width: 0.884rem;
-    height: 0.884rem;
+    width: ${SPACING.spacing16};
+    height: ${SPACING.spacing16};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      width: 1.5rem;
-      height: 1.5rem;
+      width: ${SPACING.spacing24};
+      height: ${SPACING.spacing24};
     }
   `
 
