@@ -6,7 +6,7 @@ import NiceModal from '@ebay/nice-modal-react'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__'
-import { handleUnsavedOffsetsModalODD } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsetsModal'
+import { handleUnsavedOffsetsModalODD } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 import {
   selectSelectedLwOverview,
   clearSelectedLabwareWorkingOffsets,
@@ -59,7 +59,7 @@ const render = () => {
   )
 }
 
-describe('UnsavedOffsetsModal', () => {
+describe('UnsavedOffsetsModalODD', () => {
   let mockDispatch: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
