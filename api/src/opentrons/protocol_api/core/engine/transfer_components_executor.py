@@ -1,9 +1,10 @@
 """Executor for liquid class based complex commands."""
 from __future__ import annotations
 
+import logging
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union, Literal
 from dataclasses import dataclass, field
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
@@ -20,13 +21,18 @@ from opentrons.protocol_api._liquid_properties import (
     MultiDispenseProperties,
     TouchTipProperties,
 )
-from opentrons.protocol_engine.errors import TouchTipDisabledError
+from opentrons.protocol_engine.errors import (
+    TouchTipDisabledError,
+    LiquidHeightUnknownError,
+)
 from opentrons.types import Location, Point
 
 if TYPE_CHECKING:
     from .well import WellCore
     from .instrument import InstrumentCore
     from ... import TrashBin, WasteChute
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -121,6 +127,7 @@ class TransferComponentsExecutor:
     def submerge(
         self,
         submerge_properties: Submerge,
+        volume_for_pipette_mode_configuration: Optional[float],
     ) -> None:
         """Execute submerge steps.
 
@@ -131,7 +138,10 @@ class TransferComponentsExecutor:
         2. move to aspirate position at desired speed
         3. delay
         """
-        # TODO: compare submerge start position and aspirate position and raise error if incompatible
+        if submerge_properties == self._transfer_properties.aspirate.submerge:
+            post_submerge_action = "aspirate"
+        else:
+            post_submerge_action = "dispense"
         submerge_start_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
             position_reference=submerge_properties.position_reference,
@@ -139,6 +149,15 @@ class TransferComponentsExecutor:
         )
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
+        )
+        raise_if_location_inside_liquid(
+            location=submerge_start_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="submerge start",
+                pipetting_action=post_submerge_action,  # type: ignore[arg-type]
+            ),
         )
         self._instrument.move_to(
             location=submerge_start_location,
@@ -148,6 +167,26 @@ class TransferComponentsExecutor:
             speed=None,
         )
         self._remove_air_gap(location=submerge_start_location)
+        if (
+            post_submerge_action == "aspirate"
+            and volume_for_pipette_mode_configuration is not None
+        ):
+            # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
+            self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)
+            if (
+                self._transfer_type != TransferType.MANY_TO_ONE
+                and post_submerge_action == "aspirate"
+                and self._instrument.get_liquid_presence_detection()
+            ):
+                # Currently this moves the pipette to 2mm above the well
+                # `liquid_probe_with_recovery` is being updated to start probing
+                # from the current location or a non-well-top start location.
+                self._instrument.liquid_probe_with_recovery(
+                    self._target_well, submerge_start_location
+                )
+            else:
+                self._instrument.prepare_to_aspirate()
+
         self._instrument.move_to(
             location=self._target_location,
             well_core=self._target_well,
@@ -299,6 +338,15 @@ class TransferComponentsExecutor:
         retract_location = Location(
             retract_point, labware=self._target_location.labware
         )
+        raise_if_location_inside_liquid(
+            location=retract_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="aspirate",
+            ),
+        )
         self._instrument.move_to(
             location=retract_location,
             well_core=self._target_well,
@@ -386,6 +434,15 @@ class TransferComponentsExecutor:
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
+        )
+        raise_if_location_inside_liquid(
+            location=retract_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="dispense",
+            ),
         )
         self._instrument.move_to(
             location=retract_location,
@@ -778,3 +835,47 @@ def absolute_point_from_position_reference_and_offset(
         case _:
             raise ValueError(f"Unknown position reference {position_reference}")
     return reference_point + Point(offset.x, offset.y, offset.z)
+
+
+@dataclass
+class _LocationCheckDescriptors:
+    location_type: Literal["submerge start", "retract end"]
+    pipetting_action: Literal["aspirate", "dispense"]
+
+
+def raise_if_location_inside_liquid(
+    location: Location,
+    well_location: Location,
+    well_core: WellCore,
+    location_check_descriptors: _LocationCheckDescriptors,
+) -> None:
+    """Raise an error if the location in question would be inside the liquid.
+
+    This checker will raise an error if:
+    - the location in question is below the target well location or,
+    - if we can find the liquid height AND the location in question is below this height.
+      If we can't find the liquid height, then we simply log a warning and no error is raised.
+    """
+    if location.point.z < well_location.point.z:
+        raise RuntimeError(
+            f"Received {location_check_descriptors.location_type} location of {location}"
+            f" and {location_check_descriptors.pipetting_action} location of {well_location}."
+            f" {location_check_descriptors.location_type} location z should not be lower"
+            f" than the {location_check_descriptors.pipetting_action} location z."
+        )
+    try:
+        well_liquid_z = well_core.current_liquid_height() + well_core.get_bottom(0).z
+        if well_liquid_z > location.point.z:
+            raise RuntimeError(
+                f"{location_check_descriptors.location_type} location {location} is"
+                f" inside the liquid in well {well_core} when it should be outside"
+                f"(above) the liquid."
+            )
+    except LiquidHeightUnknownError:
+        log.warning(
+            f"Could not verify height of liquid in well {well_core}, either"
+            f" because the liquid in this well has not been probed or because"
+            f" liquid was not loaded in this well using `load_liquid`."
+            f" Proceeding without verifying if {location_check_descriptors.location_type}"
+            f" location is outside the liquid."
+        )

@@ -1237,6 +1237,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 transfer_properties=transfer_props,
                 transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
                 tip_contents=post_disp_tip_contents,
+                volume_for_pipette_mode_configuration=step_volume,
             )
             post_disp_tip_contents = self.dispense_liquid_class(
                 volume=step_volume,
@@ -1307,6 +1308,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tip_rack=tiprack_uri_for_transfer_props,
         )
 
+        # If the volume to dispense into a well is less than threashold for low volume mode,
+        # then set the max working volume to the max volume of low volume mode.
+        # NOTE: this logic will need to be updated once we support list of volumes
+        # TODO (spp): refactor this to use the volume thresholds from shared data
+        has_low_volume_mode = self.get_pipette_name() in [
+            "flex_1channel_50",
+            "flex_8channel_50",
+        ]
+        if has_low_volume_mode and volume < 5:
+            working_volume = 30
         # If there are no multi-dispense properties or if the volume to distribute
         # per destination well is so large that the tip cannot hold enough liquid
         # to consecutively distribute to at least two wells, then we resort to using
@@ -1472,6 +1483,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 transfer_properties=transfer_props,
                 transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
                 tip_contents=tip_contents,
+                # We configure the mode based on the last dispense volume and disposal volume
+                # since the mode is only used to determine the dispense push out volume
+                # and we can do a push out only at the last dispense, that too if there is no disposal volume.
+                volume_for_pipette_mode_configuration=vol_dest_combo[-1][0]
+                if not disposal_vol
+                else self.get_max_volume(),
                 conditioning_volume=conditioning_vol,
             )
 
@@ -1682,6 +1699,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     transfer_properties=transfer_props,
                     transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
                     tip_contents=tip_contents,
+                    volume_for_pipette_mode_configuration=total_dispense_volume,
                 )
             tip_contents = self.dispense_liquid_class(
                 volume=total_dispense_volume,
@@ -1726,6 +1744,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         transfer_properties: TransferProperties,
         transfer_type: tx_comps_executor.TransferType,
         tip_contents: List[tx_comps_executor.LiquidAndAirGapPair],
+        volume_for_pipette_mode_configuration: float,
         conditioning_volume: Optional[float] = None,
     ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
         """Execute aspiration steps.
@@ -1775,12 +1794,19 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
             ),
         )
-        components_executor.submerge(submerge_properties=aspirate_props.submerge)
+        components_executor.submerge(
+            submerge_properties=aspirate_props.submerge,
+            volume_for_pipette_mode_configuration=volume_for_pipette_mode_configuration,
+        )
         # Do not do a pre-aspirate mix or pre-wet if consolidating
         if transfer_type != tx_comps_executor.TransferType.MANY_TO_ONE:
+            # TODO: check if we want to do a mix only once when we're splitting a transfer
+            #  and coming back to the source multiple times.
+            #  We will have to do pre-wet always even for split volumes
             components_executor.mix(
                 mix_properties=aspirate_props.mix, last_dispense_push_out=False
             )
+            # TODO: check if pre-wet needs to be enabled for first well of consolidate
             components_executor.pre_wet(
                 volume=volume,
             )
@@ -1878,7 +1904,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
             ),
         )
-        components_executor.submerge(submerge_properties=dispense_props.submerge)
+        components_executor.submerge(
+            submerge_properties=dispense_props.submerge,
+            volume_for_pipette_mode_configuration=None,
+        )
         push_out_vol = (
             0.0
             if dispense_props.mix.enabled
@@ -1956,7 +1985,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
             ),
         )
-        components_executor.submerge(submerge_properties=dispense_props.submerge)
+        components_executor.submerge(
+            submerge_properties=dispense_props.submerge,
+            volume_for_pipette_mode_configuration=None,
+        )
         tip_starting_volume = self.get_current_volume()
         is_last_dispense_without_disposal_vol = (
             disposal_volume == 0 and tip_starting_volume == volume
