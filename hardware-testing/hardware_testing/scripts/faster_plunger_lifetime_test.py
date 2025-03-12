@@ -52,10 +52,11 @@ async def main(args, cfg ) -> None:
     )
     ax = Axis.P_L
     mount = OT3Mount.LEFT
+    set_current = list(CURRENTS_SPEEDS.keys())
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
-    settings.max_speed = 25
-    settings.acceleration = 100
-    settings.run_current = 0.7 
+    settings.max_speed = SPEEDS_TO_TEST
+    settings.acceleration = 200
+    settings.run_current = set_current 
     default_current = settings.run_current
     default_speed = settings.max_speed
     default_acceleration = 100
