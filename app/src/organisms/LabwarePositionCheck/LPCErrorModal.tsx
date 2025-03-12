@@ -34,7 +34,7 @@ export function LPCErrorModal(props: LPCWizardContentProps): JSX.Element {
     <LPCContentContainer
       {...props}
       header={t('labware_position_check_title')}
-      onClickButton={headerCommands.handleClose}
+      onClickButton={headerCommands.handleCloseWithoutHome}
       buttonText={t('exit')}
     >
       <ModalContainer
@@ -71,7 +71,7 @@ export function LPCErrorModal(props: LPCWizardContentProps): JSX.Element {
         <PrimaryButton
           textTransform={TEXT_TRANSFORM_CAPITALIZE}
           alignSelf={ALIGN_FLEX_END}
-          onClick={headerCommands.handleClose}
+          onClick={headerCommands.handleCloseWithoutHome}
         >
           {t('shared:exit')}
         </PrimaryButton>

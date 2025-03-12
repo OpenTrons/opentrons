@@ -9,11 +9,7 @@ import { ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { getTrashBinAddressableAreaName } from './misc'
 import type { CutoutId } from '@opentrons/shared-data'
-import type {
-  RobotState,
-  InvariantContext,
-  CurriedCommandCreator,
-} from '../types'
+import type { InvariantContext, CurriedCommandCreator } from '../types'
 
 /** Helper fn for movable trash commands for dispense, aspirate, air_gap, drop_tip and blow_out commands */
 
@@ -22,7 +18,6 @@ export function airGapInMovableTrash(args: {
   volume: number
   flowRate: number
   invariantContext: InvariantContext
-  prevRobotState: RobotState
 }): CurriedCommandCreator[] {
   const { pipetteId, invariantContext, volume, flowRate } = args
   const offset = ZERO_OFFSET
@@ -62,7 +57,6 @@ export function dispenseInMovableTrash(args: {
   volume: number
   flowRate: number
   invariantContext: InvariantContext
-  prevRobotState: RobotState
 }): CurriedCommandCreator[] {
   const { pipetteId, invariantContext, volume, flowRate } = args
   const offset = ZERO_OFFSET
@@ -96,7 +90,6 @@ export function blowOutInMovableTrash(args: {
   pipetteId: string
   flowRate: number
   invariantContext: InvariantContext
-  prevRobotState: RobotState
 }): CurriedCommandCreator[] {
   const { pipetteId, invariantContext, flowRate } = args
   const offset = ZERO_OFFSET
@@ -130,7 +123,6 @@ export function blowOutInMovableTrash(args: {
 export function moveToMovableTrash(args: {
   pipetteId: string
   invariantContext: InvariantContext
-  prevRobotState: RobotState
 }): CurriedCommandCreator[] {
   const { pipetteId, invariantContext } = args
   const offset = ZERO_OFFSET

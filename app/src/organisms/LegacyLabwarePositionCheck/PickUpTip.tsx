@@ -100,7 +100,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     ...(protocolHasModules && currentStepIndex === 1
       ? [t('place_modules')]
       : []),
-    isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
+    isOnDevice ? t('legacy_clear_all_slots_odd') : t('legacy_clear_all_slots'),
     <Trans
       key="place_a_full_tip_rack_in_location"
       t={t}
