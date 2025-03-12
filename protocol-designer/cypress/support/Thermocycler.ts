@@ -561,10 +561,6 @@ export const thermoVerifications = {
             .contains(`${ThermoContent.Open}`)
             .should('exist')
             .should('be.visible')
-
-        // NOTE:: NEED TO CHECK IF THIS IS OK ^^^
-        //  NOTE:: I did add a command to close release notes modal, so maybe that will help??
-
         cy.get('button[aria-label="Deactivate"]').each(($btn, index) => {
             cy.wrap($btn)
                 .should('be.visible')
