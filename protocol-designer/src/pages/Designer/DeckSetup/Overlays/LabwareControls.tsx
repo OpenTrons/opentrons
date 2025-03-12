@@ -134,9 +134,7 @@ export const LabwareControls = (
   }
 
   let hoverOpacity = '0'
-  if (!isDragging && isBeingDragged) {
-    hoverOpacity = '0'
-  } else if ((isOver && canDrop) || hover === itemId) {
+  if ((isOver && canDrop) || hover === itemId) {
     hoverOpacity = '1'
   }
 
