@@ -7,17 +7,18 @@ import type { CreateCommand } from '@opentrons/shared-data'
 
 export interface UseHandleConditionalCleanupResult {
   isExiting: boolean
-  handleCleanUpAndClose: () => Promise<void>
+  handleHomeAndClose: () => Promise<void>
+  handleCloseNoHome: () => Promise<void>
 }
 
-export function useHandleCleanup({
+export function useHandleClose({
   onCloseClick,
   maintenanceRunId,
 }: UseLPCCommandChildProps): UseHandleConditionalCleanupResult {
   const [isExiting, setIsExiting] = useState(false)
   const { chainRunCommands } = useChainMaintenanceCommands()
 
-  const handleCleanUpAndClose = (): Promise<void> => {
+  const handleHomeAndClose = (): Promise<void> => {
     setIsExiting(true)
     const cleanupCommands: CreateCommand[] = [...retractSafelyAndHomeCommands()]
 
@@ -30,5 +31,13 @@ export function useHandleCleanup({
       })
   }
 
-  return { isExiting, handleCleanUpAndClose }
+  const handleCloseNoHome = (): Promise<void> => {
+    setIsExiting(true)
+
+    return new Promise(() => {
+      onCloseClick()
+    })
+  }
+
+  return { isExiting, handleHomeAndClose, handleCloseNoHome }
 }

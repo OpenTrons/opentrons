@@ -6,19 +6,28 @@ import {
   FINISH_LPC,
   START_LPC,
   GO_BACK_LAST_STEP,
-  SET_SELECTED_LABWARE_NAME,
-  CLEAR_SELECTED_LABWARE,
-  APPLY_OFFSET,
+  SET_SELECTED_LABWARE_URI,
+  APPLY_WORKING_OFFSETS,
   LPC_STEPS,
+  PROCEED_HANDLE_LW_SUBSTEP,
+  GO_BACK_HANDLE_LW_SUBSTEP,
+  HANDLE_LW_SUBSTEP,
+  RESET_OFFSET_TO_DEFAULT,
+  CLEAR_WORKING_OFFSETS,
 } from '../constants'
-import { updateOffsetsForURI } from './transforms'
+import {
+  updateOffsetsForURI,
+  proceedToNextHandleLwSubstep,
+  goBackToPreviousHandleLwSubstep,
+} from './transforms'
 
 import type {
   LPCWizardAction,
   LPCWizardState,
-  SelectedLabwareInfo,
+  SelectedLwOverview,
 } from '../types'
 
+// TODO(jh, 03-10-25): Move some of these reducer case transformations to dedicated transform fns for clarity.
 // TODO(jh, 01-17-25): A lot of this state should live above the LPC slice, in the general protocolRuns slice instead.
 //  We should make selectors for that state, too!
 export function LPCReducer(
@@ -56,12 +65,18 @@ export function LPCReducer(
           }
         }
 
+        const currentStepName = state.steps.all[newStepIdx()]
+
         return {
           ...state,
           steps: {
             ...state.steps,
             currentStepIndex: newStepIdx(),
             lastStepIndices: [...(lastStepIndices ?? []), currentStepIndex],
+            currentSubstep:
+              currentStepName === 'HANDLE_LABWARE'
+                ? HANDLE_LW_SUBSTEP.LIST
+                : null,
           },
         }
       }
@@ -81,11 +96,19 @@ export function LPCReducer(
         }
       }
 
-      case SET_SELECTED_LABWARE_NAME: {
+      case PROCEED_HANDLE_LW_SUBSTEP: {
+        return proceedToNextHandleLwSubstep(state)
+      }
+
+      case GO_BACK_HANDLE_LW_SUBSTEP: {
+        return goBackToPreviousHandleLwSubstep(state)
+      }
+
+      case SET_SELECTED_LABWARE_URI: {
         const lwUri = action.payload.labwareUri
         const thisLwInfo = state.labwareInfo.labware[lwUri]
 
-        const selectedLabware: SelectedLabwareInfo = {
+        const selectedLabware: SelectedLwOverview = {
           uri: action.payload.labwareUri,
           id: thisLwInfo.id,
           offsetLocationDetails: null,
@@ -104,7 +127,7 @@ export function LPCReducer(
         const lwUri = action.payload.labwareUri
         const thisLwInfo = state.labwareInfo.labware[lwUri]
 
-        const selectedLabware: SelectedLabwareInfo = {
+        const selectedLabware: SelectedLwOverview = {
           uri: action.payload.labwareUri,
           id: thisLwInfo.id,
           offsetLocationDetails: action.payload.location,
@@ -119,19 +142,13 @@ export function LPCReducer(
         }
       }
 
-      case CLEAR_SELECTED_LABWARE: {
-        return {
-          ...state,
-          labwareInfo: {
-            ...state.labwareInfo,
-            selectedLabware: null,
-          },
-        }
-      }
-
       case SET_INITIAL_POSITION:
-      case SET_FINAL_POSITION: {
+      case SET_FINAL_POSITION:
+      case CLEAR_WORKING_OFFSETS:
+      case RESET_OFFSET_TO_DEFAULT:
+      case APPLY_WORKING_OFFSETS: {
         const lwUri = action.payload.labwareUri
+        const updatedLwDetails = updateOffsetsForURI(state, action)
 
         return {
           ...state,
@@ -141,20 +158,14 @@ export function LPCReducer(
               ...state.labwareInfo.labware,
               [lwUri]: {
                 ...state.labwareInfo.labware[lwUri],
-                offsetDetails: updateOffsetsForURI(state, action),
+                ...updatedLwDetails,
               },
             },
           },
         }
       }
-
-      case APPLY_OFFSET: {
-        // TODO(jh, 01-30-25): Update the existing offset in the store, and clear the
-        //  the working offset state. This will break the legacy LPC "apply all offsets"
-        //  functionality, so this must be implemented simultaneously with the API changes.
-        break
-      }
-
+      // TODO(jh, 03-12-25): Revisit whether we need to set the store back to undefined, and
+      // if we can avoid having an `undefined` store at any point in the store's lifecycle.
       case FINISH_LPC:
         return undefined
 

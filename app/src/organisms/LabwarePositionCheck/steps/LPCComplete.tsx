@@ -24,7 +24,7 @@ export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
       {...props}
       header={t('labware_position_check_title')}
       buttonText={t('exit')}
-      onClickButton={props.commandUtils.headerCommands.handleClose}
+      onClickButton={props.commandUtils.headerCommands.handleCloseAndHome}
       contentStyle={CHILDREN_CONTAINER_STYLE}
     >
       <Flex css={CONTENT_CONTAINER}>
