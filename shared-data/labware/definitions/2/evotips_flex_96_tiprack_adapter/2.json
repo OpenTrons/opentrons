@@ -5,14 +5,14 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Evotips adapter",
+    "displayName": "Evotip Tiprack 96-Channel Adapter",
     "displayCategory": "adapter",
-    "displayVolumeUnits": "µL",
+    "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
   "dimensions": {
     "xDimension": 156.5,
-    "yDimension": 105,
+    "yDimension": 98,
     "zDimension": 132
   },
   "wells": {},
@@ -31,12 +31,11 @@
   },
   "namespace": "opentrons",
   "version": 2,
-  "schemaVersion": 3,
+  "schemaVersion": 2,
   "allowedRoles": ["adapter"],
   "cornerOffsetFromSlot": {
     "x": -14.25,
     "y": -3.5,
     "z": 0
-  },
-  "$otSharedSchema": "#/labware/schemas/3"
+  }
 }
