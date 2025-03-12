@@ -207,6 +207,19 @@ export const selectIsDefaultOffsetAbsent = (
       details?.workingOffset?.confirmedVector == null
   )
 
+// Whether the default offset is "missing" for the given labware geometry.
+// The default offset must be persisted on the robot-server to be considered "not missing".
+export const selectIsDefaultOffsetMissing = (
+  runId: string,
+  uri: string
+): Selector<State, boolean> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .defaultOffsetDetails,
+    details => details?.existingOffset == null
+  )
+
 export const selectWorkingOffsetsByUri = (
   runId: string
 ): Selector<State, WorkingOffsetsByUri> =>
