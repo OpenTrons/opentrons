@@ -658,7 +658,6 @@ def test_get_labware_origin_position(
 
 def test_get_labware_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
@@ -675,8 +674,8 @@ def test_get_labware_highest_z(
     calibration_offset = LabwareOffsetVector(x=1, y=-2, z=3)
 
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
+    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=999, y=999, z=100)
     )
     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
@@ -687,13 +686,11 @@ def test_get_labware_highest_z(
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
-    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
-    assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3)
+    assert highest_z == (100 + 3 + 3)
 
 
 def test_get_module_labware_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -713,7 +710,10 @@ def test_get_module_labware_highest_z(
 
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
+        sentinel.well_plate_def
+    )
+    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=999, y=999, z=100)
     )
     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
         calibration_offset
@@ -745,14 +745,13 @@ def test_get_module_labware_highest_z(
     )
     decoy.when(
         mock_labware_view.get_module_overlap_offsets(
-            well_plate_def, ModuleModel.MAGNETIC_MODULE_V2
+            sentinel.well_plate_def, ModuleModel.MAGNETIC_MODULE_V2
         )
     ).then_return(OverlapOffset(x=0, y=0, z=0))
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
-    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
-    assert highest_z == (well_plate_def.dimensions.zDimension + 3 + 3 + 6 + 0.5)
+    assert highest_z == (100 + 3 + 3 + 6 + 0.5)
 
 
 def test_get_all_obstacle_highest_z_no_equipment(
@@ -774,9 +773,6 @@ def test_get_all_obstacle_highest_z_no_equipment(
 
 def test_get_all_obstacle_highest_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    reservoir_def: LabwareDefinition,
-    falcon_tuberack_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -817,12 +813,16 @@ def test_get_all_obstacle_highest_z(
     decoy.when(mock_labware_view.get("off-deck-plate-id")).then_return(off_deck_lw)
     decoy.when(mock_labware_view.get("reservoir-id")).then_return(reservoir)
 
-    decoy.when(mock_labware_view.get_definition("plate-id")).then_return(well_plate_def)
-    decoy.when(mock_labware_view.get_definition("off-deck-plate-id")).then_return(
-        falcon_tuberack_def  # Something tall.
+    decoy.when(mock_labware_view.get_dimensions(labware_id="plate-id")).then_return(
+        Dimensions(x=0, y=0, z=10)
     )
-    decoy.when(mock_labware_view.get_definition("reservoir-id")).then_return(
-        reservoir_def
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="off-deck-plate-id")
+    ).then_return(
+        Dimensions(x=0, y=0, z=10000)  # Something tall.
+    )
+    decoy.when(mock_labware_view.get_dimensions(labware_id="reservoir-id")).then_return(
+        Dimensions(x=0, y=0, z=20)
     )
 
     decoy.when(mock_labware_view.get_labware_offset_vector("plate-id")).then_return(
@@ -852,8 +852,6 @@ def test_get_all_obstacle_highest_z(
 
 def test_get_all_obstacle_highest_z_with_staging_area(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    falcon_tuberack_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -885,9 +883,11 @@ def test_get_all_obstacle_highest_z_with_staging_area(
     decoy.when(mock_labware_view.get("plate-id")).then_return(plate)
     decoy.when(mock_labware_view.get("staging-id")).then_return(staging_lw)
 
-    decoy.when(mock_labware_view.get_definition("plate-id")).then_return(well_plate_def)
-    decoy.when(mock_labware_view.get_definition("staging-id")).then_return(
-        falcon_tuberack_def  # Something tall.
+    decoy.when(mock_labware_view.get_dimensions(labware_id="plate-id")).then_return(
+        Dimensions(x=0, y=0, z=10)
+    )
+    decoy.when(mock_labware_view.get_dimensions(labware_id="staging-id")).then_return(
+        Dimensions(x=0, y=0, z=10000)  # Something tall.
     )
 
     decoy.when(mock_labware_view.get_labware_offset_vector("plate-id")).then_return(
@@ -960,7 +960,6 @@ def test_get_highest_z_in_slot_with_single_labware(
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
-    well_plate_def: LabwareDefinition,
 ) -> None:
     """It should get the highest Z in slot with just a single labware."""
     # Case: Slot has a labware that doesn't have any other labware on it. Highest z is equal to labware height.
@@ -981,9 +980,9 @@ def test_get_highest_z_in_slot_with_single_labware(
         errors.LabwareNotLoadedOnLabwareError("no more labware")
     )
     decoy.when(mock_labware_view.get("just-labware-id")).then_return(labware_in_slot)
-    decoy.when(mock_labware_view.get_definition("just-labware-id")).then_return(
-        well_plate_def
-    )
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="just-labware-id")
+    ).then_return(Dimensions(x=0, y=0, z=1000))
     decoy.when(
         mock_labware_view.get_labware_offset_vector("just-labware-id")
     ).then_return(calibration_offset)
@@ -991,8 +990,7 @@ def test_get_highest_z_in_slot_with_single_labware(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
-    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
-    expected_highest_z = well_plate_def.dimensions.zDimension + 3 + 3
+    expected_highest_z = 1000 + 3 + 3
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
         == expected_highest_z
@@ -1045,7 +1043,6 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
     mock_labware_view: LabwareView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
-    well_plate_def: LabwareDefinition,
 ) -> None:
     """It should get the highest z in slot of the topmost labware in stack.
 
@@ -1094,11 +1091,15 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
     decoy.when(mock_labware_view.get("top-labware-id")).then_return(top_labware)
 
     decoy.when(mock_labware_view.get_definition("top-labware-id")).then_return(
-        well_plate_def
+        sentinel.well_plate_def
     )
     decoy.when(mock_labware_view.get_definition("middle-labware-id")).then_return(
         sentinel.middle_labware_def
     )
+
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="top-labware-id")
+    ).then_return(Dimensions(x=0, y=0, z=1000))
 
     decoy.when(
         mock_labware_view.get_labware_offset_vector("top-labware-id")
@@ -1112,7 +1113,7 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
 
     decoy.when(
         mock_labware_view.get_labware_overlap_offsets(
-            well_plate_def, below_labware_name="middle-labware-name"
+            sentinel.well_plate_def, below_labware_name="middle-labware-name"
         )
     ).then_return(OverlapOffset(x=4, y=5, z=6))
     decoy.when(
@@ -1125,10 +1126,7 @@ def test_get_highest_z_in_slot_with_stacked_labware_on_slot(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
-    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
-    expected_highest_z = (
-        slot_pos.z + well_plate_def.dimensions.zDimension - 6 + 30 - 9 + 13 + 3
-    )
+    expected_highest_z = slot_pos.z + 1000 - 6 + 30 - 9 + 13 + 3
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
         == expected_highest_z
@@ -1144,7 +1142,6 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
     subject: GeometryView,
-    well_plate_def: LabwareDefinition,
     ot2_standard_deck_def: DeckDefinitionV5,
 ) -> None:
     """It should get the highest z in slot of labware on module.
@@ -1193,8 +1190,11 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         ot2_standard_deck_def
     )
     decoy.when(mock_labware_view.get_definition("top-labware-id")).then_return(
-        well_plate_def
+        sentinel.well_plate_def
     )
+    decoy.when(
+        mock_labware_view.get_dimensions(labware_id="top-labware-id")
+    ).then_return(Dimensions(x=0, y=0, z=1000))
 
     decoy.when(mock_labware_view.get("adapter-id")).then_return(adapter)
     decoy.when(mock_labware_view.get_definition("adapter-id")).then_return(
@@ -1210,7 +1210,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
     )
     decoy.when(
         mock_labware_view.get_labware_overlap_offsets(
-            definition=well_plate_def, below_labware_name="adapter-name"
+            definition=sentinel.well_plate_def, below_labware_name="adapter-name"
         )
     ).then_return(OverlapOffset(x=4, y=5, z=6))
 
@@ -1237,10 +1237,7 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
         mock_addressable_area_view.get_addressable_area_position(DeckSlotName.SLOT_3.id)
     ).then_return(slot_pos)
 
-    assert well_plate_def.schemaVersion == 2  # For the presence of `dimensions`.
-    expected_highest_z = (
-        slot_pos.z + 60 + 30 - 3.3 + well_plate_def.dimensions.zDimension - 6 + 3
-    )
+    expected_highest_z = slot_pos.z + 60 + 30 - 3.3 + 1000 - 6 + 3
     assert (
         subject.get_highest_z_in_slot(DeckSlotLocation(slotName=DeckSlotName.SLOT_3))
         == expected_highest_z
@@ -1261,7 +1258,6 @@ def test_get_highest_z_in_slot_with_labware_stack_on_module(
 )
 def test_get_min_travel_z(
     decoy: Decoy,
-    well_plate_def: LabwareDefinition,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
     mock_addressable_area_view: AddressableAreaView,
@@ -1280,8 +1276,8 @@ def test_get_min_travel_z(
     )
 
     decoy.when(mock_labware_view.get("labware-id")).then_return(labware_data)
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
-        well_plate_def
+    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(x=0, y=0, z=14.22)
     )
     decoy.when(mock_labware_view.get_labware_offset_vector("labware-id")).then_return(
         LabwareOffsetVector(x=0, y=0, z=3)
@@ -3062,10 +3058,14 @@ def test_check_gripper_labware_tip_collision(
         Point(1, 2, 3)
     )
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(subject._get_highest_z_from_labware_data(labware_data)).then_return(1000)
+    decoy.when(mock_labware_view.get_dimensions(labware_id="labware-id")).then_return(
+        Dimensions(
+            x=definition.dimensions.xDimension,
+            y=definition.dimensions.yDimension,
+            z=definition.dimensions.zDimension,
+        )
+    )
 
-    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(subject.get_labware_highest_z("labware-id")).then_return(100.0)
     decoy.when(
         mock_addressable_area_view.get_addressable_area_center(
             addressable_area_name=DeckSlotName.SLOT_1.id
@@ -3075,12 +3075,6 @@ def test_check_gripper_labware_tip_collision(
         mock_labware_view.get_grip_height_from_labware_bottom(definition)
     ).then_return(1.0)
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(definition)
-    decoy.when(
-        subject.get_labware_grip_point(
-            labware_definition=definition,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        )
-    ).then_return(Point(x=100.0, y=100.0, z=0.0))
 
     with pytest.raises(errors.LabwareMovementNotAllowedError):
         subject.check_gripper_labware_tip_collision(
