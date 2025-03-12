@@ -28,6 +28,7 @@ import type {
 
 // Whenever a step uses a custom "close the robot door" view, use this component.
 // Note that the allowDoorOpen metadata for the route must be set to true for this view to render.
+// If you need a general effect use the othe modal
 export function RecoveryDoorOpenSpecial({
   currentRecoveryOptionUtils,
   runStatus,

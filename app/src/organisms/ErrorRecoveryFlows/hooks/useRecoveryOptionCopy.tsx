@@ -35,8 +35,7 @@ export function useRecoveryOptionCopy(): (
       case RECOVERY_MAP.MANUAL_FILL_AND_SKIP.ROUTE:
         if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
           return t('manually_load_labware_into_shuttle_and_skip')
-        }
-        else{
+        } else {
           return t('manually_fill_well_and_skip')
         }
       case RECOVERY_MAP.IGNORE_AND_SKIP.ROUTE:
@@ -48,7 +47,7 @@ export function useRecoveryOptionCopy(): (
       case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
         return t('manually_move_lw_and_skip')
       case RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE:
-          return t('manually_replace_lw_and_retry')
+        return t('manually_replace_lw_and_retry')
       case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('replace_labware_in_stacker_and_step')
       default:

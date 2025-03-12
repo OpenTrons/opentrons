@@ -32,12 +32,14 @@ export function RecoveryDoorOpen({
   recoveryActionMutationUtils,
   runStatus,
   routeUpdateActions,
+  recoveryMap,
 }: RecoveryContentProps): JSX.Element {
   const {
     resumeRecovery,
     isResumeRecoveryLoading,
   } = recoveryActionMutationUtils
   const { stashedMap, proceedToRouteAndStep } = routeUpdateActions
+  console.log('recoveryMap: ', recoveryMap)
   const { t } = useTranslation('error_recovery')
 
   const primaryOnClick = (): void => {
@@ -47,6 +49,18 @@ export function RecoveryDoorOpen({
         void proceedToRouteAndStep(stashedMap.route, stashedMap.step)
       }
     })
+  }
+
+  const buildSubtext = (): string => {
+    if (recoveryMap.route === 'manual-replace-in-stacker-and-retry') {
+      return t('stacker_door_open_robot_home')
+    } else return t('close_the_robot_door')
+  }
+
+  const buildTitletext = (): string => {
+    if (recoveryMap.route === 'manual-replace-in-stacker-and-retry') {
+      return t('close_robot_and_stacker_door')
+    } else return t('robot_door_is_open')
   }
 
   return (
@@ -69,13 +83,13 @@ export function RecoveryDoorOpen({
             desktopStyle="headingSmallBold"
             oddStyle="level3HeaderBold"
           >
-            {t('robot_door_is_open')}
+            {buildTitletext()}
           </StyledText>
           <StyledText
             desktopStyle="bodyDefaultRegular"
             oddStyle="level4HeaderRegular"
           >
-            {t('close_the_robot_door')}
+            {buildSubtext()}
           </StyledText>
         </Flex>
       </Flex>

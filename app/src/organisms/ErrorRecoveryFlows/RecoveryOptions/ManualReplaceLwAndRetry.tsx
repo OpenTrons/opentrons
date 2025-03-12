@@ -18,22 +18,25 @@ export function ManualReplaceLwAndRetry(
 ): JSX.Element {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
-  const { MANUAL_REPLACE_AND_RETRY, MANUAL_REPLACE_STACKER_AND_RETRY } = RECOVERY_MAP
+  const {
+    MANUAL_REPLACE_AND_RETRY,
+    MANUAL_REPLACE_STACKER_AND_RETRY,
+  } = RECOVERY_MAP
 
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions } = props
   const { proceedToRouteAndStep } = routeUpdateActions
   const primaryBtnOnClick = (): Promise<void> =>
     proceedToRouteAndStep(
-        RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
-        RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME
-      )
+      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME
+    )
   const buildBodyText = (): JSX.Element => (
-      <Trans
-        t={t}
-        i18nKey="carefully_clear_track"
-        components={{ block: <LegacyStyledText as="p" /> }}
-  />
+    <Trans
+      t={t}
+      i18nKey="carefully_clear_track"
+      components={{ block: <LegacyStyledText as="p" /> }}
+    />
   )
   const buildContent = (): JSX.Element => {
     switch (step) {
@@ -46,11 +49,15 @@ export function ManualReplaceLwAndRetry(
       case MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE:
         return <TwoColLwInfoAndDeck {...props} />
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
-        return <TwoColTextAndFailedStepNextStep {...props} 
-        leftColTitle={t('prepare_track_for_homing')}
-        leftColBodyText={buildBodyText()}
-        primaryBtnCopy={t('continue')}
-        primaryBtnOnClick={primaryBtnOnClick}/>
+        return (
+          <TwoColTextAndFailedStepNextStep
+            {...props}
+            leftColTitle={t('prepare_track_for_homing')}
+            leftColBodyText={buildBodyText()}
+            primaryBtnCopy={t('continue')}
+            primaryBtnOnClick={primaryBtnOnClick}
+          />
+        )
       case MANUAL_REPLACE_AND_RETRY.STEPS.RETRY:
         return <RetryStepInfo {...props} />
       default:
