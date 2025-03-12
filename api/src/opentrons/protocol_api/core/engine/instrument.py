@@ -339,8 +339,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_location=well_location,
             )
             if dynamic_liquid_tracking:
-                # have to move to the starting
-                # well location before executing DispenseWhileTrackingCommand
                 self._engine_client.execute_command(
                     cmd.MoveToWellParams(
                         pipetteId=self._pipette_id,
