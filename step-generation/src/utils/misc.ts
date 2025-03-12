@@ -14,7 +14,12 @@ import {
   OT2_ROBOT_TYPE,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
+import {
+  airGapInWasteChute,
+  blowoutInWasteChute,
+  dispenseInWasteChute,
+  reduceCommandCreators,
+} from './index'
 import {
   airGapInPlace,
   dispense,
@@ -389,9 +394,8 @@ export const blowoutUtil = (args: {
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    return wasteChuteCommandsUtil({
+    return blowoutInWasteChute({
       pipetteId: pipette,
-      type: 'blowOut',
       flowRate,
       addressableAreaName,
     })
@@ -618,8 +622,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     const pipetteChannels =
       invariantContext.pipetteEntities[pipetteId].spec.channels
 
-    commands = wasteChuteCommandsUtil({
-      type: 'dispense',
+    commands = dispenseInWasteChute({
       pipetteId,
       volume,
       flowRate,
@@ -796,8 +799,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
   } else if (trashOrLabware === 'wasteChute') {
     const pipetteChannels =
       invariantContext.pipetteEntities[pipetteId].spec.channels
-    commands = wasteChuteCommandsUtil({
-      type: 'airGap',
+    commands = airGapInWasteChute({
       pipetteId,
       volume,
       flowRate,

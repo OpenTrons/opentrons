@@ -14,7 +14,6 @@ import {
   curryCommandCreator,
   airGapHelper,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
@@ -40,6 +39,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,
@@ -564,11 +564,12 @@ export const transfer: CommandCreator<TransferArgs> = (
             }),
           ]
           if (isWasteChute) {
-            dropTipCommand = wasteChuteCommandsUtil({
-              type: 'dropTip',
-              pipetteId: args.pipette,
-              addressableAreaName: addressableAreaNameWasteChute,
-            })
+            dropTipCommand = [
+              curryCommandCreator(dropTipInWasteChute, {
+                pipetteId: args.pipette,
+                addressableAreaName: addressableAreaNameWasteChute,
+              }),
+            ]
           }
           if (isTrashBin) {
             dropTipCommand = dropTipInMovableTrash({

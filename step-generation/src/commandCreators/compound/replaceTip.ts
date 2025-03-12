@@ -15,10 +15,10 @@ import {
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
   getWasteChuteAddressableAreaNamePip,
   PRIMARY_NOZZLE,
 } from '../../utils'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { dropTip } from '../atomic/dropTip'
 import { pickUpTip } from '../atomic/pickUpTip'
 import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
@@ -208,9 +208,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ]
   if (isWasteChute) {
     commandCreators = [
-      ...wasteChuteCommandsUtil({
-        type: 'dropTip',
-        pipetteId: pipette,
+      curryCommandCreator(dropTipInWasteChute, {
+        pipetteId: args.pipette,
         addressableAreaName: addressableAreaNameWasteChute,
       }),
       ...configureNozzleLayoutCommand,

@@ -1,9 +1,12 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
-import { curryCommandCreator } from '../utils'
-import { wasteChuteCommandsUtil } from '../utils/wasteChuteCommandsUtil'
-import { dropTipInWasteChute } from '../commandCreators'
+import {
+  airGapInWasteChute,
+  blowoutInWasteChute,
+  curryCommandCreator,
+  dispenseInWasteChute,
+} from '../utils'
 import {
   airGapInPlace,
   blowOutInPlace,
@@ -56,7 +59,7 @@ describe('wasteChuteCommandsUtil', () => {
     }
   })
   it('returns correct commands for dispensing', () => {
-    wasteChuteCommandsUtil({ ...args, type: 'dispense' })
+    dispenseInWasteChute({ ...args })
     expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
@@ -68,9 +71,8 @@ describe('wasteChuteCommandsUtil', () => {
     })
   })
   it('returns correct commands for blow out', () => {
-    wasteChuteCommandsUtil({
+    blowoutInWasteChute({
       ...args,
-      type: 'blowOut',
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
@@ -81,20 +83,9 @@ describe('wasteChuteCommandsUtil', () => {
       flowRate: 10,
     })
   })
-  it('returns correct commands for drop tip', () => {
-    wasteChuteCommandsUtil({
-      ...args,
-      type: 'dropTip',
-    })
-    expect(curryCommandCreator).toHaveBeenCalledWith(dropTipInWasteChute, {
-      pipetteId: mockId,
-      addressableAreaName: mockAddressableAreaName,
-    })
-  })
   it('returns correct commands for air gap/aspirate in place', () => {
-    wasteChuteCommandsUtil({
+    airGapInWasteChute({
       ...args,
-      type: 'airGap',
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,

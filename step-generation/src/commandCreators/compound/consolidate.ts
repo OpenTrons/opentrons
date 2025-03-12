@@ -14,7 +14,6 @@ import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
   getTrashOrLabware,
   airGapHelper,
   dispenseLocationHelper,
@@ -34,6 +33,7 @@ import {
 } from '../atomic'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 
 import type {
   ConsolidateArgs,
@@ -487,11 +487,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         }),
       ]
       if (isWasteChute) {
-        dropTipCommand = wasteChuteCommandsUtil({
-          type: 'dropTip',
-          pipetteId: args.pipette,
-          addressableAreaName: addressableAreaNameWasteChute,
-        })
+        dropTipCommand = [
+          curryCommandCreator(dropTipInWasteChute, {
+            pipetteId: args.pipette,
+            addressableAreaName: addressableAreaNameWasteChute,
+          }),
+        ]
       }
       if (isTrashBin) {
         dropTipCommand = dropTipInMovableTrash({
