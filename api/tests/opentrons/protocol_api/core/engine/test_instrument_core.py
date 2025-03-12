@@ -1852,10 +1852,12 @@ def test_aspirate_liquid_class_for_transfer(
         transfer_properties=test_transfer_properties,
         transfer_type=TransferType.ONE_TO_ONE,
         tip_contents=[],
+        volume_for_pipette_mode_configuration=123,
     )
     decoy.verify(
         mock_transfer_components_executor.submerge(
             submerge_properties=test_transfer_properties.aspirate.submerge,
+            volume_for_pipette_mode_configuration=123,
         ),
         mock_transfer_components_executor.mix(
             mix_properties=test_transfer_properties.aspirate.mix,
@@ -1910,10 +1912,12 @@ def test_aspirate_liquid_class_for_consolidate(
         transfer_properties=test_transfer_properties,
         transfer_type=TransferType.MANY_TO_ONE,
         tip_contents=[],
+        volume_for_pipette_mode_configuration=543,
     )
     decoy.verify(
         mock_transfer_components_executor.submerge(
             submerge_properties=test_transfer_properties.aspirate.submerge,
+            volume_for_pipette_mode_configuration=543,
         ),
         mock_transfer_components_executor.aspirate_and_wait(volume=123),
         mock_transfer_components_executor.retract_after_aspiration(
@@ -1965,6 +1969,7 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
             transfer_properties=test_transfer_properties,
             transfer_type=TransferType.ONE_TO_ONE,
             tip_contents=[],
+            volume_for_pipette_mode_configuration=543,
         )
 
 
@@ -2020,6 +2025,7 @@ def test_dispense_liquid_class(
     decoy.verify(
         mock_transfer_components_executor.submerge(
             submerge_properties=test_transfer_properties.dispense.submerge,
+            volume_for_pipette_mode_configuration=None,
         ),
         mock_transfer_components_executor.dispense_and_wait(
             dispense_properties=test_transfer_properties.dispense,
@@ -2056,11 +2062,12 @@ def test_dispense_liquid_class_during_multi_dispense(
     test_transfer_properties = test_liquid_class.get_for(
         "flex_1channel_50", "opentrons_flex_96_tiprack_50ul"
     )
-    disposal_volume = test_transfer_properties.multi_dispense.disposal_by_volume.get_for_volume(  # type: ignore[union-attr]
-        123
+    assert test_transfer_properties.multi_dispense is not None
+    disposal_volume = (
+        test_transfer_properties.multi_dispense.disposal_by_volume.get_for_volume(123)
     )
     conditioning_volume = 50
-    test_transfer_properties.multi_dispense.conditioning_by_volume.set_for_volume(  # type: ignore[union-attr]
+    test_transfer_properties.multi_dispense.conditioning_by_volume.set_for_volume(
         123, conditioning_volume
     )
     decoy.when(
@@ -2100,10 +2107,11 @@ def test_dispense_liquid_class_during_multi_dispense(
     )
     decoy.verify(
         mock_transfer_components_executor.submerge(
-            submerge_properties=test_transfer_properties.multi_dispense.submerge,  # type: ignore[union-attr]
+            submerge_properties=test_transfer_properties.multi_dispense.submerge,
+            volume_for_pipette_mode_configuration=None,
         ),
         mock_transfer_components_executor.dispense_and_wait(
-            dispense_properties=test_transfer_properties.multi_dispense,  # type: ignore[arg-type]
+            dispense_properties=test_transfer_properties.multi_dispense,
             volume=123,
             push_out_override=0,
         ),
@@ -2136,11 +2144,12 @@ def test_last_dispense_liquid_class_during_multi_dispense(
         "flex_1channel_50", "opentrons_flex_96_tiprack_50ul"
     )
     disposal_volume = 0
-    test_transfer_properties.multi_dispense.disposal_by_volume.set_for_volume(  # type: ignore[union-attr]
+    assert test_transfer_properties.multi_dispense is not None
+    test_transfer_properties.multi_dispense.disposal_by_volume.set_for_volume(
         123, disposal_volume
     )
     conditioning_volume = 50
-    test_transfer_properties.multi_dispense.conditioning_by_volume.set_for_volume(  # type: ignore[union-attr]
+    test_transfer_properties.multi_dispense.conditioning_by_volume.set_for_volume(
         123, conditioning_volume
     )
     decoy.when(
@@ -2180,10 +2189,11 @@ def test_last_dispense_liquid_class_during_multi_dispense(
     )
     decoy.verify(
         mock_transfer_components_executor.submerge(
-            submerge_properties=test_transfer_properties.multi_dispense.submerge,  # type: ignore[union-attr]
+            submerge_properties=test_transfer_properties.multi_dispense.submerge,
+            volume_for_pipette_mode_configuration=None,
         ),
         mock_transfer_components_executor.dispense_and_wait(
-            dispense_properties=test_transfer_properties.multi_dispense,  # type: ignore[arg-type]
+            dispense_properties=test_transfer_properties.multi_dispense,
             volume=123,
             push_out_override=test_transfer_properties.dispense.push_out_by_volume.get_for_volume(
                 123
