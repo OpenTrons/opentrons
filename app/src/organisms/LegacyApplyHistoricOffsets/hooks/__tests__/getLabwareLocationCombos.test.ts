@@ -4,7 +4,7 @@ import {
   opentrons96PcrAdapterV1,
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
-import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
+import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
 
 import type { LabwareDefinition2, RunTimeCommand } from '@opentrons/shared-data'
 
@@ -194,7 +194,7 @@ describe('getLabwareLocationCombos', () => {
         serialNumber: 'firstModuleSerialNumber',
       },
     ]
-    expect(getLabwareLocationCombos(commands, labware, modules)).toEqual([
+    expect(getLegacyLabwareLocationCombos(commands, labware, modules)).toEqual([
       {
         location: { slotName: '1' },
         labwareId: 'firstLabwareId',
@@ -312,7 +312,7 @@ describe('getLabwareLocationCombos', () => {
         serialNumber: 'firstModuleSerialNumber',
       },
     ]
-    expect(getLabwareLocationCombos(commands, labware, modules)).toEqual([
+    expect(getLegacyLabwareLocationCombos(commands, labware, modules)).toEqual([
       {
         location: { slotName: '1' },
         labwareId: 'firstLabwareId',

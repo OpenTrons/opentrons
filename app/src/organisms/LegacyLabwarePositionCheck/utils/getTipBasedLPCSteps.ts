@@ -6,7 +6,7 @@ import {
   getIsTiprack,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
-import { getLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+import { getLegacyLabwareLocationCombos } from '/app/src/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 
 import type {
   LabwarePositionCheckStep,
@@ -20,7 +20,7 @@ import type {
   ProtocolAnalysisOutput,
   PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+import type { LabwareLocationCombo } from '/app/src/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -80,7 +80,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     modules = [],
   } = args
 
-  const labwareLocationCombos = getLabwareLocationCombos(
+  const labwareLocationCombos = getLegacyLabwareLocationCombos(
     commands,
     labware,
     modules
@@ -152,7 +152,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
   const { labware, modules, commands, primaryPipetteId } = args
   const labwareDefinitions = getLabwareDefinitionsFromCommands(commands)
 
-  const deDupedLabwareLocationCombos = getLabwareLocationCombos(
+  const deDupedLabwareLocationCombos = getLegacyLabwareLocationCombos(
     commands,
     labware,
     modules

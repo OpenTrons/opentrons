@@ -10,7 +10,7 @@ import type {
   LocationSpecificOffsetDetails,
   LPCLabwareInfo,
 } from '/app/redux/protocol-runs'
-import type { LabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+import type { LabwareLocationCombo } from '/app/src/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 import type { UseLPCLabwareInfoProps } from '.'
 
 interface GetLPCLabwareInfoParams {
