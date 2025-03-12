@@ -13,6 +13,7 @@ import {
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
 } from '@opentrons/step-generation'
+import { PROTOCOL_DESIGNER } from '../../constants'
 import { getFlexNameConversion } from './utils'
 import type {
   AdditionalEquipmentEntities,
@@ -53,6 +54,7 @@ export function pythonMetadata(fileMetadata: FileMetadataFields): string {
       subcategory: fileMetadata.subcategory,
       tags: fileMetadata.tags?.length && fileMetadata.tags.join(', '),
       protocolDesigner: process.env.OT_PD_VERSION,
+      source: PROTOCOL_DESIGNER,
     }).filter(([key, value]) => value) // drop blank entries
   )
   return `metadata = ${formatPyDict(stringifiedMetadata)}`

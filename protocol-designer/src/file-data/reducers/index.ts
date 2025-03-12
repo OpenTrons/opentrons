@@ -16,6 +16,7 @@ import type {
   SaveFileMetadataAction,
   SelectDesignerTabAction,
 } from '../types'
+import { PROTOCOL_DESIGNER } from '../../constants'
 
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
@@ -53,6 +54,7 @@ const defaultFields = {
   protocolName: '',
   author: '',
   description: '',
+  source: PROTOCOL_DESIGNER,
 }
 
 const updateMetadataFields = (
