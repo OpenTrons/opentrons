@@ -1,6 +1,6 @@
 import { HANDLE_LW_SUBSTEP } from '../../../constants'
 
-import type { HandleLwSubstep, LPCWizardState } from '../../../types'
+import type { HandleLwSubstepType, LPCWizardState } from '../../../types'
 
 // Handles proceed to next substep for the "handle labware" core LPC flow.
 // Certain steps require special state updates.
@@ -12,7 +12,7 @@ export function proceedToNextHandleLwSubstep(
   const selectedLw = state.labwareInfo.selectedLabware
 
   // Note that this is a closed loop.
-  const getNextSubStep = (): HandleLwSubstep | null => {
+  const getNextSubStep = (): HandleLwSubstepType | null => {
     switch (currentSubstep) {
       case null:
         return HANDLE_LW_SUBSTEP.LIST
@@ -86,7 +86,7 @@ export function goBackToPreviousHandleLwSubstep(
   const currentSubstep = state.steps.currentSubstep
 
   // Note that this is a closed loop.
-  const getPrevSubStep = (): HandleLwSubstep | null => {
+  const getPrevSubStep = (): HandleLwSubstepType | null => {
     switch (currentSubstep) {
       case null:
         return HANDLE_LW_SUBSTEP.LIST

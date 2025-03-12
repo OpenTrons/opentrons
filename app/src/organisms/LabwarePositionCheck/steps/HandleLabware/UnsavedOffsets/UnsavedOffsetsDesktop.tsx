@@ -18,11 +18,6 @@ import { goBackEditOffsetSubstep } from '/app/redux/protocol-runs'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-// TOME TODO: DO THIS. You'll need a custom footer style for the primary button here.
-// TOME TODO: Try to cut out most isOnDevice usage and replace with DESKTOP_ONLY and ODD_ONLY
-//  where possible.
-// TOME TODO: typeof SUBSTEP for some of the typing.
-
 interface UnsavedOffsetsDesktopProps extends LPCWizardContentProps {
   toggleShowUnsavedOffsetsDesktop: () => void
 }
