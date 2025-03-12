@@ -145,7 +145,7 @@ export const LabwareControls = (
       height={height}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      color={COLORS.white}
+      color={!isDragging ? COLORS.white : `${COLORS.black90}cc`}
       textAlign={TYPOGRAPHY.textAlignCenter}
     >
       <Link role="button">
@@ -168,6 +168,8 @@ export const LabwareControls = (
           // NOTE: cursor is inconsistent when dragging due to an active
           // react dnd bug: https://github.com/react-dnd/react-dnd/issues/325
           cursor: CURSOR_GRAB,
+          backgroundColor:
+            draggedLabware != null ? COLORS.white : `${COLORS.black90}cc`,
         },
         onMouseEnter: () => {
           setHover(itemId)
