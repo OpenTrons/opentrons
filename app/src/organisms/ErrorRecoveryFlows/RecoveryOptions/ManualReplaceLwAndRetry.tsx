@@ -26,7 +26,7 @@ export function ManualReplaceLwAndRetry(
   const primaryBtnOnClick = (): Promise<void> =>
     proceedToRouteAndStep(
         RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
-        RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME
+        RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME
       )
   const buildBodyText = (): JSX.Element => (
       <Trans
