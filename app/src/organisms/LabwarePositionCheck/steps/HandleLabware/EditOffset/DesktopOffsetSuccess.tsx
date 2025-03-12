@@ -31,9 +31,6 @@ import type {
   OffsetLocationDetails,
 } from '/app/redux/protocol-runs'
 
-// TOME TODO: If you adjust the default offset to match applied location offsets,
-// those offsets don't go back to the default!
-
 interface DesktopOffsetSuccessProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void
 }

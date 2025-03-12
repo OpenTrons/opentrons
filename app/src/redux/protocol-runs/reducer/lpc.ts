@@ -90,8 +90,8 @@ export function LPCReducer(
       }
 
       case PROCEED_HANDLE_LW_SUBSTEP: {
-        const { isOnDevice } = action.payload
-        return proceedToNextHandleLwSubstep(state, isOnDevice)
+        const { isDesktop } = action.payload
+        return proceedToNextHandleLwSubstep(state, isDesktop)
       }
 
       case GO_BACK_HANDLE_LW_SUBSTEP: {

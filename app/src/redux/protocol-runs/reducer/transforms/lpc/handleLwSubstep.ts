@@ -6,24 +6,17 @@ import type { HandleLwSubstepType, LPCWizardState } from '../../../types'
 // Certain steps require special state updates.
 export function proceedToNextHandleLwSubstep(
   state: LPCWizardState,
-  isOnDevice?: boolean
+  isDesktop?: boolean
 ): LPCWizardState {
   const nextSubstep = getNextHandleLwSubstep(
     state.steps.currentSubstep,
-    isOnDevice
+    isDesktop
   )
 
-  // Handle different transitions based on the next substep.
   if (nextSubstep === HANDLE_LW_SUBSTEP.LIST) {
     return handleTransitionToList(state)
   } else if (nextSubstep === HANDLE_LW_SUBSTEP.DETAILS) {
     return handleTransitionToDetails(state)
-  } else if (
-    nextSubstep === HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW &&
-    state.labwareInfo.selectedLabware?.offsetLocationDetails == null
-  ) {
-    console.error('Cannot proceed substep.')
-    return updateCurrentSubstep(state, nextSubstep)
   } else {
     return updateCurrentSubstep(state, nextSubstep)
   }
@@ -36,7 +29,6 @@ export function goBackToPreviousHandleLwSubstep(
 ): LPCWizardState {
   const prevSubstep = getPreviousHandleLwSubstep(state.steps.currentSubstep)
 
-  // Handle different transitions based on the previous substep
   if (prevSubstep === HANDLE_LW_SUBSTEP.LIST) {
     return handleTransitionToList(state)
   } else if (prevSubstep === HANDLE_LW_SUBSTEP.DETAILS) {
@@ -49,7 +41,7 @@ export function goBackToPreviousHandleLwSubstep(
 // Get the next substep in the flow.
 function getNextHandleLwSubstep(
   currentSubstep: HandleLwSubstepType | null,
-  isOnDevice?: boolean
+  isDesktop?: boolean
 ): HandleLwSubstepType | null {
   switch (currentSubstep) {
     case null:
@@ -61,10 +53,10 @@ function getNextHandleLwSubstep(
     case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
       return HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
     case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW: {
-      if (isOnDevice) {
-        return HANDLE_LW_SUBSTEP.DETAILS
-      } else {
+      if (isDesktop) {
         return HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
+      } else {
+        return HANDLE_LW_SUBSTEP.DETAILS
       }
     }
     case HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS:
