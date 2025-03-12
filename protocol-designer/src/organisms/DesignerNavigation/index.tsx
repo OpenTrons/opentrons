@@ -26,7 +26,7 @@ import {
   NAV_BAR_HEIGHT_REM,
 } from '../../components/atoms'
 import { useKitchen } from '../Kitchen/hooks'
-import { LiquidButton } from '../../molecules/LiquidButton'
+import { LiquidButton } from '../../components/molecules/LiquidButton'
 
 import type { StyleProps, TabProps } from '@opentrons/components'
 

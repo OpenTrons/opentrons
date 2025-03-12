@@ -16,7 +16,7 @@ import {
   InputField,
 } from '@opentrons/components'
 
-import { TextAreaField } from '../../molecules'
+import { TextAreaField } from '../../components/molecules'
 import { capitalizeFirstLetter } from '../../pages/Designer/ProtocolSteps/StepForm/utils'
 import { getMainPagePortalEl } from '../Portal'
 import { renameStep } from '../../labware-ingred/actions'

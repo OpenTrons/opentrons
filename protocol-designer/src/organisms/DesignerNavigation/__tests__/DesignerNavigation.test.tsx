@@ -4,7 +4,7 @@ import { describe, it, beforeEach, vi } from 'vitest'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
 import { getFileMetadata } from '../../../file-data/selectors'
-import { LiquidButton } from '../../../molecules'
+import { LiquidButton } from '../../../components/molecules'
 
 import { DesignerNavigation } from '..'
 
@@ -13,7 +13,7 @@ import type { NavigateFunction } from 'react-router-dom'
 import type { TabProps } from '@opentrons/components'
 
 vi.mock('../../../file-data/selectors')
-vi.mock('../../../molecules/LiquidButton')
+vi.mock('../../../components/molecules/LiquidButton')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async importOriginal => {

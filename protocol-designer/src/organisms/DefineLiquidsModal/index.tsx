@@ -25,7 +25,7 @@ import {
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
-import { TextAreaField } from '../../molecules'
+import { TextAreaField } from '../../components/molecules'
 import { getEnableLiquidClasses } from '../../feature-flags/selectors'
 import { swatchColors } from './swatchColors'
 import { LiquidColorPicker } from './LiquidColorPicker'

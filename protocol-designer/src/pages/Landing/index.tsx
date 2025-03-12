@@ -17,7 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
-import { EndUserAgreementFooter } from '../../molecules'
+import { EndUserAgreementFooter } from '../../components/molecules'
 import { AnnouncementModal } from '../../organisms'
 import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'

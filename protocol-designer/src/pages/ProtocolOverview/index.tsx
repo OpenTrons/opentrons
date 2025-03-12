@@ -35,7 +35,7 @@ import {
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
 import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../components/atoms'
-import { EndUserAgreementFooter } from '../../molecules'
+import { EndUserAgreementFooter } from '../../components/molecules'
 import { useBlockingHint } from '../../organisms/BlockingHintModal/useBlockingHint'
 import {
   EditProtocolMetadataModal,

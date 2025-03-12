@@ -11,7 +11,7 @@ import {
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../molecules'
+} from '../../../../components/molecules'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,

@@ -16,7 +16,7 @@ import {
 } from '@opentrons/components'
 import { getMainPagePortalEl } from '../Portal'
 import { actions, selectors as fileSelectors } from '../../file-data'
-import { TextAreaField } from '../../molecules'
+import { TextAreaField } from '../../components/molecules'
 import type { FileMetadataFields } from '../../file-data'
 
 interface EditProtocolMetadataModalProps {
