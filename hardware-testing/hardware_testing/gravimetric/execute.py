@@ -892,8 +892,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
             )
             resources.pipette._retract()
             for i in range(5):
-                resources.pipette.aspirate()
-                resources.pipette.dispense(push_out=0)
+                resources.pipette.aspirate(location=well.top(config.VIAL_SAFE_Z_OFFSET))
+                resources.pipette.dispense(location=well.top(config.VIAL_SAFE_Z_OFFSET), push_out=0)
             resources.pipette.prepare_to_aspirate()
             ui.print_info("moving to scale")
         if cfg.jog or not cfg.lld_every_tip:
