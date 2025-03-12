@@ -9,7 +9,6 @@ from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_engine.types import LabwareOffset
 from typing import List
 
-import datetime
 import requests
 import time
 from opentrons.types import Mount, Point
@@ -40,36 +39,19 @@ z_dimension_trash = 40
 async def _main(args):
     
     if args.grab_calibration:
-        timestamp = datetime.datetime.now()
-        # Time adjustment for ABR robot timezone
-        new_timestamp = timestamp - datetime.timedelta(hours=6)
-        # automatically write what removal attempt was used
-        if args.removal == 1:
-            remove_type = "Removal Method 1"
-        elif args.removal == 2:
-            remove_type = "Removal Method 2"
-        else:
-            raise("Invalid removal type")
-        if args.tip_location == 1:
-            location = "Trash Bin"
-        elif args.tip_location == 2:
-            location = "Waste Chute"
-        else:
-            raise("Invalid tip location")
-        # adding data grabbed from the robot's HTTP page
-        # From health: api ver, firm ver, rob serial
-        ip = "10.14.19.32"
+        """Grab calibration data from robot. You need to run this once."""
         response = requests.get(
-            f"http://{ip}:31950/health", headers={"opentrons-version": "3"}
+            f"http://{args.ip_address}:31950/health", headers={"opentrons-version": "3"}
         )
         print(response)
         health_data = response.json()
         # from instruments we get pipette serial
         response = requests.get(
-            f"http://{ip}:31950/pipettes", headers={"opentrons-version": "3"}
+            f"http://{args.ip_address}:31950/pipettes", headers={"opentrons-version": "3"}
         )
         pipette_data = response.json()
         LABWARE_OFFSETS.extend(workarounds.http_get_all_labware_offsets())
+
     protocol = helpers.get_api_context(
         requirements["apiLevel"],  # type: ignore[attr-defined]
         is_simulating=args.simulate,
@@ -82,6 +64,7 @@ async def _main(args):
                 engine.state_view._labware_store._add_labware_offset(offset)
             else:
                 print(f"Labware offset ID {offset.id} already exists.")
+
     hw_api = get_sync_hw_api(protocol)
     helpers_ot3.restart_server_ot3()
     hw_api.cache_instruments()
@@ -94,11 +77,7 @@ async def _main(args):
     pipette.home()
     # DECK SETUP AND LABWARE
     tiprack_1 = protocol.load_labware(tiprack, location="D1")
-    # pcr_plate = protocol.load_labware(
-    #     "opentrons_96_wellplate_200ul_pcr_full_skirt", location="B3"
-    # )
     trash_bin = protocol.load_trash_bin("A3")
-    # reservoir = protocol.load_labware("nest_12_reservoir_15ml", location="D3")
     hw_api.move_to(OT3Mount.RIGHT, Point(125,25,250))
     _move_coro = hw_api._move(
         target_position={Axis.P_R: attached_pipettes[Mount.RIGHT]['plunger_positions']['drop_tip']},  # type: ignore[arg-type]
@@ -119,7 +98,8 @@ async def _main(args):
     else:
         raise("Invalid tip type")
     
-    tip_adjustment_height = -(95.5*(3/4))
+    # tip_adjustment_height = -(95.5*(3/4)+9)
+    tip_adjustment_height = -(57.7-(9.5+5))
     move_to_left_mm = args.knock_distance
     print(f'tip adjustment height: {tip_adjustment_height}')
     #add pause to measure static charge
@@ -130,8 +110,9 @@ async def _main(args):
         pipette.pick_up_tip(tiprack_1[column])
         hw_api.move_rel(Mount.RIGHT, Point(0,0,120)) #make it go up out of tiprack to avoid collision
         
-        pipette.move_to(location=trash_bin.top(z=tip_adjustment_height))
-        input("Press Enter to continue")
+        pipette.move_to(location=trash_bin.top(x=-(x_edge-6), z=tip_adjustment_height))
+        move_to_left_mm = float(input("how many mm to move to the left?"))
+        
         # consider using tip size var to make it scale
         _move_coro = hw_api._move(
             target_position={Axis.P_R: attached_pipettes[Mount.RIGHT]['plunger_positions']['drop_tip']},
@@ -140,15 +121,20 @@ async def _main(args):
         print(f'Positions: {positions}')
         # x position = 362.63587499373926
         hw_api.move_to(Mount.RIGHT, Point(
-                                        positions[Axis.X]-(x_edge+nozzle_radius),
+                                        positions[Axis.X]-(move_to_left_mm),
+                                        # positions[Axis.X]-(nozzle_radius),
                                         positions[Axis.Y],
                                         positions[Axis.by_mount(OT3Mount.RIGHT)]))
+        _move_coro = hw_api._move(
+            target_position={Axis.P_R: attached_pipettes[Mount.RIGHT]['plunger_positions']['bottom']},
+            speed=10, expect_stalls=False)
         input("Press Enter to continue...")
+        positions = hw_api.current_position_ot3(OT3Mount.RIGHT)
+        print(f'Positions: {positions}')
         hw_api.move_to(Mount.RIGHT, Point(
-                                        positions[Axis.X]-(112.5+(5.5/2)),
-                                        y_pos,
-                                        z_pos)) #is -5
-        
+                                        positions[Axis.X],
+                                        positions[Axis.Y],
+                                        positions[Axis.by_mount(OT3Mount.RIGHT)]+100)) 
         
         hw_api._backend.motor_current(run_currents={Axis.P_R: motor_current})
         hw_api._move(
@@ -172,10 +158,8 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--tip_type", default=1000, choices=[50,200,1000], type=int)
     parser.add_argument("--removal", default=1, choices=['Trash Bin', 'Waste Chute'], type=int)
-    parser.add_argument("--ip_address", default="10.14.19.32", type=str)
-    #1 = trash bin, 2 = waste chute
-    parser.add_argument("--tip_location", default=1, type=int)
-    parser.add_argument("--knock_distance", default=10, type=float)
+    parser.add_argument("--ip_address", default="10.14.19.116", type=str)
+    parser.add_argument("--knock_distance", default=1, type=float)
     parser.add_argument("--grab_calibration", action="store_true")
     args = parser.parse_args()
     if args.tip_type == 50:
