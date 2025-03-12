@@ -16,6 +16,10 @@ import {
   AlertPrimaryButton,
   SecondaryButton,
   Box,
+  Icon,
+  COLORS,
+  Link,
+  StyledText,
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
@@ -31,7 +35,6 @@ import {
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getModalPortalEl } from '/app/App/portal'
 import { getIsOnDevice } from '/app/redux/config'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 
 import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -152,7 +155,6 @@ function DesktopFooterContent({
 
   return (
     <Flex css={DESKTOP_FOOTER_CONTENT_CONTAINER}>
-      {/* TODO(jh, 03-11-25): Update the link/styling after Product/Design provide input. */}
       {showHelpLink ? <NeedHelpLink /> : <Box />}
       <Flex css={DESKTOP_FOOTER_BTN_CONTAINER}>
         {tertiaryBtnProps != null && (
@@ -173,6 +175,25 @@ function DesktopFooterContent({
           </PrimaryButton>
         )}
       </Flex>
+    </Flex>
+  )
+}
+
+const LPC_HREF =
+  'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
+
+// TODO(jh, 03-11-25): Update the link/styling after Product/Design provide input.
+function NeedHelpLink(): JSX.Element {
+  const { t } = useTranslation('labware_position_check')
+
+  return (
+    <Flex css={HELP_CONTAINER}>
+      <Icon name="help" css={HELP_ICON_STLYE} />
+      <Link external href={LPC_HREF}>
+        <StyledText color={COLORS.black90} desktopStyle="bodyDefaultRegular">
+          {t('need_help')}
+        </StyledText>
+      </Link>
     </Flex>
   )
 }
@@ -232,4 +253,13 @@ const DESKTOP_FOOTER_BTN_CONTAINER = css`
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   align-items: ${ALIGN_CENTER};
   gap: ${SPACING.spacing8};
+`
+
+const HELP_CONTAINER = css`
+  gap: ${SPACING.spacing12};
+`
+
+const HELP_ICON_STLYE = css`
+  width: ${SPACING.spacing20};
+  height: ${SPACING.spacing20};
 `

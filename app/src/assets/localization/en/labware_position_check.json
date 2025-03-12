@@ -107,6 +107,7 @@
   "move_pipette": "Move pipette",
   "move_to_a1_position": "Move the pipette to line up in the A1 position",
   "moving_to_slot_title": "Moving to slot {{slot}}",
+  "need_help": "Need help?",
   "new_labware_offset_data": "New labware offset data",
   "ninety_six_probe_location": "A1 (back left corner)",
   "no_labware_offsets": "No Labware Offset",
