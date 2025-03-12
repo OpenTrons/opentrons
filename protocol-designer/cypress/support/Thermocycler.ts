@@ -89,8 +89,6 @@ export const ThermocylerEditor = {
      */
     DeleteThermocyclerStep: (): StepThunk => ({
         call: () => {
-            cy.get('[data-testid^="StepContainer"')
-                .click()
             cy.contains(ThermoContent.DeleteStep)
                 .should('be.visible')
                 .click()
@@ -142,14 +140,14 @@ export const ThermocylerEditor = {
             cy.log(`*****clicking thermocycler step ${stepNumber} with edit option ${editOption}******`)
             cy.contains(`${stepNumber}. ${ThermoContent.Thermocycler}`)
                 .click()
-            cy.contains('div[role="button"]', `${stepNumber}. ${ThermoContent.Thermocycler}`)
-                .get('[data-testid^="StepContainer"')
-                .click()
+            cy.get('[data-testid^="StepContainer"]')
+                .contains(`${stepNumber}. ${ThermoContent.Thermocycler}`)
+                .parents('[data-testid^="StepContainer"]')
+                .find('button[data-testid^="StepContainer"]')
+                .click();
             if (editOption === ThermoContent.EditStep) {
                 ThermocylerEditor.EditThermocyclerStep().call()
             } else if (editOption === ThermoContent.DeleteStep) {
-                cy.contains(`${stepNumber}. ${ThermoContent.Thermocycler}`)
-                    .click()
                 ThermocylerEditor.DeleteThermocyclerStep().call()
             } else if (editOption === ThermoContent.DuplicateStep) {
                 ThermocylerEditor.DuplicateThermocylerStep().call()
@@ -461,7 +459,7 @@ export const thermoVerifications = {
      */
     VerifyStepEditorMenu: (): StepThunk => ({
         call: () => {
-            cy.get(ThermoLocators.ThermocyclerEditor).click()
+            cy.get(ThermoLocators.ThermocyclerEditor).click({ multiple : true})
             cy.contains(ThermoContent.EditStep).should('be.visible')
             cy.contains(ThermoContent.DuplicateStep).should('be.visible')
             cy.contains(ThermoContent.DeleteStep).should('be.visible')
