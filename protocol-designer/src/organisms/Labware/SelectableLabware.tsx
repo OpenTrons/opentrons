@@ -1,4 +1,5 @@
 import reduce from 'lodash/reduce'
+import { useEffect } from 'react'
 
 import { COLUMN } from '@opentrons/shared-data'
 import { COLORS } from '@opentrons/components'
@@ -195,6 +196,10 @@ export const SelectableLabware = (
       wellFillWithLiq[wellName] = wellFill[wellName]
     })
   }
+
+  useEffect(() => {
+    updateHighlightedWells({})
+  }, [])
 
   return (
     <SelectionRect
