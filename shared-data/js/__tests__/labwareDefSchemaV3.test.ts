@@ -15,7 +15,97 @@ const globPattern = '**/*.json'
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(schema)
 
-const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
+describe(`test labware definitions with schema v3`, () => {
+  const definitionPaths = glob.sync(globPattern, {
+    cwd: definitionsDir,
+    absolute: true,
+  })
+  const fixturePaths = glob.sync(globPattern, {
+    cwd: fixturesDir,
+    absolute: true,
+  })
+  const allPaths = definitionPaths.concat(fixturePaths)
+
+  test("paths didn't break, which would give false positives", () => {
+    expect(definitionPaths.length).toBeGreaterThan(0)
+    expect(fixturePaths.length).toBeGreaterThan(0)
+  })
+
+  describe.each(allPaths)('%s', labwarePath => {
+    const labwareDef = require(labwarePath) as LabwareDefinition3
+
+    it('validates against schema', () => {
+      const valid = validate(labwareDef)
+      const validationErrors = validate.errors
+
+      // FIXME(mm, 2025-02-04): These new definitions have a displayCategory that
+      // the schema does not recognize. Either they need to change or the schema does.
+      const expectFailure = ['protocol_engine_lid_stack_object'].includes(
+        labwareDef.parameters.loadName
+      )
+
+      if (expectFailure) expect(validationErrors).not.toBe(null)
+      else expect(validationErrors).toBe(null)
+      expect(valid).toBe(!expectFailure)
+    })
+
+    checkExtents(labwareDef)
+    checkGeometryDefinitions(labwareDef)
+  })
+})
+
+describe('check groups of labware that should have the same geometry', () => {
+  describe.each(
+    Object.entries(SHARED_GEOMETRY_GROUPS).map(([groupName, groupEntries]) => ({
+      groupName,
+      groupEntries,
+    }))
+  )('$groupName', ({ groupEntries }) => {
+    const normalizedGroupEntries = groupEntries.map(entry => ({
+      loadName: typeof entry === 'string' ? entry : entry.loadName,
+      geometryKey: typeof entry === 'string' ? undefined : entry.geometryKey,
+    }))
+    test.each(normalizedGroupEntries)(
+      '$loadName',
+      ({ loadName, geometryKey }) => {
+        // We arbitrarily pick the first labware in the group to compare the rest against.
+        const otherLabwareGeometry = getGeometry(
+          normalizedGroupEntries[0].loadName,
+          normalizedGroupEntries[0].geometryKey
+        )
+        const thisLabwareGeometry = getGeometry(loadName, geometryKey)
+        expect(thisLabwareGeometry).toEqual(otherLabwareGeometry)
+      }
+    )
+  })
+})
+
+function checkExtents(labwareDef: LabwareDefinition3): void {
+  test('extents.total should be oriented correctly', () => {
+    const {
+      total: { backLeftBottom, frontRightTop },
+    } = labwareDef.extents
+    expect(backLeftBottom.x).toBeLessThanOrEqual(frontRightTop.x)
+    expect(backLeftBottom.y).toBeGreaterThanOrEqual(frontRightTop.y)
+    expect(backLeftBottom.z).toBeLessThanOrEqual(frontRightTop.z)
+  })
+  test('extents.footprint should be oriented correctly', () => {
+    const {
+      footprint: { backLeft, frontRight },
+    } = labwareDef.extents
+    expect(backLeft.x).toBeLessThanOrEqual(frontRight.x)
+    expect(backLeft.y).toBeGreaterThanOrEqual(frontRight.y)
+  })
+  test('extents.footprint should be contained inside extents.total', () => {
+    const { footprint, total } = labwareDef.extents
+    expect(footprint.backLeft.x).toBeGreaterThanOrEqual(total.backLeftBottom.x)
+    expect(footprint.backLeft.y).toBeLessThanOrEqual(total.backLeftBottom.y)
+    expect(footprint.frontRight.x).toBeLessThanOrEqual(total.frontRightTop.x)
+    expect(footprint.frontRight.y).toBeGreaterThanOrEqual(total.frontRightTop.y)
+  })
+}
+
+function checkGeometryDefinitions(labwareDef: LabwareDefinition3): void {
   test('innerLabwareGeometry sections should be sorted top to bottom', () => {
     const geometries = Object.values(labwareDef.innerLabwareGeometry ?? [])
     for (const geometry of geometries) {
@@ -53,70 +143,6 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
     }
   })
 }
-
-describe(`test labware definitions with schema v3`, () => {
-  const definitionPaths = glob.sync(globPattern, {
-    cwd: definitionsDir,
-    absolute: true,
-  })
-  const fixturePaths = glob.sync(globPattern, {
-    cwd: fixturesDir,
-    absolute: true,
-  })
-  const allPaths = definitionPaths.concat(fixturePaths)
-
-  test("paths didn't break, which would give false positives", () => {
-    expect(definitionPaths.length).toBeGreaterThan(0)
-    expect(fixturePaths.length).toBeGreaterThan(0)
-  })
-
-  describe.each(allPaths)('%s', labwarePath => {
-    const labwareDef = require(labwarePath) as LabwareDefinition3
-
-    it('validates against schema', () => {
-      const valid = validate(labwareDef)
-      const validationErrors = validate.errors
-
-      // FIXME(mm, 2025-02-04): These new definitions have a displayCategory that
-      // the schema does not recognize. Either they need to change or the schema does.
-      const expectFailure = ['protocol_engine_lid_stack_object'].includes(
-        labwareDef.parameters.loadName
-      )
-
-      if (expectFailure) expect(validationErrors).not.toBe(null)
-      else expect(validationErrors).toBe(null)
-      expect(valid).toBe(!expectFailure)
-    })
-
-    checkGeometryDefinitions(labwareDef)
-  })
-})
-
-describe('check groups of labware that should have the same geometry', () => {
-  describe.each(
-    Object.entries(SHARED_GEOMETRY_GROUPS).map(([groupName, groupEntries]) => ({
-      groupName,
-      groupEntries,
-    }))
-  )('$groupName', ({ groupEntries }) => {
-    const normalizedGroupEntries = groupEntries.map(entry => ({
-      loadName: typeof entry === 'string' ? entry : entry.loadName,
-      geometryKey: typeof entry === 'string' ? undefined : entry.geometryKey,
-    }))
-    test.each(normalizedGroupEntries)(
-      '$loadName',
-      ({ loadName, geometryKey }) => {
-        // We arbitrarily pick the first labware in the group to compare the rest against.
-        const otherLabwareGeometry = getGeometry(
-          normalizedGroupEntries[0].loadName,
-          normalizedGroupEntries[0].geometryKey
-        )
-        const thisLabwareGeometry = getGeometry(loadName, geometryKey)
-        expect(thisLabwareGeometry).toEqual(otherLabwareGeometry)
-      }
-    )
-  })
-})
 
 /**
  * Return the latest version of the given labware that's defined in schema 3.
