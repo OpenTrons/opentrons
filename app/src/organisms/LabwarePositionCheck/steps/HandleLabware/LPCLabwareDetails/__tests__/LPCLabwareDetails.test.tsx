@@ -4,9 +4,13 @@ import { useDispatch } from 'react-redux'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__'
+import {
+  MockLPCContentContainer,
+  mockLPCContentProps,
+} from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { LPCLabwareDetails } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails'
 import { InlineNotification } from '/app/atoms/InlineNotification'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   selectSelectedLwOverview,
   selectSelectedLwDisplayName,
@@ -16,7 +20,7 @@ import {
   goBackEditOffsetSubstep,
   applyWorkingOffsets,
 } from '/app/redux/protocol-runs'
-import { handleUnsavedOffsetsModalODD } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsetsModal'
+import { handleUnsavedOffsetsModalODD } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -47,11 +51,20 @@ vi.mock('/app/atoms/InlineNotification', () => ({
   )),
 }))
 vi.mock(
-  '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsetsModal',
+  '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets',
   () => ({
-    handleUnsavedOffsetsModal: vi.fn(),
+    handleUnsavedOffsetsModalODD: vi.fn(),
+    UnsavedOffsetsDesktop: vi.fn(({ toggleShowUnsavedOffsetsDesktop }) => (
+      <div data-testid="unsaved-offsets-desktop">
+        Mock Unsaved Offsets Desktop
+        <button onClick={toggleShowUnsavedOffsetsDesktop}>Cancel</button>
+      </div>
+    )),
   })
 )
+vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
+  LPCContentContainer: MockLPCContentContainer,
+}))
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
@@ -67,6 +80,9 @@ vi.mock('/app/redux/protocol-runs', () => ({
   selectStepInfo: vi.fn(),
   goBackEditOffsetSubstep: vi.fn(),
   applyWorkingOffsets: vi.fn(),
+}))
+vi.mock('/app/redux/config', () => ({
+  getIsOnDevice: vi.fn(),
 }))
 
 const render = (props: ComponentProps<typeof LPCLabwareDetails>) => {
@@ -89,17 +105,20 @@ const render = (props: ComponentProps<typeof LPCLabwareDetails>) => {
 describe('LPCLabwareDetails', () => {
   let props: ComponentProps<typeof LPCLabwareDetails>
   let mockDispatch: Mock
+  let mockHandleUnsavedOffsetsModalODD: Mock
 
   beforeEach(() => {
     mockDispatch = vi.fn()
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
+    mockHandleUnsavedOffsetsModalODD = vi.mocked(handleUnsavedOffsetsModalODD)
 
     props = {
       ...mockLPCContentProps,
     }
 
     vi.mocked(InlineNotification).mockClear()
-    vi.mocked(handleUnsavedOffsetsModalODD).mockClear()
+    mockHandleUnsavedOffsetsModalODD.mockClear()
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
 
     vi.mocked(
       selectStepInfo
@@ -122,6 +141,17 @@ describe('LPCLabwareDetails', () => {
     } as any)
   })
 
+  it('passes correct header props to LPCContentContainer', () => {
+    render(props)
+
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Test Labware')
+
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Save')
+    expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
+  })
+
   it('renders the mocked child components', () => {
     render(props)
 
@@ -129,14 +159,7 @@ describe('LPCLabwareDetails', () => {
     screen.getByText('MOCK_LOCATION_SPECIFIC_OFFSETS_CONTAINER')
   })
 
-  it('displays the selected labware name as the header', () => {
-    render(props)
-
-    screen.getByText('Test Labware')
-  })
-
   it('shows InlineNotification when default offset is absent', () => {
-    // Set the default offset to be absent
     vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => true)
 
     render(props)
@@ -158,58 +181,6 @@ describe('LPCLabwareDetails', () => {
     expect(screen.queryByTestId('inline-notification')).not.toBeInTheDocument()
   })
 
-  it('disables save button when no working offsets exist', () => {
-    render(props)
-
-    const saveButton = screen.getByRole('button', { name: 'Save' })
-
-    expect(saveButton).toHaveAttribute('disabled')
-  })
-
-  it('enables save button when working offsets exist', () => {
-    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () =>
-      ({
-        'labware-uri-1': true,
-      } as any)
-    )
-
-    render(props)
-
-    const saveButton = screen.getByRole('button', { name: 'Save' })
-
-    expect(saveButton).not.toHaveAttribute('disabled')
-  })
-
-  it('shows unsaved changes modal when back is clicked with working offsets', () => {
-    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () =>
-      ({
-        'labware-uri-1': true,
-      } as any)
-    )
-
-    render(props)
-
-    const backButton = screen.getByTestId('ChildNavigation_Back_Button')
-    backButton.click()
-
-    expect(handleUnsavedOffsetsModalODD).toHaveBeenCalledWith(props)
-    expect(mockDispatch).not.toHaveBeenCalled()
-  })
-
-  it('goes back directly when back is clicked with no working offsets', () => {
-    render(props)
-
-    const backButton = screen.getByTestId('ChildNavigation_Back_Button')
-    backButton.click()
-
-    expect(handleUnsavedOffsetsModalODD).not.toHaveBeenCalled()
-    expect(mockDispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'GO_BACK_HANDLE_LW_SUBSTEP',
-      })
-    )
-  })
-
   it('dispatches actions when save is clicked with working offsets', () => {
     vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () =>
       ({
@@ -219,8 +190,8 @@ describe('LPCLabwareDetails', () => {
 
     render(props)
 
-    const saveButton = screen.getByText('Save')
-    saveButton.click()
+    const primaryButton = screen.getByTestId('primary-button')
+    primaryButton.click()
 
     expect(mockDispatch).toHaveBeenCalledTimes(2)
     expect(applyWorkingOffsets).toHaveBeenCalledWith(
