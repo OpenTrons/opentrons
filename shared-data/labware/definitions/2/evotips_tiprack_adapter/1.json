@@ -5,15 +5,15 @@
     "brandId": []
   },
   "metadata": {
-    "displayName": "Evotips adapter",
+    "displayName": "Evotip Tiprack Adapter",
     "displayCategory": "adapter",
-    "displayVolumeUnits": "µL",
+    "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
   "dimensions": {
-    "xDimension": 156.5,
-    "yDimension": 105,
-    "zDimension": 132
+    "xDimension": 130.5,
+    "yDimension": 98,
+    "zDimension": 67.5
   },
   "wells": {},
   "groups": [
@@ -24,19 +24,18 @@
   ],
   "parameters": {
     "format": "96Standard",
-    "quirks": ["tiprackAdapterFor96Channel", "stackingMaxFive"],
+    "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotips_flex_96_tiprack_adapter"
+    "loadName": "evotips_tiprack_adapter"
   },
   "namespace": "opentrons",
-  "version": 2,
-  "schemaVersion": 3,
+  "version": 1,
+  "schemaVersion": 2,
   "allowedRoles": ["adapter"],
   "cornerOffsetFromSlot": {
-    "x": -14.25,
-    "y": -3.5,
+    "x": -0.19,
+    "y": -0.19,
     "z": 0
-  },
-  "$otSharedSchema": "#/labware/schemas/3"
+  }
 }
