@@ -10,6 +10,7 @@ from pydantic import (
     Field,
     StrictInt,
     StrictFloat,
+    StrictBool,
 )
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Annotated
@@ -72,7 +73,7 @@ class DelayParams(BaseModel):
 class DelayProperties(BaseModel):
     """Shared properties for delay.."""
 
-    enable: bool = Field(..., description="Whether delay is enabled.")
+    enable: StrictBool = Field(..., description="Whether delay is enabled.")
     params: DelayParams | SkipJsonSchema[None] = Field(
         None,
         description="Parameters for the delay function.",
