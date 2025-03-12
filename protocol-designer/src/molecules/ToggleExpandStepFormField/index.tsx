@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 
 import { InputStepFormField } from '../InputStepFormField'
-import { ToggleButton } from '../../atoms/ToggleButton'
+import { ToggleButton } from '../../components/atoms'
 import type { FieldProps } from '../../pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ToggleExpandStepFormFieldProps extends FieldProps {

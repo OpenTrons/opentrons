@@ -12,7 +12,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteSpecsV2 } from '@opentrons/shared-data'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import type { PipetteMount, PipetteName } from '@opentrons/shared-data'
 

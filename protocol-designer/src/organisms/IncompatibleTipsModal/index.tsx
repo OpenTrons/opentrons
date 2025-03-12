@@ -10,7 +10,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { setFeatureFlags } from '../../feature-flags/actions'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '../../components/atoms'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type { BaseState } from '../../types'

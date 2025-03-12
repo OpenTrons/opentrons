@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { getYearFromDate } from './utils'
 
 const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'

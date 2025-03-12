@@ -21,7 +21,10 @@ import {
   selectDropdownItem,
   selectTerminalItem,
 } from '../../ui/steps/actions/actions'
-import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
+import {
+  LINE_CLAMP_TEXT_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '../../components/atoms'
 import { useKitchen } from '../Kitchen/hooks'
 import { LiquidButton } from '../../molecules/LiquidButton'
 

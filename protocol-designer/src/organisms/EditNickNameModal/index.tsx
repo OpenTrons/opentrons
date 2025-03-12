@@ -17,7 +17,7 @@ import {
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import { getMainPagePortalEl } from '../Portal'
 import { renameLabware } from '../../labware-ingred/actions'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '../../components/atoms'
 import type { ThunkDispatch } from '../../types'
 
 const MAX_NICK_NAME_LENGTH = 115

@@ -34,7 +34,7 @@ import {
 } from '../../feature-flags/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { MaterialsListModal } from '../../organisms/MaterialsListModal'
-import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../atoms'
+import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../components/atoms'
 import { EndUserAgreementFooter } from '../../molecules'
 import { useBlockingHint } from '../../organisms/BlockingHintModal/useBlockingHint'
 import {

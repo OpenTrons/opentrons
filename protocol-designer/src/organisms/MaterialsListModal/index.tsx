@@ -29,8 +29,7 @@ import {
 import { getRobotType } from '../../file-data/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { HandleEnter } from '../../atoms/HandleEnter'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { getMainPagePortalEl } from '../Portal'
 
 import type {

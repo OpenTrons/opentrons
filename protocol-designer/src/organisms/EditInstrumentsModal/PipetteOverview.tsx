@@ -27,7 +27,7 @@ import { deleteContainer } from '../../labware-ingred/actions'
 import { toggleIsGripperRequired } from '../../step-forms/actions/additionalItems'
 import { getSectionsFromPipetteName } from './utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type { RobotType } from '@opentrons/shared-data'

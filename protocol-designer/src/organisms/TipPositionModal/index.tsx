@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 import { prefixMap } from '../../resources/utils'
 import { getIsTouchTipField } from '../../form-types'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { getMainPagePortalEl } from '../Portal'
 import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
 import * as utils from './utils'

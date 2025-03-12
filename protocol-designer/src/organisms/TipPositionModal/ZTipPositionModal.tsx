@@ -17,7 +17,7 @@ import {
 } from '@opentrons/components'
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../constants'
 import { getIsTouchTipField } from '../../form-types'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { getMainPagePortalEl } from '../Portal'
 import * as utils from './utils'
 import { TOO_MANY_DECIMALS } from './constants'

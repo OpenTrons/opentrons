@@ -22,7 +22,7 @@ import {
   getNumOptions,
   getNumSlotsAvailable,
 } from './utils'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '../../components/atoms'
 import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 
 import type { DropdownBorder } from '@opentrons/components'

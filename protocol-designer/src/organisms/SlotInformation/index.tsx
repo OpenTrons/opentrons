@@ -20,7 +20,7 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { useDeckSetupWindowBreakPoint } from '../../pages/Designer/DeckSetup/utils'
 
 import type { FC } from 'react'

@@ -21,7 +21,7 @@ import { getSelectedWells } from '../../well-selection/selectors'
 import { SelectableLabware } from '../Labware/SelectableLabware'
 import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 import { deselectWells, selectWells } from '../../well-selection/actions'
-import { NAV_BAR_HEIGHT_REM } from '../../atoms'
+import { NAV_BAR_HEIGHT_REM } from '../../components/atoms'
 import { LiquidToolbox } from './LiquidToolbox'
 
 import type { WellGroup } from '@opentrons/components'

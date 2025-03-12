@@ -15,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { toggleNewProtocolModal } from '../../navigation/actions'
 import { actions as loadFileActions } from '../../load-file'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { getHasUnsavedChanges } from '../../load-file/selectors'
 import { SettingsIcon } from '../SettingsIcon'
 

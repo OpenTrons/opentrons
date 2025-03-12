@@ -21,7 +21,7 @@ import {
   LINK_BUTTON_STYLE,
   LINE_CLAMP_TEXT_STYLE,
   NAV_BAR_HEIGHT_REM,
-} from '../../../../atoms'
+} from '../../../../components/atoms'
 import { FormAlerts } from '../../../../organisms'
 import { useKitchen } from '../../../../organisms/Kitchen/hooks'
 import { RenameStepModal } from '../../../../organisms/RenameStepModal'

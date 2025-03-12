@@ -55,7 +55,10 @@ import { useBlockingHint } from '../../../organisms/BlockingHintModal/useBlockin
 import { selectors } from '../../../labware-ingred/selectors'
 import { useKitchen } from '../../../organisms/Kitchen/hooks'
 import { getDismissedHints } from '../../../tutorial/selectors'
-import { LINK_BUTTON_STYLE, NAV_BAR_HEIGHT_REM } from '../../../atoms'
+import {
+  LINK_BUTTON_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '../../../components/atoms'
 import {
   createContainerAboveModule,
   createModuleEntityAndChangeForm,

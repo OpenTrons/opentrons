@@ -14,7 +14,7 @@ import {
   DropdownMenu,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 import { getMainPagePortalEl } from '../Portal'
 import { WellOrderVisualization } from './WellOrderVisualization'
 

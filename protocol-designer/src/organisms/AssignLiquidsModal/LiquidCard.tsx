@@ -18,7 +18,7 @@ import {
   Tag,
 } from '@opentrons/components'
 
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { getEnableLiquidClasses } from '../../feature-flags/selectors'
 import { removeWellsContents } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
