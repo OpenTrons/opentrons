@@ -144,16 +144,58 @@ describe('consolidate single-channel', () => {
       },
     }
 
-    const result = consolidate(data, invariantContext, initialRobotState)
+    const result = consolidate(data, invariantContext, robotStatePickedUpOneTip)
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      pickUpTipHelper('A1'),
+      //  drop tip from return tip
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
+      pickUpTipHelper('B1'),
       aspirateHelper('A1', 50),
       aspirateHelper('A2', 50),
       dispenseHelper('B1', 100),
       makeMoveToWellHelper('B1', DEST_LABWARE),
       ...makeAirGapHelper(5),
+      //   drop tip at end
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
     ])
   })
 
