@@ -11,6 +11,8 @@ import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   getDeckDefFromRobotType,
+  OT2_ROBOT_TYPE,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { reduceCommandCreators, wasteChuteCommandsUtil } from './index'
 import {
@@ -18,10 +20,16 @@ import {
   dispense,
   moveToAddressableArea,
   moveToWell,
+  prepareToAspirate,
 } from '../commandCreators/atomic'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
-import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
+import {
+  airGapInMovableTrash,
+  blowOutInMovableTrash,
+  dispenseInMovableTrash,
+  moveToMovableTrash,
+} from './movableTrashCommandsUtil'
 import type {
   AddressableAreaName,
   LabwareDefinition2,
@@ -103,6 +111,36 @@ export function getWasteChuteAddressableAreaNamePip(
       return NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
     }
   }
+}
+
+export function getTrashBinAddressableAreaName(
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+): AddressableAreaName | null {
+  const trash = Object.values(additionalEquipmentEntities).find(
+    aE => aE.name === 'trashBin'
+  )
+  const trashLocation = trash != null ? (trash.location as CutoutId) : null
+
+  const deckDef = getDeckDefFromRobotType(
+    trashLocation === ('cutout12' as CutoutId)
+      ? OT2_ROBOT_TYPE
+      : FLEX_ROBOT_TYPE
+  )
+  let cutouts: Record<CutoutId, AddressableAreaName[]> | null = null
+  if (deckDef.robot.model === FLEX_ROBOT_TYPE) {
+    cutouts =
+      deckDef.cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
+      )?.providesAddressableAreas ?? null
+  } else if (deckDef.robot.model === OT2_ROBOT_TYPE) {
+    cutouts =
+      deckDef.cutoutFixtures.find(
+        cutoutFixture => cutoutFixture.id === 'fixedTrashSlot'
+      )?.providesAddressableAreas ?? null
+  }
+  return trashLocation != null && cutouts != null
+    ? cutouts[trashLocation]?.[0] ?? null
+    : null
 }
 
 export function getTrashOrLabware(
@@ -359,9 +397,8 @@ export const blowoutUtil = (args: {
       prevRobotState,
     })
   } else {
-    return movableTrashCommandsUtil({
+    return blowOutInMovableTrash({
       pipetteId: pipette,
-      type: 'blowOut',
       prevRobotState,
       invariantContext,
       flowRate,
@@ -591,8 +628,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
     })
   } else {
-    commands = movableTrashCommandsUtil({
-      type: 'dispense',
+    commands = dispenseInMovableTrash({
       pipetteId,
       volume,
       flowRate,
@@ -650,9 +686,8 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
       }),
     ]
   } else {
-    commands = movableTrashCommandsUtil({
+    commands = moveToMovableTrash({
       pipetteId,
-      type: 'moveToWell',
       invariantContext,
       prevRobotState,
     })
@@ -725,6 +760,9 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
             },
           },
         }),
+        curryCommandCreator(prepareToAspirate, {
+          pipetteId,
+        }),
         curryCommandCreator(airGapInPlace, {
           pipetteId,
           volume,
@@ -747,6 +785,9 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
             },
           },
         }),
+        curryCommandCreator(prepareToAspirate, {
+          pipetteId,
+        }),
         curryCommandCreator(airGapInPlace, {
           pipetteId,
           volume,
@@ -766,8 +807,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
     })
   } else {
-    commands = movableTrashCommandsUtil({
-      type: 'airGap',
+    commands = airGapInMovableTrash({
       pipetteId,
       volume,
       flowRate,

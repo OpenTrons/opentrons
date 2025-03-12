@@ -113,6 +113,7 @@
           "disposalVolume_volume": "5",
           "dropTip_location": "1e553651-9e4d-44b1-a31b-92459642bfd7:trashBin",
           "liquidClassesSupported": false,
+          "liquidClass": null,
           "nozzles": "ALL",
           "path": "single",
           "pipette": "de7da440-95ec-43e8-8723-851321fbd6f9",
@@ -188,6 +189,7 @@
           "disposalVolume_volume": "5",
           "dropTip_location": "1e553651-9e4d-44b1-a31b-92459642bfd7:trashBin",
           "liquidClassesSupported": false,
+          "liquidClass": null,
           "nozzles": "COLUMN",
           "path": "single",
           "pipette": "de7da440-95ec-43e8-8723-851321fbd6f9",
@@ -2353,7 +2355,7 @@
   },
   "liquidSchemaId": "opentronsLiquidSchemaV1",
   "liquids": {},
-  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
       "key": "1652dde4-b828-41d9-8610-758e32c712c7",

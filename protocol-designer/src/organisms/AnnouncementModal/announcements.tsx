@@ -100,7 +100,7 @@ export const useAnnouncements = (): Announcement[] => {
             padding: 0 25%;
           `}
         >
-          <img css={modulesDiagram} src={thermocycler} />
+          <img css={modulesDiagram} src={thermocycler} alt="Thermocycler" />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -140,9 +140,9 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'batchEditTransfer',
       image: (
         <Flex css={batchEditStyles}>
-          <img src={multiSelect} />
+          <img src={multiSelect} alt="Timeline multi select" />
 
-          <img src={batchEdit} />
+          <img src={batchEdit} alt="Batch edit" />
         </Flex>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -170,7 +170,7 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'heaterShakerSupport',
       image: (
         <div css={modulesDiagramsRow}>
-          <img css={modulesDiagram} src={heaterShaker} />
+          <img css={modulesDiagram} src={heaterShaker} alt="Heater Shaker" />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -196,7 +196,11 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'thermocyclerGen2Support',
       image: (
         <div css={modulesDiagramsRow}>
-          <img css={modulesDiagram} src={thermocyclerGen2} />
+          <img
+            css={modulesDiagram}
+            src={thermocyclerGen2}
+            alt="Thermocycler Gen2"
+          />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -229,7 +233,11 @@ export const useAnnouncements = (): Announcement[] => {
             padding: 6%;
           `}
         >
-          <img css={modulesDiagram} src={liquidEnhancements} />
+          <img
+            css={modulesDiagram}
+            src={liquidEnhancements}
+            alt="Liquid Enhancements"
+          />
         </div>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -255,7 +263,12 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'flexSupport7.0',
       image: (
         <Flex justifyContent={JUSTIFY_CENTER}>
-          <img height="240" width="240" src={opentronsFlex} />
+          <img
+            height="240"
+            width="240"
+            src={opentronsFlex}
+            alt="Opentrons Flex"
+          />
         </Flex>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -282,7 +295,11 @@ export const useAnnouncements = (): Announcement[] => {
       announcementKey: 'deckConfigAnd96Channel8.0',
       image: (
         <Flex justifyContent={JUSTIFY_CENTER} paddingTop={SPACING.spacing8}>
-          <img width="340" src={deckConfiguration} />
+          <img
+            width="340"
+            src={deckConfiguration}
+            alt="FLEX Deck Configuration"
+          />
         </Flex>
       ),
       heading: t('announcements.header', { pd: PD }),
@@ -385,7 +402,11 @@ export const useAnnouncements = (): Announcement[] => {
           paddingTop={SPACING.spacing8}
           backgroundColor={COLORS.blue10}
         >
-          <img width="100%" src={absorbancePlateReaderImage} />
+          <img
+            width="100%"
+            src={absorbancePlateReaderImage}
+            alt="Absorbance Plate Reader"
+          />
         </Flex>
       ),
       heading: t('announcements.absorbancePlateReaderSupport.heading', {
@@ -460,6 +481,75 @@ export const useAnnouncements = (): Announcement[] => {
                 ),
               }}
               i18nKey="announcements.absorbancePlateReaderSupport.body7"
+            />
+          </StyledText>
+        </Flex>
+      ),
+    },
+    {
+      announcementKey: 'dragDropAndHotFix',
+      image: <Flex />,
+      heading: t('announcements.dragDropAndHotFix.heading', {
+        version: pdVersion,
+      }),
+      message: (
+        <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('announcements.dragDropAndHotFix.body1', {
+              version: pdVersion,
+            })}
+          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('announcements.dragDropAndHotFix.body2')}
+            </StyledText>
+            <Flex marginLeft={SPACING.spacing16}>
+              <ul>
+                <li>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('announcements.dragDropAndHotFix.body3')}
+                  </StyledText>
+                </li>
+                <li>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('announcements.dragDropAndHotFix.body4')}
+                  </StyledText>
+                </li>
+                <li>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('announcements.dragDropAndHotFix.body5')}
+                  </StyledText>
+                </li>
+                <li>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('announcements.dragDropAndHotFix.body6')}
+                  </StyledText>
+                </li>
+                <li>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('announcements.dragDropAndHotFix.body7')}
+                  </StyledText>
+                </li>
+              </ul>
+            </Flex>
+          </Flex>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('announcements.dragDropAndHotFix.body9')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            <Trans
+              t={t}
+              components={{
+                link1: (
+                  <LinkComponent
+                    external
+                    href={DOC_URL}
+                    textDecoration={TEXT_DECORATION_UNDERLINE}
+                    color={COLORS.black90}
+                  />
+                ),
+              }}
+              i18nKey="announcements.dragDropAndHotFix.body10"
             />
           </StyledText>
         </Flex>

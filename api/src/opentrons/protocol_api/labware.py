@@ -695,6 +695,8 @@ class Labware:
             automatically.
 
         :return: The initialized and loaded labware object representing the Lid Stack.
+
+        :meta private:
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(

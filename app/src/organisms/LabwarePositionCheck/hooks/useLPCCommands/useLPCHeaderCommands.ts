@@ -52,9 +52,6 @@ export function useLPCHeaderCommands({
   const handleAttachProbeCheck = (): void => {
     void toggleRobotMoving(true)
       .then(() => handleProbeAttachment(pipette, proceedStep))
-      .then(() => {
-        proceedStep()
-      })
       .finally(() => toggleRobotMoving(false))
   }
 

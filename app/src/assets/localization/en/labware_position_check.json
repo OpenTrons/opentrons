@@ -122,6 +122,7 @@
   "slot_location": "Slot Location",
   "slot_name": "slot {{slotName}}",
   "start_position_check": "begin labware position check, move to Slot {{initial_labware_slot}}",
+  "store_probe": "Before exiting, unlock the calibration probe, remove it from the nozzle, and return it to its storage location.",
   "stored_offset_data": "Apply Stored Labware Offset Data?",
   "stored_offsets_for_this_protocol": "Stored Labware Offset data that applies to this protocol",
   "table_view": "Table View",

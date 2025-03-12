@@ -213,6 +213,7 @@
           "disposalVolume_volume": "5",
           "dropTip_location": "9d61f642-8f9b-467d-b2f7-b67fb162fd26:wasteChute",
           "liquidClassesSupported": false,
+          "liquidClass": null,
           "nozzles": null,
           "path": "single",
           "pipette": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
@@ -3576,7 +3577,7 @@
       "displayColor": "#ffd600"
     }
   },
-  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
       "key": "49fc1872-6cc3-410a-9aa7-5af54346a9fc",

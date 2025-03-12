@@ -9,11 +9,13 @@ from opentrons.drivers.asyncio.communication.serial_connection import (
     SerialConnection,
     AsyncResponseSerialConnection,
 )
-from opentrons.drivers.asyncio.communication import (
+from opentrons.drivers.asyncio.communication.errors import (
     NoResponse,
     AlarmResponse,
     ErrorResponse,
     UnhandledGcode,
+    BaseErrorCode,
+    DefaultErrorCodes,
 )
 
 
@@ -51,6 +53,7 @@ async def subject(
             error_keyword="err",
             alarm_keyword="alarm",
             async_error_ack="async",
+            error_codes=DefaultErrorCodes,
         )
     elif serial_class == SerialConnection:
         return serial_class(  # type: ignore[no-any-return]
@@ -251,3 +254,35 @@ async def test_send_data_with_async_error_after(
             call(response=successful_response, request=data),
         ]
     )
+
+
+def test_default_error_code_raise_exception() -> None:
+    """Test that error codes can raise appropriate exceptions."""
+    with pytest.raises(UnhandledGcode) as error:
+        DefaultErrorCodes.UNHANDLED_GCODE.raise_exception(
+            port="test_port", response="ERR003:test", command="G28"
+        )
+
+    assert error.value.response == "ERR003:test"
+    assert error.value.port == "test_port"
+    assert error.value.command == "G28"
+
+
+def test_custom_error_code_raise_custom_exception() -> None:
+    """Test that custom error codes can raise appropriate exceptions."""
+
+    class CustomErrorResponse(ErrorResponse):
+        pass
+
+    class CustomDefaultErrorCodes(BaseErrorCode):
+        CUSTOM_ERROR = ("ERR999", CustomErrorResponse)
+
+    # Test that a regular ErrorResponse works correctly
+    with pytest.raises(CustomErrorResponse) as error:
+        CustomDefaultErrorCodes.CUSTOM_ERROR.raise_exception(
+            port="test_port", response="ERR999:test", command="G28"
+        )
+
+    assert error.value.command == "G28"
+    assert error.value.response == "ERR999:test"
+    assert error.value.port == "test_port"

@@ -1,11 +1,21 @@
+import { STYLE_PROPS } from '../../primitives'
 import { StyledText } from '../../atoms/StyledText'
 import { Banner } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof Banner> = {
-  title: 'Library/Molecules/Banner',
+  title: 'Helix/Molecules/Banner',
   component: Banner,
+  argTypes: {
+    // Disable all StyleProps
+    ...Object.fromEntries(
+      [...STYLE_PROPS, 'as', 'ref', 'theme', 'forwardedAs'].map(prop => [
+        prop,
+        { table: { disable: true } },
+      ])
+    ),
+  },
 }
 
 export default meta

@@ -410,7 +410,7 @@ export function LiquidToolbox(props: LiquidToolboxProps): JSX.Element {
                             max: {
                               value: selectedWellsMaxVolume,
                               message: t(
-                                'form:liquid_placement.volume_exceeded',
+                                'form:liquid_placement.errors.volume_exceeded',
                                 { volume: selectedWellsMaxVolume }
                               ),
                             },

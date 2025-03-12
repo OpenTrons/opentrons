@@ -125,10 +125,6 @@ describe('useLPCHeaderCommands', () => {
     })
 
     await waitFor(() => {
-      expect(mockProceedStep).toHaveBeenCalled()
-    })
-
-    await waitFor(() => {
       expect(mockLPCHandlerUtils.toggleRobotMoving).toHaveBeenCalledWith(false)
     })
   })

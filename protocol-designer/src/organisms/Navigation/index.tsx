@@ -30,6 +30,7 @@ export function Navigation(): JSX.Element | null {
   const loadFile = (fileChangeEvent: ChangeEvent<HTMLInputElement>): void => {
     dispatch(loadFileActions.loadProtocolFile(fileChangeEvent))
     dispatch(toggleNewProtocolModal(false))
+    navigate('/overview')
   }
   const hasUnsavedChanges = useSelector(getHasUnsavedChanges)
 

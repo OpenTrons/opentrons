@@ -17,13 +17,16 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
+import {
+  getFlexHoverDimensions,
+  getOT2HoverDimensions,
+} from '../Designer/DeckSetup/utils'
 import type {
   CoordinateTuple,
   DeckSlotId,
   AddressableAreaName,
   RobotType,
 } from '@opentrons/shared-data'
-
 import type { Dispatch, SetStateAction } from 'react'
 
 interface SlotHoverProps {
@@ -33,7 +36,6 @@ interface SlotHoverProps {
   slotPosition: CoordinateTuple | null
   robotType: RobotType
 }
-const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
 export function SlotHover(props: SlotHoverProps): JSX.Element | null {
   const { hover, setHover, slotId, slotPosition, robotType } = props
@@ -72,45 +74,21 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
   )
 
   if (robotType === FLEX_ROBOT_TYPE) {
-    const hasStagingArea = stagingAreaLocations.includes(cutoutId)
-
-    const X_ADJUSTMENT_LEFT_SIDE = -101.5
-    const X_ADJUSTMENT = -17
-    const X_DIMENSION_MIDDLE_SLOTS = 160.3
-    const X_DIMENSION_OUTER_SLOTS = hasStagingArea ? 160.0 : 246.5
-    const X_DIMENSION_4TH_COLUMN_SLOTS = 175.0
-    const Y_DIMENSION = hasTCOnSlot ? 294.0 : 106.0
-
-    const slotFromCutout = slotId
-    const isLeftSideofDeck =
-      slotFromCutout === 'A1' ||
-      slotFromCutout === 'B1' ||
-      slotFromCutout === 'C1' ||
-      slotFromCutout === 'D1'
-    const xAdjustment = isLeftSideofDeck ? X_ADJUSTMENT_LEFT_SIDE : X_ADJUSTMENT
-    const x = slotPosition[0] + xAdjustment
-
-    const yAdjustment = -10
-    const y = slotPosition[1] + yAdjustment
-
-    const isMiddleOfDeck =
-      slotId === 'A2' || slotId === 'B2' || slotId === 'C2' || slotId === 'D2'
-
-    let xDimension = X_DIMENSION_OUTER_SLOTS
-    if (isMiddleOfDeck) {
-      xDimension = X_DIMENSION_MIDDLE_SLOTS
-    } else if (FOURTH_COLUMN_SLOTS.includes(slotId)) {
-      xDimension = X_DIMENSION_4TH_COLUMN_SLOTS
-    }
-    const yDimension = Y_DIMENSION
+    const { width, height, x, y } = getFlexHoverDimensions(
+      stagingAreaLocations,
+      cutoutId,
+      slotId,
+      hasTCOnSlot != null,
+      slotPosition
+    )
 
     return (
       <RobotCoordsForeignObject
         key="flex_hover"
-        width={xDimension}
-        height={yDimension}
-        x={hasTCOnSlot ? x + 20 : x}
-        y={hasTCOnSlot ? y - 70 : y}
+        width={width}
+        height={height}
+        x={x}
+        y={y}
         flexProps={{ flex: '1' }}
         foreignObjectProps={{
           opacity: hoverOpacity,
@@ -127,16 +105,18 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
       </RobotCoordsForeignObject>
     )
   } else {
-    const y = slotPosition[1]
-    const x = slotPosition[0]
+    const { width, height, x, y } = getOT2HoverDimensions(
+      hasTCOnSlot != null,
+      slotPosition
+    )
 
     return (
       <RobotCoordsForeignObject
         key="ot2_hover"
-        width={hasTCOnSlot ? 260 : 128}
-        height={hasTCOnSlot ? 178 : 85}
+        width={width}
+        height={height}
         x={x}
-        y={hasTCOnSlot ? y - 72 : y}
+        y={y}
         flexProps={{ flex: '1' }}
         foreignObjectProps={{
           opacity: hoverOpacity,

@@ -41,6 +41,15 @@ export const customViewports = {
       height: '700px',
     },
   },
+  protocolDesignerBase: {
+    // The base size for Protocol Designer. This might be the base size for web
+    name: 'Protocol Designer Base',
+    type: 'desktop',
+    styles: {
+      width: '14402px',
+      height: '1024px',
+    },
+  },
 }
 
 export const parameters = {
@@ -51,6 +60,7 @@ export const parameters = {
       method: 'alphabetical',
       order: [
         'Design Tokens',
+        'Helix',
         'Library',
         'App',
         'ODD',

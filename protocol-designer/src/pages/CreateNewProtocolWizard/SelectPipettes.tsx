@@ -180,6 +180,17 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
     subHeader = t('which_pipette_second')
   }
 
+  useEffect(() => {
+    if (
+      pipettesByMount.left.pipetteName != null ||
+      pipettesByMount.left.tiprackDefURI != null ||
+      pipettesByMount.right.pipetteName != null ||
+      pipettesByMount.right.tiprackDefURI != null
+    ) {
+      setPage('overview')
+    }
+  }, [])
+
   return (
     <>
       {showIncompatibleTip ? (

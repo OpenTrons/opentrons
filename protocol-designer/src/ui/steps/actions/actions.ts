@@ -196,7 +196,8 @@ const setSelection = (
     formData.stepType === 'heaterShaker' ||
     formData.stepType === 'temperature' ||
     formData.stepType === 'thermocycler' ||
-    formData.stepType === 'magnet'
+    formData.stepType === 'magnet' ||
+    formData.stepType === 'absorbanceReader'
   ) {
     dispatch({
       type: 'SELECT_DROPDOWN_ITEM',

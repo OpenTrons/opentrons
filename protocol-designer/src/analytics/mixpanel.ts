@@ -62,6 +62,8 @@ export function setMixpanelTracking(optedIn: boolean): void {
         mixpanel.register({
           appVersion: process.env.OT_PD_VERSION,
           appName: 'protocolDesigner',
+          viewportHeight: window.innerHeight,
+          viewportWidth: window.innerWidth,
         })
       } else {
         console.debug(

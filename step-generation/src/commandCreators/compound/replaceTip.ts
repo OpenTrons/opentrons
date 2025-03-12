@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInTrash } from './dropTipInTrash'
 import {
   curryCommandCreator,
   getIsHeaterShakerEastWestMultiChannelPipette,
@@ -225,11 +225,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
   if (isTrashBin) {
     commandCreators = [
-      ...movableTrashCommandsUtil({
-        type: 'dropTip',
+      curryCommandCreator(dropTipInTrash, {
         pipetteId: pipette,
-        prevRobotState,
-        invariantContext,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {

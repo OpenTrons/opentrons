@@ -28,6 +28,7 @@ export {
   engageMagnet,
   moveLabware,
   moveToAddressableArea,
+  moveToAddressableAreaForDropTip,
   setTemperature,
   touchTip,
   waitForTemperature,

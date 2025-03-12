@@ -290,22 +290,34 @@ export function ProtocolDetails(
     mostRecentAnalysis
   )
 
-  const getCreationMethod = (config: JsonConfig | PythonConfig): string => {
+  const getCreationMethod = (
+    config: JsonConfig | PythonConfig,
+    metadata: { [key: string]: any }
+  ): string => {
     if (config.protocolType === 'json') {
       return t('protocol_designer_version', {
         version: config.schemaVersion.toFixed(1),
       })
     } else {
-      return t('python_api_version', {
-        version:
-          config.apiVersion != null ? config.apiVersion?.join('.') : null,
-      })
+      if ('protocolDesigner' in metadata) {
+        return t('protocol_designer_version', {
+          version: parseInt(metadata.protocolDesigner as string).toFixed(1),
+        })
+      } else {
+        return t('python_api_version', {
+          version:
+            config.apiVersion != null ? config.apiVersion?.join('.') : null,
+        })
+      }
     }
   }
 
   const creationMethod =
     mostRecentAnalysis != null
-      ? getCreationMethod(mostRecentAnalysis.config) ?? t('shared:no_data')
+      ? getCreationMethod(
+          mostRecentAnalysis.config,
+          mostRecentAnalysis.metadata
+        ) ?? t('shared:no_data')
       : t('shared:no_data')
   const author =
     mostRecentAnalysis != null

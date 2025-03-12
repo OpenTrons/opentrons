@@ -29,6 +29,7 @@ import type { Point } from '../../utils'
 export interface ExtendedAspirateParams extends AspDispAirgapParams {
   tipRack: string
   nozzles: NozzleConfigurationStyle | null
+  isAirGap?: boolean
 }
 /** Aspirate with given args. Requires tip. */
 export const aspirate: CommandCreator<ExtendedAspirateParams> = (
@@ -42,6 +43,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
     labwareId,
     wellName,
     flowRate,
+    isAirGap,
     tipRack,
     wellLocation,
     nozzles,
@@ -258,6 +260,7 @@ export const aspirate: CommandCreator<ExtendedAspirateParams> = (
         wellLocation,
         flowRate,
       },
+      ...(isAirGap && { meta: { isAirGap } }),
     },
   ]
 
