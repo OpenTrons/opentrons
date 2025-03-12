@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
@@ -21,7 +22,10 @@ import {
 } from '/app/redux/protocol-runs'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-import { handleUnsavedOffsetsModal } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsetsModal'
+import {
+  handleUnsavedOffsetsModalODD,
+  UnsavedOffsetsDesktop,
+} from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 import { getIsOnDevice } from '/app/redux/config'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
@@ -30,6 +34,9 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   const { runId } = props
   const { t } = useTranslation('labware_position_check')
   const dispatch = useDispatch()
+  const [showUnsavedOffsetsDesktop, setShowUnsavedOffsetsDesktop] = useState(
+    false
+  )
 
   const isOnDevice = useSelector(getIsOnDevice)
   const lwUri = useSelector(selectSelectedLwOverview(runId))?.uri ?? ''
@@ -39,7 +46,11 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
 
   const onHeaderGoBack = (): void => {
     if (doWorkingOffsetsExist) {
-      void handleUnsavedOffsetsModal(props)
+      if (isOnDevice) {
+        void handleUnsavedOffsetsModalODD(props)
+      } else {
+        setShowUnsavedOffsetsDesktop(true)
+      }
     } else {
       dispatch(goBackEditOffsetSubstep(runId))
     }
@@ -55,22 +66,35 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
   }
 
   return (
-    <LPCContentContainer
-      {...props}
-      header={selectedLwName}
-      buttonText={t('save')}
-      onClickButton={onHeaderSave}
-      onClickBack={onHeaderGoBack}
-      buttonIsDisabled={!doWorkingOffsetsExist}
-      tertiaryBtnProps={{
-        text: t('view_labware_list'),
-        onClick: onHeaderGoBack,
-      }}
-      containerStyle={isOnDevice ? undefined : DESKTOP_CONTAINER_STYLE}
-      contentStyle={isOnDevice ? undefined : DESKTOP_CONTENT_CONTAINER_STYLE}
-    >
-      <LPCLabwareDetailsContent {...props} />
-    </LPCContentContainer>
+    <>
+      {!showUnsavedOffsetsDesktop ? (
+        <LPCContentContainer
+          {...props}
+          header={selectedLwName}
+          buttonText={t('save')}
+          onClickButton={onHeaderSave}
+          onClickBack={onHeaderGoBack}
+          buttonIsDisabled={!doWorkingOffsetsExist}
+          tertiaryBtnProps={{
+            text: t('view_labware_list'),
+            onClick: onHeaderGoBack,
+          }}
+          containerStyle={isOnDevice ? undefined : DESKTOP_CONTAINER_STYLE}
+          contentStyle={
+            isOnDevice ? undefined : DESKTOP_CONTENT_CONTAINER_STYLE
+          }
+        >
+          <LPCLabwareDetailsContent {...props} />
+        </LPCContentContainer>
+      ) : (
+        <UnsavedOffsetsDesktop
+          {...props}
+          toggleShowUnsavedOffsetsDesktop={() => {
+            setShowUnsavedOffsetsDesktop(!showUnsavedOffsetsDesktop)
+          }}
+        />
+      )}
+    </>
   )
 }
 

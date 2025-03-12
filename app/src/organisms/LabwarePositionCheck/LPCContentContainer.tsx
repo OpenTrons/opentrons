@@ -13,6 +13,7 @@ import {
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  AlertPrimaryButton,
   SecondaryButton,
   Box,
 } from '@opentrons/components'
@@ -54,6 +55,8 @@ export type LPCContentContainerProps = LPCWizardContentProps &
     containerStyle?: FlattenSimpleInterpolation
     /* The desktop button the left of the primary button. */
     tertiaryBtnProps?: LPCContentContainerTertiaryBtnProps
+    /* Whether the primary desktop button should be alert styled. */
+    primaryBtnAlert?: boolean
   }
 
 export function LPCContentContainer(
@@ -139,6 +142,7 @@ function DesktopFooterContent({
   buttonIsDisabled,
   tertiaryBtnProps,
   onClickButton,
+  primaryBtnAlert,
 }: Omit<LPCContentContainerProps, 'children'>): JSX.Element {
   const step = useSelector(selectCurrentStep(runId))
   const { currentSubstep } = useSelector(selectStepInfo(runId))
@@ -156,9 +160,18 @@ function DesktopFooterContent({
             {tertiaryBtnProps.text}
           </SecondaryButton>
         )}
-        <PrimaryButton disabled={buttonIsDisabled} onClick={onClickButton}>
-          {buttonText}
-        </PrimaryButton>
+        {primaryBtnAlert ? (
+          <AlertPrimaryButton
+            disabled={buttonIsDisabled}
+            onClick={onClickButton}
+          >
+            {buttonText}
+          </AlertPrimaryButton>
+        ) : (
+          <PrimaryButton disabled={buttonIsDisabled} onClick={onClickButton}>
+            {buttonText}
+          </PrimaryButton>
+        )}
       </Flex>
     </Flex>
   )

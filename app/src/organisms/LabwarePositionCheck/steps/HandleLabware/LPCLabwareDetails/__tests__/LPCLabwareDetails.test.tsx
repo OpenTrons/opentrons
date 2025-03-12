@@ -16,7 +16,7 @@ import {
   goBackEditOffsetSubstep,
   applyWorkingOffsets,
 } from '/app/redux/protocol-runs'
-import { handleUnsavedOffsetsModal } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsetsModal'
+import { handleUnsavedOffsetsModalODD } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsetsModal'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -99,7 +99,7 @@ describe('LPCLabwareDetails', () => {
     }
 
     vi.mocked(InlineNotification).mockClear()
-    vi.mocked(handleUnsavedOffsetsModal).mockClear()
+    vi.mocked(handleUnsavedOffsetsModalODD).mockClear()
 
     vi.mocked(
       selectStepInfo
@@ -192,7 +192,7 @@ describe('LPCLabwareDetails', () => {
     const backButton = screen.getByTestId('ChildNavigation_Back_Button')
     backButton.click()
 
-    expect(handleUnsavedOffsetsModal).toHaveBeenCalledWith(props)
+    expect(handleUnsavedOffsetsModalODD).toHaveBeenCalledWith(props)
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -202,7 +202,7 @@ describe('LPCLabwareDetails', () => {
     const backButton = screen.getByTestId('ChildNavigation_Back_Button')
     backButton.click()
 
-    expect(handleUnsavedOffsetsModal).not.toHaveBeenCalled()
+    expect(handleUnsavedOffsetsModalODD).not.toHaveBeenCalled()
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'GO_BACK_HANDLE_LW_SUBSTEP',

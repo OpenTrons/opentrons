@@ -163,6 +163,7 @@
   "try_again": "Try again",
   "unsaved_changes_will_be_lost": "Unsaved changes will be lost",
   "view_current_offsets": "view current offsets",
+  "go_back_confirmation": "Are you sure you want to go back to the the labware list without saving?",
   "view_data": "View data",
   "view_labware_list": "View labware list",
   "what_is_labware_offset_data": "What is labware offset data?"
