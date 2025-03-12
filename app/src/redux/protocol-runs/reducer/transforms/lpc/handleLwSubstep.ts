@@ -33,7 +33,6 @@ export function proceedToNextHandleLwSubstep(
         return HANDLE_LW_SUBSTEP.DETAILS
     }
   }
-  console.log('=>(handleLwSubstep.ts:36) getNextSubStep()', getNextSubStep())
 
   if (getNextSubStep() === HANDLE_LW_SUBSTEP.LIST) {
     return {
