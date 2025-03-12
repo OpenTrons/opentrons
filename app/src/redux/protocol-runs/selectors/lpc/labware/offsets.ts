@@ -1,6 +1,6 @@
 import type { Selector } from 'reselect'
 import { createSelector } from 'reselect'
-import type { Coordinates } from '@opentrons/shared-data'
+import type { Vector3D } from '@opentrons/shared-data'
 import { getVectorDifference, getVectorSum } from '@opentrons/shared-data'
 
 import type { MissingOffsets, WorkingOffsetsByUri } from '../transforms'
@@ -228,7 +228,7 @@ export const selectMissingOffsets = (
 export interface SelectOffsetsToApplyResult {
   definitionUri: string
   location: LegacyLabwareOffsetLocation
-  vector: Coordinates
+  vector: Vector3D
 }
 
 // TODO(jh 03-07-25): Update alongside the new API integration work.
