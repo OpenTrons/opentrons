@@ -6,7 +6,7 @@ import type { HandleLwSubstepType, LPCWizardState } from '../../../types'
 // Certain steps require special state updates.
 export function proceedToNextHandleLwSubstep(
   state: LPCWizardState,
-  isOnDevice?: boolean
+  isDesktop?: boolean
 ): LPCWizardState {
   const currentSubstep = state.steps.currentSubstep
   const selectedLw = state.labwareInfo.selectedLabware
@@ -23,10 +23,10 @@ export function proceedToNextHandleLwSubstep(
       case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
         return HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
       case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW: {
-        if (isOnDevice) {
-          return HANDLE_LW_SUBSTEP.DETAILS
-        } else {
+        if (isDesktop) {
           return HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
+        } else {
+          return HANDLE_LW_SUBSTEP.DETAILS
         }
       }
       case HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS:
