@@ -54,14 +54,23 @@ export function updateOffsetsForURI(
     const { labwareUri, location } = action.payload
     const lwDetails = state.labwareInfo.labware[labwareUri]
 
-    // Handle default offsets
+    // Handle default offsets.
     if (location.kind === OFFSET_KIND_DEFAULT) {
+      const updatedDefaultOffsetDetails = updateDefaultOffsetDetails(
+        action as PositionAction,
+        lwDetails.defaultOffsetDetails
+      )
+
+      // Update location-specific offsets if they match the new default offset.
+      const updatedLocationSpecificOffsetDetails = updateLocationSpecificDetailsBasedOnDefault(
+        lwDetails.locationSpecificOffsetDetails,
+        updatedDefaultOffsetDetails
+      )
+
       return {
         ...lwDetails,
-        defaultOffsetDetails: updateDefaultOffsetDetails(
-          action as PositionAction,
-          lwDetails.defaultOffsetDetails
-        ),
+        defaultOffsetDetails: updatedDefaultOffsetDetails,
+        locationSpecificOffsetDetails: updatedLocationSpecificOffsetDetails,
       }
     } else {
       // Handle location-specific offsets
@@ -167,6 +176,53 @@ function updateDefaultOffsetDetails(
   return { ...defaultOffsetDetails, workingOffset: newWorkingDetail }
 }
 
+// Update location-specific offsets based on default offset changes
+function updateLocationSpecificDetailsBasedOnDefault(
+  locationSpecificOffsetDetails: LocationSpecificOffsetDetails[],
+  defaultOffsetDetails: DefaultOffsetDetails
+): LocationSpecificOffsetDetails[] {
+  const defaultWorkingVector =
+    defaultOffsetDetails.workingOffset?.confirmedVector
+
+  // If there's no new default vector to compare against, no changes are needed.
+  if (defaultWorkingVector == null) {
+    return locationSpecificOffsetDetails
+  } else {
+    return locationSpecificOffsetDetails.map(offset => {
+      // Check if location specific working offset confirmed vector matches the default.
+      if (
+        offset.workingOffset?.confirmedVector != null &&
+        vectorEqualsDefault(
+          offset.workingOffset.confirmedVector,
+          defaultWorkingVector
+        )
+      ) {
+        // Remove working offset if they're equal.
+        return { ...offset, workingOffset: null }
+      }
+      // Check if existing offset matches the new default.
+      else if (
+        offset.existingOffset?.vector != null &&
+        vectorEqualsDefault(offset.existingOffset.vector, defaultWorkingVector)
+      ) {
+        // Mark for reset if they match.
+        return {
+          ...offset,
+          workingOffset: {
+            initialPosition: offset.workingOffset?.initialPosition ?? null,
+            finalPosition: offset.workingOffset?.finalPosition ?? null,
+            confirmedVector: RESET_TO_DEFAULT,
+          },
+        }
+      }
+      // No changes needed for this offset
+      else {
+        return offset
+      }
+    })
+  }
+}
+
 // Update location-specific offsets.
 function updateLocationSpecificOffsetDetails(
   action: PositionAction | ResetPositionAction,
@@ -206,13 +262,13 @@ function updateLocationSpecificOffsetDetails(
         )
         return locationSpecificOffsetDetails
       } else {
-        // Get the appropriate existing vector.
+        // Get the most valid vector for the relevant location-specific offset.
         const mostValidVector = findLocationSpecificOffsetWithFallbacks(
           relevantDetail,
           lwDetails.defaultOffsetDetails
         )
 
-        // Create updated working offset
+        // Create updated working offset.
         const newWorkingDetail = createUpdatedWorkingLocationSpecificOffset(
           type,
           position,
@@ -220,11 +276,17 @@ function updateLocationSpecificOffsetDetails(
           mostValidVector
         )
 
-        // Get current default vector for comparison
+        // TOME TODO: Seems that if the adjusted = EXISTING working, it doesn't go back.
+
+        // Get current default vector for comparison.
         const currentDefaultVector =
           lwDetails.defaultOffsetDetails.workingOffset?.confirmedVector ??
           lwDetails.defaultOffsetDetails.existingOffset?.vector ??
           null
+        console.log(
+          '=>(updateOffsetsForURI.ts:286) currentDefaultVector',
+          currentDefaultVector
+        )
 
         if (
           vectorEqualsDefault(
