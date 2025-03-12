@@ -369,6 +369,16 @@ def _run_trial(
         mode=trial.mode,
         clear_accuracy_function=trial.cfg.increment,
     )
+
+
+
+    pipette.transfer_liquid(10, well_a1, well_b1, liquid_class=custom_cls)
+    pipette.transfer_liquid(20, well_a1, well_b1, liquid_class=custom_cls)
+    pipette.transfer_liquid(30, well_a1, well_b1, liquid_class=custom_cls)
+    pipette.transfer_liquid(40, well_a1, well_b1, liquid_class=custom_cls)
+
+
+
     trial.pipette._retract()  # retract to top of gantry
 
     _take_photos(trial, "aspirate")

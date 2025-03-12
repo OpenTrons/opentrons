@@ -42,6 +42,19 @@ class NoRecords(BaseException):
     pass
 
 
+NODES = [
+    NodeId.pipette_left,
+    NodeId.pipette_right,
+    NodeId.gantry_x,
+    NodeId.gantry_y,
+    NodeId.head,
+    NodeId.head_l,
+    NodeId.head_r,
+    NodeId.gripper,
+    NodeId.gripper_z,
+    NodeId.gripper_g
+]
+
 RecordSlfType = TypeVar("RecordSlfType", bound="Record")
 
 
@@ -64,7 +77,7 @@ class Record:
     def format_date_offset(self: RecordSlfType, date: datetime) -> str:
         """Print with a time offset from some other time rather than a timestamp."""
         return (
-            f"{self.__class__.__name__}: offset={(self.date-date).total_seconds()}, sender={self.sender.name}, dest={self.dest.name}, "
+            f"{self.__class__.__name__}: offset={round((self.date-date).total_seconds(), 2)}, sender={self.sender.name}, dest={self.dest.name}, "
             + self.format_fields()
         )
 
@@ -74,7 +87,7 @@ class Record:
 
     def __str__(self) -> str:
         """String."""
-        return f'{self.__class__.__name__}: date={self.date.strftime("%b %d %H:%M:%S")}.{self.date.time().microsecond/1000000}, sender={self.sender.name}, dest={self.dest.name}'
+        return f'{self.__class__.__name__}\tdate={self.date.strftime("%b %d %H:%M:%S")}.{self.date.time().microsecond/1000000}\tsender={self.sender.name}\tdest={self.dest.name}'
 
 
 _MOVE_COMPLETE_RE = re.compile(
@@ -101,8 +114,8 @@ class MoveComplete(Record):
             date=record.date,
             sender=record.sender,
             dest=record.dest,
-            motor_pos=float(data["current_position"]) / 1000,
-            encoder_pos=float(data["encoder_position"]) / 1000,
+            motor_pos=round(float(data["current_position"]) / 1000, 2),
+            encoder_pos=round(float(data["encoder_position"]) / 1000, 2),
             index=int(data["index"]),
             seq_id=int(data["seq_id"]),
         )
@@ -114,11 +127,11 @@ class MoveComplete(Record):
 
     def __str__(self) -> str:
         """String."""
-        return super().__str__() + ", " + self.format_fields()
+        return super().__str__() + "\t" + self.format_fields()
 
     def format_fields(self) -> str:
         """Used by super to print values."""
-        return f"motor_pos={self.motor_pos}, encoder_pos={self.encoder_pos}, index={self.index}, seq_id={self.seq_id}"
+        return f"motor_pos={self.motor_pos}\tencoder_pos={self.encoder_pos}\tindex={self.index}\tseq_id={self.seq_id}"
 
 
 _ERROR_RE = re.compile(
@@ -150,7 +163,7 @@ class Error(Record):
 
     def __str__(self) -> str:
         """String."""
-        return super().__str__() + ", " + self.format_fields()
+        return super().__str__() + "\t" + self.format_fields()
 
     def format_fields(self) -> str:
         """Used by super to print values."""
@@ -188,13 +201,13 @@ class MoveCommand(Record):
             sender=record.sender,
             dest=record.dest,
             seq_id=int(data["seq_id"]),
-            duration=int(data["duration"]) / interrupts_per_sec,
-            velocity=float(data["velocity"]) / (2**31) * interrupts_per_sec,
-            acceleration=float(data["acceleration"])
+            duration=round(int(data["duration"]) / interrupts_per_sec, 2),
+            velocity=round(float(data["velocity"]) / (2**31) * interrupts_per_sec, 2),
+            acceleration=round(float(data["acceleration"])
             / (2**31)
             * interrupts_per_sec
             * interrupts_per_sec
-            / acceleration_mul,
+            / acceleration_mul, 2),
             velocity_encoded=int(data["velocity"]),
             acceleration_encoded=int(data["acceleration"]),
             index=int(data["index"]),
@@ -210,7 +223,7 @@ class MoveCommand(Record):
 
     def __str__(self) -> str:
         """String."""
-        return super().__str__() + ", " + self.format_fields()
+        return super().__str__() + "\t" + self.format_fields()
 
     def format_fields(self) -> str:
         """Prints values."""
@@ -527,34 +540,47 @@ def _print_motion(
 
 def _print_durations(records_to_check: Iterator[RecordTypeVar]) -> None:
     t0: Optional[datetime] = None
-    accumulated_duration = 0.0
+    accumulated_durations: Dict[NodeId, float] = {}
     previous_move_group = {"time": 0.0, "duration": 0.0}
-    print("START TIME (sec)," "OBSERVED DURATION (sec)," "MOTION DURATION (sec)")
+    print("START TIME (sec)\tOBSERVED DURATION (sec)\tMOTION DURATION (sec)\tMOTION DELAY (sec)")
     for record in records_to_check:
-        if isinstance(record, MoveCommand) and record.dest == NodeId.pipette_left:
-            accumulated_duration += record.duration
-        elif isinstance(record, ExecuteCommand):
+        # if isinstance(record, MoveCommand):
+        #     print(record)
+        # elif isinstance(record, ExecuteCommand):
+        #     print(record)
+        #     print("------END----------\n")
+        if isinstance(record, MoveCommand):
+            if record.dest not in accumulated_durations:
+                accumulated_durations[record.dest] = 0.0
+            accumulated_durations[record.dest] += record.duration
+        _commanded_nodes = list(accumulated_durations.keys())
+        if isinstance(record, ExecuteCommand):
             if t0 is None:
                 t0 = record.date
+            if len(_commanded_nodes) >= 2:
+                _max_duration = max(list(accumulated_durations.values()))
+                accumulated_durations = {}
+            else:
+                _max_duration = 0.0
             new_move_group = {
                 "time": (record.date - t0).total_seconds(),
-                "duration": accumulated_duration,
+                "duration": _max_duration,
             }
-            if previous_move_group["duration"] > 0:
+            if _max_duration > 0:
                 _prev_move_group_duration_plus_delay = (
                     new_move_group["time"] - previous_move_group["time"]
                 )
-                print(
-                    f'{previous_move_group["time"]},'
-                    f"{_prev_move_group_duration_plus_delay},"
-                    f'{previous_move_group["duration"]}'
-                )
-                assert (
-                    previous_move_group["duration"]
-                    < _prev_move_group_duration_plus_delay
-                )
-            previous_move_group = new_move_group
-            accumulated_duration = 0.0
+                _observed_delay_seconds = max(_prev_move_group_duration_plus_delay - previous_move_group["duration"], 0.0)
+                if 0 <= _observed_delay_seconds <= 0.5:
+                    print(
+                        f'{previous_move_group["time"]}\t'  # timestamp
+                        f'{round(_prev_move_group_duration_plus_delay, 6)}\t'  # observed duration
+                        f'{round(previous_move_group["duration"], 6)}\t'  # duration sent over CAN
+                        f'{round(_observed_delay_seconds, 6)}'  # observed delay
+                    )
+            for k in previous_move_group:
+                previous_move_group[k] = float(new_move_group[k])
+            # print("\n\n--------START--------")
 
 
 def _print_errors(
