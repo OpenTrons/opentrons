@@ -134,8 +134,6 @@ export function LPCContentContainer(
   )
 }
 
-// TOME TODO: Think through the button props for here. It's not the secondary button
-// unfortunately.
 function DesktopFooterContent({
   runId,
   buttonText,

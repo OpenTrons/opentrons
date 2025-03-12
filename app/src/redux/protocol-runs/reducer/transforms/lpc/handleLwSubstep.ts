@@ -1,6 +1,6 @@
 import { HANDLE_LW_SUBSTEP } from '../../../constants'
 
-import type { HandleLwSubstep, LPCWizardState } from '../../../types'
+import type { HandleLwSubstepType, LPCWizardState } from '../../../types'
 
 // Handles proceed to next substep for the "handle labware" core LPC flow.
 // Certain steps require special state updates.
@@ -48,9 +48,9 @@ export function goBackToPreviousHandleLwSubstep(
 
 // Get the next substep in the flow.
 function getNextHandleLwSubstep(
-  currentSubstep: HandleLwSubstep | null,
+  currentSubstep: HandleLwSubstepType | null,
   isOnDevice?: boolean
-): HandleLwSubstep | null {
+): HandleLwSubstepType | null {
   switch (currentSubstep) {
     case null:
       return HANDLE_LW_SUBSTEP.LIST
@@ -74,8 +74,8 @@ function getNextHandleLwSubstep(
 
 // Get the previous substep in the flow.
 function getPreviousHandleLwSubstep(
-  currentSubstep: HandleLwSubstep | null
-): HandleLwSubstep | null {
+  currentSubstep: HandleLwSubstepType | null
+): HandleLwSubstepType | null {
   switch (currentSubstep) {
     case null:
       return HANDLE_LW_SUBSTEP.LIST
@@ -135,7 +135,7 @@ function handleTransitionToDetails(state: LPCWizardState): LPCWizardState {
 // The simple/default update substep state case.
 function updateCurrentSubstep(
   state: LPCWizardState,
-  substep: HandleLwSubstep | null
+  substep: HandleLwSubstepType | null
 ): LPCWizardState {
   return {
     ...state,
