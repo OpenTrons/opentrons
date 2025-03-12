@@ -114,7 +114,6 @@ class AspirateWhileTrackingImplementation(
             labware_id=params.labwareId,
             well_name=params.wellName,
         )
-
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
