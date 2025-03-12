@@ -116,7 +116,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json': standard96WellNames,
   'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json': standard384WellNames,
   // this labware has a lip
-  'evotips_opentrons_96_labware/3.json': standard96WellNames,
+  'evotips_opentrons_96_labware/2.json': standard96WellNames,
 }
 
 const filterWells = (
