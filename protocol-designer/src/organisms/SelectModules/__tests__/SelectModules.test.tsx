@@ -4,10 +4,13 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { SelectModules } from '../SelectModules'
+import { SelectModules } from '..'
 
 import type { ComponentProps } from 'react'
-import type { WizardFormState, WizardTileProps } from '../types'
+import type {
+  WizardFormState,
+  WizardTileProps,
+} from '../../../pages/CreateNewProtocolWizard/types'
 
 vi.mock('../../../feature-flags/selectors')
 
@@ -82,6 +85,30 @@ describe('SelectModules', () => {
     screen.getByText('Magnetic Module GEN1')
     screen.getByText('Thermocycler Module GEN2')
     screen.getByText('Thermocycler Module GEN1')
+  })
+
+  it('renders the Flex options', () => {
+    const values = {
+      fields: {
+        name: '',
+        description: '',
+        organizationOrAuthor: '',
+        robotType: FLEX_ROBOT_TYPE,
+      },
+      additionalEquipment: ['trashBin'],
+      modules: {},
+      pipettesByMount: {} as any,
+    } as WizardFormState
+    props = {
+      ...props,
+      watch: vi.fn((name: keyof typeof values) => values[name]) as any,
+    }
+    render(props)
+    screen.getByText('Absorbance Plate Reader Module GEN1')
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Magnetic Block GEN1')
+    screen.getByText('Temperature Module GEN2')
+    screen.getByText('Thermocycler Module GEN2')
   })
 
   it('calls setValue when clicking to add a Magnetic Block GEN1', () => {

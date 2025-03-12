@@ -105,6 +105,7 @@ export function ProtocolSteps(): JSX.Element {
           width={CONTENT_MAX_WIDTH}
           height="100%"
           justifyContent={JUSTIFY_CENTER}
+          paddingY={SPACING.spacing120}
         >
           {showTimelineAlerts ? (
             <TimelineAlerts
@@ -117,6 +118,7 @@ export function ProtocolSteps(): JSX.Element {
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
+            height="2.25rem"
           >
             {currentStep != null && hoveredTerminalItem == null ? (
               <StyledText desktopStyle="headingSmallBold">
@@ -142,7 +144,11 @@ export function ProtocolSteps(): JSX.Element {
               }}
             />
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing16}
+            height="100%"
+          >
             {deckView === leftString ? (
               <DeckSetupContainer tab="protocolSteps" />
             ) : (

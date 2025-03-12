@@ -1128,17 +1128,19 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
 
         # TODO: add multi-channel pipette handling here
-        source_dest_per_volume_step = tx_commons.expand_for_volume_constraints(
-            volumes=[volume for _ in range(len(source))],
-            targets=zip(source, dest),
-            max_volume=min(
-                self.get_max_volume(),
-                self._engine_client.state.geometry.get_nominal_tip_geometry(
-                    pipette_id=self.pipette_id,
-                    labware_id=tip_racks[0][1].labware_id,
-                    well_name=None,
-                ).volume,
-            ),
+        source_dest_per_volume_step = (
+            tx_commons.expand_for_volume_constraints_for_liquid_classes(
+                volumes=[volume for _ in range(len(source))],
+                targets=zip(source, dest),
+                max_volume=min(
+                    self.get_max_volume(),
+                    self._engine_client.state.geometry.get_nominal_tip_geometry(
+                        pipette_id=self.pipette_id,
+                        labware_id=tip_racks[0][1].labware_id,
+                        well_name=None,
+                    ).volume,
+                ),
+            )
         )
 
         last_tip_picked_up_from: Optional[WellCore] = None
@@ -1339,10 +1341,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         # This will return a generator that provides pairs of destination well and
         # the volume to dispense into it
-        dest_per_volume_step = tx_commons.expand_for_volume_constraints(
-            volumes=[volume for _ in range(len(dest))],
-            targets=dest,
-            max_volume=working_volume,
+        dest_per_volume_step = (
+            tx_commons.expand_for_volume_constraints_for_liquid_classes(
+                volumes=[volume for _ in range(len(dest))],
+                targets=dest,
+                max_volume=working_volume,
+            )
         )
 
         def _drop_tip() -> None:
@@ -1576,10 +1580,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
 
         # TODO: add multi-channel pipette handling here
-        source_per_volume_step = tx_commons.expand_for_volume_constraints(
-            volumes=[volume for _ in range(len(source))],
-            targets=source,
-            max_volume=max_volume,
+        source_per_volume_step = (
+            tx_commons.expand_for_volume_constraints_for_liquid_classes(
+                volumes=[volume for _ in range(len(source))],
+                targets=source,
+                max_volume=max_volume,
+            )
         )
 
         last_tip_picked_up_from: Optional[WellCore] = None

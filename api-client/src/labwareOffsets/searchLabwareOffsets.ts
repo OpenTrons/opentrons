@@ -5,14 +5,16 @@ import type {
   HostConfig,
   LabwareOffsetLocationSequenceComponent,
 } from '../types'
-import type { StoredLabwareOffset } from './types'
+import type { ANY_LOCATION, StoredLabwareOffset } from './types'
 
 export interface SearchLabwareOffsetsData {
   /** Filters are ORed together. Within a single filter, criteria are ANDed together. */
   filters: Array<{
     id?: string
     definitionUri?: string
-    locationSequence?: LabwareOffsetLocationSequenceComponent[]
+    locationSequence?:
+      | LabwareOffsetLocationSequenceComponent[]
+      | typeof ANY_LOCATION
     mostRecentOnly?: boolean
   }>
 }

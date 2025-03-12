@@ -111,7 +111,7 @@ export function OffDeck(props: DeckSetupTabType): JSX.Element {
   }
 
   return (
-    <Flex width="100%">
+    <Flex width="100%" height="100%">
       {selectedSlot.slot === 'offDeck' ? (
         <Flex
           alignItems={ALIGN_CENTER}

@@ -1,10 +1,9 @@
 import {
-  aspirateInPlace,
+  airGapInPlace,
   blowOutInPlace,
   dispenseInPlace,
-  dropTipInPlace,
   moveToAddressableArea,
-  moveToAddressableAreaForDropTip,
+  prepareToAspirate,
 } from '../commandCreators/atomic'
 import { ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -39,37 +38,13 @@ export function airGapInMovableTrash(args: {
       addressableAreaName,
       offset,
     }),
-    curryCommandCreator(aspirateInPlace, {
+    curryCommandCreator(prepareToAspirate, {
+      pipetteId,
+    }),
+    curryCommandCreator(airGapInPlace, {
       pipetteId,
       volume,
       flowRate,
-    }),
-  ]
-}
-
-export function dropTipInMovableTrash(args: {
-  pipetteId: string
-  invariantContext: InvariantContext
-  prevRobotState: RobotState
-}): CurriedCommandCreator[] {
-  const { pipetteId, invariantContext, prevRobotState } = args
-  const addressableAreaName = getTrashBinAddressableAreaName(
-    invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for dropTip')
-    return []
-  }
-  if (!prevRobotState.tipState.pipettes[pipetteId]) {
-    return []
-  }
-  return [
-    curryCommandCreator(moveToAddressableAreaForDropTip, {
-      pipetteId,
-      addressableAreaName,
-    }),
-    curryCommandCreator(dropTipInPlace, {
-      pipetteId,
     }),
   ]
 }

@@ -1,9 +1,10 @@
 import {
-  aspirateInPlace,
+  airGapInPlace,
   blowOutInPlace,
   dispenseInPlace,
   dropTipInPlace,
   moveToAddressableArea,
+  prepareToAspirate,
 } from '../commandCreators/atomic'
 import { ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -99,7 +100,10 @@ export const wasteChuteCommandsUtil = (
                 addressableAreaName,
                 offset,
               }),
-              curryCommandCreator(aspirateInPlace, {
+              curryCommandCreator(prepareToAspirate, {
+                pipetteId,
+              }),
+              curryCommandCreator(airGapInPlace, {
                 pipetteId,
                 flowRate,
                 volume,

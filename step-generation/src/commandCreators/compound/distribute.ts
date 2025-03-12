@@ -10,7 +10,7 @@ import {
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { dropTipInMovableTrash } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInTrash } from './dropTipInTrash'
 import {
   curryCommandCreator,
   reduceCommandCreators,
@@ -22,12 +22,14 @@ import {
   getHasWasteChute,
 } from '../../utils'
 import {
+  airGapInPlace,
   aspirate,
   configureForVolume,
   delay,
   dispense,
   dropTip,
   moveToWell,
+  prepareToAspirate,
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
@@ -215,12 +217,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
         getWellDepth(destLabwareDef, firstDestWell) + AIR_GAP_OFFSET_FROM_TOP
       const airGapAfterAspirateCommands = aspirateAirGapVolume
         ? [
-            curryCommandCreator(aspirate, {
+            curryCommandCreator(moveToWell, {
               pipetteId: args.pipette,
-              volume: aspirateAirGapVolume,
               labwareId: args.sourceLabware,
               wellName: args.sourceWell,
-              flowRate: aspirateFlowRateUlSec,
               wellLocation: {
                 origin: 'bottom',
                 offset: {
@@ -229,9 +229,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   y: 0,
                 },
               },
-              isAirGap: true,
-              tipRack: args.tipRack,
-              nozzles,
+            }),
+            curryCommandCreator(airGapInPlace, {
+              pipetteId: args.pipette,
+              volume: aspirateAirGapVolume,
+              flowRate: aspirateFlowRateUlSec,
             }),
             ...(aspirateDelay != null
               ? [
@@ -362,12 +364,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
           ? [
-              curryCommandCreator(aspirate, {
+              curryCommandCreator(moveToWell, {
                 pipetteId: args.pipette,
-                volume: dispenseAirGapVolume,
                 labwareId: dispenseAirGapLabware,
                 wellName: dispenseAirGapWell,
-                flowRate: aspirateFlowRateUlSec,
                 wellLocation: {
                   origin: 'bottom',
                   offset: {
@@ -376,10 +376,14 @@ export const distribute: CommandCreator<DistributeArgs> = (
                     y: 0,
                   },
                 },
-                isAirGap: true,
-                tipRack: args.tipRack,
-
-                nozzles,
+              }),
+              curryCommandCreator(prepareToAspirate, {
+                pipetteId: args.pipette,
+              }),
+              curryCommandCreator(airGapInPlace, {
+                pipetteId: args.pipette,
+                volume: dispenseAirGapVolume,
+                flowRate: aspirateFlowRateUlSec,
               }),
               ...(aspirateDelay != null
                 ? [
@@ -406,11 +410,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
         })
       }
       if (isTrashBin) {
-        dropTipCommand = dropTipInMovableTrash({
-          pipetteId: args.pipette,
-          prevRobotState,
-          invariantContext,
-        })
+        dropTipCommand = [
+          curryCommandCreator(dropTipInTrash, { pipetteId: args.pipette }),
+        ]
       }
 
       // if using dispense > air gap, drop or change the tip at the end

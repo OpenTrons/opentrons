@@ -21,12 +21,15 @@ import { moveLabware } from './moveLabware'
 import { moveToAddressableArea } from './moveToAddressableArea'
 import { moveToAddressableAreaForDropTip } from './moveToAddressableAreaForDropTip'
 import { moveToWell } from './moveToWell'
+import { pickUpTip } from './pickUpTip'
+import { prepareToAspirate } from './prepareToAspirate'
 import { setTemperature } from './setTemperature'
 import { touchTip } from './touchTip'
 import { waitForTemperature } from './waitForTemperature'
-import { pickUpTip } from './pickUpTip'
+import { airGapInPlace } from './airGapInPlace'
 
 export {
+  airGapInPlace,
   absorbanceReaderCloseLid,
   absorbanceReaderInitialize,
   absorbanceReaderOpenLid,
@@ -51,6 +54,7 @@ export {
   moveToAddressableAreaForDropTip,
   moveToWell,
   pickUpTip,
+  prepareToAspirate,
   setTemperature,
   touchTip,
   waitForTemperature,

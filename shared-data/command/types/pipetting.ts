@@ -287,6 +287,7 @@ export type TouchTipParams = PipetteAccessParams &
   }
 export type DropTipParams = PipetteAccessParams & DropTipWellLocationParam
 export type PickUpTipParams = TouchTipParams
+export type PrepareToAspirateParams = PipetteIdentityParams
 
 interface AddressableOffsetVector {
   x: number

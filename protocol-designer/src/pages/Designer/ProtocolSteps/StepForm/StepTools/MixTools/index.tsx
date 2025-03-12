@@ -230,6 +230,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
             t('form:step_edit_form.field.delay.label'),
             'capitalize'
           )}
+          testId="delay_checkbox"
           checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
           isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
           checkboxUpdateValue={
@@ -260,6 +261,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
                 t('form:step_edit_form.field.blowout.label'),
                 'capitalize'
               )}
+              testId="blowout_checkbox"
               checkboxValue={propsForFields.blowout_checkbox.value}
               isChecked={propsForFields.blowout_checkbox.value === true}
               checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
@@ -305,6 +307,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
                 t('form:step_edit_form.field.touchTip.label'),
                 'capitalize'
               )}
+              testId="touchTip_checkbox"
               checkboxValue={propsForFields.mix_touchTip_checkbox.value}
               isChecked={propsForFields.mix_touchTip_checkbox.value === true}
               checkboxUpdateValue={
