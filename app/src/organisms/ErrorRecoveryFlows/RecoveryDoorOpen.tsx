@@ -20,7 +20,8 @@ import {
   RecoveryFooterButtons,
 } from './shared'
 
-import type { RecoveryContentProps } from './types'
+import type { RecoveryContentProps, RecoveryRoute, RouteStep } from './types'
+import { RECOVERY_MAP } from './constants'
 
 // There are two code paths that render this component:
 // 1) The door is open on a route & step in which it is not permitted to have the door open.
@@ -33,34 +34,70 @@ export function RecoveryDoorOpen({
   runStatus,
   routeUpdateActions,
   recoveryMap,
+  recoveryCommands,
 }: RecoveryContentProps): JSX.Element {
   const {
     resumeRecovery,
     isResumeRecoveryLoading,
   } = recoveryActionMutationUtils
-  const { stashedMap, proceedToRouteAndStep } = routeUpdateActions
+  const {
+    stashedMap,
+    proceedToRouteAndStep,
+    handleMotionRouting,
+  } = routeUpdateActions
   console.log('recoveryMap: ', recoveryMap)
   const { t } = useTranslation('error_recovery')
 
+  const handleHomeAllAndRoute = (
+    route: RecoveryRoute,
+    step?: RouteStep
+  ): void => {
+    void handleMotionRouting(true, RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
+      .then(() => recoveryCommands.homeAll())
+      .finally(() => handleMotionRouting(false))
+      .then(() => proceedToRouteAndStep(route, step))
+  }
+
   const primaryOnClick = (): void => {
-    void resumeRecovery().then(() => {
-      // See comments above for why we do this.
-      if (stashedMap != null) {
-        void proceedToRouteAndStep(stashedMap.route, stashedMap.step)
-      }
-    })
+    if (
+      recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+    ) {
+      handleHomeAllAndRoute(
+        RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+        RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
+      )
+    } else {
+      void resumeRecovery().then(() => {
+        // See comments above for why we do this.
+        if (stashedMap != null) {
+          void proceedToRouteAndStep(stashedMap.route, stashedMap.step)
+        }
+      })
+    }
   }
 
   const buildSubtext = (): string => {
-    if (recoveryMap.route === 'manual-replace-in-stacker-and-retry') {
+    if (
+      recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+    ) {
       return t('stacker_door_open_robot_home')
     } else return t('close_the_robot_door')
   }
 
   const buildTitletext = (): string => {
-    if (recoveryMap.route === 'manual-replace-in-stacker-and-retry') {
+    if (
+      recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+    ) {
       return t('close_robot_and_stacker_door')
     } else return t('robot_door_is_open')
+  }
+
+  const buildPrimaryButtonText = (): string => {
+    if (
+      recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+    ) {
+      return t('continue')
+    } else return t('resume')
   }
 
   return (
@@ -96,7 +133,7 @@ export function RecoveryDoorOpen({
       <Flex justifyContent={JUSTIFY_END}>
         <RecoveryFooterButtons
           primaryBtnOnClick={primaryOnClick}
-          primaryBtnTextOverride={t('resume')}
+          primaryBtnTextOverride={buildPrimaryButtonText()}
           primaryBtnDisabled={
             runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
           }

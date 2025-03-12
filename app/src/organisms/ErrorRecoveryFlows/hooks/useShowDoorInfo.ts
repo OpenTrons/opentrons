@@ -3,7 +3,11 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import { GRIPPER_MOVE_STEPS, RECOVERY_MAP_METADATA, RECOVERY_MAP } from '../constants'
+import {
+  GRIPPER_MOVE_STEPS,
+  RECOVERY_MAP_METADATA,
+  RECOVERY_MAP,
+} from '../constants'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { ErrorRecoveryFlowsProps } from '../index'
@@ -31,21 +35,18 @@ export function useShowDoorInfo(
   // a valid way to ensure all apps show the door open prompt, however this could be problematic in the future.
   // Consider restructuring this check once the takeover modals are added.
   const isDoorOpen = runStatus != null && DOOR_OPEN_STATUSES.includes(runStatus)
-  console.log("isDoorOpen: ", isDoorOpen)
-  console.log("recoveryMap.route: ", recoveryMap.route)
-  console.log("am I allowed: ", isDoorPermittedOpen(recoveryMap))
   const isProhibitedDoorOpen =
-    isDoorOpen &&
-    !isDoorPermittedOpen(recoveryMap) &&
-    !GRIPPER_MOVE_STEPS.includes(currentStep) || recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE 
+    (isDoorOpen &&
+      !isDoorPermittedOpen(recoveryMap) &&
+      !GRIPPER_MOVE_STEPS.includes(currentStep))
+    //    ||
+    // recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
 
   return { isDoorOpen, isProhibitedDoorOpen }
 }
 
 function isDoorPermittedOpen(recoveryMap: IRecoveryMap): boolean {
-  console.log("route!!!")
   const { route, step } = recoveryMap
-  console.log("{ route, step }: ", { route, step })
   if (route in RECOVERY_MAP_METADATA) {
     const routeConfig = RECOVERY_MAP_METADATA[route]
 

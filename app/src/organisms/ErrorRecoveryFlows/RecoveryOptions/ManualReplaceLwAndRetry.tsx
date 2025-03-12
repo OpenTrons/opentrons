@@ -16,12 +16,14 @@ import type { RecoveryContentProps } from '../types'
 export function ManualReplaceLwAndRetry(
   props: RecoveryContentProps
 ): JSX.Element {
-  const { recoveryMap } = props
+  const { recoveryMap, doorStatusUtils } = props
   const { step, route } = recoveryMap
   const {
     MANUAL_REPLACE_AND_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY,
   } = RECOVERY_MAP
+
+  console.log("maunally moving")
 
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions } = props
@@ -29,7 +31,7 @@ export function ManualReplaceLwAndRetry(
   const primaryBtnOnClick = (): Promise<void> =>
     proceedToRouteAndStep(
       RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
-      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME
+      doorStatusUtils.isDoorOpen ? RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME : RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
     )
   const buildBodyText = (): JSX.Element => (
     <Trans
@@ -39,6 +41,7 @@ export function ManualReplaceLwAndRetry(
     />
   )
   const buildContent = (): JSX.Element => {
+    console.log("building contenct")
     switch (step) {
       case MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE:
         return <GripperIsHoldingLabware {...props} />
@@ -47,6 +50,7 @@ export function ManualReplaceLwAndRetry(
       case MANUAL_REPLACE_AND_RETRY.STEPS.CLOSE_DOOR_GRIPPER_Z_HOME:
         return <RecoveryDoorOpenSpecial {...props} />
       case MANUAL_REPLACE_AND_RETRY.STEPS.MANUAL_REPLACE:
+      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
         return <TwoColLwInfoAndDeck {...props} />
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
         return (
