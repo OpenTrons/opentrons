@@ -122,6 +122,23 @@ class LiquidHandler(
         """
         ...
 
+    async def aspirate_while_tracking(
+        self,
+        mount: MountArgType,
+        z_distance: float,
+        volume: float,
+        flow_rate: float = 1.0,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during apsiration.
+        :param volume: The volume of liquid to be aspirated.
+        :param flow_rate: The flow rate to aspirate with.
+        """
+        ...
+
     async def dispense(
         self,
         mount: MountArgType,
@@ -140,6 +157,24 @@ class LiquidHandler(
         rate : [float] Set plunger speed for this dispense, where
             speed = rate * dispense_speed
         correction_volume : Correction volume in uL for the specified dispense volume
+        """
+        ...
+
+    async def dispense_while_tracking(
+        self,
+        mount: MountArgType,
+        z_distance: float,
+        volume: float,
+        push_out: Optional[float],
+        flow_rate: float = 1.0,
+    ) -> None:
+        """
+        Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during dispensing.
+        :param volume: The volume of liquid to be dispensed.
+        :param flow_rate: The flow rate to dispense with.
         """
         ...
 
