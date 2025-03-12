@@ -134,6 +134,13 @@ export function getTrashBinAddressableAreaName(
         cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
       )?.providesAddressableAreas ?? null
   }
+
+  if (deckDef.robot.model === FLEX_ROBOT_TYPE && cutouts == null) {
+    console.error(
+      `expected to find a list of cutouts for the Flex but could not with trashLocation ${trashLocation}`
+    )
+  }
+
   //  assume trash location is the fixedTrash for OT-2 if cutouts is null
   return cutouts != null ? cutouts[trashLocation]?.[0] : 'fixedTrash'
 }
