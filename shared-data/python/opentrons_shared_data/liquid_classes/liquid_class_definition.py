@@ -18,7 +18,7 @@ from typing_extensions import Annotated
 
 _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
 _StrictGreaterThanZeroInt = Annotated[int, Field(strict=True, gt=0)]
-_StrictGraterThanZeroFloat = Annotated[float, Field(strict=True, gt=0.0)]
+_StrictGreaterThanZeroFloat = Annotated[float, Field(strict=True, gt=0.0)]
 _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
 
 
@@ -28,7 +28,7 @@ _Number = Union[StrictInt, StrictFloat]
 _NonNegativeNumber = Union[_StrictNonNegativeInt, _StrictNonNegativeFloat]
 """Non-negative JSON number type, written to preserve lack of decimal point."""
 
-_GreaterThanZeroNumber = Union[_StrictGreaterThanZeroInt, _StrictGraterThanZeroFloat]
+_GreaterThanZeroNumber = Union[_StrictGreaterThanZeroInt, _StrictGreaterThanZeroFloat]
 
 LiquidHandlingPropertyByVolume = Sequence[Tuple[_NonNegativeNumber, _NonNegativeNumber]]
 """Settings for liquid class settings that are interpolated by volume."""
