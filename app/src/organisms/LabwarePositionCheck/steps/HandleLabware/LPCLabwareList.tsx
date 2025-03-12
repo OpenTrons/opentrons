@@ -23,9 +23,9 @@ import {
 import {
   selectAllLabwareInfo,
   setSelectedLabwareUri,
-  selectIsDefaultOffsetAbsent,
   selectCountLocationSpecificOffsetsForLw,
   proceedEditOffsetSubstep,
+  selectIsDefaultOffsetMissing,
 } from '/app/redux/protocol-runs'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
@@ -159,7 +159,7 @@ function LabwareItem({
 }: LabwareItemProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const isMissingDefaultOffset = useSelector(
-    selectIsDefaultOffsetAbsent(runId, uri)
+    selectIsDefaultOffsetMissing(runId, uri)
   )
   const countLocationSpecificOffsets = useSelector(
     selectCountLocationSpecificOffsetsForLw(runId, uri)
