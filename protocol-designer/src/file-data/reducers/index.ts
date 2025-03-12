@@ -101,7 +101,10 @@ const fileMetadata = handleActions(
     ): FileMetadataFields => ({ ...state, ...action.payload }),
     SAVE_PROTOCOL_FILE: (state: FileMetadataFields): FileMetadataFields => {
       // NOTE: 'last-modified' is updated "on-demand", in response to user clicking "save/export"
-      return { ...state, lastModified: Date.now() }
+      return {
+        ...state,
+        lastModified: Date.now(),
+      }
     },
   },
   defaultFields
