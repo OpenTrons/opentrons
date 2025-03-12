@@ -91,7 +91,8 @@ class OmronMircoscanCamera:
         return s
     
 if __name__ == '__main__':
-    camera = OmronMircoscanCamera(port=None)
+    cam_port = scan_ports()
+    camera = OmronMircoscanCamera(port=cam_port)
     try:
         asyncio.run(camera.connect())
         asyncio.run(camera.check_camera_communication())
