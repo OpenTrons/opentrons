@@ -13,10 +13,29 @@
     "displayVolumeUnits": "mL",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.76,
-    "yDimension": 85.47,
-    "zDimension": 19.05
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.47,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.76,
+        "y": 0,
+        "z": 19.05
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.47
+      },
+      "frontRight": {
+        "x": 127.76,
+        "y": 0
+      }
+    }
   },
   "wells": {
     "A1": {
@@ -49,11 +68,6 @@
   "namespace": "opentrons",
   "version": 2,
   "schemaVersion": 3,
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "innerLabwareGeometry": {
     "cuboidalWell": {
       "sections": [

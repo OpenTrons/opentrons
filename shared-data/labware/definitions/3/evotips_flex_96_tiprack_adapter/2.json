@@ -10,10 +10,29 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 156.5,
-    "yDimension": 105,
-    "zDimension": 132
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": -14.25,
+        "y": 101.5,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 142.25,
+        "y": -3.5,
+        "z": 132
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": -14.25,
+        "y": 101.5
+      },
+      "frontRight": {
+        "x": 142.25,
+        "y": -3.5
+      }
+    }
   },
   "wells": {},
   "groups": [
@@ -33,10 +52,5 @@
   "version": 2,
   "schemaVersion": 3,
   "allowedRoles": ["adapter"],
-  "cornerOffsetFromSlot": {
-    "x": -14.25,
-    "y": -3.5,
-    "z": 0
-  },
   "$otSharedSchema": "#/labware/schemas/3"
 }

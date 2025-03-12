@@ -22,10 +22,29 @@
     "displayCategory": "reservoir",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.76,
-    "yDimension": 85.8,
-    "zDimension": 44.45
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.8,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.76,
+        "y": 0,
+        "z": 44.45
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.8
+      },
+      "frontRight": {
+        "x": 127.76,
+        "y": 0
+      }
+    }
   },
   "parameters": {
     "format": "trough",
@@ -195,11 +214,6 @@
     "links": [
       "https://www.usascientific.com/12-channel-automation-reservoir.aspx"
     ]
-  },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
   },
   "innerLabwareGeometry": {
     "cuboidalWell": {

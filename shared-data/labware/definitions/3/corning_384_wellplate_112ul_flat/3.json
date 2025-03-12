@@ -442,10 +442,29 @@
     "displayCategory": "wellPlate",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.76,
-    "yDimension": 85.47,
-    "zDimension": 14.22
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.47,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.76,
+        "y": 0,
+        "z": 14.22
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.47
+      },
+      "frontRight": {
+        "x": 127.76,
+        "y": 0
+      }
+    }
   },
   "parameters": {
     "format": "384Standard",
@@ -5081,11 +5100,6 @@
       }
     }
   ],
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "stackingOffsetWithLabware": {
     "opentrons_universal_flat_adapter": {
       "x": 0,

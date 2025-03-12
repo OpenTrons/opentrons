@@ -22,10 +22,29 @@
     "displayCategory": "aluminumBlock",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.75,
-    "yDimension": 85.5,
-    "zDimension": 25.61
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.5,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.75,
+        "y": 0,
+        "z": 25.61
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.5
+      },
+      "frontRight": {
+        "x": 127.75,
+        "y": 0
+      }
+    }
   },
   "parameters": {
     "format": "96Standard",
@@ -1019,10 +1038,5 @@
       }
     }
   ],
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "$otSharedSchema": "#/labware/schemas/3"
 }

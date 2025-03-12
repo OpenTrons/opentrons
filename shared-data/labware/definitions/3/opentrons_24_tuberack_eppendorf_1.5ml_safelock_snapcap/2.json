@@ -16,10 +16,29 @@
     "displayVolumeUnits": "mL",
     "displayCategory": "tubeRack"
   },
-  "dimensions": {
-    "xDimension": 127.75,
-    "yDimension": 85.5,
-    "zDimension": 79.85
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.5,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.75,
+        "y": 0,
+        "z": 79.85
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.5
+      },
+      "frontRight": {
+        "x": 127.75,
+        "y": 0
+      }
+    }
   },
   "parameters": {
     "format": "irregular",
@@ -328,11 +347,6 @@
       }
     }
   ],
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "innerLabwareGeometry": {
     "conicalWell": {
       "sections": [

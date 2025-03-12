@@ -11,10 +11,29 @@
     "displayVolumeUnits": "mL",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.76,
-    "yDimension": 85.48,
-    "zDimension": 31.4
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.48,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.76,
+        "y": 0,
+        "z": 31.4
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.48
+      },
+      "frontRight": {
+        "x": 127.76,
+        "y": 0
+      }
+    }
   },
   "gripForce": 15,
   "gripHeightFromLabwareBottom": 16.8,
@@ -49,11 +68,6 @@
   "namespace": "opentrons",
   "version": 3,
   "schemaVersion": 3,
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "innerLabwareGeometry": {
     "cuboidalWell": {
       "sections": [

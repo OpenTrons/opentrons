@@ -11,10 +11,29 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.7,
-    "yDimension": 85.48,
-    "zDimension": 12.8
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.48,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.7,
+        "y": 0,
+        "z": 12.8
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.48
+      },
+      "frontRight": {
+        "x": 127.7,
+        "y": 0
+      }
+    }
   },
   "wells": {},
   "groups": [
@@ -23,11 +42,6 @@
       "wells": []
     }
   ],
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "parameters": {
     "format": "irregular",
     "quirks": [],

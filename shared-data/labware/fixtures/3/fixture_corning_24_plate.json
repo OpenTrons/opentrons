@@ -23,10 +23,29 @@
     "displayCategory": "wellPlate",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.76,
-    "yDimension": 85.47,
-    "zDimension": 20.27
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.47,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.76,
+        "y": 0,
+        "z": 20.27
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.47
+      },
+      "frontRight": {
+        "x": 127.76,
+        "y": 0
+      }
+    }
   },
   "wells": {
     "D1": {
@@ -309,11 +328,6 @@
       }
     }
   ],
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "stackingOffsetWithLabware": {
     "opentrons_aluminum_flat_bottom_plate": {
       "x": 0,

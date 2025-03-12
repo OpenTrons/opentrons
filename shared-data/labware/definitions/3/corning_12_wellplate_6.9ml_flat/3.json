@@ -21,10 +21,29 @@
     "displayCategory": "wellPlate",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.89,
-    "yDimension": 85.6,
-    "zDimension": 20.02
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.6,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.89,
+        "y": 0,
+        "z": 20.02
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.6
+      },
+      "frontRight": {
+        "x": 127.89,
+        "y": 0
+      }
+    }
   },
   "gripForce": 16,
   "gripHeightFromLabwareBottom": 18.3,
@@ -177,11 +196,6 @@
       }
     }
   ],
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "stackingOffsetWithLabware": {
     "opentrons_aluminum_flat_bottom_plate": {
       "x": 0,

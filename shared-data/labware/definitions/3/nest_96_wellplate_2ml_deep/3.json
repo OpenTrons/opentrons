@@ -24,10 +24,29 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "dimensions": {
-    "xDimension": 127.6,
-    "yDimension": 85.3,
-    "zDimension": 41
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 0,
+        "y": 85.3,
+        "z": 0
+      },
+      "frontRightTop": {
+        "x": 127.6,
+        "y": 0,
+        "z": 41
+      }
+    },
+    "footprint": {
+      "backLeft": {
+        "x": 0,
+        "y": 85.3
+      },
+      "frontRight": {
+        "x": 127.6,
+        "y": 0
+      }
+    }
   },
   "gripForce": 15,
   "gripHeightFromLabwareBottom": 21.9,
@@ -1211,11 +1230,6 @@
   "namespace": "opentrons",
   "version": 3,
   "schemaVersion": 3,
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "stackingOffsetWithLabware": {
     "opentrons_96_deep_well_adapter": {
       "x": 0,
