@@ -2,13 +2,13 @@ import { isEqual } from 'lodash'
 
 import { getLabwareDefURI } from '@opentrons/shared-data'
 
-import { getLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+import { getLegacyLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { LabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLabwareLocationCombos'
+import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 
 export interface GetUniqueLocationComboInfoParams {
   protocolData: CompletedProtocolAnalysis | null
@@ -18,20 +18,20 @@ export interface GetUniqueLocationComboInfoParams {
 export function getUniqueLabwareLocationComboInfo({
   labwareDefs,
   protocolData,
-}: GetUniqueLocationComboInfoParams): LabwareLocationCombo[] {
+}: GetUniqueLocationComboInfoParams): LegacyLabwareLocationCombo[] {
   if (protocolData == null || labwareDefs == null) {
     return []
   }
 
   const { commands, labware, modules = [] } = protocolData
-  const labwareLocationCombos = getLabwareLocationCombos(
+  const labwareLocationCombos = getLegacyLabwareLocationCombos(
     commands,
     labware,
     modules
   )
 
   // Filter out duplicate labware and labware that is not LPC-able.
-  return labwareLocationCombos.reduce<LabwareLocationCombo[]>(
+  return labwareLocationCombos.reduce<LegacyLabwareLocationCombo[]>(
     (acc, labwareLocationCombo) => {
       const labwareDef = labwareDefs.find(
         def => getLabwareDefURI(def) === labwareLocationCombo.definitionUri
