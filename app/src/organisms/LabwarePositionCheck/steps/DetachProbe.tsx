@@ -2,7 +2,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { LegacyStyledText, StyledText } from '@opentrons/components'
 
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { selectActivePipetteChannelCount } from '/app/redux/protocol-runs'
@@ -49,11 +49,13 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
         <DescriptionContent
           headline={t('detach_probe')}
           message={
-            <Trans
-              t={t}
-              i18nKey="store_probe"
-              components={{ block: <LegacyStyledText as="p" /> }}
-            />
+            <StyledText oddStyle="bodyTextRegular">
+              <Trans
+                t={t}
+                i18nKey="store_probe"
+                components={{ block: <LegacyStyledText as="p" /> }}
+              />
+            </StyledText>
           }
         />
         <StyledVideo

@@ -100,7 +100,7 @@ class PipettingHandler(TypingProtocol):
 
 
 class HardwarePipettingHandler(PipettingHandler):
-    """Liquid handling, using the Hardware API.""" ""
+    """Liquid handling, using the Hardware API."""
 
     def __init__(self, state_view: StateView, hardware_api: HardwareControlAPI) -> None:
         """Initialize a PipettingHandler instance."""

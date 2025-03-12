@@ -24,7 +24,7 @@ export interface UseHandleConfirmPositionResult {
   handleConfirmLwFinalPosition: (
     offsetLocationDetails: OffsetLocationDetails,
     pipette: LoadedPipette
-  ) => Promise<Vector3D | null>
+  ) => Promise<Vector3D>
 }
 
 export function useHandleConfirmLwFinalPosition({
@@ -34,7 +34,7 @@ export function useHandleConfirmLwFinalPosition({
   const handleConfirmLwFinalPosition = (
     offsetLocationDetails: OffsetLocationDetails,
     pipette: LoadedPipette
-  ): Promise<Vector3D | null> => {
+  ): Promise<Vector3D> => {
     const confirmCommands: CreateCommand[] = [
       ...savePositionCommands(pipette.id),
       ...retractPipetteAxesSequentiallyCommands(pipette),
@@ -44,14 +44,17 @@ export function useHandleConfirmLwFinalPosition({
 
     return chainLPCCommands(confirmCommands, false).then(responses => {
       const firstResponse = responses[0]
-      if (firstResponse.data.commandType === 'savePosition') {
-        const { position } = firstResponse.data?.result ?? { position: null }
+      if (
+        firstResponse.data.commandType === 'savePosition' &&
+        firstResponse.data?.result != null
+      ) {
+        const { position } = firstResponse.data?.result
 
         return Promise.resolve(position)
       } else {
-        setErrorMessage('CheckItem failed to save final position with message')
+        setErrorMessage('CheckItem failed to save final position.')
         return Promise.reject(
-          new Error('CheckItem failed to save final position with message')
+          new Error('CheckItem failed to save final position.')
         )
       }
     })

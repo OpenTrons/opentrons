@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import { makeContext } from '../fixtures'
 import { curryCommandCreator } from '../utils'
 import {
   airGapInMovableTrash,
@@ -50,7 +50,6 @@ const args = {
       },
     },
   },
-  prevRobotState: getInitialRobotStateStandard(invariantContext),
 }
 
 describe('movableTrashCommandsUtil', () => {
@@ -81,10 +80,6 @@ describe('movableTrashCommandsUtil', () => {
   it('returns correct commands for aspirate in place (air gap)', () => {
     airGapInMovableTrash({
       ...args,
-      prevRobotState: {
-        ...args.prevRobotState,
-        tipState: { pipettes: { [mockId]: true } } as any,
-      },
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,

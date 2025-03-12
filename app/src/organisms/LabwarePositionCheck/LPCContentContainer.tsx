@@ -5,6 +5,7 @@ import {
   Flex,
   RESPONSIVENESS,
   SPACING,
+  POSITION_FIXED,
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
@@ -39,11 +40,13 @@ export function LPCContentContainer({
 
   return (
     <Flex css={CONTAINER_STYLE}>
-      <StepMeter
-        totalSteps={totalStepCount}
-        currentStep={currentStepIndex + 1}
-      />
-      <ChildNavigation {...rest} css={CHILD_NAV_STYLE} />
+      <Flex css={FIXED_HEADER_STYLE}>
+        <StepMeter
+          totalSteps={totalStepCount}
+          currentStep={currentStepIndex + 1}
+        />
+        <ChildNavigation {...rest} css={CHILD_NAV_STYLE} />
+      </Flex>
       <Flex css={contentStyle ?? CHILDREN_CONTAINER_STYLE}>{children}</Flex>
     </Flex>
   )
@@ -54,14 +57,24 @@ const CONTAINER_STYLE = css`
   height: 100vh;
 `
 
+// TODO(jh, 03-12-25): This should be a fixed value in components.
+const FIXED_HEADER_STYLE = css`
+  position: ${POSITION_FIXED};
+  top: 0;
+  left: 0;
+  right: 0;
+  flex-direction: ${DIRECTION_COLUMN};
+`
+
 // TODO(jh, 02-05-25): Investigate whether we can remove the position: fixed styling from ChildNav.
 const CHILD_NAV_STYLE = css`
-  top: ${SPACING.spacing8};
+  margin-top: ${SPACING.spacing8};
 `
 const CHILDREN_CONTAINER_STYLE = css`
   margin-top: 7.75rem;
   flex-direction: ${DIRECTION_COLUMN};
   height: 100%;
+  overflow-y: auto;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing40}

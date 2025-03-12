@@ -9,6 +9,7 @@ import type {
   Vector3D,
   CreateCommand,
 } from '@opentrons/shared-data'
+import type { VectorOffset } from '@opentrons/api-client'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
@@ -22,8 +23,9 @@ export interface UseHandleConfirmPlacementResult {
    before moving the pipette to the initial LPC position. */
   handleConfirmLwModulePlacement: (
     offsetLocationDetails: OffsetLocationDetails,
-    pipetteId: string
-  ) => Promise<Vector3D | null>
+    pipetteId: string,
+    initialVectorOffset?: VectorOffset | null
+  ) => Promise<Vector3D>
 }
 
 export function useHandleConfirmLwModulePlacement({
@@ -33,19 +35,27 @@ export function useHandleConfirmLwModulePlacement({
 }: UseHandleConfirmPlacementProps): UseHandleConfirmPlacementResult {
   const handleConfirmLwModulePlacement = (
     offsetLocationDetails: OffsetLocationDetails,
-    pipetteId: string
-  ): Promise<Vector3D | null> => {
+    pipetteId: string,
+    initialVectorOffset?: VectorOffset | null
+  ): Promise<Vector3D> => {
     const confirmCommands: CreateCommand[] = [
       ...buildMoveLabwareCommand(offsetLocationDetails),
       ...moduleInitDuringLPCCommands(mostRecentAnalysis),
-      ...moveToWellCommands(offsetLocationDetails, pipetteId),
+      ...moveToWellCommands(
+        offsetLocationDetails,
+        pipetteId,
+        initialVectorOffset
+      ),
       ...savePositionCommands(pipetteId),
     ]
 
     return chainLPCCommands(confirmCommands, false).then(responses => {
       const finalResponse = responses[responses.length - 1]
-      if (finalResponse.data.commandType === 'savePosition') {
-        const { position } = finalResponse.data.result ?? { position: null }
+      if (
+        finalResponse.data.commandType === 'savePosition' &&
+        finalResponse.data.result != null
+      ) {
+        const { position } = finalResponse.data.result
 
         return Promise.resolve(position)
       } else {
@@ -67,8 +77,6 @@ function buildMoveLabwareCommand(
 ): MoveLabwareCreateCommand[] {
   const { labwareId, moduleId, adapterId, slotName } = offsetLocationDetails
 
-  // TODO(jh, 01-29-25): Once default offsets are implemented, we'll have to load them
-  //  into a slot somehow. Talk to Design.
   const locationSpecificSlotName = slotName as string
 
   const newLocationLabware =
