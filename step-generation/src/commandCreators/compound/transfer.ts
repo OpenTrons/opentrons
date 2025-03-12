@@ -525,7 +525,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             flowRate: blowoutFlowRateUlSec,
             offsetFromTopMm: blowoutOffsetFromTopMm,
             invariantContext,
-            prevRobotState,
           })
 
           const airGapAfterDispenseCommands =
