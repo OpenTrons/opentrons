@@ -17,7 +17,6 @@ import {
   blowoutUtil,
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
-  getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
 } from '../../utils'
 import {
@@ -181,11 +180,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const isTrashBin =
     invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
     'trashBin'
-
-  const channels = invariantContext.pipetteEntities[args.pipette].spec.channels
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    channels
-  )
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol
@@ -405,7 +399,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInWasteChute, {
             pipetteId: args.pipette,
-            addressableAreaName: addressableAreaNameWasteChute,
           }),
         ]
       }

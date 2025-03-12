@@ -7,12 +7,12 @@ import {
   prepareToAspirate,
 } from '../commandCreators/atomic'
 import { curryCommandCreator } from './curryCommandCreator'
-import type { AddressableAreaName } from '@opentrons/shared-data'
-import type { CurriedCommandCreator } from '../types'
+import { getWasteChuteAddressableAreaNamePip } from './misc'
+import type { CurriedCommandCreator, InvariantContext } from '../types'
 
 interface WasteChuteCommandArgs {
   pipetteId: string
-  addressableAreaName: AddressableAreaName
+  invariantContext: InvariantContext
   volume?: number
   flowRate?: number
 }
@@ -20,7 +20,12 @@ interface WasteChuteCommandArgs {
 export const dispenseInWasteChute = (
   args: WasteChuteCommandArgs
 ): CurriedCommandCreator[] => {
-  const { pipetteId, addressableAreaName, flowRate, volume } = args
+  const { pipetteId, invariantContext, flowRate, volume } = args
+  const pipetteChannels =
+    invariantContext.pipetteEntities[pipetteId].spec.channels
+  const addressableAreaName = getWasteChuteAddressableAreaNamePip(
+    pipetteChannels
+  )
 
   return flowRate != null && volume != null
     ? [
@@ -41,7 +46,12 @@ export const dispenseInWasteChute = (
 export const blowoutInWasteChute = (
   args: WasteChuteCommandArgs
 ): CurriedCommandCreator[] => {
-  const { pipetteId, addressableAreaName, flowRate } = args
+  const { pipetteId, invariantContext, flowRate } = args
+  const pipetteChannels =
+    invariantContext.pipetteEntities[pipetteId].spec.channels
+  const addressableAreaName = getWasteChuteAddressableAreaNamePip(
+    pipetteChannels
+  )
 
   return flowRate != null
     ? [
@@ -61,7 +71,12 @@ export const blowoutInWasteChute = (
 export const airGapInWasteChute = (
   args: WasteChuteCommandArgs
 ): CurriedCommandCreator[] => {
-  const { pipetteId, addressableAreaName, volume, flowRate } = args
+  const { pipetteId, invariantContext, volume, flowRate } = args
+  const pipetteChannels =
+    invariantContext.pipetteEntities[pipetteId].spec.channels
+  const addressableAreaName = getWasteChuteAddressableAreaNamePip(
+    pipetteChannels
+  )
 
   return flowRate != null && volume != null
     ? [

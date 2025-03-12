@@ -1,5 +1,4 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { describe, it, expect, vi } from 'vitest'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import {
   airGapInWasteChute,
@@ -19,45 +18,34 @@ import type { PipetteEntities } from '../types'
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 vi.mock('../utils/curryCommandCreator')
 
-const mockWasteChuteId = 'mockWasteChuteId'
-const mockAddressableAreaName: 'A3' = 'A3'
 const mockId = 'mockId'
 
-let invariantContext = makeContext()
-const args = {
-  pipetteId: mockId,
-  addressableAreaName: mockAddressableAreaName,
-  volume: 10,
-  flowRate: 10,
-  prevRobotState: getInitialRobotStateStandard(invariantContext),
-}
-const mockMoveToAddressableAreaParams = {
-  pipetteId: mockId,
-  addressableAreaName: mockAddressableAreaName,
-  offset: { x: 0, y: 0, z: 0 },
-}
-
+const invariantContext = makeContext()
 const mockPipEntities: PipetteEntities = {
   [mockId]: {
     name: 'p50_single_flex',
     id: mockId,
+    spec: { channels: 1 },
   },
 } as any
 
+const args = {
+  pipetteId: mockId,
+  volume: 10,
+  flowRate: 10,
+  prevRobotState: getInitialRobotStateStandard(invariantContext),
+  invariantContext: {
+    ...invariantContext,
+    pipetteEntities: mockPipEntities,
+  },
+}
+const mockMoveToAddressableAreaParams = {
+  pipetteId: mockId,
+  addressableAreaName: '1ChannelWasteChute',
+  offset: { x: 0, y: 0, z: 0 },
+}
+
 describe('wasteChuteCommandsUtil', () => {
-  beforeEach(() => {
-    invariantContext = {
-      ...invariantContext,
-      pipetteEntities: mockPipEntities,
-      additionalEquipmentEntities: {
-        [mockWasteChuteId]: {
-          name: 'wasteChute',
-          location: WASTE_CHUTE_CUTOUT,
-          id: 'mockId',
-        },
-      },
-    }
-  })
   it('returns correct commands for dispensing', () => {
     dispenseInWasteChute({ ...args })
     expect(curryCommandCreator).toHaveBeenCalledWith(

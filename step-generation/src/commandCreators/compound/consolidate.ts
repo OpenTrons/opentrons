@@ -19,7 +19,6 @@ import {
   dispenseLocationHelper,
   moveHelper,
   getIsSafePipetteMovement,
-  getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
 } from '../../utils'
 import {
@@ -202,10 +201,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       null &&
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'trashBin'
-  const channels = invariantContext.pipetteEntities[args.pipette].spec.channels
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    channels
-  )
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -490,7 +485,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInWasteChute, {
             pipetteId: args.pipette,
-            addressableAreaName: addressableAreaNameWasteChute,
           }),
         ]
       }

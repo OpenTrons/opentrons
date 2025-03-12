@@ -15,7 +15,6 @@ import {
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
   reduceCommandCreators,
-  getWasteChuteAddressableAreaNamePip,
   PRIMARY_NOZZLE,
 } from '../../utils'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
@@ -174,10 +173,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    channels
-  )
-
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
     channels === 96 && args.nozzles != null && args.nozzles !== stateNozzles
@@ -210,7 +205,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     commandCreators = [
       curryCommandCreator(dropTipInWasteChute, {
         pipetteId: args.pipette,
-        addressableAreaName: addressableAreaNameWasteChute,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {

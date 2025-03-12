@@ -1,12 +1,14 @@
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import {
+  curryCommandCreator,
+  getWasteChuteAddressableAreaNamePip,
+  reduceCommandCreators,
+} from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
 import { dropTipInPlace, moveToAddressableArea } from '../atomic'
-import type { AddressableAreaName } from '@opentrons/shared-data'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface DropTipInWasteChuteArgs {
   pipetteId: string
-  addressableAreaName: AddressableAreaName
 }
 
 export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
@@ -15,8 +17,12 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   prevRobotState
 ) => {
   const offset = ZERO_OFFSET
-
-  const { pipetteId, addressableAreaName } = args
+  const { pipetteId } = args
+  const pipetteChannels =
+    invariantContext.pipetteEntities[pipetteId].spec.channels
+  const addressableAreaName = getWasteChuteAddressableAreaNamePip(
+    pipetteChannels
+  )
 
   let commandCreators: CurriedCommandCreator[] = []
 

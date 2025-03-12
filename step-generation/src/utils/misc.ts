@@ -353,8 +353,6 @@ export const blowoutUtil = (args: {
     prevRobotState,
   } = args
   if (!blowoutLocation) return []
-  const channels = invariantContext.pipetteEntities[pipette].spec.channels
-  const addressableAreaName = getWasteChuteAddressableAreaNamePip(channels)
 
   const trashOrLabware = getTrashOrLabware(
     invariantContext.labwareEntities,
@@ -397,7 +395,7 @@ export const blowoutUtil = (args: {
     return blowoutInWasteChute({
       pipetteId: pipette,
       flowRate,
-      addressableAreaName,
+      invariantContext,
     })
   } else {
     return blowOutInMovableTrash({
@@ -619,14 +617,11 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    const pipetteChannels =
-      invariantContext.pipetteEntities[pipetteId].spec.channels
-
     commands = dispenseInWasteChute({
       pipetteId,
       volume,
       flowRate,
-      addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
+      invariantContext,
     })
   } else {
     commands = dispenseInMovableTrash({
@@ -797,13 +792,11 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       ]
     }
   } else if (trashOrLabware === 'wasteChute') {
-    const pipetteChannels =
-      invariantContext.pipetteEntities[pipetteId].spec.channels
     commands = airGapInWasteChute({
       pipetteId,
       volume,
       flowRate,
-      addressableAreaName: getWasteChuteAddressableAreaNamePip(pipetteChannels),
+      invariantContext,
     })
   } else {
     commands = airGapInMovableTrash({

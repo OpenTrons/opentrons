@@ -17,7 +17,6 @@ import {
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
 } from '../../utils'
 import {
@@ -178,10 +177,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       null &&
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'trashBin'
-
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    pipetteSpec.channels
-  )
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -567,7 +562,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             dropTipCommand = [
               curryCommandCreator(dropTipInWasteChute, {
                 pipetteId: args.pipette,
-                addressableAreaName: addressableAreaNameWasteChute,
               }),
             ]
           }
