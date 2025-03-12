@@ -51,9 +51,9 @@ import {
   selectZoomedIntoSlot,
 } from '../../../labware-ingred/actions'
 import { getEnableMutlipleTempsOT2 } from '../../../feature-flags/selectors'
-import { useBlockingHint } from '../../../organisms/BlockingHintModal/useBlockingHint'
+import { useBlockingHint } from '../../../components/organisms/BlockingHintModal/useBlockingHint'
 import { selectors } from '../../../labware-ingred/selectors'
-import { useKitchen } from '../../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { getDismissedHints } from '../../../tutorial/selectors'
 import {
   LINK_BUTTON_STYLE,
@@ -63,7 +63,7 @@ import {
   createContainerAboveModule,
   createModuleEntityAndChangeForm,
 } from '../../../step-forms/actions/thunks'
-import { ConfirmDeleteStagingAreaModal } from '../../../organisms'
+import { ConfirmDeleteStagingAreaModal } from '../../../components/organisms'
 import { getSlotInformation } from '../utils'
 import { ALL_ORDERED_CATEGORIES, FIXTURES, MOAM_MODELS } from './constants'
 import { LabwareTools } from './LabwareTools'

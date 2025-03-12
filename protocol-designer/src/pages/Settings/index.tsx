@@ -17,7 +17,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { AnnouncementModal, DOC_URL } from '../../organisms'
+import { AnnouncementModal, DOC_URL } from '../../components/organisms'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,

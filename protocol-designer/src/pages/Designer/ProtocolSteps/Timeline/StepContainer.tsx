@@ -25,7 +25,7 @@ import {
   DELETE_MULTIPLE_STEP_FORMS,
   DELETE_STEP_FORM,
   getMainPagePortalEl,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import { actions as steplistActions } from '../../../../steplist'
 import {
   deselectAllSteps,

@@ -40,7 +40,7 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
-import { TimelineAlerts } from '../../../organisms'
+import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'

@@ -1,5 +1,5 @@
 import floor from 'lodash/floor'
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'

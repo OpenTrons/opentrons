@@ -8,7 +8,7 @@ import { DraggableSidebar } from '../DraggableSidebar'
 import type { ComponentProps } from 'react'
 
 vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../ui/steps/selectors')
+vi.mock('../../../ui/steps/selectors')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../Timeline/DraggableSteps')
 vi.mock('../Timeline/PresavedStep')

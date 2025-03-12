@@ -15,7 +15,7 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { WizardBody } from './WizardBody'
 import {
   AdditionalEquipmentDiagram,

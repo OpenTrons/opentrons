@@ -22,9 +22,9 @@ import {
   LINE_CLAMP_TEXT_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '../../../../components/atoms'
-import { FormAlerts } from '../../../../organisms'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { RenameStepModal } from '../../../../organisms/RenameStepModal'
+import { FormAlerts } from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'

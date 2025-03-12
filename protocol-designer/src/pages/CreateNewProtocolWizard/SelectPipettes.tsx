@@ -37,8 +37,11 @@ import { getAllowAllTipracks } from '../../feature-flags/selectors'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { setFeatureFlags } from '../../feature-flags/actions'
 import { createCustomTiprackDef } from '../../labware-defs/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
-import { IncompatibleTipsModal, PipetteInfoItem } from '../../organisms'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import {
+  IncompatibleTipsModal,
+  PipetteInfoItem,
+} from '../../components/organisms'
 import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
