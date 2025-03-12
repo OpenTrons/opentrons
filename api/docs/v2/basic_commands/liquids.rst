@@ -127,12 +127,39 @@ Push Out After Dispense
 
 The optional ``push_out`` parameter of ``dispense()`` helps ensure all liquid leaves the tip. Use ``push_out`` for applications that require moving the pipette plunger lower than the default, without performing a full :ref:`blow out <blow-out>`.
 
-For example, this dispense action moves the plunger the equivalent of an additional 5 µL beyond where it would stop if ``push_out`` was set to zero or omitted::
+Flex pipettes include a ``push_out`` by default for any dispense that completely empties the attached pipette tip. The default ``push_out`` volume depends on your pipette and tip combination. 
+
+.. list-table::
+    :header-rows: 1
+    * - **Pipette**
+      - **Tip**
+      - **``push_out`` Volume (µL)**
+    * - 1- and 8-channel (50 µL)
+      - 
+          * 50
+      - 
+          * Default: 2
+          * Low-volume mode: 7
+    * - 1-, 8-, and 96-channel (1000 µL)
+      - 
+          * 50
+          * 200
+          * 1000
+      - 
+          * 7
+          * 5
+          * 20
+
+OT-2 pipettes do not include a ``push_out`` by default. 
+
+You can change the ``push_out`` volume for any :py:meth:`~.InstrumentContext.dispense` command. For example, this dispense action moves the ``flex_1channel_1000`` pipette plunger the equivalent of an additional 5 µL beyond where it would stop when dispensing 100 µL of liquid. 
 
     pipette.pick_up_tip()
     pipette.aspirate(100, plate["A1"])
     pipette.dispense(100, plate["B1"], push_out=5)
     pipette.drop_tip()
+
+To disable ``push_out`` during a dispense action, set ``push_out=0``.
 
 .. versionadded:: 2.15
 
