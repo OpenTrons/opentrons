@@ -674,8 +674,9 @@ def _print_durations(
             if isinstance(record, (HomeCommand, SyncMoveCommand)):
                 sent_home_or_sync_command = True
                 continue
+            # a new EXECUTE command means the PREVIOUS move-group has finished
+            # so print the PREVIOUS move-group's information
             if isinstance(record, ExecuteCommand):
-                error_msg = ""
                 if t0 is None:
                     t0 = record.date
                 _commanded_nodes = list(accumulated_durations.keys())
@@ -683,15 +684,7 @@ def _print_durations(
                     cached_duration = 0.0
                 else:
                     # only track move-groups where ALL nodes are commanded with identical durations
-                    # NOTE: (sigler) ask FW why would we want nodes to have different durations?
-                    _max_duration = round(max(list(accumulated_durations.values())), 6)
-                    _min_duration = round(min(list(accumulated_durations.values())), 6)
-                    error_msg += (
-                        "ERROR(unequal-durations) "
-                        if _max_duration != _min_duration
-                        else ""
-                    )
-                    cached_duration = _max_duration
+                    cached_duration = round(max(list(accumulated_durations.values())), 6)
                     accumulated_durations = {}
                 # cache the TIME and DURATION of the EXECUTED move-group
                 new_move_group = MoveGroupAsCSVLine(
