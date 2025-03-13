@@ -23,8 +23,6 @@ export function ManualReplaceLwAndRetry(
     MANUAL_REPLACE_STACKER_AND_RETRY,
   } = RECOVERY_MAP
 
-  console.log('maunally moving')
-
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions } = props
   const { proceedToRouteAndStep } = routeUpdateActions
@@ -44,7 +42,6 @@ export function ManualReplaceLwAndRetry(
     />
   )
   const buildContent = (): JSX.Element => {
-    console.log('building contenct')
     switch (step) {
       case MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE:
         return <GripperIsHoldingLabware {...props} />
