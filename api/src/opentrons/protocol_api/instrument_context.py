@@ -252,6 +252,8 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_aspirate_target(
             target=target
         )
+        # we definitely should have a move_to_location since after this point
+        # target could not be a TrashBin or WasteChute
         assert move_to_location
         if self.api_version >= APIVersion(2, 11):
             instrument.validate_takes_liquid(
@@ -412,16 +414,6 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_dispense_target(
             target=target
         )
-        assert move_to_location
-
-        if self.api_version >= APIVersion(2, 11) and not isinstance(
-            target, (TrashBin, WasteChute)
-        ):
-            instrument.validate_takes_liquid(
-                location=move_to_location,
-                reject_module=self.api_version >= APIVersion(2, 13),
-                reject_adapter=self.api_version >= APIVersion(2, 15),
-            )
 
         if self.api_version >= APIVersion(2, 16):
             c_vol = self._core.get_current_volume() if volume is None else volume
@@ -452,13 +444,26 @@ class InstrumentContext(publisher.CommandPublisher):
                     meniscus_tracking=meniscus_tracking,
                 )
             return self
+        if move_to_location is None:
+            # since target cant be TrashBin or WasteChute past this point,
+            # it has to have a location
+            assert target.location is not None
+            dispense_location: types.Location = target.location
 
+        if self.api_version >= APIVersion(2, 11) and not isinstance(
+            target, (TrashBin, WasteChute)
+        ):
+            instrument.validate_takes_liquid(
+                location=dispense_location,
+                reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
+            )
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.dispense(
                 instrument=self,
                 volume=c_vol,
-                location=move_to_location,
+                location=dispense_location,
                 rate=rate,
                 flow_rate=flow_rate,
             ),
@@ -466,7 +471,7 @@ class InstrumentContext(publisher.CommandPublisher):
             self._core.dispense(
                 volume=c_vol,
                 rate=rate,
-                location=move_to_location,
+                location=dispense_location,
                 well_core=well._core if well is not None else None,
                 flow_rate=flow_rate,
                 in_place=target.in_place,
@@ -2539,7 +2544,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Optional[labware.Well],
         Optional[types.MeniscusTrackingTarget],
     ]:
-        move_to_location: Optional[types.Location] = None
+        move_to_location = None
         well: Optional[labware.Well] = None
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if isinstance(target, validation.WellTarget):
@@ -2565,7 +2570,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Optional[labware.Well],
         Optional[types.MeniscusTrackingTarget],
     ]:
-        move_to_location: Optional[types.Location] = None
+        move_to_location = None
         well: Optional[labware.Well] = None
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if isinstance(target, validation.WellTarget):
