@@ -1,10 +1,11 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
 
 import {
   mockSelectedLwOverview,
   mockActivePipette,
+  MockLPCContentContainer,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -53,20 +54,7 @@ vi.mock(
   })
 )
 vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
-  LPCContentContainer: vi
-    .fn()
-    .mockImplementation(
-      ({ children, header, buttonText, onClickButton, onClickBack }) => (
-        <div data-testid="lpc-content-container">
-          <h2 data-testid="header">{header}</h2>
-          <button onClick={onClickBack} aria-label="Back">
-            Back
-          </button>
-          {children}
-          <button onClick={onClickButton}>{buttonText}</button>
-        </div>
-      )
-    ),
+  LPCContentContainer: MockLPCContentContainer,
 }))
 vi.mock('/app/redux/protocol-runs', () => ({
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset: vi.fn(),
@@ -87,6 +75,7 @@ describe('CheckLabware', () => {
   let mockToggleRobotMoving: Mock
   let mockHandleConfirmLwFinalPosition: Mock
   let mockHandleJog: Mock
+  let mockResetJog: Mock
   let mockHandleResetLwModulesOnDeck: Mock
   let props: ComponentProps<typeof CheckLabware>
 
@@ -104,6 +93,7 @@ describe('CheckLabware', () => {
         setPosition({ x: 100, y: 200, z: 50 })
         return Promise.resolve()
       })
+    mockResetJog = vi.fn().mockResolvedValue(undefined)
     mockHandleResetLwModulesOnDeck = vi.fn().mockResolvedValue(undefined)
 
     props = {
@@ -113,8 +103,10 @@ describe('CheckLabware', () => {
         toggleRobotMoving: mockToggleRobotMoving,
         handleConfirmLwFinalPosition: mockHandleConfirmLwFinalPosition,
         handleJog: mockHandleJog,
+        resetJog: mockResetJog,
         handleResetLwModulesOnDeck: mockHandleResetLwModulesOnDeck,
       } as any,
+      handleAddConfirmedWorkingVector: vi.fn(),
     } as any
 
     vi.mocked(getIsOnDevice).mockReturnValue(false)
@@ -181,16 +173,33 @@ describe('CheckLabware', () => {
     })[0]
   }
 
-  it('renders the component with correct header', () => {
+  it('passes correct header props to LPCContentContainer for desktop', () => {
     render(props)
-    expect(screen.getByTestId('header')).toHaveTextContent(
-      'Test Content Header'
+
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Test Content Header')
+
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute(
+      'data-button-text',
+      'Confirm placement'
     )
+    expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 
-  it('renders the LPCContentContainer component', () => {
+  it('passes correct header props to LPCContentContainer for ODD', () => {
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
     render(props)
-    expect(screen.getByTestId('lpc-content-container')).toBeInTheDocument()
+
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Test Content Header')
+
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute(
+      'data-button-text',
+      'Confirm placement'
+    )
+    expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 
   it('renders the labware jog component', () => {
@@ -198,87 +207,24 @@ describe('CheckLabware', () => {
     expect(screen.getByTestId('mock-labware-jog')).toBeInTheDocument()
   })
 
-  it('renders the confirm button', () => {
-    render(props)
-    expect(screen.getByText(/confirm placement/i)).toBeInTheDocument()
-  })
-
-  it('renders a back button', () => {
-    render(props)
-    expect(screen.getByLabelText('Back')).toBeInTheDocument()
-  })
-
-  it('handles confirm button click correctly', async () => {
+  it('dispatches proceedEditOffsetSubstep on desktop when confirm is clicked', () => {
     render(props)
 
-    const confirmButton = screen.getByText(/confirm placement/i)
-    fireEvent.click(confirmButton)
+    const primaryButton = screen.getByTestId('primary-button')
+    primaryButton.click()
 
-    expect(mockToggleRobotMoving).toHaveBeenCalledWith(true)
-
-    await vi.waitFor(() => {
-      expect(mockHandleConfirmLwFinalPosition).toHaveBeenCalledWith(
-        mockSelectedLwOverview.offsetLocationDetails,
-        mockActivePipette
-      )
-
-      expect(mockDispatch).toHaveBeenCalledWith(
-        setFinalPosition(props.runId, {
-          labwareUri: mockSelectedLwOverview.uri,
-          location: mockSelectedLwOverview.offsetLocationDetails,
-          position: { x: 102, y: 203, z: 51 },
-        })
-      )
-
-      expect(mockDispatch).toHaveBeenCalledWith(
-        proceedEditOffsetSubstep(props.runId)
-      )
-
-      expect(mockToggleRobotMoving).toHaveBeenCalledWith(false)
-    })
+    expect(mockDispatch).toHaveBeenCalledWith(
+      proceedEditOffsetSubstep(props.runId, true)
+    )
   })
 
-  it('handles back button click correctly', async () => {
-    render(props)
-
-    const backButton = screen.getByLabelText('Back')
-    fireEvent.click(backButton)
-
-    expect(mockToggleRobotMoving).toHaveBeenCalledWith(true)
-
-    await vi.waitFor(() => {
-      expect(mockHandleResetLwModulesOnDeck).toHaveBeenCalledWith(
-        mockSelectedLwOverview.offsetLocationDetails
-      )
-      expect(mockDispatch).toHaveBeenCalledWith(
-        goBackEditOffsetSubstep(props.runId)
-      )
-      expect(mockToggleRobotMoving).toHaveBeenCalledWith(false)
-    })
-  })
-
-  it('handles "Move Pipette" button click', () => {
+  it('calls handleAddConfirmedWorkingVector on ODD when confirm is clicked', async () => {
     vi.mocked(getIsOnDevice).mockReturnValue(true)
-
     render(props)
 
-    const moveButton = screen.getAllByText('Move pipette')[1]
-    fireEvent.click(moveButton)
+    const primaryButton = screen.getByTestId('primary-button')
+    primaryButton.click()
 
-    expect(screen.getByTestId('mock-jog-controls')).toBeInTheDocument()
-  })
-
-  it('works with different selector return values', () => {
-    vi.mocked(
-      selectIsSelectedLwTipRack
-    ).mockImplementation((runId: string) => (state: any) => true)
-
-    vi.mocked(
-      selectSelectedLwWithOffsetDetailsMostRecentVectorOffset
-    ).mockImplementation((runId: string) => (state: any) => null)
-
-    render(props)
-
-    expect(screen.getByTestId('lpc-content-container')).toBeInTheDocument()
+    expect(props.handleAddConfirmedWorkingVector).toHaveBeenCalled()
   })
 })

@@ -10,15 +10,18 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { AnnouncementModal } from '../../organisms'
+
+import { AnnouncementModal } from '../../components/organisms'
+import { selectors as analyticsSelectors } from '../../analytics'
 import { selectors as tutorialSelectors } from '../../tutorial'
 import { getFeatureFlagData } from '../../feature-flags/selectors'
-import { selectors as analyticsSelectors } from '../../analytics'
 
-import { AppInfo } from './AppInfo'
-import { UserSettings } from './UserSettings'
-import { Privacy } from './Privacy'
-import { FeatureFlag } from './FeatureFlag'
+import {
+  AppInfo,
+  FeatureFlag,
+  Privacy,
+  UserSettings,
+} from '../../components/organisms/Settings'
 
 const SETTINGS_MAX_WIDTH = '56rem'
 

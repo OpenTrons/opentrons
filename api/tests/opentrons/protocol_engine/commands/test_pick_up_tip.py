@@ -110,6 +110,9 @@ async def test_success(
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                 pipette_id="pipette-id"
             ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id", ready_to_aspirate=True
+            ),
         ),
     )
 

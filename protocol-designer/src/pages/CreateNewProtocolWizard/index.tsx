@@ -40,7 +40,7 @@ import {
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
 import { getNewProtocolModal } from '../../navigation/selectors'
-import { SelectModules } from '../../organisms/SelectModules'
+import { SelectModules } from '../../components/organisms/SelectModules'
 import { SelectRobot } from './SelectRobot'
 import { SelectPipettes } from './SelectPipettes'
 import { SelectGripper } from './SelectGripper'

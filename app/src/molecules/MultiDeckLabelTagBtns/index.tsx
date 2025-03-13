@@ -12,11 +12,12 @@ import {
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
   RESPONSIVENESS,
+  SecondaryButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import { QuaternaryButton, SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
 
 import type { SmallButtonTypes } from '/app/atoms/buttons/SmallButton'
 
@@ -75,11 +76,11 @@ export function MultiDeckLabelTagBtns({
         )}
         <>
           <SmallButton {...colThreePrimaryBtn} css={ODD_ONLY_BUTTON} />
-          <QuaternaryButton {...colThreePrimaryBtn} css={DESKTOP_ONLY_BUTTON}>
+          <SecondaryButton {...colThreePrimaryBtn} css={DESKTOP_ONLY_BUTTON}>
             <StyledText desktopStyle="captionSemiBold">
               {colThreePrimaryBtn.buttonText}
             </StyledText>
-          </QuaternaryButton>
+          </SecondaryButton>
         </>
       </Flex>
     </Flex>

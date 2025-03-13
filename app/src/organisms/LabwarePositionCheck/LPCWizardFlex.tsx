@@ -1,11 +1,7 @@
 import { useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { ModalShell } from '@opentrons/components'
-
-import { getTopPortalEl } from '/app/App/portal'
 import {
   BeforeBeginning,
   HandleLabware,
@@ -14,7 +10,7 @@ import {
   LPCComplete,
 } from '/app/organisms/LabwarePositionCheck/steps'
 import { LPCRobotInMotion } from './LPCRobotInMotion'
-import { LPCErrorModal } from './LPCErrorModal'
+import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
 import {
   useLPCCommands,
@@ -27,7 +23,6 @@ import {
   LPC_STEP,
   selectCurrentStep,
 } from '/app/redux/protocol-runs'
-import { getIsOnDevice } from '/app/redux/config'
 import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
 
 import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
@@ -69,29 +64,12 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   })
 
   return (
-    <LPCWizardFlexComponent
+    <LPCWizardContent
       {...props}
       proceedStep={proceedStep}
       goBackLastStep={goBackLastStep}
       commandUtils={{ ...LPCHandlerUtils, headerCommands }}
     />
-  )
-}
-
-function LPCWizardFlexComponent(props: LPCWizardContentProps): JSX.Element {
-  const isOnDevice = useSelector(getIsOnDevice)
-
-  return isOnDevice ? (
-    <>
-      <LPCWizardContent {...props} />
-    </>
-  ) : (
-    createPortal(
-      <ModalShell width="47rem">
-        <LPCWizardContent {...props} />
-      </ModalShell>,
-      getTopPortalEl()
-    )
   )
 }
 
@@ -110,7 +88,7 @@ function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
     )
   }
   if (errorMessage != null) {
-    return <LPCErrorModal {...props} />
+    return <LPCFatalError {...props} />
   }
   if (unableToDetect) {
     return <LPCProbeNotAttached {...props} />

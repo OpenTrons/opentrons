@@ -1,25 +1,22 @@
 import { HANDLE_LW_SUBSTEP } from '../../../constants'
 
-import type { HandleLwSubstep, LPCWizardState } from '../../../types'
+import type { HandleLwSubstepType, LPCWizardState } from '../../../types'
 
 // Handles proceed to next substep for the "handle labware" core LPC flow.
 // Certain steps require special state updates.
 export function proceedToNextHandleLwSubstep(
-  state: LPCWizardState
+  state: LPCWizardState,
+  isDesktop?: boolean
 ): LPCWizardState {
-  const nextSubstep = getNextHandleLwSubstep(state.steps.currentSubstep)
+  const nextSubstep = getNextHandleLwSubstep(
+    state.steps.currentSubstep,
+    isDesktop
+  )
 
-  // Handle different transitions based on the next substep.
   if (nextSubstep === HANDLE_LW_SUBSTEP.LIST) {
     return handleTransitionToList(state)
   } else if (nextSubstep === HANDLE_LW_SUBSTEP.DETAILS) {
     return handleTransitionToDetails(state)
-  } else if (
-    nextSubstep === HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW &&
-    state.labwareInfo.selectedLabware?.offsetLocationDetails == null
-  ) {
-    console.error('Cannot proceed substep.')
-    return updateCurrentSubstep(state, nextSubstep)
   } else {
     return updateCurrentSubstep(state, nextSubstep)
   }
@@ -32,7 +29,6 @@ export function goBackToPreviousHandleLwSubstep(
 ): LPCWizardState {
   const prevSubstep = getPreviousHandleLwSubstep(state.steps.currentSubstep)
 
-  // Handle different transitions based on the previous substep
   if (prevSubstep === HANDLE_LW_SUBSTEP.LIST) {
     return handleTransitionToList(state)
   } else if (prevSubstep === HANDLE_LW_SUBSTEP.DETAILS) {
@@ -44,8 +40,9 @@ export function goBackToPreviousHandleLwSubstep(
 
 // Get the next substep in the flow.
 function getNextHandleLwSubstep(
-  currentSubstep: HandleLwSubstep | null
-): HandleLwSubstep | null {
+  currentSubstep: HandleLwSubstepType | null,
+  isDesktop?: boolean
+): HandleLwSubstepType | null {
   switch (currentSubstep) {
     case null:
       return HANDLE_LW_SUBSTEP.LIST
@@ -55,15 +52,22 @@ function getNextHandleLwSubstep(
       return HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
     case HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW:
       return HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
-    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW: {
+      if (isDesktop) {
+        return HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
+      } else {
+        return HANDLE_LW_SUBSTEP.DETAILS
+      }
+    }
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS:
       return HANDLE_LW_SUBSTEP.DETAILS
   }
 }
 
 // Get the previous substep in the flow.
 function getPreviousHandleLwSubstep(
-  currentSubstep: HandleLwSubstep | null
-): HandleLwSubstep | null {
+  currentSubstep: HandleLwSubstepType | null
+): HandleLwSubstepType | null {
   switch (currentSubstep) {
     case null:
       return HANDLE_LW_SUBSTEP.LIST
@@ -75,6 +79,8 @@ function getPreviousHandleLwSubstep(
       return HANDLE_LW_SUBSTEP.DETAILS
     case HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW:
       return HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
+    case HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS:
+      return HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
   }
 }
 
@@ -121,7 +127,7 @@ function handleTransitionToDetails(state: LPCWizardState): LPCWizardState {
 // The simple/default update substep state case.
 function updateCurrentSubstep(
   state: LPCWizardState,
-  substep: HandleLwSubstep | null
+  substep: HandleLwSubstepType | null
 ): LPCWizardState {
   return {
     ...state,

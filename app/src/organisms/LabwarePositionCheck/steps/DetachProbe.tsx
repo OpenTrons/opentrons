@@ -10,27 +10,37 @@ import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
+import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 
 export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
-  const { proceedStep, goBackLastStep } = props
+  const { proceedStep, goBackLastStep, commandUtils } = props
   const { t } = useTranslation('labware_position_check')
+
+  const handleGoBack = (): void => {
+    void commandUtils
+      .toggleRobotMoving(true)
+      .then(() => commandUtils.home())
+      .then(() => {
+        goBackLastStep()
+      })
+      .then(() => commandUtils.toggleRobotMoving(false))
+  }
 
   const channelCount = useSelector(selectActivePipetteChannelCount(props.runId))
 
   const probeVideo = (): string => {
     switch (channelCount) {
       case 1:
-        return attachProbe1
+        return detachProbe1
       case 8:
-        return attachProbe8
+        return detachProbe8
       case 96:
-        return attachProbe96
+        return detachProbe96
       default: {
         console.error('Unexpected channel count.')
-        return attachProbe1
+        return detachProbe1
       }
     }
   }
@@ -43,13 +53,17 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
       onClickButton={() => {
         proceedStep()
       }}
-      onClickBack={goBackLastStep}
+      tertiaryBtnProps={{ onClick: handleGoBack, text: t('cancel') }}
+      onClickBack={handleGoBack}
     >
       <TwoColumn>
         <DescriptionContent
           headline={t('detach_probe')}
           message={
-            <StyledText oddStyle="bodyTextRegular">
+            <StyledText
+              oddStyle="bodyTextRegular"
+              desktopStyle="bodyDefaultRegular"
+            >
               <Trans
                 t={t}
                 i18nKey="store_probe"

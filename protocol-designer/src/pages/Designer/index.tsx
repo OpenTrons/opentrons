@@ -19,10 +19,13 @@ import {
   selectDropdownItem,
   selectTerminalItem,
 } from '../../ui/steps/actions/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
-import { DefineLiquidsModal, DesignerNavigation } from '../../organisms'
+import {
+  DefineLiquidsModal,
+  DesignerNavigation,
+} from '../../components/organisms'
 import { selectDesignerTab } from '../../file-data/actions'
 import { getDesignerTab, getFileMetadata } from '../../file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
