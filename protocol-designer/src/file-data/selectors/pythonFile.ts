@@ -53,6 +53,7 @@ export function pythonMetadata(fileMetadata: FileMetadataFields): string {
       subcategory: fileMetadata.subcategory,
       tags: fileMetadata.tags?.length && fileMetadata.tags.join(', '),
       protocolDesigner: process.env.OT_PD_VERSION,
+      source: fileMetadata.source,
     }).filter(([key, value]) => value) // drop blank entries
   )
   return `metadata = ${formatPyDict(stringifiedMetadata)}`
