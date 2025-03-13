@@ -1,0 +1,190 @@
+{
+  "ordering": [
+    ["A1"],
+    ["A2"],
+    ["A3"],
+    ["A4"],
+    ["A5"],
+    ["A6"],
+    ["A7"],
+    ["A8"],
+    ["A9"],
+    ["A10"],
+    ["A11"],
+    ["A12"]
+  ],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": ["999-00260"],
+    "links": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Tough 22mL 12 Well Reservoir",
+    "displayCategory": "reservoir",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 45.3
+  },
+  "wells": {
+    "A1": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 14.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A2": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 23.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A3": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 32.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A4": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 41.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A5": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 50.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A6": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 59.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A7": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 68.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A8": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 77.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A9": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 86.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A10": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 95.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A11": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 104.38,
+      "y": 42.74,
+      "z": 3
+    },
+    "A12": {
+      "depth": 26.85,
+      "shape": "rectangular",
+      "xDimension": 8.31,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 113.38,
+      "y": 42.74,
+      "z": 3
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "wellBottomShape": "v"
+      },
+      "wells": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12"
+      ]
+    }
+  ],
+  "parameters": {
+    "format": "trough",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "loadName": "opentrons_tough_12_reservoir_22ml"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}
