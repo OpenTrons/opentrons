@@ -54,10 +54,8 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
                         print(f"Error in {file_path}")
                         for e in data["errors"]:
                             for w in e["wrappedErrors"]:
-                                print(f"{w['errorInfo']['args']}")
-                                print(f"{w['errorInfo']['class']}")
-                                print(f"{w['errorInfo']['name']}")
-                                print(f"{w['errorInfo']['traceback']}")
+                                for key in w.keys():
+                                    print(f"{w[key]}")
                         files_with_unexpected_errors.append(file_path)
                 else:
                     if not errors_present:
