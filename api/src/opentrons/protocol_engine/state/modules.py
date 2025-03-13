@@ -15,7 +15,6 @@ from typing import (
     Union,
     overload,
 )
-import math
 from numpy import array, dot, double as npdouble
 from numpy.typing import NDArray
 
