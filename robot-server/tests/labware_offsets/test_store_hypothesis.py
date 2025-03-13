@@ -11,6 +11,7 @@ from tempfile import TemporaryDirectory
 from typing import Sequence
 
 import pytest
+import hypothesis
 import hypothesis.strategies as st
 import hypothesis.stateful
 
@@ -21,6 +22,7 @@ from opentrons.protocol_engine import (
     OnAddressableAreaOffsetLocationSequenceComponent,
 )
 from opentrons.protocol_engine.types import (
+    LabwareOffsetLocationSequenceComponents,
     ModuleModel,
 )
 from robot_server.labware_offsets.store import (
@@ -40,6 +42,15 @@ from tests.conftest import make_sql_engine
 
 
 pytestmark = pytest.mark.slow
+
+
+st_ids = st.uuids().map(lambda uuid: str(uuid))
+"""Generates unique (within a single test) strings to use as offset IDs.
+
+Note that we're drawing from st.uuids() even though the subject should be able to handle
+arbitrary, non-UUID strings. st.uuids() is convenient because it's guaranteed to be
+unique.
+"""
 
 
 st_utc_dts = st.datetimes(timezones=st.just(timezone.utc))
@@ -67,6 +78,56 @@ st_location_sequences = st.lists(st_location_components, min_size=1) | st.just(
     ANY_LOCATION
 )
 """Generates locationSequence values."""
+
+
+st_vector_components = st.floats(allow_nan=False, allow_infinity=False)
+st_vectors = st.builds(
+    LabwareOffsetVector,
+    x=st_vector_components,
+    y=st_vector_components,
+    z=st_vector_components,
+)
+"""Generates LabwareOffsetVector values."""
+
+
+@hypothesis.given(
+    id=st_ids,
+    created_at=st_utc_dts,
+    definition_uri=st.text(),
+    location_sequence=st_location_sequences,
+    vector=st_vectors,
+)
+def test_round_trip(
+    id: str,
+    created_at: datetime,
+    definition_uri: str,
+    location_sequence: list[LabwareOffsetLocationSequenceComponents] | AnyLocation,
+    vector: LabwareOffsetVector,
+) -> None:
+    """Test that offsets retrieved are identical to offsets stored."""
+    offset_to_add = IncomingStoredLabwareOffset(
+        id=id,
+        createdAt=created_at,
+        definitionUri=definition_uri,
+        locationSequence=location_sequence,
+        vector=vector,
+    )
+    offset_expected = StoredLabwareOffset(
+        id=id,
+        createdAt=created_at,
+        definitionUri=definition_uri,
+        locationSequence=location_sequence,
+        vector=vector,
+    )
+
+    with TemporaryDirectory() as tmp_dir, make_sql_engine(Path(tmp_dir)) as sql_engine:
+        subject = LabwareOffsetStore(sql_engine)
+        subject.add(offset_to_add)
+        [offset_retrieved_by_get_all] = subject.get_all()
+        [offset_retrieved_by_search] = subject.search([SearchFilter(id=id)])
+
+    assert offset_retrieved_by_get_all == offset_expected
+    assert offset_retrieved_by_search == offset_expected
 
 
 class SimulatedStore:
@@ -165,13 +226,13 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
         sql_engine = self._exit_stack.enter_context(make_sql_engine(temp_dir))
         self._subject = LabwareOffsetStore(sql_engine)
         self._simulated_model = SimulatedStore()
-        self._seen_ids = set[str]()
+        self._added_ids = set[str]()
 
     def teardown(self) -> None:
         """Run by Hypothesis to clean up after the test."""
         self._exit_stack.close()
 
-    @hypothesis.stateful.rule(target=ids, id=st.text())
+    @hypothesis.stateful.rule(target=ids, id=st_ids)
     def add_id_to_bundle(self, id: str) -> str:  # noqa: D102
         return id
 
@@ -198,19 +259,20 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
         created_at: datetime,
         location: list[StoredLabwareOffsetLocationSequenceComponents] | AnyLocation,
     ) -> None:
-        hypothesis.assume(id not in self._seen_ids)
+        hypothesis.assume(id not in self._added_ids)
 
         to_add = IncomingStoredLabwareOffset(
             id=id,
             createdAt=created_at,
             definitionUri=definition_uri,
             locationSequence=location,
-            # todo(mm, 2025-03-10): Draw vectors from Hypothesis.
+            # Note: Constant vector here so Hypothesis doesn't waste time trying
+            # different floats. Different floats are tried in the round-trip test.
             vector=LabwareOffsetVector(x=1, y=2, z=3),
         )
         self._subject.add(to_add)
         self._simulated_model.add(to_add)
-        self._seen_ids.add(to_add.id)
+        self._added_ids.add(to_add.id)
 
     @hypothesis.stateful.rule()
     def get_all(self) -> None:  # noqa: D102
