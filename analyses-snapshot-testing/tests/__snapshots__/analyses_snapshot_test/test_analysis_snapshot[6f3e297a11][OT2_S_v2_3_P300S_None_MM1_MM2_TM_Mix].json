@@ -3155,244 +3155,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.DISPENSE-0",
-      "notes": [],
-      "params": {
-        "flowRate": 46.43,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.ASPIRATE-1",
-      "notes": [],
-      "params": {
-        "flowRate": 46.43,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.DISPENSE-1",
-      "notes": [],
-      "params": {
-        "flowRate": 46.43,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.ASPIRATE-2",
-      "notes": [],
-      "params": {
-        "flowRate": 46.43,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.DISPENSE-2",
-      "notes": [],
-      "params": {
-        "flowRate": 46.43,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.ASPIRATE-3",
-      "notes": [],
-      "params": {
-        "flowRate": 46.43,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.DISPENSE-3",
-      "notes": [],
-      "params": {
-        "flowRate": 46.43,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -3403,7 +3165,34 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "UnboundLocalError [line 18]: local variable 'dispense_location' referenced before assignment",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_S_v2_3_P300S_None_MM1_MM2_TM_Mix.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in mix\n    self.dispense(volume, rate=rate, **dispense_kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "OT2_S_v2_3_P300S_None_MM1_MM2_TM_Mix.py",
@@ -3474,7 +3263,7 @@
       "pipetteName": "p300_single_gen2"
     }
   ],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

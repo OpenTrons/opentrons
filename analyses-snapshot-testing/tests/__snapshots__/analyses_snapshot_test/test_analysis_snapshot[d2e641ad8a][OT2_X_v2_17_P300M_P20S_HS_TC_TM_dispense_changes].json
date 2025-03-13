@@ -3037,83 +3037,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "e5095a66b323544441b6883fe68a5c38",
-      "notes": [],
-      "params": {
-        "flowRate": 7.56,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 0.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -25.85
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 146.88,
-          "y": 42.78,
-          "z": 5.55
-        },
-        "volume": 0.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "error": {
-        "createdAt": "TIMESTAMP",
-        "detail": "Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
-        "errorCode": "4000",
-        "errorInfo": {},
-        "errorType": "InvalidDispenseVolumeError",
-        "id": "UUID",
-        "isDefined": false,
-        "wrappedErrors": []
-      },
-      "id": "UUID",
-      "key": "0bd3f36a944ee534e422ee69360a9501",
-      "notes": [
-        {
-          "longMessage": "Handling this command failure with FAIL_RUN.",
-          "noteKind": "debugErrorRecovery",
-          "shortMessage": "Handling this command failure with FAIL_RUN.",
-          "source": "execution"
-        }
-      ],
-      "params": {
-        "flowRate": 7.56,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 21.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -25.85
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "failed"
     }
   ],
   "config": {
@@ -3127,7 +3050,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "ProtocolCommandFailedError [line 76]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): InvalidDispenseVolumeError: Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
+      "detail": "UnboundLocalError [line 68]: local variable 'dispense_location' referenced before assignment",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3136,24 +3059,18 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "InvalidDispenseVolumeError: Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
           "errorCode": "4000",
-          "errorInfo": {},
-          "errorType": "ProtocolCommandFailedError",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_17_P300M_P20S_HS_TC_TM_dispense_changes.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
           "id": "UUID",
           "isDefined": false,
-          "wrappedErrors": [
-            {
-              "createdAt": "TIMESTAMP",
-              "detail": "Cannot dispense 21.0 µL when only 20.0 µL has been aspirated.",
-              "errorCode": "4000",
-              "errorInfo": {},
-              "errorType": "InvalidDispenseVolumeError",
-              "id": "UUID",
-              "isDefined": false,
-              "wrappedErrors": []
-            }
-          ]
+          "wrappedErrors": []
         }
       ]
     }

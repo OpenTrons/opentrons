@@ -2693,72 +2693,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.DISPENSE-0",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 20.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 20.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.DROP_TIP-0",
-      "notes": [],
-      "params": {
-        "alternateDropLocation": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "scrape_tips": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -2772,7 +2706,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "AttributeError [line 23]: 'InstrumentContext' object has no attribute 'pair_with'",
+      "detail": "UnboundLocalError [line 18]: local variable 'dispense_location' referenced before assignment",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -2781,14 +2715,13 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "AttributeError: 'InstrumentContext' object has no attribute 'pair_with'",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
           "errorCode": "4000",
           "errorInfo": {
-            "args": "(\"'InstrumentContext' object has no attribute 'pair_with'\",)",
-            "class": "AttributeError",
-            "name": "pair_with",
-            "obj": "P300 Single-Channel GEN2 on left mount",
-            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_7_P300S_TwinningError.py\", line N, in run\n"
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_7_P300S_TwinningError.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
           },
           "errorType": "PythonException",
           "id": "UUID",

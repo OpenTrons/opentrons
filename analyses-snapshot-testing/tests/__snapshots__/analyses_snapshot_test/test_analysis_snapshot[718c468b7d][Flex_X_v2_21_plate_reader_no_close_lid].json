@@ -2499,72 +2499,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "f7727e49089030d8d36b4d8af8ff97dc",
-      "notes": [],
-      "params": {
-        "flowRate": 57.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 30.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -9.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 178.28,
-          "y": 172.18,
-          "z": 4.5
-        },
-        "volume": 30.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "3f368c52f4738504283097cb6935a781",
-      "notes": [],
-      "params": {
-        "alternateDropLocation": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "scrape_tips": true,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 288.38,
-          "z": 57.891000000000005
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -2578,7 +2512,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "CannotPerformModuleAction [line 34]: Error 4000 GENERAL_ERROR (CannotPerformModuleAction): Cannot perform Initialize action on Absorbance Reader without calling `.close_lid()` first.",
+      "detail": "UnboundLocalError [line 28]: local variable 'dispense_location' referenced before assignment",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -2587,10 +2521,15 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Cannot perform Initialize action on Absorbance Reader without calling `.close_lid()` first.",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
           "errorCode": "4000",
-          "errorInfo": {},
-          "errorType": "CannotPerformModuleAction",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_21_plate_reader_no_close_lid.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []

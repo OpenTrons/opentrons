@@ -3649,40 +3649,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "ddccee6754fe0092b9c66898d66b79a7",
-      "notes": [],
-      "params": {
-        "flowRate": 160.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 20.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -9.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A2"
-      },
-      "result": {
-        "position": {
-          "x": 23.28,
-          "y": 181.18,
-          "z": 4.5
-        },
-        "volume": 20.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -3696,7 +3662,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "UnexpectedProtocolError [line 22]: Error 4000 GENERAL_ERROR (UnexpectedProtocolError): Cannot return tip to a tiprack while the pipette is configured for partial tip.",
+      "detail": "UnboundLocalError [line 21]: local variable 'dispense_location' referenced before assignment",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3705,10 +3671,15 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Cannot return tip to a tiprack while the pipette is configured for partial tip.",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
           "errorCode": "4000",
-          "errorInfo": {},
-          "errorType": "UnexpectedProtocolError",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_16_P1000_96_TC_PartialTipPickupTryToReturnTip.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []

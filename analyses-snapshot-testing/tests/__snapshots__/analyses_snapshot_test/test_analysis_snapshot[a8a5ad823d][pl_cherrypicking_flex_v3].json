@@ -10084,338 +10084,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "72ee90f7e2d204bd3c4b3a4f4147d58c",
-      "notes": [],
-      "params": {
-        "flowRate": 57.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 1.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -13.78
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A11"
-      },
-      "result": {
-        "position": {
-          "x": 104.38,
-          "y": 181.24,
-          "z": 1.92
-        },
-        "volume": 1.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "a2e6ac47a3f002f9f9a9621f69607713",
-      "notes": [],
-      "params": {
-        "alternateDropLocation": true,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "scrape_tips": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 509.25,
-          "y": 364.0,
-          "z": 40.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "4ce19ecc6f018fb75f0edb3f3b41f4ca",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 172.38,
-          "z": 99.0
-        },
-        "tipDiameter": 5.58,
-        "tipLength": 47.4,
-        "tipVolume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "24f218c0a242b86aa43860dd48e55ade",
-      "notes": [],
-      "params": {
-        "flowRate": 35.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 3.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -25.85
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 42.78,
-          "z": 5.55
-        },
-        "volume": 3.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "7f9a7b49520272e352774d05c9a37e70",
-      "notes": [],
-      "params": {
-        "flowRate": 57.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 3.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -37.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A5"
-      },
-      "result": {
-        "position": {
-          "x": 214.3,
-          "y": 181.15,
-          "z": 4.0
-        },
-        "volume": 3.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "8bb6127a84d52442b5bfc4caa40fa5aa",
-      "notes": [],
-      "params": {
-        "alternateDropLocation": true,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "scrape_tips": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 359.25,
-          "y": 364.0,
-          "z": 40.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "8d290d63112b8a373ceec78f4e02b5cf",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "C1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 163.38,
-          "z": 99.0
-        },
-        "tipDiameter": 5.58,
-        "tipLength": 47.4,
-        "tipVolume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "ca54aa3e1c37f7ccd324e2d84617a7bd",
-      "notes": [],
-      "params": {
-        "flowRate": 35.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 7.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -24.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 391.88,
-          "y": 42.74,
-          "z": 5.55
-        },
-        "volume": 7.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "f459e78311688e93be1631103559a0c5",
-      "notes": [],
-      "params": {
-        "flowRate": 57.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 7.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -37.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "H12"
-      },
-      "result": {
-        "position": {
-          "x": 277.3,
-          "y": 118.15,
-          "z": 4.0
-        },
-        "volume": 7.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "da8532aabec6f9ad3baae80b55a0d977",
-      "notes": [],
-      "params": {
-        "alternateDropLocation": true,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "scrape_tips": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 509.25,
-          "y": 364.0,
-          "z": 40.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -10426,7 +10094,34 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "UnboundLocalError [line 85]: local variable 'dispense_location' referenced before assignment",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"pl_cherrypicking_flex_v3.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/legacy_commands/publisher.py\", line N, in _decorated\n    return func(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in transfer\n    self._execute_transfer(plan)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in _execute_transfer\n    getattr(self, cmd[\"method\"])(*cmd[\"args\"], **cmd[\"kwargs\"])\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "pl_cherrypicking_flex_v3.py",
@@ -10545,7 +10240,7 @@
       "pipetteName": "p50_single_flex"
     }
   ],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }

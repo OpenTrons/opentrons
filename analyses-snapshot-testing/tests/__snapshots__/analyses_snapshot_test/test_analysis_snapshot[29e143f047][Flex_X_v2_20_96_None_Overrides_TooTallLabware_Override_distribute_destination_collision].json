@@ -3909,7 +3909,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "PartialTipMovementNotAllowedError [line 501]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Moving to NEST 96 Well Plate 100 µL PCR Full Skirt in slot D3 with H12 nozzle partial configuration will result in collision with items in deck slot C3.",
+      "detail": "UnboundLocalError [line 501]: local variable 'dispense_location' referenced before assignment",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3918,10 +3918,15 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Moving to NEST 96 Well Plate 100 µL PCR Full Skirt in slot D3 with H12 nozzle partial configuration will result in collision with items in deck slot C3.",
-          "errorCode": "2004",
-          "errorInfo": {},
-          "errorType": "PartialTipMovementNotAllowedError",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_20_96_None_Overrides_TooTallLabware_Override_distribute_destination_collision.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/legacy_commands/publisher.py\", line N, in _decorated\n    return func(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in distribute\n    return self.transfer(volume, source, dest, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/legacy_commands/publisher.py\", line N, in _decorated\n    return func(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in transfer\n    self._execute_transfer(plan)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in _execute_transfer\n    getattr(self, cmd[\"method\"])(*cmd[\"args\"], **cmd[\"kwargs\"])\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []

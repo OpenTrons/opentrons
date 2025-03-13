@@ -1709,183 +1709,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "4350e0ad040c51cc52b61277b5e2b39c",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 32.7,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -36.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 327.65,
-          "z": 43.05
-        },
-        "volume": 32.7
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToWell",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "708c94cef21aca228bc0da89fc3ce725",
-      "notes": [],
-      "params": {
-        "forceDirect": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 5.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 327.65,
-          "z": 84.85
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "09c1223bdf13aee9b67594ba819898e7",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 10.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 5.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B1"
-      },
-      "result": {
-        "position": {
-          "x": 18.21,
-          "y": 327.65,
-          "z": 84.85
-        },
-        "volume": 10.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "67ec30fc58a094ff2f68fe7f7731126f",
-      "notes": [],
-      "params": {
-        "flowRate": 92.86,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 32.699999999999996,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -36.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "B2"
-      },
-      "result": {
-        "position": {
-          "x": 38.1,
-          "y": 327.65,
-          "z": 43.05
-        },
-        "volume": 32.699999999999996
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToAddressableAreaForDropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "38d6283a4e301637e33b8441fb3be449",
-      "notes": [],
-      "params": {
-        "addressableAreaName": "fixedTrash",
-        "alternateDropLocation": true,
-        "forceDirect": false,
-        "ignoreTipConfiguration": true,
-        "offset": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "pipetteId": "UUID"
-      },
-      "result": {
-        "position": {
-          "x": 363.89500000000004,
-          "y": 351.5,
-          "z": 82.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTipInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "11dc6f65cf3d35d4b8f6c3097521e3e8",
-      "notes": [],
-      "params": {
-        "pipetteId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -1896,7 +1719,34 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "UnboundLocalError [line 14]: local variable 'dispense_location' referenced before assignment",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_S_v2_16_P300S_None_verifyNoFloatingPointErrorInPipetting.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/legacy_commands/publisher.py\", line N, in _decorated\n    return func(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in distribute\n    return self.transfer(volume, source, dest, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/legacy_commands/publisher.py\", line N, in _decorated\n    return func(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in transfer\n    self._execute_transfer(plan)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in _execute_transfer\n    getattr(self, cmd[\"method\"])(*cmd[\"args\"], **cmd[\"kwargs\"])\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "OT2_S_v2_16_P300S_None_verifyNoFloatingPointErrorInPipetting.py",
@@ -1932,7 +1782,7 @@
       "pipetteName": "p300_single_gen2"
     }
   ],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

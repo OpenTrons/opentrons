@@ -4945,40 +4945,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "517162d1e8d73c035348a1870a8abc8a",
-      "notes": [],
-      "params": {
-        "flowRate": 160.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 20.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -9.8
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A2"
-      },
-      "result": {
-        "position": {
-          "x": 23.28,
-          "y": 181.18,
-          "z": 4.5
-        },
-        "volume": 20.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -4992,7 +4958,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "PartialTipMovementNotAllowedError [line 26]: Error 2004 MOTION_PLANNING_FAILURE (PartialTipMovementNotAllowedError): Moving to NEST 96 Well Plate 200 µL Flat in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
+      "detail": "UnboundLocalError [line 24]: local variable 'dispense_location' referenced before assignment",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -5001,10 +4967,15 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "Moving to NEST 96 Well Plate 200 µL Flat in slot A2 with A12 nozzle partial configuration will result in collision with thermocycler lid in deck slot A1.",
-          "errorCode": "2004",
-          "errorInfo": {},
-          "errorType": "PartialTipMovementNotAllowedError",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_16_P1000_96_TC_PartialTipPickupThermocyclerLidConflict.py\", line N, in run\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []

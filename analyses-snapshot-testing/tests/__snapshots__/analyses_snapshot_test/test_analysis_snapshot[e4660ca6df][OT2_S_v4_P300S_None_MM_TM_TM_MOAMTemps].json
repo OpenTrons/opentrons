@@ -2474,72 +2474,6 @@
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.DISPENSE-0",
-      "notes": [],
-      "params": {
-        "flowRate": 46.43,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 100.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "volume": 100.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "command.DROP_TIP-0",
-      "notes": [],
-      "params": {
-        "alternateDropLocation": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "scrape_tips": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -2547,7 +2481,34 @@
     "schemaVersion": 4
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "local variable 'dispense_location' referenced before assignment",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "UnexpectedProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/task_queue.py\", line N, in _run\n    await self._run_func()\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/task_queue.py\", line N, in _do_run\n    await func(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/protocol_runner.py\", line N, in run_func\n    await self._protocol_executor.execute(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_runner/python_protocol_wrappers.py\", line N, in execute\n    await to_thread.run_sync(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/to_thread.py\", line N, in run_sync\n    return await get_asynclib().run_sync_in_worker_thread(\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run_sync_in_worker_thread\n    return await future\n\n  File \"/usr/local/lib/python3.10/site-packages/anyio/_backends/_asyncio.py\", line N, in run\n    result = context.run(func, *args)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute.py\", line N, in run_protocol\n    execute_json_v4.dispatch_json(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_json_v4.py\", line N, in dispatch_json\n    pipette_command_map[command_type](  # type: ignore\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_json_v3.py\", line N, in _dispense\n    pipette.dispense(volume, location)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "OT2_S_v4_P300S_None_MM_TM_TM_MOAMTemps.json",
@@ -2627,7 +2588,7 @@
       "pipetteName": "p300_single_gen2"
     }
   ],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-2 Standard",
   "runTimeParameters": []
 }

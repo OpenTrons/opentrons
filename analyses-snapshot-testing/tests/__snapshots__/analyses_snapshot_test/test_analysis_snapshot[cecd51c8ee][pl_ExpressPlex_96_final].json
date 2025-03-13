@@ -12982,486 +12982,6 @@
       "result": {},
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "5fe5263417f962de8b78ea905f7f701d",
-      "notes": [],
-      "params": {
-        "flowRate": 3.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 4.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -13.310000000000002
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 74.24,
-          "z": 2.7499999999999982
-        },
-        "volume": 4.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForDuration",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "40c8e33c4fb3fff303320179384a6a2a",
-      "notes": [],
-      "params": {
-        "seconds": 20.0
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "af6cc9fa6b682bf033a394e8968f3719",
-      "notes": [],
-      "params": {
-        "alternateDropLocation": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "scrape_tips": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 14.38,
-          "y": 181.38,
-          "z": 75.26
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "pickUpTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "dbf0dd3fd84ecbbac05bed7f7fa01aa4",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "top"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 181.38,
-          "z": 110.0
-        },
-        "tipDiameter": 5.58,
-        "tipLength": 47.4,
-        "tipVolume": 50.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirate",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "29b888f91017f1f11be538aff8356de8",
-      "notes": [],
-      "params": {
-        "flowRate": 2.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 6.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -13.810000000000002
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 342.38,
-          "y": 74.24,
-          "z": 2.2499999999999982
-        },
-        "volume": 6.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForDuration",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "371c10302e3b84d6481f1e4b80cba364",
-      "notes": [],
-      "params": {
-        "seconds": 5.0
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispense",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "9ad447590dd6894f018184ac8bf19c53",
-      "notes": [],
-      "params": {
-        "flowRate": 3.0,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "volume": 4.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -13.310000000000002
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 74.24,
-          "z": 2.7499999999999982
-        },
-        "volume": 4.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForDuration",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "bf223e81c9cec47432f7433710f90965",
-      "notes": [],
-      "params": {
-        "seconds": 10.0
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dropTip",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "494bf0750df0a3b1d36334602737349b",
-      "notes": [],
-      "params": {
-        "alternateDropLocation": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "scrape_tips": false,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "origin": "default"
-        },
-        "wellName": "A1"
-      },
-      "result": {
-        "position": {
-          "x": 178.38,
-          "y": 181.38,
-          "z": 75.26
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForResume",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "0056970c0a3f5e7d6a930cf585c43bc0",
-      "notes": [],
-      "params": {
-        "message": "Seal and manually place Reaction Plate 1 onto heater shaker"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveLabware",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "d61ba07fe802a802b29d3857347cdc3b",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "newLocation": {
-          "labwareId": "UUID"
-        },
-        "strategy": "manualMoveWithPause"
-      },
-      "result": {
-        "eventualDestinationLocationSequence": [
-          {
-            "kind": "onLabware",
-            "labwareId": "UUID"
-          },
-          {
-            "addressableAreaName": "heaterShakerV1A1",
-            "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
-            "cutoutId": "cutoutA1",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "heaterShakerModuleV1"
-            ]
-          }
-        ],
-        "immediateDestinationLocationSequence": [
-          {
-            "kind": "onLabware",
-            "labwareId": "UUID"
-          },
-          {
-            "addressableAreaName": "heaterShakerV1A1",
-            "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
-            "cutoutId": "cutoutA1",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "heaterShakerModuleV1"
-            ]
-          }
-        ],
-        "originLocationSequence": [
-          {
-            "addressableAreaName": "D2",
-            "kind": "onAddressableArea"
-          },
-          {
-            "cutoutId": "cutoutD2",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
-          }
-        ]
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "heaterShaker/closeLabwareLatch",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "12c574a5ed5502c1881a6d5876d7d7ba",
-      "notes": [],
-      "params": {
-        "moduleId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "heaterShaker/setAndWaitForShakeSpeed",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "715401dfd26b1b2d4253567a6aee394d",
-      "notes": [],
-      "params": {
-        "moduleId": "UUID",
-        "rpm": 3000.0
-      },
-      "result": {
-        "pipetteRetracted": false
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForDuration",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "c8a353f35afdf6233b2067b8cf2b31fe",
-      "notes": [],
-      "params": {
-        "seconds": 90.0
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "heaterShaker/deactivateShaker",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "155ee8e35a92e405256b027ae70093db",
-      "notes": [],
-      "params": {
-        "moduleId": "UUID"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "heaterShaker/openLabwareLatch",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "272492001745b6244e4aa03254682658",
-      "notes": [],
-      "params": {
-        "moduleId": "UUID"
-      },
-      "result": {
-        "pipetteRetracted": false
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveLabware",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "3c0903b3a8511a36b2b34fdfb286fa3b",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "newLocation": "offDeck",
-        "strategy": "manualMoveWithPause"
-      },
-      "result": {
-        "eventualDestinationLocationSequence": [
-          {
-            "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
-          }
-        ],
-        "immediateDestinationLocationSequence": [
-          {
-            "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
-          }
-        ],
-        "originLocationSequence": [
-          {
-            "kind": "onLabware",
-            "labwareId": "UUID"
-          },
-          {
-            "addressableAreaName": "heaterShakerV1A1",
-            "kind": "onAddressableArea"
-          },
-          {
-            "kind": "onModule",
-            "moduleId": "UUID"
-          },
-          {
-            "cutoutId": "cutoutA1",
-            "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "heaterShakerModuleV1"
-            ]
-          }
-        ]
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "bf838dffd023f6816dcd72e73bfa79ae",
-      "notes": [],
-      "params": {
-        "message": "Seal and place Reagent Plate 1 into preprogrammed thermocycler"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "home",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "1d899c0e261908578543773daece5508",
-      "notes": [],
-      "params": {},
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
     }
   ],
   "config": {
@@ -13472,7 +12992,34 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "UnboundLocalError [line 90]: local variable 'dispense_location' referenced before assignment",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "UnboundLocalError: local variable 'dispense_location' referenced before assignment",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "(\"local variable 'dispense_location' referenced before assignment\",)",
+            "class": "UnboundLocalError",
+            "name": "None",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"pl_ExpressPlex_96_final.py\", line N, in run\n\n  File \"pl_ExpressPlex_96_final.py\", line N, in Index_transfer\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/api_support/util.py\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/instrument_context.py\", line N, in dispense\n    location=dispense_location,\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "BioRad_96_Well_Plate_200_uL.json",
@@ -13514,7 +13061,9 @@
       "displayName": "Reaction Plate_1",
       "id": "UUID",
       "loadName": "biorad_96_wellplate_200ul_pcr",
-      "location": "offDeck"
+      "location": {
+        "slotName": "D2"
+      }
     },
     {
       "definitionUri": "custom_beta/biorad_96_wellplate_200ul_pcr/1",
@@ -13611,7 +13160,7 @@
       "pipetteName": "p1000_96"
     }
   ],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
   "runTimeParameters": []
 }
