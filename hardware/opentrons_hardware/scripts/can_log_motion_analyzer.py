@@ -642,9 +642,11 @@ def _print_durations(records_to_check: Iterator[RecordTypeVar]) -> None:
                 previous_observed_duration = new_move_group["time"] - previous_move_group["time"]
                 if previous_move_group["home-or-sync"]:
                     displayed_duration = previous_observed_duration
-                    error_msg += "ERROR(unpredictable-duration)"
+                    error_msg += "ERROR(unpredictable-home-or-probe-duration)"
                 else:
                     displayed_duration = previous_move_group["duration"]
+                if displayed_duration == 0.0:
+                    error_msg += "ERROR(unexpected-execute-command)"
                 previous_system_delay_seconds = previous_observed_duration - displayed_duration
                 error_msg += "ERROR(negative-delay) " if previous_system_delay_seconds < 0 else ""
                 error_msg += "ERROR(very-large-delay) " if previous_system_delay_seconds > 0.5 else ""
