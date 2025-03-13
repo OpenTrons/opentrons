@@ -96,5 +96,6 @@
   "unsuccessfully_sent": "Unsuccessfully sent",
   "value_out_of_range": "Value must be between {{min}}-{{max}}",
   "view_run_details": "View run details",
-  "view_unavailable_robots": "View unavailable robots on the Devices page"
+  "view_unavailable_robots": "View unavailable robots on the Devices page",
+  "with_lid_name": "with {{lid}}"
 }
