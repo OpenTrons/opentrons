@@ -412,6 +412,7 @@ class InstrumentContext(publisher.CommandPublisher):
         move_to_location, well, meniscus_tracking = self._handle_dispense_target(
             target=target
         )
+        assert move_to_location
 
         if self.api_version >= APIVersion(2, 11) and not isinstance(
             target, (TrashBin, WasteChute)
@@ -2560,9 +2561,11 @@ class InstrumentContext(publisher.CommandPublisher):
     def _handle_dispense_target(
         self, target: validation.ValidTarget
     ) -> tuple[
-        types.Location, Optional[labware.Well], Optional[types.MeniscusTrackingTarget]
+        Optional[types.Location],
+        Optional[labware.Well],
+        Optional[types.MeniscusTrackingTarget],
     ]:
-        move_to_location: types.Location
+        move_to_location: Optional[types.Location] = None
         well: Optional[labware.Well] = None
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if isinstance(target, validation.WellTarget):
