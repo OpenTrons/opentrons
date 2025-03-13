@@ -34,6 +34,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         self._limit_switch_status = LimitSwitchStatus(False, False, False, False, False)
         self._platform_sensor_status = PlatformStatus(False, False)
         self._door_closed = True
+        self._install_detected = True
         self._connected = True
         self._stallgard_threshold = {
             a: StallGuardParams(a, False, 0) for a in StackerAxis
@@ -223,6 +224,14 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         :return: True if door is closed, False otherwise
         """
         return self._door_closed
+
+    @ensure_yield
+    async def get_installation_detected(self) -> bool:
+        """Get whether or not installation is detected.
+
+        :return: True if installation is detected, False otherwise
+        """
+        return self._install_detected
 
     @ensure_yield
     async def move_in_mm(
