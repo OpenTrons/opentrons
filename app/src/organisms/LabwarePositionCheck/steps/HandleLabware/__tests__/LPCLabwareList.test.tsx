@@ -1,19 +1,23 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import {
+  MockLPCContentContainer,
+  mockLabwareInfo,
+} from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
-import { mockLabwareInfo } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { LPCLabwareList } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareList'
-import { clickButtonLabeled } from '/app/organisms/LabwarePositionCheck/__tests__/utils'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   selectAllLabwareInfo,
   selectIsDefaultOffsetAbsent,
   selectCountLocationSpecificOffsetsForLw,
   selectStepInfo,
   setSelectedLabwareUri,
+  selectIsDefaultOffsetMissing,
   proceedEditOffsetSubstep,
 } from '/app/redux/protocol-runs'
 
@@ -28,9 +32,16 @@ vi.mock('react-redux', async () => {
   }
 })
 
+vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
+  LPCContentContainer: MockLPCContentContainer,
+}))
+
+vi.mock('/app/redux/config')
+
 vi.mock('/app/redux/protocol-runs', () => ({
   selectAllLabwareInfo: vi.fn(),
   selectIsDefaultOffsetAbsent: vi.fn(),
+  selectIsDefaultOffsetMissing: vi.fn(),
   selectCountLocationSpecificOffsetsForLw: vi.fn(),
   selectStepInfo: vi.fn(),
   setSelectedLabwareUri: vi.fn(),
@@ -69,6 +80,7 @@ describe('LPCLabwareList', () => {
     mockDispatch = vi.fn()
 
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
 
     props = {
       ...mockLPCContentProps,
@@ -81,7 +93,6 @@ describe('LPCLabwareList', () => {
       },
     }
 
-    // Mock the action creators
     vi.mocked(setSelectedLabwareUri).mockReturnValue({
       type: 'SET_SELECTED_LABWARE_URI',
     } as any)
@@ -89,12 +100,10 @@ describe('LPCLabwareList', () => {
       type: 'PROCEED_EDIT_OFFSET_SUBSTEP',
     } as any)
 
-    // Make sure we properly mock the selectors to use our state correctly
     vi.mocked(
       selectStepInfo
     ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
 
-    // This is the critical change - make sure it correctly returns the mockLabwareInfo
     vi.mocked(
       selectAllLabwareInfo
     ).mockImplementation((runId: string) => (state: any) => mockLabwareInfo)
@@ -106,20 +115,39 @@ describe('LPCLabwareList', () => {
     )
 
     vi.mocked(
+      selectIsDefaultOffsetMissing
+    ).mockImplementation((runId: string, uri: string) => (state: any) =>
+      uri === 'labware-uri-1'
+    )
+
+    vi.mocked(
       selectCountLocationSpecificOffsetsForLw
     ).mockImplementation((runId: string, uri: string) => (state: any) =>
       uri === 'labware-uri-2' ? 2 : 1
     )
   })
 
-  it('renders appropriate header content and onClick behavior', () => {
+  it('passes correct header props to LPCContentContainer for desktop', () => {
     render(props)
 
-    screen.getByText('Labware Position Check')
-    screen.getByText('Exit')
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Labware Position Check')
 
-    clickButtonLabeled('Exit')
-    expect(mockHandleNavToDetachProbe).toHaveBeenCalled()
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Continue')
+    expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
+  })
+
+  it('passes correct header props to LPCContentContainer for ODD', () => {
+    vi.mocked(getIsOnDevice).mockReturnValue(true)
+    render(props)
+
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Labware Position Check')
+
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Exit')
+    expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 
   it('renders all labware items', () => {
@@ -135,26 +163,15 @@ describe('LPCLabwareList', () => {
       selectIsDefaultOffsetAbsent
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
     vi.mocked(
+      selectIsDefaultOffsetMissing
+    ).mockImplementation((runId: any, uri: any) => (state: any) => false)
+    vi.mocked(
       selectCountLocationSpecificOffsetsForLw
     ).mockImplementation((runId: any, uri: any) => (state: any) => 1)
 
     render(props)
 
     screen.getByText('Labware 1')
-  })
-
-  it('handles labware item click correctly', () => {
-    render(props)
-
-    const labware1Item = screen.getByText('Labware 1')
-    fireEvent.click(labware1Item)
-
-    expect(mockDispatch).toHaveBeenCalledTimes(2)
-    expect(setSelectedLabwareUri).toHaveBeenCalledWith(
-      props.runId,
-      'labware-uri-1'
-    )
-    expect(proceedEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
   })
 
   it('shows "one missing offset" message when default offset is absent', () => {
@@ -168,6 +185,9 @@ describe('LPCLabwareList', () => {
     vi.mocked(
       selectIsDefaultOffsetAbsent
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
+    vi.mocked(
+      selectIsDefaultOffsetMissing
+    ).mockImplementation((runId: any, uri: any) => (state: any) => false)
 
     render(props)
 
@@ -178,6 +198,9 @@ describe('LPCLabwareList', () => {
   it('shows multiple missing offsets message correctly', () => {
     vi.mocked(
       selectIsDefaultOffsetAbsent
+    ).mockImplementation((runId: any, uri: any) => (state: any) => true)
+    vi.mocked(
+      selectIsDefaultOffsetMissing
     ).mockImplementation((runId: any, uri: any) => (state: any) => true)
     vi.mocked(
       selectCountLocationSpecificOffsetsForLw

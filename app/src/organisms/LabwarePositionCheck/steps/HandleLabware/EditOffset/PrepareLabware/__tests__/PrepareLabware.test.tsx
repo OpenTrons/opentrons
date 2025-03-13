@@ -1,10 +1,11 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
 
 import {
   mockSelectedLwOverview,
   mockActivePipette,
+  MockLPCContentContainer,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -47,20 +48,7 @@ vi.mock(
   })
 )
 vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
-  LPCContentContainer: vi
-    .fn()
-    .mockImplementation(
-      ({ children, header, buttonText, onClickButton, onClickBack }) => (
-        <div data-testid="lpc-content-container">
-          <h2 data-testid="header">{header}</h2>
-          <button onClick={onClickBack} aria-label="Back">
-            Back
-          </button>
-          {children}
-          <button onClick={onClickButton}>{buttonText}</button>
-        </div>
-      )
-    ),
+  LPCContentContainer: MockLPCContentContainer,
 }))
 vi.mock('/app/molecules/InterventionModal', () => ({
   TwoColumn: vi
@@ -157,16 +145,18 @@ describe('PrepareLabware', () => {
     })[0]
   }
 
-  it('renders the component with correct header', () => {
+  it('passes correct header props to LPCContentContainer', () => {
     render(props)
-    expect(screen.getByTestId('header')).toHaveTextContent(
-      'Test Content Header'
-    )
-  })
 
-  it('renders the LPCContentContainer component', () => {
-    render(props)
-    expect(screen.getByTestId('lpc-content-container')).toBeInTheDocument()
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Test Content Header')
+
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute(
+      'data-button-text',
+      'Confirm placement'
+    )
+    expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 
   it('renders the LPCDeck component', () => {
@@ -181,21 +171,11 @@ describe('PrepareLabware', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders the confirm button', () => {
-    render(props)
-    expect(screen.getByText('Confirm placement')).toBeInTheDocument()
-  })
-
-  it('renders a back button', () => {
-    render(props)
-    expect(screen.getByLabelText('Back')).toBeInTheDocument()
-  })
-
   it('handles confirm button click correctly', async () => {
     render(props)
 
-    const confirmButton = screen.getByText('Confirm placement')
-    fireEvent.click(confirmButton)
+    const primaryButton = screen.getByTestId('primary-button')
+    primaryButton.click()
 
     expect(mockToggleRobotMoving).toHaveBeenCalledWith(true)
 
@@ -219,14 +199,5 @@ describe('PrepareLabware', () => {
       expect(mockProceedSubstep).toHaveBeenCalled()
       expect(mockToggleRobotMoving).toHaveBeenCalledWith(false)
     })
-  })
-
-  it('handles back button click correctly', () => {
-    render(props)
-
-    const backButton = screen.getByLabelText('Back')
-    fireEvent.click(backButton)
-
-    expect(mockGoBackSubstep).toHaveBeenCalled()
   })
 })

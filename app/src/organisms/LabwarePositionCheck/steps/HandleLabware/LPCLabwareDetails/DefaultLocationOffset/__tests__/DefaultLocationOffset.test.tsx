@@ -15,6 +15,7 @@ import {
   selectMostRecentVectorOffsetForLwWithOffsetDetails,
   setSelectedLabware,
   proceedEditOffsetSubstep,
+  selectSelectedLwDisplayName,
 } from '/app/redux/protocol-runs'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
 
@@ -48,6 +49,7 @@ vi.mock(
 vi.mock('/app/redux/protocol-runs', () => ({
   selectSelectedLwDefaultOffsetDetails: vi.fn(),
   selectMostRecentVectorOffsetForLwWithOffsetDetails: vi.fn(),
+  selectSelectedLwDisplayName: vi.fn(),
   setSelectedLabware: vi.fn(),
   proceedEditOffsetSubstep: vi.fn(),
 }))
@@ -91,6 +93,10 @@ describe('DefaultLocationOffset', () => {
     vi.mocked(
       selectSelectedLwDefaultOffsetDetails
     ).mockImplementation((runId: string) => () => mockDefaultOffsetDetails)
+
+    vi.mocked(
+      selectSelectedLwDisplayName
+    ).mockImplementation((runId: string) => () => 'mock-lw-name')
 
     vi.mocked(
       selectMostRecentVectorOffsetForLwWithOffsetDetails

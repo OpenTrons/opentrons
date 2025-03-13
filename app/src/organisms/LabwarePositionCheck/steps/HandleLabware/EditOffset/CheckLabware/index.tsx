@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import { css } from 'styled-components'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  COLORS,
   DIRECTION_COLUMN,
   Flex,
   getLabwareDisplayLocation,
-  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_FLEX_END,
   LegacyStyledText,
-  PrimaryButton,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -24,15 +24,13 @@ import {
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
+import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
 import { JogControls } from '/app/molecules/JogControls'
 import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   selectActivePipette,
   selectIsSelectedLwTipRack,
   selectSelectedLwOverview,
-  setFinalPosition,
   goBackEditOffsetSubstep,
   proceedEditOffsetSubstep,
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
@@ -43,7 +41,7 @@ import { LPCLabwareJogRender } from '/app/organisms/LabwarePositionCheck/steps/H
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
-import type { LoadedPipette } from '@opentrons/shared-data'
+import type { LoadedPipette, Coordinates } from '@opentrons/shared-data'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { DisplayLocationParams } from '@opentrons/components'
 import type {
@@ -54,15 +52,16 @@ import type {
 import type { State } from '/app/redux/types'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
-const LPC_HELP_LINK_URL =
-  'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
+interface CheckLabwareProps extends EditOffsetContentProps {
+  handleAddConfirmedWorkingVector: () => void
+}
 
-export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
+export function CheckLabware(props: CheckLabwareProps): JSX.Element {
   const { runId, commandUtils, contentHeader } = props
   const {
     toggleRobotMoving,
-    handleConfirmLwFinalPosition,
     handleJog,
+    resetJog,
     handleResetLwModulesOnDeck,
   } = commandUtils
   const { t } = useTranslation('labware_position_check')
@@ -89,8 +88,6 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
   const [joggedPosition, setJoggedPosition] = useState<VectorOffset>(
     workingInitialOffset
   )
-
-  const [showOddJogControls, setShowOddJogControls] = useState(false)
 
   const liveOffset = getVectorSum(
     mostRecentVector ?? IDENTITY_VECTOR,
@@ -128,29 +125,11 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
     ...buildDisplayParams(),
   })
 
-  const buildHeader = (): string =>
+  const buildSectionHeader = (): string =>
     t('check_item_in_location', {
       item: isLwTiprack ? t('tip_rack') : t('labware'),
       location: slotOnlyDisplayLocation,
     })
-
-  const handleProceed = (): void => {
-    void toggleRobotMoving(true)
-      .then(() => handleConfirmLwFinalPosition(offsetLocationDetails, pipette))
-      .then(position => {
-        dispatch(
-          setFinalPosition(runId, {
-            labwareUri: selectedLwInfo.uri,
-            location: offsetLocationDetails,
-            position,
-          })
-        )
-      })
-      .then(() => {
-        dispatch(proceedEditOffsetSubstep(runId))
-      })
-      .finally(() => toggleRobotMoving(false))
-  }
 
   const handleGoBack = (): void => {
     void toggleRobotMoving(true)
@@ -161,7 +140,68 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
       .finally(() => toggleRobotMoving(false))
   }
 
-  // TODO(jh, 03-07-25): Componentize this further during the desktop view refactor.
+  const handleResetJog = (): void => {
+    void resetJog(
+      offsetLocationDetails,
+      pipette.id,
+      mostRecentVector ?? IDENTITY_VECTOR
+    ).then(() => {
+      setJoggedPosition(workingInitialOffset)
+    })
+  }
+
+  return isOnDevice ? (
+    <CheckLabwareContentODD
+      {...props}
+      contentHeader={contentHeader}
+      sectionHeader={buildSectionHeader()}
+      handleGoBack={handleGoBack}
+      handleResetJog={handleResetJog}
+      liveOffset={liveOffset}
+      isLwTiprack={isLwTiprack}
+      setJoggedPosition={setJoggedPosition}
+    />
+  ) : (
+    <CheckLabwareContentDesktop
+      {...props}
+      contentHeader={contentHeader}
+      sectionHeader={buildSectionHeader()}
+      handleGoBack={handleGoBack}
+      handleResetJog={handleResetJog}
+      liveOffset={liveOffset}
+      isLwTiprack={isLwTiprack}
+      setJoggedPosition={setJoggedPosition}
+    />
+  )
+}
+
+interface CheckLabwareContentProps extends CheckLabwareProps {
+  contentHeader: string
+  sectionHeader: string
+  handleGoBack: () => void
+  handleResetJog: () => void
+  setJoggedPosition: (vector: VectorOffset) => void
+  liveOffset: Coordinates
+  isLwTiprack: boolean
+}
+
+function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
+  const { t } = useTranslation('labware_position_check')
+  const {
+    contentHeader,
+    sectionHeader,
+    handleAddConfirmedWorkingVector,
+    handleGoBack,
+    isLwTiprack,
+    liveOffset,
+    setJoggedPosition,
+  } = props
+  const [showOddJogControls, setShowOddJogControls] = useState(false)
+
+  const handleProceed = (): void => {
+    handleAddConfirmedWorkingVector()
+  }
+
   return (
     <>
       <LPCContentContainer
@@ -174,14 +214,12 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
         <Flex css={CONTENT_CONTAINER_STYLE}>
           <Flex css={CONTENT_GRID_STYLE}>
             <Flex css={INFO_CONTAINER_STYLE}>
-              <Header>{buildHeader()}</Header>
+              <StyledText oddStyle="level4HeaderSemiBold">
+                {sectionHeader}
+              </StyledText>
               <Trans
                 t={t}
-                i18nKey={
-                  isOnDevice
-                    ? 'ensure_nozzle_position_odd'
-                    : 'ensure_nozzle_position_desktop'
-                }
+                i18nKey={'ensure_nozzle_position_odd'}
                 values={{
                   tip_type: t('calibration_probe'),
                   item_location: isLwTiprack
@@ -196,7 +234,10 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
               <Flex css={OFFSET_CONTAINER_STYLE}>
                 {/* TODO(jh, 03-07-25): smallBodyTextSemiBold does not display proper font weight. */}
                 {/* Work with Design to update this. */}
-                <StyledText css={OFFSET_COPY_STYLE}>
+                <StyledText
+                  css={OFFSET_COPY_STYLE}
+                  desktopStyle="bodyDefaultSemiBold"
+                >
                   {t('labware_offset_data')}
                 </StyledText>
                 <OffsetTag kind="vector" {...liveOffset} />
@@ -214,21 +255,6 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
               }}
             />
           </Flex>
-          <Flex css={DESKTOP_BOTTOM_CONTENT_CONTAINER_STYLE}>
-            <JogControls
-              jog={(axis, direction, step, _onSuccess) =>
-                handleJog(axis, direction, step, setJoggedPosition)
-              }
-            />
-            <Flex css={FOOTER_CONTAINER_STYLE}>
-              <NeedHelpLink href={LPC_HELP_LINK_URL} />
-              <Flex css={BUTTON_GROUP_STYLE}>
-                <PrimaryButton onClick={handleProceed}>
-                  {t('shared:confirm_position')}
-                </PrimaryButton>
-              </Flex>
-            </Flex>
-          </Flex>
         </Flex>
       </LPCContentContainer>
       {showOddJogControls && (
@@ -244,21 +270,129 @@ export function CheckLabware(props: EditOffsetContentProps): JSX.Element {
   )
 }
 
+function CheckLabwareContentDesktop(
+  props: CheckLabwareContentProps
+): JSX.Element {
+  const { t } = useTranslation('labware_position_check')
+  const {
+    contentHeader,
+    sectionHeader,
+    handleGoBack,
+    isLwTiprack,
+    liveOffset,
+    handleResetJog,
+    setJoggedPosition,
+    commandUtils,
+    runId,
+  } = props
+  const dispatch = useDispatch()
+
+  const handleProceed = (): void => {
+    dispatch(proceedEditOffsetSubstep(runId, true))
+  }
+
+  return (
+    <LPCContentContainer
+      {...props}
+      header={contentHeader}
+      buttonText={t('confirm_placement')}
+      onClickButton={handleProceed}
+      onClickBack={handleGoBack}
+      containerStyle={DESKTOP_CONTAINER_STYLE}
+      contentStyle={DESKTOP_CONTENT_CONTAINER_STYLE}
+    >
+      <Flex css={CONTENT_CONTAINER_STYLE}>
+        <Flex css={CONTENT_GRID_STYLE}>
+          <Flex css={INFO_CONTAINER_STYLE}>
+            <StyledText desktopStyle="headingSmallBold">
+              {sectionHeader}
+            </StyledText>
+            <Trans
+              t={t}
+              i18nKey={'ensure_nozzle_position_desktop'}
+              values={{
+                tip_type: t('calibration_probe'),
+                item_location: isLwTiprack
+                  ? t('check_tip_location')
+                  : t('check_well_location'),
+              }}
+              components={{
+                block: <LegacyStyledText as="p" />,
+                bold: <strong />,
+              }}
+            />
+            <Flex css={OFFSET_CONTAINER_STYLE}>
+              {/* TODO(jh, 03-07-25): smallBodyTextSemiBold does not display proper font weight. */}
+              {/* Work with Design to update this. */}
+              <StyledText
+                css={OFFSET_COPY_STYLE}
+                desktopStyle="bodyDefaultSemiBold"
+              >
+                {t('labware_offset_data')}
+              </StyledText>
+              <OffsetTag kind="vector" {...liveOffset} />
+            </Flex>
+          </Flex>
+          <LPCLabwareJogRender {...props} />
+        </Flex>
+        <Flex css={DESKTOP_BOTTOM_CONTENT_CONTAINER_STYLE}>
+          <JogControls
+            jog={(axis, direction, step, _onSuccess) =>
+              commandUtils.handleJog(axis, direction, step, setJoggedPosition)
+            }
+          />
+          <Flex css={JOG_TOO_FAR_CONTAINER}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('jog_too_far')}
+            </StyledText>
+            <TextOnlyButton
+              onClick={handleResetJog}
+              buttonText={
+                <StyledText
+                  desktopStyle="bodyDefaultRegLink"
+                  color={COLORS.black90}
+                >
+                  {t('start_over')}
+                </StyledText>
+              }
+            />
+          </Flex>
+        </Flex>
+      </Flex>
+    </LPCContentContainer>
+  )
+}
+
 const CONTENT_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   height: 100%;
   width: 100%;
+
+  flex-direction: ${DIRECTION_COLUMN};
+  gap: ${SPACING.spacing40};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    gap: 0;
+  }
 `
 
 const CONTENT_GRID_STYLE = css`
-  grid-gap: ${SPACING.spacing24};
+  grid-gap: ${SPACING.spacing40};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing24};
+  }
 `
 
 const INFO_CONTAINER_STYLE = css`
   flex: 1;
   flex-direction: ${DIRECTION_COLUMN};
-  grid-gap: ${SPACING.spacing24};
+  grid-gap: ${SPACING.spacing16};
   align-items: ${ALIGN_FLEX_START};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-gap: ${SPACING.spacing24};
+  }
 `
 
 const OFFSET_CONTAINER_STYLE = css`
@@ -274,38 +408,30 @@ const OFFSET_COPY_STYLE = css`
   }
 `
 
-const FOOTER_CONTAINER_STYLE = css`
-  width: 100%;
-  margin-top: ${SPACING.spacing32};
-  justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  align-items: ${ALIGN_CENTER};
-`
-
-const BUTTON_GROUP_STYLE = css`
-  grid-gap: ${SPACING.spacing8};
-  align-items: ${ALIGN_CENTER};
-`
-
-const Header = styled.h1`
-  ${TYPOGRAPHY.h1Default}
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    ${TYPOGRAPHY.level4HeaderSemiBold}
-  }
-`
-
 const ODD_BOTTOM_CONTENT_CONTAINER_STYLE = css`
   margin-top: auto;
-
-  @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    display: none;
-  }
 `
 
 const DESKTOP_BOTTOM_CONTENT_CONTAINER_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
+  gap: ${SPACING.spacing8};
+`
 
-  @media (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
-    display: none;
-  }
+const JOG_TOO_FAR_CONTAINER = css`
+  gap: ${SPACING.spacing4};
+  justify-content: ${JUSTIFY_FLEX_END};
+  align-items: ${ALIGN_CENTER};
+`
+
+// The design system makes a height exception for this view.
+const DESKTOP_CONTAINER_STYLE = css`
+  height: 39.25rem;
+  width: 47rem;
+`
+const DESKTOP_CONTENT_CONTAINER_STYLE = css`
+  height: 35.5rem;
+  flex-direction: ${DIRECTION_COLUMN};
+  padding: ${SPACING.spacing24};
+  gap: ${SPACING.spacing24};
+  overflow-y: hidden;
 `

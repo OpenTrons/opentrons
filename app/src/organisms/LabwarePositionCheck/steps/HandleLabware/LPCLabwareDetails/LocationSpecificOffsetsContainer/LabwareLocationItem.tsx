@@ -8,6 +8,7 @@ import {
   MODULE_ICON_NAME_BY_TYPE,
   COLORS,
   BORDERS,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 import { getModuleType } from '@opentrons/shared-data'
 
@@ -141,6 +142,11 @@ export function LabwareLocationItem({
 }
 
 const DECK_LABEL_CONTAINER_STYLE = css`
-  background-color: ${COLORS.grey35};
-  border-radius: ${BORDERS.borderRadius8};
+  background-color: ${COLORS.grey20};
+  border-radius: ${BORDERS.borderRadius4};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    background-color: ${COLORS.grey35};
+    border-radius: ${BORDERS.borderRadius8};
+  }
 `

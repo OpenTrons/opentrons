@@ -11,7 +11,6 @@ import {
   LPC_STEPS,
   PROCEED_HANDLE_LW_SUBSTEP,
   GO_BACK_HANDLE_LW_SUBSTEP,
-  HANDLE_LW_SUBSTEP,
   RESET_OFFSET_TO_DEFAULT,
   CLEAR_WORKING_OFFSETS,
 } from '../constants'
@@ -65,18 +64,12 @@ export function LPCReducer(
           }
         }
 
-        const currentStepName = state.steps.all[newStepIdx()]
-
         return {
           ...state,
           steps: {
             ...state.steps,
             currentStepIndex: newStepIdx(),
             lastStepIndices: [...(lastStepIndices ?? []), currentStepIndex],
-            currentSubstep:
-              currentStepName === 'HANDLE_LABWARE'
-                ? HANDLE_LW_SUBSTEP.LIST
-                : null,
           },
         }
       }
@@ -97,7 +90,8 @@ export function LPCReducer(
       }
 
       case PROCEED_HANDLE_LW_SUBSTEP: {
-        return proceedToNextHandleLwSubstep(state)
+        const { isDesktop } = action.payload
+        return proceedToNextHandleLwSubstep(state, isDesktop)
       }
 
       case GO_BACK_HANDLE_LW_SUBSTEP: {

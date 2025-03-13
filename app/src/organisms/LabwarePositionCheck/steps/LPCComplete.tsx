@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+import { useSelector } from 'react-redux'
 
 import {
   DIRECTION_COLUMN,
@@ -11,6 +12,7 @@ import {
 } from '@opentrons/components'
 
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import { getIsOnDevice } from '/app/redux/config'
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
 
@@ -18,6 +20,7 @@ import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/
 
 export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
+  const isOnDevice = useSelector(getIsOnDevice)
 
   return (
     <LPCContentContainer
@@ -25,11 +28,13 @@ export function LPCComplete(props: LPCWizardContentProps): JSX.Element {
       header={t('labware_position_check_title')}
       buttonText={t('exit')}
       onClickButton={props.commandUtils.headerCommands.handleCloseAndHome}
-      contentStyle={CHILDREN_CONTAINER_STYLE}
+      contentStyle={isOnDevice ? CHILDREN_CONTAINER_STYLE : undefined}
     >
       <Flex css={CONTENT_CONTAINER}>
-        <img src={SuccessIcon} alt="Success Icon" />
-        <StyledText oddStyle="level3HeaderBold">{t('lpc_complete')}</StyledText>
+        <img src={SuccessIcon} css={IMAGE_STYLE} alt="Success Icon" />
+        <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
+          {t('lpc_complete')}
+        </StyledText>
       </Flex>
     </LPCContentContainer>
   )
@@ -52,4 +57,15 @@ const CONTENT_CONTAINER = css`
   align-items: ${ALIGN_CENTER};
   padding: ${SPACING.spacing40};
   gap: ${SPACING.spacing24};
+`
+
+const IMAGE_STYLE = css`
+  width: 10.625rem;
+  height: 8.813rem;
+
+  // The default image size.
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 15.688rem;
+    height: 13rem;
+  }
 `
