@@ -53,16 +53,16 @@
     "t50": {
       "uiMaxFlowRate": 45,
       "defaultAspirateFlowRate": {
-        "default": 6.5,
-        "valuesByApiLevel": { "2.14": 6.5 }
+        "default": 22,
+        "valuesByApiLevel": { "2.14": 22 }
       },
       "defaultDispenseFlowRate": {
-        "default": 6.5,
-        "valuesByApiLevel": { "2.14": 6.5 }
+        "default": 22,
+        "valuesByApiLevel": { "2.14": 22 }
       },
       "defaultBlowOutFlowRate": {
-        "default": 10,
-        "valuesByApiLevel": { "2.14": 10 }
+        "default": 22,
+        "valuesByApiLevel": { "2.14": 22 }
       },
       "defaultFlowAcceleration": 3160.0,
       "defaultTipLength": 57.9,
@@ -111,7 +111,7 @@
           ]
         }
       },
-      "defaultPushOutVolume": 7
+      "defaultPushOutVolume": 5
     },
     "t200": {
       "uiMaxFlowRate": 45,
