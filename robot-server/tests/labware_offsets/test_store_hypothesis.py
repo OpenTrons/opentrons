@@ -189,7 +189,7 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
         id=ids,
         definition_uri=definition_uris,
         created_at=utc_dt_strat,
-        location=location_sequence_strat,
+        location=locations,
     )
     def add(  # noqa: D102
         self,
@@ -225,7 +225,7 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
                     hypothesis.strategies.just(DO_NOT_FILTER) | definition_uris
                 ),
                 locationSequence=(
-                    hypothesis.strategies.just(DO_NOT_FILTER) | location_sequence_strat
+                    hypothesis.strategies.just(DO_NOT_FILTER) | locations
                 ),
                 mostRecentOnly=hypothesis.strategies.booleans(),
             )
