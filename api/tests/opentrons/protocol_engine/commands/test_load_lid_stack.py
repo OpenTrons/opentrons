@@ -124,7 +124,7 @@ async def test_load_lid_stack(
             stackLabwareId="stack-labware-id",
             labwareIds=["lid-labware-1", "lid-labware-2", "lid-labware-3"],
             definition=tiprack_lid_def,
-            stackDefinition=lid_stack_def,
+            lidStackDefinition=lid_stack_def,
             location=input_location,
             stackLocationSequence=[stack_loc],
             locationSequences=[
