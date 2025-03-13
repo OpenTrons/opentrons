@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 import { Controller, useForm } from 'react-hook-form'
-
-import { getAllLiquidClassDefs } from '@opentrons/shared-data'
+import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
 import {
   Btn,
   COLORS,
@@ -70,7 +69,7 @@ export function DefineLiquidsModal(
     labwareIngredSelectors.allIngredientGroupFields
   )
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-  const liquidClassDefs = getAllLiquidClassDefs()
+  const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
   const liquidGroupId = selectedLiquidGroupState.liquidGroupId
   const deleteLiquidGroup = (): void => {
@@ -136,16 +135,8 @@ export function DefineLiquidsModal(
 
   const liquidClassOptions = [
     { name: t('liquids:dont_use_liquid_class'), value: '' },
-    ...Object.entries(liquidClassDefs)
-      .sort(([_0, a], [_1, b]) => {
-        if (a.displayName < b.displayName) {
-          return -1
-        } else if (a.displayName > b.displayName) {
-          return 1
-        }
-        return 0
-      })
-      .map(([liquidClassDefName, { displayName, description }]) => {
+    ...Object.entries(sortedLiquidClassDefs).map(
+      ([liquidClassDefName, { displayName, description }]) => {
         return {
           value: liquidClassDefName,
           name: t('liquids:liquid_class_name_description', {
@@ -153,7 +144,8 @@ export function DefineLiquidsModal(
             description,
           }),
         }
-      }),
+      }
+    ),
   ]
 
   return (

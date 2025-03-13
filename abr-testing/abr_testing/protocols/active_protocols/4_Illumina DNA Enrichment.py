@@ -26,7 +26,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.21",
+    "apiLevel": "2.22",
 }
 
 # SCRIPT SETTINGS
@@ -75,7 +75,7 @@ def run(protocol: ProtocolContext) -> None:
     deck_riser = protocol.params.deck_riser  # type: ignore[attr-defined]
     trash_lid = protocol.params.trash_lid  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "01")
+    helpers.comment_protocol_version(protocol, "02")
 
     unused_lids: List[Labware] = []
     used_lids: List[Labware] = []

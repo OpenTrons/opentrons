@@ -114,7 +114,11 @@ function StartingDeckBody(props: StartingDeckBodyProps): JSX.Element {
       {isOffDeck ? (
         <OffDeckThumbnail hover={hover} setHover={setHover} width="100%" />
       ) : (
-        <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
+        <DeckThumbnail
+          hoverSlot={hover}
+          setHoverSlot={setHover}
+          robotType={robotType}
+        />
       )}
       <Box width="100%" height="12.5rem">
         <SlotDetailsContainer

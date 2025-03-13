@@ -23,7 +23,7 @@ const mockDeckLabels = [
 ]
 
 const meta: Meta<typeof DeckLabelSetComponent> = {
-  title: 'Library/Organisms/DeckLabelSet',
+  title: 'Helix/Organisms/DeckLabelSet',
   component: DeckLabelSetComponent,
   decorators: [
     Story => (

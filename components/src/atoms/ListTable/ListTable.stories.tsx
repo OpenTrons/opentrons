@@ -8,7 +8,7 @@ import type { ComponentProps } from 'react'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Atoms/ListTable',
+  title: 'Helix/Atoms/ListTable',
   component: ListTableComponent,
   argTypes: {
     headers: {

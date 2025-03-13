@@ -24,6 +24,7 @@ import {
   SOURCE_LABWARE,
   blowoutInPlaceHelper,
   makeMoveToWellHelper,
+  makeAirGapAfterAspirateHelper,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type {
@@ -143,16 +144,58 @@ describe('consolidate single-channel', () => {
       },
     }
 
-    const result = consolidate(data, invariantContext, initialRobotState)
+    const result = consolidate(data, invariantContext, robotStatePickedUpOneTip)
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      pickUpTipHelper('A1'),
+      //  drop tip from return tip
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
+      pickUpTipHelper('B1'),
       aspirateHelper('A1', 50),
       aspirateHelper('A2', 50),
       dispenseHelper('B1', 100),
       makeMoveToWellHelper('B1', DEST_LABWARE),
-      makeAirGapHelper(5),
+      ...makeAirGapHelper(5),
+      //   drop tip at end
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
     ])
   })
 
@@ -844,13 +887,13 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A1', 100),
       ...delayWithOffset('A1', SOURCE_LABWARE),
       makeMoveToWellHelper('A1'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       aspirateHelper('A2', 100),
       ...delayWithOffset('A2', SOURCE_LABWARE),
       makeMoveToWellHelper('A2'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       dispenseHelper('B1', 210),
@@ -858,13 +901,13 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A3', 100),
       ...delayWithOffset('A3', SOURCE_LABWARE),
       makeMoveToWellHelper('A3'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       aspirateHelper('A4', 100),
       ...delayWithOffset('A4', SOURCE_LABWARE),
       makeMoveToWellHelper('A4'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       dispenseHelper('B1', 210),
@@ -1006,21 +1049,21 @@ describe('consolidate single-channel', () => {
 
       aspirateHelper('A1', 100),
       makeMoveToWellHelper('A1'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
 
       aspirateHelper('A2', 100),
       makeMoveToWellHelper('A2'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 210),
 
       aspirateHelper('A3', 100),
       makeMoveToWellHelper('A3'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
 
       aspirateHelper('A4', 100),
       makeMoveToWellHelper('A4'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 210),
     ])
@@ -1044,25 +1087,25 @@ describe('consolidate single-channel', () => {
 
       aspirateHelper('A1', 150),
       makeMoveToWellHelper('A1'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A2', 150),
       makeMoveToWellHelper('A2'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A3', 150),
       makeMoveToWellHelper('A3'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A4', 150),
       makeMoveToWellHelper('A4'),
-      makeAirGapHelper(5),
+      makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
     ])
@@ -1235,10 +1278,11 @@ describe('consolidate single-channel', () => {
         {
           commandType: 'airGapInPlace',
           key: expect.any(String),
+
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -1329,9 +1373,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -1595,9 +1639,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -1738,6 +1782,13 @@ describe('consolidate single-channel', () => {
                 z: 11.54,
               },
             },
+          },
+        },
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
           },
         },
         {
@@ -1935,9 +1986,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -2028,9 +2079,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -2309,9 +2360,9 @@ describe('consolidate single-channel', () => {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
+            flowRate: 2.1,
             pipetteId: 'p300SingleId',
             volume: 31,
-            flowRate: 2.1,
           },
         },
         {
@@ -2469,6 +2520,14 @@ describe('consolidate single-channel', () => {
             },
           },
         },
+
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
         {
           commandType: 'airGapInPlace',
           key: expect.any(String),
@@ -2483,6 +2542,29 @@ describe('consolidate single-channel', () => {
           key: expect.any(String),
           params: {
             seconds: 11,
+          },
+        },
+
+        // Should drop tip at the end
+        {
+          commandType: 'moveToAddressableAreaForDropTip',
+          key: expect.any(String),
+          params: {
+            addressableAreaName: 'movableTrashA3',
+            alternateDropLocation: true,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
+          commandType: 'dropTipInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
           },
         },
       ])
@@ -2915,6 +2997,14 @@ describe('consolidate single-channel', () => {
             },
           },
         },
+
+        {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
         {
           commandType: 'airGapInPlace',
           key: expect.any(String),
@@ -3074,6 +3164,7 @@ describe('consolidate single-channel', () => {
             },
           },
         },
+
         {
           commandType: 'airGapInPlace',
           key: expect.any(String),
@@ -3239,6 +3330,13 @@ describe('consolidate single-channel', () => {
           },
         },
         {
+          commandType: 'prepareToAspirate',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
           commandType: 'airGapInPlace',
           key: expect.any(String),
           params: {
@@ -3252,6 +3350,28 @@ describe('consolidate single-channel', () => {
           key: expect.any(String),
           params: {
             seconds: 11,
+          },
+        },
+        // Should drop tip at the end
+        {
+          commandType: 'moveToAddressableAreaForDropTip',
+          key: expect.any(String),
+          params: {
+            addressableAreaName: 'movableTrashA3',
+            alternateDropLocation: true,
+            offset: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            pipetteId: 'p300SingleId',
+          },
+        },
+        {
+          commandType: 'dropTipInPlace',
+          key: expect.any(String),
+          params: {
+            pipetteId: 'p300SingleId',
           },
         },
       ])

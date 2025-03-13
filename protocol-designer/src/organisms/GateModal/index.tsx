@@ -1,7 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_END,
@@ -10,7 +9,10 @@ import {
   PrimaryButton,
   SPACING,
   StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+
+import { LINK_BUTTON_STYLE } from '../../atoms'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
@@ -29,6 +31,7 @@ export function GateModal(): JSX.Element | null {
   if (appVersion == null || hasOptedIn == null) {
     return (
       <Modal
+        childrenPadding={SPACING.spacing24}
         hasHeader={false}
         position="bottomRight"
         showOverlay={false}
@@ -36,7 +39,7 @@ export function GateModal(): JSX.Element | null {
           <Flex
             justifyContent={JUSTIFY_END}
             gridGap={SPACING.spacing8}
-            padding={SPACING.spacing24}
+            padding={`0 ${SPACING.spacing24} ${SPACING.spacing24}`}
           >
             <PrimaryButton onClick={() => dispatch(analyticsActions.optIn())}>
               <StyledText desktopStyle="bodyDefaultRegular">
@@ -59,7 +62,8 @@ export function GateModal(): JSX.Element | null {
                   <LinkComponent
                     external
                     href={PRIVACY_POLICY_URL}
-                    color={COLORS.blue50}
+                    css={LINK_BUTTON_STYLE}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   />
                 ),
               }}
@@ -74,7 +78,8 @@ export function GateModal(): JSX.Element | null {
                   <LinkComponent
                     external
                     href={EULA_URL}
-                    color={COLORS.blue50}
+                    css={LINK_BUTTON_STYLE}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
                   />
                 ),
               }}

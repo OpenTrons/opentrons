@@ -6,6 +6,8 @@ export const thermocyclerWaitForBlockTemperature: CommandCreator<ModuleOnlyParam
   invariantContext,
   prevRobotState
 ) => {
+  // NOTE: there is no python equivelent for this command since `set_block_temperature()` already
+  // sets and waits for the temperature to be reached
   return {
     commands: [
       {

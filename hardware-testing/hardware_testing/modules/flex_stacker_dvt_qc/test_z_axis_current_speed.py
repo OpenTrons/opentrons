@@ -1,5 +1,5 @@
 """Test X Axis."""
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Optional
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -91,7 +91,7 @@ async def test_extend_cycle(
                 0,
                 HOME_CURRENT,
             )
-        except Exception as e:
+        except Exception:
             pass
         # If limit switch is triggered, we did not stall
         if await stacker._driver.get_limit_switch(TEST_AXIS, Direction.EXTEND):
@@ -122,7 +122,7 @@ async def test_retract_cycle(
 
     try:
         # moving at the testing speed and current to just above the springs
-        retract_distance = (AXIS_TRAVEL + TOP_OFFSET) - BOTTOM_OFFSET
+        retract_distance: float = (AXIS_TRAVEL + TOP_OFFSET) - BOTTOM_OFFSET
         await stacker.move_axis(
             TEST_AXIS,
             Direction.RETRACT,
@@ -150,7 +150,7 @@ async def test_retract_cycle(
                 0,
                 HOME_CURRENT,
             )
-        except Exception as e:
+        except Exception:
             pass
         # If limit switch is triggered, we did not stall
         if await stacker._driver.get_limit_switch(TEST_AXIS, Direction.RETRACT):
@@ -177,15 +177,16 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             ui.print_header(f"Z Speed: {speed} mm/s, Current: {current} A")
             trial = 0
             failures = 0
-            extend_data: List[float] = [None] * TEST_TRIALS
-            retract_data: List[float] = [None] * TEST_TRIALS
+            extend_data: List[Optional[float]] = [None] * TEST_TRIALS
+            retract_data: List[Optional[float]] = [None] * TEST_TRIALS
             while trial < TEST_TRIALS:
                 # Test extend direction first
                 extend, dist = await test_extend_cycle(stacker, speed, current)
                 extend_data[trial] = dist
                 if not extend:
                     ui.print_error(
-                        f"Z Axis extend failed at speed {speed} mm/s, current {current} A, Distance {dist} mm"
+                        f"Z Axis extend failed at speed {speed} mm/s, "
+                        f"current {current} A, Distance {dist} mm"
                     )
                     failures += 1
                     trial += 1
@@ -196,7 +197,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
                 retract_data[trial] = dist
                 if not retract:
                     ui.print_error(
-                        f"Z Axis retract failed at speed {speed} mm/s, current {current} A, Distance {dist} mm"
+                        f"Z Axis retract failed at speed {speed} mm/s, "
+                        f"current {current} A, Distance {dist} mm"
                     )
                     failures += 1
                 trial += 1

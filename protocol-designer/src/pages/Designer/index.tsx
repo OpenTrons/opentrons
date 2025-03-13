@@ -197,8 +197,10 @@ export function Designer(): JSX.Element {
               {zoomIn.slot == null ? (
                 <Flex
                   justifyContent={JUSTIFY_FLEX_END}
+                  alignItems={ALIGN_CENTER}
                   alignSelf={ALIGN_STRETCH}
                   width="100%"
+                  height="2.25rem"
                 >
                   <ToggleGroup
                     selectedValue={deckView}

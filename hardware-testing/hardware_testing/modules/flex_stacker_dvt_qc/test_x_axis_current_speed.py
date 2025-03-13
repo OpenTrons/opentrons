@@ -1,5 +1,5 @@
 """Test X Axis."""
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Optional
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -79,7 +79,7 @@ async def test_cycle_per_direction(
                 0,
                 HOME_CURRENT,
             )
-        except Exception as e:
+        except Exception:
             pass
 
         if await stacker._driver.get_limit_switch(TEST_AXIS, direction):
@@ -109,8 +109,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             ui.print_header(f"X Speed: {speed} mm/s, Current: {current} A")
             trial = 0
             failures = 0
-            extend_data: List[float] = [None] * TEST_TRIALS
-            retract_data: List[float] = [None] * TEST_TRIALS
+            extend_data: List[Optional[float]] = [None] * TEST_TRIALS
+            retract_data: List[Optional[float]] = [None] * TEST_TRIALS
             while trial < TEST_TRIALS:
                 # Test extend direction first
                 extend, dist = await test_cycle_per_direction(
@@ -119,7 +119,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
                 extend_data[trial] = dist
                 if not extend:
                     ui.print_error(
-                        f"X Axis extend failed at speed {speed} mm/s, current {current} A, Distance {dist} mm"
+                        f"X Axis extend failed at speed {speed} mm/s, "
+                        f"current {current} A, Distance {dist} mm"
                     )
                     failures += 1
                     trial += 1
@@ -132,7 +133,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
                 retract_data[trial] = dist
                 if not retract:
                     ui.print_error(
-                        f"X Axis retract failed at speed {speed} mm/s, current {current} A, Distance {dist} mm"
+                        f"X Axis retract failed at speed {speed} mm/s, "
+                        f"current {current} A, Distance {dist} mm"
                     )
                     failures += 1
                 trial += 1

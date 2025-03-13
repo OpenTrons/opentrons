@@ -34,8 +34,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
     # Reset LEDs to off
     if not stacker._simulating:
-        await stacker._driver.set_led(0, LEDColor.GREEN, 0, LEDPattern.STATIC)
-        await stacker._driver.set_led(0, LEDColor.GREEN, 1, LEDPattern.STATIC)
+        await stacker._driver.set_led(0, LEDColor.GREEN, False, LEDPattern.STATIC)
+        await stacker._driver.set_led(0, LEDColor.GREEN, True, LEDPattern.STATIC)
 
     for external in [False, True]:
         for color in COLORS:
@@ -44,9 +44,8 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             if not stacker._simulating:
                 await stacker._driver.set_led(1.0, color, external)
                 led_on = ui.get_user_answer(f"Is the {tag} {color} LED on?")
+                # turn off led before moving on
+                await stacker._driver.set_led(0.0)
             else:
                 led_on = True
             report(section, f"{tag}-{color}", [CSVResult.from_bool(led_on)])
-            if not stacker._simulating:
-                # turn off led before moving on
-                await stacker._driver.set_led(0.0)

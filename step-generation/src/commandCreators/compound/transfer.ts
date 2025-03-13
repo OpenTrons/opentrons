@@ -8,17 +8,15 @@ import {
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInTrash } from './dropTipInTrash'
 import {
   blowoutUtil,
   curryCommandCreator,
   airGapHelper,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
 } from '../../utils'
 import {
@@ -40,6 +38,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,
@@ -178,10 +177,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       null &&
     invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
       'trashBin'
-
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    pipetteSpec.channels
-  )
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -440,9 +435,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                         y: 0,
                       },
                     },
+                    isAirGap: true,
                     tipRack: args.tipRack,
                     nozzles: args.nozzles,
-                    isAirGap: true,
                   }),
                   ...(dispenseDelay != null
                     ? [
@@ -530,7 +525,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             flowRate: blowoutFlowRateUlSec,
             offsetFromTopMm: blowoutOffsetFromTopMm,
             invariantContext,
-            prevRobotState,
           })
 
           const airGapAfterDispenseCommands =
@@ -564,20 +558,16 @@ export const transfer: CommandCreator<TransferArgs> = (
             }),
           ]
           if (isWasteChute) {
-            dropTipCommand = wasteChuteCommandsUtil({
-              type: 'dropTip',
-              pipetteId: args.pipette,
-              prevRobotState,
-              addressableAreaName: addressableAreaNameWasteChute,
-            })
+            dropTipCommand = [
+              curryCommandCreator(dropTipInWasteChute, {
+                pipetteId: args.pipette,
+              }),
+            ]
           }
           if (isTrashBin) {
-            dropTipCommand = movableTrashCommandsUtil({
-              type: 'dropTip',
-              pipetteId: args.pipette,
-              invariantContext,
-              prevRobotState,
-            })
+            dropTipCommand = [
+              curryCommandCreator(dropTipInTrash, { pipetteId: args.pipette }),
+            ]
           }
 
           // if using dispense > air gap, drop or change the tip at the end

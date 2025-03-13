@@ -243,7 +243,7 @@ def _get_height_of_liquid_in_well(
         height = pipette.measure_liquid_height(well) - well.bottom().point.z
     else:
         height = 0.0
-    return height
+    return height  # type: ignore[return-value]
 
 
 def _test_for_finding_liquid_height(

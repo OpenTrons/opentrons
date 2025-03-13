@@ -15,7 +15,7 @@ import type {
   TemperatureParams,
   TCProfileParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { CommandCreator } from '../types'
+import type { CommandCreator, ModuleEntities } from '../types'
 
 const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for these command creators
@@ -23,7 +23,7 @@ const getRobotInitialState = (): any => {
 }
 
 // neither should InvariantContext
-const invariantContext: any = {}
+let invariantContext: any = {}
 const module: ModuleOnlyParams['module'] = 'someTCModuleId'
 const temperature: TemperatureParams['temperature'] = 42
 const holdTime: AtomicProfileStep['holdTime'] = 10
@@ -34,6 +34,17 @@ const profile = [
     holdSeconds: holdTime,
   },
 ]
+invariantContext = {
+  ...invariantContext,
+  moduleEntities: {
+    [module]: {
+      id: module,
+      type: 'thermocyclerModuleType',
+      model: 'thermocyclerModuleV1',
+      pythonName: 'mock_thermocycler',
+    },
+  } as ModuleEntities,
+}
 describe('thermocycler atomic commands', () => {
   const testCasesSetBlock = [
     {
