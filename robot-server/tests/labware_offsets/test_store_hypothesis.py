@@ -10,6 +10,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Sequence
 
+import pytest
 import hypothesis.strategies
 import hypothesis.stateful
 
@@ -36,6 +37,9 @@ from robot_server.labware_offsets.models import (
     StoredLabwareOffsetLocationSequenceComponents,
 )
 from tests.conftest import make_sql_engine
+
+
+pytestmark = pytest.mark.slow
 
 
 utc_dt_strat = hypothesis.strategies.datetimes(
