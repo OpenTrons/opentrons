@@ -49,7 +49,7 @@ describe('LPCComplete', () => {
         ...mockLPCContentProps.commandUtils,
         headerCommands: {
           ...mockLPCContentProps.commandUtils.headerCommands,
-          handleClose: mockHandleClose,
+          handleCloseAndHome: mockHandleClose,
         },
       },
     }

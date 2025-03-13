@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { useApplyLPCOffsets } from './useApplyLPCOffsets'
 import { useHandleJog } from './useHandleJog'
-import { useHandleCleanup } from './useHandleCleanup'
+import { useHandleClose } from './useHandleClose'
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
 import { useHandleProbeCommands } from './useHandleProbeCommands'
 import { useHandleStartLPC } from './useHandleStartLPC'
@@ -16,7 +16,7 @@ import { useHandleValidMoveToMaintenancePosition } from './useHandleValidMoveToM
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CommandData } from '@opentrons/api-client'
 import type { UseProbeCommandsResult } from './useHandleProbeCommands'
-import type { UseHandleConditionalCleanupResult } from './useHandleCleanup'
+import type { UseHandleConditionalCleanupResult } from './useHandleClose'
 import type { UseHandleJogResult } from './useHandleJog'
 import type { UseApplyLPCOffsetsResult } from './useApplyLPCOffsets'
 import type { UseHandleStartLPCResult } from './useHandleStartLPC'
@@ -76,7 +76,7 @@ export function useLPCCommands(
   const applyLPCOffsetsUtils = useApplyLPCOffsets({ ...props, setErrorMessage })
   const buildLPCOffsets = useBuildOffsetsToApply({ ...props, setErrorMessage })
   const handleJogUtils = useHandleJog({ ...props, setErrorMessage })
-  const handleConditionalCleanupUtils = useHandleCleanup(props)
+  const handleConditionalCleanupUtils = useHandleClose(props)
   const handleProbeCommands = useHandleProbeCommands({
     ...props,
     chainLPCCommands,
