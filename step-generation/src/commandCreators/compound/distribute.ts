@@ -6,7 +6,6 @@ import {
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
-  SINGLE,
 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -81,10 +80,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
   // TODO Ian 2018-05-03 next ~20 lines match consolidate.js
   const actionName = 'distribute'
   const errors: CommandCreatorError[] = []
-  const pipChannels =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels
-  const is96Channel = pipChannels === 96
-  const is8Channel = pipChannels === 8
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels !== 1
 
   // TODO: Ian 2019-04-19 revisit these pipetteDoesNotExist errors, how to do it DRY?
   if (
@@ -129,9 +126,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
-  if (
-    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
-    !getIsSafePipetteMovement(
+  if (isMultiChannelPipette && nozzles !== ALL) {
+    const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
       args.nozzles,
       prevRobotState,
       invariantContext,
@@ -140,13 +136,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       args.tipRack,
       { x: aspirateXOffset, y: aspirateYOffset }
     )
-  ) {
-    errors.push(errorCreators.possiblePipetteCollision())
-  }
-
-  if (
-    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
-    !getIsSafePipetteMovement(
+    const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
       args.nozzles,
       prevRobotState,
       invariantContext,
@@ -155,8 +145,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
       args.tipRack,
       { x: dispenseXOffset, y: dispenseYOffset }
     )
-  ) {
-    errors.push(errorCreators.possiblePipetteCollision())
+    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
+      errors.push(errorCreators.possiblePipetteCollision())
+    }
   }
 
   if (errors.length > 0)

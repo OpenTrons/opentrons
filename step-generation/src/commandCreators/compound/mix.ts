@@ -3,7 +3,6 @@ import {
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
-  SINGLE,
 } from '@opentrons/shared-data'
 import {
   repeatArray,
@@ -150,9 +149,8 @@ export const mix: CommandCreator<MixArgs> = (
     nozzles,
   } = data
 
-  const pipChannels = invariantContext.pipetteEntities[pipette]?.spec.channels
-  const is96Channel = pipChannels === 96
-  const is8Channel = pipChannels === 8
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipette]?.spec.channels !== 1
 
   // Errors
   if (
@@ -199,7 +197,7 @@ export const mix: CommandCreator<MixArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) {
+  if (isMultiChannelPipette && nozzles !== ALL) {
     const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
       data.nozzles,
       prevRobotState,

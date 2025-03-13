@@ -1,9 +1,4 @@
-import {
-  ALL,
-  FLEX_ROBOT_TYPE,
-  OT2_ROBOT_TYPE,
-  SINGLE,
-} from '@opentrons/shared-data'
+import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import {
   absorbanceReaderCollision,
@@ -118,12 +113,12 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     }
   }
 
-  const pipChannels = invariantContext.pipetteEntities[pipetteId]?.spec.channels
-  const is96Channel = pipChannels === 96
-  const is8Channel = pipChannels === 8
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
 
   if (
-    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
+    isMultiChannelPipette &&
+    nozzles !== ALL &&
     !getIsSafePipetteMovement(
       nozzles,
       prevRobotState,

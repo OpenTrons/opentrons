@@ -99,9 +99,7 @@ const _patchDefaultNozzle = (args: {
 }): FormUpdater => formData => {
   const { labwareEntities, pipetteEntities } = args
   const hasPartialTipSupportedChannel = Object.values(pipetteEntities).find(
-    pip => pip.spec.channels === 96
-    // || pip.spec.channels === 8
-    // TODO: add this in once we remove enablePartialTip feature flag
+    pip => pip.spec.channels === 96 || pip.spec.channels === 8
   )
 
   const formHasNozzlesField = formData && 'nozzles' in formData

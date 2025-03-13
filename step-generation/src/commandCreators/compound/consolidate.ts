@@ -5,7 +5,6 @@ import {
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
-  SINGLE,
 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -87,10 +86,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   } = args
 
   const pipetteData = prevRobotState.pipettes[args.pipette]
-  const pipChannels =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels
-  const is96Channel = pipChannels === 96
-  const is8Channel = pipChannels === 8
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels !== 1
 
   if (!pipetteData) {
     // bail out before doing anything else
@@ -132,10 +129,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if (
-    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
-    !getIsSafePipetteMovement(
-      nozzles,
+  if (isMultiChannelPipette && nozzles !== ALL) {
+    const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
+      args.nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,
@@ -143,16 +139,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       args.tipRack,
       { x: aspirateXOffset, y: aspirateYOffset }
     )
-  ) {
-    return {
-      errors: [errorCreators.possiblePipetteCollision()],
-    }
-  }
-
-  if (
-    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
-    !getIsSafePipetteMovement(
-      nozzles,
+    const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
+      args.nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,
@@ -160,9 +148,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       args.tipRack,
       { x: dispenseXOffset, y: dispenseYOffset }
     )
-  ) {
-    return {
-      errors: [errorCreators.possiblePipetteCollision()],
+    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
+      return {
+        errors: [errorCreators.possiblePipetteCollision()],
+      }
     }
   }
 

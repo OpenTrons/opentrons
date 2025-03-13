@@ -1,11 +1,6 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
-import {
-  ALL,
-  COLUMN,
-  SINGLE,
-  getWellNamePerMultiTip,
-} from '@opentrons/shared-data'
+import { COLUMN, SINGLE, getWellNamePerMultiTip } from '@opentrons/shared-data'
 import * as StepGeneration from '@opentrons/step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
@@ -31,19 +26,11 @@ function _wellsForPipette(
   nozzles: NozzleConfigurationStyle | null
 ): string[] {
   const pipChannels = pipetteEntity.spec.channels
-
-  // `wells` is all the wells that pipette's channel 1 interacts with.
+  // `wells` is all the wells that pipette interacts with.
   if ((pipChannels === 8 || pipChannels === 96) && nozzles !== SINGLE) {
     let channels = pipChannels
-    if (nozzles === ALL && pipChannels === 8) {
-      channels = 96
-    } else if (
-      (nozzles === COLUMN && pipChannels === 96) ||
-      pipChannels === 8
-    ) {
+    if ((nozzles === COLUMN && pipChannels === 96) || pipChannels === 8) {
       channels = 8
-    } else {
-      console.error(`we don't support other partial tip configurations yet`)
     }
     return wells.reduce((acc: string[], well: string) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(
@@ -51,7 +38,6 @@ function _wellsForPipette(
         well,
         channels
       )
-
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
   }
@@ -123,17 +109,15 @@ function _getSelectedWellsForStep(
       const pipetteId = c.params.pipetteId
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
-      let channels = 1
+      let channels = pipetteSpec.channels
       if (
         stepArgs.commandCreatorFnName === 'mix' ||
         stepArgs.commandCreatorFnName === 'transfer'
       ) {
-        if (stepArgs.nozzles === ALL && pipetteSpec.channels === 96) {
-          channels = 96
-        } else if (stepArgs.nozzles === COLUMN) {
+        if (stepArgs.nozzles === COLUMN) {
           channels = 8
-        } else if (nozzles !== SINGLE && pipetteSpec.channels === 8) {
-          channels = 8
+        } else if (stepArgs.nozzles === SINGLE) {
+          channels = 1
         }
       }
       const commandWellName = c.params.wellName
@@ -237,18 +221,11 @@ function _getSelectedWellsForSubstep(
           const pipChannels =
             invariantContext.pipetteEntities[stepArgs.pipette].spec.channels
           let channels = pipChannels
-          if (stepArgs.nozzles === ALL && pipChannels === 96) {
-            channels = 96
-          } else if (
-            (stepArgs.nozzles === COLUMN && pipChannels === 96) ||
-            pipChannels === 8
-          ) {
+
+          if (stepArgs.nozzles === COLUMN) {
             channels = 8
-          } else {
-            console.error(
-              `we don't support other partial tip configurations yet`
-            )
           }
+
           // just use first multi row
           if (
             activeTips &&

@@ -1,4 +1,4 @@
-import { ALL, SINGLE } from '@opentrons/shared-data'
+import { ALL } from '@opentrons/shared-data'
 import {
   pipettingIntoColumn4,
   possiblePipetteCollision,
@@ -23,12 +23,12 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
   const { pipetteId, labwareId, wellName, nozzles } = args
   const errors: CommandCreatorError[] = []
 
-  const pipChannels = invariantContext.pipetteEntities[pipetteId]?.spec.channels
-  const is96Channel = pipChannels === 96
-  const is8Channel = pipChannels === 8
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
 
   if (
-    ((is96Channel && nozzles !== ALL) || (is8Channel && nozzles === SINGLE)) &&
+    isMultiChannelPipette &&
+    nozzles !== ALL &&
     !getIsSafePipetteMovement(
       args.nozzles ?? null,
       prevRobotState,
