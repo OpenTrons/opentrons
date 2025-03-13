@@ -206,16 +206,40 @@ class TOFSensorStatus:
 class MoveParams:
     """Move Parameters."""
 
-    axis: Optional[StackerAxis] = None
-    max_speed: Optional[float] = None
-    acceleration: Optional[float] = None
-    max_speed_discont: Optional[float] = None
-    current: Optional[float] = 0
+    max_speed: float
+    acceleration: float
+    max_speed_discont: float
 
     @classmethod
     def get_fields(cls) -> List[str]:
         """Get parsing fields."""
-        return ["M", "V", "A", "D"]
+        return ["V", "A", "D"]
+
+    def update(
+        self,
+        max_speed: Optional[float] = None,
+        acceleration: Optional[float] = None,
+        max_speed_discont: Optional[float] = None,
+    ) -> "MoveParams":
+        """Update the move parameters and return a new object."""
+        return MoveParams(
+            max_speed=max_speed if max_speed is not None else self.max_speed,
+            acceleration=acceleration
+            if acceleration is not None
+            else self.acceleration,
+            max_speed_discont=max_speed_discont
+            if max_speed_discont is not None
+            else self.max_speed_discont,
+        )
+
+
+@dataclass
+class AxisParams:
+    """Axis Parameters."""
+
+    run_current: float
+    hold_current: float
+    move_params: MoveParams
 
 
 @dataclass
