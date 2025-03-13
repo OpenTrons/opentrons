@@ -8,6 +8,12 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.4.2
+
+v8.4.2 of Opentrons Protocol Designer is a hot fix that addresses a bug when trying to air gap over a trash bin or waste chute and increases the command schema in JSON protocols for schema version 10.
+
+---
+
 ## Opentrons Protocol Designer Changes in 8.4.0
 
 **Welcome to Protocol Designer 8.4.0!**
