@@ -75,8 +75,7 @@ export function ProtocolSteps(): JSX.Element {
   const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
-  const showTimelineAlerts =
-    hasTimelineErrors && tab === 'protocolSteps' && formData == null
+  const showTimelineAlerts = hasTimelineErrors && tab === 'protocolSteps'
   const stepDetails = currentStep?.stepDetails ?? null
 
   return (
