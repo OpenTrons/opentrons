@@ -257,6 +257,9 @@ async def test_liquid_probe_implementation(
                 volume=30.0,
                 last_probed=timestamp,
             ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="abc", ready_to_aspirate=True
+            ),
         ),
     )
 
@@ -368,6 +371,9 @@ async def test_liquid_not_found_error(
             height=update_types.CLEAR,
             volume=update_types.CLEAR,
             last_probed=error_timestamp,
+        ),
+        ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+            pipette_id=pipette_id, ready_to_aspirate=True
         ),
     )
     if isinstance(subject, LiquidProbeImplementation):

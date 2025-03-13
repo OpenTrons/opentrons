@@ -34,6 +34,9 @@ _VOLUME_ROUNDING_ERROR_TOLERANCE = 1e-9
 class PipettingHandler(TypingProtocol):
     """Liquid handling commands."""
 
+    def get_state_view(self) -> StateView:
+        """Get the stateview associated with this handler."""
+
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
 
@@ -69,6 +72,7 @@ class PipettingHandler(TypingProtocol):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool = False,
     ) -> float:
         """Set flow-rate and dispense while tracking."""
 
@@ -78,6 +82,7 @@ class PipettingHandler(TypingProtocol):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool,
         correction_volume: float = 0.0,
     ) -> float:
         """Set flow-rate and dispense."""
@@ -107,6 +112,10 @@ class HardwarePipettingHandler(PipettingHandler):
         self._state_view = state_view
         self._hardware_api = hardware_api
 
+    def get_state_view(self) -> StateView:
+        """Get the stateview associated with this handler."""
+        return self._state_view
+
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
         hw_pipette = self._state_view.pipettes.get_hardware_pipette(
@@ -116,6 +125,7 @@ class HardwarePipettingHandler(PipettingHandler):
         return (
             self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
             and hw_pipette.config["ready_to_aspirate"]
+            and self._state_view.pipettes.get_ready_to_aspirate(pipette_id)
         )
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
@@ -187,6 +197,7 @@ class HardwarePipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool = False,
     ) -> float:
         """Set flow-rate and dispense.
 
@@ -227,6 +238,7 @@ class HardwarePipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool,
         correction_volume: float = 0.0,
     ) -> float:
         """Dispense liquid without moving the pipette."""
@@ -242,6 +254,7 @@ class HardwarePipettingHandler(PipettingHandler):
                 volume=adjusted_volume,
                 push_out=push_out,
                 correction_volume=correction_volume,
+                is_full_dispense=is_full_dispense,
             )
 
         return adjusted_volume
@@ -326,12 +339,17 @@ class VirtualPipettingHandler(PipettingHandler):
         """Initialize a PipettingHandler instance."""
         self._state_view = state_view
 
+    def get_state_view(self) -> StateView:
+        """Get the stateview associated with this handler."""
+        return self._state_view
+
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
         return self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Virtually prepare to aspirate (no-op)."""
+        self._validate_tip_attached(pipette_id=pipette_id, command_name="aspirate")
 
     async def aspirate_in_place(
         self,
@@ -356,6 +374,7 @@ class VirtualPipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool,
         correction_volume: float = 0.0,
     ) -> float:
         """Virtually dispense (no-op)."""
@@ -421,6 +440,7 @@ class VirtualPipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool = False,
     ) -> float:
         """Virtually dispense (no-op)."""
         # TODO (tz, 8-23-23): add a check for push_out not larger that the max volume allowed when working on this https://opentrons.atlassian.net/browse/RSS-329

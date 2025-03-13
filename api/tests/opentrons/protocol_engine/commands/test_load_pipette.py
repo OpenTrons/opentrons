@@ -4,6 +4,7 @@ from opentrons.protocol_engine.state.update_types import (
     PipetteConfigUpdate,
     StateUpdate,
     PipetteUnknownFluidUpdate,
+    PipetteAspirateReadyUpdate,
 )
 import pytest
 from decoy import Decoy
@@ -119,6 +120,9 @@ async def test_load_pipette_implementation(
                 config=config_data,
             ),
             pipette_aspirated_fluid=PipetteUnknownFluidUpdate(pipette_id="some id"),
+            ready_to_aspirate=PipetteAspirateReadyUpdate(
+                pipette_id="some id", ready_to_aspirate=False
+            ),
         ),
     )
 
@@ -194,6 +198,9 @@ async def test_load_pipette_implementation_96_channel(
                 config=config_data,
             ),
             pipette_aspirated_fluid=PipetteUnknownFluidUpdate(pipette_id="pipette-id"),
+            ready_to_aspirate=PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id", ready_to_aspirate=False
+            ),
         ),
     )
 
