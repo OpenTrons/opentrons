@@ -17,6 +17,8 @@ from typing_extensions import Annotated
 
 
 _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
+_StrictGreaterThanZeroInt = Annotated[int, Field(strict=True, gt=0)]
+_StrictGreaterThanZeroFloat = Annotated[float, Field(strict=True, gt=0.0)]
 _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
 
 
@@ -25,6 +27,8 @@ _Number = Union[StrictInt, StrictFloat]
 
 _NonNegativeNumber = Union[_StrictNonNegativeInt, _StrictNonNegativeFloat]
 """Non-negative JSON number type, written to preserve lack of decimal point."""
+
+_GreaterThanZeroNumber = Union[_StrictGreaterThanZeroInt, _StrictGreaterThanZeroFloat]
 
 LiquidHandlingPropertyByVolume = Sequence[Tuple[_NonNegativeNumber, _NonNegativeNumber]]
 """Settings for liquid class settings that are interpolated by volume."""
@@ -104,7 +108,7 @@ class LiquidClassTouchTipParams(BaseModel):
     mmToEdge: _Number = Field(
         ..., description="Offset away from the the well edge, in millimeters."
     )
-    speed: _NonNegativeNumber = Field(
+    speed: _GreaterThanZeroNumber = Field(
         ..., description="Touch-tip speed, in millimeters per second."
     )
 
@@ -112,7 +116,7 @@ class LiquidClassTouchTipParams(BaseModel):
 class TouchTipProperties(BaseModel):
     """Shared properties for the touch-tip function."""
 
-    enable: bool = Field(..., description="Whether touch-tip is enabled.")
+    enable: StrictBool = Field(..., description="Whether touch-tip is enabled.")
     params: LiquidClassTouchTipParams | SkipJsonSchema[None] = Field(
         None,
         description="Parameters for the touch-tip function.",

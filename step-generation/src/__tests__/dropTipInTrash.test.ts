@@ -17,6 +17,7 @@ const mockPipEntities: PipetteEntities = {
     name: 'p50_single_flex',
     id: mockId,
     spec: { channels: 1 },
+    pythonName: 'mock_pipette',
   },
 } as any
 const mockCutout = 'cutoutA3'
@@ -61,5 +62,6 @@ describe('dropTipInTrash', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe('mock_pipette.drop_tip()')
   })
 })

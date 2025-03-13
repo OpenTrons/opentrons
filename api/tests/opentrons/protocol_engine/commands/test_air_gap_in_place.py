@@ -120,6 +120,9 @@ async def test_air_gap_in_place_implementation(
         )
     ).then_return(123)
 
+    decoy.when(
+        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
+    ).then_return(True)
     decoy.when(state_store.pipettes.get_current_location()).then_return(location)
 
     result = await subject.execute(params=data)
@@ -178,6 +181,7 @@ async def test_handle_air_gap_in_place_request_not_ready_to_aspirate(
 async def test_aspirate_raises_volume_error(
     decoy: Decoy,
     pipetting: PipettingHandler,
+    state_store: StateStore,
     subject: AirGapInPlaceImplementation,
     mock_command_note_adder: CommandNoteAdder,
 ) -> None:
@@ -189,6 +193,7 @@ async def test_aspirate_raises_volume_error(
     )
 
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="abc")).then_return(True)
+    decoy.when(state_store.pipettes.get_ready_to_aspirate("abc")).then_return(True)
 
     decoy.when(
         await pipetting.aspirate_in_place(
@@ -264,6 +269,7 @@ async def test_overpressure_error(
     decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
     decoy.when(await gantry_mover.get_position(pipette_id)).then_return(position)
     decoy.when(state_store.pipettes.get_current_location()).then_return(location)
+    decoy.when(state_store.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     result = await subject.execute(data)
 

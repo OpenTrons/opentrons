@@ -120,7 +120,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     stepGroups,
     invariantContext
   ) => {
-    const { author, description, created } = fileMetadata
+    const { author, description, created, source } = fileMetadata
     const {
       pipetteEntities,
       labwareEntities,
@@ -286,6 +286,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         description,
         created,
         lastModified,
+        source,
         // TODO LATER
         category: null,
         subcategory: null,

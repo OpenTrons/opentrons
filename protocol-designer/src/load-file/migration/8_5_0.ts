@@ -1,4 +1,5 @@
 import floor from 'lodash/floor'
+import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
 import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
@@ -179,6 +180,10 @@ export const migrateFile = (
   )
   return {
     ...appData,
+    metadata: {
+      ...appData.metadata,
+      source: PROTOCOL_DESIGNER_SOURCE,
+    },
     designerApplication: {
       ...designerApplication,
       data: {
