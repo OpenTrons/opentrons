@@ -529,8 +529,8 @@ export const getHasWasteChute = (
 ): boolean => {
   return Object.values(additionalEquipmentEntities).some(
     additionalEquipmentEntity =>
-      additionalEquipmentEntity.location === WASTE_CHUTE_CUTOUT &&
-      additionalEquipmentEntity.name === 'wasteChute'
+      additionalEquipmentEntity.name === 'wasteChute' &&
+      additionalEquipmentEntity.location === WASTE_CHUTE_CUTOUT
   )
 }
 
