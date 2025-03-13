@@ -2,6 +2,7 @@
 """Analyze a can log of a motion and display encoder variance over time"""
 
 from dataclasses import dataclass
+from copy import copy
 import re
 import sys
 import argparse
@@ -36,6 +37,12 @@ class IgnoredMessage(BaseException):
     pass
 
 
+class UnexpectedMessage(BaseException):
+    """Unexpected."""
+
+    pass
+
+
 class NoRecords(BaseException):
     """No records for the given filters."""
 
@@ -65,6 +72,7 @@ class Record:
     date: datetime
     sender: NodeId
     dest: NodeId
+    message_id: str
 
     def dest_includes(self: RecordSlfType, nodes: Set[NodeId]) -> bool:
         """Check if the destination is in the provided set."""
@@ -118,6 +126,7 @@ class MoveComplete(Record):
             encoder_pos=round(float(data["encoder_position"]) / 1000, 2),
             index=int(data["index"]),
             seq_id=int(data["seq_id"]),
+            message_id=record.message_id
         )
 
     motor_pos: float
@@ -156,6 +165,7 @@ class Error(Record):
             dest=record.dest,
             error_type=data["error"],
             index=int(data["index"]),
+            message_id=record.message_id
         )
 
     error_type: str
@@ -211,6 +221,7 @@ class MoveCommand(Record):
             velocity_encoded=int(data["velocity"]),
             acceleration_encoded=int(data["acceleration"]),
             index=int(data["index"]),
+            message_id=record.message_id
         )
 
     seq_id: int
@@ -252,6 +263,7 @@ class ExecuteCommand(Record):
             sender=record.sender,
             dest=record.dest,
             index=int(data["index"]),
+            message_id=record.message_id
         )
 
     index: int
@@ -261,7 +273,37 @@ class ExecuteCommand(Record):
         return self.dest in nodes or self.dest == NodeId.broadcast
 
 
-RecordType = Union[MoveCommand, Error, MoveComplete, ExecuteCommand]
+class HomeCommand(Record):
+
+    @classmethod
+    def from_payload_log(
+            cls: Type["HomeCommand"], record: Record, line: str
+    ) -> "HomeCommand":
+        """Build from a log line."""
+        return HomeCommand(
+            date=record.date,
+            sender=record.sender,
+            dest=record.dest,
+            message_id=record.message_id,
+        )
+
+
+class SyncMoveCommand(Record):
+
+    @classmethod
+    def from_payload_log(
+            cls: Type["SyncMoveCommand"], record: Record, line: str
+    ) -> "SyncMoveCommand":
+        """Build from a log line."""
+        return SyncMoveCommand(
+            date=record.date,
+            sender=record.sender,
+            dest=record.dest,
+            message_id=record.message_id,
+        )
+
+
+RecordType = Union[MoveCommand, Error, MoveComplete, ExecuteCommand, HomeCommand, SyncMoveCommand]
 RecordTypeVar = TypeVar("RecordTypeVar", bound=Union[Record], covariant=True)
 
 
@@ -274,7 +316,7 @@ def _lines(logfile: io.TextIOBase) -> Iterator[str]:
 
 
 _ARB_RE = re.compile(
-    r"node_id: (?P<node_id>\w+), originating_node_id: (?P<originating_node_id>\w+),"
+    r"node_id: (?P<node_id>\w+), originating_node_id: (?P<originating_node_id>\w+), message_id: (?P<message_id>\w+),"
 )
 
 
@@ -285,24 +327,30 @@ def _arb_from_line(line: str, date: datetime) -> Record:
         date=date,
         sender=NodeId[match["originating_node_id"]],
         dest=NodeId[match["node_id"]],
+        message_id=match["message_id"]
     )
 
 
 def _send_record(
-    payload_line: str, record: Record
-) -> Union[MoveCommand, ExecuteCommand]:
+    payload_line: str, record: Record, message_id: str
+) -> Union[MoveCommand, ExecuteCommand, HomeCommand, SyncMoveCommand]:
     if "AddLinearMoveRequest" in payload_line:
         return MoveCommand.from_payload_log(record, payload_line)
     if "ExecuteMoveGroupRequest" in payload_line:
         return ExecuteCommand.from_payload_log(record, payload_line)
+    if "HomeRequestPayload" in payload_line:
+        return HomeCommand.from_payload_log(record, payload_line)
+    if "sync" in payload_line:
+        return SyncMoveCommand.from_payload_log(record, payload_line)
     raise IgnoredMessage()
 
 
-def _receive_record(payload_line: str, record: Record) -> Union[MoveComplete, Error]:
+def _receive_record(payload_line: str, record: Record, message_id: str) -> Union[MoveComplete, Error]:
     if "ErrorMessage" in payload_line:
         return Error.from_payload_log(record, payload_line)
     if "MoveCompleted" in payload_line:
         return MoveComplete.from_payload_log(record, payload_line)
+    # always ignore received messages
     raise IgnoredMessage()
 
 
@@ -331,9 +379,9 @@ def _record(
     record = _arb_from_line(arbline, date)
     payline = next(lines)
     if "Received" in dirline:
-        return _receive_record(payline, record)
+        return _receive_record(payline, record, record.message_id)
     if "Sending" in dirline:
-        return _send_record(payline, record)
+        return _send_record(payline, record, record.message_id)
 
     raise KeyError(f"Bad direction line: {dirline}")
 
@@ -348,6 +396,9 @@ def records(logfile: io.TextIOBase) -> Iterator[Record]:
         except StopIteration:
             return
         except IgnoredMessage:
+            continue
+        except UnexpectedMessage as e:
+            print(e)
             continue
 
 
@@ -541,46 +592,75 @@ def _print_motion(
 def _print_durations(records_to_check: Iterator[RecordTypeVar]) -> None:
     t0: Optional[datetime] = None
     accumulated_durations: Dict[NodeId, float] = {}
-    previous_move_group = {"time": 0.0, "duration": 0.0}
-    print("START TIME (sec)\tOBSERVED DURATION (sec)\tMOTION DURATION (sec)\tMOTION DELAY (sec)")
+    previous_move_group = {"time": 0.0, "duration": 0.0, "home-or-sync": False, "execute-index": ""}
+    sent_home_or_sync_command = False
+    print("EXECUTE CMD INDEX\t"
+          "START TIME (sec)\t"
+          "NUMBER of NODES\t"
+          "OBSERVED DURATION (sec)\t"
+          "EXPECTED DURATION (sec)\t"
+          "SYSTEM DELAY (sec)")
     for record in records_to_check:
-        # if isinstance(record, MoveCommand):
-        #     print(record)
-        # elif isinstance(record, ExecuteCommand):
-        #     print(record)
-        #     print("------END----------\n")
+        # only monitor the SENT messages (from host)
+        if record.sender != NodeId.host:
+            continue
+        # record the "duration" sent for every node
         if isinstance(record, MoveCommand):
             if record.dest not in accumulated_durations:
                 accumulated_durations[record.dest] = 0.0
             accumulated_durations[record.dest] += record.duration
-        _commanded_nodes = list(accumulated_durations.keys())
+            continue
+        # don't monitor the durations of HOME or PROBING commands
+        # because they have UNPREDICTABLE durations in reality
+        if isinstance(record, (HomeCommand, SyncMoveCommand)):
+            sent_home_or_sync_command = True
+            continue
         if isinstance(record, ExecuteCommand):
+            error_msg = ""
             if t0 is None:
                 t0 = record.date
-            if len(_commanded_nodes) >= 2:
-                _max_duration = max(list(accumulated_durations.values()))
-                accumulated_durations = {}
+            _commanded_nodes = list(accumulated_durations.keys())
+            if not len(_commanded_nodes):
+                cached_duration = 0.0
             else:
-                _max_duration = 0.0
+                # only track move-groups where ALL nodes are commanded with identical durations
+                # NOTE: (sigler) ask FW why would we want nodes to have different durations?
+                _max_duration = round(max(list(accumulated_durations.values())), 3)
+                _min_duration = round(min(list(accumulated_durations.values())), 3)
+                error_msg += "ERROR(unequal-durations) " if _max_duration != _min_duration else ""
+                cached_duration = _max_duration
+                accumulated_durations = {}
+            # cache the TIME and DURATION of the EXECUTED move-group
             new_move_group = {
                 "time": (record.date - t0).total_seconds(),
-                "duration": _max_duration,
+                "duration": cached_duration,
+                "home-or-sync": sent_home_or_sync_command,
+                "execute-index": record.index
             }
-            if _max_duration > 0:
-                _prev_move_group_duration_plus_delay = (
-                    new_move_group["time"] - previous_move_group["time"]
-                )
-                _observed_delay_seconds = max(_prev_move_group_duration_plus_delay - previous_move_group["duration"], 0.0)
-                if 0 <= _observed_delay_seconds <= 0.5:
+            if previous_move_group["execute-index"]:
+                # print the info for the COMPLETED move-group
+                previous_observed_duration = new_move_group["time"] - previous_move_group["time"]
+                if previous_move_group["home-or-sync"]:
+                    displayed_duration = previous_observed_duration
+                    error_msg += "ERROR(unpredictable-duration)"
+                else:
+                    displayed_duration = previous_move_group["duration"]
+                previous_system_delay_seconds = previous_observed_duration - displayed_duration
+                error_msg += "ERROR(negative-delay) " if previous_system_delay_seconds < 0 else ""
+                error_msg += "ERROR(very-large-delay) " if previous_system_delay_seconds > 0.5 else ""
+                if not error_msg:
                     print(
-                        f'{previous_move_group["time"]}\t'  # timestamp
-                        f'{round(_prev_move_group_duration_plus_delay, 6)}\t'  # observed duration
-                        f'{round(previous_move_group["duration"], 6)}\t'  # duration sent over CAN
-                        f'{round(_observed_delay_seconds, 6)}'  # observed delay
+                        f'{previous_move_group["execute-index"]}\t'
+                        f'{previous_move_group["time"]:.{6}f}\t'  # timestamp
+                        f'{len(_commanded_nodes)}\t'
+                        f'{previous_observed_duration:.{6}f}\t'  # observed duration
+                        f'{displayed_duration:.{6}f}\t'  # duration sent over CAN
+                        f'{previous_system_delay_seconds:.{6}f}\t'  # observed delay
+                        f'{error_msg}'
                     )
-            for k in previous_move_group:
-                previous_move_group[k] = float(new_move_group[k])
-            # print("\n\n--------START--------")
+            # store the cached TIME/DURATION to use for comparison next time
+            previous_move_group = new_move_group.copy()
+            sent_home_or_sync_command = False
 
 
 def _print_errors(
