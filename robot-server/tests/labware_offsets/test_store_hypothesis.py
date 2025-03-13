@@ -143,6 +143,10 @@ class SimulatedStore:
         self._entries: list[StoredLabwareOffset] = []
 
     def add(self, offset: IncomingStoredLabwareOffset) -> None:  # noqa: D102
+        id_already_exists = any(
+            existing_offset.id == offset.id for existing_offset in self._entries
+        )
+        assert not id_already_exists
         self._entries.append(
             StoredLabwareOffset(
                 id=offset.id,
