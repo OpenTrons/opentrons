@@ -14,6 +14,40 @@ FG_ERROR_KEYWORD = "err"
 FG_ASYNC_ERROR_ACK = "async"
 DEFAULT_COMMAND_RETRIES = 0
 
+
+logger = AsyncResponseSerialConnection.logger
+#logger = logging.getLogger(__name__)
+
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "basic": {"format": "%(asctime)s %(name)s %(levelname)s %(message)s"}
+    },
+    "handlers": {
+        "file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "basic",
+            "filename": "/data/stallguard/stallguard_test.log",
+            "maxBytes": 5000000,
+            "level": logging.INFO,
+            "backupCount": 3,
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["file_handler"],
+            "level": logging.INFO,
+        },
+    },
+}
+
+class Mark10ProtocolError(Exception):
+    pass 
+
+class Mark10Error(Exception):
+    pass
+
 class AbstractForceGaugeDriver(Protocol):
     """Protocol for the force gauge driver."""
     async def connect(self) -> None:
@@ -32,15 +66,6 @@ class AbstractForceGaugeDriver(Protocol):
     async def read_force(self, timeout: float = 1.0) -> float:
         """Read Force in Newtons."""
         ...
-
-    # @classmethod
-    # def vid_pid(cls) -> Tuple[int, int]:
-    #     """Mark10 Force Gauge VID:PID."""
-    #     # Check what's the VID and PID for this device
-    #     return 0x0483, 0xA1AD
-
-
-
 
 class Mark10(AbstractForceGaugeDriver):
     """Mark10 Driver."""
@@ -67,45 +92,74 @@ class Mark10(AbstractForceGaugeDriver):
 
     async def connect(self) -> None:
         """Connect."""
-        await self._force_guage.open()
+        try:
+            await self._force_guage.open()
+            if not self._force_guage.is_open:
+                raise Mark10Error("Unable to connect to force gauge")
+        except Exception as e:
+            logger.error(f"Error connecting to force gauge: {e}")
+            raise Mark10Error("Unable to connect to force gauge")
 
     async def disconnect(self) -> None:
         """Disconnect."""
-        await self._force_guage.close()
+        try: 
+            if self._force_guage.is_open:
+                await self._force_guage.close()
+                logger.info("Disconneted from force gauge")
+        except Exception as e:
+            logger.error(f"Error disconnecting for force gauge: {e}")
+            raise Mark10Error("Unable to disconnect from force gauge")
 
     async def _write(self, data: bytes) -> None:
         """Non-blocking write operation."""
-        # Offload write to another thread to avoid blocking the event loop
-        await asyncio.to_thread(self._force_guage.write, data)
+        try:
+            # Offload write to another thread to avoid blocking the event loop
+            await asyncio.to_thread(self._force_guage.write, data)
+        except Exception as e:
+            logger.error(f"Error writing to force gauge: {e}")
+            raise Mark10Error("Unable to write to force gauge")
+
 
     async def _readline(self) -> str:
         """Non-blocking read operation."""
-        # Offload readline to another thread to avoid blocking the event loop
-        return await asyncio.to_thread(self._force_guage.readline)
+        try:
+            # Offload readline to another thread to avoid blocking the event loop
+            return await asyncio.to_thread(self._force_guage.readline)
+        except Exception as e:
+            logger.error(f"Error reading from force gauge: {e} ")
+            raise Mark10Error("Unable to read from force gauge")
 
     async def read_force(self, timeout: float = 1.0) -> float:
         """Get Force in Newtons."""
-        await self._write("?\r\n".encode("utf-8"))
-        start_time = time()
-        while time() < start_time + timeout:
-            # Read the line asynchronously
-            line = await self._readline()
-            line = line.decode("utf-8").strip()
-            try:
-                force_val, units = line.split(" ")
-                if units != "N":
-                    await self._write("N\r\n")  # Set force gauge units to Newtons
-                    print(f'Setting gauge units from {units} to "N" (newtons)')
+        try:
+            await self._write("?\r\n".encode("utf-8"))
+            start_time = time()
+            while time() < start_time + timeout:
+                # Read the line asynchronously
+                line = await self._readline()
+                line = line.decode("utf-8").strip()
+                try:
+                    force_val, units = line.split(" ")
+                    if units != "N":
+                        await self._write("N\r\n")  # Set force gauge units to Newtons
+                        print(f'Setting gauge units from {units} to "N" (newtons)')
+                        continue
+                    else:
+                        return float(force_val)
+                except ValueError as e:
+                    print(e)
+                    print(f'bad data: "{line}"')
                     continue
-                else:
-                    return float(force_val)
-            except ValueError as e:
-                print(e)
-                print(f'bad data: "{line}"')
-                continue
-        raise TimeoutError(f"unable to read from gauge within {timeout} seconds")
+            raise TimeoutError(f"unable to read from gauge within {timeout} seconds")
+        except Exception as e:
+            logger.error(f"Error reading force: {e}")
+            raise Mark10Error("Unable to read force from gauge")
 
     def reset_serial_buffers(self) -> None:
         """Reset the input and output serial buffers."""
-        self._force_guage._serial.reset_input_buffer()
-        self._force_guage._serial.reset_output_buffer()
+        try:
+            self._force_guage._serial.reset_input_buffer()
+            self._force_guage._serial.reset_output_buffer()
+        except Exception as e:
+            logger.error(f"Error resetting serial buffers: {e}")
+            raise Mark10Error("Unable to reset serial buffers")
