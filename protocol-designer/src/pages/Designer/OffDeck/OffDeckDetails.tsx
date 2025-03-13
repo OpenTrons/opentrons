@@ -23,8 +23,8 @@ import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { OffDeckControls } from './OffDeckControls'
-import { SlotDetailsContainer } from '../../../organisms'
-import { wellFillFromWellContents } from '../../../organisms/LabwareOnDeck/utils'
+import { SlotDetailsContainer } from '../../../components/organisms'
+import { wellFillFromWellContents } from '../../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../../file-data/selectors'
 import {
   getHoveredDropdownItem,
