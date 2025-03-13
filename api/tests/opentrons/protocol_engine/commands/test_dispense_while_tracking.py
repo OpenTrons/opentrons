@@ -101,7 +101,9 @@ async def test_dispense_while_tracking_implementation(
             is_full_dispense=True,
         )
     ).then_return(42)
-    decoy.when(state_view.pipettes.get_aspirated_volume("pipette-id-abc")).then_return(123)
+    decoy.when(state_view.pipettes.get_aspirated_volume("pipette-id-abc")).then_return(
+        123
+    )
 
     decoy.when(pipetting.get_state_view()).then_return(state_view)
 

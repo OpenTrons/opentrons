@@ -1871,9 +1871,13 @@ async def test_dispense_while_tracking(
 
     if not tip_present:
         with pytest.raises(UnexpectedTipRemovalError):
-            await ot3_hardware.dispense_while_tracking(mount, 8.0, 80.0, push_out=None, is_full_dispense=is_ready)
+            await ot3_hardware.dispense_while_tracking(
+                mount, 8.0, 80.0, push_out=None, is_full_dispense=is_ready
+            )
     else:
-        await ot3_hardware.dispense_while_tracking(mount, 8.0, 80.0, push_out=None, is_full_dispense=is_ready)
+        await ot3_hardware.dispense_while_tracking(
+            mount, 8.0, 80.0, push_out=None, is_full_dispense=True
+        )
         if is_ready:
             # make sure the move planning math stays the same
             expected_target_pos = {
