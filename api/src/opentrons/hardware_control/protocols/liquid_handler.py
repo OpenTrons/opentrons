@@ -168,6 +168,7 @@ class LiquidHandler(
         volume: float,
         push_out: Optional[float],
         flow_rate: float = 1.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.

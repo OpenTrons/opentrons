@@ -3051,6 +3051,7 @@ class OT3API(
         volume: float,
         push_out: Optional[float],
         flow_rate: float = 1.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -3062,7 +3063,7 @@ class OT3API(
         """
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
-            realmount, volume, flow_rate, push_out
+            realmount, volume, flow_rate, push_out, is_full_dispense
         )
         if not dispense_spec:
             return

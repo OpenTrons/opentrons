@@ -296,7 +296,7 @@ async def dispense_while_tracking(
     current_volume = (
         pipetting.get_state_view().pipettes.get_aspirated_volume(pipette_id) or 0.0
     )
-    is_full_dispense = numpy.isclose(current_volume - volume, 0)
+    is_full_dispense = bool(numpy.isclose(current_volume - volume, 0))
     ready = push_out == 0 if push_out is not None else not is_full_dispense
     try:
         volume_dispensed = await pipetting.dispense_while_tracking(
@@ -306,6 +306,7 @@ async def dispense_while_tracking(
             volume=volume,
             flow_rate=flow_rate,
             push_out=push_out,
+            is_full_dispense=is_full_dispense,
         )
     except PipetteOverpressureError as e:
         return DefinedErrorData(

@@ -72,6 +72,7 @@ class PipettingHandler(TypingProtocol):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool = False,
     ) -> float:
         """Set flow-rate and dispense while tracking."""
 
@@ -196,6 +197,7 @@ class HardwarePipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool = False,
     ) -> float:
         """Set flow-rate and dispense.
 
@@ -438,6 +440,7 @@ class VirtualPipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool = False,
     ) -> float:
         """Virtually dispense (no-op)."""
         # TODO (tz, 8-23-23): add a check for push_out not larger that the max volume allowed when working on this https://opentrons.atlassian.net/browse/RSS-329
