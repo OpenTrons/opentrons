@@ -518,7 +518,7 @@ export interface FlexStackerFillRunTimeCommand
 
 export interface FlexStackerEmptyRunTimeCommand
   extends FlexStackerEmptyCreateCommand,
-    CommonCommandCreateInfo {
+    CommonCommandRunTimeInfo {
   result?: {
     count: number
   }
