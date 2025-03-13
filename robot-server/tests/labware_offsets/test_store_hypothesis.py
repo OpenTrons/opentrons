@@ -11,7 +11,7 @@ from tempfile import TemporaryDirectory
 from typing import Sequence
 
 import pytest
-import hypothesis.strategies
+import hypothesis.strategies as st
 import hypothesis.stateful
 
 from opentrons.protocol_engine import (
@@ -42,32 +42,30 @@ from tests.conftest import make_sql_engine
 pytestmark = pytest.mark.slow
 
 
-utc_dt_strat = hypothesis.strategies.datetimes(
-    timezones=hypothesis.strategies.just(timezone.utc)
-)
+st_utc_dts = st.datetimes(timezones=st.just(timezone.utc))
 """Generates datetimes with their timezone set to UTC."""
 
 
-location_component_strat = hypothesis.strategies.one_of(
-    hypothesis.strategies.builds(
+st_location_components = st.one_of(
+    st.builds(
         OnLabwareOffsetLocationSequenceComponent,
-        definitionUri=hypothesis.strategies.text(),
+        definitionUri=st.text(),
     ),
-    hypothesis.strategies.builds(
+    st.builds(
         OnModuleOffsetLocationSequenceComponent,
-        moduleModel=hypothesis.strategies.sampled_from(ModuleModel),
+        moduleModel=st.sampled_from(ModuleModel),
     ),
-    hypothesis.strategies.builds(
+    st.builds(
         OnAddressableAreaOffsetLocationSequenceComponent,
-        addressableAreaName=hypothesis.strategies.text(),
+        addressableAreaName=st.text(),
     ),
 )
 """Generates individual components of a locationSequence list."""
 
 
-location_sequence_strat = hypothesis.strategies.lists(
-    location_component_strat, min_size=1
-) | hypothesis.strategies.just(ANY_LOCATION)
+st_location_sequences = st.lists(st_location_components, min_size=1) | st.just(
+    ANY_LOCATION
+)
 """Generates locationSequence values."""
 
 
@@ -173,17 +171,15 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
         """Run by Hypothesis to clean up after the test."""
         self._exit_stack.close()
 
-    @hypothesis.stateful.rule(target=ids, id=hypothesis.strategies.text())
+    @hypothesis.stateful.rule(target=ids, id=st.text())
     def add_id_to_bundle(self, id: str) -> str:  # noqa: D102
         return id
 
-    @hypothesis.stateful.rule(
-        target=definition_uris, definition_uri=hypothesis.strategies.text()
-    )
+    @hypothesis.stateful.rule(target=definition_uris, definition_uri=st.text())
     def add_definition_uri_to_bundle(self, definition_uri: str) -> str:  # noqa: D102
         return definition_uri
 
-    @hypothesis.stateful.rule(target=locations, location=location_sequence_strat)
+    @hypothesis.stateful.rule(target=locations, location=st_location_sequences)
     def add_location_to_bundle(  # noqa: D102
         self, location: StoredLabwareOffsetLocationSequenceComponents | AnyLocation
     ) -> StoredLabwareOffsetLocationSequenceComponents | AnyLocation:
@@ -192,7 +188,7 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
     @hypothesis.stateful.rule(
         id=ids,
         definition_uri=definition_uris,
-        created_at=utc_dt_strat,
+        created_at=st_utc_dts,
         location=locations,
     )
     def add(  # noqa: D102
@@ -221,17 +217,13 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
         assert self._subject.get_all() == self._simulated_model.get_all()
 
     @hypothesis.stateful.rule(
-        filters=hypothesis.strategies.lists(
-            hypothesis.strategies.builds(
+        filters=st.lists(
+            st.builds(
                 SearchFilter,
-                id=(hypothesis.strategies.just(DO_NOT_FILTER) | ids),
-                definitionUri=(
-                    hypothesis.strategies.just(DO_NOT_FILTER) | definition_uris
-                ),
-                locationSequence=(
-                    hypothesis.strategies.just(DO_NOT_FILTER) | locations
-                ),
-                mostRecentOnly=hypothesis.strategies.booleans(),
+                id=(st.just(DO_NOT_FILTER) | ids),
+                definitionUri=(st.just(DO_NOT_FILTER) | definition_uris),
+                locationSequence=(st.just(DO_NOT_FILTER) | locations),
+                mostRecentOnly=st.booleans(),
             )
         )
     )
