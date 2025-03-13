@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Analyze a can log of a motion and display encoder variance over time"""
 
-from dataclasses import dataclass
-from copy import copy
+from dataclasses import dataclass, replace
 import re
 import sys
 import argparse
@@ -19,6 +18,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
+    Tuple,
 )
 from typing_extensions import Literal
 from itertools import chain, tee
@@ -59,7 +59,7 @@ NODES = [
     NodeId.head_r,
     NodeId.gripper,
     NodeId.gripper_z,
-    NodeId.gripper_g
+    NodeId.gripper_g,
 ]
 
 RecordSlfType = TypeVar("RecordSlfType", bound="Record")
@@ -122,11 +122,11 @@ class MoveComplete(Record):
             date=record.date,
             sender=record.sender,
             dest=record.dest,
-            motor_pos=round(float(data["current_position"]) / 1000, 2),
-            encoder_pos=round(float(data["encoder_position"]) / 1000, 2),
+            motor_pos=round(float(data["current_position"]) / 1000, 6),
+            encoder_pos=round(float(data["encoder_position"]) / 1000, 6),
             index=int(data["index"]),
             seq_id=int(data["seq_id"]),
-            message_id=record.message_id
+            message_id=record.message_id,
         )
 
     motor_pos: float
@@ -165,7 +165,7 @@ class Error(Record):
             dest=record.dest,
             error_type=data["error"],
             index=int(data["index"]),
-            message_id=record.message_id
+            message_id=record.message_id,
         )
 
     error_type: str
@@ -211,17 +211,20 @@ class MoveCommand(Record):
             sender=record.sender,
             dest=record.dest,
             seq_id=int(data["seq_id"]),
-            duration=round(int(data["duration"]) / interrupts_per_sec, 2),
-            velocity=round(float(data["velocity"]) / (2**31) * interrupts_per_sec, 2),
-            acceleration=round(float(data["acceleration"])
-            / (2**31)
-            * interrupts_per_sec
-            * interrupts_per_sec
-            / acceleration_mul, 2),
+            duration=round(int(data["duration"]) / interrupts_per_sec, 6),
+            velocity=round(float(data["velocity"]) / (2**31) * interrupts_per_sec, 6),
+            acceleration=round(
+                float(data["acceleration"])
+                / (2**31)
+                * interrupts_per_sec
+                * interrupts_per_sec
+                / acceleration_mul,
+                2,
+            ),
             velocity_encoded=int(data["velocity"]),
             acceleration_encoded=int(data["acceleration"]),
             index=int(data["index"]),
-            message_id=record.message_id
+            message_id=record.message_id,
         )
 
     seq_id: int
@@ -263,7 +266,7 @@ class ExecuteCommand(Record):
             sender=record.sender,
             dest=record.dest,
             index=int(data["index"]),
-            message_id=record.message_id
+            message_id=record.message_id,
         )
 
     index: int
@@ -274,10 +277,9 @@ class ExecuteCommand(Record):
 
 
 class HomeCommand(Record):
-
     @classmethod
     def from_payload_log(
-            cls: Type["HomeCommand"], record: Record, line: str
+        cls: Type["HomeCommand"], record: Record, line: str
     ) -> "HomeCommand":
         """Build from a log line."""
         return HomeCommand(
@@ -289,10 +291,9 @@ class HomeCommand(Record):
 
 
 class SyncMoveCommand(Record):
-
     @classmethod
     def from_payload_log(
-            cls: Type["SyncMoveCommand"], record: Record, line: str
+        cls: Type["SyncMoveCommand"], record: Record, line: str
     ) -> "SyncMoveCommand":
         """Build from a log line."""
         return SyncMoveCommand(
@@ -303,7 +304,9 @@ class SyncMoveCommand(Record):
         )
 
 
-RecordType = Union[MoveCommand, Error, MoveComplete, ExecuteCommand, HomeCommand, SyncMoveCommand]
+RecordType = Union[
+    MoveCommand, Error, MoveComplete, ExecuteCommand, HomeCommand, SyncMoveCommand
+]
 RecordTypeVar = TypeVar("RecordTypeVar", bound=Union[Record], covariant=True)
 
 
@@ -327,7 +330,7 @@ def _arb_from_line(line: str, date: datetime) -> Record:
         date=date,
         sender=NodeId[match["originating_node_id"]],
         dest=NodeId[match["node_id"]],
-        message_id=match["message_id"]
+        message_id=match["message_id"],
     )
 
 
@@ -345,7 +348,9 @@ def _send_record(
     raise IgnoredMessage()
 
 
-def _receive_record(payload_line: str, record: Record, message_id: str) -> Union[MoveComplete, Error]:
+def _receive_record(
+    payload_line: str, record: Record, message_id: str
+) -> Union[MoveComplete, Error]:
     if "ErrorMessage" in payload_line:
         return Error.from_payload_log(record, payload_line)
     if "MoveCompleted" in payload_line:
@@ -589,80 +594,137 @@ def _print_motion(
             )
 
 
-def _print_durations(records_to_check: Iterator[RecordTypeVar]) -> None:
+@dataclass
+class MoveGroupAsCSVLine:
+    time: float
+    duration: float
+    home_or_sync: bool
+    execute_index: int
+
+    @classmethod
+    def generate_csv_header(cls) -> str:
+        csv_delimiter = "\t"
+        return (
+            f"EXECUTE CMD INDEX{csv_delimiter}"
+            f"START TIME (sec){csv_delimiter}"
+            f"NUMBER of NODES{csv_delimiter}"
+            f"OBSERVED DURATION (sec){csv_delimiter}"
+            f"EXPECTED DURATION (sec){csv_delimiter}"
+            f"SYSTEM DELAY (sec)"
+        )
+
+    def generate_csv_line(
+        self, new_time: float, number_of_nodes: int
+    ) -> Tuple[str, bool]:
+        # print the info for the COMPLETED move-group
+        previous_observed_duration = new_time - self.time
+        error_msg = ""
+        if self.home_or_sync:
+            displayed_duration = previous_observed_duration
+            error_msg += "ERROR(unpredictable-home-or-probe-duration)"
+        else:
+            displayed_duration = self.duration
+        if displayed_duration == 0.0:
+            error_msg += "ERROR(unexpected-execute-command)"
+        previous_system_delay_seconds = previous_observed_duration - displayed_duration
+        error_msg += (
+            "ERROR(negative-delay) " if previous_system_delay_seconds < 0 else ""
+        )
+        error_msg += (
+            "ERROR(very-large-delay) " if previous_system_delay_seconds > 0.5 else ""
+        )
+        csv_delimiter = "\t"
+        csv_line = (
+            f"{self.execute_index}{csv_delimiter}"
+            f"{self.time:.{6}f}{csv_delimiter}"  # timestamp
+            f"{number_of_nodes}{csv_delimiter}"
+            f"{previous_observed_duration:.{6}f}{csv_delimiter}"  # observed duration
+            f"{displayed_duration:.{6}f}{csv_delimiter}"  # duration sent over CAN
+            f"{previous_system_delay_seconds:.{6}f}{csv_delimiter}"  # observed delay
+            f"{error_msg}"
+        )
+        return csv_line, bool(error_msg)
+
+
+def _print_durations(
+    records_to_check: Iterator[RecordTypeVar],
+    nodes_to_check: Set[NodeId],
+    annotate_errors: bool,
+) -> None:
     t0: Optional[datetime] = None
     accumulated_durations: Dict[NodeId, float] = {}
-    previous_move_group = {"time": 0.0, "duration": 0.0, "home-or-sync": False, "execute-index": ""}
     sent_home_or_sync_command = False
-    print("EXECUTE CMD INDEX\t"
-          "START TIME (sec)\t"
-          "NUMBER of NODES\t"
-          "OBSERVED DURATION (sec)\t"
-          "EXPECTED DURATION (sec)\t"
-          "SYSTEM DELAY (sec)")
-    for record in records_to_check:
-        # only monitor the SENT messages (from host)
-        if record.sender != NodeId.host:
-            continue
-        # record the "duration" sent for every node
-        if isinstance(record, MoveCommand):
-            if record.dest not in accumulated_durations:
-                accumulated_durations[record.dest] = 0.0
-            accumulated_durations[record.dest] += record.duration
-            continue
-        # don't monitor the durations of HOME or PROBING commands
-        # because they have UNPREDICTABLE durations in reality
-        if isinstance(record, (HomeCommand, SyncMoveCommand)):
-            sent_home_or_sync_command = True
-            continue
-        if isinstance(record, ExecuteCommand):
-            error_msg = ""
-            if t0 is None:
-                t0 = record.date
-            _commanded_nodes = list(accumulated_durations.keys())
-            if not len(_commanded_nodes):
-                cached_duration = 0.0
-            else:
-                # only track move-groups where ALL nodes are commanded with identical durations
-                # NOTE: (sigler) ask FW why would we want nodes to have different durations?
-                _max_duration = round(max(list(accumulated_durations.values())), 3)
-                _min_duration = round(min(list(accumulated_durations.values())), 3)
-                error_msg += "ERROR(unequal-durations) " if _max_duration != _min_duration else ""
-                cached_duration = _max_duration
-                accumulated_durations = {}
-            # cache the TIME and DURATION of the EXECUTED move-group
-            new_move_group = {
-                "time": (record.date - t0).total_seconds(),
-                "duration": cached_duration,
-                "home-or-sync": sent_home_or_sync_command,
-                "execute-index": record.index
-            }
-            if previous_move_group["execute-index"]:
-                # print the info for the COMPLETED move-group
-                previous_observed_duration = new_move_group["time"] - previous_move_group["time"]
-                if previous_move_group["home-or-sync"]:
-                    displayed_duration = previous_observed_duration
-                    error_msg += "ERROR(unpredictable-home-or-probe-duration)"
+    csv_lines: List[str] = [MoveGroupAsCSVLine.generate_csv_header()]
+    previous_move_group = MoveGroupAsCSVLine(
+        time=0.0, duration=0.0, home_or_sync=False, execute_index=0
+    )
+    try:
+        for record in records_to_check:
+            # only monitor the SENT messages (from host)
+            if record.sender != NodeId.host or record.dest not in nodes_to_check:
+                continue
+            # record the "duration" sent for every node
+            if isinstance(record, MoveCommand):
+                if record.dest not in accumulated_durations:
+                    accumulated_durations[record.dest] = 0.0
+                accumulated_durations[record.dest] += record.duration
+                continue
+            # don't monitor the durations of HOME or PROBING commands
+            # because they have UNPREDICTABLE durations in reality
+            if isinstance(record, (HomeCommand, SyncMoveCommand)):
+                sent_home_or_sync_command = True
+                continue
+            if isinstance(record, ExecuteCommand):
+                error_msg = ""
+                if t0 is None:
+                    t0 = record.date
+                _commanded_nodes = list(accumulated_durations.keys())
+                if not len(_commanded_nodes):
+                    cached_duration = 0.0
                 else:
-                    displayed_duration = previous_move_group["duration"]
-                if displayed_duration == 0.0:
-                    error_msg += "ERROR(unexpected-execute-command)"
-                previous_system_delay_seconds = previous_observed_duration - displayed_duration
-                error_msg += "ERROR(negative-delay) " if previous_system_delay_seconds < 0 else ""
-                error_msg += "ERROR(very-large-delay) " if previous_system_delay_seconds > 0.5 else ""
-                if not error_msg:
-                    print(
-                        f'{previous_move_group["execute-index"]}\t'
-                        f'{previous_move_group["time"]:.{6}f}\t'  # timestamp
-                        f'{len(_commanded_nodes)}\t'
-                        f'{previous_observed_duration:.{6}f}\t'  # observed duration
-                        f'{displayed_duration:.{6}f}\t'  # duration sent over CAN
-                        f'{previous_system_delay_seconds:.{6}f}\t'  # observed delay
-                        f'{error_msg}'
+                    # only track move-groups where ALL nodes are commanded with identical durations
+                    # NOTE: (sigler) ask FW why would we want nodes to have different durations?
+                    _max_duration = round(max(list(accumulated_durations.values())), 6)
+                    _min_duration = round(min(list(accumulated_durations.values())), 6)
+                    error_msg += (
+                        "ERROR(unequal-durations) "
+                        if _max_duration != _min_duration
+                        else ""
                     )
-            # store the cached TIME/DURATION to use for comparison next time
-            previous_move_group = new_move_group.copy()
-            sent_home_or_sync_command = False
+                    cached_duration = _max_duration
+                    accumulated_durations = {}
+                # cache the TIME and DURATION of the EXECUTED move-group
+                new_move_group = MoveGroupAsCSVLine(
+                    time=(record.date - t0).total_seconds(),
+                    duration=cached_duration,
+                    home_or_sync=sent_home_or_sync_command,
+                    execute_index=record.index,
+                )
+                if previous_move_group.execute_index:
+                    node_len = len(_commanded_nodes)
+                    new_line, new_error = previous_move_group.generate_csv_line(
+                        new_move_group.time, node_len
+                    )
+                    if not new_error:
+                        csv_lines.append(new_line)
+                    elif annotate_errors:
+                        print(new_line)
+                # store the cached TIME/DURATION to use for comparison next time
+                previous_move_group = replace(new_move_group)
+                sent_home_or_sync_command = False
+    finally:
+        print("\n\n\n")
+        print("===========================================")
+        print("===============  CSV START  ===============")
+        print("===========================================")
+        print()
+        for line in csv_lines:
+            print(line)  # print takes care of the newline for us
+        print()
+        print("===========================================")
+        print("===============  CSV DONE  ================")
+        print("===========================================")
+        print("\n\n\n")
 
 
 def _print_errors(
@@ -693,7 +755,7 @@ def main(
     elif operation == "print-motion":
         _print_motion(records_to_check, nodes, annotate_errors)
     elif operation == "print-durations":
-        _print_durations(records_to_check)
+        _print_durations(records_to_check, nodes, annotate_errors)
     elif operation == "print-errors":
         _print_errors(records_to_check, nodes, annotate_errors)
     elif operation == "plot-positions":
