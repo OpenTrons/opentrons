@@ -29,7 +29,7 @@ import { getSectionsFromPipetteName } from './utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type { GripperEntity } from '@opentrons/step-generation'
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -40,7 +40,7 @@ import type { PipetteConfig } from './usePipetteConfig'
 import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
 
 interface Gripper {
-  name: AdditionalEquipmentName
+  name: GripperEntity['name']
   id: string
   location?: string
 }

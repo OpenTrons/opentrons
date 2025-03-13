@@ -140,23 +140,40 @@ export interface Ingredients {
   [liquidId: string]: Ingredient
 }
 
-export type AdditionalEquipmentName =
-  | 'gripper'
-  | 'wasteChute'
-  | 'stagingArea'
-  | 'trashBin'
-export interface NormalizedAdditionalEquipmentById {
-  [additionalEquipmentId: string]: {
-    name: AdditionalEquipmentName
-    id: string
-    location?: string
-    //  Note: leaving as optional since gripper and stagingArea
-    //  will never need a pythonName
-    pythonName?: string
-  }
+export interface GripperEntity {
+  name: 'gripper'
+  id: string
 }
-
-export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
+export interface StagingAreaEntity {
+  name: 'stagingArea'
+  id: string
+  location: string
+}
+export interface TrashBinEntity {
+  name: 'trashBin'
+  id: string
+  location: string
+  pythonName: string
+}
+export interface WasteChuteEntity {
+  name: 'wasteChute'
+  id: string
+  location: string
+  pythonName: string
+}
+export type AdditionalEquipmentName =
+  | GripperEntity['name']
+  | StagingAreaEntity['name']
+  | TrashBinEntity['name']
+  | WasteChuteEntity['name']
+export type AdditionalEquipmentEntity =
+  | GripperEntity
+  | StagingAreaEntity
+  | TrashBinEntity
+  | WasteChuteEntity
+export interface NormalizedAdditionalEquipmentById {
+  [additionalEquipmentId: string]: AdditionalEquipmentEntity
+}
 export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
