@@ -23,7 +23,7 @@ export function ManualReplaceLwAndRetry(
     MANUAL_REPLACE_STACKER_AND_RETRY,
   } = RECOVERY_MAP
 
-  console.log("maunally moving")
+  console.log('maunally moving')
 
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions } = props
@@ -31,7 +31,10 @@ export function ManualReplaceLwAndRetry(
   const primaryBtnOnClick = (): Promise<void> =>
     proceedToRouteAndStep(
       RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
-      doorStatusUtils.isDoorOpen ? RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME : RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
+      doorStatusUtils.isDoorOpen
+        ? RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
+            .CLOSE_DOOR_AND_HOME
+        : RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
     )
   const buildBodyText = (): JSX.Element => (
     <Trans
@@ -41,7 +44,7 @@ export function ManualReplaceLwAndRetry(
     />
   )
   const buildContent = (): JSX.Element => {
-    console.log("building contenct")
+    console.log('building contenct')
     switch (step) {
       case MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE:
         return <GripperIsHoldingLabware {...props} />

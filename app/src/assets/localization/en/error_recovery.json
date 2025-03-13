@@ -81,6 +81,8 @@
   "replace_tips_and_select_location": "It's best to replace tips and select the last location used for tip pickup.",
   "replace_used_tips_in_rack_location": "Replace used tips in rack location {{location}} in {{slot}}",
   "replace_with_new_tip_rack": "Replace with new tip rack in {{slot}}",
+  "ensure_stacker_has_labware": "Ensure stacker has labware",
+  "make_sure_loaded_correct_number_of_labware_stacker": "Make sure you load the correct number of labware into the stacker.",
   "resume": "Resume",
   "retry_dropping_tip": "Retry dropping tip",
   "retry_now": "Retry now",

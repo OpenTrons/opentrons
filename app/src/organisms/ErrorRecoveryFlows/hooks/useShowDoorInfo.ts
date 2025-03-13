@@ -36,11 +36,11 @@ export function useShowDoorInfo(
   // Consider restructuring this check once the takeover modals are added.
   const isDoorOpen = runStatus != null && DOOR_OPEN_STATUSES.includes(runStatus)
   const isProhibitedDoorOpen =
-    (isDoorOpen &&
-      !isDoorPermittedOpen(recoveryMap) &&
-      !GRIPPER_MOVE_STEPS.includes(currentStep))
-    //    ||
-    // recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+    isDoorOpen &&
+    !isDoorPermittedOpen(recoveryMap) &&
+    !GRIPPER_MOVE_STEPS.includes(currentStep)
+  //    ||
+  // recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
 
   return { isDoorOpen, isProhibitedDoorOpen }
 }
