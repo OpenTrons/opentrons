@@ -11,6 +11,7 @@ import {
   BORDERS,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  RESPONSIVENESS,
 } from '@opentrons/components'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -34,7 +35,7 @@ export function ManageDefaultOffsetBtn({
     >
       <Flex css={BUTTON_TEXT_CONTAINER_STYLE}>
         {isMissingDefaultOffset && <Icon name="add" css={ADD_ICON_STYLE} />}
-        <StyledText oddStyle="bodyTextSemiBold">
+        <StyledText oddStyle="bodyTextSemiBold" desktopStyle="captionSemiBold">
           {isMissingDefaultOffset ? t('add') : t('adjust')}
         </StyledText>
       </Flex>
@@ -45,7 +46,7 @@ export function ManageDefaultOffsetBtn({
 const customButtonStyle = (
   isMissingDefaultOffset: boolean
 ): FlattenSimpleInterpolation => css`
-  padding: ${SPACING.spacing16} ${SPACING.spacing24};
+  padding: ${SPACING.spacing8} ${SPACING.spacing16};
   border-radius: ${BORDERS.borderRadiusFull};
 
   &:hover,
@@ -56,6 +57,10 @@ const customButtonStyle = (
   &:focus-visible {
     box-shadow: 0 0 0 3px ${COLORS.yellow50};
   }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    padding: ${SPACING.spacing16} ${SPACING.spacing24};
+  }
 `
 
 const BUTTON_TEXT_CONTAINER_STYLE = css`
@@ -65,6 +70,11 @@ const BUTTON_TEXT_CONTAINER_STYLE = css`
 `
 
 const ADD_ICON_STYLE = css`
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 0.75rem;
+  height: 0.75rem;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
 `

@@ -26,7 +26,7 @@ export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
         protocol_name: protocolName,
       }),
     },
-    { loadName: t('calibration_probe'), displayName: t('calibration_probe') },
+    { loadName: 'calibration_probe', displayName: t('calibration_probe') },
   ]
 
   return (

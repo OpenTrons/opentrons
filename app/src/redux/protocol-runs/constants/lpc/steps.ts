@@ -29,4 +29,5 @@ export const HANDLE_LW_SUBSTEP = {
   DETAILS: 'handle-lw/details',
   EDIT_OFFSET_PREP_LW: 'handle-lw/edit-offset/prepare-labware',
   EDIT_OFFSET_CHECK_LW: 'handle-lw/edit-offset/check-labware',
+  EDIT_OFFSET_SUCCESS: 'handle-lw/edit-offset/success',
 } as const

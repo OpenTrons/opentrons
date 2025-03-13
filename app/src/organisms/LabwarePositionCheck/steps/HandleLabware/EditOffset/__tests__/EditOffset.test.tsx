@@ -12,6 +12,7 @@ import {
   selectCurrentSubstep,
   selectActivePipette,
   selectStepInfo,
+  selectSelectedLwOverview,
   goBackEditOffsetSubstep,
   proceedEditOffsetSubstep,
   HANDLE_LW_SUBSTEP,
@@ -40,6 +41,19 @@ vi.mock(
     ),
   })
 )
+vi.mock(
+  '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/DesktopOffsetSuccess',
+  () => ({
+    DesktopOffsetSuccess: (props: any) => (
+      <div
+        data-testid="mock-desktop-offset-success"
+        data-header={props.contentHeader}
+      >
+        Mock Desktop Offset Success
+      </div>
+    ),
+  })
+)
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
@@ -53,11 +67,14 @@ vi.mock('/app/redux/protocol-runs', () => ({
   selectCurrentSubstep: vi.fn(),
   selectActivePipette: vi.fn(),
   selectStepInfo: vi.fn(),
+  selectSelectedLwOverview: vi.fn(),
   goBackEditOffsetSubstep: vi.fn(),
   proceedEditOffsetSubstep: vi.fn(),
+  setFinalPosition: vi.fn(),
   HANDLE_LW_SUBSTEP: {
     EDIT_OFFSET_PREP_LW: 'handle-lw/edit-offset/prepare-labware',
     EDIT_OFFSET_CHECK_LW: 'handle-lw/edit-offset/check-labware',
+    EDIT_OFFSET_SUCCESS: 'handle-lw/edit-offset/success',
   },
 }))
 
@@ -110,6 +127,16 @@ describe('EditOffset', () => {
     ).mockImplementation(() => () => null)
     vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
       HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
+    )
+    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
+      ({
+        uri: 'test-labware-uri',
+        displayName: 'Test Labware',
+        offsetLocationDetails: {
+          location: 'test-location',
+          slot: '1',
+        },
+      } as any)
     )
     vi.mocked(goBackEditOffsetSubstep).mockReturnValue({
       type: 'GO_BACK_HANDLE_LW_SUBSTEP',
@@ -189,6 +216,9 @@ describe('EditOffset', () => {
 
       screen.getByTestId('mock-prepare-labware')
       expect(screen.queryByTestId('mock-check-labware')).not.toBeInTheDocument()
+      expect(
+        screen.queryByTestId('mock-desktop-offset-success')
+      ).not.toBeInTheDocument()
     })
 
     it('renders CheckLabware when on check substep', () => {
@@ -202,6 +232,23 @@ describe('EditOffset', () => {
       expect(
         screen.queryByTestId('mock-prepare-labware')
       ).not.toBeInTheDocument()
+      expect(
+        screen.queryByTestId('mock-desktop-offset-success')
+      ).not.toBeInTheDocument()
+    })
+
+    it('renders DesktopOffsetSuccess when on success substep', () => {
+      vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
+        HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
+      )
+
+      render(props)
+
+      screen.getByTestId('mock-desktop-offset-success')
+      expect(
+        screen.queryByTestId('mock-prepare-labware')
+      ).not.toBeInTheDocument()
+      expect(screen.queryByTestId('mock-check-labware')).not.toBeInTheDocument()
     })
 
     it('renders nothing for unknown substeps', () => {

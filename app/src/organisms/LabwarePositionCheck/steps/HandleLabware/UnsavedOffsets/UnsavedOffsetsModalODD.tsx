@@ -21,15 +21,15 @@ import {
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export const handleUnsavedOffsetsModal = (
+export const handleUnsavedOffsetsModalODD = (
   props: LPCWizardContentProps
 ): Promise<unknown> => {
-  return NiceModal.show(UnsavedOffsetsModal, {
+  return NiceModal.show(UnsavedOffsetsModalODD, {
     ...props,
   })
 }
 
-const UnsavedOffsetsModal = NiceModal.create(
+const UnsavedOffsetsModalODD = NiceModal.create(
   (props: LPCWizardContentProps): JSX.Element => {
     const { runId } = props
     const { t } = useTranslation('labware_position_check')

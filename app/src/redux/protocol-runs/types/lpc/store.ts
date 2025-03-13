@@ -3,7 +3,10 @@ import type {
   DeckConfiguration,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { LPC_STEP } from '/app/redux/protocol-runs'
+import type {
+  LPC_STEP,
+  HANDLE_LW_SUBSTEP,
+} from '/app/redux/protocol-runs/constants'
 import type { LPCLabwareInfo } from './labware'
 
 export interface LPCWizardState {
@@ -25,17 +28,13 @@ export interface StepInfo {
   lastStepIndices: number[] | null
   /* Certain steps utilize substeps. These substeps shouldn't impact state the same way as steps,
    * so they are treated differently. */
-  currentSubstep: HandleLwSubstep | null
+  currentSubstep: HandleLwSubstepType | null
 }
 
 export type LPCStep = keyof typeof LPC_STEP
 
 export type LPCFlowType = 'default' | 'location-specific'
 
-export type LPCSubstep = HandleLwSubstep
+export type LPCSubstep = HandleLwSubstepType
 
-export type HandleLwSubstep =
-  | 'handle-lw/list'
-  | 'handle-lw/details'
-  | 'handle-lw/edit-offset/prepare-labware'
-  | 'handle-lw/edit-offset/check-labware'
+export type HandleLwSubstepType = typeof HANDLE_LW_SUBSTEP[keyof typeof HANDLE_LW_SUBSTEP]

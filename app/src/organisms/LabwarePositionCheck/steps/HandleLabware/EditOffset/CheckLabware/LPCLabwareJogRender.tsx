@@ -50,8 +50,8 @@ export function LPCLabwareJogRender({
               wellStroke={{ A1: COLORS.blue50 }}
               wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
               highlightedWellLabels={{ wells: ['A1'] }}
-              labwareStroke={COLORS.grey30}
-              wellLabelColor={COLORS.grey30}
+              labwareStroke={COLORS.black90}
+              wellLabelColor={COLORS.black90}
             />
             <PipetteRender
               labwareDef={itemLwDef}
