@@ -171,7 +171,6 @@ export const RECOVERY_MAP = {
       PREPARE_TRACK_FOR_HOMING: 'prepare-track-for-homing',
       CLOSE_DOOR_AND_HOME: 'close-door-and-home',
       CONFIRM_RETRY: 'confirm-retry',
-      MANUAL_REPLACE: 'manual-replace',
       RETRY: 'retry',
     },
   },
@@ -303,7 +302,6 @@ export const STEP_ORDER: StepOrder = {
     MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
     MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CLOSE_DOOR_AND_HOME,
     MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY,
-    MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.MANUAL_REPLACE,
     MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.RETRY,
   ],
   [ERROR_WHILE_RECOVERING.ROUTE]: [
@@ -441,9 +439,6 @@ export const RECOVERY_MAP_METADATA: RecoveryRouteStepMetadata = {
       allowDoorOpen: true,
     },
     [MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY]: {
-      allowDoorOpen: false,
-    },
-    [MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.MANUAL_REPLACE]: {
       allowDoorOpen: false,
     },
     [MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.RETRY]: { allowDoorOpen: false },

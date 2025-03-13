@@ -66,6 +66,7 @@ export function ManualReplaceLwAndRetry(
           />
         )
       case MANUAL_REPLACE_AND_RETRY.STEPS.RETRY:
+      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.RETRY:
         return <RetryStepInfo {...props} />
       default:
         console.warn(
