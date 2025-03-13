@@ -11,7 +11,7 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { InputStepFormField } from '../../../../../../molecules'
+import { InputStepFormField } from '../../../../../../components/molecules'
 import { PositionField } from '../../PipetteFields'
 
 import type { FieldPropsByName } from '../../types'

@@ -454,7 +454,8 @@ def _test_for_finding_liquid_height(  # noqa: C901
                 0.0 if is_empty else -9999
             )  # some obviously fake number so we know it failed
         corrected_height = height + tip_z_error
-        all_corrected_heights.append(corrected_height)  # type: ignore[arg-type]
+        if not ctx.is_simulating():
+            all_corrected_heights.append(corrected_height)  # type: ignore[arg-type]
         ctx.pause("CHECK LABWARE")
         # drop tips
         if not SAME_TIP:

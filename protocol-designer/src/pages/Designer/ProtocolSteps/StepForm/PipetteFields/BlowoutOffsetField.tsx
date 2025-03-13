@@ -12,7 +12,7 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { ZTipPositionModal } from '../../../../../organisms'
+import { ZTipPositionModal } from '../../../../../components/organisms'
 import { getLabwareEntities } from '../../../../../step-forms/selectors'
 import type { FieldProps } from '../types'
 

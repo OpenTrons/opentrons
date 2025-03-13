@@ -98,8 +98,14 @@ async def test_dispense_while_tracking_implementation(
             push_out=None,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,
+            is_full_dispense=True,
         )
     ).then_return(42)
+    decoy.when(state_view.pipettes.get_aspirated_volume("pipette-id-abc")).then_return(
+        123
+    )
+
+    decoy.when(pipetting.get_state_view()).then_return(state_view)
 
     decoy.when(state_view.pipettes.get_current_location()).then_return(location)
     decoy.when(
@@ -141,6 +147,9 @@ async def test_dispense_while_tracking_implementation(
                     well_names=["A3", "A4"],
                     volume_added=68,
                 ),
+                ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                    pipette_id="pipette-id-abc", ready_to_aspirate=False
+                ),
             ),
         )
     else:
@@ -151,7 +160,10 @@ async def test_dispense_while_tracking_implementation(
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
                     pipette_id="pipette-id-abc", volume=42
-                )
+                ),
+                ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                    pipette_id="pipette-id-abc", ready_to_aspirate=False
+                ),
             ),
         )
 
@@ -220,7 +232,9 @@ async def test_overpressure_error(
             stateupdateLabware, stateupdateWell, "pipette-id"
         )
     ).then_return(["A3", "A4"])
+    decoy.when(state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(50)
 
+    decoy.when(pipetting.get_state_view()).then_return(state_view)
     decoy.when(
         await pipetting.dispense_while_tracking(
             pipette_id=pipette_id,
@@ -229,6 +243,7 @@ async def test_overpressure_error(
             push_out=10,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,
+            is_full_dispense=True,
         ),
     ).then_raise(PipetteOverpressureError())
 
@@ -256,6 +271,9 @@ async def test_overpressure_error(
                 pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                     pipette_id="pipette-id"
                 ),
+                ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                    pipette_id="pipette-id", ready_to_aspirate=False
+                ),
             ),
         )
     else:
@@ -269,6 +287,9 @@ async def test_overpressure_error(
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                     pipette_id="pipette-id"
-                )
+                ),
+                ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                    pipette_id="pipette-id", ready_to_aspirate=False
+                ),
             ),
         )

@@ -1,6 +1,6 @@
 import { Box } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { SlotDetailsContainer } from '../../../organisms'
+import { SlotDetailsContainer } from '../../../components/organisms'
 import type { RobotType } from '@opentrons/shared-data'
 
 const LEFT_SLOTS = [

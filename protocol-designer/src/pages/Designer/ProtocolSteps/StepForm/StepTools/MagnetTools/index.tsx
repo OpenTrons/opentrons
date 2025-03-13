@@ -15,7 +15,7 @@ import {
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import { getModuleEntities } from '../../../../../../step-forms/selectors'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
