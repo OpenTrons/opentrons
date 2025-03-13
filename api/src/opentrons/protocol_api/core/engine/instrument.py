@@ -340,21 +340,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
             if dynamic_liquid_tracking:
                 self._engine_client.execute_command(
-                    cmd.MoveToWellParams(
-                        pipetteId=self._pipette_id,
-                        labwareId=labware_id,
-                        wellName=well_name,
-                        wellLocation=WellLocation(
-                            origin=well_location.origin,
-                            offset=well_location.offset,
-                            volumeOffset=0,
-                        ),
-                        minimumZHeight=None,
-                        forceDirect=False,
-                        speed=None,
-                    )
-                )
-                self._engine_client.execute_command(
                     cmd.DispenseWhileTrackingParams(
                         pipetteId=self._pipette_id,
                         labwareId=labware_id,

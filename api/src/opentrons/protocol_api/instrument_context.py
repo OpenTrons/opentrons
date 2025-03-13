@@ -2543,6 +2543,8 @@ class InstrumentContext(publisher.CommandPublisher):
             if target.location:
                 move_to_location = target.location
                 meniscus_tracking = target.location.meniscus_tracking
+                if meniscus_tracking == types.MeniscusTrackingTarget.START:
+                    raise ValueError("Cannot aspirate at starting height.")
 
             else:
                 move_to_location = target.well.bottom(

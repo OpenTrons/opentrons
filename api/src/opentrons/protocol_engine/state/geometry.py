@@ -1809,12 +1809,11 @@ class GeometryView:
             initial_height=initial_handling_height,
             volume=operation_volume,
         )
-        if isinstance(initial_handling_height, SimulatedProbeResult) or isinstance(
-            final_height, SimulatedProbeResult
-        ):
-            raise errors.LiquidHeightUnknownError(
-                "liquid handling z change can only be found using real height and volume inputs."
-            )
+        # this function is only called by
+        # HardwarePipetteHandler::aspirate/dispense while_tracking, and shouldn't
+        # be reached in the case of a simulated liquid_probe
+        assert not isinstance(initial_handling_height, SimulatedProbeResult)
+        assert not isinstance(final_height, SimulatedProbeResult)
         return final_height - initial_handling_height
 
     def get_well_offset_adjustment(
