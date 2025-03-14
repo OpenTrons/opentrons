@@ -10,7 +10,7 @@ import {
   BORDERS,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { getModuleType } from '@opentrons/shared-data'
+import { FLEX_STACKER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 
 import {
   OFFSET_KIND_DEFAULT,
@@ -102,9 +102,28 @@ export function LabwareLocationItem({
       }
     }
 
+    const isLabwareInLwStackup = (): boolean => {
+      const { lwModOnlyStackupDetails } = locationDetails
+      const lwOnlyStackup = lwModOnlyStackupDetails.filter(
+        component => component.kind === 'onLabware'
+      )
+
+      return lwOnlyStackup.length > 1
+    }
+
     const deckInfoLabels = [
       <DeckInfoLabel deckLabel={slotCopy} key={slotCopy} />,
     ]
+
+    if (isLabwareInLwStackup()) {
+      // We use the flex stacker's stacked icon to represent stacked labware.
+      deckInfoLabels.push(
+        <DeckInfoLabel
+          iconName={MODULE_ICON_NAME_BY_TYPE[FLEX_STACKER_MODULE_TYPE]}
+          key="stacked-icon"
+        />
+      )
+    }
 
     const moduleType = moduleIconType()
     if (moduleType !== null) {
