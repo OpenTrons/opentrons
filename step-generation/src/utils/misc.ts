@@ -119,33 +119,29 @@ export function getWasteChuteAddressableAreaNamePip(
 }
 
 export function getTrashBinAddressableAreaName(
-  additionalEquipmentEntities: AdditionalEquipmentEntities
-): AddressableAreaName | null {
-  const trash = Object.values(additionalEquipmentEntities).find(
-    aE => aE.name === 'trashBin'
-  )
-  const trashLocation = trash != null ? (trash.location as CutoutId) : null
-
+  trashLocation: CutoutId
+): AddressableAreaName {
   const deckDef = getDeckDefFromRobotType(
     trashLocation === ('cutout12' as CutoutId)
       ? OT2_ROBOT_TYPE
       : FLEX_ROBOT_TYPE
   )
   let cutouts: Record<CutoutId, AddressableAreaName[]> | null = null
+
   if (deckDef.robot.model === FLEX_ROBOT_TYPE) {
     cutouts =
       deckDef.cutoutFixtures.find(
         cutoutFixture => cutoutFixture.id === 'trashBinAdapter'
       )?.providesAddressableAreas ?? null
-  } else if (deckDef.robot.model === OT2_ROBOT_TYPE) {
-    cutouts =
-      deckDef.cutoutFixtures.find(
-        cutoutFixture => cutoutFixture.id === 'fixedTrashSlot'
-      )?.providesAddressableAreas ?? null
   }
-  return trashLocation != null && cutouts != null
-    ? cutouts[trashLocation]?.[0] ?? null
-    : null
+
+  if (deckDef.robot.model === FLEX_ROBOT_TYPE && cutouts == null) {
+    console.error(
+      `expected to find a list of cutouts for the Flex but could not with trashLocation ${trashLocation}`
+    )
+  }
+  //  assume trash location is the fixedTrash for OT-2 if cutouts is null
+  return cutouts != null ? cutouts[trashLocation]?.[0] : 'fixedTrash'
 }
 
 export function getTrashOrLabware(
@@ -156,14 +152,10 @@ export function getTrashOrLabware(
   if (labwareEntities[destinationId] != null) {
     return 'labware'
   } else if (
-    additionalEquipmentEntities[destinationId] != null &&
-    additionalEquipmentEntities[destinationId].name === 'wasteChute'
+    additionalEquipmentEntities[destinationId]?.name === 'wasteChute'
   ) {
     return 'wasteChute'
-  } else if (
-    additionalEquipmentEntities[destinationId] != null &&
-    additionalEquipmentEntities[destinationId].name === 'trashBin'
-  ) {
+  } else if (additionalEquipmentEntities[destinationId]?.name === 'trashBin') {
     return 'trashBin'
   } else {
     console.error(
@@ -351,10 +343,10 @@ export const blowoutUtil = (args: {
     invariantContext,
   } = args
   if (!blowoutLocation) return []
-
+  const { labwareEntities, additionalEquipmentEntities } = invariantContext
   const trashOrLabware = getTrashOrLabware(
-    invariantContext.labwareEntities,
-    invariantContext.additionalEquipmentEntities,
+    labwareEntities,
+    additionalEquipmentEntities,
     destLabwareId
   )
   let labware: LabwareEntity | null = null
@@ -398,7 +390,8 @@ export const blowoutUtil = (args: {
   } else {
     return blowOutInMovableTrash({
       pipetteId: pipette,
-      invariantContext,
+      trashLocation: additionalEquipmentEntities[destLabwareId]
+        .location as CutoutId,
       flowRate,
     })
   }
@@ -581,10 +574,10 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     tipRack,
     nozzles,
   } = args
-
+  const { labwareEntities, additionalEquipmentEntities } = invariantContext
   const trashOrLabware = getTrashOrLabware(
-    invariantContext.labwareEntities,
-    invariantContext.additionalEquipmentEntities,
+    labwareEntities,
+    additionalEquipmentEntities,
     destinationId
   )
 
@@ -625,7 +618,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       pipetteId,
       volume,
       flowRate,
-      invariantContext,
+      trashLocation: additionalEquipmentEntities[destinationId]
+        .location as CutoutId,
     })
   }
 
@@ -645,10 +639,10 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   prevRobotState
 ) => {
   const { destinationId, pipetteId, zOffset, well } = args
-
+  const { labwareEntities, additionalEquipmentEntities } = invariantContext
   const trashOrLabware = getTrashOrLabware(
-    invariantContext.labwareEntities,
-    invariantContext.additionalEquipmentEntities,
+    labwareEntities,
+    additionalEquipmentEntities,
     destinationId
   )
 
@@ -680,7 +674,8 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   } else {
     commands = moveToMovableTrash({
       pipetteId,
-      invariantContext,
+      trashLocation: additionalEquipmentEntities[destinationId]
+        .location as CutoutId,
     })
   }
 
@@ -715,10 +710,10 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     sourceWell,
     volume,
   } = args
-
+  const { labwareEntities, additionalEquipmentEntities } = invariantContext
   const trashOrLabware = getTrashOrLabware(
-    invariantContext.labwareEntities,
-    invariantContext.additionalEquipmentEntities,
+    labwareEntities,
+    additionalEquipmentEntities,
     destinationId
   )
 
@@ -798,7 +793,8 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       pipetteId,
       volume,
       flowRate,
-      invariantContext,
+      trashLocation: additionalEquipmentEntities[destinationId]
+        .location as CutoutId,
     })
   }
 
