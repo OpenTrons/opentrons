@@ -8,7 +8,7 @@
   "metadata": {
     "displayName": "Opentrons Tough PCR Auto-Sealing Lid",
     "displayCategory": "lid",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
