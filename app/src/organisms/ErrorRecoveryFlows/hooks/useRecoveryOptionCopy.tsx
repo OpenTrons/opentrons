@@ -50,6 +50,8 @@ export function useRecoveryOptionCopy(): (
         return t('manually_replace_lw_and_retry')
       case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('replace_labware_in_stacker_and_step')
+      case RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+        return t('manually_load_labware_into_labware_shuttle_and_skip_step')
       default:
         return 'Unknown action'
     }

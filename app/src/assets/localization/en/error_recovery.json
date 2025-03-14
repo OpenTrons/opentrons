@@ -83,6 +83,8 @@
   "replace_with_new_tip_rack": "Replace with new tip rack in {{slot}}",
   "ensure_stacker_has_labware": "Ensure stacker has labware",
   "make_sure_loaded_correct_number_of_labware_stacker": "Make sure you load the correct number of labware into the stacker.",
+  "manually_load_labware_into_labware_shuttle_and_skip_step": "Manually load labware into labware shuttle and skip step",
+  "load_labware_into_labware_shuttle": "Load labware into labware shuttle",
   "resume": "Resume",
   "retry_dropping_tip": "Retry dropping tip",
   "retry_now": "Retry now",

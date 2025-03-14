@@ -36,6 +36,7 @@ export function TwoColLwInfoAndDeck(
     MANUAL_REPLACE_AND_RETRY,
     HOME_AND_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { relevantWellName, failedLabware } = failedLabwareUtils
@@ -75,6 +76,8 @@ export function TwoColLwInfoAndDeck(
       }
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+        return t('load_labware_into_labware_shuttle')
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -83,7 +86,7 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
-  const buildBannerText = (): string => {
+  const buildBannerText = (): string | undefined => {
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
       case MANUAL_REPLACE_AND_RETRY.ROUTE:
@@ -97,6 +100,8 @@ export function TwoColLwInfoAndDeck(
       }
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('make_sure_loaded_correct_number_of_labware_stacker')
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+        return undefined
       default:
         console.error(
           `TwoColLwInfoAndDeck:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
