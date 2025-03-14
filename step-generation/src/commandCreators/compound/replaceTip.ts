@@ -23,7 +23,7 @@ import { dropTip } from '../atomic/dropTip'
 import { pickUpTip } from '../atomic/pickUpTip'
 import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
 
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface ReplaceTipArgs {
@@ -98,15 +98,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
-    invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-      'wasteChute'
-
-  const isTrashBin =
-    invariantContext.additionalEquipmentEntities[dropTipLocation] != null &&
-    invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-      'trashBin'
+  const dropTipEntity =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  const isWasteChute = dropTipEntity?.name === 'wasteChute'
+  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   if (!labwareDef) {
     return {
@@ -230,6 +225,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     commandCreators = [
       curryCommandCreator(dropTipInTrash, {
         pipetteId: pipette,
+        trashLocation: dropTipEntity.location as CutoutId,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {

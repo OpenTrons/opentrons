@@ -2,7 +2,6 @@ import {
   dropTipInPlace,
   moveToAddressableArea,
   getWasteChuteAddressableAreaNamePip,
-  getTrashBinAddressableAreaName,
   dropTipInTrash,
   curryCommandCreator,
   dropTip,
@@ -14,6 +13,7 @@ import {
 import { commandCreatorFromStepArgs } from '../file-data/helpers'
 import type { StepArgsAndErrorsById } from '../steplist/types'
 import type * as StepGeneration from '@opentrons/step-generation'
+import type { CutoutId } from '@opentrons/shared-data'
 
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
@@ -70,24 +70,14 @@ export const generateRobotStateTimeline = (
           'changeTip' in nextStepArgsForPipette &&
           nextStepArgsForPipette.changeTip === 'never'
 
-        const isWasteChute =
-          invariantContext.additionalEquipmentEntities[dropTipLocation] !=
-            null &&
-          invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-            'wasteChute'
-        const isTrashBin =
-          invariantContext.additionalEquipmentEntities[dropTipLocation] !=
-            null &&
-          invariantContext.additionalEquipmentEntities[dropTipLocation].name ===
-            'trashBin'
+        const dropTipEntity =
+          invariantContext.additionalEquipmentEntities[dropTipLocation]
+        const isWasteChute = dropTipEntity?.name === 'wasteChute'
+        const isTrashBin = dropTipEntity?.name === 'trashBin'
 
         const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
         const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
           pipetteSpec.channels
-        )
-
-        const addressableAreaNameTrashBin = getTrashBinAddressableAreaName(
-          invariantContext.additionalEquipmentEntities
         )
 
         let dropTipCommands = [
@@ -108,8 +98,14 @@ export const generateRobotStateTimeline = (
             }),
           ]
         }
-        if (isTrashBin && addressableAreaNameTrashBin != null) {
-          dropTipCommands = [curryCommandCreator(dropTipInTrash, { pipetteId })]
+        if (isTrashBin) {
+          const trashLocation = dropTipEntity.location
+          dropTipCommands = [
+            curryCommandCreator(dropTipInTrash, {
+              pipetteId,
+              trashLocation: trashLocation as CutoutId,
+            }),
+          ]
         }
         if (!willReuseTip) {
           return [
