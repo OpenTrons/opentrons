@@ -42,7 +42,8 @@
         "aluminumBlock",
         "adapter",
         "other",
-        "lid"
+        "lid",
+        "system"
       ]
     },
     "safeString": {
