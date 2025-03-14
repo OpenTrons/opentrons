@@ -65,7 +65,8 @@ _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN = APIVersion(2,
 """The version after which partial nozzle configurations of single, row, and partial column layouts became available."""
 _AIR_GAP_TRACKING_ADDED_IN = APIVersion(2, 22)
 """The version after which air gaps should be implemented with a separate call instead of an aspirate for better liquid volume tracking."""
-
+_LLD_OVERRIDE_LOCATION_ADDED = APIVersion(2, 23)
+"""The Version where liquid probe added the ability to override the starting location of a probe."""
 
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
 
@@ -2481,7 +2482,9 @@ class InstrumentContext(publisher.CommandPublisher):
         self._tip_racks = tip_racks or []
 
     @requires_version(2, 20)
-    def detect_liquid_presence(self, well: labware.Well) -> bool:
+    def detect_liquid_presence(
+        self, well: labware.Well, start_offset: Optional[float] = None
+    ) -> bool:
         """Checks for liquid in a well.
 
         Returns ``True`` if liquid is present and ``False`` if liquid is not present. Will not raise an error if it does not detect liquid. When simulating a protocol, the check always succeeds (returns ``True``). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`detect-liquid-presence`.
@@ -2490,11 +2493,22 @@ class InstrumentContext(publisher.CommandPublisher):
             The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
         """
         self._raise_if_pressure_not_supported_by_pipette()
-        loc = well.top()
+
+        if not start_offset:
+            start_offset = 2
+        else:
+            if self._api_version <= _LLD_OVERRIDE_LOCATION_ADDED:
+                raise UnsupportedAPIError(
+                    message=f"Overriding the Liquid probe location not available in api versions less than {_LLD_OVERRIDE_LOCATION_ADDED}."
+                )
+
+        loc = well.top(start_offset)
         return self._core.detect_liquid_presence(well._core, loc)
 
     @requires_version(2, 20)
-    def require_liquid_presence(self, well: labware.Well) -> None:
+    def require_liquid_presence(
+        self, well: labware.Well, start_offset: Optional[float] = None
+    ) -> None:
         """Check for liquid in a well and raises an error if none is detected.
 
         When this method raises an error, Flex will offer the opportunity to enter recovery mode. In recovery mode, you can manually add liquid to resolve the error. When simulating a protocol, the check always succeeds (does not raise an error). Works with Flex 1-, 8-, and 96-channel pipettes. See :ref:`lpd` and :ref:`require-liquid-presence`.
@@ -2503,11 +2517,20 @@ class InstrumentContext(publisher.CommandPublisher):
             The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8 (positions A1 and H1). For the Flex 96-channel pipette, the pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
         """
         self._raise_if_pressure_not_supported_by_pipette()
-        loc = well.top()
+        if not start_offset:
+            start_offset = 2
+        else:
+            if self._api_version <= _LLD_OVERRIDE_LOCATION_ADDED:
+                raise UnsupportedAPIError(
+                    message=f"Overriding the Liquid probe location not available in api versions less than {_LLD_OVERRIDE_LOCATION_ADDED}."
+                )
+        loc = well.top(start_offset)
         self._core.liquid_probe_with_recovery(well._core, loc)
 
     @requires_version(2, 20)
-    def measure_liquid_height(self, well: labware.Well) -> LiquidTrackingType:
+    def measure_liquid_height(
+        self, well: labware.Well, start_offset: Optional[float] = None
+    ) -> LiquidTrackingType:
         """Check the height of the liquid within a well.
 
         :returns: The height, in mm, of the liquid from the deck.
@@ -2517,7 +2540,14 @@ class InstrumentContext(publisher.CommandPublisher):
         This is intended for Opentrons internal use only and is not a guaranteed API.
         """
         self._raise_if_pressure_not_supported_by_pipette()
-        loc = well.top()
+        if not start_offset:
+            start_offset = 2
+        else:
+            if self._api_version <= _LLD_OVERRIDE_LOCATION_ADDED:
+                raise UnsupportedAPIError(
+                    message=f"Overriding the Liquid probe location not available in api versions less than {_LLD_OVERRIDE_LOCATION_ADDED}."
+                )
+        loc = well.top(start_offset)
         return self._core.liquid_probe_without_recovery(well._core, loc)
 
     def _raise_if_configuration_not_supported_by_pipette(

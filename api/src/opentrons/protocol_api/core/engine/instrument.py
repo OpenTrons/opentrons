@@ -1995,12 +1995,26 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             self.pipette_id
         )
 
+    def _convert_lpd_target_to_well_location(
+        self, well_core: WellCore, loc: Location
+    ) -> WellLocation:
+        top_point = self._engine_client.state.geometry.get_well_position(
+            well_name=well_core.get_name(),
+            labware_id=well_core.labware_id,
+            well_location=WellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
+            ),
+        )
+        loc_point = loc.point
+        offset = loc_point.z - top_point.z
+        return WellLocation(
+            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=offset)
+        )
+
     def detect_liquid_presence(self, well_core: WellCore, loc: Location) -> bool:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
-        well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=0)
-        )
+        well_location = self._convert_lpd_target_to_well_location(well_core, loc)
 
         # The error handling here is a bit nuanced and also a bit broken:
         #
@@ -2057,9 +2071,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def liquid_probe_with_recovery(self, well_core: WellCore, loc: Location) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
-        well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
-        )
+        well_location = self._convert_lpd_target_to_well_location(well_core, loc)
+
         self._engine_client.execute_command(
             cmd.LiquidProbeParams(
                 labwareId=labware_id,
@@ -2077,9 +2090,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     ) -> LiquidTrackingType:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
-        well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
-        )
+        well_location = self._convert_lpd_target_to_well_location(well_core, loc)
+
         result = self._engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(
                 labwareId=labware_id,
