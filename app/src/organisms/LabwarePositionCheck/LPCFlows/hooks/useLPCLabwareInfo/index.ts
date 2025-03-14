@@ -12,6 +12,7 @@ import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueValidLwLocationInfoByAnalysis'
+import { useTrackEvent } from '/app/redux/analytics'
 
 const REFETCH_OFFSET_SEARCH_MS = 5000
 
@@ -42,16 +43,21 @@ function useFlexLPCLabwareInfo({
   labwareDefs,
   protocolData,
   robotType,
+  runId,
 }: UseLPCLabwareInfoProps): Pick<
   UseLPCLabwareInfoResult,
   'labwareInfo' | 'storedOffsets'
 > {
+  const trackEvent = useTrackEvent()
+
   const lwLocationCombos = useMemo(
     () =>
       getUniqueValidLwLocationInfoByAnalysis({
         labwareDefs,
         protocolData,
         robotType,
+        trackEvent,
+        runId,
       }),
     [labwareDefs?.length, protocolData?.commands.length, robotType]
   )

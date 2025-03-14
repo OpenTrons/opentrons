@@ -71,7 +71,7 @@ export function useLPCFlows({
       mostRecentAnalysis?.commands ?? []
     )
     return labwareDefsFromCommands
-  }, [mostRecentAnalysis != null])
+  }, [mostRecentAnalysis?.commands.length])
 
   const {
     labwareInfo,
