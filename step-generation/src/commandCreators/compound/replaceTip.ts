@@ -169,24 +169,14 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  let primaryNozzle
-  if (nozzles === COLUMN) {
-    primaryNozzle = PRIMARY_NOZZLE
-  } else if (nozzles === SINGLE && channels === 96) {
-    primaryNozzle = 'H12'
-  } else if (nozzles === SINGLE && channels === 8) {
-    primaryNozzle = 'H1'
-  }
-
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
-    (channels === 96 || channels === 8) &&
-    args.nozzles != null &&
-    args.nozzles !== stateNozzles
+    channels === 96 && args.nozzles != null && args.nozzles !== stateNozzles
       ? [
           curryCommandCreator(configureNozzleLayout, {
             configurationParams: {
-              primaryNozzle,
+              primaryNozzle:
+                args.nozzles === COLUMN ? PRIMARY_NOZZLE : undefined,
               style: args.nozzles,
             },
             pipetteId: args.pipette,
