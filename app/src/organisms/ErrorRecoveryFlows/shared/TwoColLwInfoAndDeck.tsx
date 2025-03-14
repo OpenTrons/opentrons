@@ -28,6 +28,7 @@ export function TwoColLwInfoAndDeck(
     deckMapUtils,
     currentRecoveryOptionUtils,
     isOnDevice,
+    recoveryMap,
   } = props
   const {
     RETRY_NEW_TIPS,
@@ -41,6 +42,7 @@ export function TwoColLwInfoAndDeck(
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { relevantWellName, failedLabware } = failedLabwareUtils
   const { proceedNextStep } = routeUpdateActions
+  const { step } = recoveryMap
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
@@ -77,7 +79,11 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('ensure_stacker_has_labware')
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-        return t('load_labware_into_labware_shuttle')
+        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE) {
+          return t('load_labware_into_labware_shuttle')
+        } else {
+          return t('ensure_stacker_has_labware')
+        }
       default:
         console.error(
           `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
@@ -101,7 +107,11 @@ export function TwoColLwInfoAndDeck(
       case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('make_sure_loaded_correct_number_of_labware_stacker')
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-        return undefined
+        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE) {
+          return undefined
+        } else {
+          return t('make_sure_loaded_correct_number_of_labware_stacker')
+        }
       default:
         console.error(
           `TwoColLwInfoAndDeck:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`

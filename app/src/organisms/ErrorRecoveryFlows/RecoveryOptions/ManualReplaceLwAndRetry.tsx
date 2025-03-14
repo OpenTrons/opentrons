@@ -8,6 +8,7 @@ import {
   TwoColTextAndFailedStepNextStep,
   RetryStepInfo,
   RecoveryDoorOpenSpecial,
+  SkipStepInfo,
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
@@ -21,6 +22,7 @@ export function ManualReplaceLwAndRetry(
   const {
     MANUAL_REPLACE_AND_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
   } = RECOVERY_MAP
 
   const { t } = useTranslation('error_recovery')
@@ -28,11 +30,15 @@ export function ManualReplaceLwAndRetry(
   const { proceedToRouteAndStep } = routeUpdateActions
   const primaryBtnOnClick = (): Promise<void> =>
     proceedToRouteAndStep(
-      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+      route,
       doorStatusUtils.isDoorOpen
-        ? RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
-            .CLOSE_DOOR_AND_HOME
-        : RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
+        ? route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+          ? RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
+              .CLOSE_DOOR_AND_HOME
+          : MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLOSE_DOOR_AND_HOME
+        : route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+        ? RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
+        : MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
     )
   const buildBodyText = (): JSX.Element => (
     <Trans
@@ -65,6 +71,8 @@ export function ManualReplaceLwAndRetry(
       case MANUAL_REPLACE_AND_RETRY.STEPS.RETRY:
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.RETRY:
         return <RetryStepInfo {...props} />
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.SKIP:
+        return <SkipStepInfo {...props} />
       default:
         console.warn(
           `ManualReplaceLwAndRetry: ${step} in ${route} not explicitly handled. Rerouting.`
