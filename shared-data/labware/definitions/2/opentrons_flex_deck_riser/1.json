@@ -7,7 +7,7 @@
   "metadata": {
     "displayName": "Opentrons Flex Deck Riser",
     "displayCategory": "adapter",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
