@@ -7,15 +7,18 @@ from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
 if ARCHITECTURE is SystemArchitecture.YOCTO:
     from opentrons_hardware.sensors import SENSOR_LOG_NAME
+    from opentrons_hardware.hardware_control import MOVE_PROFILE_LOG_NAME
 else:
     # we don't use the sensor log on ot2 or host
     SENSOR_LOG_NAME = "unused"
+    MOVE_PROFILE_LOG_NAME = "unused"
 
 
 def _host_config(level_value: int) -> Dict[str, Any]:
     serial_log_filename = CONFIG["serial_log_file"]
     api_log_filename = CONFIG["api_log_file"]
     sensor_log_filename = CONFIG["sensor_log_file"]
+    move_profile_log_filename = CONFIG["move_profile_log_file"]
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -56,6 +59,14 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "backupCount": 5,
             },
+            "move_profile": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "basic",
+                "filename": move_profile_log_filename,
+                "maxBytes": 1000000,
+                "level": logging.DEBUG,
+                "backupCount": 5,
+            },
         },
         "loggers": {
             "opentrons": {
@@ -86,6 +97,11 @@ def _host_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "propagate": False,
             },
+            MOVE_PROFILE_LOG_NAME: {
+                "handlers": ["move_profile"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
             "__main__": {"handlers": ["api"], "level": level_value},
         },
     }
@@ -96,6 +112,7 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
     # linux systems and we probably don't want to use it on linux desktops
     # either
     sensor_log_filename = CONFIG["sensor_log_file"]
+    move_profile_log_filename = CONFIG["move_profile_log_file"]
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -135,6 +152,14 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "backupCount": 3,
             },
+            "move_profile": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "message_only",
+                "filename": move_profile_log_filename,
+                "maxBytes": 1000000,
+                "level": logging.DEBUG,
+                "backupCount": 3,
+            },
         },
         "loggers": {
             "opentrons.drivers.asyncio.communication.serial_connection": {
@@ -162,6 +187,11 @@ def _buildroot_config(level_value: int) -> Dict[str, Any]:
             },
             SENSOR_LOG_NAME: {
                 "handlers": ["sensor"],
+                "level": logging.DEBUG,
+                "propagate": False,
+            },
+            MOVE_PROFILE_LOG_NAME: {
+                "handlers": ["move_profile"],
                 "level": logging.DEBUG,
                 "propagate": False,
             },

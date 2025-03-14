@@ -5,6 +5,7 @@ from copy import deepcopy
 from functools import partial, lru_cache, wraps
 from dataclasses import replace
 import logging
+import time
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
@@ -26,6 +27,8 @@ from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
 
+
+from opentrons_hardware.hardware_control import MOVE_PROFILE_LOG_NAME
 
 from opentrons_shared_data.pipette.types import (
     PipetteName,
@@ -148,6 +151,7 @@ from .backends.ot3simulator import OT3Simulator
 from .backends.errors import SubsystemUpdating
 
 mod_log = logging.getLogger(__name__)
+PROFILE_LOG = logging.getLogger(MOVE_PROFILE_LOG_NAME)
 
 AXES_IN_HOMING_ORDER: Tuple[Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis] = (
     *Axis.ot3_mount_axes(),
@@ -1460,6 +1464,8 @@ class OT3API(
         expect_stalls: bool = False,
     ) -> None:
         """Worker function to apply robot motion."""
+        start = time.time()
+        PROFILE_LOG.info(f"API level move {start}")
         machine_pos = machine_from_deck(
             deck_pos=target_position,
             attitude=self._robot_calibration.deck_calibration.attitude,
@@ -1492,10 +1498,13 @@ class OT3API(
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
+                PROFILE_LOG.info(f"API level move Failed {time.time() - start}")
                 raise
             else:
                 await self._cache_current_position()
                 await self._cache_encoder_position()
+
+        PROFILE_LOG.info(f"API level move done {time.time() - start}")
 
     async def _set_plunger_current_and_home(
         self,
