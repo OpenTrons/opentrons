@@ -22,6 +22,8 @@ export function LPCProbeNotAttached(props: LPCWizardContentProps): JSX.Element {
   const { commandUtils } = props
   const { headerCommands } = commandUtils
 
+  // TOME TODO: This is broken on desktop!
+
   return (
     <LPCContentContainer
       {...props}

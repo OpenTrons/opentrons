@@ -94,6 +94,7 @@ interface BaseOffsetDetails {
 }
 
 export interface ExistingOffset {
+  id: string
   createdAt: string
   vector: VectorOffset
 }

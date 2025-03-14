@@ -10,7 +10,7 @@ import { useHandlePrepModules } from './useHandlePrepModules'
 import { useHandleConfirmLwModulePlacement } from './useHandleConfirmLwModulePlacement'
 import { useHandleConfirmLwFinalPosition } from './useHandleConfirmLwFinalPosition'
 import { useHandleResetLwModulesOnDeck } from './useHandleResetLwModulesOnDeck'
-import { useBuildOffsetsToApply } from './useBuildOffsetsToApply'
+import { useSaveWorkingOffsets } from './useSaveWorkingOffsets'
 import { useHandleValidMoveToMaintenancePosition } from './useHandleValidMoveToMaintenancePosition'
 
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -25,7 +25,7 @@ import type { UseHandleConfirmPlacementResult } from './useHandleConfirmLwModule
 import type { UseHandleConfirmPositionResult } from './useHandleConfirmLwFinalPosition'
 import type { UseHandleResetLwModulesOnDeckResult } from './useHandleResetLwModulesOnDeck'
 import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
-import type { UseBuildOffsetsToApplyResult } from './useBuildOffsetsToApply'
+import type { UseBuildOffsetsToApplyResult } from './useSaveWorkingOffsets'
 import type { UseHandleValidMoveToMaintenancePositionResult } from './useHandleValidMoveToMaintenancePosition'
 import { fullHomeCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/commands'
 
@@ -78,7 +78,7 @@ export function useLPCCommands(
     })
 
   const applyLPCOffsetsUtils = useApplyLPCOffsets({ ...props, setErrorMessage })
-  const buildLPCOffsets = useBuildOffsetsToApply({ ...props, setErrorMessage })
+  const applyWorkingOffsets = useSaveWorkingOffsets({ ...props })
   const handleJogUtils = useHandleJog({
     ...props,
     setErrorMessage,
@@ -120,7 +120,7 @@ export function useLPCCommands(
     home: () =>
       chainLPCCommands(fullHomeCommands(), false).then(() => Promise.resolve()),
     ...applyLPCOffsetsUtils,
-    ...buildLPCOffsets,
+    ...applyWorkingOffsets,
     ...handleJogUtils,
     ...handleConditionalCleanupUtils,
     ...handleProbeCommands,
