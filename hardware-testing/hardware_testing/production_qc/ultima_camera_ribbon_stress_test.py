@@ -181,7 +181,7 @@ def _record_motion_check_data(
 def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
     """Create points for the bowtie movement."""
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
-    pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
+    pos_min = types.Point(x=0, y=30, z=pos_max.z)  # stay above deck to be safe
     bowtie_points = [
         pos_max,  # back-right
         pos_min,  # front-left
