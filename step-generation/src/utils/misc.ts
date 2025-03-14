@@ -388,10 +388,13 @@ export const blowoutUtil = (args: {
       invariantContext,
     })
   } else {
+    const trashBin = Object.values(additionalEquipmentEntities).find(
+      ae => ae.name === 'trashBin'
+    )
+    console.log('trashBin entity', trashBin)
     return blowOutInMovableTrash({
       pipetteId: pipette,
-      trashLocation: additionalEquipmentEntities[destLabwareId]
-        .location as CutoutId,
+      trashLocation: trashBin?.location as CutoutId,
       flowRate,
     })
   }
