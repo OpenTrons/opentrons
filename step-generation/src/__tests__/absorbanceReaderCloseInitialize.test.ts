@@ -1,4 +1,8 @@
 import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
+import {
+  ABSORBANCE_READER_TYPE,
+  ABSORBANCE_READER_V1,
+} from '@opentrons/shared-data'
 import { absorbanceReaderCloseInitialize } from '../commandCreators'
 import {
   absorbanceReaderStateGetter,
@@ -6,6 +10,7 @@ import {
 } from '../robotStateSelectors'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
+import { GRIPPER_LOCATION } from '../constants'
 
 import type {
   AbsorbanceReaderInitializeArgs,
@@ -13,10 +18,6 @@ import type {
   InvariantContext,
   RobotState,
 } from '../types'
-import {
-  ABSORBANCE_READER_TYPE,
-  ABSORBANCE_READER_V1,
-} from '@opentrons/shared-data'
 
 vi.mock('../robotStateSelectors')
 
@@ -50,6 +51,7 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
         [GRIPPER_ID]: {
           id: GRIPPER_ID,
           name: 'gripper',
+          location: GRIPPER_LOCATION,
         },
       },
     }
