@@ -184,7 +184,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
     @ensure_yield
     async def get_motion_params(self, axis: StackerAxis) -> MoveParams:
         """Get the motion parameters used by the given axis motor."""
-        return MoveParams(axis, 1, 1, 1)
+        return MoveParams(1, 1, 1)
 
     @ensure_yield
     async def get_stallguard_threshold(self, axis: StackerAxis) -> StallGuardParams:

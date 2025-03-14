@@ -13,12 +13,12 @@ from opentrons.drivers.flex_stacker.driver import STACKER_MOTION_CONFIG
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
 TEST_AXIS = StackerAxis.X
-HOME_SPEED = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].max_speed
-HOME_CURRENT = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].current
+HOME_SPEED = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].move_params.max_speed
+HOME_CURRENT = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].run_current
 
 TEST_SPEEDS = [200, 220]  # mm/s
 TEST_CURRENTS = [1.5, 0.7, 0.5, 0.4, 0.3]  # A rms
-TEST_ACCELERATION = STACKER_MOTION_CONFIG[TEST_AXIS]["move"].acceleration
+TEST_ACCELERATION = STACKER_MOTION_CONFIG[TEST_AXIS]["move"].move_params.acceleration
 CURRENT_THRESHOD = 0.5  # A rms
 TEST_TRIALS = 10
 
