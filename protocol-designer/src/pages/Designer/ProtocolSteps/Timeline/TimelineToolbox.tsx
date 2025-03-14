@@ -11,7 +11,7 @@ import {
   Toolbox,
 } from '@opentrons/components'
 
-import { NAV_BAR_HEIGHT_REM } from '../../../../atoms'
+import { NAV_BAR_HEIGHT_REM } from '../../../../components/atoms'
 import {
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,

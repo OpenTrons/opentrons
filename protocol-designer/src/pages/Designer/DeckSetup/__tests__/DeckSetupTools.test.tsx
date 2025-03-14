@@ -10,7 +10,7 @@ import {
 import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { deleteContainer } from '../../../../labware-ingred/actions'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { deleteModule } from '../../../../modules'
 import {
   getAdditionalEquipment,
@@ -37,7 +37,7 @@ vi.mock('../../../../step-forms/actions/additionalItems')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../organisms/Kitchen/hooks')
+vi.mock('../../../../components/organisms/Kitchen/hooks')
 const render = (props: ComponentProps<typeof DeckSetupTools>) => {
   return renderWithProviders(<DeckSetupTools {...props} />, {
     i18nInstance: i18n,

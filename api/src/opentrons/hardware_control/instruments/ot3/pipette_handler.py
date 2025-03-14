@@ -607,6 +607,7 @@ class OT3PipetteHandler:
         volume: Optional[float],
         rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool,
         correction_volume: float = 0.0,
     ) -> Optional[LiquidActionSpec]:
         """Check preconditions for dispense, parse args, and calculate positions.
@@ -644,7 +645,21 @@ class OT3PipetteHandler:
         # of the OT-2 version of this class. Protocol Engine does its own clamping,
         # so we don't expect this to trigger in practice.
         disp_vol = min(instrument.current_volume, disp_vol)
-        is_full_dispense = numpy.isclose(instrument.current_volume - disp_vol, 0)
+
+        # TODO (Ryan): Remove this check in the future.
+        # we moved this logic up to protocol_engine but replacing with this check to make sure
+        # we don't accidentally call this incorrectly from somewhere else.
+        if not is_full_dispense and numpy.isclose(
+            instrument.current_volume - disp_vol, 0
+        ):
+            raise CommandPreconditionViolated(
+                message="Command created a full-dispense without the full dispense argument",
+                detail={
+                    "command": "dispense",
+                    "current-volume": str(instrument.current_volume),
+                    "dispense-volume": str(disp_vol),
+                },
+            )
 
         if disp_vol == 0:
             return None

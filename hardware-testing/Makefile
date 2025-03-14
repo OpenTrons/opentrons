@@ -170,7 +170,7 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: test-stacker
 test-stacker:
-	$(python) -m hardware_testing.modules.flex_stacker_evt_qc --simulate
+	$(python) -m hardware_testing.modules.flex_stacker_dvt_qc --simulate
 
 .PHONY: lint
 lint:

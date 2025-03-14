@@ -1,5 +1,5 @@
 import * as Fixtures from '../../../../app/src/molecules/Command/__fixtures__'
-import { getLabwareDefinitionsFromCommands } from '../ProtocolTimelineScrubber/utils'
+import { getLabwareDefinitionsFromCommands } from './useCommandTextString/utils'
 import { Box } from '../../primitives'
 import { CommandText as CommandTextComponent } from './index'
 import type { RobotType } from '@opentrons/shared-data'
