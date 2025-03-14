@@ -7,9 +7,8 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
 import {
-  ALL,
-  COLUMN,
   PIPETTE_NAMES_MAP,
+  SINGLE,
   getIncompatibleLiquidClasses,
 } from '@opentrons/shared-data'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
@@ -237,12 +236,10 @@ export const getNozzleType = (
   nozzles: string | null
 ): NozzleType | null => {
   const is8Channel = pipette != null && pipette.spec.channels === 8
-  if (is8Channel) {
+  if (is8Channel && nozzles !== SINGLE) {
     return '8-channel'
-  } else if (nozzles === COLUMN) {
-    return COLUMN
-  } else if (nozzles === ALL) {
-    return ALL
+  } else if (nozzles != null) {
+    return nozzles as NozzleType
   } else {
     return null
   }

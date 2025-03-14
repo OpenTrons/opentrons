@@ -7,6 +7,7 @@
     "description": "",
     "created": 1689346890165,
     "lastModified": 1740602529129,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
@@ -3923,7 +3924,7 @@
       "displayColor": "#ffd600"
     }
   },
-  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
       "key": "7ad3ac41-b82b-414f-af25-b4fef3a9b85c",

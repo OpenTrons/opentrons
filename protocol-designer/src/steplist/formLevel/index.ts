@@ -48,6 +48,7 @@ import {
   wavelengthOutOfRange,
   referenceWavelengthOutOfRange,
   absorbanceReaderModuleIdRequired,
+  magneticModuleIdRequired,
   aspirateTouchTipSpeedRequired,
   dispenseTouchTipSpeedRequired,
 } from './errors'
@@ -175,7 +176,8 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       magnetActionRequired,
       engageHeightRequired,
       moduleIdRequired,
-      engageHeightRangeExceeded
+      engageHeightRangeExceeded,
+      magneticModuleIdRequired
     ),
   },
   temperature: {

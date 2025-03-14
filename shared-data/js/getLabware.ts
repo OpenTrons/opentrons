@@ -47,6 +47,8 @@ export const LABWAREV2_DO_NOT_LIST = [
   // temporarily blocking evotips until it is out of beta
   'evotips_flex_96_tiprack_adapter',
   'evotips_opentrons_96_labware',
+  'evotips_tiprack_adapter',
+  'evotips_reservoir_adapter',
   // temporarily blocking tiprack lids until stacker launches
   'opentrons_flex_tiprack_lid',
   // temporarily blocking 20 uL Flex tip racks until they launch
@@ -71,6 +73,8 @@ export const PD_DO_NOT_LIST = [
   //  temporarily blocking evotips until it is supported in PD
   'evotips_flex_96_tiprack_adapter',
   'evotips_opentrons_96_labware',
+  'evotips_tiprack_adapter',
+  'evotips_reservoir_adapter',
   // temporarily blocking tiprack lids until stacker launches
   'opentrons_flex_tiprack_lid',
   // temporarily blocking 20 uL Flex tip racks until they launch

@@ -3,10 +3,11 @@ import {
   COLUMN,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
+  SINGLE,
 } from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInTrash } from './dropTipInTrash'
 import {
   curryCommandCreator,
   getIsHeaterShakerEastWestMultiChannelPipette,
@@ -15,10 +16,9 @@ import {
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
-  getWasteChuteAddressableAreaNamePip,
   PRIMARY_NOZZLE,
 } from '../../utils'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { dropTip } from '../atomic/dropTip'
 import { pickUpTip } from '../atomic/pickUpTip'
 import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
@@ -174,18 +174,24 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    channels
-  )
+  let primaryNozzle
+  if (nozzles === COLUMN) {
+    primaryNozzle = PRIMARY_NOZZLE
+  } else if (nozzles === SINGLE && channels === 96) {
+    primaryNozzle = 'H12'
+  } else if (nozzles === SINGLE && channels === 8) {
+    primaryNozzle = 'H1'
+  }
 
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
-    channels === 96 && args.nozzles != null && args.nozzles !== stateNozzles
+    (channels === 96 || channels === 8) &&
+    args.nozzles != null &&
+    args.nozzles !== stateNozzles
       ? [
           curryCommandCreator(configureNozzleLayout, {
             configurationParams: {
-              primaryNozzle:
-                args.nozzles === COLUMN ? PRIMARY_NOZZLE : undefined,
+              primaryNozzle,
               style: args.nozzles,
             },
             pipetteId: args.pipette,
@@ -208,11 +214,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ]
   if (isWasteChute) {
     commandCreators = [
-      ...wasteChuteCommandsUtil({
-        type: 'dropTip',
-        pipetteId: pipette,
-        addressableAreaName: addressableAreaNameWasteChute,
-        prevRobotState,
+      curryCommandCreator(dropTipInWasteChute, {
+        pipetteId: args.pipette,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {
@@ -225,11 +228,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
   if (isTrashBin) {
     commandCreators = [
-      ...movableTrashCommandsUtil({
-        type: 'dropTip',
+      curryCommandCreator(dropTipInTrash, {
         pipetteId: pipette,
-        prevRobotState,
-        invariantContext,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {

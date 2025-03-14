@@ -47,6 +47,7 @@ describe('pythonMetadata', () => {
         category: 'PCR',
         subcategory: 'PCR Prep',
         tags: ['wombat', 'kangaroo', 'wallaby'],
+        source: 'Protocol Designer',
       })
     ).toBe(
       `
@@ -60,6 +61,7 @@ metadata = {
     "subcategory": "PCR Prep",
     "tags": "wombat, kangaroo, wallaby",
     "protocolDesigner": "fake_PD_version",
+    "source": "Protocol Designer",
 }`.trimStart()
     )
   })
@@ -323,6 +325,37 @@ pipette_left = protocol.load_instrument("flex_1channel_1000", "right", tip_racks
       `
 # Load Pipettes:
 pipette_left = protocol.load_instrument("p300_multi_gen2", "left")`.trimStart()
+    )
+  })
+
+  it('should generate loadPipette for 96-channel pipette with no tiprack', () => {
+    const pipette1 = 'pipette1'
+    const mockPipetteEntities: PipetteEntities = {
+      [pipette1]: {
+        id: pipette1,
+        pythonName: 'pipette',
+        name: 'p1000_96',
+        tiprackDefURI: [],
+        spec: { ...fixtureP1000SingleV2Specs, channels: 96 },
+        tiprackLabwareDef: [],
+      },
+    }
+
+    const mockTiprackEntities: LabwareEntities = {}
+    const pipetteRobotState: TimelineFrame['pipettes'] = {
+      [pipette1]: { mount: 'left' },
+    }
+
+    expect(
+      getLoadPipettes(
+        mockPipetteEntities,
+        mockTiprackEntities,
+        pipetteRobotState
+      )
+    ).toBe(
+      `
+# Load Pipettes:
+pipette = protocol.load_instrument("flex_96channel_1000")`.trimStart()
     )
   })
 })

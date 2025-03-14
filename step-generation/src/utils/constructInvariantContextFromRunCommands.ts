@@ -17,6 +17,7 @@ import type {
   AdditionalEquipmentName,
 } from '../types'
 import { uuid } from '.'
+import { GRIPPER_LOCATION } from '../constants'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
@@ -108,7 +109,7 @@ export function constructInvariantContextFromRunCommands(
         const addressableAreaName = command.params.addressableAreaName
         const id = `${uuid()}:${addressableAreaName}`
         let name: AdditionalEquipmentName = 'trashBin'
-        let location
+        let location: string = GRIPPER_LOCATION
         if (addressableAreaName === 'fixedTrash') {
           location = '12'
         } else if (addressableAreaName.includes('WasteChute')) {

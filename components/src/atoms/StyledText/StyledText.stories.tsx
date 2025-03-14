@@ -5,7 +5,7 @@ import { StyledText, ODD_STYLES, HELIX_STYLES } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof StyledText> = {
-  title: 'Library/Atoms/StyledText',
+  title: 'Helix/Atoms/StyledText',
   component: StyledText,
   argTypes: {
     oddStyle: {

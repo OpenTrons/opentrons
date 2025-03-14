@@ -10,7 +10,7 @@ import { AltPrimaryButton } from './AltPrimaryButton'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Atoms/Buttons',
+  title: 'Helix/Atoms/Buttons',
 } as Meta
 
 const PrimaryButtonTemplate: Story<

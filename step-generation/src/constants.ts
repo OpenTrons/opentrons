@@ -84,3 +84,5 @@ export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
 export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'
 export const COLUMN_4_SLOTS = ['A4', 'B4', 'C4', 'D4']
 export const ZERO_OFFSET: AddressableOffsetVector = { x: 0, y: 0, z: 0 }
+
+export const GRIPPER_LOCATION: 'mounted' = 'mounted'

@@ -7,6 +7,7 @@
     "description": "",
     "created": 1701805621086,
     "lastModified": 1740602607511,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
@@ -2355,7 +2356,7 @@
   },
   "liquidSchemaId": "opentronsLiquidSchemaV1",
   "liquids": {},
-  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
       "key": "1652dde4-b828-41d9-8610-758e32c712c7",

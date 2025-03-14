@@ -2,6 +2,8 @@ export { absorbanceReaderCloseInitialize } from './absorbanceReaderCloseInitiali
 export { absorbanceReaderCloseRead } from './absorbanceReaderCloseRead'
 export { consolidate } from './consolidate'
 export { distribute } from './distribute'
+export { dropTipInTrash } from './dropTipInTrash'
+export { dropTipInWasteChute } from './dropTipInWasteChute'
 export { heaterShaker } from './heaterShaker'
 export { mix } from './mix'
 export { replaceTip } from './replaceTip'

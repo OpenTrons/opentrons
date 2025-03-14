@@ -1,8 +1,5 @@
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
-import {
-  COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER,
-  getLabwareCompatibleWithModule,
-} from '../../utils/labwareModuleCompatibility'
+import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
 import type { LabwareLocation } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -26,7 +23,6 @@ const getMoveLabwareError = (
     !getLabwareDefIsStandard(labware?.def)
   )
     return null
-  const selectedLabwareDefUri = labware?.labwareDefURI
   if ('moduleId' in newLocation) {
     const moduleType =
       invariantContext.moduleEntities[newLocation.moduleId].type
@@ -34,14 +30,13 @@ const getMoveLabwareError = (
       ? 'Labware incompatible with this module'
       : null
   } else if ('labwareId' in newLocation) {
-    const adapterValueDefUri =
+    const adapterLoadName =
       invariantContext.labwareEntities[newLocation.labwareId].def.parameters
         .loadName
-    const adapterAllowList =
-      COMPATIBLE_LABWARE_ALLOWLIST_FOR_ADAPTER[adapterValueDefUri]
-    errorString = !adapterAllowList?.includes(selectedLabwareDefUri)
-      ? 'Labware incompatible with this adapter'
-      : null
+    errorString =
+      labware?.def.stackingOffsetWithLabware?.[adapterLoadName] == null
+        ? 'Labware incompatible with this adapter'
+        : null
   }
   return errorString
 }

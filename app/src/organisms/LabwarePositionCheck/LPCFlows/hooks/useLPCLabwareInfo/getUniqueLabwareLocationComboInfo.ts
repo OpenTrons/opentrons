@@ -38,7 +38,8 @@ export function getUniqueLabwareLocationComboInfo({
       )
       if (
         (labwareDef?.allowedRoles ?? []).includes('adapter') ||
-        (labwareDef?.allowedRoles ?? []).includes('lid')
+        (labwareDef?.allowedRoles ?? []).includes('lid') ||
+        (labwareDef?.allowedRoles ?? []).includes('system')
       ) {
         return acc
       }

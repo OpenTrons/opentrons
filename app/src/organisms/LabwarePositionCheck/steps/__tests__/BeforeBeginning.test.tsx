@@ -4,9 +4,9 @@ import { useSelector } from 'react-redux'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { BeforeBeginning } from '/app/organisms/LabwarePositionCheck/steps'
-import { clickButtonLabeled } from '/app/organisms/LabwarePositionCheck/__tests__/utils'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -18,6 +18,10 @@ vi.mock('react-redux', async importOriginal => {
     useSelector: vi.fn(),
   }
 })
+
+vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
+  LPCContentContainer: MockLPCContentContainer,
+}))
 
 const render = (props: ComponentProps<typeof BeforeBeginning>) => {
   return renderWithProviders(<BeforeBeginning {...props} />, {
@@ -53,21 +57,20 @@ describe('BeforeBeginning', () => {
     })
   })
 
-  it('renders appropriate header content and onClick behavior', () => {
+  it('passes correct header props to LPCContentContainer', () => {
     render(props)
 
-    screen.getByText('Labware Position Check')
-    screen.getByText('Exit')
-    screen.getByText('Move gantry to front')
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Labware Position Check')
 
-    const progressBar = screen.getByTestId('StepMeter_StepMeterBar')
-    expect(progressBar).toHaveStyle('width: 20%')
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute(
+      'data-button-text',
+      'Move gantry to front'
+    )
 
-    clickButtonLabeled('Move gantry to front')
-    expect(mockHandleProceed).toHaveBeenCalled()
-
-    clickButtonLabeled('Exit')
-    expect(mockHandleNavToDetachProbe).toHaveBeenCalled()
+    const secondaryButton = screen.getByTestId('secondary-button')
+    expect(secondaryButton).toHaveAttribute('data-text', 'Exit')
   })
 
   it('renders appropriate body content', () => {

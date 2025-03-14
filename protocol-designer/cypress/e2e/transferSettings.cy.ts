@@ -2,17 +2,16 @@ import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { UniversalSteps } from '../support/UniversalSteps'
 import { StepBuilder } from '../support/StepBuilder'
 
-describe('The Redesigned Create Protocol Landing Page', () => {
+describe('Transfer stepform testing Single Channel - Happy Path', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
   })
 
-  it('content and step 1 flow works', () => {
+  it('Goes through onboarding flow and then single-channel one-to-one transfer', () => {
     cy.clickCreateNew()
     cy.verifyCreateNewHeader()
-
     const steps = new StepBuilder()
     steps.add(SetupVerifications.OnStep1())
     steps.add(SetupVerifications.FlexSelected())

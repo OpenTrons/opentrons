@@ -40,7 +40,7 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
-import { TimelineAlerts } from '../../../organisms'
+import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
@@ -75,8 +75,7 @@ export function ProtocolSteps(): JSX.Element {
   const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
-  const showTimelineAlerts =
-    hasTimelineErrors && tab === 'protocolSteps' && formData == null
+  const showTimelineAlerts = hasTimelineErrors && tab === 'protocolSteps'
   const stepDetails = currentStep?.stepDetails ?? null
 
   return (
@@ -105,6 +104,7 @@ export function ProtocolSteps(): JSX.Element {
           width={CONTENT_MAX_WIDTH}
           height="100%"
           justifyContent={JUSTIFY_CENTER}
+          paddingY={SPACING.spacing120}
         >
           {showTimelineAlerts ? (
             <TimelineAlerts
@@ -117,6 +117,7 @@ export function ProtocolSteps(): JSX.Element {
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
+            height="2.25rem"
           >
             {currentStep != null && hoveredTerminalItem == null ? (
               <StyledText desktopStyle="headingSmallBold">
@@ -142,7 +143,11 @@ export function ProtocolSteps(): JSX.Element {
               }}
             />
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing16}
+            height="100%"
+          >
             {deckView === leftString ? (
               <DeckSetupContainer tab="protocolSteps" />
             ) : (

@@ -169,7 +169,7 @@
       },
       "POSSIBLE_PIPETTE_COLLISION": {
         "title": "Pipette collisions likely",
-        "body": "There is a possibility that the pipette will collide with the adjascent labware or module for partial tip pick up."
+        "body": "There is a possibility that the pipette will collide with the adjacent labware or module for partial tip pick up."
       },
       "ABSORBANCE_READER_NO_INITIALIZATION": {
         "title": "Missing Absorbance Plate Reader initialization step",
