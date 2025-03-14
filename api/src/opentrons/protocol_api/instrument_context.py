@@ -408,19 +408,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 "knows where it is."
             ) from e
 
-        move_to_location, well, meniscus_tracking = self._handle_dispense_target(
-            target=target
-        )
-
-        if self.api_version >= APIVersion(2, 11) and not isinstance(
-            target, (TrashBin, WasteChute)
-        ):
-            instrument.validate_takes_liquid(
-                location=move_to_location,
-                reject_module=self.api_version >= APIVersion(2, 13),
-                reject_adapter=self.api_version >= APIVersion(2, 15),
-            )
-
         if self.api_version >= APIVersion(2, 16):
             c_vol = self._core.get_current_volume() if volume is None else volume
         else:
@@ -447,9 +434,20 @@ class InstrumentContext(publisher.CommandPublisher):
                     flow_rate=flow_rate,
                     in_place=False,
                     push_out=push_out,
-                    meniscus_tracking=meniscus_tracking,
+                    meniscus_tracking=None,
                 )
             return self
+
+        move_to_location, well, meniscus_tracking = self._handle_dispense_target(
+            target=target
+        )
+
+        if self.api_version >= APIVersion(2, 11):
+            instrument.validate_takes_liquid(
+                location=move_to_location,
+                reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
+            )
 
         with publisher.publish_context(
             broker=self.broker,
@@ -2531,49 +2529,41 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
     def _handle_aspirate_target(
-        self, target: validation.ValidTarget
+        self, target: Union[validation.WellTarget, validation.PointTarget]
     ) -> tuple[
         types.Location, Optional[labware.Well], Optional[types.MeniscusTrackingTarget]
     ]:
-        move_to_location = types.Location(point=types.Point(), labware=None)
-        well: Optional[labware.Well] = None
-        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if isinstance(target, validation.WellTarget):
-            well = target.well
             if target.location:
-                move_to_location = target.location
-                meniscus_tracking = target.location.meniscus_tracking
+                return target.location, target.well, target.location.meniscus_tracking
 
             else:
-                move_to_location = target.well.bottom(
-                    z=self._well_bottom_clearances.aspirate
+                return (
+                    target.well.bottom(z=self._well_bottom_clearances.aspirate),
+                    target.well,
+                    None,
                 )
         if isinstance(target, validation.PointTarget):
-            move_to_location = target.location
-        return move_to_location, well, meniscus_tracking
+            return target.location, None, None
 
     def _handle_dispense_target(
-        self, target: validation.ValidTarget
+        self, target: Union[validation.WellTarget, validation.PointTarget]
     ) -> tuple[
         types.Location, Optional[labware.Well], Optional[types.MeniscusTrackingTarget]
     ]:
-        move_to_location = types.Location(point=types.Point(), labware=None)
-        well: Optional[labware.Well] = None
-        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if isinstance(target, validation.WellTarget):
-            well = target.well
             if target.location:
-                move_to_location = target.location
-                meniscus_tracking = target.location.meniscus_tracking
-            elif well.parent._core.is_fixed_trash():
-                move_to_location = target.well.top()
+                return target.location, target.well, target.location.meniscus_tracking
+            elif target.well.parent._core.is_fixed_trash():
+                return target.well.top(), target.well, None
             else:
-                move_to_location = target.well.bottom(
-                    z=self._well_bottom_clearances.dispense
+                return (
+                    target.well.bottom(z=self._well_bottom_clearances.dispense),
+                    target.well,
+                    None,
                 )
         if isinstance(target, validation.PointTarget):
-            move_to_location = target.location
-        return move_to_location, well, meniscus_tracking
+            return target.location, None, None
 
 
 class AutoProbeDisable:
