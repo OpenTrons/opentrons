@@ -56,7 +56,6 @@ export const RunPreviewComponent = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['run_details', 'protocol_setup'])
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  console.log(robotSideAnalysis)
   const runStatus = useRunStatus(runId)
   const { data: runRecord } = useNotifyRunQuery(runId)
   const isRunTerminal =

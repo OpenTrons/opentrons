@@ -1,7 +1,81 @@
-import type { VectorOffset } from '@opentrons/api-client'
+import type {
+  ANY_LOCATION,
+  LabwareOffsetLocationSequence,
+  OnLabwareOffsetLocationSequenceComponent,
+  OnModuleOffsetLocationSequenceComponent,
+  VectorOffset,
+} from '@opentrons/api-client'
 import type { ModuleModel } from '@opentrons/shared-data'
 
+export type LabwareOffsetLocSeqOrAnyLoc =
+  | LabwareOffsetLocationSequence
+  | typeof ANY_LOCATION
+
+export type OnModuleOffsetLocationSequenceComponentWithId = OnModuleOffsetLocationSequenceComponent & {
+  id: string
+}
+export type OnLabwareOffsetLocationSequenceComponentWithId = OnLabwareOffsetLocationSequenceComponent & {
+  id: string
+}
+
+export type LabwareModuleOnlyLocWithId =
+  | OnModuleOffsetLocationSequenceComponentWithId
+  | OnLabwareOffsetLocationSequenceComponentWithId
+
+export type LabwareModuleOnlyStackupDetails = LabwareModuleOnlyLocWithId[]
+
+/** The location and labware info for a top-most labware in a stackup. This data is associated
+ * with a labware that is LPC-able.
+ *
+ * In current LPC flows, the UI is greatly concerned with the closest module and
+ * adapter beneath the labware of LPC interest. Therefore, much of the below data
+ * are so frequently used in copy, deck maps, deck labels, etc., that it is reasonable to inject
+ * these data as a part of the location info. */
+export interface LabwareLocationInfo {
+  // The definition URI of the top-most labware.
+  definitionUri: string
+  // A labware id in the run that is an instance of the labware geometry (the definitionUri).
+  labwareId: string
+  // The base slot in which the top-most labware resides.
+  slotName: string
+  // The actual offset location sequence used for querying or updating the offset related
+  // to the labware location info.
+  lwOffsetLocSeq: LabwareOffsetLocSeqOrAnyLoc
+  // The module + labware stackup including the top-most labware (the labware being LPC'd).
+  // LPC cares about real instances of these geometries for running commands, so the
+  // id is included, too.
+  lwModOnlyStackupDetails: LabwareModuleOnlyStackupDetails
+  // The id of the closest module that resides beneath the top-most labware, if any.
+  closestBeneathModuleId?: string
+  // The model of the closest module that resides beneath the top-most labware, if any.
+  closestBeneathModuleModel?: ModuleModel
+  // The id of the closest adapter that resides beneath the top-most labware, if any.
+  closestBeneathAdapterId?: string
+}
+
 export type LPCOffsetKind = 'default' | 'location-specific' | 'hardcoded'
+
+interface BaseOffsetLocationDetails extends LabwareLocationInfo {
+  kind: LPCOffsetKind
+}
+
+export type OffsetLocationDetails =
+  | DefaultOffsetLocationDetails
+  | LocationSpecificOffsetLocationDetails
+
+export interface DefaultOffsetLocationDetails
+  extends BaseOffsetLocationDetails {
+  slotName: 'C2'
+  kind: 'default'
+  lwOffsetLocSeq: typeof ANY_LOCATION
+}
+
+export interface LocationSpecificOffsetLocationDetails
+  extends BaseOffsetLocationDetails {
+  slotName: string
+  kind: 'location-specific'
+  lwOffsetLocSeq: LabwareOffsetLocationSequence
+}
 
 export interface LocationSpecificOffsetDetails extends BaseOffsetDetails {
   locationDetails: LocationSpecificOffsetLocationDetails
@@ -37,29 +111,4 @@ interface WorkingBaseOffset {
   initialPosition: VectorOffset | null
   finalPosition: VectorOffset | null
   confirmedVector: VectorOffset | 'RESET_TO_DEFAULT' | null
-}
-
-export type OffsetLocationDetails =
-  | DefaultOffsetLocationDetails
-  | LocationSpecificOffsetLocationDetails
-
-export interface DefaultOffsetLocationDetails
-  extends BaseOffsetLocationDetails {
-  slotName: 'C2'
-  kind: 'default'
-}
-
-export interface LocationSpecificOffsetLocationDetails
-  extends BaseOffsetLocationDetails {
-  slotName: string
-  kind: 'location-specific'
-}
-
-interface BaseOffsetLocationDetails {
-  kind: LPCOffsetKind
-  labwareId: string
-  definitionUri: string
-  moduleModel?: ModuleModel
-  moduleId?: string
-  adapterId?: string
 }

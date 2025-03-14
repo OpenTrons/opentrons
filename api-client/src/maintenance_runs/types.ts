@@ -7,6 +7,7 @@ import type {
 import type {
   RunCommandSummary,
   LegacyLabwareOffsetCreateData,
+  LabwareOffsetCreateData,
   RunStatus,
   RunAction,
 } from '../runs'
@@ -42,7 +43,7 @@ export interface MaintenanceRunError {
 }
 
 export interface CreateMaintenanceRunData {
-  labwareOffsets?: LegacyLabwareOffsetCreateData[]
+  labwareOffsets?: LegacyLabwareOffsetCreateData[] | LabwareOffsetCreateData[]
 }
 
 export interface LabwareDefinitionSummary {

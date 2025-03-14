@@ -12,7 +12,12 @@ export function LPCWizardContainer(
     case FLEX_ROBOT_TYPE:
       return <LPCWizardFlex {...props} />
     case OT2_ROBOT_TYPE:
-      return <LegacyLabwarePositionCheck {...props} />
+      return (
+        <LegacyLabwarePositionCheck
+          {...props}
+          existingOffsets={props.runRecordExistingOffsets}
+        />
+      )
     default: {
       console.error('Unhandled robot type in LPC.')
       return <></>

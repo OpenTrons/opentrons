@@ -6,7 +6,7 @@ import {
   getIsTiprack,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
-import { getLegacyLabwareLocationCombos } from '/app/src/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+import { getLegacyLabwareLocationCombos } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 
 import type {
   LabwarePositionCheckStep,
@@ -20,7 +20,7 @@ import type {
   ProtocolAnalysisOutput,
   PickUpTipRunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareLocationCombo } from '/app/src/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
+import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 
 interface LPCArgs {
   primaryPipetteId: string
@@ -118,7 +118,7 @@ function getCheckTipRackSectionSteps(args: LPCArgs): CheckTipRacksStep[] {
     ...uniqPrimaryPipettePickUpTipCommands,
   ].reduce<CheckTipRacksStep[]>((acc, { params }) => {
     const labwareLocations = labwareLocationCombos.reduce<
-      LabwareLocationCombo[]
+      LegacyLabwareLocationCombo[]
     >((acc, labwareLocationCombo) => {
       // remove labware that isn't accessed by a pickup tip command
       if (labwareLocationCombo.labwareId !== params.labwareId) {
@@ -156,7 +156,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
     commands,
     labware,
     modules
-  ).reduce<LabwareLocationCombo[]>((acc, labwareLocationCombo) => {
+  ).reduce<LegacyLabwareLocationCombo[]>((acc, labwareLocationCombo) => {
     const labwareDef = labwareDefinitions.find(
       def => getLabwareDefURI(def) === labwareLocationCombo.definitionUri
     )
