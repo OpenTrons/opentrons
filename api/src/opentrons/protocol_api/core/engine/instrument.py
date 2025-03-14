@@ -1128,7 +1128,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             if self._protocol_core.robot_type == "OT-2 Standard":
                 raise NoLiquidClassPropertyError(
                     "Default liquid classes are not supported with OT-2 pipettes and tip racks."
-                )
+                ) from None
             raise
 
         # TODO: use the ID returned by load_liquid_class in command annotations
@@ -1322,7 +1322,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             if self._protocol_core.robot_type == "OT-2 Standard":
                 raise NoLiquidClassPropertyError(
                     "Default liquid classes are not supported with OT-2 pipettes and tip racks."
-                )
+                ) from None
             raise
 
         # If there are no multi-dispense properties or if the volume to distribute
@@ -1577,7 +1577,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             if self._protocol_core.robot_type == "OT-2 Standard":
                 raise NoLiquidClassPropertyError(
                     "Default liquid classes are not supported with OT-2 pipettes and tip racks."
-                )
+                ) from None
             raise
 
         blow_out_properties = transfer_props.dispense.retract.blowout
