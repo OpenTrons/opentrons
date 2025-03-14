@@ -17,7 +17,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { AnnouncementModal, DOC_URL } from '../../organisms'
+import { AnnouncementModal, DOC_URL } from '../../components/organisms'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
@@ -26,8 +26,7 @@ import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../tutorial'
-import { ToggleButton } from '../../atoms/ToggleButton'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE, ToggleButton } from '../../components/atoms'
 import { actions as featureFlagActions } from '../../feature-flags'
 import { getFeatureFlagData } from '../../feature-flags/selectors'
 import type { FlagTypes } from '../../feature-flags'

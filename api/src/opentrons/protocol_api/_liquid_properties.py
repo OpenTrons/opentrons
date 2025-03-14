@@ -168,7 +168,7 @@ class TouchTipProperties:
 
     @speed.setter
     def speed(self, new_speed: float) -> None:
-        validated_speed = validation.ensure_positive_float(new_speed)
+        validated_speed = validation.ensure_greater_than_zero_float(new_speed)
         self._speed = validated_speed
 
     def _get_shared_data_params(self) -> Optional[SharedDataTouchTipParams]:

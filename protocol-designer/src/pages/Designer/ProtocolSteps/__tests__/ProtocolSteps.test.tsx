@@ -36,7 +36,7 @@ vi.mock('../Timeline')
 vi.mock('../DraggableSidebar')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../organisms/Alerts')
+vi.mock('../../../../components/organisms/Alerts')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {
     i18nInstance: i18n,

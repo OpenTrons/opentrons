@@ -6,12 +6,16 @@ from tempfile import TemporaryDirectory
 
 import anyio
 import httpx
+import pytest
 
 from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
 from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
+
+
+pytestmark = pytest.mark.slow
 
 
 _CORRUPT_PERSISTENCE_DIR = PERSISTENCE_SNAPSHOTS_DIR / "corrupt"

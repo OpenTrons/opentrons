@@ -17,6 +17,10 @@ from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 if TYPE_CHECKING:
     from _pytest.mark import ParameterSet
 
+
+pytestmark = pytest.mark.slow
+
+
 # Allow plenty of time for database migrations, which can take a while in our CI runners.
 _STARTUP_TIMEOUT = 60
 

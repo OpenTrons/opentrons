@@ -6,7 +6,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { TextAreaField } from '../../../../../../molecules'
+import { TextAreaField } from '../../../../../../components/molecules'
 import type { ChangeEvent } from 'react'
 import type { StepFormProps } from '../../types'
 

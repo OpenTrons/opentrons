@@ -8,14 +8,14 @@ import {
 } from '@opentrons/shared-data'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { LabwareOnDeck } from '../../../organisms'
+import { LabwareOnDeck } from '../../../components/organisms'
 import { DeckThumbnail } from '../DeckThumbnail'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type * as Components from '@opentrons/components'
 
-vi.mock('../../../organisms')
+vi.mock('../../../components/organisms')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../step-forms/selectors')
 vi.mock('@opentrons/components', async importOriginal => {

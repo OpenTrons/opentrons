@@ -33,8 +33,8 @@ import { deleteModule } from '../../../modules'
 import {
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
-} from '../../../organisms'
-import { useKitchen } from '../../../organisms/Kitchen/hooks'
+} from '../../../components/organisms'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 

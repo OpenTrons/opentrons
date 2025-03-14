@@ -17,7 +17,7 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import {
   deselectAllSteps,
   hoverOnStep,

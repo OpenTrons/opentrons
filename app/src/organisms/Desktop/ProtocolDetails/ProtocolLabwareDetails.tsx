@@ -24,33 +24,82 @@ import { getTopPortalEl } from '/app/App/portal'
 import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 
 import type { MouseEventHandler } from 'react'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data'
+import type {
+  LoadLabwareRunTimeCommand,
+  LoadLidStackRunTimeCommand,
+  LoadLidRunTimeCommand,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 interface ProtocolLabwareDetailsProps {
-  requiredLabwareDetails: LoadLabwareRunTimeCommand[] | null
+  loadLabwareCommands: Array<
+    | LoadLabwareRunTimeCommand
+    | LoadLidStackRunTimeCommand
+    | LoadLidRunTimeCommand
+  > | null
 }
 
 export const ProtocolLabwareDetails = (
   props: ProtocolLabwareDetailsProps
 ): JSX.Element => {
-  const { requiredLabwareDetails } = props
+  const { loadLabwareCommands } = props
   const { t } = useTranslation('protocol_details')
 
-  const labwareDetails =
-    requiredLabwareDetails != null
+  const labwareAndLidDetails =
+    loadLabwareCommands != null
       ? [
-          ...requiredLabwareDetails
-            .reduce((acc, labware) => {
-              if (labware.result?.definition == null) return acc
-              else if (!acc.has(getLabwareDefURI(labware.result.definition))) {
-                acc.set(getLabwareDefURI(labware.result.definition), {
-                  ...labware,
-                  quantity: 0,
-                })
+          ...loadLabwareCommands
+            .reduce((acc, command) => {
+              if (command.result?.definition == null) return acc
+              else if (command.commandType === 'loadLid') return acc
+              else if (command.commandType === 'loadLidStack') {
+                if (!acc.has(getLabwareDefURI(command.result.definition))) {
+                  acc.set(getLabwareDefURI(command.result.definition), {
+                    ...command,
+                    quantity: 0,
+                  })
+                }
+                acc.get(
+                  getLabwareDefURI(command.result?.definition)
+                ).quantity += command.result?.labwareIds.length
+                return acc
+              } else {
+                let defUri = getLabwareDefURI(command.result?.definition)
+                const lidCommand = loadLabwareCommands.find(
+                  c =>
+                    c.commandType === 'loadLid' &&
+                    c.params.location !== 'offDeck' &&
+                    c.params.location !== 'systemLocation' &&
+                    'labwareId' in c.params.location &&
+                    c.params.location.labwareId === command.result?.labwareId
+                )
+                if (
+                  lidCommand != null &&
+                  lidCommand.result?.definition != null
+                ) {
+                  defUri = `${defUri}_${getLabwareDefURI(
+                    lidCommand.result.definition
+                  )}`
+
+                  if (!acc.has(defUri)) {
+                    acc.set(defUri, {
+                      ...command,
+                      quantity: 0,
+                      lid: lidCommand.result.definition,
+                    })
+                  }
+                } else {
+                  if (!acc.has(defUri)) {
+                    acc.set(defUri, {
+                      ...command,
+                      quantity: 0,
+                    })
+                  }
+                }
+                acc.get(defUri).quantity++
+                return acc
               }
-              acc.get(getLabwareDefURI(labware.result?.definition)).quantity++
-              return acc
             }, new Map())
             .values(),
         ]
@@ -58,7 +107,7 @@ export const ProtocolLabwareDetails = (
 
   return (
     <>
-      {labwareDetails.length > 0 ? (
+      {labwareAndLidDetails.length > 0 ? (
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           <Flex flexDirection={DIRECTION_ROW}>
             <StyledText
@@ -78,13 +127,14 @@ export const ProtocolLabwareDetails = (
               {t('quantity')}
             </StyledText>
           </Flex>
-          {labwareDetails?.map((labware, index) => (
+          {labwareAndLidDetails?.map((labware, index) => (
             <ProtocolLabwareDetailItem
               key={index}
               namespace={labware.params.namespace}
               displayName={labware.result?.definition?.metadata?.displayName}
               quantity={labware.quantity}
               labware={{ definition: labware.result?.definition }}
+              lid={labware.lid}
               data-testid={`ProtocolLabwareDetails_item_${index}`}
             />
           ))}
@@ -100,13 +150,15 @@ interface ProtocolLabwareDetailItemProps {
   namespace: string
   displayName: string
   quantity: string
+  lid?: LabwareDefinition2
   labware: LabwareDefAndDate
 }
 
 export const ProtocolLabwareDetailItem = (
   props: ProtocolLabwareDetailItemProps
 ): JSX.Element => {
-  const { namespace, displayName, quantity, labware } = props
+  const { t } = useTranslation('protocol_details')
+  const { namespace, displayName, quantity, labware, lid } = props
   return (
     <>
       <Divider width="100%" />
@@ -133,12 +185,23 @@ export const ProtocolLabwareDetailItem = (
           ) : (
             <Flex marginLeft={SPACING.spacing20} />
           )}
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            paddingRight={SPACING.spacing32}
-          >
-            {displayName}
-          </StyledText>
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              paddingRight={SPACING.spacing32}
+            >
+              {displayName}
+            </StyledText>
+            {lid != null ? (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                color={COLORS.grey60}
+                paddingRight={SPACING.spacing32}
+              >
+                {t('with_lid_name', { lid: lid.metadata.displayName })}
+              </StyledText>
+            ) : null}
+          </Flex>
         </Flex>
         <StyledText desktopStyle="bodyDefaultRegular">{quantity}</StyledText>
         <LabwareDetailOverflowMenu labware={labware} />

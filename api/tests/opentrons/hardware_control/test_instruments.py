@@ -585,7 +585,7 @@ async def test_dispense_ot3(
     with pytest.raises(CommandPreconditionViolated):
         await hw_api.dispense(mount, 5, push_out=10)
 
-    await hw_api.dispense(mount, rate=2, push_out=10)
+    await hw_api.dispense(mount, rate=2, push_out=10, is_full_dispense=True)
     plunger_pos_2 = 72.2715
     assert (await hw_api.current_position(mount))[Axis.B] == pytest.approx(
         plunger_pos_2, 0.1
@@ -832,7 +832,7 @@ async def test_dispense_flow_rate(
         assert_move_called(mock_move, 10)
 
     with mock.patch.object(hw_api, "_move") as mock_move:
-        await hw_api.dispense(types.Mount.LEFT, 1, rate=0.5)
+        await hw_api.dispense(types.Mount.LEFT, 1, rate=0.5, is_full_dispense=True)
         assert_move_called(mock_move, 5)
 
 

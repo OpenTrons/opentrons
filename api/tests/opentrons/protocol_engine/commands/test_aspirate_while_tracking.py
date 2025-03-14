@@ -139,6 +139,10 @@ async def test_aspirate_while_tracking_implementation(
     ).then_return(True)
 
     decoy.when(
+        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
+    ).then_return(True)
+
+    decoy.when(
         await pipetting.aspirate_while_tracking(
             pipette_id="pipette-id-abc",
             volume=123,
@@ -218,6 +222,9 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
         )
     ).then_return(False)
 
+    decoy.when(
+        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
+    ).then_return(False)
     with pytest.raises(
         PipetteNotReadyToAspirateError,
         match="Pipette cannot aspirate while tracking because of a previous blow out."
@@ -255,6 +262,9 @@ async def test_aspirate_raises_volume_error(
         pipetting.get_is_ready_to_aspirate(pipette_id="pipette-id-abc")
     ).then_return(True)
 
+    decoy.when(
+        state_store.pipettes.get_ready_to_aspirate("pipette-id-abc")
+    ).then_return(True)
     decoy.when(
         await pipetting.aspirate_while_tracking(
             pipette_id="pipette-id-abc",
@@ -334,6 +344,8 @@ async def test_overpressure_error(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)).then_return(
         True
     )
+
+    decoy.when(state_store.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     decoy.when(
         await pipetting.aspirate_while_tracking(

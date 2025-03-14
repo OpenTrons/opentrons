@@ -81,17 +81,29 @@ def test_set_stored_labware_all_elements(
     ).then_return(sentinel.custom_labware_load_params)
     decoy.when(
         load_labware_params.resolve(
-            "main-name", "main-namespace", 1, sentinel.custom_labware_load_params
+            "main-name",
+            "main-namespace",
+            1,
+            sentinel.custom_labware_load_params,
+            MAX_SUPPORTED_VERSION,
         )
     ).then_return(("main-namespace-verified", 10))
     decoy.when(
         load_labware_params.resolve(
-            "adapter-name", "adapter-namespace", 2, sentinel.custom_labware_load_params
+            "adapter-name",
+            "adapter-namespace",
+            2,
+            sentinel.custom_labware_load_params,
+            MAX_SUPPORTED_VERSION,
         )
     ).then_return(("adapter-namespace-verified", 20))
     decoy.when(
         load_labware_params.resolve(
-            "lid-name", "lid-namespace", 3, sentinel.custom_labware_load_params
+            "lid-name",
+            "lid-namespace",
+            3,
+            sentinel.custom_labware_load_params,
+            MAX_SUPPORTED_VERSION,
         )
     ).then_return(("lid-namespace-verified", 30))
 
@@ -139,7 +151,11 @@ def test_set_stored_labware_only_checks_load_name_for_lid_and_adapter_valid(
     ).then_return(sentinel.custom_labware_load_params)
     decoy.when(
         load_labware_params.resolve(
-            "main-name", "main-namespace", 1, sentinel.custom_labware_load_params
+            "main-name",
+            "main-namespace",
+            1,
+            sentinel.custom_labware_load_params,
+            MAX_SUPPORTED_VERSION,
         )
     ).then_return(("main-namespace-verified", 10))
 

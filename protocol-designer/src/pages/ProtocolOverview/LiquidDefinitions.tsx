@@ -12,7 +12,7 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { getEnableLiquidClasses } from '../../feature-flags/selectors'
 import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 

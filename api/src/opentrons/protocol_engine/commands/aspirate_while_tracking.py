@@ -91,8 +91,8 @@ class AspirateWhileTrackingImplementation(
             TipNotAttachedError: if no tip is attached to the pipette.
             PipetteNotReadyToAspirateError: pipette plunger is not ready.
         """
-        ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
-            pipette_id=params.pipetteId,
+        ready_to_aspirate = self._state_view.pipettes.get_ready_to_aspirate(
+            pipette_id=params.pipetteId
         )
         if not ready_to_aspirate:
             raise PipetteNotReadyToAspirateError(

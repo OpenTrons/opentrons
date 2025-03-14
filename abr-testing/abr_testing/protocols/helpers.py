@@ -514,7 +514,7 @@ def find_liquid_height(pipette: InstrumentContext, well_to_probe: Well) -> float
         )
     except PipetteLiquidNotFoundError:
         liquid_height = 0
-    return liquid_height
+    return liquid_height if isinstance(liquid_height, (float, int)) else 0
 
 
 def load_wells_with_custom_liquids(

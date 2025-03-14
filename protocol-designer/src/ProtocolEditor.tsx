@@ -9,7 +9,7 @@ import {
   OVERFLOW_AUTO,
 } from '@opentrons/components'
 import { ProtocolRoutes } from './ProtocolRoutes'
-import { PortalRoot } from './organisms'
+import { PortalRoot } from './components/organisms'
 import { getEnableReactScan } from './feature-flags/selectors'
 
 export function ProtocolEditor(): JSX.Element {

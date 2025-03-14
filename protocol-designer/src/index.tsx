@@ -7,7 +7,7 @@ import { initialize } from './initialize'
 import { initializeMixpanel } from './analytics/mixpanel'
 import { i18n } from './assets/localization'
 import { App } from './App'
-import { GlobalStyle } from './atoms/GlobalStyle'
+import { GlobalStyle } from './components/atoms'
 
 // initialize Redux
 const store = configureStore()

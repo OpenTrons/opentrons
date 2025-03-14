@@ -19,7 +19,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { getLiquidEntities } from '../../step-forms/selectors'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 

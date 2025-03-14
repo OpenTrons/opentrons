@@ -15,14 +15,14 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { WizardBody } from './WizardBody'
 import {
   AdditionalEquipmentDiagram,
   getNumOptions,
   getNumSlotsAvailable,
 } from './utils'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '../../components/atoms'
 import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 
 import type { DropdownBorder } from '@opentrons/components'

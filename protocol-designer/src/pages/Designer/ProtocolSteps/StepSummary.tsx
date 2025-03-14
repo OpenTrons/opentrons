@@ -25,7 +25,7 @@ import {
   getModuleEntities,
 } from '../../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../../components/atoms'
 import { formatTime } from '../utils'
 
 import type { FormData } from '../../../form-types'

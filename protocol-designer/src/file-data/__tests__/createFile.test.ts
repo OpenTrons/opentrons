@@ -125,6 +125,7 @@ metadata = {
     "description": "Protocol description",
     "created": "2020-02-25T21:48:32.515Z",
     "protocolDesigner": "fake_PD_version",
+    "source": "Protocol Designer",
 }
 
 requirements = {

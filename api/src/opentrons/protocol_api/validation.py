@@ -627,6 +627,16 @@ def ensure_positive_float(value: Union[int, float]) -> float:
     return float_value
 
 
+def ensure_greater_than_zero_float(value: Union[int, float]) -> float:
+    """Ensure value is a positive and real float value."""
+    float_value = ensure_float(value)
+    if isnan(float_value) or isinf(float_value):
+        raise ValueError("Value must be a defined, non-infinite number.")
+    if float_value <= 0:
+        raise ValueError("Value must be a positive float greater than 0.")
+    return float_value
+
+
 def ensure_positive_int(value: int) -> int:
     """Ensure value is a positive integer."""
     if not isinstance(value, int):

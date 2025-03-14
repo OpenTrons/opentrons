@@ -3,14 +3,14 @@ import { screen } from '@testing-library/react'
 import { COLORS } from '@opentrons/components'
 import { i18n } from '../../../../../../../assets/localization'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
-import { InputStepFormField } from '../../../../../../../molecules'
+import { InputStepFormField } from '../../../../../../../components/molecules'
 import { PositionField } from '../../../PipetteFields'
 import { MultiInputField } from '../MultiInputField'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('../../../PipetteFields')
-vi.mock('../../../../../../../molecules')
+vi.mock('../../../../../../../components/molecules')
 
 const render = (props: ComponentProps<typeof MultiInputField>) => {
   return renderWithProviders(<MultiInputField {...props} />, {

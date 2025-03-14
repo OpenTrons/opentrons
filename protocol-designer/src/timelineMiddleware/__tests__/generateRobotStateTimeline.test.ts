@@ -183,5 +183,43 @@ describe('generateRobotStateTimeline', () => {
         ],
       ]
     `)
+
+    // The regex elides all the indented arguments in the Python code
+    const pythonCommandsOverview = result.timeline.map(frame =>
+      frame.python?.replaceAll(/(\n\s+.*)+\n/g, '...')
+    )
+    expect(pythonCommandsOverview).toEqual([
+      // Step a:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+      // Step b:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+      // Step c:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+    ])
   })
 })

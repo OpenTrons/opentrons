@@ -105,6 +105,7 @@ export interface ProtocolBase<DesignerApplicationData> {
     category?: string | null | undefined
     subcategory?: string | null | undefined
     tags?: string[]
+    source?: string | null
   }
   designerApplication?: {
     name?: string

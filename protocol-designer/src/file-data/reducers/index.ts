@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
 import type { Reducer } from 'redux'
 import type { Timeline } from '@opentrons/step-generation'
 import type { RobotType } from '@opentrons/shared-data'
@@ -53,6 +54,7 @@ const defaultFields = {
   protocolName: '',
   author: '',
   description: '',
+  source: PROTOCOL_DESIGNER_SOURCE,
 }
 
 const updateMetadataFields = (
@@ -99,7 +101,10 @@ const fileMetadata = handleActions(
     ): FileMetadataFields => ({ ...state, ...action.payload }),
     SAVE_PROTOCOL_FILE: (state: FileMetadataFields): FileMetadataFields => {
       // NOTE: 'last-modified' is updated "on-demand", in response to user clicking "save/export"
-      return { ...state, lastModified: Date.now() }
+      return {
+        ...state,
+        lastModified: Date.now(),
+      }
     },
   },
   defaultFields

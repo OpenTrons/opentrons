@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { InputStepFormField } from '../../../../../molecules'
+import { InputStepFormField } from '../../../../../components/molecules'
 
 import type { FieldProps } from '../types'
 

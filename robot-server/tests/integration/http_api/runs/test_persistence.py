@@ -11,6 +11,9 @@ from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
 
+pytestmark = pytest.mark.slow
+
+
 class ClientServerFixture(NamedTuple):
     client: RobotClient
     server: DevServer

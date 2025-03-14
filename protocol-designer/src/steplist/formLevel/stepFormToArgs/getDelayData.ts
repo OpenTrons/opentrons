@@ -1,4 +1,4 @@
-import { getDefaultMmFromEdge } from '../../../organisms/TipPositionModal/utils'
+import { getDefaultMmFromEdge } from '../../../components/organisms/TipPositionModal/utils'
 import type { InnerDelayArgs } from '@opentrons/step-generation'
 import type {
   DelayCheckboxFields,

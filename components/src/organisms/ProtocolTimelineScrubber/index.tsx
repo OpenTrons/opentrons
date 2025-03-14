@@ -26,8 +26,8 @@ import {
   SPACING,
 } from '../..'
 import { PipetteMountViz } from './PipetteVisuals'
+import { getLabwareDefinitionsFromCommands } from '../CommandText/useCommandTextString/utils/getLabwareDefinitionsFromCommands'
 import {
-  getLabwareDefinitionsFromCommands,
   getAllWellContentsForActiveItem,
   wellFillFromWellContents,
 } from './utils'

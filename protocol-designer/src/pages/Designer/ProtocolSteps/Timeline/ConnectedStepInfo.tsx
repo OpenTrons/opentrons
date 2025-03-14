@@ -19,7 +19,7 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import { stepIconsByType } from '../../../../form-types'
 import {
   hoverOnStep,
@@ -42,7 +42,7 @@ import type {
 } from '../../../../ui/steps'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
-import type { DeleteModalType } from '../../../../organisms'
+import type { DeleteModalType } from '../../../../components/organisms'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType

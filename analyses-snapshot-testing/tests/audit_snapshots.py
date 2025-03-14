@@ -51,6 +51,11 @@ def audit_snapshots() -> AuditResult:  # noqa: C901
                 file_path_str = str(file_path)
                 if "Flex_S" in file_path_str or "OT2_S" in file_path_str or "pl_" in file_path_str:
                     if errors_present:
+                        print(f"Error in {file_path}")
+                        for e in data["errors"]:
+                            for w in e["wrappedErrors"]:
+                                for key in w.keys():
+                                    print(f"{w[key]}")
                         files_with_unexpected_errors.append(file_path)
                 else:
                     if not errors_present:

@@ -32,7 +32,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import { LINK_BUTTON_STYLE } from '../../../atoms'
+import { LINK_BUTTON_STYLE } from '../../../components/atoms'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import {

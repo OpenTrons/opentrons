@@ -8,7 +8,7 @@ import {
   CheckboxExpandStepFormField,
   DropdownStepFormField,
   InputStepFormField,
-} from '../../../../../molecules'
+} from '../../../../../components/molecules'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { FlowRateField } from './FlowRateField'
 import { BlowoutOffsetField } from './BlowoutOffsetField'

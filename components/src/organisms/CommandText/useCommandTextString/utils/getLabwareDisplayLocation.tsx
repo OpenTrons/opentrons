@@ -46,7 +46,7 @@ export function getLabwareDisplayLocation(
 
   const { slotName, moduleModel, adapterName } = locationResult
 
-  if (slotName === 'offDeck') {
+  if (slotName === 'offDeck' || slotName === 'systemLocation') {
     return t('off_deck')
   }
   // Simple slot location

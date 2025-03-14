@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getRobotType } from '../../../../../../file-data/selectors'
-import { CheckboxStepFormField } from '../../../../../../molecules'
+import { CheckboxStepFormField } from '../../../../../../components/molecules'
 import {
   getAdditionalEquipment,
   getCurrentFormCanBeSaved,
