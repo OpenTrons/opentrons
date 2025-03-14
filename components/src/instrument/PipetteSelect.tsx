@@ -56,6 +56,9 @@ const specToOption = ({
   label: displayName,
 })
 
+/**
+ * @deprecated The component is no longer used and will be removed in a future release.
+ */
 export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   const {
     tabIndex,
