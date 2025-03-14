@@ -154,6 +154,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.GRIPPER_ERROR:
       return failedCommandByRunRecord as MoveLabwareRunTimeCommand
     case ERROR_KINDS.GENERAL_ERROR:
+    case ERROR_KINDS.STALL_WHILE_STACKING:
       return null
     default:
       console.error(

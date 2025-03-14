@@ -28,6 +28,7 @@ import type {
 
 // Whenever a step uses a custom "close the robot door" view, use this component.
 // Note that the allowDoorOpen metadata for the route must be set to true for this view to render.
+// If you need a general effect use the othe modal
 export function RecoveryDoorOpenSpecial({
   currentRecoveryOptionUtils,
   runStatus,
@@ -54,6 +55,8 @@ export function RecoveryDoorOpenSpecial({
       case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
       case RECOVERY_MAP.HOME_AND_RETRY.ROUTE:
         return t('door_open_robot_home')
+      case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+          return t('close_robot_and_stacker_door')
       default: {
         console.error(
           `Unhandled special-cased door open subtext on route ${selectedRecoveryOption}.`
@@ -104,6 +107,12 @@ export function RecoveryDoorOpenSpecial({
             RECOVERY_MAP.HOME_AND_RETRY.STEPS.CONFIRM_RETRY
           )
           break
+        case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+            handleHomeAllAndRoute(
+              RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+              RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
+            )
+            break
         default: {
           console.error(
             `Unhandled special-cased door open on route ${selectedRecoveryOption}.`
