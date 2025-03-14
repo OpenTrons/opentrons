@@ -68,9 +68,11 @@ export function useLPCCommands(
       continuePastCommandFailure
     ).catch((e: Error) => {
       if (!shouldPropogateError) {
+        console.error(`Error during LPC command: ${e.message}`)
         setErrorMessage(`Error during LPC command: ${e.message}`)
         return Promise.resolve([])
       } else {
+        console.error(`Error during LPC command: ${e.message}`)
         return Promise.reject(e)
       }
     })
