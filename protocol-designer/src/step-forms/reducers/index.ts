@@ -44,6 +44,7 @@ import {
 import type { Reducer } from 'redux'
 import type { Action as ReduxActionsAction } from 'redux-actions'
 import type {
+  AdditionalEquipmentEntity,
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'

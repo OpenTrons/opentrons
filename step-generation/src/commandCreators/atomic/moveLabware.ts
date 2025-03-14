@@ -273,7 +273,8 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     const matchingTrashId =
       matchingTrashCutoutId != null
         ? Object.values(additionalEquipmentEntities).find(
-            ae => ae.location === matchingTrashCutoutId
+            ae =>
+              ae.name === 'trashBin' && ae.location === matchingTrashCutoutId
           )?.id
         : null
 
