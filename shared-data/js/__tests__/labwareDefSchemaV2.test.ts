@@ -41,6 +41,7 @@ const expectedWellsHigherThanZDimension: Record<string, Set<string>> = {
   'geb_96_tiprack_10ul/1.json': standard96WellNames,
   'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json': standard24WellNames,
   'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json': standard24WellNames,
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/2.json': standard24WellNames,
   'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json': standard96WellNames,
   'opentrons_96_filtertiprack_200ul/1.json': standard96WellNames,
   'opentrons_96_tiprack_300ul/1.json': standard96WellNames,
@@ -63,6 +64,12 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
     'A4',
     'B4',
   ]),
+  'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical/2.json': new Set([
+    'A3',
+    'B3',
+    'A4',
+    'B4',
+  ]),
   'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic/1.json': new Set([
     'A3',
     'B3',
@@ -75,10 +82,19 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
     'A4',
     'B4',
   ]),
+  'opentrons_10_tuberack_nest_4x50ml_6x15ml_conical/2.json': new Set([
+    'A3',
+    'B3',
+    'A4',
+    'B4',
+  ]),
 
   // These height mismatches are legitimate. The zDimension should match the taller side.
   'opentrons_calibrationblock_short_side_left/1.json': new Set(['A1']),
   'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
+
+  // this labware has a lip
+  'evotips_opentrons_96_labware/2.json': standard96WellNames,
 
   // These height mismatches need to be investigated. See Jira RSS-202.
   // Each one should either be explained here or marked as a known bug.
@@ -115,8 +131,15 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json': standard96WellNames,
   'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json': standard96WellNames,
   'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json': standard384WellNames,
-  // this labware has a lip
-  'evotips_opentrons_96_labware/2.json': standard96WellNames,
+  // This batch may have incompletely-updated geometry from recent work related to
+  // liquid level detection and meniscus-relative pipetting. Probably, the wells were
+  // updated but not the overall labware dimensions. This needs to be investigated and fixed.
+  'nest_96_wellplate_100ul_pcr_full_skirt/3.json': standard96WellNames,
+  'opentrons_24_tuberack_nest_1.5ml_screwcap/2.json': standard24WellNames,
+  'opentrons_24_tuberack_nest_2ml_screwcap/2.json': standard24WellNames,
+  'usascientific_12_reservoir_22ml/2.json': generateStandardWellNames(1, 12),
+  'corning_12_wellplate_6.9ml_flat/3.json': generateStandardWellNames(3, 4),
+  'biorad_96_wellplate_200ul_pcr/3.json': standard96WellNames,
 }
 
 const filterWells = (
