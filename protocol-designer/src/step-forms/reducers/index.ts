@@ -12,8 +12,9 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
-import { GRIPPER_LOCATION, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
@@ -1320,6 +1321,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           [id]: {
             name: 'gripper' as const,
             id,
+            location: GRIPPER_LOCATION,
           },
         }
       }
