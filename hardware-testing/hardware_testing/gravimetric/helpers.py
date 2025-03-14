@@ -18,6 +18,7 @@ from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocol_api._types import OffDeckType
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.types import APIVersion
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
 from opentrons.hardware_control.thread_manager import ThreadManager
 from opentrons.hardware_control.types import OT3Mount, Axis, HardwareFeatureFlags
 from opentrons.hardware_control.ot3api import OT3API
@@ -432,7 +433,6 @@ def _load_pipette(
     if pipette_mount in loaded_pipettes.keys():
         return loaded_pipettes[pipette_mount]
 
-    trash = ctx.load_labware("opentrons_1_trash_3200ml_fixed", "A3")
     pipette = ctx.load_instrument(pip_name, pipette_mount)
     loaded_pipettes = ctx.loaded_instruments
     assert pipette.max_volume == pipette_volume, (
@@ -455,7 +455,12 @@ def _load_pipette(
         pipette_movement_conflict.check_safe_for_pipette_movement = (
             _override_check_safe_for_pipette_movement
         )
-    pipette.trash_container = trash
+    try:
+        trash = pipette.trash_container
+    except NoTrashDefinedError:
+        trash = ctx.load_trash_bin("A3")
+        pipette.trash_container = trash
+        pass
     return pipette
 
 
