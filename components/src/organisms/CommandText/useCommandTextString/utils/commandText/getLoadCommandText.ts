@@ -49,18 +49,31 @@ export const getLoadCommandText = ({
         slot_name: command.params.location.slotName,
       })
     }
+    case 'loadLid':
     case 'loadLabware': {
-      const location = getLabwareDisplayLocation({
-        location: command.params.location,
-        robotType,
-        allRunDefs,
-        loadedLabwares: commandTextData?.labware ?? [],
-        loadedModules: commandTextData?.modules ?? [],
-        t,
-      })
+      const location =
+        command.result?.locationSequence != null
+          ? getLabwareDisplayLocation({
+              locationSequence: command.result.locationSequence,
+              robotType,
+              allRunDefs,
+              loadedLabwares: commandTextData?.labware ?? [],
+              loadedModules: commandTextData?.modules ?? [],
+              t,
+            })
+          : getLabwareDisplayLocation({
+              location: command.params.location,
+              robotType,
+              allRunDefs,
+              loadedLabwares: commandTextData?.labware ?? [],
+              loadedModules: commandTextData?.modules ?? [],
+              t,
+            })
       const labwareName =
-        command.params.displayName ??
-        command.result?.definition.metadata.displayName
+        'displayName' in command.params && command.params.displayName != null
+          ? command.params.displayName
+          : command.result?.definition.metadata.displayName
+
       // use in preposition for modules and slots, on for labware and adapters
       let displayLocation = t('in_location', { location })
       if (
@@ -77,12 +90,38 @@ export const getLoadCommandText = ({
         display_location: displayLocation,
       })
     }
-    // TODO(sb, 01/29): Add full support for these commands in run log once location refactor is complete
-    case 'loadLid': {
-      return t('load_lid')
-    }
     case 'loadLidStack': {
-      return t('load_lid_stack')
+      // this will be the case if the system creates an empty stack to move lids onto
+      if (command.result?.definition == null) {
+        return t('load_lid_stack_empty')
+      }
+      const location =
+        command.result?.stackLocationSequence != null
+          ? getLabwareDisplayLocation({
+              locationSequence: command.result.stackLocationSequence,
+              robotType,
+              allRunDefs,
+              loadedLabwares: commandTextData?.labware ?? [],
+              loadedModules: commandTextData?.modules ?? [],
+              t,
+            })
+          : ''
+      // use in preposition for modules and slots, on for labware and adapters
+      let displayLocation = t('in_location', { location })
+      if (
+        command.params.location !== 'systemLocation' &&
+        command.params.location !== 'offDeck' &&
+        'labwareId' in command.params.location
+      ) {
+        displayLocation = t('on_location', { location })
+      }
+      const lidName = command.result.definition.metadata.displayName
+      const quantity = command.params.quantity
+      return t('load_lid_stack', {
+        quantity,
+        labware: lidName,
+        display_location: displayLocation,
+      })
     }
     case 'reloadLabware': {
       const { labwareId } = command.params

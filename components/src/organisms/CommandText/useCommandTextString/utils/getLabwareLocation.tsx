@@ -1,14 +1,23 @@
-import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getCutoutDisplayName,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
+} from '@opentrons/shared-data'
+import { getModuleDisplayLocation } from './getModuleDisplayLocation'
+import { getModuleModel } from './getModuleModel'
 
 import type {
   LabwareDefinition2,
   LabwareLocation,
   ModuleModel,
   RobotType,
+  LabwareLocationSequence,
+  CutoutId,
+  AddressableAreaName,
 } from '@opentrons/shared-data'
 import type { LoadedLabwares, LoadedModules } from './types'
-import { getModuleDisplayLocation } from './getModuleDisplayLocation'
-import { getModuleModel } from './getModuleModel'
 
 export interface LocationResult {
   slotName: string
@@ -22,12 +31,24 @@ interface BaseParams {
   loadedLabwares: LoadedLabwares
   robotType: RobotType
 }
+interface SequenceBaseParams {
+  locationSequence: LabwareLocationSequence
+  loadedModules: LoadedModules
+  loadedLabwares: LoadedLabwares
+}
 
 export interface LocationSlotOnlyParams extends BaseParams {
   detailLevel: 'slot-only'
 }
 
+export interface SequenceSlotOnlyParams extends SequenceBaseParams {
+  detailLevel: 'slot-only'
+}
 export interface LocationFullParams extends BaseParams {
+  allRunDefs: LabwareDefinition2[]
+  detailLevel?: 'full'
+}
+export interface SequenceFullParams extends SequenceBaseParams {
   allRunDefs: LabwareDefinition2[]
   detailLevel?: 'full'
 }
@@ -35,6 +56,85 @@ export interface LocationFullParams extends BaseParams {
 export type GetLabwareLocationParams =
   | LocationSlotOnlyParams
   | LocationFullParams
+
+export type GetLabwareLocationFromSequenceParams =
+  | SequenceSlotOnlyParams
+  | SequenceFullParams
+
+export function getLabwareLocationFromSequence(
+  params: GetLabwareLocationFromSequenceParams
+): LocationResult {
+  const {
+    loadedLabwares,
+    loadedModules,
+    locationSequence,
+    detailLevel = 'full',
+  } = params
+
+  return locationSequence.reduce<LocationResult>(
+    (acc, sequenceItem) => {
+      if (sequenceItem.kind === 'notOnDeck') {
+        return {
+          slotName: sequenceItem.logicalLocationName,
+        }
+      } else if (sequenceItem.kind === 'onCutoutFixture') {
+        return {
+          ...acc,
+          slotName: getCutoutDisplayName(sequenceItem.cutoutId as CutoutId),
+        }
+      } else if (
+        sequenceItem.kind === 'onAddressableArea' &&
+        (WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+          sequenceItem.addressableAreaName as AddressableAreaName
+        ) ||
+          MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+            sequenceItem.addressableAreaName as AddressableAreaName
+          ))
+      ) {
+        return {
+          slotName: sequenceItem.addressableAreaName,
+        }
+      } else if (detailLevel === 'full') {
+        const { allRunDefs } = params as SequenceFullParams
+        if (sequenceItem.kind === 'onLabware' && acc.adapterName == null) {
+          if (!Array.isArray(loadedLabwares)) {
+            console.error('Cannot get location from loaded labwares object')
+          } else {
+            const nestedLabware = loadedLabwares.find(
+              lw => lw.id === sequenceItem.labwareId
+            )
+            const nestedLabwareDef = allRunDefs.find(
+              def => getLabwareDefURI(def) === nestedLabware?.definitionUri
+            )
+            const nestedLabwareName =
+              nestedLabwareDef != null
+                ? getLabwareDisplayName(nestedLabwareDef)
+                : ''
+            return {
+              ...acc,
+              adapterName: nestedLabwareName,
+            }
+          }
+        } else if (sequenceItem.kind === 'onModule') {
+          const moduleModel = getModuleModel(
+            loadedModules,
+            sequenceItem.moduleId
+          )
+          if (moduleModel == null) {
+            console.error('labware is located on an unknown module model')
+          } else {
+            return {
+              ...acc,
+              moduleModel,
+            }
+          }
+        }
+      }
+      return { ...acc }
+    },
+    { slotName: '' }
+  )
+}
 
 // detailLevel returns additional information about the module and adapter in the same location, if applicable.
 // if 'slot-only', returns the underlying slot location.

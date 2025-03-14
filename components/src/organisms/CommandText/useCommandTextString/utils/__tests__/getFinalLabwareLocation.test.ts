@@ -28,7 +28,7 @@ describe('getFinalLabwareLocation', () => {
           startedAt: 'fake_timestamp',
           completedAt: 'fake_timestamp',
         },
-      ])
+      ]).location
     ).toBe(location)
   })
   it('calculates labware location after only load_labware and move_labware', () => {
@@ -69,7 +69,7 @@ describe('getFinalLabwareLocation', () => {
           startedAt: 'fake_timestamp',
           completedAt: 'fake_timestamp',
         },
-      ])
+      ]).location
     ).toBe(finalLocation)
   })
   it('calculates labware location after multiple moves', () => {
@@ -124,7 +124,7 @@ describe('getFinalLabwareLocation', () => {
           startedAt: 'fake_timestamp',
           completedAt: 'fake_timestamp',
         },
-      ])
+      ]).location
     ).toBe(finalLocation)
   })
 })

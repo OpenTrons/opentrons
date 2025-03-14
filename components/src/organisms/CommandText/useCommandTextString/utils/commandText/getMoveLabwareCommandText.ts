@@ -15,33 +15,57 @@ export function getMoveLabwareCommandText({
   robotType,
 }: HandlesCommands<MoveLabwareRunTimeCommand>): string {
   const { labwareId, newLocation, strategy } = command.params
+  let oldDisplayLocation = null
+  let newDisplayLocation = null
+  if (
+    command.result?.originLocationSequence != null &&
+    command.result?.immediateDestinationLocationSequence != null
+  ) {
+    oldDisplayLocation = getLabwareDisplayLocation({
+      locationSequence: command.result.originLocationSequence,
+      robotType,
+      allRunDefs,
+      loadedLabwares: commandTextData?.labware ?? [],
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
+    newDisplayLocation = getLabwareDisplayLocation({
+      locationSequence: command.result.immediateDestinationLocationSequence,
+      robotType,
+      allRunDefs,
+      loadedLabwares: commandTextData?.labware ?? [],
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
+  } else {
+    const allPreviousCommands = commandTextData?.commands.slice(
+      0,
+      commandTextData.commands.findIndex(c => c.id === command.id)
+    )
+    const oldLocation =
+      allPreviousCommands != null
+        ? getFinalLabwareLocation(labwareId, allPreviousCommands)
+        : null
 
-  const allPreviousCommands = commandTextData?.commands.slice(
-    0,
-    commandTextData.commands.findIndex(c => c.id === command.id)
-  )
-  const oldLocation =
-    allPreviousCommands != null
-      ? getFinalLabwareLocation(labwareId, allPreviousCommands)
-      : null
+    oldDisplayLocation = getLabwareDisplayLocation({
+      location: oldLocation?.location ?? null,
+      robotType,
+      allRunDefs,
+      loadedLabwares: commandTextData?.labware ?? [],
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
+    newDisplayLocation = getLabwareDisplayLocation({
+      location: newLocation,
+      robotType,
+      allRunDefs,
+      loadedLabwares: commandTextData?.labware ?? [],
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
+  }
 
-  const oldDisplayLocation = getLabwareDisplayLocation({
-    location: oldLocation,
-    robotType,
-    allRunDefs,
-    loadedLabwares: commandTextData?.labware ?? [],
-    loadedModules: commandTextData?.modules ?? [],
-    t,
-  })
-  const newDisplayLocation = getLabwareDisplayLocation({
-    location: newLocation,
-    robotType,
-    allRunDefs,
-    loadedLabwares: commandTextData?.labware ?? [],
-    loadedModules: commandTextData?.modules ?? [],
-    t,
-  })
-
+  // add waste chute to i18n
   const location = newDisplayLocation?.includes(
     GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA
   )

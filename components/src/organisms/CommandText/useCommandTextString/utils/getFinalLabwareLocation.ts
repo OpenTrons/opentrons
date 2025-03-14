@@ -5,6 +5,7 @@ import type {
   RunTimeCommand,
   LoadLabwareRunTimeCommand,
   MoveLabwareRunTimeCommand,
+  LabwareLocationSequence,
 } from '@opentrons/shared-data'
 
 /**
@@ -17,7 +18,7 @@ import type {
 export function getFinalLabwareLocation(
   labwareId: string,
   commands: RunTimeCommand[]
-): LabwareLocation | null {
+): { location?: LabwareLocation; locationSequence?: LabwareLocationSequence } {
   const [lastMove, lastMoveIndex] = findLastAt(
     commands,
     (c: RunTimeCommand): c is MoveLabwareRunTimeCommand =>
@@ -30,10 +31,16 @@ export function getFinalLabwareLocation(
       c.commandType === 'loadLabware' && c.result?.labwareId === labwareId
   )
   if (lastMoveIndex > lastLoadIndex) {
-    return lastMove?.params?.newLocation ?? null
+    return {
+      location: lastMove?.params?.newLocation,
+      locationSequence: lastMove?.result?.immediateDestinationLocationSequence,
+    }
   } else if (lastLoadIndex > lastMoveIndex) {
-    return lastLoad?.params?.location ?? null
+    return {
+      location: lastLoad?.params?.location,
+      locationSequence: lastLoad?.result?.locationSequence,
+    }
   } else {
-    return null
+    return {}
   }
 }
