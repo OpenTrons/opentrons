@@ -47,23 +47,26 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   ) as LabwareDefinition2
 
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
-  const { moduleModel, kind: offsetKind } = offsetLocationDetails
+  const { closestBeneathModuleModel, kind: offsetKind } = offsetLocationDetails
 
   const buildModulesOnDeck = (): ModuleOnDeck[] => {
     const allModulesOnDeck = protocolData.modules.map(mod => {
       return {
         moduleModel: mod.model,
         moduleLocation: mod.location,
-        nestedLabwareDef: moduleModel != null ? labwareDef : null,
+        nestedLabwareDef: closestBeneathModuleModel != null ? labwareDef : null,
         innerProps:
-          moduleModel != null &&
-          getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
+          closestBeneathModuleModel != null &&
+          getModuleType(closestBeneathModuleModel) === THERMOCYCLER_MODULE_TYPE
             ? { lidMotorState: 'open' }
             : {},
       }
     })
 
-    if (offsetKind === OFFSET_KIND_DEFAULT || moduleModel == null) {
+    if (
+      offsetKind === OFFSET_KIND_DEFAULT ||
+      closestBeneathModuleModel == null
+    ) {
       return allModulesOnDeck.filter(
         moduleOnDeck =>
           moduleOnDeck.moduleLocation.slotName !==

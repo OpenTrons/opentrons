@@ -10,11 +10,20 @@ import {
 import {
   useCreateTargetedMaintenanceRunMutation,
   useMostRecentCompletedAnalysis,
-  useNotifyRunQuery,
 } from '/app/resources/runs'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useLPCLabwareInfo } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks'
+import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+
+// TOME TODO: Definitely test OT-2 flows before merging!
+
+// TOME TODO: For posting offsets,
+//  I think the current hook that's used in the legacy LPC flows works. You can always
+//  post the list of offsets at run start. You do NOT and should NOT create runs with offsets now.
+//  Always post them at run start, and have a selector to check whether LPC offsets have
+// been confirmed, etc. You may want to do this in another PR after you do all the actual entry
+//  point stuff.
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
@@ -55,8 +64,6 @@ export function useLPCFlows({
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
   const deckConfig = useNotifyDeckConfigurationQuery().data
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
-  const currentOffsets = runRecord?.data?.labwareOffsets ?? []
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const labwareDefs = useMemo(() => {
@@ -65,10 +72,16 @@ export function useLPCFlows({
     )
     return labwareDefsFromCommands
   }, [mostRecentAnalysis != null])
-  const labwareInfo = useLPCLabwareInfo({
-    currentOffsets,
+
+  const {
+    labwareInfo,
+    storedOffsets: flexOffsets,
+    legacyOffsets: ot2Offsets,
+  } = useLPCLabwareInfo({
     labwareDefs,
     protocolData: mostRecentAnalysis,
+    robotType,
+    runId,
   })
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
@@ -107,13 +120,7 @@ export function useLPCFlows({
     setIsLaunching(true)
 
     return createTargetedMaintenanceRun({
-      labwareOffsets: currentOffsets.map(
-        ({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        })
-      ),
+      labwareOffsets: getRelevantOffsets(robotType, ot2Offsets, flexOffsets),
     }).then(maintenanceRun => {
       setMaintenanceRunId(maintenanceRun.data.id)
     })
@@ -152,7 +159,7 @@ export function useLPCFlows({
           mostRecentAnalysis,
           protocolName,
           maintenanceRunId,
-          existingOffsets: currentOffsets,
+          runRecordExistingOffsets: ot2Offsets,
         },
       }
     : { launchLPC, isLaunchingLPC: isLaunching, lpcProps: null, showLPC }

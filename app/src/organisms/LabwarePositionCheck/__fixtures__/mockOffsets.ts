@@ -66,7 +66,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
     locationDetails: {
       kind: 'location-specific',
       slotName: 'B3',
-      moduleId: 'module-1',
+      closestBeneathModuleId: 'module-1',
       labwareId: 'labware-2',
       definitionUri: 'def-uri-2',
     },

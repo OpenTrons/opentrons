@@ -93,7 +93,7 @@ export function LabwareLocationItem({
   //  Note that it is the same as the Flex stacker module type.
   const buildDeckInfoLabels = (): JSX.Element[] => {
     const moduleIconType = (): ModuleType | null => {
-      const moduleModel = locationDetails.moduleModel
+      const moduleModel = locationDetails.closestBeneathModuleModel
 
       if (moduleModel != null) {
         return getModuleType(moduleModel)

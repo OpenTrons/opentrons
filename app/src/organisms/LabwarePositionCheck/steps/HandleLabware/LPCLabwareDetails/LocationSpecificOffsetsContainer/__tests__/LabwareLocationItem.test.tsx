@@ -92,7 +92,7 @@ describe('LabwareLocationItem', () => {
         ...mockLocationSpecificOffsetDetails[0],
         locationDetails: {
           ...mockLocationSpecificOffsetDetails[0].locationDetails,
-          moduleModel: undefined,
+          closestBeneathModuleModel: undefined,
         },
       },
       slotCopy: 'C1',
@@ -181,7 +181,7 @@ describe('LabwareLocationItem', () => {
         ...mockLocationSpecificOffsetDetails[2],
         locationDetails: {
           ...mockLocationSpecificOffsetDetails[2].locationDetails,
-          moduleModel: 'flexStackerModuleV1',
+          closestBeneathModuleModel: 'flexStackerModuleV1',
         },
       },
     }

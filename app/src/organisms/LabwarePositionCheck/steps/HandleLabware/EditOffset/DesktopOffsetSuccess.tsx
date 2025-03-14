@@ -50,7 +50,8 @@ export function DesktopOffsetSuccess(
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(props.runId)
   ) as SelectedLwOverview
-  const moduleModel = selectedLwInfo.offsetLocationDetails?.moduleModel
+  const moduleModel =
+    selectedLwInfo.offsetLocationDetails?.closestBeneathModuleModel
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
   const labwareDisplayName = useSelector(
     selectSelectedLwDisplayName(props.runId)

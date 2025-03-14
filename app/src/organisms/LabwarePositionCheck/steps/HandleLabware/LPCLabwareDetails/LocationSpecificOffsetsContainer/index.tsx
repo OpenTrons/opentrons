@@ -75,7 +75,7 @@ export function LocationSpecificOffsetsContainer(
 
             return (
               <LabwareLocationItem
-                key={`${offset.locationDetails.slotName}${offset.locationDetails.moduleId}${offset.locationDetails.adapterId}`}
+                key={`${offset.locationDetails.slotName}${offset.locationDetails.closestBeneathModuleId}${offset.locationDetails.closestBeneathAdapterId}`}
                 {...props}
                 locationSpecificOffsetDetails={details}
                 slotCopy={slotCopy}

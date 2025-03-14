@@ -1,25 +1,30 @@
 import isEqual from 'lodash/isEqual'
 
 import { getLabwareDisplayName, getLabwareDefURI } from '@opentrons/shared-data'
+import { ANY_LOCATION } from '@opentrons/api-client'
 
-import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
+import {
+  OFFSET_KIND_DEFAULT,
+  OFFSET_KIND_LOCATION_SPECIFIC,
+} from '/app/redux/protocol-runs'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   DefaultOffsetDetails,
   LocationSpecificOffsetDetails,
   LPCLabwareInfo,
+  LabwareLocationInfo,
 } from '/app/redux/protocol-runs'
-import type { LabwareLocationCombo } from '/app/src/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 import type { UseLPCLabwareInfoProps } from '.'
+import type { StoredLabwareOffset } from '@opentrons/api-client'
 
 interface GetLPCLabwareInfoParams {
-  lwURIs: string[]
-  currentOffsets: UseLPCLabwareInfoProps['currentOffsets']
-  lwLocationCombos: LabwareLocationCombo[]
+  currentOffsets: StoredLabwareOffset[]
+  lwLocationCombos: LabwareLocationInfo[]
   labwareDefs: UseLPCLabwareInfoProps['labwareDefs']
 }
 
+// Prepare data for injection into LPC.
 export function getLPCLabwareInfoFrom(
   params: GetLPCLabwareInfoParams
 ): LPCLabwareInfo {
@@ -31,13 +36,9 @@ function getLabwareInfoRecords(
 ): LPCLabwareInfo['labware'] {
   const labwareDetails: LPCLabwareInfo['labware'] = {}
 
-  params.lwURIs.forEach(uri => {
-    if (!labwareUriKnown({ ...params, uri })) {
-      console.warn(
-        `getLPCLabwareInfoFrom: No information about labware uri ${uri}, is there a command that loads labware that we're not handling?`
-      )
-      return
-    }
+  params.lwLocationCombos.forEach(combo => {
+    const uri = combo.definitionUri
+
     if (!(uri in labwareDetails)) {
       labwareDetails[uri] = {
         id: getALabwareIdFromUri({ ...params, uri }),
@@ -59,7 +60,7 @@ function getLabwareInfoRecords(
   return labwareDetails
 }
 
-type GetLPCLabwareInfoForURI = Omit<GetLPCLabwareInfoParams, 'lwURIs'> & {
+type GetLPCLabwareInfoForURI = GetLPCLabwareInfoParams & {
   uri: string
 }
 
@@ -72,13 +73,6 @@ function getALabwareIdFromUri({
   )
 }
 
-function labwareUriKnown({
-  uri,
-  labwareDefs,
-}: GetLPCLabwareInfoForURI): boolean {
-  return labwareDefs?.find(def => getLabwareDefURI(def) === uri) != null
-}
-
 function getDisplayNameFromUri({
   uri,
   labwareDefs,
@@ -86,6 +80,7 @@ function getDisplayNameFromUri({
   const matchedDef = labwareDefs?.find(
     def => getLabwareDefURI(def) === uri
   ) as LabwareDefinition2
+
   if (!!!matchedDef) {
     console.warn(
       `Could not get labware def for uri ${uri} from list of defs with uri ${
@@ -97,41 +92,52 @@ function getDisplayNameFromUri({
   return getLabwareDisplayName(matchedDef)
 }
 
-// NOTE: A lot of the logic here acts as temporary adapter that resolves the app's current way of getting offset data (scraping the run record)
-// and the end goal of treating labware as first class citizens.
 function getLocationSpecificOffsetDetailsForLabware({
   currentOffsets,
   lwLocationCombos,
   uri,
 }: GetLPCLabwareInfoForURI): LocationSpecificOffsetDetails[] {
-  // @ts-expect-error - Temporary util. No need to solve this completely here.
   return lwLocationCombos
-    .flatMap(comboInfo => {
-      const { definitionUri, location, ...restInfo } = comboInfo
+    .reduce<LocationSpecificOffsetDetails[]>((acc, comboInfo) => {
+      const { definitionUri, lwOffsetLocSeq, ...restInfo } = comboInfo
 
       const existingOffset =
         currentOffsets.find(
           offset =>
             uri === offset.definitionUri &&
-            isEqual(offset.location, comboInfo.location)
+            isEqual(offset.locationSequence, comboInfo.lwOffsetLocSeq)
         ) ?? null
 
-      return {
-        existingOffset: existingOffset ?? null,
-        workingOffset: null,
-        locationDetails: {
-          ...location,
-          ...restInfo,
-          definitionUri,
-          kind: OFFSET_KIND_LOCATION_SPECIFIC,
-        },
-      }
-    })
+      return lwOffsetLocSeq !== ANY_LOCATION
+        ? [
+            ...acc,
+            {
+              existingOffset: existingOffset ?? null,
+              workingOffset: null,
+              locationDetails: {
+                ...restInfo,
+                definitionUri,
+                lwOffsetLocSeq,
+                // Add the top-most labware itself.
+                lwModOnlyStackupDetails: [
+                  ...restInfo.lwModOnlyStackupDetails,
+                  {
+                    kind: 'onLabware',
+                    labwareUri: uri,
+                    id: restInfo.labwareId,
+                  },
+                ],
+                kind: OFFSET_KIND_LOCATION_SPECIFIC,
+              },
+            },
+          ]
+        : acc
+    }, [])
     .filter(detail => detail.locationDetails.definitionUri === uri)
 }
 
-// A temporary utility for getting a dummy default offset.
 function getDefaultOffsetDetailsForLabware({
+  currentOffsets,
   lwLocationCombos,
   uri,
 }: GetLPCLabwareInfoForURI): DefaultOffsetDetails {
@@ -139,14 +145,26 @@ function getDefaultOffsetDetailsForLabware({
     lwLocationCombos?.find(combo => combo.definitionUri === uri)?.labwareId ??
     ''
 
+  const existingOffset =
+    currentOffsets.find(
+      offset =>
+        offset.locationSequence === ANY_LOCATION && offset.definitionUri === uri
+    ) ?? null
+
   return {
     workingOffset: null,
-    existingOffset: null,
+    existingOffset,
     locationDetails: {
       labwareId: aLabwareId,
       definitionUri: uri,
-      kind: 'default',
+      kind: OFFSET_KIND_DEFAULT,
+      // We always do default offset LPCing in this slot.
       slotName: 'C2',
+      lwOffsetLocSeq: ANY_LOCATION,
+      // The only labware present on deck when configuring the default offset is the top-most labware itself.
+      lwModOnlyStackupDetails: [
+        { kind: 'onLabware', labwareUri: uri, id: aLabwareId },
+      ],
     },
   }
 }
