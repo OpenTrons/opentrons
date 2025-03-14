@@ -6,7 +6,11 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { SINGLE } from '@opentrons/shared-data'
+import {
+  PIPETTE_NAMES_MAP,
+  SINGLE,
+  getIncompatibleLiquidClasses,
+} from '@opentrons/shared-data'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
   getDisabledFields,
@@ -14,7 +18,7 @@ import {
 } from '../../../../steplist/formLevel'
 import { i18n } from '../../../../assets/localization'
 import { PROFILE_CYCLE } from '../../../../form-types'
-import type { PipetteEntity } from '@opentrons/step-generation'
+import type { PipetteEntities, PipetteEntity } from '@opentrons/step-generation'
 import type { DropdownOption } from '@opentrons/components'
 import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../../../steplist/formLevel/warnings'
@@ -26,6 +30,7 @@ import type {
   StepType,
   PathOption,
   HydratedFormData,
+  LiquidClassesOption,
 } from '../../../../form-types'
 import type { FormError } from '../../../../steplist/formLevel'
 import type { NozzleType } from '../../../../types'
@@ -387,4 +392,50 @@ export const getFormLevelError = (
     mappedErrorsToField[fieldName].showAtField
     ? mappedErrorsToField[fieldName].title
     : null
+}
+
+export interface ValuesForLiquidClasses {
+  path?: string | null
+  volume?: number | null
+  tipRack?: string | null
+  pipette?: string | null
+}
+export const getDisableLiquidClasses = (
+  values: ValuesForLiquidClasses,
+  pipetteEntities: PipetteEntities
+): Set<LiquidClassesOption> | null => {
+  const { volume, tipRack, pipette, path } = values
+  if (pipette == null) return null
+
+  const pipetteModel = PIPETTE_NAMES_MAP[pipetteEntities[pipette].name]
+  const disabledLiquidClasses = new Set<LiquidClassesOption>()
+
+  if (volume != null && volume < 10) {
+    ;['Aqueous', 'Viscous', 'Volatile'].forEach(cls =>
+      disabledLiquidClasses.add(cls)
+    )
+  }
+
+  getIncompatibleLiquidClasses(
+    p => p.pipetteModel === pipetteModel
+  ).forEach(cls => disabledLiquidClasses.add(cls))
+
+  getIncompatibleLiquidClasses(
+    p =>
+      p.pipetteModel === pipetteModel &&
+      p.byTipType.some((t: { tiprack: string }) => t.tiprack === tipRack)
+  ).forEach(cls => disabledLiquidClasses.add(cls))
+
+  if (path === 'multiDispense') {
+    getIncompatibleLiquidClasses(
+      p =>
+        p.pipetteModel === pipetteModel &&
+        p.byTipType.some(
+          (t: { tiprack: string; multiDispense: any }) =>
+            t.tiprack === tipRack && t.multiDispense !== undefined
+        )
+    ).forEach(cls => disabledLiquidClasses.add(cls))
+  }
+
+  return disabledLiquidClasses.size > 0 ? disabledLiquidClasses : null
 }

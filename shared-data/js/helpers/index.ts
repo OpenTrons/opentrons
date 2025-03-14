@@ -414,3 +414,12 @@ export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
     )
   )
 }
+
+export const getIncompatibleLiquidClasses = (
+  predicate: (p: any) => boolean
+): string[] => {
+  const liquidClassDefs = getAllLiquidClassDefs()
+  return Object.values(liquidClassDefs)
+    .filter(liquidClass => !Boolean(liquidClass.byPipette?.some(predicate)))
+    .map(liquidClass => liquidClass.displayName)
+}
