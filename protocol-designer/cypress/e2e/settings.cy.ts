@@ -41,7 +41,7 @@ describe('The Settings Page', () => {
     // Then return to see privacy toggle remains toggled on
     cy.visit('/')
     cy.openSettingsPage()
-    cy.getByTestId('analyticsToggle').find(
+    cy.getByAriaLabel('Settings_Privacy').find(
       'path[aria-roledescription="ot-toggle-input-off"]'
     )
     // Toggle off editing timeline tips

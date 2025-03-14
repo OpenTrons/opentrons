@@ -74,7 +74,7 @@ describe('Settings', () => {
   })
   it('renders the analytics toggle and calls the action when pressed', () => {
     render()
-    fireEvent.click(screen.getByTestId('analyticsToggle'))
+    fireEvent.click(screen.getByLabelText('Settings_Privacy'))
     expect(vi.mocked(optIn)).toHaveBeenCalled()
   })
   it('renders the dev ffs section when prerelease mode is turned on', () => {
