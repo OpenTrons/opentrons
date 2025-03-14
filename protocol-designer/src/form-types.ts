@@ -272,13 +272,18 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   aspirate_retract_speed?: number | null
   aspirate_retract_x_position?: number | null
   aspirate_retract_y_position?: number | null
+  aspirate_retract_position_reference: string | null
   aspirate_submerge_delay_seconds?: number | null
   aspirate_submerge_speed?: number | null
+  aspirate_submerge_mmFromBottom: number | null
+  aspirate_submerge_x_position: number | null
+  aspirate_submerge_y_position: number | null
   aspirate_touchTip_mmFromTop?: number | null
   aspirate_touchTip_speed?: number | null
   aspirate_wells_grouped?: boolean | null
   aspirate_x_position?: number | null
   aspirate_y_position?: number | null
+  aspirate_position_reference: string | null
   blowout_flowRate?: number | null
   blowout_location?: string | null
   blowout_z_offset?: number | null
@@ -294,12 +299,17 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dispense_retract_speed?: number | null
   dispense_retract_x_position?: number | null
   dispense_retract_y_position?: number | null
+  dispense_retract_position_reference: string | null
   dispense_submerge_delay_seconds?: number | null
   dispense_submerge_speed?: number | null
+  dispense_submerge_mmFromBottom: number | null
+  dispense_submerge_x_position: number | null
+  dispense_submerge_y_position: number | null
   dispense_touchTip_mmFromTop?: number | null
   dispense_touchTip_speed?: number | null
   dispense_x_position?: number | null
   dispense_y_position?: number | null
+  dispense_position_reference: string | null
   disposalVolume_volume?: number | null
   dropTip_wellNames?: string[] | null
   pickUpTip_location?: string | null
@@ -438,6 +448,8 @@ export type TipZOffsetFields =
   | 'mix_touchTip_mmFromTop'
   | 'aspirate_retract_mmFromBottom'
   | 'dispense_retract_mmFromBottom'
+  | 'aspirate_submerge_mmFromBottom'
+  | 'dispense_submerge_mmFromBottom'
 
 export type TipYOffsetFields =
   | 'aspirate_y_position'
@@ -445,6 +457,8 @@ export type TipYOffsetFields =
   | 'mix_y_position'
   | 'aspirate_retract_y_position'
   | 'dispense_retract_y_position'
+  | 'aspirate_submerge_y_position'
+  | 'dispense_submerge_y_position'
 
 export type TipXOffsetFields =
   | 'aspirate_x_position'
@@ -452,6 +466,16 @@ export type TipXOffsetFields =
   | 'mix_x_position'
   | 'aspirate_retract_x_position'
   | 'dispense_retract_x_position'
+  | 'aspirate_submerge_x_position'
+  | 'dispense_submerge_x_position'
+
+export type ReferenceFields =
+  | 'aspirate_position_reference'
+  | 'dispense_position_reference'
+  | 'aspirate_submerge_position_reference'
+  | 'dispense_submerge_position_reference'
+  | 'aspirate_retract_position_reference'
+  | 'dispense_retract_position_reference'
 
 export type DelayCheckboxFields =
   | 'aspirate_delay_checkbox'

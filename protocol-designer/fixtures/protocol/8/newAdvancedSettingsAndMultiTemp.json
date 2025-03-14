@@ -6,16 +6,16 @@
     "author": "",
     "description": "",
     "created": 1714565695341,
-    "lastModified": 1740602770093,
+    "lastModified": 1741896398827,
     "category": null,
     "subcategory": null,
     "tags": []
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "8.4.0",
+    "version": "8.4.3-alpha.0",
     "data": {
-      "_internalAppBuildDate": "Wed, 26 Feb 2025 19:45:16 GMT",
+      "_internalAppBuildDate": "Mon, 10 Mar 2025 14:05:38 GMT",
       "pipetteTiprackAssignments": {
         "21087f15-4c03-4587-8a2b-1ba0b5a501a0": [
           "opentrons/opentrons_flex_96_tiprack_50ul/1"
@@ -63,13 +63,19 @@
           "aspirate_mix_times": null,
           "aspirate_mix_volume": null,
           "aspirate_mmFromBottom": 29,
+          "aspirate_position_reference": null,
           "aspirate_retract_delay_seconds": null,
           "aspirate_retract_mmFromBottom": null,
           "aspirate_retract_speed": null,
           "aspirate_retract_x_position": 0,
           "aspirate_retract_y_position": 0,
+          "aspirate_retract_position_reference": null,
           "aspirate_submerge_delay_seconds": null,
           "aspirate_submerge_speed": null,
+          "aspirate_submerge_mmFromBottom": null,
+          "aspirate_submerge_x_position": null,
+          "aspirate_submerge_y_position": null,
+          "aspirate_submerge_position_reference": null,
           "aspirate_touchTip_checkbox": false,
           "aspirate_touchTip_mmFromTop": null,
           "aspirate_touchTip_speed": null,
@@ -95,13 +101,19 @@
           "dispense_mix_times": null,
           "dispense_mix_volume": null,
           "dispense_mmFromBottom": null,
+          "dispense_position_reference": null,
           "dispense_retract_delay_seconds": null,
           "dispense_retract_mmFromBottom": null,
           "dispense_retract_speed": null,
           "dispense_retract_x_position": 0,
           "dispense_retract_y_position": 0,
+          "dispense_retract_position_reference": null,
           "dispense_submerge_delay_seconds": null,
           "dispense_submerge_speed": null,
+          "dispense_submerge_mmFromBottom": null,
+          "dispense_submerge_x_position": null,
+          "dispense_submerge_y_position": null,
+          "dispense_submerge_position_reference": null,
           "dispense_touchTip_checkbox": false,
           "dispense_touchTip_mmFromTop": null,
           "dispense_touchTip_speed": null,
@@ -3636,7 +3648,7 @@
   "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
-      "key": "e0743333-4ba5-4694-831a-5a120e2891c7",
+      "key": "4572f6f1-1375-4cab-b619-854b206c60e3",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p50_single_flex",
@@ -3645,7 +3657,7 @@
       }
     },
     {
-      "key": "32a1b63e-4a0e-46ef-a3d9-26ff30c7f385",
+      "key": "2a23ac3c-9798-4f51-a90a-38119bf5c750",
       "commandType": "loadModule",
       "params": {
         "model": "temperatureModuleV2",
@@ -3656,7 +3668,7 @@
       }
     },
     {
-      "key": "ce44bb19-2071-4da3-87ed-dde11ba12ea9",
+      "key": "84263002-1dea-4f3e-905b-3573cf82c255",
       "commandType": "loadModule",
       "params": {
         "model": "temperatureModuleV2",
@@ -3667,7 +3679,7 @@
       }
     },
     {
-      "key": "f9488a82-abc9-4228-b415-912850303d26",
+      "key": "e30fcfdb-3503-4470-94a1-a7dae13882f2",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons 96 Well Aluminum Block",
@@ -3681,7 +3693,7 @@
       }
     },
     {
-      "key": "236d025e-ff97-4ac8-af17-687261415fbf",
+      "key": "5f42cfed-ec48-4935-94e1-01b55c49885f",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons Flex 96 Tip Rack 50 µL",
@@ -3695,7 +3707,7 @@
       }
     },
     {
-      "key": "bc64d15f-2e5c-482f-9740-caca3490f9ca",
+      "key": "4d6b2696-d110-4672-a7c5-200cdbf64be3",
       "commandType": "loadLabware",
       "params": {
         "displayName": "Opentrons 24 Well Aluminum Block with NEST 1.5 mL Screwcap",
@@ -3709,7 +3721,7 @@
       }
     },
     {
-      "key": "1c2962e4-f212-479d-b369-b75568635662",
+      "key": "9a188697-e44d-4cc3-bfc0-ac605b39b003",
       "commandType": "loadLabware",
       "params": {
         "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -3724,7 +3736,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "dd3b16b1-1bde-40b6-9d66-ade1115b7c0d",
+      "key": "13602bb0-c7b7-4431-8337-ec4056457ca2",
       "params": {
         "pipetteId": "21087f15-4c03-4587-8a2b-1ba0b5a501a0",
         "labwareId": "0d39213c-49c2-4170-bf19-4c09e1b72aca:opentrons/opentrons_flex_96_tiprack_50ul/1",
@@ -3733,7 +3745,7 @@
     },
     {
       "commandType": "configureForVolume",
-      "key": "be61a1d1-7264-459d-bc75-2c796ab7a775",
+      "key": "37ab9ed1-e6ec-4ede-bd31-88a5732525cc",
       "params": {
         "pipetteId": "21087f15-4c03-4587-8a2b-1ba0b5a501a0",
         "volume": 10
@@ -3741,7 +3753,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "1311a80b-5820-4593-8895-c0a7b5d62e90",
+      "key": "260f614a-baed-4914-8b5e-90ec842a305c",
       "params": {
         "pipetteId": "21087f15-4c03-4587-8a2b-1ba0b5a501a0",
         "volume": 10,
@@ -3760,7 +3772,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "af509649-c5ca-435e-a59f-8b5308b3e429",
+      "key": "df52dfc4-69e8-4252-bccd-1a01b11387ac",
       "params": {
         "pipetteId": "21087f15-4c03-4587-8a2b-1ba0b5a501a0",
         "volume": 10,
@@ -3779,7 +3791,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "a577c7d9-1381-4d56-bb44-1775415aa727",
+      "key": "a0b0c944-99b6-4de0-b107-0ed9fc908566",
       "params": {
         "pipetteId": "21087f15-4c03-4587-8a2b-1ba0b5a501a0",
         "labwareId": "c0093e5f-3f7d-4cbf-aa17-d88394108501:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
@@ -3795,7 +3807,7 @@
     },
     {
       "commandType": "moveToAddressableAreaForDropTip",
-      "key": "ecf713bf-0a4b-4539-89e6-b4421b9180a1",
+      "key": "776304d1-ec7e-4f4a-8f62-5dd873da0c9f",
       "params": {
         "pipetteId": "21087f15-4c03-4587-8a2b-1ba0b5a501a0",
         "addressableAreaName": "movableTrashA3",
@@ -3809,14 +3821,14 @@
     },
     {
       "commandType": "dropTipInPlace",
-      "key": "897ff9e3-43a7-4012-9a83-b887ca4794a4",
+      "key": "6c906bc3-8fbe-468c-96c3-6cf621f41830",
       "params": {
         "pipetteId": "21087f15-4c03-4587-8a2b-1ba0b5a501a0"
       }
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
-      "key": "5e4fdb03-5cf3-4119-822a-b06f8943fdf3",
+      "key": "8498b188-43b4-4780-9e33-dc07d3adc2cf",
       "params": {
         "moduleId": "d6966555-6c0e-45e0-8056-428d7c486401:temperatureModuleType",
         "celsius": 40
@@ -3824,7 +3836,7 @@
     },
     {
       "commandType": "temperatureModule/waitForTemperature",
-      "key": "039d6440-c0e2-4f30-9310-1c3aaf0c6468",
+      "key": "61d63415-4af0-425b-bd70-981664064996",
       "params": {
         "moduleId": "d6966555-6c0e-45e0-8056-428d7c486401:temperatureModuleType",
         "celsius": 40
@@ -3832,7 +3844,7 @@
     },
     {
       "commandType": "temperatureModule/setTargetTemperature",
-      "key": "45c2aecc-17e2-4a54-9777-9935533aa50f",
+      "key": "13daa9ce-84d5-41af-a4b8-1782378c3e83",
       "params": {
         "moduleId": "b9c56153-9026-42d1-8113-949e15254571:temperatureModuleType",
         "celsius": 4
@@ -3840,7 +3852,7 @@
     },
     {
       "commandType": "temperatureModule/waitForTemperature",
-      "key": "6928a314-db67-4554-b172-d41a17cff05a",
+      "key": "029c9eb6-54b4-464d-89ee-ae0505aef890",
       "params": {
         "moduleId": "b9c56153-9026-42d1-8113-949e15254571:temperatureModuleType",
         "celsius": 4
@@ -3848,14 +3860,14 @@
     },
     {
       "commandType": "temperatureModule/deactivate",
-      "key": "7df607a3-354a-4fcf-9816-2ce93b2efbcc",
+      "key": "78bb31ff-f030-4b29-a002-ce43fd1a89d7",
       "params": {
         "moduleId": "d6966555-6c0e-45e0-8056-428d7c486401:temperatureModuleType"
       }
     },
     {
       "commandType": "temperatureModule/deactivate",
-      "key": "8ca9ab98-5a4d-4360-bfe4-909a91c1f210",
+      "key": "c5d42dcb-a6a7-4edb-9340-721153d3138b",
       "params": {
         "moduleId": "b9c56153-9026-42d1-8113-949e15254571:temperatureModuleType"
       }

@@ -222,6 +222,8 @@ export function getLabwareFieldForPositioningField(
     mix_touchTip_mmFromTop: 'labware',
     aspirate_retract_mmFromBottom: 'aspirate_labware',
     dispense_retract_mmFromBottom: 'dispense_labware',
+    aspirate_submerge_mmFromBottom: 'aspirate_labware',
+    dispense_submerge_mmFromBottom: 'dispense_labware',
   }
   return fieldMap[name]
 }

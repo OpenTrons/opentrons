@@ -141,7 +141,7 @@
   "timeline": "Timeline",
   "tiprack": "Tiprack",
   "tip_handling": "Tip handling",
-  "tip_position": "{{prefix}} tip position",
+  "tip_position": "{{prefix}} position",
   "touch_tip_position": "Touch tip position from top",
   "valid_range": "Valid range between {{min}} - {{max}} {{unit}}",
   "view_details": "View details",

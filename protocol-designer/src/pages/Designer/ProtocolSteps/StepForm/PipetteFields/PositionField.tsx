@@ -22,6 +22,7 @@ import { getDefaultMmFromEdge } from '../../../../../organisms/TipPositionModal/
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
 import type {
+  ReferenceFields,
   TipXOffsetFields,
   TipYOffsetFields,
   TipZOffsetFields,
@@ -40,6 +41,7 @@ interface PositionFieldProps {
   padding?: string
   showButton?: boolean
   isNested?: boolean
+  referenceField?: ReferenceFields
 }
 
 export function PositionField(props: PositionFieldProps): JSX.Element {
@@ -53,6 +55,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     padding = `0 ${SPACING.spacing16}`,
     showButton = false,
     isNested = false,
+    referenceField,
   } = props
   const {
     name: zName,
@@ -65,7 +68,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
 
   const { t, i18n } = useTranslation(['application', 'protocol_steps'])
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const [isModalOpen, setModalOpen] = useState<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const labwareDef =
     labwareId != null && labwareEntities[labwareId] != null
@@ -97,15 +100,15 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
   }
 
   const handleOpen = (has3Specs: boolean): void => {
-    if (has3Specs && wellDepthMm && wellXWidthMm && wellYWidthMm) {
-      setModalOpen(true)
-    }
-    if (!has3Specs && wellDepthMm) {
-      setModalOpen(true)
+    if (
+      wellDepthMm != null &&
+      (has3Specs ? wellXWidthMm != null && wellYWidthMm != null : true)
+    ) {
+      setIsModalOpen(true)
     }
   }
   const handleClose = (): void => {
-    setModalOpen(false)
+    setIsModalOpen(false)
   }
   const isDelayPositionField = getIsDelayPositionField(zName)
   let zValue: string | number = '0'
@@ -113,7 +116,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
   const mmFromBottom = typeof rawZValue === 'number' ? rawZValue : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
-    zValue = mmFromBottom ?? getDefaultMmFromEdge({ name: zName })
+    zValue =
+      mmFromBottom ??
+      getDefaultMmFromEdge({ name: zName, wellDepth: wellDepthMm })
   }
 
   let modal = (
@@ -165,6 +170,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
         isIndeterminate={isIndeterminate}
         specs={specs}
         prefix={prefix}
+        reference={
+          referenceField != null ? propsForFields[referenceField] : null
+        }
       />
     )
   }

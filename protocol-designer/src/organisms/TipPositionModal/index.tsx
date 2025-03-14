@@ -17,18 +17,22 @@ import {
   InputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { WELL_BOTTOM, WELL_CENTER, WELL_TOP } from '@opentrons/shared-data'
 import { prefixMap } from '../../resources/utils'
 import { getIsTouchTipField } from '../../form-types'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
+import { usePositionReference } from './hooks'
 import * as utils from './utils'
 import { TipPositionTopView } from './TipPositionTopView'
 import { TipPositionSideView } from './TipPositionSideView'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { PositionReference } from '@opentrons/shared-data'
 import type { StepFieldName } from '../../form-types'
 import type { MoveLiquidPrefixType } from '../../resources/types'
+import type { FieldProps } from '../../pages/Designer/ProtocolSteps/types'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {
@@ -44,8 +48,9 @@ interface TipPositionModalProps {
   wellDepthMm: number
   wellXWidthMm: number
   wellYWidthMm: number
-  isIndeterminate?: boolean
   prefix: MoveLiquidPrefixType
+  isIndeterminate?: boolean
+  reference?: FieldProps | null
 }
 
 export function TipPositionModal(
@@ -59,6 +64,7 @@ export function TipPositionModal(
     wellYWidthMm,
     closeModal,
     prefix,
+    reference: referenceSpec,
   } = props
   const { t } = useTranslation([
     'modal',
@@ -68,9 +74,7 @@ export function TipPositionModal(
     'application',
   ])
   const [view, setView] = useState<'top' | 'side'>('side')
-  const zSpec = specs.z
-  const ySpec = specs.y
-  const xSpec = specs.x
+  const { z: zSpec, y: ySpec, x: xSpec } = specs
 
   if (zSpec == null || xSpec == null || ySpec == null) {
     console.error(
@@ -83,7 +87,9 @@ export function TipPositionModal(
   })
 
   const [zValue, setZValue] = useState<string | null>(
-    zSpec?.value == null ? String(defaultMmFromBottom) : String(zSpec?.value)
+    zSpec?.value == null
+      ? String(referenceSpec?.value === WELL_BOTTOM ? defaultMmFromBottom : 0)
+      : String(zSpec?.value)
   )
   const [yValue, setYValue] = useState<string | null>(
     ySpec?.value == null ? null : String(ySpec?.value)
@@ -91,10 +97,19 @@ export function TipPositionModal(
   const [xValue, setXValue] = useState<string | null>(
     xSpec?.value == null ? null : String(xSpec?.value)
   )
+  const { positionReferenceDropdown, reference } = usePositionReference({
+    initialReference: referenceSpec?.value as PositionReference,
+    zValue: Number(zValue),
+    updateZValue: setZValue,
+    wellDepth: wellDepthMm,
+  })
 
   // in this modal, pristinity hides the OUT_OF_BOUNDS error only.
   const [isPristine, setPristine] = useState<boolean>(true)
-  const getMinMaxMmFromBottom = (): {
+  const getMinMaxMmFromBottom = (
+    reference: PositionReference,
+    wellDepth: number
+  ): {
     maxMmFromBottom: number
     minMmFromBottom: number
   } => {
@@ -104,13 +119,27 @@ export function TipPositionModal(
         minMmFromBottom: utils.roundValue(wellDepthMm / 2, 'up'),
       }
     }
+    let [min, max]: [number, number] = [0, wellDepthMm]
+    switch (reference) {
+      case WELL_CENTER:
+        ;[min, max] = [-wellDepth / 2, wellDepth / 2]
+        break
+      case WELL_TOP:
+        ;[min, max] = [-wellDepth, 0]
+        break
+      default:
+        break
+    }
     return {
-      maxMmFromBottom: utils.roundValue(wellDepthMm, 'up'),
-      minMmFromBottom: 0,
+      maxMmFromBottom: utils.roundValue(max, 'up'),
+      minMmFromBottom: utils.roundValue(min, 'up'),
     }
   }
 
-  const { maxMmFromBottom, minMmFromBottom } = getMinMaxMmFromBottom()
+  const { maxMmFromBottom, minMmFromBottom } = getMinMaxMmFromBottom(
+    reference,
+    wellDepthMm
+  )
   const { minValue: yMinWidth, maxValue: yMaxWidth } = utils.getMinMaxWidth(
     wellYWidthMm
   )
@@ -159,6 +188,7 @@ export function TipPositionModal(
       zSpec?.updateValue(zValue === null ? null : Number(zValue))
       xSpec?.updateValue(xValue === null ? null : Number(xValue))
       ySpec?.updateValue(yValue === null ? null : Number(yValue))
+      referenceSpec?.updateValue(reference)
       closeModal()
     }
   }
@@ -167,26 +197,10 @@ export function TipPositionModal(
     closeModal()
   }
 
-  const handleZChange = (newValueRaw: string | number): void => {
-    // if string, strip non-number characters from string and cast to number
-    const newValue =
-      typeof newValueRaw === 'string'
-        ? newValueRaw.replace(/[^.0-9]/, '')
-        : String(newValueRaw)
-
-    if (newValue === '.') {
-      setZValue('0.')
-    } else {
-      setZValue(Number(newValue) >= 0 ? newValue : '0')
-    }
-  }
-
-  const handleZInputFieldChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    handleZChange(e.currentTarget.value)
-    setPristine(false)
-  }
-
-  const handleXChange = (newValueRaw: string | number): void => {
+  const handleChange = (
+    newValueRaw: string,
+    setValue: Dispatch<SetStateAction<string | null>>
+  ): void => {
     // if string, strip non-number characters from string and cast to number
     const newValue =
       typeof newValueRaw === 'string'
@@ -194,35 +208,13 @@ export function TipPositionModal(
         : String(newValueRaw)
 
     if (newValue === '.') {
-      setXValue('0.')
+      setValue('0.')
     } else {
-      setXValue(newValue)
+      setValue(newValue)
     }
-  }
-
-  const handleXInputFieldChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    handleXChange(e.currentTarget.value)
     setPristine(false)
   }
 
-  const handleYChange = (newValueRaw: string | number): void => {
-    // if string, strip non-number characters from string and cast to number
-    const newValue =
-      typeof newValueRaw === 'string'
-        ? newValueRaw.replace(/[^-.0-9]/g, '')
-        : String(newValueRaw)
-
-    if (newValue === '.') {
-      setYValue('0.')
-    } else {
-      setYValue(newValue)
-    }
-  }
-
-  const handleYInputFieldChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    handleYChange(e.currentTarget.value)
-    setPristine(false)
-  }
   const isXValueNearEdge =
     xValue != null &&
     (parseInt(xValue) > PERCENT_RANGE_TO_SHOW_WARNING * xMaxWidth ||
@@ -231,13 +223,18 @@ export function TipPositionModal(
     yValue != null &&
     (parseInt(yValue) > PERCENT_RANGE_TO_SHOW_WARNING * yMaxWidth ||
       parseInt(yValue) < PERCENT_RANGE_TO_SHOW_WARNING * yMinWidth)
-  const isZValueAtBottom = zValue != null && zValue === '0'
+
+  // logic for determining if tip is at bottom based on reference
+  const isZValueAtBottom =
+    zValue != null
+      ? utils.getIsZValueAtBottom(zValue, wellDepthMm, reference)
+      : false
 
   return createPortal(
     <Modal
       marginLeft="0"
       type="info"
-      width="37.125rem"
+      width="47rem"
       closeOnOutsideClick
       title={t('shared:tip_position', { prefix: prefixMap[prefix] })}
       onClose={handleCancel}
@@ -277,50 +274,77 @@ export function TipPositionModal(
           </Banner>
         ) : null}
         <Flex gridGap={SPACING.spacing40}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing12}
+            width="100%"
+          >
             <StyledText desktopStyle="bodyDefaultRegular">
               {t(`tip_position.body.${zSpec?.name}`)}
             </StyledText>
+            {positionReferenceDropdown}
             <InputField
               title={t('tip_position.field_titles.x_position')}
-              caption={t('tip_position.caption', {
-                min: roundedXMin,
-                max: roundedXMax,
-              })}
+              caption={
+                xErrorText == null
+                  ? t('tip_position.caption', {
+                      min: roundedXMin,
+                      max: roundedXMax,
+                    })
+                  : null
+              }
               error={xErrorText}
               id="TipPositionModal_x_custom_input"
-              onChange={handleXInputFieldChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                handleChange(e.target.value, setXValue)
+              }}
               units={t('application:units.millimeter')}
               value={xValue ?? ''}
             />
             <InputField
               tooltipText={t('tooltip:y_position_value')}
               title={t('tip_position.field_titles.y_position')}
-              caption={t('tip_position.caption', {
-                min: roundedYMin,
-                max: roundedYMax,
-              })}
+              caption={
+                yErrorText == null
+                  ? t('tip_position.caption', {
+                      min: roundedYMin,
+                      max: roundedYMax,
+                    })
+                  : null
+              }
               error={yErrorText}
               id="TipPositionModal_y_custom_input"
-              onChange={handleYInputFieldChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                handleChange(e.target.value, setYValue)
+              }}
               units={t('application:units.millimeter')}
               value={yValue ?? ''}
             />
             <InputField
               title={t('tip_position.field_titles.z_position')}
-              caption={t('tip_position.caption', {
-                min: minMmFromBottom,
-                max: maxMmFromBottom,
-              })}
+              caption={
+                zErrorText == null
+                  ? t('tip_position.caption', {
+                      min: minMmFromBottom,
+                      max: maxMmFromBottom,
+                    })
+                  : null
+              }
               error={zErrorText}
               id="TipPositionModal_z_custom_input"
               isIndeterminate={zValue === null && isIndeterminate}
-              onChange={handleZInputFieldChange}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                handleChange(e.target.value, setZValue)
+              }}
               units={t('application:units.millimeter')}
               value={zValue !== null ? zValue : ''}
             />
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            width="100%"
+          >
             <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 {view === 'side' ? 'Side view' : 'Top view'}
@@ -338,7 +362,13 @@ export function TipPositionModal(
             {view === 'side' ? (
               <TipPositionSideView
                 mmFromBottom={
-                  zValue !== null ? Number(zValue) : defaultMmFromBottom
+                  zValue !== null
+                    ? utils.getMmFromBottom(
+                        Number(zValue),
+                        reference,
+                        wellDepthMm
+                      )
+                    : defaultMmFromBottom
                 }
                 wellDepthMm={wellDepthMm}
                 xPosition={parseInt(xValue ?? '0')}
