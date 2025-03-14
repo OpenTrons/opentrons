@@ -12,6 +12,8 @@ export interface RobotCoordsForeignDivProps {
   innerDivProps?: ComponentProps<typeof Box>
   transformWithSVG?: boolean
   extraTransform?: string
+  /** optional data-testid to test foreignObjects in cypress */
+  dataTestId?: string
 }
 
 export const RobotCoordsForeignDiv = (
@@ -27,11 +29,13 @@ export const RobotCoordsForeignDiv = (
     innerDivProps,
     transformWithSVG = false,
     extraTransform = '',
+    dataTestId = '',
   } = props
 
   const transform = `scale(1, -1) ${extraTransform}`
   return (
     <foreignObject
+      data-testid={dataTestId}
       {...{ x, y, height, width, ...outerProps }}
       transform={transformWithSVG ? transform : extraTransform}
     >

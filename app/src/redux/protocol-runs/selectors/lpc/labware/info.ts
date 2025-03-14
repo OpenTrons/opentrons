@@ -1,26 +1,23 @@
 import { createSelector } from 'reselect'
 
-import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
+import { getIsTiprack } from '@opentrons/shared-data'
 
+import { getItemLabwareDef, getSelectedLabwareDefFrom } from '../transforms'
 import {
-  getItemLabwareDef,
-  getSelectedLabwareOffsetDetails,
-  getSelectedLabwareDefFrom,
-} from '../transforms'
+  OFFSET_KIND_DEFAULT,
+  OFFSET_KIND_LOCATION_SPECIFIC,
+} from '/app/redux/protocol-runs/constants'
 
 import type { Selector } from 'reselect'
-import type {
-  LegacyLabwareOffsetLocation,
-  VectorOffset,
-} from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
-import type { Coordinates, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LPCFlowType,
   LPCLabwareInfo,
-  SelectedLabwareInfo,
+  SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
+// Returns all the LPC labware info for the labware used in the current run.
 export const selectAllLabwareInfo = (
   runId: string
 ): Selector<State, LPCLabwareInfo['labware']> =>
@@ -29,38 +26,18 @@ export const selectAllLabwareInfo = (
     labware => labware ?? {}
   )
 
-export const selectSelectedLabwareInfo = (
+// Returns the labware overview for the currently user-selected labware, if any.
+export const selectSelectedLwOverview = (
   runId: string
-): Selector<State, SelectedLabwareInfo | null> =>
+): Selector<State, SelectedLwOverview | null> =>
   createSelector(
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware,
     selectedLabware => selectedLabware ?? null
   )
 
-export const selectSelectedLwInitialPosition = (
-  runId: string
-): Selector<State, VectorOffset | null> =>
-  createSelector(
-    (state: State) => getSelectedLabwareOffsetDetails(runId, state),
-    details => {
-      const workingOffset = details?.workingOffset
-
-      if (workingOffset == null) {
-        return null
-      } else {
-        return workingOffset.initialPosition
-      }
-    }
-  )
-
-export interface SelectOffsetsToApplyResult {
-  definitionUri: string
-  location: LegacyLabwareOffsetLocation
-  vector: Coordinates
-}
-
-export const selectSelectedLabwareFlowType = (
+// Returns the current edit offset flow type that the user is performing, if any.
+export const selectSelectedLwFlowType = (
   runId: string
 ): Selector<State, LPCFlowType | null> =>
   createSelector(
@@ -70,16 +47,19 @@ export const selectSelectedLabwareFlowType = (
       if (selectedLabware?.offsetLocationDetails == null) {
         return null
       } else {
-        if (selectedLabware.offsetLocationDetails.kind === 'default') {
-          return 'default'
+        if (
+          selectedLabware.offsetLocationDetails.kind === OFFSET_KIND_DEFAULT
+        ) {
+          return OFFSET_KIND_DEFAULT
         } else {
-          return 'location-specific'
+          return OFFSET_KIND_LOCATION_SPECIFIC
         }
       }
     }
   )
 
-export const selectSelectedLabwareDisplayName = (
+// Returns the display name for the user-selected labware, if any.
+export const selectSelectedLwDisplayName = (
   runId: string
 ): Selector<State, string> =>
   createSelector(
@@ -96,6 +76,8 @@ export const selectSelectedLabwareDisplayName = (
     }
   )
 
+// Returns whether the user-selected labware is a tiprack.
+// Returns false if there is no user-selected labware.
 export const selectIsSelectedLwTipRack = (
   runId: string
 ): Selector<State, boolean> =>
@@ -104,15 +86,8 @@ export const selectIsSelectedLwTipRack = (
     def => (def != null ? getIsTiprack(def) : false)
   )
 
-export const selectSelectedLwDisplayName = (
-  runId: string
-): Selector<State, string> =>
-  createSelector(
-    (state: State) => getSelectedLabwareDefFrom(runId, state),
-    def => (def != null ? getLabwareDisplayName(def) : '')
-  )
-
-export const selectActiveAdapterDisplayName = (
+// Returns the associated adapter display name for the user-selected labware, if any.
+export const selectSelectedLwRelatedAdapterDisplayName = (
   runId: string
 ): Selector<State, string> =>
   createSelector(
@@ -138,7 +113,8 @@ export const selectActiveAdapterDisplayName = (
     }
   )
 
-export const selectSelectedLabwareDef = (
+// Returns the labware definition for the user-selected labware, if any.
+export const selectSelectedLwDef = (
   runId: string
 ): Selector<State, LabwareDefinition2 | null> =>
   createSelector(

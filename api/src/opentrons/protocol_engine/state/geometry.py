@@ -20,10 +20,11 @@ from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
-from opentrons_shared_data.pipette.types import ChannelCount
+from opentrons_shared_data.pipette.types import ChannelCount, LabwareUri
 
 from .. import errors
 from ..errors import (
+    LabwareNotLoadedError,
     LabwareNotLoadedOnLabwareError,
     LabwareNotLoadedOnModuleError,
     LabwareMovementNotAllowedError,
@@ -333,12 +334,12 @@ class GeometryView:
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(parent, ModuleLocation):
             module_id = parent.moduleId
-            module_to_child = self._modules.get_nominal_offset_to_child(
-                module_id=module_id, addressable_areas=self._addressable_areas
-            )
             module_model = self._modules.get_connected_model(module_id)
             stacking_overlap = self._labware.get_module_overlap_offsets(
                 child_definition, module_model
+            )
+            module_to_child = self._modules.get_nominal_offset_to_child(
+                module_id=module_id, addressable_areas=self._addressable_areas
             )
             return LabwareOffsetVector(
                 x=module_to_child.x - stacking_overlap.x,
@@ -838,9 +839,11 @@ class GeometryView:
             area = (
                 location.slotName.id
                 if isinstance(location, DeckSlotLocation)
-                else location.addressableAreaName
-                if isinstance(location, AddressableAreaLocation)
-                else None
+                else (
+                    location.addressableAreaName
+                    if isinstance(location, AddressableAreaLocation)
+                    else None
+                )
             )
             if area is not None and (
                 existing_fixtures is None
@@ -921,6 +924,7 @@ class GeometryView:
             self._labware.get_grip_height_from_labware_bottom(labware_definition)
         )
         location_name: str
+        module_location: ModuleLocation | None = None
 
         if isinstance(location, DeckSlotLocation):
             location_name = location.slotName.id
@@ -939,11 +943,19 @@ class GeometryView:
                 offset = LabwareOffsetVector(x=0, y=0, z=0)
         else:
             if isinstance(location, ModuleLocation):
-                location_name = self._modules.get_location(
+                location_name = self._modules.get_provided_addressable_area(
                     location.moduleId
-                ).slotName.id
+                )
+                module_location = location
             else:  # OnLabwareLocation
-                location_name = self.get_ancestor_slot_name(location.labwareId).id
+                labware_loc = self._labware.get(location.labwareId).location
+                if isinstance(labware_loc, ModuleLocation):
+                    location_name = self._modules.get_provided_addressable_area(
+                        labware_loc.moduleId
+                    )
+                    module_location = labware_loc
+                else:
+                    location_name = self.get_ancestor_slot_name(location.labwareId).id
             labware_offset = self._get_offset_from_parent(
                 child_definition=labware_definition, parent=location
             )
@@ -955,9 +967,28 @@ class GeometryView:
                 z=labware_offset.z + cal_offset.z,
             )
 
-        location_center = self._addressable_areas.get_addressable_area_center(
-            location_name
-        )
+        if module_location is not None:
+            # Location center must be determined from the cutout the Module is loaded in
+            position = deck_configuration_provider.get_cutout_position(
+                cutout_id=self._addressable_areas.get_cutout_id_by_deck_slot_name(
+                    self._modules.get_location(module_location.moduleId).slotName
+                ),
+                deck_definition=self._addressable_areas.deck_definition,
+            )
+            bounding_box = self._addressable_areas.get_addressable_area(
+                location_name
+            ).bounding_box
+            location_center = Point(
+                position.x + bounding_box.x / 2,
+                position.y + bounding_box.y / 2,
+                position.z,
+            )
+
+        else:
+            location_center = self._addressable_areas.get_addressable_area_center(
+                location_name
+            )
+
         return Point(
             location_center.x + offset.x,
             location_center.y + offset.y,
@@ -1500,10 +1531,14 @@ class GeometryView:
         )
 
     def get_predicted_location_sequence(
-        self, labware_location: LabwareLocation
+        self,
+        labware_location: LabwareLocation,
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
     ) -> LabwareLocationSequence:
         """Get the location sequence for this location. Useful for a labware that hasn't been loaded."""
-        return self._recurse_labware_location(labware_location, [])
+        return self._recurse_labware_location(
+            labware_location, [], labware_pending_load or {}
+        )
 
     def _cutout_fixture_location_sequence_from_addressable_area(
         self, addressable_area_name: str
@@ -1610,6 +1645,7 @@ class GeometryView:
         self,
         labware_location: LabwareLocation,
         building: LabwareLocationSequence,
+        labware_pending_load: dict[str, LoadedLabware],
     ) -> LabwareLocationSequence:
         if isinstance(labware_location, AddressableAreaLocation):
             return self._recurse_labware_location_from_aa_component(
@@ -1623,17 +1659,18 @@ class GeometryView:
             ]
 
         elif isinstance(labware_location, OnLabwareLocation):
+            labware = self._get_or_default_labware(
+                labware_location.labwareId, labware_pending_load
+            )
             return self._recurse_labware_location(
-                self._labware.get_location(labware_location.labwareId),
+                labware.location,
                 building
                 + [
                     OnLabwareLocationSequenceComponent(
-                        labwareId=labware_location.labwareId,
-                        lidId=self._labware.get_lid_id_by_labware_id(
-                            labware_location.labwareId
-                        ),
+                        labwareId=labware_location.labwareId, lidId=labware.lid_id
                     )
                 ],
+                labware_pending_load,
             )
         elif isinstance(labware_location, ModuleLocation):
             return self._recurse_labware_location_from_module_component(
@@ -1668,13 +1705,20 @@ class GeometryView:
         return self.get_projected_offset_location(parent_location)
 
     def get_projected_offset_location(
-        self, labware_location: LabwareLocation
+        self,
+        labware_location: LabwareLocation,
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
     ) -> Optional[LabwareOffsetLocationSequence]:
         """Get the offset location that a labware loaded into this location would match."""
-        return self._recurse_labware_offset_location(labware_location, [])
+        return self._recurse_labware_offset_location(
+            labware_location, [], labware_pending_load or {}
+        )
 
     def _recurse_labware_offset_location(
-        self, labware_location: LabwareLocation, building: LabwareOffsetLocationSequence
+        self,
+        labware_location: LabwareLocation,
+        building: LabwareOffsetLocationSequence,
+        labware_pending_load: dict[str, LoadedLabware],
     ) -> LabwareOffsetLocationSequence | None:
         if isinstance(labware_location, DeckSlotLocation):
             return building + [
@@ -1726,9 +1770,11 @@ class GeometryView:
 
         elif isinstance(labware_location, OnLabwareLocation):
             parent_labware_id = labware_location.labwareId
-            parent_labware_uri = self._labware.get_definition_uri(parent_labware_id)
-
-            base_location = self._labware.get_parent_location(parent_labware_id)
+            parent_labware = self._get_or_default_labware(
+                parent_labware_id, labware_pending_load
+            )
+            parent_labware_uri = LabwareUri(parent_labware.definitionUri)
+            base_location = parent_labware.location
             return self._recurse_labware_offset_location(
                 base_location,
                 building
@@ -1737,6 +1783,7 @@ class GeometryView:
                         labwareUri=parent_labware_uri
                     )
                 ],
+                labware_pending_load,
             )
 
         else:  # Off deck
@@ -2069,3 +2116,14 @@ class GeometryView:
         if not pool_list:
             return 0.0
         return self.get_height_of_labware_stack(pool_list)
+
+    def _get_or_default_labware(
+        self, labware_id: str, pending_labware: dict[str, LoadedLabware]
+    ) -> LoadedLabware:
+        try:
+            return self._labware.get(labware_id)
+        except LabwareNotLoadedError as lnle:
+            try:
+                return pending_labware[labware_id]
+            except KeyError as ke:
+                raise lnle from ke

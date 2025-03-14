@@ -7,6 +7,7 @@
     "description": "Description here",
     "created": 1560957631666,
     "lastModified": 1740602363965,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
@@ -180,6 +181,7 @@
           "disposalVolume_volume": "1",
           "dropTip_location": "102df8f7-3e8e-45d6-be15-094b37672fcc:trashBin",
           "liquidClassesSupported": false,
+          "liquidClass": null,
           "nozzles": null,
           "path": "single",
           "pipette": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
@@ -3439,7 +3441,7 @@
       "displayColor": "#ffd600"
     }
   },
-  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
       "key": "06e1b8af-e87e-4255-8d5b-0c81faff7085",

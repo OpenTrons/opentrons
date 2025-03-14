@@ -1,8 +1,6 @@
 """Command models to engage a user to empty a Flex Stacker."""
 
 from __future__ import annotations
-
-from __future__ import annotations
 from typing import Optional, Literal, TYPE_CHECKING
 from typing_extensions import Type
 

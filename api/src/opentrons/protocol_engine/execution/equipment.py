@@ -52,6 +52,7 @@ from ..types import (
     ModuleModel,
     ModuleDefinition,
     AddressableAreaLocation,
+    LoadedLabware,
 )
 
 
@@ -170,6 +171,7 @@ class EquipmentHandler:
         definition: LabwareDefinition,
         location: LabwareLocation,
         labware_id: Optional[str],
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
     ) -> LoadedLabwareData:
         """Load labware from already-found definition."""
         definition_uri = uri_from_details(
@@ -178,7 +180,7 @@ class EquipmentHandler:
             version=definition.version,
         )
         return await self._load_labware_from_def_and_uri(
-            definition, definition_uri, location, labware_id
+            definition, definition_uri, location, labware_id, labware_pending_load
         )
 
     async def _load_labware_from_def_and_uri(
@@ -186,7 +188,8 @@ class EquipmentHandler:
         definition: LabwareDefinition,
         definition_uri: str,
         location: LabwareLocation,
-        labware_id: Optional[str],
+        labware_id: str | None,
+        labware_pending_load: dict[str, LoadedLabware] | None,
     ) -> LoadedLabwareData:
         labware_id = (
             labware_id if labware_id is not None else self._model_utils.generate_id()
@@ -196,6 +199,7 @@ class EquipmentHandler:
         offset_id = self.find_applicable_labware_offset_id(
             labware_definition_uri=definition_uri,
             labware_location=location,
+            labware_pending_load=labware_pending_load,
         )
 
         return LoadedLabwareData(
@@ -231,7 +235,7 @@ class EquipmentHandler:
             load_name, namespace, version
         )
         return await self._load_labware_from_def_and_uri(
-            definition, definition_uri, location, labware_id
+            definition, definition_uri, location, labware_id, None
         )
 
     async def reload_labware(self, labware_id: str) -> ReloadedLabwareData:
@@ -681,8 +685,11 @@ class EquipmentHandler:
         )
 
     def find_applicable_labware_offset_id(
-        self, labware_definition_uri: str, labware_location: LabwareLocation
-    ) -> Optional[str]:
+        self,
+        labware_definition_uri: str,
+        labware_location: LabwareLocation,
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
+    ) -> str | None:
         """Figure out what offset would apply to a labware in the given location.
 
         Raises:
@@ -694,7 +701,9 @@ class EquipmentHandler:
             or None if no labware offset will apply.
         """
         labware_offset_location = (
-            self._state_store.geometry.get_projected_offset_location(labware_location)
+            self._state_store.geometry.get_projected_offset_location(
+                labware_location, labware_pending_load
+            )
         )
 
         if labware_offset_location is None:

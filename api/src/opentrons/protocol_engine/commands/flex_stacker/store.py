@@ -147,10 +147,6 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
-        if stacker_state.in_static_mode:
-            raise CannotPerformModuleAction(
-                "Cannot store labware in Flex Stacker while in static mode"
-            )
 
         if stacker_state.pool_count == stacker_state.max_pool_count:
             raise CannotPerformModuleAction(
@@ -209,9 +205,6 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             new_offset_ids_by_id={id: None for id in id_list},
         )
 
-        state_update.store_flex_stacker_labware(
-            module_id=params.moduleId, labware_id=primary_id
-        )
         state_update.update_flex_stacker_labware_pool_count(
             module_id=params.moduleId, count=stacker_state.pool_count + 1
         )

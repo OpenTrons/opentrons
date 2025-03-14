@@ -212,6 +212,7 @@ describe('createPresavedStepForm', () => {
       blowout_z_offset: 0,
       blowout_flowRate: null,
       liquidClassesSupported: true,
+      liquidClass: null,
     })
   })
   describe('mix step', () => {

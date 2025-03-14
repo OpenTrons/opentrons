@@ -69,7 +69,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
 
   const instructions = [
-    isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
+    isOnDevice ? t('legacy_clear_all_slots_odd') : t('legacy_clear_all_slots'),
     <Trans
       key="place_previous_tip_rack_in_location"
       t={t}

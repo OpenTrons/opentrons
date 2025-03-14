@@ -53,6 +53,7 @@ export function pythonMetadata(fileMetadata: FileMetadataFields): string {
       subcategory: fileMetadata.subcategory,
       tags: fileMetadata.tags?.length && fileMetadata.tags.join(', '),
       protocolDesigner: process.env.OT_PD_VERSION,
+      source: fileMetadata.source,
     }).filter(([key, value]) => value) // drop blank entries
   )
   return `metadata = ${formatPyDict(stringifiedMetadata)}`
@@ -206,7 +207,9 @@ export function getLoadPipettes(
     .map(pipette => {
       const { name, id, spec, pythonName, tiprackDefURI } = pipette
       const mount =
-        spec.channels === 96 ? '' : formatPyStr(pipetteRobotState[id].mount)
+        spec.channels === 96
+          ? ''
+          : `, ${formatPyStr(pipetteRobotState[id].mount)}`
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
@@ -223,7 +226,7 @@ export function getLoadPipettes(
 
       return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(${formatPyStr(
         pipetteName
-      )}, ${mount}${pythonTipRacks})`
+      )}${mount}${pythonTipRacks})`
     })
     .join('\n')
 

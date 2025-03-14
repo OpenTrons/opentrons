@@ -51,7 +51,9 @@ export function LabwareOffsetTable(
           <OffsetTableHeader>{t('location')}</OffsetTableHeader>
           <OffsetTableHeader>{t('run')}</OffsetTableHeader>
           <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
-          <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
+          <OffsetTableHeader>
+            {t('legacy_labware_offset_data')}
+          </OffsetTableHeader>
         </tr>
       </thead>
       <tbody>

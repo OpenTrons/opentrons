@@ -1,4 +1,5 @@
 """Test Flex Stacker store command implementation."""
+
 from datetime import datetime
 from unittest.mock import sentinel
 
@@ -15,7 +16,6 @@ from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.state.update_types import (
     StateUpdate,
     FlexStackerStateUpdate,
-    FlexStackerStoreLabware,
     BatchLabwareLocationUpdate,
 )
 
@@ -56,38 +56,6 @@ def subject(
     )
 
 
-async def test_store_raises_in_static_mode(
-    decoy: Decoy,
-    equipment: EquipmentHandler,
-    state_view: StateView,
-    model_utils: ModelUtils,
-    subject: StoreImpl,
-    stacker_id: FlexStackerId,
-    flex_50uL_tiprack: LabwareDefinition,
-) -> None:
-    """It should raise if called when the stacker is static."""
-    data = flex_stacker.StoreParams(moduleId=stacker_id)
-
-    fs_module_substate = FlexStackerSubState(
-        module_id=stacker_id,
-        in_static_mode=True,
-        hopper_labware_ids=["labware-id"],
-        pool_primary_definition=flex_50uL_tiprack,
-        pool_adapter_definition=None,
-        pool_lid_definition=None,
-        pool_count=0,
-        max_pool_count=5,
-    )
-    decoy.when(
-        state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
-    ).then_return(fs_module_substate)
-    with pytest.raises(
-        CannotPerformModuleAction,
-        match="Cannot store labware in Flex Stacker while in static mode",
-    ):
-        await subject.execute(data)
-
-
 async def test_store_raises_if_full(
     decoy: Decoy,
     equipment: EquipmentHandler,
@@ -101,13 +69,11 @@ async def test_store_raises_if_full(
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
-        in_static_mode=False,
-        hopper_labware_ids=["labware-id"],
         pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
-        pool_count=5,
-        max_pool_count=5,
+        pool_count=6,
+        max_pool_count=6,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -132,8 +98,6 @@ async def test_store_raises_if_carriage_logically_empty(
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
-        in_static_mode=False,
-        hopper_labware_ids=["labware-id"],
         pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
@@ -164,8 +128,6 @@ async def test_store_raises_if_not_configured(
     data = flex_stacker.StoreParams(moduleId=stacker_id)
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
-        in_static_mode=False,
-        hopper_labware_ids=["labware-id"],
         pool_primary_definition=None,
         pool_adapter_definition=None,
         pool_lid_definition=None,
@@ -199,8 +161,6 @@ async def test_store_raises_if_stall(
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
-        in_static_mode=False,
-        hopper_labware_ids=["labware-id"],
         pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
@@ -368,8 +328,6 @@ async def test_store_raises_if_labware_does_not_match(
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
-        in_static_mode=False,
-        hopper_labware_ids=["labware-id"],
         pool_primary_definition=sentinel.primary,
         pool_adapter_definition=pool_adapter,
         pool_lid_definition=pool_lid,
@@ -437,8 +395,6 @@ async def test_store(
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
-        in_static_mode=False,
-        hopper_labware_ids=["labware-id"],
         pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
@@ -513,7 +469,6 @@ async def test_store(
             ),
             flex_stacker_state_update=FlexStackerStateUpdate(
                 module_id=stacker_id,
-                hopper_labware_update=FlexStackerStoreLabware(labware_id="labware-id"),
                 pool_count=1,
             ),
         ),

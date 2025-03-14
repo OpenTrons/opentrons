@@ -80,9 +80,8 @@ def run(protocol_context):
     tiprack_4 = protocol_context.load_labware(test.tiprack_loadname, "C2", adapter="opentrons_flex_96_tiprack_adapter")
     tiprack_5 = protocol_context.load_labware(test.tiprack_loadname, "B3", adapter="opentrons_flex_96_tiprack_adapter")
     tiprack_6 = protocol_context.load_labware(test.tiprack_loadname, "C3", adapter="opentrons_flex_96_tiprack_adapter")
-    tiprack_7 = protocol_context.load_labware(test.tiprack_loadname, "D3", adapter="opentrons_flex_96_tiprack_adapter")
 
-    tip_racks = [tiprack_1, tiprack_2, tiprack_3, tiprack_4, tiprack_5, tiprack_6, tiprack_7]
+    tip_racks = [tiprack_1, tiprack_2, tiprack_3, tiprack_4, tiprack_5, tiprack_6]
     trash = protocol_context.load_trash_bin("A3")
     pipette_96 = protocol_context.load_instrument("flex_96channel_1000", "right", tip_racks=tip_racks)
 
@@ -103,7 +102,8 @@ def run(protocol_context):
 
     # Target
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep
-    target = protocol_context.load_labware("nest_96_wellplate_2ml_deep", "D2")
+    target_1 = protocol_context.load_labware("nest_96_wellplate_2ml_deep", "D2")
+    target_2 = protocol_context.load_labware("nest_96_wellplate_2ml_deep", "D3")
     TARGET_WELL = "A1"  # Target A1 with 96 channel
 
     # Transfer
@@ -116,7 +116,7 @@ def run(protocol_context):
         liquid_class=water_class,
         volume=volume,
         source=water_source.wells_by_name()[SOURCE_WELL],
-        dest=target.wells_by_name()[TARGET_WELL],
+        dest=[target_1.wells_by_name()[TARGET_WELL], target_2.wells_by_name()[TARGET_WELL]],
         new_tip=new_tip,
         trash_location=trash,
     )
@@ -125,7 +125,7 @@ def run(protocol_context):
         liquid_class=ethanol_class,
         volume=volume,
         source=ethanol_source.wells_by_name()[SOURCE_WELL],
-        dest=target.wells_by_name()[TARGET_WELL],
+        dest=[target_1.wells_by_name()[TARGET_WELL], target_2.wells_by_name()[TARGET_WELL]],
         new_tip=new_tip,
         trash_location=trash,
     )
@@ -133,8 +133,8 @@ def run(protocol_context):
     pipette_96.distribute_liquid(
         liquid_class=glycerol_class,
         volume=volume,
-        source=ethanol_source.wells_by_name()[SOURCE_WELL],
-        dest=target.wells_by_name()[TARGET_WELL],
+        source=glycerol_source.wells_by_name()[SOURCE_WELL],
+        dest=[target_1.wells_by_name()[TARGET_WELL], target_2.wells_by_name()[TARGET_WELL]],
         new_tip=new_tip,
         trash_location=trash,
     )

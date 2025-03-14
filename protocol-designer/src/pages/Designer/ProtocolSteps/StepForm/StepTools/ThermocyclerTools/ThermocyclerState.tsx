@@ -9,7 +9,7 @@ import {
 import {
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { FormData } from '../../../../../../form-types'

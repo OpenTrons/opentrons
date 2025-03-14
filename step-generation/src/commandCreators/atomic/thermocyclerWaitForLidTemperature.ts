@@ -6,6 +6,8 @@ export const thermocyclerWaitForLidTemperature: CommandCreator<ModuleOnlyParams>
   invariantContext,
   prevRobotState
 ) => {
+  // NOTE: there is no python equivelent for this command since `set_lid_temperature()` already
+  // sets and waits for the temperature to be reached
   return {
     commands: [
       {

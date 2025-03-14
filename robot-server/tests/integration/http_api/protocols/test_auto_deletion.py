@@ -9,6 +9,7 @@ from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     ("num_to_configure_as_maximum", "num_to_upload", "num_to_expect"),
     [

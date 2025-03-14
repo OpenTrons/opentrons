@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInTrash } from './dropTipInTrash'
 import {
   curryCommandCreator,
   getIsHeaterShakerEastWestMultiChannelPipette,
@@ -15,10 +15,9 @@ import {
   modulePipetteCollision,
   pipetteAdjacentHeaterShakerWhileShaking,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
-  getWasteChuteAddressableAreaNamePip,
   PRIMARY_NOZZLE,
 } from '../../utils'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { dropTip } from '../atomic/dropTip'
 import { pickUpTip } from '../atomic/pickUpTip'
 import { configureNozzleLayout } from '../atomic/configureNozzleLayout'
@@ -174,10 +173,6 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    channels
-  )
-
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state is different
     channels === 96 && args.nozzles != null && args.nozzles !== stateNozzles
@@ -208,11 +203,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   ]
   if (isWasteChute) {
     commandCreators = [
-      ...wasteChuteCommandsUtil({
-        type: 'dropTip',
-        pipetteId: pipette,
-        addressableAreaName: addressableAreaNameWasteChute,
-        prevRobotState,
+      curryCommandCreator(dropTipInWasteChute, {
+        pipetteId: args.pipette,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {
@@ -225,11 +217,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   }
   if (isTrashBin) {
     commandCreators = [
-      ...movableTrashCommandsUtil({
-        type: 'dropTip',
+      curryCommandCreator(dropTipInTrash, {
         pipetteId: pipette,
-        prevRobotState,
-        invariantContext,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {

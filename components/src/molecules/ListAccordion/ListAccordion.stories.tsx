@@ -15,7 +15,7 @@ import type { ComponentProps } from 'react'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Molecules/ListAccordion',
+  title: 'Helix/Molecules/ListAccordion',
   component: ListAccordionComponent,
   argTypes: {
     alertKind: {

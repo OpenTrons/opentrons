@@ -11,6 +11,7 @@ import {
   COLUMN,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+
 import type { Channels } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -66,6 +67,9 @@ const _createNextTimelineFrame = (args: {
     volume: args.volume,
     activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),
   }
+  const command = args.command
+  const isAirGapCommand =
+    'meta' in command && command.meta != null && 'isAirGap' in command.meta
 
   const newTimelineFrame =
     args.command.commandType === 'aspirate' ||
@@ -73,10 +77,12 @@ const _createNextTimelineFrame = (args: {
       ? {
           ..._newTimelineFrameKeys,
           source: args.wellInfo,
+          isAirGap: isAirGapCommand,
         }
       : {
           ..._newTimelineFrameKeys,
           dest: args.wellInfo,
+          isAirGap: isAirGapCommand,
         }
   return newTimelineFrame
 }
@@ -102,12 +108,14 @@ export const substepTimelineSingleChannel = (
         invariantContext,
         acc.prevRobotState
       ).robotState
-
       if (
         command.commandType === 'aspirate' ||
         command.commandType === 'dispense'
       ) {
-        const { wellName, volume, labwareId } = command.params
+        if ('meta' in command && command?.meta?.isAirGap) {
+          return acc
+        }
+        const { volume, wellName, labwareId } = command.params
 
         const wellInfo = {
           labwareId,
@@ -116,6 +124,7 @@ export const substepTimelineSingleChannel = (
             acc.prevRobotState.liquidState.labware[labwareId][wellName],
           postIngreds: nextRobotState.liquidState.labware[labwareId][wellName],
         }
+
         return {
           ...acc,
           timeline: [
@@ -242,7 +251,10 @@ export const substepTimelineMultiChannel = (
         command.commandType === 'aspirate' ||
         command.commandType === 'dispense'
       ) {
-        const { wellName, volume, labwareId } = command.params
+        if ('meta' in command && command?.meta?.isAirGap) {
+          return acc
+        }
+        const { volume, wellName, labwareId } = command.params
         const labwareDef =
           invariantContext.labwareEntities[labwareId] != null
             ? invariantContext.labwareEntities[labwareId].def
@@ -272,6 +284,7 @@ export const substepTimelineMultiChannel = (
             ? pick(nextRobotState.liquidState.labware[labwareId], wellsForTips)
             : {},
         }
+
         return {
           ...acc,
           timeline: [

@@ -239,6 +239,14 @@ class PipetteTipStateUpdate:
 
 
 @dataclasses.dataclass
+class PipetteAspirateReadyUpdate:
+    """Update pipette ready state."""
+
+    pipette_id: str
+    ready_to_aspirate: bool
+
+
+@dataclasses.dataclass
 class TipsUsedUpdate:
     """Represents an update that marks tips in a tip rack as used."""
 
@@ -354,27 +362,6 @@ class AbsorbanceReaderStateUpdate:
 
 
 @dataclasses.dataclass
-class FlexStackerLoadHopperLabware:
-    """An update to the Flex Stacker module static state."""
-
-    labware_id: str
-
-
-@dataclasses.dataclass
-class FlexStackerRetrieveLabware:
-    """An update to the Flex Stacker module static state."""
-
-    labware_id: str
-
-
-@dataclasses.dataclass
-class FlexStackerStoreLabware:
-    """An update to the Flex Stacker module static state."""
-
-    labware_id: str
-
-
-@dataclasses.dataclass
 class FlexStackerPoolConstraint:
     """The labware definitions that are contained in the pool."""
 
@@ -389,13 +376,6 @@ class FlexStackerStateUpdate:
     """An update to the Flex Stacker module state."""
 
     module_id: str
-    in_static_mode: bool | NoChangeType = NO_CHANGE
-    hopper_labware_update: (
-        FlexStackerLoadHopperLabware
-        | FlexStackerRetrieveLabware
-        | FlexStackerStoreLabware
-        | NoChangeType
-    ) = NO_CHANGE
     pool_constraint: FlexStackerPoolConstraint | NoChangeType = NO_CHANGE
     pool_count: int | NoChangeType = NO_CHANGE
 
@@ -487,6 +467,8 @@ class StateUpdate:
     files_added: FilesAddedUpdate | NoChangeType = NO_CHANGE
 
     addressable_area_used: AddressableAreaUsedUpdate | NoChangeType = NO_CHANGE
+
+    ready_to_aspirate: PipetteAspirateReadyUpdate | NoChangeType = NO_CHANGE
 
     def append(self, other: Self) -> Self:
         """Apply another `StateUpdate` "on top of" this one.
@@ -847,62 +829,6 @@ class StateUpdate:
         )
         return self
 
-    def load_flex_stacker_hopper_labware(
-        self,
-        module_id: str,
-        labware_id: str,
-    ) -> Self:
-        """Add a labware definition to the engine."""
-        self.flex_stacker_state_update = dataclasses.replace(
-            FlexStackerStateUpdate.create_or_override(
-                self.flex_stacker_state_update, module_id
-            ),
-            hopper_labware_update=FlexStackerLoadHopperLabware(labware_id=labware_id),
-        )
-        return self
-
-    def retrieve_flex_stacker_labware(
-        self,
-        module_id: str,
-        labware_id: str,
-    ) -> Self:
-        """Add a labware definition to the engine."""
-        self.flex_stacker_state_update = dataclasses.replace(
-            FlexStackerStateUpdate.create_or_override(
-                self.flex_stacker_state_update, module_id
-            ),
-            hopper_labware_update=FlexStackerRetrieveLabware(labware_id=labware_id),
-        )
-        return self
-
-    def store_flex_stacker_labware(
-        self,
-        module_id: str,
-        labware_id: str,
-    ) -> Self:
-        """Add a labware definition to the engine."""
-        self.flex_stacker_state_update = dataclasses.replace(
-            FlexStackerStateUpdate.create_or_override(
-                self.flex_stacker_state_update, module_id
-            ),
-            hopper_labware_update=FlexStackerStoreLabware(labware_id=labware_id),
-        )
-        return self
-
-    def update_flex_stacker_mode(
-        self,
-        module_id: str,
-        static_mode: bool,
-    ) -> Self:
-        """Update the mode of the Flex Stacker."""
-        self.flex_stacker_state_update = dataclasses.replace(
-            FlexStackerStateUpdate.create_or_override(
-                self.flex_stacker_state_update, module_id
-            ),
-            in_static_mode=static_mode,
-        )
-        return self
-
     def update_flex_stacker_labware_pool_definition(
         self,
         module_id: str,
@@ -934,5 +860,14 @@ class StateUpdate:
                 self.flex_stacker_state_update, module_id
             ),
             pool_count=count,
+        )
+        return self
+
+    def set_pipette_ready_to_aspirate(
+        self, pipette_id: str, ready_to_aspirate: bool
+    ) -> Self:
+        """Set the ready to aspirate state for a pipette."""
+        self.ready_to_aspirate = PipetteAspirateReadyUpdate(
+            pipette_id=pipette_id, ready_to_aspirate=ready_to_aspirate
         )
         return self

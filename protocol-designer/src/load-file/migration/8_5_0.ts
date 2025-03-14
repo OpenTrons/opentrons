@@ -1,5 +1,6 @@
 import floor from 'lodash/floor'
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
@@ -108,6 +109,7 @@ export const migrateFile = (
           aspirate_touchTip_speed: null,
           dispense_touchTip_speed: null,
           liquidClassesSupported: liquidClassesSupported ?? false,
+          liquidClass: null,
         },
       }
     }
@@ -178,6 +180,10 @@ export const migrateFile = (
   )
   return {
     ...appData,
+    metadata: {
+      ...appData.metadata,
+      source: PROTOCOL_DESIGNER_SOURCE,
+    },
     designerApplication: {
       ...designerApplication,
       data: {

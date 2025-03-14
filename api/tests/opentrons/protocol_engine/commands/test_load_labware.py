@@ -21,13 +21,8 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     LoadableLabwareLocation,
     OnLabwareLocation,
-    ModuleLocation,
-    ModuleModel,
-    LoadedModule,
-    InStackerHopperLocation,
     OnLabwareLocationSequenceComponent,
     OnAddressableAreaLocationSequenceComponent,
-    OnCutoutFixtureLocationSequenceComponent,
 )
 from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
 from opentrons.protocol_engine.resources import labware_validation
@@ -35,13 +30,7 @@ from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
     AddressableAreaUsedUpdate,
     LoadedLabwareUpdate,
-    FlexStackerStateUpdate,
-    FlexStackerLoadHopperLabware,
     StateUpdate,
-)
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
 )
 
 from opentrons.protocol_engine.commands.command import SuccessData
@@ -283,104 +272,3 @@ async def test_load_labware_raises_if_location_occupied(
 
     with pytest.raises(LocationIsOccupiedError):
         await subject.execute(data)
-
-
-@pytest.mark.parametrize("display_name", ["My custom display name", None])
-async def test_load_labware_in_flex_stacker(
-    decoy: Decoy,
-    well_plate_def: LabwareDefinition,
-    equipment: EquipmentHandler,
-    state_view: StateView,
-    display_name: Optional[str],
-) -> None:
-    """A LoadLabware command should have an execution implementation."""
-    subject = LoadLabwareImplementation(equipment=equipment, state_view=state_view)
-
-    data = LoadLabwareParams(
-        location=ModuleLocation(moduleId="some-module-id"),
-        loadName="some-load-name",
-        namespace="opentrons-test",
-        version=1,
-        displayName=display_name,
-    )
-
-    decoy.when(state_view.modules.get("some-module-id")).then_return(
-        LoadedModule(
-            id="some-module-id",
-            model=ModuleModel.FLEX_STACKER_MODULE_V1,
-        )
-    )
-    decoy.when(
-        state_view.modules.get_flex_stacker_substate("some-module-id")
-    ).then_return(
-        FlexStackerSubState(
-            module_id=FlexStackerId("some-module-id"),
-            in_static_mode=False,
-            hopper_labware_ids=[],
-            pool_primary_definition=None,
-            pool_adapter_definition=None,
-            pool_lid_definition=None,
-            pool_count=0,
-            max_pool_count=0,
-        )
-    )
-    decoy.when(
-        state_view.geometry.get_predicted_location_sequence(
-            InStackerHopperLocation(moduleId="some-module-id")
-        )
-    ).then_return(
-        [
-            InStackerHopperLocation(moduleId="some-module-id"),
-            OnCutoutFixtureLocationSequenceComponent(
-                cutoutId="cutoutA3", possibleCutoutFixtureIds=["flexStackerModuleV1"]
-            ),
-        ]
-    )
-
-    decoy.when(
-        await equipment.load_labware(
-            location=InStackerHopperLocation(moduleId="some-module-id"),
-            load_name="some-load-name",
-            namespace="opentrons-test",
-            version=1,
-            labware_id=None,
-        )
-    ).then_return(
-        LoadedLabwareData(
-            labware_id="labware-id",
-            definition=well_plate_def,
-            offsetId=None,
-        )
-    )
-
-    result = await subject.execute(data)
-
-    assert result == SuccessData(
-        public=LoadLabwareResult(
-            labwareId="labware-id",
-            definition=well_plate_def,
-            offsetId=None,
-            locationSequence=[
-                InStackerHopperLocation(moduleId="some-module-id"),
-                OnCutoutFixtureLocationSequenceComponent(
-                    cutoutId="cutoutA3",
-                    possibleCutoutFixtureIds=["flexStackerModuleV1"],
-                ),
-            ],
-        ),
-        state_update=StateUpdate(
-            loaded_labware=LoadedLabwareUpdate(
-                labware_id="labware-id",
-                definition=well_plate_def,
-                offset_id=None,
-                new_location=InStackerHopperLocation(moduleId="some-module-id"),
-                display_name=display_name,
-            ),
-            flex_stacker_state_update=FlexStackerStateUpdate(
-                module_id="some-module-id",
-                hopper_labware_update=FlexStackerLoadHopperLabware(
-                    labware_id="labware-id"
-                ),
-            ),
-        ),
-    )

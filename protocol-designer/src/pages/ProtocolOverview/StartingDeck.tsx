@@ -15,8 +15,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { SlotDetailsContainer } from '../../organisms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
+import { SlotDetailsContainer } from '../../components/organisms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'
@@ -114,7 +114,11 @@ function StartingDeckBody(props: StartingDeckBodyProps): JSX.Element {
       {isOffDeck ? (
         <OffDeckThumbnail hover={hover} setHover={setHover} width="100%" />
       ) : (
-        <DeckThumbnail hoverSlot={hover} setHoverSlot={setHover} />
+        <DeckThumbnail
+          hoverSlot={hover}
+          setHoverSlot={setHover}
+          robotType={robotType}
+        />
       )}
       <Box width="100%" height="12.5rem">
         <SlotDetailsContainer

@@ -1,4 +1,5 @@
 """Labware movement command handling."""
+
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING, overload
@@ -128,6 +129,13 @@ class LabwareMovementHandler:
             assert labware_id is not None  # From this method's @typing.overloads.
             labware_definition = self._state_store.labware.get_definition(labware_id)
 
+        from_labware_center = self._state_store.geometry.get_labware_grip_point(
+            labware_definition=labware_definition, location=current_location
+        )
+        to_labware_center = self._state_store.geometry.get_labware_grip_point(
+            labware_definition=labware_definition, location=new_location
+        )
+
         if use_virtual_gripper:
             # todo(mm, 2024-11-07): We should do this collision checking even when we
             # only have a `labware_definition`, not a `labware_id`. Resolve when
@@ -181,12 +189,6 @@ class LabwareMovementHandler:
                     additional_offset_vector=user_offset_data,
                     current_labware=labware_definition,
                 )
-            )
-            from_labware_center = self._state_store.geometry.get_labware_grip_point(
-                labware_definition=labware_definition, location=current_location
-            )
-            to_labware_center = self._state_store.geometry.get_labware_grip_point(
-                labware_definition=labware_definition, location=new_location
             )
             movement_waypoints = get_gripper_labware_movement_waypoints(
                 from_labware_center=from_labware_center,

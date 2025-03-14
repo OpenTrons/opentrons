@@ -1,6 +1,7 @@
 """Common functions between v1 transfer and liquid-class-based transfer."""
 import enum
-from typing import Iterable, Generator, Tuple, TypeVar, Literal
+import math
+from typing import Iterable, Generator, Tuple, TypeVar, Literal, List
 
 
 class TransferTipPolicyV2(enum.Enum):
@@ -71,3 +72,28 @@ def expand_for_volume_constraints(
             volume /= 2
             yield volume, target
         yield volume, target
+
+
+def _split_volume_equally(volume: float, max_volume: float) -> List[float]:
+    """
+    Splits a given volume into a list of volumes that are all less than or equal to max volume.
+
+    If volume provided is more than the max volume, the volumes will be split evenly.
+    """
+    if volume <= max_volume:
+        return [volume]
+    else:
+        iterations = math.ceil(volume / max_volume)
+        return [volume / iterations for _ in range(iterations)]
+
+
+def expand_for_volume_constraints_for_liquid_classes(
+    volumes: Iterable[float],
+    targets: Iterable[Target],
+    max_volume: float,
+) -> Generator[Tuple[float, "Target"], None, None]:
+    """Split a sequence of proposed transfers to keep each under the max volume, splitting larger ones equally."""
+    assert max_volume > 0
+    for volume, target in zip(volumes, targets):
+        for split_volume in _split_volume_equally(volume, max_volume):
+            yield split_volume, target
