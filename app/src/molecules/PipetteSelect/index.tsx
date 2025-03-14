@@ -50,7 +50,7 @@ const specToOption = ({
   label: displayName,
 })
 
-export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
+export function PipetteSelect(props: PipetteSelectProps): JSX.Element {
   const { tabIndex, enableNoneOption, nameBlocklist = [] } = props
   const { t } = useTranslation('shared')
   const NONE = t('none')
