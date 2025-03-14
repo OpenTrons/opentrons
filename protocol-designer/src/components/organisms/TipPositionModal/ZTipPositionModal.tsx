@@ -15,8 +15,8 @@ import {
   SecondaryButton,
   StyledText,
 } from '@opentrons/components'
-import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../constants'
-import { getIsTouchTipField } from '../../form-types'
+import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '../../../constants'
+import { getIsTouchTipField } from '../../../form-types'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 import * as utils from './utils'
@@ -24,7 +24,7 @@ import { TOO_MANY_DECIMALS } from './constants'
 import { TipPositionZOnlyView } from './TipPositionZOnlyView'
 
 import type { ChangeEvent } from 'react'
-import type { StepFieldName } from '../../form-types'
+import type { StepFieldName } from '../../../form-types'
 
 interface ZTipPositionModalProps {
   closeModal: () => void

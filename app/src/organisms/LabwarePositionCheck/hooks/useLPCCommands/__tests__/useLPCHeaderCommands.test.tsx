@@ -30,7 +30,8 @@ let toggleRobotMovingPromise: Promise<void>
 let handleStartLPCPromise: Promise<void>
 let handleProbeAttachmentPromise: Promise<void>
 let handleValidMoveToMaintenancePositionPromise: Promise<void>
-let handleCleanUpAndClosePromise: Promise<void>
+let handleHomeAndClose: Promise<void>
+let handleCloseNoHome: Promise<void>
 
 describe('useLPCHeaderCommands', () => {
   const mockPipette = { id: 'mock-pipette' }
@@ -42,7 +43,8 @@ describe('useLPCHeaderCommands', () => {
     handleStartLPCPromise = Promise.resolve()
     handleProbeAttachmentPromise = Promise.resolve()
     handleValidMoveToMaintenancePositionPromise = Promise.resolve()
-    handleCleanUpAndClosePromise = Promise.resolve()
+    handleHomeAndClose = Promise.resolve()
+    handleCloseNoHome = Promise.resolve()
 
     mockLPCHandlerUtils = {
       toggleRobotMoving: vi.fn(() => toggleRobotMovingPromise),
@@ -51,7 +53,8 @@ describe('useLPCHeaderCommands', () => {
       handleValidMoveToMaintenancePosition: vi.fn(
         () => handleValidMoveToMaintenancePositionPromise
       ),
-      handleCleanUpAndClose: vi.fn(() => handleCleanUpAndClosePromise),
+      handleHomeAndClose: vi.fn(() => handleHomeAndClose),
+      handleCloseNoHome: vi.fn(() => handleCloseNoHome),
     } as any
 
     props = {
@@ -119,9 +122,12 @@ describe('useLPCHeaderCommands', () => {
 
     await waitFor(() => {
       expect(mockLPCHandlerUtils.handleProbeAttachment).toHaveBeenCalledWith(
-        mockPipette,
-        mockProceedStep
+        mockPipette
       )
+    })
+
+    await waitFor(() => {
+      expect(mockProceedStep).toHaveBeenCalled()
     })
 
     await waitFor(() => {
@@ -157,13 +163,13 @@ describe('useLPCHeaderCommands', () => {
     })
   })
 
-  it('should execute handleClose commands in correct sequence', async () => {
+  it('should execute handleCloseAndHome commands in correct sequence', async () => {
     const { result } = renderHook(() => useLPCHeaderCommands(props), {
       wrapper,
     })
 
     await act(async () => {
-      result.current.handleClose()
+      result.current.handleCloseAndHome()
     })
 
     await waitFor(() => {
@@ -171,7 +177,21 @@ describe('useLPCHeaderCommands', () => {
     })
 
     await waitFor(() => {
-      expect(mockLPCHandlerUtils.handleCleanUpAndClose).toHaveBeenCalled()
+      expect(mockLPCHandlerUtils.handleHomeAndClose).toHaveBeenCalled()
+    })
+  })
+
+  it('should execute handleCloseWithoutHome commands in correct sequence', async () => {
+    const { result } = renderHook(() => useLPCHeaderCommands(props), {
+      wrapper,
+    })
+
+    await act(async () => {
+      result.current.handleCloseWithoutHome()
+    })
+
+    await waitFor(() => {
+      expect(mockLPCHandlerUtils.handleCloseNoHome).toHaveBeenCalled()
     })
   })
 })

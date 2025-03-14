@@ -338,7 +338,6 @@ export const blowoutUtil = (args: {
   offsetFromTopMm: number
   invariantContext: InvariantContext
   destWell: BlowoutParams['wellName'] | null
-  prevRobotState: RobotState
 }): CurriedCommandCreator[] => {
   const {
     pipette,
@@ -350,7 +349,6 @@ export const blowoutUtil = (args: {
     flowRate,
     offsetFromTopMm,
     invariantContext,
-    prevRobotState,
   } = args
   if (!blowoutLocation) return []
 
@@ -400,7 +398,6 @@ export const blowoutUtil = (args: {
   } else {
     return blowOutInMovableTrash({
       pipetteId: pipette,
-      prevRobotState,
       invariantContext,
       flowRate,
     })
@@ -629,7 +626,6 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       volume,
       flowRate,
       invariantContext,
-      prevRobotState,
     })
   }
 
@@ -685,7 +681,6 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
     commands = moveToMovableTrash({
       pipetteId,
       invariantContext,
-      prevRobotState,
     })
   }
 
@@ -804,7 +799,6 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       volume,
       flowRate,
       invariantContext,
-      prevRobotState,
     })
   }
 

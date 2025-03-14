@@ -52,7 +52,7 @@ class BaseErrorCode(Enum):
     def code_string(self) -> str:
         """Return the error code string."""
         code: str = self.value[0]
-        return code
+        return code.lower()
 
     @property
     def exception(self) -> Type[ErrorResponse]:

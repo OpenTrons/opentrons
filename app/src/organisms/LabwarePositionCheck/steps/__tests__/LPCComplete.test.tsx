@@ -3,9 +3,10 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { LPCComplete } from '/app/organisms/LabwarePositionCheck/steps'
-import { clickButtonLabeled } from '/app/organisms/LabwarePositionCheck/__tests__/utils'
+import { getIsOnDevice } from '/app/redux/config'
 import { selectStepInfo } from '/app/redux/protocol-runs'
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
@@ -13,7 +14,12 @@ import SuccessIcon from '/app/assets/images/icon_success.png'
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
 
+vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
+  LPCContentContainer: MockLPCContentContainer,
+}))
+
 vi.mock('/app/redux/protocol-runs')
+vi.mock('/app/redux/config')
 
 const render = (props: ComponentProps<typeof LPCComplete>) => {
   const mockState = {
@@ -34,14 +40,16 @@ const render = (props: ComponentProps<typeof LPCComplete>) => {
 
 describe('LPCComplete', () => {
   let props: ComponentProps<typeof LPCComplete>
-  let mockHandleClose: Mock
+  let mockHandleCloseAndHome: Mock
 
   beforeEach(() => {
-    mockHandleClose = vi.fn()
+    mockHandleCloseAndHome = vi.fn()
 
     vi.mocked(
       selectStepInfo
     ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
+
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
 
     props = {
       ...mockLPCContentProps,
@@ -49,20 +57,21 @@ describe('LPCComplete', () => {
         ...mockLPCContentProps.commandUtils,
         headerCommands: {
           ...mockLPCContentProps.commandUtils.headerCommands,
-          handleClose: mockHandleClose,
+          handleCloseAndHome: mockHandleCloseAndHome,
         },
       },
     }
   })
 
-  it('renders appropriate header content and onClick behavior', () => {
+  it('passes correct header props to LPCContentContainer', () => {
     render(props)
 
-    screen.getByText('Labware Position Check')
-    screen.getByText('Exit')
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Labware Position Check')
 
-    clickButtonLabeled('Exit')
-    expect(mockHandleClose).toHaveBeenCalled()
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Exit')
+    expect(primaryButton).toHaveAttribute('data-click-handler', 'true')
   })
 
   it('renders appropriate body content', () => {

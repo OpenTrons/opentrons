@@ -16,9 +16,12 @@ import {
 } from '@opentrons/components'
 import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
 import { prefixMap } from '../../../../../resources/utils'
-import { TipPositionModal, ZTipPositionModal } from '../../../../../organisms'
+import {
+  TipPositionModal,
+  ZTipPositionModal,
+} from '../../../../../components/organisms'
 import { getIsDelayPositionField } from '../../../../../form-types'
-import { getDefaultMmFromEdge } from '../../../../../organisms/TipPositionModal/utils'
+import { getDefaultMmFromEdge } from '../../../../../components/organisms/TipPositionModal/utils'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
 import type {
@@ -27,7 +30,7 @@ import type {
   TipYOffsetFields,
   TipZOffsetFields,
 } from '../../../../../form-types'
-import type { PositionSpecs } from '../../../../../organisms'
+import type { PositionSpecs } from '../../../../../components/organisms'
 import type { FieldPropsByName } from '../types'
 import type { MoveLiquidPrefixType } from '../../../../../resources/types'
 

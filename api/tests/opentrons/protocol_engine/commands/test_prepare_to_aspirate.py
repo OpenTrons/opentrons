@@ -54,7 +54,10 @@ async def test_prepare_to_aspirate_implementation(
         state_update=update_types.StateUpdate(
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
                 pipette_id="some id"
-            )
+            ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="some id", ready_to_aspirate=True
+            ),
         ),
     )
 

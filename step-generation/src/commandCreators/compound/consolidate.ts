@@ -450,7 +450,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
-        prevRobotState,
       })
 
       const willReuseTip = args.changeTip !== 'always' && !isLastChunk

@@ -8,9 +8,9 @@ import {
   POSITION_RELATIVE,
   StyledText,
 } from '@opentrons/components'
-import BOTTOM_LAYER from '../../assets/images/tip_side_bottom_layer.svg'
-import MID_LAYER from '../../assets/images/tip_side_mid_layer.svg'
-import TOP_LAYER from '../../assets/images/tip_side_top_layer.svg'
+import BOTTOM_LAYER from '../../../assets/images/tip_side_bottom_layer.svg'
+import MID_LAYER from '../../../assets/images/tip_side_mid_layer.svg'
+import TOP_LAYER from '../../../assets/images/tip_side_top_layer.svg'
 
 const WELL_HEIGHT_PIXELS = 71
 const WELL_WIDTH_PIXELS = 70
@@ -46,7 +46,11 @@ export function TipPositionSideView(
       height="18rem"
       overflow={OVERFLOW_HIDDEN}
     >
-      <img src={BOTTOM_LAYER} style={{ position: POSITION_ABSOLUTE }} />
+      <img
+        src={BOTTOM_LAYER}
+        style={{ position: POSITION_ABSOLUTE }}
+        alt="bottom layer"
+      />
       <img
         src={MID_LAYER}
         style={{
@@ -54,8 +58,13 @@ export function TipPositionSideView(
           transform: `translate(${roundedXPositionPixels}px)`,
           bottom: `calc(${bottomPx}px + 33px)`,
         }}
+        alt="mid layer"
       />
-      <img src={TOP_LAYER} style={{ position: POSITION_ABSOLUTE }} />
+      <img
+        src={TOP_LAYER}
+        style={{ position: POSITION_ABSOLUTE }}
+        alt="top layer"
+      />
       {wellDepthMm !== null && (
         <Box position={POSITION_ABSOLUTE} bottom="7.3rem" right="2rem">
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
