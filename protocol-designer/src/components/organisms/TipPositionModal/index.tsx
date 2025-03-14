@@ -18,10 +18,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { WELL_BOTTOM, WELL_CENTER, WELL_TOP } from '@opentrons/shared-data'
-import { prefixMap } from '../../resources/utils'
-import { getIsTouchTipField } from '../../form-types'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { getMainPagePortalEl } from '../Portal'
+import { prefixMap } from '../../../resources/utils'
+import { getIsTouchTipField } from '../../../form-types'
+import { LINK_BUTTON_STYLE } from '../../../atoms'
+import { getMainPagePortalEl } from '../../../organisms'
 import { TOO_MANY_DECIMALS, PERCENT_RANGE_TO_SHOW_WARNING } from './constants'
 import { usePositionReference } from './hooks'
 import * as utils from './utils'
@@ -30,9 +30,9 @@ import { TipPositionSideView } from './TipPositionSideView'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { PositionReference } from '@opentrons/shared-data'
-import type { StepFieldName } from '../../form-types'
-import type { MoveLiquidPrefixType } from '../../resources/types'
-import type { FieldProps } from '../../pages/Designer/ProtocolSteps/types'
+import type { StepFieldName } from '../../../form-types'
+import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
+import type { MoveLiquidPrefixType } from '../../../resources/types'
 
 type Offset = 'x' | 'y' | 'z'
 interface PositionSpec {
