@@ -398,20 +398,20 @@ export const getFormLevelError = (
 }
 
 export interface ValuesForLiquidClasses {
+  path?: string | null
   volume?: number | null
   tipRack?: string | null
   pipette?: string | null
-  path: string
 }
 export const getDisableLiquidClasses = (
   values: ValuesForLiquidClasses,
   pipetteEntities: PipetteEntities
-): Set<string> | null => {
+): Set<LiquidClassesOption> | null => {
   const { volume, tipRack, pipette, path } = values
   if (pipette == null) return null
 
   const pipetteModel = PIPETTE_NAMES_MAP[pipetteEntities[pipette].name]
-  const disabledLiquidClasses = new Set<string>()
+  const disabledLiquidClasses = new Set<LiquidClassesOption>()
 
   if (volume != null && volume < 10) {
     ;['Aqueous', 'Viscous', 'Volatile'].forEach(cls =>
@@ -434,10 +434,8 @@ export const getDisableLiquidClasses = (
       p =>
         p.pipetteModel === pipetteModel &&
         p.byTipType.some(
-          (t: {
-            tiprack: string
-            multiDispense: any 
-          }) => t.tiprack === tipRack && t.multiDispense !== undefined
+          (t: { tiprack: string; multiDispense: any }) =>
+            t.tiprack === tipRack && t.multiDispense !== undefined
         )
     ).forEach(cls => disabledLiquidClasses.add(cls))
   }

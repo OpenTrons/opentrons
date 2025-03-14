@@ -11,12 +11,11 @@ import {
 import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
 import { getLiquidEntities } from '../../../../../../step-forms/selectors'
 import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
-
+import { selectors as stepFormSelectors } from '../../../../../../step-forms'
+import { getDisableLiquidClasses } from '../../utils'
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
-import { getDisableLiquidClasses } from '../../utils'
-import { selectors as stepFormSelectors } from '../../../../../../step-forms'
 
 interface LiquidClassesStepToolsProps {
   propsForFields: FieldPropsByName
@@ -31,8 +30,6 @@ export const LiquidClassesStepTools = ({
   const { t } = useTranslation(['liquids'])
   const liquids = useSelector(getLiquidEntities)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
-
-  console.log(sortedLiquidClassDefs)
 
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const disabledLiquidClasses = getDisableLiquidClasses(

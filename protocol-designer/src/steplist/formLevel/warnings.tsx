@@ -79,7 +79,7 @@ const lowVolumeTransferWarning = (): FormWarning => ({
 const incompatiblePipettePathWarning = (): FormWarning => ({
   type: 'INCOMPATIBLE_PIPETTE_PATH',
   title: 'The selected pipette path is incompatible with some liquid classes.',
-  dependentFields: ['path'],
+  dependentFields: ['path', 'pipette', 'tipRack'],
 })
 
 const incompatibleAllPipetteLabwareWarning = (type: string): FormWarning => ({
@@ -190,9 +190,22 @@ export const lowVolumeTransfer = (
 export const incompatiblePipettePath = (
   fields: HydratedFormData
 ): FormWarning | null => {
-  const { path } = fields
+  const { pipette, tipRack, path } = fields
 
-  return path === 'multiAspirate' ? incompatiblePipettePathWarning() : null
+  const pipetteModel = PIPETTE_NAMES_MAP[pipette.name]
+  if (path === 'multiDispense') {
+    const incompatiblePath = getIncompatibleLiquidClasses(
+      p =>
+        p.pipetteModel === pipetteModel &&
+        p.byTipType.some(
+          (t: { tiprack: string; multiDispense: any }) =>
+            t.tiprack === tipRack && t.multiDispense !== undefined
+        )
+    )
+    return incompatiblePath.length > 0 ? incompatiblePipettePathWarning() : null
+  }
+
+  return null
 }
 
 export const incompatiblePipetteTiprack = (

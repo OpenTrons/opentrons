@@ -1,4 +1,5 @@
 import type { CutoutFixtureId, CutoutId, AddressableAreaName } from '../deck'
+import type { PipetteName } from './pipettes'
 import type { ModuleModel, ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
@@ -658,7 +659,7 @@ export const DEPRECATED_WHALE_GREY = '#9395a0'
 // react code because the web worker context does not play nicely with react
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
 
-export const PIPETTE_NAMES_MAP: Record<string, string> = {
+export const PIPETTE_NAMES_MAP: Record<PipetteName, string> = {
   p10_single: 'p10_single',
   p10_multi: 'p10_multi',
   p20_single_gen2: 'p20_single_gen2',
@@ -675,7 +676,7 @@ export const PIPETTE_NAMES_MAP: Record<string, string> = {
   p1000_single_gen2: 'p1000_single_gen2',
   p1000_single_flex: 'flex_1channel_1000',
   p1000_multi_flex: 'flex_8channel_1000',
-  p1000_multi_em: 'flex_8channel_1000_em',
+  p1000_multi_em_flex: 'flex_8channel_1000_em',
   p1000_96: 'flex_96channel_1000',
   p200_96: 'flex_96channel_200',
 }
