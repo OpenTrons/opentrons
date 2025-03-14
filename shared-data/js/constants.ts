@@ -657,3 +657,25 @@ export const DEPRECATED_WHALE_GREY = '#9395a0'
 // method in PD (not react code) and we do not want non react code loading
 // react code because the web worker context does not play nicely with react
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
+
+export const PIPETTE_NAMES_MAP: Record<string, string> = {
+  p10_single: 'p10_single',
+  p10_multi: 'p10_multi',
+  p20_single_gen2: 'p20_single_gen2',
+  p20_multi_gen2: 'p20_multi_gen2',
+  p50_single: 'p50_single',
+  p50_multi: 'p50_multi',
+  p50_single_flex: 'flex_1channel_50',
+  p50_multi_flex: 'flex_8channel_50',
+  p300_single: 'p300_single',
+  p300_multi: 'p300_multi',
+  p300_single_gen2: 'p300_single_gen2',
+  p300_multi_gen2: 'p300_multi_gen2',
+  p1000_single: 'p1000_single',
+  p1000_single_gen2: 'p1000_single_gen2',
+  p1000_single_flex: 'flex_1channel_1000',
+  p1000_multi_flex: 'flex_8channel_1000',
+  p1000_multi_em: 'flex_8channel_1000_em',
+  p1000_96: 'flex_96channel_1000',
+  p200_96: 'flex_96channel_200',
+}

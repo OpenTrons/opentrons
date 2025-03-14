@@ -13,20 +13,37 @@ import { getLiquidEntities } from '../../../../../../step-forms/selectors'
 import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
 
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
+import { getDisableLiquidClasses } from '../../utils'
+import { selectors as stepFormSelectors } from '../../../../../../step-forms'
 
 interface LiquidClassesStepToolsProps {
   propsForFields: FieldPropsByName
+  formData: FormData
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>
 }
 export const LiquidClassesStepTools = ({
   propsForFields,
+  formData,
   setShowFormErrors,
 }: LiquidClassesStepToolsProps): JSX.Element => {
   const { t } = useTranslation(['liquids'])
   const liquids = useSelector(getLiquidEntities)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
+  console.log(sortedLiquidClassDefs)
+
+  const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
+  const disabledLiquidClasses = getDisableLiquidClasses(
+    {
+      volume: formData.volume,
+      tipRack: formData.tipRack,
+      pipette: formData.pipette,
+      path: formData.path,
+    },
+    pipetteEntities
+  )
   const liquidClassToLiquidsMap: Record<string, string[]> = {}
   Object.values(liquids).forEach(({ displayName, liquidClass }) => {
     if (liquidClass !== undefined) {
@@ -82,6 +99,8 @@ export const LiquidClassesStepTools = ({
     }
   }
 
+  console.log(disabledLiquidClasses)
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -118,6 +137,10 @@ export const LiquidClassesStepTools = ({
                 align: 'vertical',
               }}
               largeDesktopBorderRadius
+              disabled={
+                disabledLiquidClasses !== null &&
+                disabledLiquidClasses.has(name)
+              }
             />
           )
         })}

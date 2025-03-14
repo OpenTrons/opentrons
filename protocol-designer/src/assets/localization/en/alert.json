@@ -24,6 +24,18 @@
         "title": "Disposal volume is below recommended minimum ({{min}} µL)",
         "body": "For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette's minimum. Read more ",
         "link": "here"
+      },
+      "LOW_VOLUME_TRANSFER": {
+        "title": "Transfer volumes of 10 µL or less are incompatible with liquid classes."
+      },
+      "INCOMPATIBLE_PIPETTE_PATH": {
+        "title": "The pipette path is incompatible with some liquid classes."
+      },
+      "INCOMPATIBLE_ALL_PIPETTE_LABWARE": {
+        "title": "The selected {{type}} is incompatible with liquid classes."
+      },
+      "INCOMPATIBLE_SOME_PIPETTE_LABWARE": {
+        "title": "The selected {{type}} is incompatible with some liquid classes."
       }
     }
   },

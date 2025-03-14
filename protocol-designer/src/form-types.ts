@@ -230,6 +230,7 @@ export type BlankForm = AnnotationFields & {
   stepType: StepType
   id: StepIdType
 }
+export type LiquidClassesOption = 'Aqueous' | 'Viscous' | 'Volatile'
 
 export interface HydratedMoveLiquidFormData extends AnnotationFields {
   id: string

@@ -1,4 +1,8 @@
-import { getWellTotalVolume } from '@opentrons/shared-data'
+import {
+  PIPETTE_NAMES_MAP,
+  getIncompatibleLiquidClasses,
+  getWellTotalVolume,
+} from '@opentrons/shared-data'
 import type { FormError } from './errors'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -13,6 +17,10 @@ export type FormWarningType =
   | 'OVER_MAX_WELL_VOLUME'
   | 'MIX_TIP_POSITIONED_LOW_IN_TUBE'
   | 'TIP_POSITIONED_LOW_IN_TUBE'
+  | 'LOW_VOLUME_TRANSFER'
+  | 'INCOMPATIBLE_PIPETTE_PATH'
+  | 'INCOMPATIBLE_ALL_PIPETTE_LABWARE'
+  | 'INCOMPATIBLE_SOME_PIPETTE_LABWARE'
 
 export type FormWarning = FormError & {
   type: FormWarningType
@@ -59,6 +67,31 @@ const mixTipPositionedLowInTube = (): FormWarning => ({
   title:
     'The default mix height is 1mm from the bottom of the well, which could cause liquid overflow or pipette damage. Edit tip position in advanced settings.',
   dependentFields: ['labware'],
+})
+
+const lowVolumeTransferWarning = (): FormWarning => ({
+  type: 'LOW_VOLUME_TRANSFER',
+  title:
+    'Transfer volumes of 10 µL or less are incompatible with liquid classes.',
+  dependentFields: ['volume'],
+})
+
+const incompatiblePipettePathWarning = (): FormWarning => ({
+  type: 'INCOMPATIBLE_PIPETTE_PATH',
+  title: 'The selected pipette path is incompatible with some liquid classes.',
+  dependentFields: ['path'],
+})
+
+const incompatibleAllPipetteLabwareWarning = (type: string): FormWarning => ({
+  type: 'INCOMPATIBLE_ALL_PIPETTE_LABWARE',
+  title: `The selected ${type} is incompatible with liquid classes.`,
+  dependentFields: ['pipette', 'tipRack'],
+})
+
+const incompatibleSomePipetteLabwareWarning = (type: string): FormWarning => ({
+  type: 'INCOMPATIBLE_SOME_PIPETTE_LABWARE',
+  title: `The selected ${type} is incompatible with some liquid classes.`,
+  dependentFields: ['pipette', 'tipRack'],
 })
 
 export type WarningChecker = (val: unknown) => FormWarning | null
@@ -144,6 +177,53 @@ export const maxDispenseWellVolume = (
     return maximum && volume > maximum
   })
   return hasExceeded ? overMaxWellVolumeWarning() : null
+}
+
+export const lowVolumeTransfer = (
+  fields: HydratedFormData
+): FormWarning | null => {
+  const { volume } = fields
+
+  return volume < 10 ? lowVolumeTransferWarning() : null
+}
+
+export const incompatiblePipettePath = (
+  fields: HydratedFormData
+): FormWarning | null => {
+  const { path } = fields
+
+  return path === 'multiAspirate' ? incompatiblePipettePathWarning() : null
+}
+
+export const incompatiblePipetteTiprack = (
+  fields: HydratedFormData
+): FormWarning | null => {
+  const { pipette, tipRack } = fields
+
+  const pipetteModel = PIPETTE_NAMES_MAP[pipette.name]
+
+  const incompatiblePipette = getIncompatibleLiquidClasses(
+    p => p.pipetteModel === pipetteModel
+  )
+  const incompatibleTiprack = getIncompatibleLiquidClasses(
+    p =>
+      p.pipetteModel === pipetteModel &&
+      p.byTipType.some((t: { tiprack: string }) => t.tiprack === tipRack)
+  )
+
+  const incompatiblePipetteCount = incompatiblePipette.length
+  const incompatibleTiprackCount = incompatibleTiprack.length
+  if (incompatiblePipetteCount > 0) {
+    return incompatiblePipetteCount === 3
+      ? incompatibleAllPipetteLabwareWarning('pipette')
+      : incompatibleSomePipetteLabwareWarning('pipette')
+  } else if (incompatibleTiprackCount > 0) {
+    return incompatibleTiprackCount === 3
+      ? incompatibleAllPipetteLabwareWarning('tiprack')
+      : incompatibleSomePipetteLabwareWarning('tiprack')
+  } else {
+    return null
+  }
 }
 
 export const minDisposalVolume = (
