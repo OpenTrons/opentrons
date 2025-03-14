@@ -4,7 +4,6 @@ import {
   getWellDepth,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
-  CutoutId,
 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -32,7 +31,7 @@ import {
 } from '../atomic'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
-
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   TransferArgs,
   CurriedCommandCreator,

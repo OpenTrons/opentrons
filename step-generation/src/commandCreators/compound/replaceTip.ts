@@ -3,7 +3,6 @@ import {
   COLUMN,
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
-  SINGLE,
 } from '@opentrons/shared-data'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
