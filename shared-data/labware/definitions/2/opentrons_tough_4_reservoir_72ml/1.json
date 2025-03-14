@@ -20,8 +20,8 @@
     "A1": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 25.74,
-      "yDimension": 70.01,
+      "xDimension": 26.43,
+      "yDimension": 70.7,
       "totalLiquidVolume": 72000,
       "x": 22.74,
       "y": 42.74,
@@ -30,8 +30,8 @@
     "A2": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 25.74,
-      "yDimension": 70.01,
+      "xDimension": 26.43,
+      "yDimension": 70.7,
       "totalLiquidVolume": 72000,
       "x": 50.17,
       "y": 42.74,
@@ -40,8 +40,8 @@
     "A3": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 25.74,
-      "yDimension": 70.01,
+      "xDimension": 26.43,
+      "yDimension": 70.7,
       "totalLiquidVolume": 72000,
       "x": 77.6,
       "y": 42.74,
@@ -50,8 +50,8 @@
     "A4": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 25.74,
-      "yDimension": 70.01,
+      "xDimension": 26.43,
+      "yDimension": 70.7,
       "totalLiquidVolume": 72000,
       "x": 105.03,
       "y": 42.74,
