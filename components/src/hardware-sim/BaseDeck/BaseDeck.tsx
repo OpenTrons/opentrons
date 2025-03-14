@@ -47,6 +47,7 @@ import type {
 import type { TrashCutoutId } from '../Deck/FlexTrash'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 import type { WellFill, WellGroup } from '../Labware'
+import { SceneWithSVGPath } from '../../organisms/ProtocolTimelineScrubber/threeJsTest'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
@@ -152,29 +153,18 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
   return (
     <RobotCoordinateSpace
       viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
-      animated={animatedSVG}
       {...svgProps}
     >
       {robotType === OT2_ROBOT_TYPE ? (
-        <DeckFromLayers
+        <>
+          <SceneWithSVGPath />
+          {/* <DeckFromLayers
           robotType={robotType}
           layerBlocklist={deckLayerBlocklist}
-        />
+        /> */}
+        </>
       ) : (
         <>
-          {showSlotLabels ? (
-            <SlotLabels
-              robotType={robotType}
-              color={COLORS.black90}
-              show4thColumn={
-                stagingAreaFixtures.length > 0 ||
-                wasteChuteStagingAreaFixtures.length > 0 ||
-                modulesOnDeck.findIndex(
-                  module => module.moduleModel === 'absorbanceReaderV1'
-                ) >= 0
-              }
-            />
-          ) : null}
           {singleSlotFixtures.map(fixture => (
             <SingleSlotFixture
               key={fixture.cutoutId}
@@ -185,227 +175,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
               showExpansion={showExpansion}
             />
           ))}
-          {stagingAreaFixtures.map(fixture => (
-            <StagingAreaFixture
-              key={fixture.cutoutId}
-              cutoutId={fixture.cutoutId as StagingAreaLocation}
-              deckDefinition={deckDef}
-              slotClipColor={darkFill}
-              fixtureBaseColor={lightFill}
-            />
-          ))}
-          {trashBinFixtures.map(fixture => (
-            <Fragment key={fixture.cutoutId}>
-              <SingleSlotFixture
-                cutoutId={fixture.cutoutId}
-                deckDefinition={deckDef}
-                slotClipColor={COLORS.transparent}
-                fixtureBaseColor={lightFill}
-              />
-              <FlexTrash
-                robotType={robotType}
-                trashIconColor={lightFill}
-                trashCutoutId={fixture.cutoutId as TrashCutoutId}
-                backgroundColor={mediumFill}
-              />
-            </Fragment>
-          ))}
-          {wasteChuteOnlyFixtures.map(fixture => {
-            if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
-              return (
-                <WasteChuteFixture
-                  key={fixture.cutoutId}
-                  cutoutId={fixture.cutoutId}
-                  deckDefinition={deckDef}
-                  fixtureBaseColor={lightFill}
-                  wasteChuteColor={mediumFill}
-                />
-              )
-            } else {
-              return null
-            }
-          })}
-          {wasteChuteStagingAreaFixtures.map(fixture => {
-            if (fixture.cutoutId === WASTE_CHUTE_CUTOUT) {
-              return (
-                <WasteChuteStagingAreaFixture
-                  key={fixture.cutoutId}
-                  cutoutId={fixture.cutoutId}
-                  deckDefinition={deckDef}
-                  slotClipColor={darkFill}
-                  fixtureBaseColor={lightFill}
-                  wasteChuteColor={mediumFill}
-                />
-              )
-            } else {
-              return null
-            }
-          })}
         </>
       )}
-      <>
-        {/* render modules, nested labware, and overlays */}
-        {modulesOnDeck.map(
-          ({
-            moduleModel,
-            moduleLocation,
-            nestedLabwareDef,
-            nestedLabwareWellFill,
-            innerProps,
-            moduleChildren,
-            onLabwareClick,
-            highlightLabware,
-            highlightShadowLabware,
-          }) => {
-            const slotPosition = getPositionFromSlotId(
-              moduleLocation.slotName,
-              deckDef
-            )
-            const moduleDef = getModuleDef2(moduleModel)
-            return slotPosition != null ? (
-              <Module
-                key={`${moduleModel} ${moduleLocation.slotName}`}
-                def={moduleDef}
-                x={slotPosition[0]}
-                y={slotPosition[1]}
-                orientation={inferModuleOrientationFromXCoordinate(
-                  slotPosition[0]
-                )}
-                innerProps={innerProps}
-              >
-                {nestedLabwareDef != null ? (
-                  <LabwareRender
-                    definition={nestedLabwareDef}
-                    onLabwareClick={onLabwareClick}
-                    wellFill={nestedLabwareWellFill}
-                    shouldRotateAdapterOrientation={
-                      inferModuleOrientationFromXCoordinate(slotPosition[0]) ===
-                        'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                    }
-                    highlight={highlightLabware}
-                    highlightShadow={highlightShadowLabware}
-                  />
-                ) : null}
-                {moduleChildren}
-              </Module>
-            ) : null
-          }
-        )}
-        {/* render non-module labware and overlays */}
-        {labwareOnDeck.map(
-          ({
-            labwareLocation,
-            definition,
-            labwareChildren,
-            wellFill,
-            missingTips,
-            onLabwareClick,
-            highlight,
-            highlightShadow,
-          }) => {
-            if (
-              labwareLocation === 'offDeck' ||
-              labwareLocation === 'systemLocation' ||
-              !('slotName' in labwareLocation) ||
-              // for legacy protocols that list fixed trash as a labware, do not render
-              definition.parameters.loadName ===
-                'opentrons_1_trash_3200ml_fixed'
-            ) {
-              return null
-            }
-
-            const slotPosition = getPositionFromSlotId(
-              labwareLocation.slotName,
-              deckDef
-            )
-
-            return slotPosition != null ? (
-              <g
-                key={labwareLocation.slotName}
-                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
-                cursor={onLabwareClick != null ? 'pointer' : ''}
-              >
-                <LabwareRender
-                  definition={definition}
-                  onLabwareClick={onLabwareClick}
-                  wellFill={wellFill ?? undefined}
-                  missingTips={missingTips}
-                  highlight={highlight}
-                  highlightShadow={highlightShadow}
-                />
-                {labwareChildren}
-              </g>
-            ) : null
-          }
-        )}
-        {/* render stacked badge on module labware */}
-        {modulesOnDeck.map(
-          ({ moduleModel, moduleLocation, stacked = false }) => {
-            const slotPosition = getPositionFromSlotId(
-              moduleLocation.slotName,
-              deckDef
-            )
-            const moduleDef = getModuleDef2(moduleModel)
-
-            const {
-              x: nestedLabwareOffsetX,
-              y: nestedLabwareOffsetY,
-            } = moduleDef.labwareOffset
-
-            // labwareOffset values are more accurate than our SVG renderings, so ignore any deviations under a certain threshold
-            const clampedLabwareOffsetX =
-              Math.abs(nestedLabwareOffsetX) > LABWARE_OFFSET_DISPLAY_THRESHOLD
-                ? nestedLabwareOffsetX
-                : 0
-            const clampedLabwareOffsetY =
-              Math.abs(nestedLabwareOffsetY) > LABWARE_OFFSET_DISPLAY_THRESHOLD
-                ? nestedLabwareOffsetY
-                : 0
-            // transform to be applied to children which render within the labware interfacing surface of the module
-            const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
-
-            return slotPosition != null && stacked ? (
-              <g
-                key={`stacked_${moduleLocation.slotName}`}
-                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
-              >
-                <g transform={childrenTransform}>
-                  <StackedBadge />
-                </g>
-              </g>
-            ) : null
-          }
-        )}
-        {/* render stacked badge on non-module labware */}
-        {labwareOnDeck.map(
-          ({ labwareLocation, definition, stacked = false }) => {
-            if (
-              labwareLocation === 'offDeck' ||
-              labwareLocation === 'systemLocation' ||
-              !('slotName' in labwareLocation) ||
-              // for legacy protocols that list fixed trash as a labware, do not render
-              definition.parameters.loadName ===
-                'opentrons_1_trash_3200ml_fixed'
-            ) {
-              return null
-            }
-
-            const slotPosition = getPositionFromSlotId(
-              labwareLocation.slotName,
-              deckDef
-            )
-
-            return slotPosition != null && stacked ? (
-              <g
-                key={`stacked_${labwareLocation.slotName}`}
-                transform={`translate(${slotPosition[0].toString()},${slotPosition[1].toString()})`}
-              >
-                <StackedBadge />
-              </g>
-            ) : null
-          }
-        )}
-      </>
       {children}
     </RobotCoordinateSpace>
   )

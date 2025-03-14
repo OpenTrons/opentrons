@@ -31,6 +31,7 @@
     "@types/lodash": "^4.14.191",
     "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
+    "@types/three": "^0.174.0",
     "classnames": "2.2.5",
     "interactjs": "^1.10.27",
     "i18next": "^19.8.3",
@@ -42,7 +43,8 @@
     "react-select": "5.4.0",
     "react-viewport-list": "6.3.0",
     "redux": "4.0.5",
-    "styled-components": "5.3.6"
+    "styled-components": "5.3.6",
+    "three": "^0.174.0"
   },
   "devDependencies": {
     "react-redux": "8.1.2"
