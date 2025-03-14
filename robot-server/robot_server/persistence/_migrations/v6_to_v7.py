@@ -70,14 +70,17 @@ def _migrate_command_table_with_new_command_intent_col(
     for row in dest_transaction.execute(select_commands).all():
         data = json.loads(row.command)
         new_command_intent = (
-            # Account for old_row.command["intent"] being NULL.
+            # Account for the `intent` prop of the old command JSON being omitted or `null`.
+            # We convert either case to the SQL string "protocol".
             "protocol"
-            if "intent" not in row.command or data["intent"] == None  # noqa: E711
+            if "intent" not in data or data["intent"] is None
             else data["intent"]
         )
 
         dest_transaction.execute(
-            f"UPDATE run_command SET command_intent='{new_command_intent}' WHERE row_id={row.row_id}"
+            sqlalchemy.update(schema_7.run_command_table)
+            .where(schema_7.run_command_table.c.row_id == row.row_id)
+            .values(command_intent=new_command_intent),
         )
 
 
