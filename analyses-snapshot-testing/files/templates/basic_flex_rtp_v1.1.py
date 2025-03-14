@@ -461,6 +461,62 @@ def comment_tip_rack_status(ctx, tip_rack):
         ctx.comment(status_line)
 
 
+### Helper functions
+
+
+def is_tip_rack_empty(tip_rack):
+    """
+    Check if a tip rack is completely empty.
+
+    Args:
+        tip_rack: An Opentrons tip rack labware object
+
+    Returns:
+        bool: True if the tip rack has no tips, False if it has at least one tip
+    """
+    range_A_to_H = [chr(i) for i in range(ord("A"), ord("H") + 1)]
+    range_1_to_12 = range(1, 13)
+
+    for row in range_A_to_H:
+        for col in range_1_to_12:
+            well = f"{row}{col}"
+            if tip_rack.wells_by_name()[well].has_tip:
+                return False
+
+    return True
+
+
+def is_missing_tips(tip_rack):
+    """
+    Check if a tip rack is missing any tips.
+
+    Args:
+        tip_rack: An Opentrons tip rack labware object
+
+    Returns:
+        bool: True if the tip rack is missing at least one tip, False if all tips are present
+    """
+    range_A_to_H = [chr(i) for i in range(ord("A"), ord("H") + 1)]
+    range_1_to_12 = range(1, 13)
+
+    for row in range_A_to_H:
+        for col in range_1_to_12:
+            well = f"{row}{col}"
+            if not tip_rack.wells_by_name()[well].has_tip:
+                return True
+
+    return False
+
+
+def using_96_channel(ctx) -> bool:
+    """Check if a 96-channel pipette is loaded in the protocol."""
+    for instrument in ctx.loaded_instruments.values():
+        if instrument.channels == 96:
+            ctx.comment("9️⃣6️⃣ channel pipette is loaded")
+            return True
+    return False
+
+
 def run(ctx):
     trash = ctx.load_trash_bin("A3")  # must load trash bin
     # get the key from the parameters
