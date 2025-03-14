@@ -195,16 +195,26 @@ export const SecondStepsMoveLiquidTools = ({
             )
           ]
         }
+        referenceField={`${tab}_position_reference`}
       />
       {enableLiquidClasses ? (
         <>
           <Divider marginY="0" />
           <MultiInputField
             name={t('submerge')}
-            prefix={tab}
+            prefix={`${tab}_submerge`}
             tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
             propsForFields={propsForFields}
             fields={getFields('submerge')}
+            isWellPosition
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('submerge_mmFromBottom')
+                )
+              ]
+            }
+            referenceField={`${tab}_submerge_position_reference`}
           />
           <Divider marginY="0" />
           <MultiInputField
@@ -213,7 +223,7 @@ export const SecondStepsMoveLiquidTools = ({
             tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
             propsForFields={propsForFields}
             fields={getFields('retract')}
-            isWellPosition={true}
+            isWellPosition
             labwareId={
               formData[
                 getLabwareFieldForPositioningField(
@@ -221,6 +231,7 @@ export const SecondStepsMoveLiquidTools = ({
                 )
               ]
             }
+            referenceField={`${tab}_retract_position_reference`}
           />
         </>
       ) : null}
@@ -326,18 +337,6 @@ export const SecondStepsMoveLiquidTools = ({
                   `${tab}_delay_seconds`,
                   mappedErrorsToField
                 )}
-              />
-              <PositionField
-                prefix={tab}
-                propsForFields={propsForFields}
-                zField={`${tab}_delay_mmFromBottom`}
-                labwareId={
-                  formData[
-                    getLabwareFieldForPositioningField(
-                      addFieldNamePrefix('delay_mmFromBottom')
-                    )
-                  ]
-                }
               />
             </Flex>
           ) : null}
