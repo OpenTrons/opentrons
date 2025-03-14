@@ -22,7 +22,10 @@ from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
+from opentrons.protocols.advanced_control.transfers.common import (
+    TransferTipPolicyV2,
+    NoLiquidClassPropertyError,
+)
 from opentrons.protocols.advanced_control.transfers import common as tx_commons
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine import (
@@ -1156,9 +1159,17 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 "No tipracks found for pipette in order to perform transfer"
             )
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-        )
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
+
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
             name=liquid_class.name,
@@ -1341,10 +1352,17 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=None,
             ).volume,
         )
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(),
-            tip_rack=tiprack_uri_for_transfer_props,
-        )
+
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
 
         # If there are no multi-dispense properties or if the volume to distribute
         # per destination well is so large that the tip cannot hold enough liquid
@@ -1588,10 +1606,19 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             raise RuntimeError(
                 "No tipracks found for pipette in order to perform transfer"
             )
+
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-        )
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
+
         blow_out_properties = transfer_props.dispense.retract.blowout
         if (
             blow_out_properties.enabled
