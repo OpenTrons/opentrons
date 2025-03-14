@@ -212,6 +212,15 @@ CONFIG_ELEMENTS = (
         "relative path it will be relative to log_dir",
     ),
     ConfigElement(
+        "move_profile_log_file",
+        "Move Profile File",
+        Path("logs") / "profile.log",
+        ConfigElementType.FILE,
+        "The location of the file to save move profile logs to. If this is an"
+        " absolute path, it will be used directly. If it is a "
+        "relative path it will be relative to log_dir",
+    ),
+    ConfigElement(
         "serial_log_file",
         "Serial Log File",
         Path("logs") / "serial.log",
