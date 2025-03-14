@@ -71,7 +71,7 @@ export const locators = {
   privacyPolicy: 'a[href="https://opentrons.com/privacy-policy"]',
   eula: 'a[href="https://opentrons.com/eula"]',
   privacyToggle: 'Settings_OT_PD_ENABLE_HOT_KEYS_DISPLAY',
-  analyticsToggleTestId: 'analyticsToggle',
+  analyticsToggleAriaLabel: 'Settings_Privacy',
   confirm: 'Confirm',
 }
 
@@ -165,7 +165,7 @@ Cypress.Commands.add('verifySettingsPage', () => {
   cy.contains(content.privacy).should('exist').should('be.visible')
   cy.contains(content.shareSessions).should('exist').should('be.visible')
   cy.getByAriaLabel(locators.privacyToggle).should('exist').should('be.visible')
-  cy.getByTestId(locators.analyticsToggleTestId)
+  cy.getByAriaLabel(locators.analyticsToggleAriaLabel)
     .should('exist')
     .should('be.visible')
 })
