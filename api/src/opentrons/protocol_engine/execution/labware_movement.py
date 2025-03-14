@@ -91,6 +91,7 @@ class LabwareMovementHandler:
         new_location: OnDeckLabwareLocation,
         user_offset_data: LabwareMovementOffsetData,
         post_drop_slide_offset: Optional[Point],
+        user_grip_force: float | None = None,
     ) -> None:
         ...
 
@@ -103,6 +104,7 @@ class LabwareMovementHandler:
         new_location: OnDeckLabwareLocation,
         user_offset_data: LabwareMovementOffsetData,
         post_drop_slide_offset: Optional[Point],
+        user_grip_force: float | None = None,
     ) -> None:
         ...
 
@@ -115,6 +117,7 @@ class LabwareMovementHandler:
         new_location: OnDeckLabwareLocation,
         user_offset_data: LabwareMovementOffsetData,
         post_drop_slide_offset: Optional[Point],
+        user_grip_force: float | None = None,
     ) -> None:
         """Physically move a labware from one location to another using the gripper.
 
@@ -197,9 +200,19 @@ class LabwareMovementHandler:
                 offset_data=final_offsets,
                 post_drop_slide_offset=post_drop_slide_offset,
             )
-            labware_grip_force = self._state_store.labware.get_grip_force(
-                labware_definition
-            )
+
+            if user_grip_force is None:
+                labware_grip_force = self._state_store.labware.get_grip_force(
+                    labware_definition
+                )
+            else:
+                MAX_GRIP_FORCE = 25
+                if user_grip_force > MAX_GRIP_FORCE:
+                    raise CannotPerformGripperAction(
+                        f"User-specified grip force of {user_grip_force} N exceeds maximum grip force of {MAX_GRIP_FORCE} N."
+                    )
+                labware_grip_force = user_grip_force
+
             holding_labware = False
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:
