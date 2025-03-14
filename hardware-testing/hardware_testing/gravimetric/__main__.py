@@ -388,12 +388,13 @@ def build_gravimetric_cfg(
     same_tip: bool,
     ignore_fail: bool,
     mode: str,
+    mount: str,
     run_args: RunArgs,
 ) -> GravimetricConfig:
     """Build."""
     return GravimetricConfig(
         name=run_args.name,
-        pipette_mount="left",
+        pipette_mount=mount,
         pipette_volume=run_args.pipette_volume,
         pipette_channels=run_args.pipette_channels,
         tip_volume=tip_volume,
@@ -436,12 +437,13 @@ def build_photometric_cfg(
     photoplate_column_offset: List[int],
     dye_well_column_offset: List[int],
     mode: str,
+    mount: str,
     run_args: RunArgs,
 ) -> PhotometricConfig:
     """Run."""
     return PhotometricConfig(
         name=run_args.name,
-        pipette_mount="left",
+        pipette_mount=mount,
         pipette_volume=run_args.pipette_volume,
         pipette_channels=pipette_channels,
         increment=False,
@@ -492,6 +494,7 @@ def _main(
             args.photoplate_col_offset,
             args.dye_well_col_offset,
             args.mode,
+            args.mount,
             run_args,
         )
         union_cfg = cfg_pm
@@ -513,6 +516,7 @@ def _main(
             args.same_tip,
             args.ignore_fail,
             args.mode,
+            args.mount,
             run_args,
         )
 
@@ -578,6 +582,9 @@ if __name__ == "__main__":
     parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
         "--mode", type=str, choices=["", "default", "lowVolumeDefault"], default=""
+    )
+    parser.add_argument(
+        "--mount", type=str, choices=["left", "right"], default="left"
     )
     parser.add_argument(
         "--liquid",
