@@ -34,14 +34,26 @@ export function getLiquidProbeCommandText({
         )
       : null
 
-  const displayLocation = getLabwareDisplayLocation({
-    loadedLabwares: commandTextData?.labware ?? [],
-    location: labwareLocation,
-    robotType,
-    allRunDefs,
-    loadedModules: commandTextData?.modules ?? [],
-    t,
-  })
+  let displayLocation = ''
+  if (labwareLocation?.locationSequence != null) {
+    displayLocation = getLabwareDisplayLocation({
+      loadedLabwares: commandTextData?.labware ?? [],
+      locationSequence: labwareLocation.locationSequence,
+      robotType,
+      allRunDefs,
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
+  } else {
+    displayLocation = getLabwareDisplayLocation({
+      loadedLabwares: commandTextData?.labware ?? [],
+      location: labwareLocation?.location ?? null,
+      robotType,
+      allRunDefs,
+      loadedModules: commandTextData?.modules ?? [],
+      t,
+    })
+  }
 
   const labware =
     commandTextData != null

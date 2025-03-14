@@ -6,15 +6,21 @@ import {
   THERMOCYCLER_MODULE_V2,
   TRASH_BIN_FIXTURE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from './getLabwareLocation'
+import {
+  getLabwareLocation,
+  getLabwareLocationFromSequence,
+} from './getLabwareLocation'
 
 import type { TFunction } from 'i18next'
 
-import type { AddressableAreaName } from '@opentrons/shared-data'
+import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
 import type {
   LocationFullParams,
   LocationSlotOnlyParams,
+  SequenceSlotOnlyParams,
+  SequenceFullParams,
 } from './getLabwareLocation'
 
 export interface DisplayLocationSlotOnlyParams extends LocationSlotOnlyParams {
@@ -26,20 +32,36 @@ export interface DisplayLocationFullParams extends LocationFullParams {
   t: TFunction
   isOnDevice?: boolean
 }
+export interface DisplaySequenceSlotOnlyParams extends SequenceSlotOnlyParams {
+  t: TFunction
+  isOnDevice?: boolean
+  robotType: RobotType
+}
+export interface DisplaySequenceFullParams extends SequenceFullParams {
+  t: TFunction
+  isOnDevice?: boolean
+  robotType: RobotType
+}
 
 export type DisplayLocationParams =
   | DisplayLocationSlotOnlyParams
   | DisplayLocationFullParams
 
+export type DisplayLocationFromSequenceParams =
+  | DisplaySequenceSlotOnlyParams
+  | DisplaySequenceFullParams
+
 // detailLevel applies to nested labware. If 'full', return copy that includes the actual peripheral that nests the
 // labware, ex, "in module XYZ in slot C1".
 // If 'slot-only', return only the slot name, ex "in slot C1".
 export function getLabwareDisplayLocation(
-  params: DisplayLocationParams
+  params: DisplayLocationParams | DisplayLocationFromSequenceParams
 ): string {
   const { t, isOnDevice = false } = params
-  const locationResult = getLabwareLocation(params)
-
+  const locationResult =
+    'locationSequence' in params
+      ? getLabwareLocationFromSequence(params)
+      : getLabwareLocation(params)
   if (locationResult == null) {
     return ''
   }
@@ -104,7 +126,10 @@ function handleSpecialSlotNames(
 ): { odd: string; desktop: string } {
   if (WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotName as AddressableAreaName)) {
     return { odd: t('waste_chute'), desktop: t('waste_chute') }
-  } else if (slotName === TRASH_BIN_FIXTURE) {
+  } else if (
+    slotName === TRASH_BIN_FIXTURE ||
+    MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotName as AddressableAreaName)
+  ) {
     return { odd: t('trash_bin'), desktop: t('trash_bin') }
   } else {
     return {
