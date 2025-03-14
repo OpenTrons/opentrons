@@ -2535,7 +2535,9 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> tuple[
         types.Location, Optional[labware.Well], Optional[types.MeniscusTrackingTarget]
     ]:
-        move_to_location: types.Location
+        move_to_location: types.Location = types.Location(
+            point=types.Point(), labware=None
+        )
         well: Optional[labware.Well] = None
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if isinstance(target, validation.WellTarget):
@@ -2557,7 +2559,9 @@ class InstrumentContext(publisher.CommandPublisher):
     ) -> tuple[
         types.Location, Optional[labware.Well], Optional[types.MeniscusTrackingTarget]
     ]:
-        move_to_location: types.Location
+        move_to_location: types.Location = types.Location(
+            point=types.Point(), labware=None
+        )
         well: Optional[labware.Well] = None
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None
         if isinstance(target, validation.WellTarget):
