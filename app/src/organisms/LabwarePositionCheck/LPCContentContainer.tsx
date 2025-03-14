@@ -78,6 +78,11 @@ export function LPCContentContainer(
   const handleExit = (): void => {
     if (step === LPC_STEP.HANDLE_LABWARE && commandUtils.errorMessage == null) {
       commandUtils.headerCommands.handleNavToDetachProbe()
+    } else if (
+      step === LPC_STEP.DETACH_PROBE &&
+      commandUtils.errorMessage == null
+    ) {
+      commandUtils.headerCommands.handleCloseAndHome()
     } else {
       void commandUtils.handleCloseNoHome()
     }

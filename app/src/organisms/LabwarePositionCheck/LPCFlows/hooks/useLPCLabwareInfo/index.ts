@@ -13,6 +13,8 @@ import type { RobotType } from '@opentrons/shared-data'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueValidLwLocationInfoByAnalysis'
 
+const REFETCH_OFFSET_SEARCH_MS = 5000
+
 export type UseLPCLabwareInfoProps = GetUniqueValidLwLocationInfoByAnalysisParams & {
   runId: string
   robotType: RobotType
@@ -59,12 +61,15 @@ function useFlexLPCLabwareInfo({
     [lwLocationCombos.length]
   )
 
+  // TODO(jh, 03-14-25): Add this search route to notifications.
+
+  // We have to poll, because it's possible for a user to update the
+  // offsets on a different app while a view utilizing this data is active.
   const { data } = useSearchLabwareOffsets(searchLwOffsetsParams, {
     enabled:
       searchLwOffsetsParams.filters.length > 0 && robotType === FLEX_ROBOT_TYPE,
-    staleTime: Infinity,
+    refetchInterval: REFETCH_OFFSET_SEARCH_MS,
   })
-
   const storedOffsets = data?.data ?? []
 
   const labwareInfo = useMemo(
@@ -74,7 +79,11 @@ function useFlexLPCLabwareInfo({
         lwLocationCombos,
         labwareDefs,
       }),
-    [storedOffsets.length, labwareDefs?.length, lwLocationCombos.length]
+    [
+      JSON.stringify(storedOffsets),
+      labwareDefs?.length,
+      lwLocationCombos.length,
+    ]
   )
 
   return { labwareInfo, storedOffsets }

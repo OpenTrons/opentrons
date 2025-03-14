@@ -18,6 +18,7 @@ import {
   updateOffsetsForURI,
   proceedToNextHandleLwSubstep,
   goBackToPreviousHandleLwSubstep,
+  handleApplyWorkingOffsets,
 } from './transforms'
 
 import type {
@@ -139,8 +140,7 @@ export function LPCReducer(
       case SET_INITIAL_POSITION:
       case SET_FINAL_POSITION:
       case CLEAR_WORKING_OFFSETS:
-      case RESET_OFFSET_TO_DEFAULT:
-      case APPLY_WORKING_OFFSETS: {
+      case RESET_OFFSET_TO_DEFAULT: {
         const lwUri = action.payload.labwareUri
         const updatedLwDetails = updateOffsetsForURI(state, action)
 
@@ -158,6 +158,21 @@ export function LPCReducer(
           },
         }
       }
+
+      case APPLY_WORKING_OFFSETS: {
+        const updatedLabware = handleApplyWorkingOffsets(state, action)
+
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            labware: {
+              ...updatedLabware,
+            },
+          },
+        }
+      }
+
       // TODO(jh, 03-12-25): Revisit whether we need to set the store back to undefined, and
       // if we can avoid having an `undefined` store at any point in the store's lifecycle.
       case FINISH_LPC:
