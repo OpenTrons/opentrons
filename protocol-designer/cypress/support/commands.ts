@@ -74,7 +74,7 @@ export const locators = {
   privacyToggle: 'Settings_OT_PD_ENABLE_HOT_KEYS_DISPLAY',
   analyticsToggleTestId: 'analyticsToggle',
   confirm: 'Confirm',
-  releaseNote: '[data-testid="Toast_info"]'
+  releaseNote: '[data-testid="Toast_info"]',
 }
 
 // General Custom Commands
@@ -133,7 +133,7 @@ Cypress.Commands.add('closeAnalyticsModal', () => {
 })
 
 Cypress.Commands.add('closeReleaseNotesModal', () => {
-    cy.get(locators.releaseNote).find('button').click()
+  cy.get(locators.releaseNote).find('button').click()
 })
 
 Cypress.Commands.add('clickConfirm', () => {
