@@ -100,6 +100,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            operation_volume=volume,
         )
         if isinstance(move_result, DefinedErrorData):
             return move_result
