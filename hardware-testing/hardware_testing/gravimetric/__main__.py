@@ -547,6 +547,9 @@ def _main(
         recorder=run_args.recorder,
         test_report=run_args.test_report,
     )
+    if args.reverse_tips:
+        for k in test_resources.tips.keys():
+            test_resources.tips[k].reverse()
 
     if args.photometric:
         execute_photometric.run(cfg_pm, test_resources)
@@ -578,6 +581,7 @@ if __name__ == "__main__":
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--same-tip", action="store_true")
     parser.add_argument("--ignore-fail", action="store_true")
+    parser.add_argument("--reverse-tips", action="store_true")
     parser.add_argument("--photoplate-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument("--dye-well-col-offset", nargs="+", type=int, default=[1])
     parser.add_argument(
