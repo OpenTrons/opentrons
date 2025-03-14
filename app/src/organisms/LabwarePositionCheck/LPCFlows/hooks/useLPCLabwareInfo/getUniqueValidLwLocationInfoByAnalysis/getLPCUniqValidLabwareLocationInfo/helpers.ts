@@ -111,6 +111,8 @@ export function getLwOffsetLocSeqFrom(
 
 // LPC cares about real modules/labware for commands and often only cares about
 // modules and labware for UI purposes. Return that data to simplify LPC access.
+// Note that while these data are derived from the (offset) location sequence, they are not
+// synonymous with a (offset) location sequence.
 export function getLwModOnlyLocSeqWithIds(
   offsetLocSeq: LabwareOffsetLocationSequence,
   locSeq: LabwareLocationSequence

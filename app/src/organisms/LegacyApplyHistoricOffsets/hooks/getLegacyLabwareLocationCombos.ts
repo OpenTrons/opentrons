@@ -18,6 +18,9 @@ export interface LegacyLabwareLocationCombo {
   moduleId?: string
   adapterId?: string
 }
+
+// Dev note: This only needs to be updated if analysis output changes affect the OT-2.
+// The flex does not make use of this util!
 export function getLegacyLabwareLocationCombos(
   commands: RunTimeCommand[],
   labware: ProtocolAnalysisOutput['labware'],
