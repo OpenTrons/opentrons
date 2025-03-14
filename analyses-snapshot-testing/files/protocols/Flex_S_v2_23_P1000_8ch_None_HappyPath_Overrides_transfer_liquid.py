@@ -94,7 +94,6 @@ def run(ctx):
         trash_location=trash,
     )
 
-    # https://opentrons.atlassian.net/browse/AUTH-1420
     pipette_8ch_1000.transfer_liquid(
         liquid_class=ethanol_class,
         volume=volume,
@@ -104,7 +103,6 @@ def run(ctx):
         trash_location=trash,
     )
 
-    # https://opentrons.atlassian.net/browse/AUTH-1421
     pipette_8ch_1000.transfer_liquid(
         liquid_class=glycerol_class,
         volume=volume,

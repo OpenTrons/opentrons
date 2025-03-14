@@ -1,6 +1,6 @@
-
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 metadata = {"protocolName": "P50 8ch transfer, distribute, consolidate, _liquid"}
+
 
 def run(ctx):
     # Stock liquid classes
@@ -17,7 +17,6 @@ def run(ctx):
     tipracks = [tiprack_1, tiprack_2, tiprack_3]
     filter_tipracks = [filter_tiprack_1, filter_tiprack_2, filter_tiprack_3]
     trash = ctx.load_trash_bin("A3")
-
 
     # Liquids to transfer
     # Using a 15 mL reservoir as source
@@ -37,13 +36,12 @@ def run(ctx):
     glycerol = ctx.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
 
     # Load liquids into source wells
-    for well in WATER_SOURCE_WELLS + WATER_SOURCE_WELL
+    for well in WATER_SOURCE_WELLS + WATER_SOURCE_WELL:
         source.wells_by_name()[well].load_liquid(liquid=water, volume=1000)
     for well in ETHANOL_SOURCE_WELLS + ETHANOL_SOURCE_WELL:
         source.wells_by_name()[well].load_liquid(liquid=ethanol, volume=1000)
     for well in GLYCEROL_SOURCE_WELLS:
         source.wells_by_name()[well].load_liquid(liquid=glycerol, volume=1000)
-
 
     # Target
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep
@@ -52,11 +50,9 @@ def run(ctx):
     ETHANOL_TARGET_WELL = "A2"
     GLYCEROL_TARGET_WELL = "A3"
 
-
     WATER_TARGET_WELLS = ["H4", "H5"]
     ETHANOL_TARGET_WELLS = ["H6", "H7"]
     GLYCEROL_TARGET_WELLS = ["H8", "H9"]
-
 
     # Transfer with regular tips
 
