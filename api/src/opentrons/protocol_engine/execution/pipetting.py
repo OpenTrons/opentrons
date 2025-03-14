@@ -13,6 +13,7 @@ from ..errors.exceptions import (
     InvalidAspirateVolumeError,
     InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
+    InvalidLiquidHeightFound,
 )
 from opentrons.protocol_engine.types import WellLocation
 from opentrons.protocol_engine.types.liquid_level_detection import (
@@ -187,7 +188,27 @@ class HardwarePipettingHandler(PipettingHandler):
         Raises:
             PipetteOverpressureError, propagated as-is from the hardware controller.
         """
-        return 0.0
+        # get mount and config data from state and hardware controller
+        hw_pipette, adjusted_volume = self.get_hw_aspirate_params(
+            pipette_id, volume, command_note_adder
+        )
+        aspirate_z_distance = self._state_view.geometry.get_liquid_handling_z_change(
+            labware_id=labware_id,
+            well_name=well_name,
+            operation_volume=volume * -1,
+        )
+        if isinstance(aspirate_z_distance, SimulatedProbeResult):
+            raise InvalidLiquidHeightFound(
+                "Aspirate distance must be a float in Hardware pipetting handler."
+            )
+        with self._set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
+            await self._hardware_api.aspirate_while_tracking(
+                mount=hw_pipette.mount,
+                z_distance=aspirate_z_distance,
+                flow_rate=flow_rate,
+                volume=adjusted_volume,
+            )
+        return adjusted_volume
 
     async def dispense_while_tracking(
         self,
@@ -204,7 +225,26 @@ class HardwarePipettingHandler(PipettingHandler):
         Raises:
             PipetteOverpressureError, propagated as-is from the hardware controller.
         """
-        return 0.0
+        # get mount and config data from state and hardware controller
+        hw_pipette, adjusted_volume = self.get_hw_dispense_params(pipette_id, volume)
+        dispense_z_distance = self._state_view.geometry.get_liquid_handling_z_change(
+            labware_id=labware_id,
+            well_name=well_name,
+            operation_volume=volume,
+        )
+        if isinstance(dispense_z_distance, SimulatedProbeResult):
+            raise InvalidLiquidHeightFound(
+                "Dispense distance must be a float in Hardware pipetting handler."
+            )
+        with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
+            await self._hardware_api.dispense_while_tracking(
+                mount=hw_pipette.mount,
+                z_distance=dispense_z_distance,
+                flow_rate=flow_rate,
+                volume=adjusted_volume,
+                push_out=push_out,
+            )
+        return adjusted_volume
 
     async def aspirate_in_place(
         self,
