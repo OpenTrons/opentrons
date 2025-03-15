@@ -44,6 +44,7 @@ export function LabwareLocationItem({
   const { toggleRobotMoving, handleCheckItemsPrepModules } = commandUtils
   const { locationDetails } = locationSpecificOffsetDetails
   const { definitionUri } = locationDetails
+  const isHardcodedOffset = locationDetails.hardCodedOffsetId != null
   const dispatch = useDispatch()
 
   const mostRecentOffset = useSelector(
@@ -80,7 +81,9 @@ export function LabwareLocationItem({
   }
 
   const buildOffsetTagProps = (): OffsetTagProps => {
-    if (mostRecentOffset == null) {
+    if (isHardcodedOffset) {
+      return { kind: 'hardcoded' }
+    } else if (mostRecentOffset == null) {
       return { kind: 'noOffset' }
     } else if (mostRecentOffset?.kind === OFFSET_KIND_DEFAULT) {
       return { kind: 'default' }
@@ -89,8 +92,6 @@ export function LabwareLocationItem({
     }
   }
 
-  // TODO(jh, 03-06-25): Add the stacked label after integrating the new API work.
-  //  Note that it is the same as the Flex stacker module type.
   const buildDeckInfoLabels = (): JSX.Element[] => {
     const moduleIconType = (): ModuleType | null => {
       const moduleModel = locationDetails.closestBeneathModuleModel
@@ -147,13 +148,15 @@ export function LabwareLocationItem({
           buttonText: lpcTextT('adjust'),
           onClick: handleLaunchEditOffset,
           buttonType: 'secondary',
-          disabled: isMissingDefaultOffset,
+          disabled: isMissingDefaultOffset || isHardcodedOffset,
         }}
         colThreeSecondaryBtn={{
           buttonText: lpcTextT('reset_to_default'),
           onClick: handleResetOffset,
           buttonType: 'tertiaryHighLight',
-          disabled: mostRecentOffset?.kind !== OFFSET_KIND_LOCATION_SPECIFIC,
+          disabled:
+            mostRecentOffset?.kind !== OFFSET_KIND_LOCATION_SPECIFIC ||
+            isHardcodedOffset,
         }}
       />
     </Flex>

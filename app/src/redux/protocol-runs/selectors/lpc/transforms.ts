@@ -217,3 +217,23 @@ export function getWorkingOffsetsByUri(
 
   return workingOffsetsByUri
 }
+
+export function getAreAllOffsetsHardCoded(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): boolean {
+  return (
+    lsDetails?.every(
+      detail => detail.locationDetails.hardCodedOffsetId != null
+    ) ?? false
+  )
+}
+
+export function getCountHardCodedOffsets(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): number {
+  return lsDetails != null
+    ? lsDetails.filter(
+        detail => detail.locationDetails.hardCodedOffsetId != null
+      ).length
+    : 0
+}

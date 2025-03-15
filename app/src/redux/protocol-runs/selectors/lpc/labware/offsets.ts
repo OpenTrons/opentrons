@@ -2,6 +2,8 @@ import type { Selector } from 'reselect'
 import { createSelector } from 'reselect'
 
 import {
+  getAreAllOffsetsHardCoded,
+  getCountHardCodedOffsets,
   getDefaultOffsetDetailsForAllLabware,
   getLocationSpecificOffsetDetailsForAllLabware,
   getMissingOffsets,
@@ -180,8 +182,8 @@ export const selectMostRecentVectorOffsetForLwWithOffsetDetails = (
   )
 
 // NOTE: This count is analogous to the number of unique locations a labware geometry is utilized
-// in a run.
-export const selectCountLocationSpecificOffsetsForLw = (
+// in a run minus those locations that are hardcoded.
+export const selectCountNonHardcodedLocationSpecificOffsetsForLw = (
   runId: string,
   uri: string
 ): Selector<State, number> =>
@@ -189,12 +191,16 @@ export const selectCountLocationSpecificOffsetsForLw = (
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .locationSpecificOffsetDetails,
-    locationSpecificDetails =>
-      locationSpecificDetails != null ? locationSpecificDetails.length : 0
+    lsDetails =>
+      lsDetails != null
+        ? lsDetails.length - getCountHardCodedOffsets(lsDetails)
+        : 0
   )
 
 // Whether the default offset is "absent" for the given labware geometry.
 // The default offset only needs to be added client-side to be considered "not absent".
+// Note that the default offset is not considered absent if all locations that would
+// utilize the default offset in the run are "hardcoded".
 export const selectIsDefaultOffsetAbsent = (
   runId: string,
   uri: string
@@ -203,13 +209,19 @@ export const selectIsDefaultOffsetAbsent = (
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .defaultOffsetDetails,
-    details =>
-      details?.existingOffset == null &&
-      details?.workingOffset?.confirmedVector == null
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .locationSpecificOffsetDetails,
+    (defaultDetails, lsDetails) =>
+      defaultDetails?.existingOffset == null &&
+      defaultDetails?.workingOffset?.confirmedVector == null &&
+      !getAreAllOffsetsHardCoded(lsDetails)
   )
 
 // Whether the default offset is "missing" for the given labware geometry.
 // The default offset must be persisted on the robot-server to be considered "not missing".
+// Note that the default offset is not considered missing if all locations that would
+// utilize the default offset in the run are "hardcoded".
 export const selectIsDefaultOffsetMissing = (
   runId: string,
   uri: string
@@ -218,7 +230,12 @@ export const selectIsDefaultOffsetMissing = (
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .defaultOffsetDetails,
-    details => details?.existingOffset == null
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .locationSpecificOffsetDetails,
+    (defaultDetails, lsDetails) =>
+      defaultDetails?.existingOffset == null &&
+      !getAreAllOffsetsHardCoded(lsDetails)
   )
 
 export const selectWorkingOffsetsByUri = (
@@ -229,6 +246,22 @@ export const selectWorkingOffsetsByUri = (
     labware => getWorkingOffsetsByUri(labware)
   )
 
+// Whether any offsets are "hardcoded" for the given labware geometry.
+export const selectIsAnyOffsetHardCoded = (
+  runId: string,
+  uri: string
+): Selector<State, boolean> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .locationSpecificOffsetDetails,
+    details =>
+      details?.some(
+        detail => detail.locationDetails.hardCodedOffsetId != null
+      ) ?? false
+  )
+
+// TODO(jh, 03-15-24): Ensure we don't count hardcoded offsets as missing!
 // Returns the offset details for missing offsets, keyed by the labware URI.
 // Note: only offsets persisted on the robot-server are "not missing".
 export const selectMissingOffsets = (
@@ -243,6 +276,8 @@ export interface SelectOffsetsToApplyResult {
   toUpdate: StoredLabwareOffsetCreate[]
   toDelete: string[] // existing offset ids
 }
+
+// TOME TODO: Update this naming to save, not apply.
 
 // Get all the offset data that requires server-side updating.
 export const selectOffsetsToApply = (

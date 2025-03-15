@@ -51,9 +51,11 @@ export interface LabwareLocationInfo {
   closestBeneathModuleModel?: ModuleModel
   // The id of the closest adapter that resides beneath the top-most labware, if any.
   closestBeneathAdapterId?: string
+  // The offset id associated with labware.set_offset(), if any.
+  hardCodedOffsetId?: string | null
 }
 
-export type LPCOffsetKind = 'default' | 'location-specific' | 'hardcoded'
+export type LPCOffsetKind = 'default' | 'location-specific'
 
 interface BaseOffsetLocationDetails extends LabwareLocationInfo {
   kind: LPCOffsetKind
@@ -68,6 +70,7 @@ export interface DefaultOffsetLocationDetails
   slotName: 'C2'
   kind: 'default'
   lwOffsetLocSeq: typeof ANY_LOCATION
+  hardCodedOffsetId?: undefined
 }
 
 export interface LocationSpecificOffsetLocationDetails
@@ -75,6 +78,7 @@ export interface LocationSpecificOffsetLocationDetails
   slotName: string
   kind: 'location-specific'
   lwOffsetLocSeq: LabwareOffsetLocationSequence
+  hardCodedOffsetId: string | null
 }
 
 export interface LocationSpecificOffsetDetails extends BaseOffsetDetails {

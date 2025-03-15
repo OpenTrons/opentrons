@@ -15,6 +15,7 @@ import { DefaultLocationOffset } from './DefaultLocationOffset'
 import {
   applyWorkingOffsets,
   goBackEditOffsetSubstep,
+  selectIsAnyOffsetHardCoded,
   selectIsDefaultOffsetAbsent,
   selectSelectedLwDisplayName,
   selectSelectedLwOverview,
@@ -101,21 +102,53 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
 
 function LPCLabwareDetailsContent(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
+  const { runId } = props
 
-  const selectedLwInfo = useSelector(selectSelectedLwOverview(props.runId))
-  const isMissingDefaultOffset = useSelector(
-    selectIsDefaultOffsetAbsent(props.runId, selectedLwInfo?.uri ?? '')
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
+  const isOnDevice = useSelector(getIsOnDevice)
+  const uri = selectedLwInfo?.uri ?? ''
+  const isDefaultOffsetAbsent = useSelector(
+    selectIsDefaultOffsetAbsent(runId, uri)
+  )
+  const isAnyOffsetHardCoded = useSelector(
+    selectIsAnyOffsetHardCoded(runId, uri)
   )
 
-  // TODO(jh, 03-06-25): Add the "hardcoded" inline notification once hardcoded offsets
-  //  are supported.
+  const [showDefaultBanner, setShowDefaultBanner] = useState(
+    isDefaultOffsetAbsent
+  )
+  const [showHardCodedBanner, setShowHardCodedBanner] = useState(
+    isAnyOffsetHardCoded
+  )
+
   return (
     <Flex css={LIST_CONTAINER_STYLE}>
-      {isMissingDefaultOffset && (
+      {showDefaultBanner && (
         <InlineNotification
           type="alert"
           heading={t('add_a_default_offset')}
           message={t('specific_slots_can_be_adjusted')}
+          onCloseClick={
+            isOnDevice
+              ? undefined
+              : () => {
+                  setShowDefaultBanner(false)
+                }
+          }
+        />
+      )}
+      {showHardCodedBanner && (
+        <InlineNotification
+          type="neutral"
+          heading={t('changing_default_not_update_hardcoded')}
+          message={t('hardcoded_offsets_changed_in_python')}
+          onCloseClick={
+            isOnDevice
+              ? undefined
+              : () => {
+                  setShowHardCodedBanner(false)
+                }
+          }
         />
       )}
       <DefaultLocationOffset {...props} />

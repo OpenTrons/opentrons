@@ -86,8 +86,9 @@ function useFlexLPCLabwareInfo({
     () =>
       getLPCLabwareInfoFrom({
         currentOffsets: storedOffsets,
-        lwLocationCombos,
+        lwLocInfo: lwLocationCombos,
         labwareDefs,
+        protocolData,
       }),
     [
       JSON.stringify(storedOffsets),

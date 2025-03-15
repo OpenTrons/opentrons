@@ -14,7 +14,7 @@ import { getIsOnDevice } from '/app/redux/config'
 import {
   selectAllLabwareInfo,
   selectIsDefaultOffsetAbsent,
-  selectCountLocationSpecificOffsetsForLw,
+  selectCountNonHardcodedLocationSpecificOffsetsForLw,
   selectStepInfo,
   setSelectedLabwareUri,
   selectIsDefaultOffsetMissing,
@@ -121,7 +121,7 @@ describe('LPCLabwareList', () => {
     )
 
     vi.mocked(
-      selectCountLocationSpecificOffsetsForLw
+      selectCountNonHardcodedLocationSpecificOffsetsForLw
     ).mockImplementation((runId: string, uri: string) => (state: any) =>
       uri === 'labware-uri-2' ? 2 : 1
     )
@@ -166,7 +166,7 @@ describe('LPCLabwareList', () => {
       selectIsDefaultOffsetMissing
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
     vi.mocked(
-      selectCountLocationSpecificOffsetsForLw
+      selectCountNonHardcodedLocationSpecificOffsetsForLw
     ).mockImplementation((runId: any, uri: any) => (state: any) => 1)
 
     render(props)
@@ -203,7 +203,7 @@ describe('LPCLabwareList', () => {
       selectIsDefaultOffsetMissing
     ).mockImplementation((runId: any, uri: any) => (state: any) => true)
     vi.mocked(
-      selectCountLocationSpecificOffsetsForLw
+      selectCountNonHardcodedLocationSpecificOffsetsForLw
     ).mockImplementation((runId: any, uri: any) => (state: any) => 3)
 
     render(props)
