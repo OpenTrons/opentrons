@@ -53,14 +53,12 @@ export function ProtocolStartingDeck({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={COLORS.grey10}
-      // could remove this gridGap
       gridGap={SPACING.spacing24}
       padding={
         zoomIn.slot != null ? '0' : `${SPACING.spacing60} ${SPACING.spacing40}`
       }
       height="100%"
       width="100%"
-      id="top-part"
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
