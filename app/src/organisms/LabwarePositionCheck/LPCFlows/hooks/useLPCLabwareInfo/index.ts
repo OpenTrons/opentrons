@@ -2,17 +2,18 @@ import { useMemo } from 'react'
 
 import { useSearchLabwareOffsets } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { getUniqueValidLwLocationInfoByAnalysis } from './getUniqueValidLwLocationInfoByAnalysis'
 import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
 import { getLPCSearchParams } from './getLPCSearchParams'
-import { useNotifyRunQuery } from '/app/resources/runs'
+import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+import { useTrackEvent } from '/app/redux/analytics'
 
 import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueValidLwLocationInfoByAnalysis'
-import { useTrackEvent } from '/app/redux/analytics'
 
 const REFETCH_OFFSET_SEARCH_MS = 5000
 
@@ -49,6 +50,7 @@ function useFlexLPCLabwareInfo({
   'labwareInfo' | 'storedOffsets'
 > {
   const trackEvent = useTrackEvent()
+  const runStatus = useRunStatus(runId)
 
   const lwLocationCombos = useMemo(
     () =>
@@ -73,7 +75,9 @@ function useFlexLPCLabwareInfo({
   // offsets on a different app while a view utilizing this data is active.
   const { data } = useSearchLabwareOffsets(searchLwOffsetsParams, {
     enabled:
-      searchLwOffsetsParams.filters.length > 0 && robotType === FLEX_ROBOT_TYPE,
+      searchLwOffsetsParams.filters.length > 0 &&
+      robotType === FLEX_ROBOT_TYPE &&
+      runStatus === RUN_STATUS_IDLE,
     refetchInterval: REFETCH_OFFSET_SEARCH_MS,
   })
   const storedOffsets = data?.data ?? []
