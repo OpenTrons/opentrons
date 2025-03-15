@@ -459,6 +459,7 @@ async def test_store(
                     possibleCutoutFixtureIds=["flexStackerModuleV1"],
                 ),
             ],
+            primaryLabwareURI="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
         ),
         state_update=StateUpdate(
             batch_labware_location=BatchLabwareLocationUpdate(
