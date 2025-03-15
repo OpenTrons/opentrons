@@ -8,10 +8,7 @@ import {
   INFO_TOAST,
   useOnClickOutside,
 } from '@opentrons/components'
-import {
-  selectDropdownItem,
-  selectTerminalItem,
-} from '../../ui/steps/actions/actions'
+import { selectTerminalItem } from '../../ui/steps/actions/actions'
 import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
@@ -19,7 +16,6 @@ import {
   DefineLiquidsModal,
   DesignerNavigation,
 } from '../../components/organisms'
-import { selectDesignerTab } from '../../file-data/actions'
 import { getDesignerTab, getFileMetadata } from '../../file-data/selectors'
 import { selectors } from '../../labware-ingred/selectors'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
@@ -36,7 +32,7 @@ export interface OpenSlot {
 
 export function Designer(): JSX.Element {
   const { t } = useTranslation(['starting_deck_state', 'protocol_steps'])
-  const { bakeToast, makeSnackbar } = useKitchen()
+  const { bakeToast } = useKitchen()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const fileMetadata = useSelector(getFileMetadata)
@@ -52,31 +48,6 @@ export function Designer(): JSX.Element {
   const hasTrashEntity = Object.values(additionalEquipmentOnDeck).some(
     ae => ae.name === 'trashBin' || ae.name === 'wasteChute'
   )
-
-  const startingDeckTab = {
-    text: t('protocol_starting_deck'),
-    isActive: tab === 'startingDeck',
-    onClick: () => {
-      dispatch(selectDesignerTab({ tab: 'startingDeck' }))
-      dispatch(
-        selectDropdownItem({
-          selection: null,
-          mode: 'clear',
-        })
-      )
-    },
-  }
-  const protocolStepTab = {
-    text: t('protocol_steps:protocol_steps'),
-    isActive: tab === 'protocolSteps',
-    onClick: () => {
-      if (hasTrashEntity) {
-        dispatch(selectDesignerTab({ tab: 'protocolSteps' }))
-      } else {
-        makeSnackbar(t('trash_required') as string)
-      }
-    },
-  }
 
   const hasHardware =
     (modules != null && Object.values(modules).length > 0) ||
@@ -144,7 +115,6 @@ export function Designer(): JSX.Element {
           hasZoomInSlot={zoomIn.slot != null || zoomIn.cutout != null}
           hasTrashEntity={hasTrashEntity}
           showLiquidOverflowMenu={showLiquidOverflowMenu}
-          tabs={[startingDeckTab, protocolStepTab]}
         />
 
         {tab === 'startingDeck' ? (
