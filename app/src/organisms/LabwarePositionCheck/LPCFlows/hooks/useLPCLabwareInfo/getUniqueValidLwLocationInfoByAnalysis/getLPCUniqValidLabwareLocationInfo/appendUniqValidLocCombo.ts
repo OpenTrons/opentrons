@@ -15,7 +15,12 @@ export function appendUniqValidLocCombo(
   if (combo == null) {
     return acc
   } else {
-    const isUniqueCombo = !acc.some(accCombo => isEqual(accCombo, combo))
+    const isUniqueCombo = !acc.some(accCombo => {
+      const { labwareId, ...comboNoLwId } = combo
+      const { labwareId: accLwId, ...accComboNoLwId } = accCombo
+
+      return isEqual(accComboNoLwId, comboNoLwId)
+    })
     const isValidCombo = isValidLocCombo(lwDefs, combo)
 
     return isUniqueCombo && isValidCombo ? [...acc, combo] : acc
