@@ -33,8 +33,6 @@ type UpdateOffsetsAction =
   | ResetPositionAction
   | ClearSelectedLabwareWorkingOffsetsAction
 
-// TOME TODO: We have to apply offsets in the store.
-
 // Handle vector position updates, only updating the appropriate working/existing offsets.
 export function updateOffsetsForURI(
   state: LPCWizardState,

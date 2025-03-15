@@ -51,9 +51,6 @@ interface LwAndAdapterIdAndUri {
   adapter?: LwIdAndUri
 }
 
-// TOME TODO: Ask about how this command works. I THINK you only care about the
-//  primary sequence.
-
 // Returns the labware id and uri for the retrieved labware and adapter, if present.
 function getFlexStackerRetrieveLwAndAdapterInfo(
   command: FlexStackerRetrieveRunTimeCommand

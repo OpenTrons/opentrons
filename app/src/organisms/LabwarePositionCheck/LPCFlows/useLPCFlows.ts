@@ -16,15 +16,6 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useLPCLabwareInfo } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks'
 import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
 
-// TOME TODO: Definitely test OT-2 flows before merging!
-
-// TOME TODO: For posting offsets,
-//  I think the current hook that's used in the legacy LPC flows works. You can always
-//  post the list of offsets at run start. You do NOT and should NOT create runs with offsets now.
-//  Always post them at run start, and have a selector to check whether LPC offsets have
-// been confirmed, etc. You may want to do this in another PR after you do all the actual entry
-//  point stuff.
-
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   LegacySupportLPCFlowsProps,
