@@ -93,6 +93,7 @@ describe('LabwareLocationItem', () => {
         locationDetails: {
           ...mockLocationSpecificOffsetDetails[0].locationDetails,
           closestBeneathModuleModel: undefined,
+          hardCodedOffsetId: null,
         },
       },
       slotCopy: 'C1',
@@ -191,5 +192,37 @@ describe('LabwareLocationItem', () => {
     const multiDeckBtnsProps = MultiDeckLabelTagBtnsMock.mock.calls[0][0]
 
     expect(multiDeckBtnsProps.colOneDeckInfoLabels).toHaveLength(2)
+  })
+
+  it('disables the edit offset buttons when the offset is hardcoded', () => {
+    props = {
+      ...props,
+      locationSpecificOffsetDetails: {
+        ...props.locationSpecificOffsetDetails,
+        locationDetails: {
+          ...props.locationSpecificOffsetDetails.locationDetails,
+          hardCodedOffsetId: '123',
+        },
+      },
+    }
+
+    render(props)
+
+    const multiDeckBtnsProps = MultiDeckLabelTagBtnsMock.mock.calls[0][0]
+
+    expect(multiDeckBtnsProps.colThreePrimaryBtn).toEqual(
+      expect.objectContaining({
+        buttonText: 'Adjust',
+        buttonType: 'secondary',
+        disabled: true,
+      })
+    )
+    expect(multiDeckBtnsProps.colThreeSecondaryBtn).toEqual(
+      expect.objectContaining({
+        buttonText: 'Reset to default',
+        buttonType: 'tertiaryHighLight',
+        disabled: true,
+      })
+    )
   })
 })

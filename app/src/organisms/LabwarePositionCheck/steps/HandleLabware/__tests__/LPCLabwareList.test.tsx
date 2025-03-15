@@ -46,6 +46,7 @@ vi.mock('/app/redux/protocol-runs', () => ({
   selectStepInfo: vi.fn(),
   setSelectedLabwareUri: vi.fn(),
   proceedEditOffsetSubstep: vi.fn(),
+  selectCountNonHardcodedLocationSpecificOffsetsForLw: vi.fn(),
 }))
 
 const render = (props: ComponentProps<typeof LPCLabwareList>) => {

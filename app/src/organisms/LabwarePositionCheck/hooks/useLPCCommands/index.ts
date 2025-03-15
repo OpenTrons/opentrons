@@ -48,6 +48,8 @@ export type UseLPCCommandsResult = UseApplyLPCOffsetsResult &
     home: () => Promise<void>
   }
 
+// TODO(jh, 03-14-25): Add testing here!
+
 // Consolidates all command handlers and handler state for injection into LPC.
 export function useLPCCommands(
   props: UseLPCCommandsProps

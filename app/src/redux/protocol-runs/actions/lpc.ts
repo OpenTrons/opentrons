@@ -34,7 +34,7 @@ import type {
   ResetLocationSpecificOffsetToDefaultAction,
   ClearSelectedLabwareWorkingOffsetsAction,
 } from '../types'
-import { StoredLabwareOffset } from '@opentrons/api-client'
+import type { StoredLabwareOffset } from '@opentrons/api-client'
 
 export const proceedStep = (
   runId: string,

@@ -261,7 +261,7 @@ export const selectIsAnyOffsetHardCoded = (
       ) ?? false
   )
 
-// TODO(jh, 03-15-24): Ensure we don't count hardcoded offsets as missing!
+// TODO(jh, 03-14-24): Ensure we don't count hardcoded offsets as missing!
 // Returns the offset details for missing offsets, keyed by the labware URI.
 // Note: only offsets persisted on the robot-server are "not missing".
 export const selectMissingOffsets = (

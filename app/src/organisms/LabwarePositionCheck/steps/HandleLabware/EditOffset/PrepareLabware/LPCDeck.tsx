@@ -29,6 +29,9 @@ import type {
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
+// TODO(jh, 03-14-25): Current designs/behavior do not include rendering the
+//  adapter beneath the labware if present, but let's add this!
+
 /** On the LPC deck, the only visible labware should be the labware with an actively edited offset.
  * Modules are always visible if they are not in the actively utilized deck slot.
  * If modules are in the actively utilized deck slot:

@@ -16,6 +16,10 @@ export const mockDefaultOffsetDetails: DefaultOffsetDetails = {
     slotName: 'C2',
     labwareId: 'labware-1',
     definitionUri: 'def-uri-1',
+    lwOffsetLocSeq: 'anyLocation',
+    lwModOnlyStackupDetails: [
+      { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+    ],
   },
 }
 
@@ -23,6 +27,7 @@ export const mockDefaultOffsetDetailsWithOffset: DefaultOffsetDetails = {
   existingOffset: {
     createdAt: '2025-03-01T12:00:00Z',
     vector: { x: 0.1, y: 0.2, z: 0.3 },
+    id: '123',
   },
   workingOffset: null,
   locationDetails: {
@@ -30,6 +35,10 @@ export const mockDefaultOffsetDetailsWithOffset: DefaultOffsetDetails = {
     slotName: 'C2',
     labwareId: 'labware-1',
     definitionUri: 'def-uri-1',
+    lwOffsetLocSeq: 'anyLocation',
+    lwModOnlyStackupDetails: [
+      { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+    ],
   },
 }
 
@@ -38,6 +47,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
     existingOffset: {
       createdAt: '2025-03-01T12:00:00Z',
       vector: { x: 0.1, y: 0.2, z: 0.3 },
+      id: '123',
     },
     workingOffset: null,
     locationDetails: {
@@ -45,6 +55,16 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
       slotName: 'C1',
       labwareId: 'labware-1',
       definitionUri: 'def-uri-1',
+      hardCodedOffsetId: null,
+      lwOffsetLocSeq: [
+        {
+          kind: 'onAddressableArea',
+          addressableAreaName: 'C1',
+        },
+      ],
+      lwModOnlyStackupDetails: [
+        { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+      ],
     },
   },
   {
@@ -55,12 +75,23 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
       slotName: 'A2',
       labwareId: 'labware-1',
       definitionUri: 'def-uri-1',
+      hardCodedOffsetId: null,
+      lwOffsetLocSeq: [
+        {
+          kind: 'onAddressableArea',
+          addressableAreaName: 'A2',
+        },
+      ],
+      lwModOnlyStackupDetails: [
+        { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+      ],
     },
   },
   {
     existingOffset: {
       createdAt: '2025-03-01T12:00:00Z',
       vector: { x: 0.4, y: 0.5, z: 0.6 },
+      id: '123',
     },
     workingOffset: null,
     locationDetails: {
@@ -69,6 +100,16 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
       closestBeneathModuleId: 'module-1',
       labwareId: 'labware-2',
       definitionUri: 'def-uri-2',
+      hardCodedOffsetId: null,
+      lwOffsetLocSeq: [
+        {
+          kind: 'onAddressableArea',
+          addressableAreaName: 'B3',
+        },
+      ],
+      lwModOnlyStackupDetails: [
+        { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+      ],
     },
   },
 ]

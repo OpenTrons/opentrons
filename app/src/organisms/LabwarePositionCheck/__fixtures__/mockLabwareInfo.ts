@@ -12,6 +12,10 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
         slotName: 'C2',
         labwareId: 'labware-1',
         definitionUri: 'def-uri-1',
+        lwOffsetLocSeq: 'anyLocation',
+        lwModOnlyStackupDetails: [
+          { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+        ],
       },
     },
     locationSpecificOffsetDetails: [],
@@ -23,6 +27,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
       existingOffset: {
         createdAt: '2025-03-01T12:00:00Z',
         vector: { x: 0.1, y: 0.2, z: 0.3 },
+        id: '123',
       },
       workingOffset: null,
       locationDetails: {
@@ -30,6 +35,10 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
         slotName: 'C2',
         labwareId: 'labware-2',
         definitionUri: 'def-uri-2',
+        lwOffsetLocSeq: 'anyLocation',
+        lwModOnlyStackupDetails: [
+          { kind: 'onLabware', labwareUri: 'def-uri-2', id: '123' },
+        ],
       },
     },
     locationSpecificOffsetDetails: [
@@ -37,13 +46,24 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
         existingOffset: {
           createdAt: '2025-03-01T12:00:00Z',
           vector: { x: 0.1, y: 0.2, z: 0.3 },
+          id: '123',
         },
         workingOffset: null,
         locationDetails: {
           kind: 'location-specific',
+          hardCodedOffsetId: null,
           slotName: 'A1',
           labwareId: 'labware-2',
           definitionUri: 'def-uri-2',
+          lwOffsetLocSeq: [
+            {
+              kind: 'onAddressableArea',
+              addressableAreaName: 'C2',
+            },
+          ],
+          lwModOnlyStackupDetails: [
+            { kind: 'onLabware', labwareUri: 'def-uri-2', id: '123' },
+          ],
         },
       },
       {
@@ -54,6 +74,17 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
           slotName: 'B2',
           labwareId: 'labware-2',
           definitionUri: 'def-uri-2',
+          lwOffsetLocSeq: [
+            {
+              kind: 'onAddressableArea',
+              addressableAreaName: 'C1',
+            },
+          ],
+
+          hardCodedOffsetId: null,
+          lwModOnlyStackupDetails: [
+            { kind: 'onLabware', labwareUri: 'def-uri-2', id: 'labware-2' },
+          ],
         },
       },
     ],

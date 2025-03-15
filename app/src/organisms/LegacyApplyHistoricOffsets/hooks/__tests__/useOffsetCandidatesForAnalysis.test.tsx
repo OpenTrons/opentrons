@@ -17,7 +17,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
 vi.mock('../useAllHistoricOffsets')
-vi.mock('../getLabwareLocationCombos')
+vi.mock('../getLegacyLabwareLocationCombos')
 vi.mock('@opentrons/shared-data')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/useNotifyDataReady')
