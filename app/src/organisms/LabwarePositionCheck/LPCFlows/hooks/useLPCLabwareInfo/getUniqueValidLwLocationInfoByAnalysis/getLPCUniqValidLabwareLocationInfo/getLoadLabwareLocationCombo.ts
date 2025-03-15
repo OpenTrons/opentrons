@@ -4,9 +4,9 @@ import {
   getClosestBeneathModuleId,
   getClosestBeneathModuleModel,
   getLwModOnlyLocSeqWithIds,
-  getLwOffsetLocSeqFrom,
   getSlotNameFrom,
 } from './helpers'
+import { getLwOffsetLocSeqFrom } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useLPCLabwareInfo/utils'
 
 import type {
   LoadLabwareRunTimeCommand,

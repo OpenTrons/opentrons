@@ -4,9 +4,9 @@ import {
   getClosestBeneathModuleModel,
   getLabwareDefURIFrom,
   getLwModOnlyLocSeqWithIds,
-  getLwOffsetLocSeqFrom,
   getSlotNameFrom,
 } from './helpers'
+import { getLwOffsetLocSeqFrom } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useLPCLabwareInfo/utils'
 
 import type {
   LoadedLabware,
