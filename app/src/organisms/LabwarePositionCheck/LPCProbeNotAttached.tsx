@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -13,6 +14,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { getIsOnDevice } from '/app/redux/config'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
@@ -21,8 +23,7 @@ export function LPCProbeNotAttached(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const { commandUtils } = props
   const { headerCommands } = commandUtils
-
-  // TOME TODO: This is broken on desktop!
+  const isOnDevice = useSelector(getIsOnDevice)
 
   return (
     <LPCContentContainer
@@ -36,7 +37,7 @@ export function LPCProbeNotAttached(props: LPCWizardContentProps): JSX.Element {
         buttonType: 'tertiaryLowLight',
         onClick: headerCommands.handleNavToDetachProbe,
       }}
-      contentStyle={CHILDREN_CONTAINER_STYLE}
+      contentStyle={isOnDevice ? CHILDREN_CONTAINER_STYLE : undefined}
     >
       <Flex css={CONTAINER_STYLE}>
         <Icon name="alert-circle" css={ICON_STYLE} color={COLORS.red50} />
