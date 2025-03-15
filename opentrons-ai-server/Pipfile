@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-openai = "==1.25.1"
+openai = "*"
 python-dotenv = "==1.0.1"
 httpx = "==0.27.0"
 llama-index = "==0.10.51"
@@ -20,8 +20,8 @@ asgi-correlation-id = "==4.3.3"
 gspread = "==6.1.4"
 google-auth = "==2.36.0"
 google-auth-oauthlib = "==1.2.1"
-anthropic = "0.40.0"
-weave = "0.51.22"
+anthropic = "==0.49.0"
+weave = "*"
 
 [dev-packages]
 docker = "==7.1.0"
