@@ -13,8 +13,8 @@ import {
 } from '/app/resources/runs'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useLPCLabwareInfo } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks'
 import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+import { useLPCLabwareInfo, useInitLPCStore } from './hooks'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
@@ -73,6 +73,17 @@ export function useLPCFlows({
     protocolData: mostRecentAnalysis,
     robotType,
     runId,
+  })
+
+  useInitLPCStore({
+    runId,
+    mostRecentAnalysis,
+    protocolName,
+    maintenanceRunId,
+    labwareDefs,
+    labwareInfo,
+    deckConfig,
+    robotType,
   })
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
