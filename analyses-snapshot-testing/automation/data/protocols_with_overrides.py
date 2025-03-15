@@ -107,3 +107,52 @@ class ProtocolsWithOverrides:
             "drop_tip_with_location",
         ],
     )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid.py
+    Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+        ],
+    )
+
+    # Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid.py
+    Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+        ],
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid.py
+
+    Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+        ],
+    )
