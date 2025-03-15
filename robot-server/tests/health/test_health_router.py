@@ -1,4 +1,5 @@
 """Tests for the /health router."""
+
 import pytest
 from typing import Dict, Iterator
 from mock import MagicMock, patch
@@ -32,8 +33,8 @@ def test_get_health(
             "/logs/update_server.log",
         ],
         "system_version": "mytestsystemversion",
-        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION),
-        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION),
+        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION[:2]),
+        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION[:2]),
         "robot_model": "OT-2 Standard",
         "links": {
             "apiLog": "/logs/api.log",
@@ -75,8 +76,8 @@ def test_get_health_with_none_version(
             "/logs/update_server.log",
         ],
         "system_version": "mytestsystemversion",
-        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION),
-        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION),
+        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION[:2]),
+        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION[:2]),
         "robot_model": "OT-2 Standard",
         "links": {
             "apiLog": "/logs/api.log",

@@ -1,4 +1,5 @@
 """ProtocolContext factory."""
+
 import asyncio
 from typing import Any, Dict, Optional, Union, cast
 
@@ -83,7 +84,7 @@ def create_protocol_context(
     Returns:
         A ready-to-use ProtocolContext.
     """
-    if api_version > MAX_SUPPORTED_VERSION:
+    if api_version > MAX_SUPPORTED_VERSION and not api_version.experimental:
         raise ValueError(
             f"API version {api_version} is not supported by this robot software."
             f" Please reduce your API version to {MAX_SUPPORTED_VERSION} or below"

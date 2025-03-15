@@ -1,4 +1,5 @@
-""" Utility functions and classes for the protocol api """
+"""Utility functions and classes for the protocol api"""
+
 from __future__ import annotations
 
 from collections import UserDict
@@ -18,7 +19,10 @@ from typing import (
     cast,
     KeysView,
     ItemsView,
+    overload,
 )
+
+from typing_extensions import Literal
 
 from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
@@ -303,7 +307,6 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
         return checked_key
 
     def __setitem__(self, key: object, value: object) -> None:
-
         checked_key = AxisMaxSpeeds._verify_key(key)
         if value is None:
             del self[checked_key]
@@ -353,13 +356,32 @@ def clamp_value(
 FuncT = TypeVar("FuncT", bound=Callable[..., Any])
 
 
+@overload
+def requires_version(
+    major: Literal["experimental"],
+) -> Callable[[FuncT], FuncT]:
+    ...
+
+
+@overload
 def requires_version(major: int, minor: int) -> Callable[[FuncT], FuncT]:
+    ...
+
+
+def requires_version(
+    major: int | Literal["experimental"], minor: int | None = None
+) -> Callable[[FuncT], FuncT]:
     """Decorator. Apply to Protocol API methods or attributes to indicate
     the first version in which the method or attribute was present.
     """
 
     def _set_version(decorated_obj: FuncT) -> FuncT:
-        added_version = APIVersion(major, minor)
+        if major == "experimental":
+            added_version = APIVersion.as_experimental()
+        else:
+            assert major is not None
+            assert minor is not None
+            added_version = APIVersion(major, minor, False)
         setattr(decorated_obj, "__opentrons_version_added", added_version)
         if hasattr(decorated_obj, "__doc__"):
             # Add the versionadded stanza to everything decorated if we can

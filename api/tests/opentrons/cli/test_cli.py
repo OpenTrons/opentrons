@@ -1,6 +1,5 @@
 """Test cli execution."""
 
-
 import json
 import tempfile
 import textwrap
@@ -128,6 +127,12 @@ def _get_deck_definition_test_source(api_level: str, robot_type: str) -> str:
             "OT-3",
             "(227.88, 42.785, 44.04)",
             marks=pytest.mark.ot3_only,  # Analyzing an OT-3 protocol requires an OT-3 hardware API.
+        ),
+        pytest.param(
+            "experimental",
+            "Flex",
+            "(227.88, 42.785, 44.04)",
+            marks=pytest.mark.ot3_only,
         ),
     ],
 )
