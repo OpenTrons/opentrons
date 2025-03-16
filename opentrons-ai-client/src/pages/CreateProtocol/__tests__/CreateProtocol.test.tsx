@@ -222,8 +222,8 @@ describe('CreateProtocol', () => {
 
     const previewItems = screen.getAllByTestId('Tag_default')
 
-    expect(previewItems).toHaveLength(10)
-    expect(previewItems[9]).toHaveTextContent('Test step')
+    expect(previewItems).toHaveLength(9)
+    expect(previewItems[8]).toHaveTextContent('Test step')
 
     expect(screen.getByRole('button', { name: 'Submit prompt' })).toBeEnabled()
   })
@@ -246,8 +246,8 @@ describe('CreateProtocol', () => {
 
     const previewItems = screen.getAllByTestId('Tag_default')
 
-    expect(previewItems).toHaveLength(10)
-    expect(previewItems[9]).toHaveTextContent('Test step')
+    expect(previewItems).toHaveLength(9)
+    expect(previewItems[8]).toHaveTextContent('Test step')
 
     const submitPromptButton = screen.getByRole('button', {
       name: 'Submit prompt',

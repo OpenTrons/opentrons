@@ -117,7 +117,7 @@ class AnthropicPredict:
             }
         ]
 
-        response = self.client.messages.create(
+        response = self.client.messages.create(  # type: ignore[call-overload]
             max_tokens=2048,
             temperature=0.0,
             messages=msg,
@@ -127,7 +127,7 @@ class AnthropicPredict:
             """,
             metadata={"user_id": user_id},
         )
-        return response.content[0].text
+        return response.content[0].text  # type: ignore[no-any-return]
 
     @tracer.wrap()
     def _process_message(
@@ -138,12 +138,12 @@ class AnthropicPredict:
         For now, system prompt is the same.
         """
 
-        response: Message = self.client.messages.create(
-            model=self.model_name,
-            system=self.system_prompt,
+        response: Message = self.client.messages.create(  # type: ignore[call-overload]
             max_tokens=max_tokens,
             messages=messages,
-            tools=self.tools,  # type: ignore
+            model=self.model_name,
+            system=self.system_prompt,
+            tools=self.tools,
             metadata={"user_id": user_id},
             temperature=0.0,
         )
@@ -179,7 +179,7 @@ class AnthropicPredict:
             if response.content[-1].type == "tool_use":
                 tool_use = response.content[-1]
                 messages.append({"role": "assistant", "content": response.content})
-                result = self.handle_tool_use(tool_use.name, tool_use.input)  # type: ignore
+                result = self.handle_tool_use(tool_use.name, tool_use.input)  # type: ignore[arg-type]
                 messages.append(
                     {
                         "role": "user",
@@ -193,9 +193,14 @@ class AnthropicPredict:
                     }
                 )
                 follow_up = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
-                return follow_up.content[0].text  # type: ignore
+                if follow_up.content and follow_up.content[0].type == "text":
+                    # Simply return the text directly
+                    return follow_up.content[0].text
+                logger.error("Unexpected follow-up response type")
+                return None
 
-            elif response.content[0].type == "text":
+            elif response.content and response.content[0].type == "text":
+                # Simply return the text directly
                 return response.content[0].text
 
             logger.error("Unexpected response type")
