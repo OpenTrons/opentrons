@@ -77,7 +77,7 @@ const StepTag = styled.div`
 `
 
 // Component to handle multiline steps
-const StepTagContent = ({ text }: { text: string }) => {
+const StepTagContent = ({ text }: { text: string }): JSX.Element => {
   // Split by newlines and display each line properly
   return (
     <StepTag>

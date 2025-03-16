@@ -274,4 +274,3 @@ const CodeWrapper = styled(Flex)`
   border-radius: ${BORDERS.borderRadius4};
   overflow: auto;
 `
-
