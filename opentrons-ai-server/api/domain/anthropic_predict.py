@@ -9,7 +9,7 @@ from anthropic import Anthropic
 from anthropic.types import Message, MessageParam
 from ddtrace import tracer
 
-from api.domain.config_anthropic import DOCUMENTS, PROMPT, SYSTEM_PROMPT, PROMPT_RELEVANT_API
+from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, SYSTEM_PROMPT
 from api.settings import Settings
 
 weave.init("OpentronsAI-Phase-2-1")
@@ -38,9 +38,7 @@ class AnthropicPredict:
         self.cached_api_docs: List[MessageParam] = [
             {
                 "role": "user",
-                "content": [
-                    {"type": "text", "text": self.get_api_docs(), "cache_control": {"type": "ephemeral"}}  # type: ignore
-                ],
+                "content": [{"type": "text", "text": self.get_api_docs(), "cache_control": {"type": "ephemeral"}}],  # type: ignore
             }
         ]
         self.tools: List[Dict[str, Any]] = [
@@ -97,32 +95,25 @@ class AnthropicPredict:
         with open(self.path_api_docs, "r") as f:
             v2_doc_content = f.read()
         return f"<python_v2_api_doc>\n{v2_doc_content}\n</python_v2_api_doc>"
-    
+
     @tracer.wrap()
     def get_relevant_api_docs(self, query: str, user_id: str) -> str:
         """
         Get relevant API docs based on the user's prompt
-        """        
+        """
         msg = [
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "document",
-                        "source": {
-                            "type": "text",
-                            "media_type": "text/plain",
-                            "data": self.get_api_docs()
-                        },
+                        "source": {"type": "text", "media_type": "text/plain", "data": self.get_api_docs()},
                         "title": "Python API V2 Documentation",
                         "context": "This is an Official Python API V2 Documentation for Opentrons robots.",
-                        "cache_control": {"type": "ephemeral"}
+                        "cache_control": {"type": "ephemeral"},
                     },
-                    {
-                        "type": "text",
-                        "text": PROMPT_RELEVANT_API.format(API_QUERY=query)
-                    }
-                ]
+                    {"type": "text", "text": PROMPT_RELEVANT_API.format(API_QUERY=query)},
+                ],
             }
         ]
 
@@ -135,7 +126,7 @@ class AnthropicPredict:
                 given in tags <python_v2_api_doc>.
             """,
             metadata={"user_id": user_id},
-        ) 
+        )
         return response.content[0].text
 
     @tracer.wrap()
@@ -177,7 +168,7 @@ class AnthropicPredict:
             messages: List[MessageParam] = self.cached_docs.copy()
             if history:
                 messages += history
-            
+
             if len(messages) == 1:
                 relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
                 prompt = f"{prompt}\n\n{relevant_api_docs}"

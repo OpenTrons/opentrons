@@ -103,7 +103,7 @@ Follow these instructions to handle the user's prompt:
 
 
    c) Generate the protocol using the following structure:
-      - apiLevel and robotType are required otherwise robot does not run. 
+      - apiLevel and robotType are required otherwise robot does not run.
       `source` and `author` are always "OpentronsAI".
 
       ```python
@@ -263,14 +263,14 @@ Here are the inputs you will work with:
 
 
 PROMPT_RELEVANT_API = """Your task is to collect relevant information from the Python API V2 Documentation for the user's query.
-User is going to append this information as context for the subsequent task. 
+User is going to append this information as context for the subsequent task.
 In general, whatever user requests, their intention is to write a protocol.
 Protocol is a collection of commands that are executed in a specific order in python.
 
 Here is a template for a protocol:
 
 ```template
-- imports (from opentrons import protocol_api)  
+- imports (from opentrons import protocol_api)
 - metadata
 - requirements
 - add parameters for `Runtime parameters`
@@ -288,11 +288,11 @@ Here's the user's query:
 </user_query>
 
 Instructions:
-- For the sake of generalization, get all the commands including runtime parameters, modules, labware, pipettes, 
+- For the sake of generalization, get all the commands including runtime parameters, modules, labware, pipettes,
    liquid definitions etc.
 - Find the key words in the query and for each key word find all related information.
 - Do not put order in rour response, it must be bullte points.
-- Do not add any other text in your response, only the information. 
+- Do not add any other text in your response, only the information.
 - Information must be coming from the Python API V2 Documentation in the form of chunks.
 - List all api methods that might be needed to answer the query with its parameters.
 - List modules-related methods with its parameters
@@ -300,7 +300,7 @@ Instructions:
 - List pipette related methods with its parameters
 - List all atomic methods and functions needed to answer the query with its parameters.
 - If there are examples, list them as well.
-- Assume all protocols are written with api level 2.22 or higher. This has a profound impact on the code. 
+- Assume all protocols are written with api level 2.22 or higher. This has a profound impact on the code.
    For example, "apiLevel" is not needed in `metadata` variable.
 
 Format your response:
@@ -319,7 +319,7 @@ Here's an example of how your response should be structured:
 [Add more files as needed]
 </relevant files>
 
-Remember to be thorough and precise in your response. Consider all relevant aspects of the query 
+Remember to be thorough and precise in your response. Consider all relevant aspects of the query
 and double-check your answer for completeness before finalizing it.
 
 Now, please analyze the user's query and provide your response following these guidelines.

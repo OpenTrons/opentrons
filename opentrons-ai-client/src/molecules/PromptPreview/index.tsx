@@ -78,10 +78,7 @@ export function PromptPreview({
               key={`section-${index}`}
               title={section.title}
               items={section.items}
-              itemMaxWidth={
-                index === 1 ? '50%' : 
-                index === 4 ? '100%' : '100%'
-              }
+              itemMaxWidth={index === 1 ? '50%' : index === 4 ? '100%' : '100%'}
               oneItemPerRow={index === 4}
             />
           )

@@ -104,14 +104,18 @@ export function generatePromptPreviewLabwareLiquidsItems(
   })
 
   // Only add liquids if there are any
-  if (liquids && liquids.length > 0 && liquids.some(liquid => liquid.trim() !== '')) {
+  if (
+    liquids &&
+    liquids.length > 0 &&
+    liquids.some(liquid => liquid.trim() !== '')
+  ) {
     // Add a special item that will force a line break by taking up 100% width
-    items.push('__LINE_BREAK__');
-    
+    items.push('__LINE_BREAK__')
+
     // Add all liquid items
     liquids.forEach(liquid => {
       if (liquid.trim() !== '') {
-        items.push(liquid);
+        items.push(liquid)
       }
     })
   }
@@ -126,83 +130,82 @@ export function generatePromptPreviewStepsItems(
   const { steps } = watch()
 
   if (steps === undefined || steps?.length === 0) return []
-  
+
   if (typeof steps === 'string') {
     // If string is empty, return empty array
     if (steps.trim() === '') return []
-    
+
     // Split the string by line
-    const lines = steps.split('\n');
-    const result: string[] = [];
-    let currentStep = '';
-    let isFirstLineInCurrentStep = true;
-    let lastLineWasNumberedStep = false;
-    
+    const lines = steps.split('\n')
+    const result: string[] = []
+    let currentStep = ''
+    let isFirstLineInCurrentStep = true
+    let lastLineWasNumberedStep = false
+
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      
+      const line = lines[i].trim()
+
       // Check if this line starts a new numbered step (like "1." or "2)")
-      const isNumberedStep = /^\d+[.)]/.test(line);
-      
+      const isNumberedStep = /^\d+[.)]/.test(line)
+
       // Check if this line is a bullet point
-      const isBulletPoint = /^[-*•]/.test(line);
-      
+      const isBulletPoint = /^[-*•]/.test(line)
+
       // A new step starts if:
       // 1. It's a numbered step OR
       // 2. It's a bullet point that's not immediately after a numbered step OR
       // 3. It's the first line
-      const isNewStepLine = (
-        isNumberedStep || 
+      const isNewStepLine =
+        isNumberedStep ||
         (isBulletPoint && !lastLineWasNumberedStep) ||
         (i === 0 && line !== '')
-      );
-      
+
       // Update tracking for whether the last line was a numbered step
       // This helps us keep dashed points with their parent numbered step
       if (isNumberedStep) {
-        lastLineWasNumberedStep = true;
+        lastLineWasNumberedStep = true
       } else if (!isBulletPoint) {
-        lastLineWasNumberedStep = false;
+        lastLineWasNumberedStep = false
       }
-      
+
       // If empty line and we have content, finalize current step
       if (line === '' && currentStep !== '') {
-        result.push(currentStep.trim());
-        currentStep = '';
-        isFirstLineInCurrentStep = true;
-        lastLineWasNumberedStep = false;
-        continue;
+        result.push(currentStep.trim())
+        currentStep = ''
+        isFirstLineInCurrentStep = true
+        lastLineWasNumberedStep = false
+        continue
       }
-      
+
       // Skip empty lines otherwise
-      if (line === '') continue;
-      
+      if (line === '') continue
+
       // Start a new step or add to current step
       if (isNewStepLine) {
         // If we already have content, push it as a completed step
         if (currentStep !== '') {
-          result.push(currentStep.trim());
+          result.push(currentStep.trim())
         }
-        currentStep = line;
-        isFirstLineInCurrentStep = false;
+        currentStep = line
+        isFirstLineInCurrentStep = false
       } else {
         // This is a continuation of the current step (created with Shift+Enter)
         // Add a line break to preserve formatting
         if (!isFirstLineInCurrentStep) {
-          currentStep += '\n' + line;
+          currentStep += '\n' + line
         } else {
-          currentStep += line;
-          isFirstLineInCurrentStep = false;
+          currentStep += line
+          isFirstLineInCurrentStep = false
         }
       }
     }
-    
+
     // Add the last step if there's content
     if (currentStep.trim() !== '') {
-      result.push(currentStep.trim());
+      result.push(currentStep.trim())
     }
-    
-    return result;
+
+    return result
   }
 
   return steps.filter(Boolean)

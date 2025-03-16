@@ -88,8 +88,8 @@ const StepTagContent = ({ text }: { text: string }) => {
         </React.Fragment>
       ))}
     </StepTag>
-  );
-};
+  )
+}
 
 export function PromptPreviewSection({
   title,
@@ -101,15 +101,15 @@ export function PromptPreviewSection({
     <PromptPreviewSectionContainer>
       <SectionHeading desktopStyle="bodyLargeSemiBold">{title}</SectionHeading>
       <TagsContainer oneItemPerRow={oneItemPerRow}>
-        {items.map(
-          (item: string, index: number) => {
-            // Handle the special line break item that separates labware from liquids
-            if (item === '__LINE_BREAK__') {
-              return <LineBreakWrapper key={`line-break-${index}`} />;
-            }
+        {items.map((item: string, index: number) => {
+          // Handle the special line break item that separates labware from liquids
+          if (item === '__LINE_BREAK__') {
+            return <LineBreakWrapper key={`line-break-${index}`} />
+          }
 
-            // Render regular items
-            return item.trim() !== '' && (
+          // Render regular items
+          return (
+            item.trim() !== '' && (
               <TagItemWrapper
                 data-testid={`item-tag-wrapper-${index}`}
                 key={`item-tag-${index}`}
@@ -122,8 +122,8 @@ export function PromptPreviewSection({
                 )}
               </TagItemWrapper>
             )
-          }
-        )}
+          )
+        })}
       </TagsContainer>
     </PromptPreviewSectionContainer>
   )

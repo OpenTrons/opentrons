@@ -237,7 +237,6 @@ export function ChatDisplay({ chat, chatId }: ChatDisplayProps): JSX.Element {
     </Flex>
   )
 }
-
 // Note (05/08/2024) the following styles are temp
 function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
   return <a {...props} target="_blank" rel="noopener noreferrer" />
@@ -275,3 +274,4 @@ const CodeWrapper = styled(Flex)`
   border-radius: ${BORDERS.borderRadius4};
   overflow: auto;
 `
+
