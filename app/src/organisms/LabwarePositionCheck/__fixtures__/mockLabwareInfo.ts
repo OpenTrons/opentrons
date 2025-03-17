@@ -14,7 +14,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
         definitionUri: 'def-uri-1',
         lwOffsetLocSeq: 'anyLocation',
         lwModOnlyStackupDetails: [
-          { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+          { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
         ],
       },
     },
@@ -37,7 +37,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
         definitionUri: 'def-uri-2',
         lwOffsetLocSeq: 'anyLocation',
         lwModOnlyStackupDetails: [
-          { kind: 'onLabware', labwareUri: 'def-uri-2', id: '123' },
+          { kind: 'labware', labwareUri: 'def-uri-2', id: '123' },
         ],
       },
     },
@@ -62,7 +62,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
             },
           ],
           lwModOnlyStackupDetails: [
-            { kind: 'onLabware', labwareUri: 'def-uri-2', id: '123' },
+            { kind: 'labware', labwareUri: 'def-uri-2', id: '123' },
           ],
         },
       },
@@ -83,7 +83,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
 
           hardCodedOffsetId: null,
           lwModOnlyStackupDetails: [
-            { kind: 'onLabware', labwareUri: 'def-uri-2', id: 'labware-2' },
+            { kind: 'labware', labwareUri: 'def-uri-2', id: 'labware-2' },
           ],
         },
       },

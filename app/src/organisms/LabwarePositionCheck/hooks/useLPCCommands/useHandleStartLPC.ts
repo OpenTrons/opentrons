@@ -25,15 +25,15 @@ export interface UseHandleStartLPCResult {
 
 export function useHandleStartLPC({
   chainLPCCommands,
-  mostRecentAnalysis,
+  analysis,
 }: UseLPCCommandWithChainRunChildProps): UseHandleStartLPCResult {
   const handleStartLPC = (
     pipette: LoadedPipette | null,
     onSuccess: () => void
   ): Promise<void> => {
     const startCommands: CreateCommand[] = [
-      ...buildInstrumentLabwarePrepCommands(mostRecentAnalysis),
-      ...moduleInitBeforeAnyLPCCommands(mostRecentAnalysis),
+      ...buildInstrumentLabwarePrepCommands(analysis),
+      ...moduleInitBeforeAnyLPCCommands(analysis),
       ...fullHomeCommands(),
       ...moveToMaintenancePosition(pipette),
     ]

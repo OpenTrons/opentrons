@@ -31,7 +31,7 @@ export interface UseHandleConfirmPlacementResult {
 
 export function useHandleConfirmLwModulePlacement({
   chainLPCCommands,
-  mostRecentAnalysis,
+  analysis,
   setErrorMessage,
 }: UseHandleConfirmPlacementProps): UseHandleConfirmPlacementResult {
   const handleConfirmLwModulePlacement = (
@@ -41,7 +41,7 @@ export function useHandleConfirmLwModulePlacement({
   ): Promise<Coordinates> => {
     const confirmCommands: CreateCommand[] = [
       ...buildMoveLabwareCommand(offsetLocationDetails),
-      ...moduleInitDuringLPCCommands(mostRecentAnalysis),
+      ...moduleInitDuringLPCCommands(analysis),
       ...moveToWellCommands(
         offsetLocationDetails,
         pipetteId,

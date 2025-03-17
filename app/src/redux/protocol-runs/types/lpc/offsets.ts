@@ -1,8 +1,6 @@
 import type {
   ANY_LOCATION,
   LabwareOffsetLocationSequence,
-  OnLabwareOffsetLocationSequenceComponent,
-  OnModuleOffsetLocationSequenceComponent,
   VectorOffset,
 } from '@opentrons/api-client'
 import type {

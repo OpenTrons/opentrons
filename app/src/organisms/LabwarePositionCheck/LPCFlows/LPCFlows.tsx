@@ -21,7 +21,7 @@ export interface LPCFlowsProps {
   deckConfig: DeckConfiguration
   labwareDefs: LabwareDefinition2[]
   labwareInfo: LPCLabwareInfo
-  mostRecentAnalysis: CompletedProtocolAnalysis
+  analysis: CompletedProtocolAnalysis
   protocolName: string
   maintenanceRunId: string
 }

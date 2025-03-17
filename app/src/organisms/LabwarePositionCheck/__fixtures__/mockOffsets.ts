@@ -18,7 +18,7 @@ export const mockDefaultOffsetDetails: DefaultOffsetDetails = {
     definitionUri: 'def-uri-1',
     lwOffsetLocSeq: 'anyLocation',
     lwModOnlyStackupDetails: [
-      { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+      { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
     ],
   },
 }
@@ -37,7 +37,7 @@ export const mockDefaultOffsetDetailsWithOffset: DefaultOffsetDetails = {
     definitionUri: 'def-uri-1',
     lwOffsetLocSeq: 'anyLocation',
     lwModOnlyStackupDetails: [
-      { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+      { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
     ],
   },
 }
@@ -63,7 +63,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
         },
       ],
       lwModOnlyStackupDetails: [
-        { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+        { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
       ],
     },
   },
@@ -83,7 +83,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
         },
       ],
       lwModOnlyStackupDetails: [
-        { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+        { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
       ],
     },
   },
@@ -108,7 +108,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
         },
       ],
       lwModOnlyStackupDetails: [
-        { kind: 'onLabware', labwareUri: 'def-uri-1', id: '123' },
+        { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
       ],
     },
   },

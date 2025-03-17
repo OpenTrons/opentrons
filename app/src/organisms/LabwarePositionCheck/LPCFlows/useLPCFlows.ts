@@ -21,6 +21,7 @@ import type {
   LegacySupportLPCFlowsProps,
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
+import { useCompatibleAnalysis } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useCompatibleAnalysis'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -56,13 +57,14 @@ export function useLPCFlows({
 
   const deckConfig = useNotifyDeckConfigurationQuery().data
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const compatibleAnalysis = useCompatibleAnalysis(runId, mostRecentAnalysis)
 
   const labwareDefs = useMemo(() => {
     const labwareDefsFromCommands = getLabwareDefinitionsFromCommands(
-      mostRecentAnalysis?.commands ?? []
+      compatibleAnalysis?.commands ?? []
     )
     return labwareDefsFromCommands
-  }, [mostRecentAnalysis?.commands.length])
+  }, [compatibleAnalysis?.commands.length])
 
   const {
     labwareInfo,
@@ -70,14 +72,14 @@ export function useLPCFlows({
     legacyOffsets: ot2Offsets,
   } = useLPCLabwareInfo({
     labwareDefs,
-    protocolData: mostRecentAnalysis,
+    protocolData: compatibleAnalysis,
     robotType,
     runId,
   })
 
   useInitLPCStore({
     runId,
-    mostRecentAnalysis,
+    analysis: compatibleAnalysis,
     protocolName,
     maintenanceRunId,
     labwareDefs,
@@ -143,7 +145,7 @@ export function useLPCFlows({
     hasCreatedLPCRun &&
     maintenanceRunId != null &&
     protocolName != null &&
-    mostRecentAnalysis != null &&
+    compatibleAnalysis != null &&
     deckConfig != null
 
   return showLPC
@@ -158,7 +160,7 @@ export function useLPCFlows({
           deckConfig,
           labwareDefs,
           labwareInfo,
-          mostRecentAnalysis,
+          analysis: compatibleAnalysis,
           protocolName,
           maintenanceRunId,
           runRecordExistingOffsets: ot2Offsets,

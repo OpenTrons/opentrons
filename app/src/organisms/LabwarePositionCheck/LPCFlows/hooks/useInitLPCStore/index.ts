@@ -16,7 +16,7 @@ import type {
 
 export interface UseLPCInitialStateProps {
   runId: string
-  mostRecentAnalysis: CompletedProtocolAnalysis | null
+  analysis: CompletedProtocolAnalysis | null
   protocolName: string | undefined
   maintenanceRunId: string | null
   labwareDefs: LabwareDefinition2[]
@@ -27,7 +27,7 @@ export interface UseLPCInitialStateProps {
 
 // Initialize the LPC store if store data is sufficiently present.
 export function useInitLPCStore({
-  mostRecentAnalysis,
+  analysis,
   runId,
   labwareDefs,
   protocolName,
@@ -38,15 +38,15 @@ export function useInitLPCStore({
   const dispatch = useDispatch()
 
   const isReadyToInit =
-    mostRecentAnalysis != null && protocolName != null && deckConfig != null
+    analysis != null && protocolName != null && deckConfig != null
 
   useEffect(() => {
     if (isReadyToInit && robotType === FLEX_ROBOT_TYPE) {
-      const activePipetteId = getActivePipetteId(mostRecentAnalysis.pipettes)
+      const activePipetteId = getActivePipetteId(analysis.pipettes)
 
       const initialState: LPCWizardState = {
         ...rest,
-        protocolData: mostRecentAnalysis,
+        protocolData: analysis,
         labwareDefs,
         activePipetteId,
         protocolName,
