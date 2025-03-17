@@ -14,7 +14,7 @@ export function getDefaultOffsetDetailsForLabware({
     lwLocInfo?.find(combo => combo.definitionUri === uri)?.labwareId ?? ''
 
   const existingOffset =
-    currentOffsets.find(
+    currentOffsets?.find(
       offset =>
         offset.locationSequence === ANY_LOCATION && offset.definitionUri === uri
     ) ?? null

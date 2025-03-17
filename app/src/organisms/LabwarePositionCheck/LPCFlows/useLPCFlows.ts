@@ -10,6 +10,7 @@ import {
 import {
   useCreateTargetedMaintenanceRunMutation,
   useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
 } from '/app/resources/runs'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
@@ -22,6 +23,7 @@ import type {
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
 import { useCompatibleAnalysis } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useCompatibleAnalysis'
+import { useClonedRunOffsetStaleTimestamp } from '/app/organisms/LabwarePositionCheck/LPCFlows/useClonedRunOffsetStaleTimestamp'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -55,9 +57,17 @@ export function useLPCFlows({
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
+  // TOME TODO: Check that offset requests don't happen if we are looking at a historical
+  // run. Also, what is the general behavior? Is manipulating offsets disabled.
+
   const deckConfig = useNotifyDeckConfigurationQuery().data
+  const { data: runRecord } = useNotifyRunQuery(runId)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const compatibleAnalysis = useCompatibleAnalysis(runId, mostRecentAnalysis)
+  const compatibleAnalysis = useCompatibleAnalysis(
+    runId,
+    runRecord,
+    mostRecentAnalysis
+  )
 
   const labwareDefs = useMemo(() => {
     const labwareDefsFromCommands = getLabwareDefinitionsFromCommands(
@@ -70,12 +80,18 @@ export function useLPCFlows({
     labwareInfo,
     storedOffsets: flexOffsets,
     legacyOffsets: ot2Offsets,
+    searchLwOffsetsParams: flexOffsetSearchParams,
   } = useLPCLabwareInfo({
     labwareDefs,
     protocolData: compatibleAnalysis,
     robotType,
     runId,
   })
+
+  const lastFreshOffsetRunTs = useClonedRunOffsetStaleTimestamp(
+    runRecord,
+    flexOffsetSearchParams
+  )
 
   useInitLPCStore({
     runId,
@@ -86,6 +102,7 @@ export function useLPCFlows({
     labwareInfo,
     deckConfig,
     robotType,
+    lastFreshOffsetRunTs,
   })
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
@@ -120,14 +137,20 @@ export function useLPCFlows({
     enabled: maintenanceRunId != null,
   })
 
+  // TOME TODO: Disable this button while waiting on flex offsets.
+
   const launchLPC = (): Promise<void> => {
     setIsLaunching(true)
 
-    return createTargetedMaintenanceRun({
-      labwareOffsets: getRelevantOffsets(robotType, ot2Offsets, flexOffsets),
-    }).then(maintenanceRun => {
-      setMaintenanceRunId(maintenanceRun.data.id)
-    })
+    if (flexOffsets != null) {
+      return createTargetedMaintenanceRun({
+        labwareOffsets: getRelevantOffsets(robotType, ot2Offsets, flexOffsets),
+      }).then(maintenanceRun => {
+        setMaintenanceRunId(maintenanceRun.data.id)
+      })
+    } else {
+      return Promise.resolve()
+    }
   }
 
   const handleCloseLPC = (): void => {

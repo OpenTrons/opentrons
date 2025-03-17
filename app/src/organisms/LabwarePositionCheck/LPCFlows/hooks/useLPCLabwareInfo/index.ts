@@ -9,7 +9,11 @@ import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
 import { getLPCSearchParams } from './getLPCSearchParams'
 import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 
-import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
+import type {
+  LabwareOffset,
+  StoredLabwareOffset,
+  SearchLabwareOffsetsData,
+} from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueValidLwLocationInfoByAnalysis'
@@ -23,8 +27,9 @@ export type UseLPCLabwareInfoProps = GetUniqueValidLwLocationInfoByAnalysisParam
 
 export interface UseLPCLabwareInfoResult {
   labwareInfo: LPCLabwareInfo
-  storedOffsets: StoredLabwareOffset[]
+  storedOffsets: StoredLabwareOffset[] | undefined
   legacyOffsets: LabwareOffset[]
+  searchLwOffsetsParams: SearchLabwareOffsetsData
 }
 
 // Prepare LPC-able labware info for injection into LPC flows, querying for
@@ -34,9 +39,13 @@ export function useLPCLabwareInfo(
   props: UseLPCLabwareInfoProps
 ): UseLPCLabwareInfoResult {
   const { legacyOffsets } = useOT2LPCLabwareInfo(props)
-  const { labwareInfo, storedOffsets } = useFlexLPCLabwareInfo(props)
+  const {
+    labwareInfo,
+    storedOffsets,
+    searchLwOffsetsParams,
+  } = useFlexLPCLabwareInfo(props)
 
-  return { storedOffsets, labwareInfo, legacyOffsets }
+  return { storedOffsets, labwareInfo, legacyOffsets, searchLwOffsetsParams }
 }
 
 function useFlexLPCLabwareInfo({
@@ -46,7 +55,7 @@ function useFlexLPCLabwareInfo({
   runId,
 }: UseLPCLabwareInfoProps): Pick<
   UseLPCLabwareInfoResult,
-  'labwareInfo' | 'storedOffsets'
+  'labwareInfo' | 'storedOffsets' | 'searchLwOffsetsParams'
 > {
   const runStatus = useRunStatus(runId)
 
@@ -70,14 +79,17 @@ function useFlexLPCLabwareInfo({
 
   // We have to poll, because it's possible for a user to update the
   // offsets on a different app while a view utilizing this data is active.
-  const { data } = useSearchLabwareOffsets(searchLwOffsetsParams, {
-    enabled:
-      searchLwOffsetsParams.filters.length > 0 &&
-      robotType === FLEX_ROBOT_TYPE &&
-      runStatus === RUN_STATUS_IDLE,
-    refetchInterval: REFETCH_OFFSET_SEARCH_MS,
-  })
-  const storedOffsets = data?.data ?? []
+  const { data: lwOffsetsData } = useSearchLabwareOffsets(
+    searchLwOffsetsParams,
+    {
+      enabled:
+        searchLwOffsetsParams.filters.length > 0 &&
+        robotType === FLEX_ROBOT_TYPE &&
+        runStatus === RUN_STATUS_IDLE,
+      refetchInterval: REFETCH_OFFSET_SEARCH_MS,
+    }
+  )
+  const storedOffsets = lwOffsetsData?.data
 
   const labwareInfo = useMemo(
     () =>
@@ -88,13 +100,14 @@ function useFlexLPCLabwareInfo({
         protocolData,
       }),
     [
-      JSON.stringify(storedOffsets),
+      storedOffsets?.length,
       labwareDefs?.length,
       lwLocationCombos.length,
+      protocolData?.commands.length,
     ]
   )
 
-  return { labwareInfo, storedOffsets }
+  return { labwareInfo, storedOffsets, searchLwOffsetsParams }
 }
 
 function useOT2LPCLabwareInfo({
@@ -102,7 +115,6 @@ function useOT2LPCLabwareInfo({
   robotType,
 }: UseLPCLabwareInfoProps): Pick<UseLPCLabwareInfoResult, 'legacyOffsets'> {
   const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
     enabled: robotType === OT2_ROBOT_TYPE,
   })
   const legacyOffsets = runRecord?.data?.labwareOffsets ?? []

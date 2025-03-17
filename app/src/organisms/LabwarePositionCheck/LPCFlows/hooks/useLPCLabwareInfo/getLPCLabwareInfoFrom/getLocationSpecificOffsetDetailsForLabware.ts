@@ -25,7 +25,7 @@ export function getLocationSpecificOffsetDetailsForLabware({
       const { definitionUri, lwOffsetLocSeq, ...restInfo } = comboInfo
 
       const existingOffset =
-        currentOffsets.find(
+        currentOffsets?.find(
           offset =>
             uri === offset.definitionUri &&
             isEqual(offset.locationSequence, comboInfo.lwOffsetLocSeq)

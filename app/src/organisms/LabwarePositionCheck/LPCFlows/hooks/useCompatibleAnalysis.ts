@@ -1,18 +1,21 @@
+import { useEffect, useRef, useState } from 'react'
+
+import {
+  useCreateProtocolAnalysisMutation,
+  useProtocolAnalysisAsDocumentQuery,
+} from '@opentrons/react-api-client'
+
+import {
+  ANALYTICS_LPC_ANALYSIS_KIND,
+  useTrackEvent,
+} from '/app/redux/analytics'
+
+import type { Run } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisSummary,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import {
-  ANALYTICS_LPC_ANALYSIS_KIND,
-  useTrackEvent,
-} from '/app/redux/analytics'
-import { useEffect, useRef, useState } from 'react'
-import {
-  useCreateProtocolAnalysisMutation,
-  useProtocolAnalysisAsDocumentQuery,
-} from '@opentrons/react-api-client'
-import { useNotifyRunQuery } from '/app/resources/runs'
 
 // TODO(jh, 03-17-25): Add testing here.
 
@@ -23,6 +26,7 @@ import { useNotifyRunQuery } from '/app/resources/runs'
 // otherwise, use the current analysis.
 export function useCompatibleAnalysis(
   runId: string,
+  runRecord: Run | undefined,
   mostRecentAnalysis: CompletedProtocolAnalysis | null
 ): CompletedProtocolAnalysis | null {
   const [
@@ -35,7 +39,7 @@ export function useCompatibleAnalysis(
   const hasProcessedAnalysis = useRef(false)
 
   const trackEvent = useTrackEvent()
-  const protocolId = useNotifyRunQuery(runId).data?.data.protocolId ?? ''
+  const protocolId = runRecord?.data.protocolId ?? ''
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
     protocolId
   )
