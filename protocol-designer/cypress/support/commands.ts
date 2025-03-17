@@ -113,6 +113,7 @@ Cypress.Commands.add('verifyCreateNewHeader', () => {
 
 // Onboarding page
 Cypress.Commands.add('verifyOnboardingPage', () => {
+  verifyUniversal()
   cy.get(locators.privacyPolicy).should('exist').and('be.visible')
   cy.get(locators.eula).should('exist').and('be.visible')
   cy.contains(SetupContent.LetsGetStarted)
