@@ -1,4 +1,5 @@
 """Test load module command."""
+
 from typing import cast
 import pytest
 from decoy import Decoy
@@ -42,27 +43,45 @@ from opentrons.protocols.api_support.deck_type import (
 
 
 @pytest.mark.parametrize(
-    "module_model,module_def_fixture_name,load_slot_name",
+    "module_model,module_def_fixture_name,load_slot_name,addressable_area_name",
     [
-        (ModuleModel.TEMPERATURE_MODULE_V2, "tempdeck_v2_def", DeckSlotName.SLOT_D1),
-        (ModuleModel.MAGNETIC_BLOCK_V1, "mag_block_v1_def", DeckSlotName.SLOT_D1),
+        (
+            ModuleModel.TEMPERATURE_MODULE_V2,
+            "tempdeck_v2_def",
+            DeckSlotName.SLOT_D1,
+            "temperatureModuleV2D1",
+        ),
+        (
+            ModuleModel.MAGNETIC_BLOCK_V1,
+            "mag_block_v1_def",
+            DeckSlotName.SLOT_D1,
+            "magneticBlockV1D1",
+        ),
         (
             ModuleModel.THERMOCYCLER_MODULE_V2,
             "thermocycler_v2_def",
             # only B1 provides addressable area for thermocycler v2
             # so we use it here with decoy
             DeckSlotName.SLOT_B1,
+            "thermocyclerModuleV2B1",
         ),
         (
             ModuleModel.HEATER_SHAKER_MODULE_V1,
             "heater_shaker_v1_def",
             DeckSlotName.SLOT_D3,
+            "heaterShakerModuleV1D3",
         ),
-        (ModuleModel.ABSORBANCE_READER_V1, "abs_reader_v1_def", DeckSlotName.SLOT_D3),
+        (
+            ModuleModel.ABSORBANCE_READER_V1,
+            "abs_reader_v1_def",
+            DeckSlotName.SLOT_D3,
+            "absorbanceReaderV1D3",
+        ),
         (
             ModuleModel.FLEX_STACKER_MODULE_V1,
             "flex_stacker_v1_def",
             DeckSlotName.SLOT_D3,
+            "flexStackerModuleV1D4",
         ),
     ],
 )
@@ -75,6 +94,7 @@ async def test_load_module_implementation(
     module_model: ModuleModel,
     module_def_fixture_name: str,
     load_slot_name: DeckSlotName,
+    addressable_area_name: str,
 ) -> None:
     """A loadModule command should have an execution implementation."""
     module_definition = request.getfixturevalue(module_def_fixture_name)
@@ -96,7 +116,7 @@ async def test_load_module_implementation(
 
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            DeckSlotLocation(slotName=load_slot_name)
+            DeckSlotLocation(slotName=load_slot_name), addressable_area_name
         )
     ).then_return(DeckSlotLocation(slotName=load_slot_name))
 

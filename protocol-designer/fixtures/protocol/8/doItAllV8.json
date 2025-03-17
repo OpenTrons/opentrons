@@ -7,6 +7,7 @@
     "description": "",
     "created": 1701659107408,
     "lastModified": 1738780362701,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
@@ -162,6 +163,11 @@
           "aspirate_mix_times": null,
           "aspirate_mix_volume": null,
           "aspirate_mmFromBottom": null,
+          "aspirate_retract_delay_seconds": null,
+          "aspirate_retract_mmFromBottom": null,
+          "aspirate_retract_speed": null,
+          "aspirate_retract_x_position": 0,
+          "aspirate_retract_y_position": 0,
           "aspirate_submerge_delay_seconds": null,
           "aspirate_submerge_speed": null,
           "aspirate_touchTip_checkbox": false,
@@ -189,6 +195,11 @@
           "dispense_mix_times": null,
           "dispense_mix_volume": null,
           "dispense_mmFromBottom": null,
+          "dispense_retract_delay_seconds": null,
+          "dispense_retract_mmFromBottom": null,
+          "dispense_retract_speed": null,
+          "dispense_retract_x_position": 0,
+          "dispense_retract_y_position": 0,
           "dispense_submerge_delay_seconds": null,
           "dispense_submerge_speed": null,
           "dispense_touchTip_checkbox": false,
@@ -202,6 +213,8 @@
           "disposalVolume_checkbox": true,
           "disposalVolume_volume": "5",
           "dropTip_location": "9d61f642-8f9b-467d-b2f7-b67fb162fd26:wasteChute",
+          "liquidClassesSupported": false,
+          "liquidClass": null,
           "nozzles": null,
           "path": "single",
           "pipette": "9fcd50d9-92b2-45ac-acf1-e2cf773feffc",
@@ -3565,7 +3578,7 @@
       "displayColor": "#ffd600"
     }
   },
-  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
       "key": "49fc1872-6cc3-410a-9aa7-5af54346a9fc",

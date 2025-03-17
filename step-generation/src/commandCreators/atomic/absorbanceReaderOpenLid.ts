@@ -7,6 +7,7 @@ import type { CommandCreator, CommandCreatorError } from '../../types'
 export const absorbanceReaderOpenLid: CommandCreator<
   AbsorbanceReaderOpenLidCreateCommand['params']
 > = (args, invariantContext, prevRobotState) => {
+  const { additionalEquipmentEntities, moduleEntities } = invariantContext
   const absorbanceReaderState = absorbanceReaderStateGetter(
     prevRobotState,
     args.moduleId
@@ -17,7 +18,7 @@ export const absorbanceReaderOpenLid: CommandCreator<
   }
 
   if (
-    !Object.values(invariantContext.additionalEquipmentEntities).some(
+    !Object.values(additionalEquipmentEntities).some(
       ({ name }) => name === 'gripper'
     )
   ) {
@@ -26,6 +27,7 @@ export const absorbanceReaderOpenLid: CommandCreator<
   if (errors.length > 0) {
     return { errors }
   }
+  const pythonName = moduleEntities[args.moduleId].pythonName
 
   return {
     commands: [
@@ -37,5 +39,6 @@ export const absorbanceReaderOpenLid: CommandCreator<
         },
       },
     ],
+    python: `${pythonName}.open_lid()`,
   }
 }

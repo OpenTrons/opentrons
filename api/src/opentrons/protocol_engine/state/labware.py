@@ -168,8 +168,10 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         """Modify state in reaction to an action."""
         for state_update in get_state_updates(action):
             self._add_loaded_labware(state_update)
+            self._add_batch_loaded_labwares(state_update)
             self._add_loaded_lid_stack(state_update)
             self._set_labware_location(state_update)
+            self._set_batch_labware_location(state_update)
             self._set_labware_lid(state_update)
 
         if isinstance(action, AddLabwareOffsetAction):
@@ -236,6 +238,49 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 displayName=display_name,
             )
 
+    def _add_batch_loaded_labwares(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
+        batch_loaded_labware_update = state_update.batch_loaded_labware
+        if batch_loaded_labware_update == update_types.NO_CHANGE:
+            return
+        # If the labware load refers to an offset, that offset must actually exist.
+        for labware_id in batch_loaded_labware_update.new_locations_by_id:
+            if batch_loaded_labware_update.offset_ids_by_id[labware_id] is not None:
+                assert (
+                    batch_loaded_labware_update.offset_ids_by_id[labware_id]
+                    in self._state.labware_offsets_by_id
+                )
+
+            definition_uri = uri_from_details(
+                namespace=batch_loaded_labware_update.definitions_by_id[
+                    labware_id
+                ].namespace,
+                load_name=batch_loaded_labware_update.definitions_by_id[
+                    labware_id
+                ].parameters.loadName,
+                version=batch_loaded_labware_update.definitions_by_id[
+                    labware_id
+                ].version,
+            )
+
+            self._state.definitions_by_uri[
+                definition_uri
+            ] = batch_loaded_labware_update.definitions_by_id[labware_id]
+
+            location = batch_loaded_labware_update.new_locations_by_id[labware_id]
+
+            self._state.labware_by_id[labware_id] = LoadedLabware.model_construct(
+                id=labware_id,
+                location=location,
+                loadName=batch_loaded_labware_update.definitions_by_id[
+                    labware_id
+                ].parameters.loadName,
+                definitionUri=definition_uri,
+                offsetId=batch_loaded_labware_update.offset_ids_by_id[labware_id],
+                displayName=batch_loaded_labware_update.display_names_by_id[labware_id],
+            )
+
     def _add_loaded_lid_stack(self, state_update: update_types.StateUpdate) -> None:
         loaded_lid_stack_update = state_update.loaded_lid_stack
         if loaded_lid_stack_update != update_types.NO_CHANGE:
@@ -294,27 +339,46 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 lid_id = labware_lid_update.lid_ids[i]
                 self._state.labware_by_id[parent_labware_ids[i]].lid_id = lid_id
 
+    def _do_update_labware_location(
+        self, labware_id: str, new_location: LabwareLocation, new_offset_id: str | None
+    ) -> None:
+        self._state.labware_by_id[labware_id].offsetId = new_offset_id
+
+        if isinstance(new_location, AddressableAreaLocation) and (
+            fixture_validation.is_gripper_waste_chute(new_location.addressableAreaName)
+            or fixture_validation.is_trash(new_location.addressableAreaName)
+        ):
+            # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+            new_location = OFF_DECK_LOCATION
+
+        self._state.labware_by_id[labware_id].location = new_location
+
     def _set_labware_location(self, state_update: update_types.StateUpdate) -> None:
         labware_location_update = state_update.labware_location
-        if labware_location_update != update_types.NO_CHANGE:
-            labware_id = labware_location_update.labware_id
-            new_offset_id = labware_location_update.offset_id
+        if labware_location_update == update_types.NO_CHANGE:
+            return
 
-            self._state.labware_by_id[labware_id].offsetId = new_offset_id
+        self._do_update_labware_location(
+            labware_location_update.labware_id,
+            labware_location_update.new_location,
+            labware_location_update.offset_id,
+        )
 
-            if labware_location_update.new_location:
-                new_location = labware_location_update.new_location
-
-                if isinstance(new_location, AddressableAreaLocation) and (
-                    fixture_validation.is_gripper_waste_chute(
-                        new_location.addressableAreaName
-                    )
-                    or fixture_validation.is_trash(new_location.addressableAreaName)
-                ):
-                    # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
-                    new_location = OFF_DECK_LOCATION
-
-                self._state.labware_by_id[labware_id].location = new_location
+    def _set_batch_labware_location(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
+        batch_location_update = state_update.batch_labware_location
+        if batch_location_update == update_types.NO_CHANGE:
+            return
+        for (
+            labware_id,
+            new_location,
+        ) in batch_location_update.new_locations_by_id.items():
+            self._do_update_labware_location(
+                labware_id,
+                new_location,
+                batch_location_update.new_offset_ids_by_id.get(labware_id, None),
+            )
 
 
 class LabwareView:
@@ -497,13 +561,30 @@ class LabwareView:
 
     def get_highest_child_labware(self, labware_id: str) -> str:
         """Get labware's highest child labware returning the labware ID."""
+        if (child_id := self.get_next_child_labware(labware_id)) is not None:
+            return self.get_highest_child_labware(labware_id=child_id)
+        return labware_id
+
+    def get_next_child_labware(self, labware_id: str) -> str | None:
+        """Get the labware that is on this labware, if any.
+
+        This includes lids.
+        """
         for labware in self._state.labware_by_id.values():
             if (
                 isinstance(labware.location, OnLabwareLocation)
                 and labware.location.labwareId == labware_id
             ):
-                return self.get_highest_child_labware(labware_id=labware.id)
-        return labware_id
+                return labware.id
+        return None
+
+    def get_labware_stack_from_parent(self, labware_id: str) -> list[str]:
+        """Get the stack of labware starting from the specified labware ID and moving up."""
+        labware_ids = [labware_id]
+        while (next_id := self.get_next_child_labware(labware_id)) is not None:
+            labware_ids.append(next_id)
+            labware_id = next_id
+        return labware_ids
 
     def get_labware_stack(
         self, labware_stack: List[LoadedLabware]

@@ -160,6 +160,11 @@ describe('createPresavedStepForm', () => {
       aspirate_mix_times: null,
       aspirate_mix_volume: null,
       aspirate_mmFromBottom: null,
+      aspirate_retract_delay_seconds: null,
+      aspirate_retract_mmFromBottom: null,
+      aspirate_retract_speed: null,
+      aspirate_retract_x_position: 0,
+      aspirate_retract_y_position: 0,
       aspirate_submerge_delay_seconds: null,
       aspirate_submerge_speed: null,
       aspirate_touchTip_checkbox: false,
@@ -180,6 +185,11 @@ describe('createPresavedStepForm', () => {
       dispense_mix_times: null,
       dispense_mix_volume: null,
       dispense_mmFromBottom: null,
+      dispense_retract_delay_seconds: null,
+      dispense_retract_mmFromBottom: null,
+      dispense_retract_speed: null,
+      dispense_retract_x_position: 0,
+      dispense_retract_y_position: 0,
       dispense_submerge_delay_seconds: null,
       dispense_submerge_speed: null,
       dispense_touchTip_checkbox: false,
@@ -201,6 +211,8 @@ describe('createPresavedStepForm', () => {
       dispense_y_position: 0,
       blowout_z_offset: 0,
       blowout_flowRate: null,
+      liquidClassesSupported: true,
+      liquidClass: null,
     })
   })
   describe('mix step', () => {
@@ -241,6 +253,7 @@ describe('createPresavedStepForm', () => {
         dispense_flowRate: null,
         tipRack: null,
         blowout_flowRate: null,
+        liquidClassesSupported: true,
       })
     })
   })

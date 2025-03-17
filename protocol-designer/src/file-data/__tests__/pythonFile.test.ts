@@ -19,11 +19,14 @@ import {
   getLoadLiquids,
   getLoadModules,
   getLoadPipettes,
+  getLoadTrashBins,
+  getLoadWasteChute,
   pythonMetadata,
   pythonRequirements,
 } from '../selectors/pythonFile'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
+  AdditionalEquipmentEntities,
   LabwareEntities,
   LabwareLiquidState,
   LiquidEntities,
@@ -44,6 +47,7 @@ describe('pythonMetadata', () => {
         category: 'PCR',
         subcategory: 'PCR Prep',
         tags: ['wombat', 'kangaroo', 'wallaby'],
+        source: 'Protocol Designer',
       })
     ).toBe(
       `
@@ -57,6 +61,7 @@ metadata = {
     "subcategory": "PCR Prep",
     "tags": "wombat, kangaroo, wallaby",
     "protocolDesigner": "fake_PD_version",
+    "source": "Protocol Designer",
 }`.trimStart()
     )
   })
@@ -322,6 +327,37 @@ pipette_left = protocol.load_instrument("flex_1channel_1000", "right", tip_racks
 pipette_left = protocol.load_instrument("p300_multi_gen2", "left")`.trimStart()
     )
   })
+
+  it('should generate loadPipette for 96-channel pipette with no tiprack', () => {
+    const pipette1 = 'pipette1'
+    const mockPipetteEntities: PipetteEntities = {
+      [pipette1]: {
+        id: pipette1,
+        pythonName: 'pipette',
+        name: 'p1000_96',
+        tiprackDefURI: [],
+        spec: { ...fixtureP1000SingleV2Specs, channels: 96 },
+        tiprackLabwareDef: [],
+      },
+    }
+
+    const mockTiprackEntities: LabwareEntities = {}
+    const pipetteRobotState: TimelineFrame['pipettes'] = {
+      [pipette1]: { mount: 'left' },
+    }
+
+    expect(
+      getLoadPipettes(
+        mockPipetteEntities,
+        mockTiprackEntities,
+        pipetteRobotState
+      )
+    ).toBe(
+      `
+# Load Pipettes:
+pipette = protocol.load_instrument("flex_96channel_1000")`.trimStart()
+    )
+  })
 })
 
 const liquid1 = 'liquid1'
@@ -386,6 +422,51 @@ well_plate_1["A1"].load_liquid(liquid_1, 10)
 well_plate_1["A2"].load_liquid(liquid_1, 10)
 well_plate_1["A3"].load_liquid(liquid_2, 50)
 well_plate_2["D1"].load_liquid(liquid_2, 180)`.trimStart()
+    )
+  })
+})
+
+const trash1 = 'trash1'
+const trash2 = 'trash2'
+const wasteChute = 'wasteChute'
+const mockAdditionalEquipmentEntities: AdditionalEquipmentEntities = {
+  [trash1]: {
+    name: 'trashBin',
+    pythonName: 'trash_bin_1',
+    location: 'A3',
+    id: trash1,
+  },
+  [trash2]: {
+    name: 'trashBin',
+    pythonName: 'trash_bin_2',
+    location: 'C3',
+    id: trash2,
+  },
+  [wasteChute]: {
+    name: 'wasteChute',
+    pythonName: 'waste_chute',
+    location: 'D3',
+    id: wasteChute,
+  },
+}
+
+describe('getTrashBins', () => {
+  it('should generate 2 trash bins', () => {
+    expect(getLoadTrashBins(mockAdditionalEquipmentEntities)).toBe(
+      `
+# Load Trash Bins:
+trash_bin_1 = protocol.load_trash_bin("A3")
+trash_bin_2 = protocol.load_trash_bin("C3")`.trimStart()
+    )
+  })
+})
+
+describe('getLoadWasteChute', () => {
+  it('should generate a waste chute', () => {
+    expect(getLoadWasteChute(mockAdditionalEquipmentEntities)).toBe(
+      `
+# Load Waste Chute:
+waste_chute = protocol.load_waste_chute()`.trimStart()
     )
   })
 })

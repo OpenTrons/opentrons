@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 import { Flex } from '../../primitives'
-import { SPACING } from '../../ui-style-constants'
+import { SPACING, RESPONSIVENESS } from '../../ui-style-constants'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { CURSOR_DEFAULT, CURSOR_POINTER } from '../../styles'
 
@@ -19,7 +19,7 @@ interface ListButtonProps extends StyleProps {
   testId?: string
 }
 
-const LISTBUTTON_PROPS_BY_TYPE: Record<
+const DESKTOP_LISTBUTTON_PROPS_BY_TYPE: Record<
   ListButtonType,
   { backgroundColor: string; hoverBackgroundColor: string }
 > = {
@@ -41,6 +41,28 @@ const LISTBUTTON_PROPS_BY_TYPE: Record<
   },
 }
 
+const ODD_LISTBUTTON_PROPS_BY_TYPE: Record<
+  ListButtonType,
+  { backgroundColor: string; hoverBackgroundColor: string }
+> = {
+  noActive: {
+    backgroundColor: COLORS.grey35,
+    hoverBackgroundColor: COLORS.grey40,
+  },
+  connected: {
+    backgroundColor: COLORS.green35,
+    hoverBackgroundColor: COLORS.green40,
+  },
+  notConnected: {
+    backgroundColor: COLORS.yellow35,
+    hoverBackgroundColor: COLORS.yellow40,
+  },
+  onColor: {
+    backgroundColor: COLORS.white,
+    hoverBackgroundColor: COLORS.grey20,
+  },
+}
+
 /*
   ListButton is used in helix 
   TODO(ja, 8/12/24): shuld be used in ODD as well and need to add
@@ -55,14 +77,14 @@ export function ListButton(props: ListButtonProps): JSX.Element {
     testId, // optional data-testid value for Cypress testing
     ...styleProps
   } = props
-  const listButtonProps = LISTBUTTON_PROPS_BY_TYPE[type]
+  const desktopListButtonProps = DESKTOP_LISTBUTTON_PROPS_BY_TYPE[type]
+  const oddListButtonProps = ODD_LISTBUTTON_PROPS_BY_TYPE[type]
 
   const LIST_BUTTON_STYLE = css`
     cursor: ${disabled ? CURSOR_DEFAULT : CURSOR_POINTER};
     background-color: ${disabled
       ? COLORS.grey20
-      : listButtonProps.backgroundColor};
-    max-width: 26.875rem;
+      : desktopListButtonProps.backgroundColor};
     padding: ${styleProps.padding ??
     `${SPACING.spacing20} ${SPACING.spacing24}`};
     border-radius: ${BORDERS.borderRadius8};
@@ -70,12 +92,24 @@ export function ListButton(props: ListButtonProps): JSX.Element {
     &:hover {
       background-color: ${disabled
         ? COLORS.grey20
-        : listButtonProps.hoverBackgroundColor};
+        : desktopListButtonProps.hoverBackgroundColor};
     }
 
     &:focus-visible {
       outline: 2px solid ${COLORS.blue50};
-      outline-offset: 0.25rem;
+      outline-offset: 0.125rem;
+    }
+
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      background-color: ${disabled
+        ? COLORS.grey35
+        : oddListButtonProps.backgroundColor};
+
+      &:hover {
+        background-color: ${disabled
+          ? COLORS.grey35
+          : oddListButtonProps.hoverBackgroundColor};
+      }
     }
   `
 
@@ -88,6 +122,7 @@ export function ListButton(props: ListButtonProps): JSX.Element {
       }}
       css={LIST_BUTTON_STYLE}
       tabIndex={0}
+      max-width="26.875rem"
       {...styleProps}
     >
       {children}

@@ -15,7 +15,7 @@ const mockContent = [
 ]
 
 const meta: Meta<typeof InfoScreenComponent> = {
-  title: 'Library/Molecules/InfoScreen',
+  title: 'Helix/Molecules/InfoScreen',
   component: InfoScreenComponent,
   argTypes: {
     content: {

@@ -1,18 +1,12 @@
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  ALIGN_CENTER,
-  COLORS,
   DIRECTION_COLUMN,
   Divider,
   Flex,
-  Icon,
-  ListItem,
   SPACING,
   StyledText,
   Tabs,
-  Tooltip,
-  useHoverTooltip,
 } from '@opentrons/components'
 import { getTrashOrLabware } from '@opentrons/step-generation'
 
@@ -29,7 +23,7 @@ import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -40,8 +34,10 @@ import {
   getFormLevelError,
   getLabwareFieldForPositioningField,
 } from '../../utils'
+import { MultiInputField } from './MultiInputField'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { StepInputFieldProps } from './MultiInputField'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { FormData, StepFieldName } from '../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../steplist'
@@ -67,7 +63,6 @@ export const SecondStepsMoveLiquidTools = ({
   visibleFormErrors,
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
-  const [targetProps, tooltipProps] = useHoverTooltip()
   const labwares = useSelector(getLabwareEntities)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
@@ -127,6 +122,29 @@ export const SecondStepsMoveLiquidTools = ({
 
   const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
+  const getFields = (type: 'submerge' | 'retract'): StepInputFieldProps[] => {
+    return [
+      {
+        fieldTitle: t(`protocol_steps:${type}_speed`),
+        fieldKey: `${tab}_${type}_speed`,
+        units: 'application:units.millimeterPerSec',
+        errorToShow: getFormLevelError(
+          `${tab}_${type}_speed`,
+          mappedErrorsToField
+        ),
+      },
+      {
+        fieldTitle: t('protocol_steps:delay_duration'),
+        fieldKey: `${tab}_${type}_delay_seconds`,
+        units: 'application:units.seconds',
+        errorToShow: getFormLevelError(
+          `${tab}_${type}_delay_seconds`,
+          mappedErrorsToField
+        ),
+      },
+    ]
+  }
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -181,62 +199,29 @@ export const SecondStepsMoveLiquidTools = ({
       {enableLiquidClasses ? (
         <>
           <Divider marginY="0" />
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            padding={`0 ${SPACING.spacing16}`}
-          >
-            <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-              >
-                {t('protocol_steps:submerge')}
-              </StyledText>
-              <Flex {...targetProps}>
-                <Icon
-                  name="information"
-                  size="1rem"
-                  color={COLORS.grey60}
-                  data-testid="information_icon"
-                />
-              </Flex>
-              <Tooltip tooltipProps={tooltipProps}>
-                {t(`tooltip:step_fields.defaults.${tab}_submerge`)}
-              </Tooltip>
-            </Flex>
-            <ListItem type="noActive">
-              <Flex
-                padding={SPACING.spacing12}
-                width="100%"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing8}
-              >
-                <InputStepFormField
-                  showTooltip={false}
-                  padding="0"
-                  title={t('protocol_steps:submerge_speed')}
-                  {...propsForFields[`${tab}_submerge_speed`]}
-                  units={t('application:units.millimeterPerSec')}
-                  errorToShow={getFormLevelError(
-                    `${tab}_submerge_speed`,
-                    mappedErrorsToField
-                  )}
-                />
-                <InputStepFormField
-                  showTooltip={false}
-                  padding="0"
-                  title={t('protocol_steps:delay_duration')}
-                  {...propsForFields[`${tab}_submerge_delay_seconds`]}
-                  units={t('application:units.seconds')}
-                  errorToShow={getFormLevelError(
-                    `${tab}_submerge_delay_seconds`,
-                    mappedErrorsToField
-                  )}
-                />
-              </Flex>
-            </ListItem>
-          </Flex>
+          <MultiInputField
+            name={t('submerge')}
+            prefix={tab}
+            tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
+            propsForFields={propsForFields}
+            fields={getFields('submerge')}
+          />
+          <Divider marginY="0" />
+          <MultiInputField
+            name={t('retract')}
+            prefix={`${tab}_retract`}
+            tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
+            propsForFields={propsForFields}
+            fields={getFields('retract')}
+            isWellPosition={true}
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('retract_mmFromBottom')
+                )
+              ]
+            }
+          />
         </>
       ) : null}
       <Divider marginY="0" />

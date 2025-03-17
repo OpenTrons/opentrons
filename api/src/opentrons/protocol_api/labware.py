@@ -19,11 +19,12 @@ from typing import (
     List,
     Dict,
     Optional,
-    Union,
     Tuple,
     cast,
     Sequence,
     Mapping,
+    Union,
+    Literal,
 )
 
 from opentrons_shared_data.labware.types import (
@@ -33,13 +34,19 @@ from opentrons_shared_data.labware.types import (
     LabwareParameters3,
 )
 
-from opentrons.types import Location, Point, NozzleMapInterface
+from opentrons.types import (
+    Location,
+    Point,
+    NozzleMapInterface,
+    MeniscusTrackingTarget,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
     UnsupportedAPIError,
 )
+from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -255,16 +262,21 @@ class Well:
         return Location(self._core.get_center(), self)
 
     @requires_version(2, 21)
-    def meniscus(self, z: float = 0.0) -> Location:
+    def meniscus(
+        self, target: Literal["start", "end", "dynamic"], z: float = 0.0
+    ) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
             negative offsets are lower.
+        :param target: The relative position inside the well to target when performing a liquid handling operation.
         :return: A :py:class:`~opentrons.types.Location` that indicates location is meniscus and that holds the ``z`` offset in its point.z field.
 
         :meta private:
         """
         return Location(
-            point=Point(x=0, y=0, z=z), labware=self, _ot_internal_is_meniscus=True
+            point=Point(x=0, y=0, z=z),
+            labware=self,
+            _meniscus_tracking=MeniscusTrackingTarget(target),
         )
 
     @requires_version(2, 8)
@@ -324,17 +336,20 @@ class Well:
         )
 
     @requires_version(2, 21)
-    def current_liquid_height(self) -> float:
+    def current_liquid_height(self) -> LiquidTrackingType:
         """Get the current liquid height in a well."""
         return self._core.current_liquid_height()
 
     @requires_version(2, 21)
-    def current_liquid_volume(self) -> float:
+    def current_liquid_volume(self) -> LiquidTrackingType:
         """Get the current liquid volume in a well."""
         return self._core.get_liquid_volume()
 
     @requires_version(2, 21)
-    def estimate_liquid_height_after_pipetting(self, operation_volume: float) -> float:
+    def estimate_liquid_height_after_pipetting(
+        self,
+        operation_volume: float,
+    ) -> LiquidTrackingType:
         """Check the height of the liquid within a well.
 
         :returns: The height, in mm, of the liquid from the deck.
@@ -691,6 +706,8 @@ class Labware:
             automatically.
 
         :return: The initialized and loaded labware object representing the Lid Stack.
+
+        :meta private:
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(

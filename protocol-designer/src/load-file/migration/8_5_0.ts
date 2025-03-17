@@ -1,5 +1,6 @@
 import floor from 'lodash/floor'
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
@@ -58,6 +59,7 @@ export const migrateFile = (
         dispense_touchTip_mmFromBottom,
         aspirate_labware,
         dispense_labware,
+        liquidClassesSupported,
         ...rest
       } = form
       const matchingAspirateLabwareWellDepth = getMigratedPositionFromTop(
@@ -96,12 +98,18 @@ export const migrateFile = (
                     matchingDispenseLabwareWellDepth,
                   1
                 ),
+          aspirate_retract_delay_seconds: null,
+          dispense_retract_delay_seconds: null,
+          aspirate_retract_speed: null,
+          dispense_retract_speed: null,
           aspirate_submerge_delay_seconds: null,
           dispense_submerge_delay_seconds: null,
           aspirate_submerge_speed: null,
           dispense_submerge_speed: null,
           aspirate_touchTip_speed: null,
           dispense_touchTip_speed: null,
+          liquidClassesSupported: liquidClassesSupported ?? false,
+          liquidClass: null,
         },
       }
     }
@@ -111,7 +119,13 @@ export const migrateFile = (
   const savedStepsWithUpdatedMixFields = Object.values(savedStepForms).reduce(
     (acc, form) => {
       if (form.stepType === 'mix') {
-        const { id, mix_touchTip_mmFromBottom, labware, ...rest } = form
+        const {
+          id,
+          mix_touchTip_mmFromBottom,
+          labware,
+          liquidClassesSupported,
+          ...rest
+        } = form
         const matchingLabwareWellDepth = getMigratedPositionFromTop(
           labwareDefinitions,
           loadLabwareCommands,
@@ -131,6 +145,7 @@ export const migrateFile = (
                     mix_touchTip_mmFromBottom - matchingLabwareWellDepth,
                     1
                   ),
+            liquidClassesSupported: liquidClassesSupported ?? false,
           },
         }
       }
@@ -165,6 +180,10 @@ export const migrateFile = (
   )
   return {
     ...appData,
+    metadata: {
+      ...appData.metadata,
+      source: PROTOCOL_DESIGNER_SOURCE,
+    },
     designerApplication: {
       ...designerApplication,
       data: {

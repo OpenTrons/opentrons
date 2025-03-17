@@ -26,7 +26,7 @@
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
-    "z": -0.71
+    "z": 0
   },
   "parameters": {
     "format": "irregular",
@@ -75,6 +75,11 @@
       "x": 0,
       "y": 0,
       "z": 34
+    },
+    "protocol_engine_lid_stack_object": {
+      "x": 0,
+      "y": 0,
+      "z": 0
     }
   },
   "stackLimit": 5,

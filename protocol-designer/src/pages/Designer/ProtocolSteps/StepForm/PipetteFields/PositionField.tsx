@@ -15,9 +15,13 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
-import { TipPositionModal, ZTipPositionModal } from '../../../../../organisms'
+import { prefixMap } from '../../../../../resources/utils'
+import {
+  TipPositionModal,
+  ZTipPositionModal,
+} from '../../../../../components/organisms'
 import { getIsDelayPositionField } from '../../../../../form-types'
-import { getDefaultMmFromEdge } from '../../../../../organisms/TipPositionModal/utils'
+import { getDefaultMmFromEdge } from '../../../../../components/organisms/TipPositionModal/utils'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
 import type {
@@ -25,9 +29,10 @@ import type {
   TipYOffsetFields,
   TipZOffsetFields,
 } from '../../../../../form-types'
-import type { PositionSpecs } from '../../../../../organisms'
+import type { PositionSpecs } from '../../../../../components/organisms'
 import type { FieldPropsByName } from '../types'
 import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+
 interface PositionFieldProps {
   prefix: MoveLiquidPrefixType
   propsForFields: FieldPropsByName
@@ -167,6 +172,8 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     )
   }
 
+  const isRetract = prefixMap[prefix] === 'retract'
+
   return (
     <>
       <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
@@ -180,7 +187,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
         >
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {i18n.format(
-              t('protocol_steps:tip_position', { prefix }),
+              t('protocol_steps:tip_position', {
+                prefix: prefixMap[prefix],
+              }),
               'capitalize'
             )}
           </StyledText>
@@ -197,17 +206,22 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
             {!isNested ? <Icon name="tip-position" size="1.25rem" /> : null}
             <StyledText desktopStyle="bodyDefaultRegular">
               {xField != null && yField != null
-                ? t('protocol_steps:well_position', {
-                    x:
-                      propsForFields[xField]?.value != null
-                        ? Number(propsForFields[xField]?.value)
-                        : 0,
-                    y:
-                      propsForFields[yField]?.value != null
-                        ? Number(propsForFields[yField]?.value)
-                        : 0,
-                    z: zValue,
-                  })
+                ? t(
+                    isRetract
+                      ? 'protocol_steps:well_position_xyz'
+                      : 'protocol_steps:well_position',
+                    {
+                      x:
+                        propsForFields[xField].value != null
+                          ? Number(propsForFields[xField].value)
+                          : 0,
+                      y:
+                        propsForFields[yField].value != null
+                          ? Number(propsForFields[yField].value)
+                          : 0,
+                      z: zValue,
+                    }
+                  )
                 : t('protocol_steps:well_position_z_only', {
                     z: zValue,
                   })}

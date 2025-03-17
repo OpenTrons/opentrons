@@ -11,16 +11,12 @@ import type { CreateCommand, LoadedPipette } from '@opentrons/shared-data'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
 
 export interface UseProbeCommandsResult {
-  handleProbeAttachment: (
-    pipette: LoadedPipette | null,
-    onSuccess: () => void
-  ) => Promise<void>
+  handleProbeAttachment: (pipette: LoadedPipette | null) => Promise<void>
   handleProbeDetachment: (
     pipette: LoadedPipette | null,
     onSuccess: () => void
   ) => Promise<void>
   unableToDetect: boolean
-  setShowUnableToDetect: (canDetect: boolean) => void
 }
 
 export function useHandleProbeCommands({
@@ -39,8 +35,7 @@ export function useHandleProbeCommands({
   }, [currentStep, showUnableToDetect])
 
   const handleProbeAttachment = (
-    pipette: LoadedPipette | null,
-    onSuccess: () => void
+    pipette: LoadedPipette | null
   ): Promise<void> => {
     const attachmentCommands: CreateCommand[] = [
       ...verifyProbeAttachmentAndHomeCommands(pipette),
@@ -53,7 +48,6 @@ export function useHandleProbeCommands({
       })
       .then(() => {
         setShowUnableToDetect(false)
-        onSuccess()
       })
   }
 
@@ -73,7 +67,6 @@ export function useHandleProbeCommands({
   return {
     handleProbeAttachment,
     unableToDetect: showUnableToDetect,
-    setShowUnableToDetect,
     handleProbeDetachment,
   }
 }

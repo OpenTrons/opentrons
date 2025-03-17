@@ -21,7 +21,6 @@ from opentrons.drivers.flex_stacker.driver import (
 from opentrons.drivers.flex_stacker.abstract import AbstractFlexStackerDriver
 from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.modules.errors import FlexStackerStallError
 from opentrons.hardware_control.poller import Reader, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
@@ -36,6 +35,8 @@ from opentrons.hardware_control.modules.types import (
     LiveData,
     FlexStackerData,
 )
+
+from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 
 log = logging.getLogger(__name__)
 

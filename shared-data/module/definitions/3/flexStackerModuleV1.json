@@ -15,7 +15,9 @@
     "footprintXDimension": 128,
     "footprintYDimension": 86,
     "labwareInterfaceXDimension": 128,
-    "labwareInterfaceYDimension": 86
+    "labwareInterfaceYDimension": 86,
+    "maxStackerFillHeight": 612.75,
+    "maxStackerRetrievableHeight": 106.5
   },
   "cornerOffsetFromSlot": {
     "x": -18,

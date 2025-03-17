@@ -74,8 +74,7 @@ export function getAddressableAreasInProtocol(
           params.location.slotName,
           deckDef
         )
-
-        return [...acc, ...addressableAreaNames]
+        return [...acc, addressableAreaNames[0]]
       } else if (
         (commandType === 'loadLabware' ||
           commandType === 'loadLid' ||

@@ -1,4 +1,5 @@
 """Tests for tip state store and selectors."""
+
 from collections import OrderedDict
 
 import pytest
@@ -16,8 +17,12 @@ from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.tips import TipStore, TipView
-from opentrons.protocol_engine.types import DeckSlotLocation, FlowRates
+from opentrons.protocol_engine.state.tips import TipStore, TipView, TipRackWellState
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    FlowRates,
+    OFF_DECK_LOCATION,
+)
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
@@ -1486,3 +1491,47 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
     for _ in range(96):
         _get_next_and_pickup(map)
     assert _get_next_and_pickup(map) is None
+
+
+def test_handle_batch_labware_loaded_update(
+    subject: TipStore, labware_definition: LabwareDefinition
+) -> None:
+    """It should consume batch_loaded_labware updates."""
+    subject.handle_action(
+        actions.SucceedCommandAction(
+            command=_dummy_command(),
+            state_update=update_types.StateUpdate(
+                batch_loaded_labware=update_types.BatchLoadedLabwareUpdate(
+                    new_locations_by_id={
+                        "some-labware-id": DeckSlotLocation(
+                            slotName=DeckSlotName.SLOT_1
+                        ),
+                        "some-other-labware-id": OFF_DECK_LOCATION,
+                    },
+                    offset_ids_by_id={
+                        "some-labware-id": "some-offset-id",
+                        "some-other-labware-id": None,
+                    },
+                    display_names_by_id={
+                        "some-labware-id": "some-display-name",
+                        "some-other-labware-id": None,
+                    },
+                    definitions_by_id={
+                        "some-labware-id": labware_definition,
+                        "some-other-labware-id": labware_definition,
+                    },
+                )
+            ),
+        )
+    )
+
+    assert "some-labware-id" in subject._state.tips_by_labware_id
+    assert "some-other-labware-id" in subject._state.tips_by_labware_id
+    for well_state in subject._state.tips_by_labware_id["some-labware-id"].values():
+        assert well_state == TipRackWellState.CLEAN
+    for well_state in subject._state.tips_by_labware_id[
+        "some-other-labware-id"
+    ].values():
+        assert well_state == TipRackWellState.CLEAN
+    assert "some-labware-id" in subject._state.column_by_labware_id
+    assert "some-other-labware-id" in subject._state.column_by_labware_id

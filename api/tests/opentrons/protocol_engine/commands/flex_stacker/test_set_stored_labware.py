@@ -47,6 +47,7 @@ def subject(state_view: StateView, equipment: EquipmentHandler) -> SetStoredLabw
                 loadName="lid-name", namespace="lid-namespace", version=3
             ),
             FlexStackerPoolConstraint(
+                max_pool_count=10,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=sentinel.adapter_definition,
@@ -57,6 +58,7 @@ def subject(state_view: StateView, equipment: EquipmentHandler) -> SetStoredLabw
             None,
             None,
             FlexStackerPoolConstraint(
+                max_pool_count=10,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=None,
@@ -69,6 +71,7 @@ def subject(state_view: StateView, equipment: EquipmentHandler) -> SetStoredLabw
                 loadName="lid-name", namespace="lid-namespace", version=3
             ),
             FlexStackerPoolConstraint(
+                max_pool_count=10,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=None,
@@ -81,6 +84,7 @@ def subject(state_view: StateView, equipment: EquipmentHandler) -> SetStoredLabw
             ),
             None,
             FlexStackerPoolConstraint(
+                max_pool_count=10,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=sentinel.adapter_definition,
@@ -114,12 +118,11 @@ async def test_set_stored_labware_happypath(
     decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
         FlexStackerSubState(
             module_id=cast(FlexStackerId, module_id),
-            in_static_mode=False,
-            hopper_labware_ids=[],
             pool_primary_definition=None,
             pool_adapter_definition=None,
             pool_lid_definition=None,
             pool_count=0,
+            max_pool_count=0,
         )
     )
     decoy.when(
@@ -147,6 +150,26 @@ async def test_set_stored_labware_happypath(
             )
         ).then_return((sentinel.adapter_definition, sentinel.unused))
         adapter_definition = sentinel.adapter_definition
+
+    decoy.when(
+        state_view.geometry.get_height_of_labware_stack(
+            [
+                x
+                for x in [
+                    lid_definition,
+                    sentinel.primary_definition,
+                    adapter_definition,
+                ]
+                if x is not None
+            ]
+        )
+    ).then_return(sentinel.pool_height)
+    decoy.when(
+        state_view.modules.stacker_max_pool_count_by_height(
+            module_id, sentinel.pool_height
+        )
+    ).then_return(10)
+
     result = await subject.execute(params)
     decoy.verify(
         state_view.labware.raise_if_stacker_labware_pool_is_not_valid(
@@ -169,12 +192,7 @@ async def test_set_stored_labware_happypath(
     )
 
 
-@pytest.mark.parametrize(
-    "hopper_labware,pool_count", [([], 1), (["fake-id"], 0), (["fake-id"], 1)]
-)
 async def test_set_stored_labware_requires_empty_hopper(
-    hopper_labware: list[str],
-    pool_count: int,
     decoy: Decoy,
     state_view: StateView,
     subject: SetStoredLabwareImpl,
@@ -184,12 +202,11 @@ async def test_set_stored_labware_requires_empty_hopper(
     decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
         FlexStackerSubState(
             module_id=cast(FlexStackerId, module_id),
-            in_static_mode=False,
-            hopper_labware_ids=hopper_labware,
             pool_primary_definition=None,
             pool_adapter_definition=None,
             pool_lid_definition=None,
-            pool_count=pool_count,
+            pool_count=2,
+            max_pool_count=6,
         )
     )
     with pytest.raises(FlexStackerNotLogicallyEmptyError):
@@ -206,7 +223,7 @@ async def test_set_stored_labware_requires_empty_hopper(
         )
 
 
-@pytest.mark.parametrize("input_count,output_count", [(None, 5), (2, 2), (6, 5)])
+@pytest.mark.parametrize("input_count,output_count", [(None, 6), (2, 2), (7, 6)])
 async def test_set_stored_labware_limits_count(
     input_count: int | None,
     output_count: int,
@@ -229,12 +246,11 @@ async def test_set_stored_labware_limits_count(
     decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
         FlexStackerSubState(
             module_id=cast(FlexStackerId, module_id),
-            in_static_mode=False,
-            hopper_labware_ids=[],
             pool_primary_definition=None,
             pool_adapter_definition=None,
             pool_lid_definition=None,
             pool_count=0,
+            max_pool_count=0,
         )
     )
     decoy.when(
@@ -244,6 +260,15 @@ async def test_set_stored_labware_limits_count(
             version=1,
         )
     ).then_return((sentinel.primary_definition, sentinel.unused))
+    decoy.when(
+        state_view.geometry.get_height_of_labware_stack([sentinel.primary_definition])
+    ).then_return(sentinel.pool_height)
+    decoy.when(
+        state_view.modules.stacker_max_pool_count_by_height(
+            module_id, sentinel.pool_height
+        )
+    ).then_return(6)
+
     result = await subject.execute(params)
     assert result == SuccessData(
         public=SetStoredLabwareResult.model_construct(
@@ -256,6 +281,7 @@ async def test_set_stored_labware_limits_count(
             flex_stacker_state_update=FlexStackerStateUpdate(
                 module_id=module_id,
                 pool_constraint=FlexStackerPoolConstraint(
+                    max_pool_count=6,
                     primary_definition=sentinel.primary_definition,
                     lid_definition=None,
                     adapter_definition=None,

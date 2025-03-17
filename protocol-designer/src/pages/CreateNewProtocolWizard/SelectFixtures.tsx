@@ -15,14 +15,14 @@ import {
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { WizardBody } from './WizardBody'
 import {
   AdditionalEquipmentDiagram,
   getNumOptions,
   getNumSlotsAvailable,
 } from './utils'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '../../components/atoms'
 import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 
 import type { DropdownBorder } from '@opentrons/components'
@@ -179,7 +179,7 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                   },
                 }
                 return (
-                  <ListItem type="noActive" key={ae}>
+                  <ListItem type="default" key={ae}>
                     <ListItemCustomize
                       linkText={t('remove')}
                       onClick={() => {

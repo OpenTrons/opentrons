@@ -415,6 +415,7 @@
         "sections": {
           "description": "A list of all of the sections of the well that have a contiguous shape. Must be ordered from top (highest z) to bottom (lowest z).",
           "type": "array",
+          "minItems": 1,
           "items": {
             "oneOf": [
               {

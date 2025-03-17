@@ -130,6 +130,10 @@
       "detail": "Tip Hit Well Bottom",
       "category": "roboticsControlError"
     },
+    "2019": {
+      "detail": "Flex Stacker Stall or Collision Detected",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"

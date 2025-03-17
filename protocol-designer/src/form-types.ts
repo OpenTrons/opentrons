@@ -32,6 +32,11 @@ export type StepFieldName = string
 // | 'aspirate_mix_times'
 // | 'aspirate_mix_volume'
 // | 'aspirate_mmFromBottom'
+// | 'aspirate_retract_delay_seconds'
+// | 'aspirate_retract_mmFromBottom'
+// | 'aspirate_retract_speed'
+// | 'aspirate_retract_x_position'
+// | 'aspirate_retract_y_position'
 // | 'aspirate_submerge_delay_seconds'
 // | 'aspirate_submerge_speed'
 // | 'aspirate_touchTip_checkbox'
@@ -53,6 +58,11 @@ export type StepFieldName = string
 // | 'dispense_mix_times'
 // | 'dispense_mix_volume'
 // | 'dispense_mmFromBottom'
+// | 'dispense_retract_delay_seconds'
+// | 'dispense_retract_mmFromBottom'
+// | 'dispense_retract_speed'
+// | 'dispense_retract_x_position'
+// | 'dispense_retract_y_position'
 // | 'dispense_submerge_delay_seconds'
 // | 'dispense_submerge_speed'
 // | 'dispense_touchTip_checkbox'
@@ -244,6 +254,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dispense_wells: string[]
   disposalVolume_checkbox: boolean
   dropTip_location: string
+  liquidClassesSupported: boolean
   nozzles: NozzleConfigurationStyle | null
   path: PathOption
   pipette: PipetteEntity
@@ -256,6 +267,11 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   aspirate_mix_times?: number | null
   aspirate_mix_volume?: number | null
   aspirate_mmFromBottom?: number | null
+  aspirate_retract_delay_seconds?: number | null
+  aspirate_retract_mmFromBottom?: number | null
+  aspirate_retract_speed?: number | null
+  aspirate_retract_x_position?: number | null
+  aspirate_retract_y_position?: number | null
   aspirate_submerge_delay_seconds?: number | null
   aspirate_submerge_speed?: number | null
   aspirate_touchTip_mmFromTop?: number | null
@@ -273,6 +289,11 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dispense_mix_times?: number | null
   dispense_mix_volume?: number | null
   dispense_mmFromBottom?: number | null
+  dispense_retract_delay_seconds?: number | null
+  dispense_retract_mmFromBottom?: number | null
+  dispense_retract_speed?: number | null
+  dispense_retract_x_position?: number | null
+  dispense_retract_y_position?: number | null
   dispense_submerge_delay_seconds?: number | null
   dispense_submerge_speed?: number | null
   dispense_touchTip_mmFromTop?: number | null
@@ -284,6 +305,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
   preWetTip?: boolean | null
+  liquidClass?: string | null
 }
 
 export interface HydratedMoveLabwareFormData extends AnnotationFields {
@@ -308,6 +330,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   dropTip_location: string
   id: string
   labware: LabwareEntity
+  liquidClassesSupported: boolean
   mix_touchTip_checkbox: boolean
   mix_wellOrder_first: WellOrderOption
   mix_wellOrder_second: WellOrderOption
@@ -413,16 +436,22 @@ export type TipZOffsetFields =
   | 'aspirate_delay_mmFromBottom'
   | 'dispense_delay_mmFromBottom'
   | 'mix_touchTip_mmFromTop'
+  | 'aspirate_retract_mmFromBottom'
+  | 'dispense_retract_mmFromBottom'
 
 export type TipYOffsetFields =
   | 'aspirate_y_position'
   | 'dispense_y_position'
   | 'mix_y_position'
+  | 'aspirate_retract_y_position'
+  | 'dispense_retract_y_position'
 
 export type TipXOffsetFields =
   | 'aspirate_x_position'
   | 'dispense_x_position'
   | 'mix_x_position'
+  | 'aspirate_retract_x_position'
+  | 'dispense_retract_x_position'
 
 export type DelayCheckboxFields =
   | 'aspirate_delay_checkbox'

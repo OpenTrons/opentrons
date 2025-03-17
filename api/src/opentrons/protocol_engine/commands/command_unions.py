@@ -14,6 +14,7 @@ from .pipetting_common import (
     TipPhysicallyAttachedError,
 )
 from .movement_common import StallOrCollisionError
+from .flex_stacker.common import FlexStackerStallOrCollisionError
 
 from . import absorbance_reader
 from . import flex_stacker
@@ -476,7 +477,6 @@ Command = Annotated[
         absorbance_reader.OpenLid,
         absorbance_reader.Initialize,
         absorbance_reader.ReadAbsorbance,
-        flex_stacker.Configure,
         flex_stacker.Retrieve,
         flex_stacker.Store,
         flex_stacker.SetStoredLabware,
@@ -575,7 +575,6 @@ CommandParams = Union[
     absorbance_reader.OpenLidParams,
     absorbance_reader.InitializeParams,
     absorbance_reader.ReadAbsorbanceParams,
-    flex_stacker.ConfigureParams,
     flex_stacker.RetrieveParams,
     flex_stacker.StoreParams,
     flex_stacker.SetStoredLabwareParams,
@@ -672,7 +671,6 @@ CommandType = Union[
     absorbance_reader.OpenLidCommandType,
     absorbance_reader.InitializeCommandType,
     absorbance_reader.ReadAbsorbanceCommandType,
-    flex_stacker.ConfigureCommandType,
     flex_stacker.RetrieveCommandType,
     flex_stacker.StoreCommandType,
     flex_stacker.SetStoredLabwareCommandType,
@@ -770,7 +768,6 @@ CommandCreate = Annotated[
         absorbance_reader.OpenLidCreate,
         absorbance_reader.InitializeCreate,
         absorbance_reader.ReadAbsorbanceCreate,
-        flex_stacker.ConfigureCreate,
         flex_stacker.RetrieveCreate,
         flex_stacker.StoreCreate,
         flex_stacker.SetStoredLabwareCreate,
@@ -876,7 +873,6 @@ CommandResult = Union[
     absorbance_reader.OpenLidResult,
     absorbance_reader.InitializeResult,
     absorbance_reader.ReadAbsorbanceResult,
-    flex_stacker.ConfigureResult,
     flex_stacker.RetrieveResult,
     flex_stacker.StoreResult,
     flex_stacker.SetStoredLabwareResult,
@@ -908,6 +904,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[LiquidNotFoundError],
     DefinedErrorData[GripperMovementError],
     DefinedErrorData[StallOrCollisionError],
+    DefinedErrorData[FlexStackerStallOrCollisionError],
 ]
 
 

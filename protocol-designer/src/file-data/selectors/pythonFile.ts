@@ -3,16 +3,19 @@
 import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
+  getCutoutDisplayName,
   isFlexPipette,
 } from '@opentrons/shared-data'
 import {
   formatPyDict,
   formatPyStr,
   indentPyLines,
+  OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
 } from '@opentrons/step-generation'
 import { getFlexNameConversion } from './utils'
 import type {
+  AdditionalEquipmentEntities,
   InvariantContext,
   LabwareEntities,
   LabwareLiquidState,
@@ -22,7 +25,7 @@ import type {
   Timeline,
   TimelineFrame,
 } from '@opentrons/step-generation'
-import type { RobotType } from '@opentrons/shared-data'
+import type { CutoutId, RobotType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../types'
 
 const PAPI_VERSION = '2.23' // latest version from api/src/opentrons/protocols/api_support/definitions.py
@@ -50,6 +53,7 @@ export function pythonMetadata(fileMetadata: FileMetadataFields): string {
       subcategory: fileMetadata.subcategory,
       tags: fileMetadata.tags?.length && fileMetadata.tags.join(', '),
       protocolDesigner: process.env.OT_PD_VERSION,
+      source: fileMetadata.source,
     }).filter(([key, value]) => value) // drop blank entries
   )
   return `metadata = ${formatPyDict(stringifiedMetadata)}`
@@ -109,7 +113,13 @@ export function getLoadAdapters(
 
       const adapterArgs = [
         `${formatPyStr(parameters.loadName)}`,
-        ...(!onModule ? [`${formatPyStr(adapterSlot)}`] : []),
+        ...(!onModule
+          ? [
+              `${formatPyStr(
+                adapterSlot === 'offDeck' ? OFF_DECK : adapterSlot
+              )}`,
+            ]
+          : []),
         `namespace=${formatPyStr(namespace)}`,
         `version=${version}`,
       ].join(',\n')
@@ -151,7 +161,13 @@ export function getLoadLabware(
 
       const labwareArgs = [
         `${formatPyStr(parameters.loadName)}`,
-        ...(!onModule && !onAdapter ? [`${formatPyStr(labwareSlot)}`] : []),
+        ...(!onModule && !onAdapter
+          ? [
+              `${formatPyStr(
+                labwareSlot === 'offDeck' ? OFF_DECK : labwareSlot
+              )}`,
+            ]
+          : []),
         ...(hasNickname
           ? [`label=${formatPyStr(labwareNicknamesById[id])}`]
           : []),
@@ -191,7 +207,9 @@ export function getLoadPipettes(
     .map(pipette => {
       const { name, id, spec, pythonName, tiprackDefURI } = pipette
       const mount =
-        spec.channels === 96 ? '' : formatPyStr(pipetteRobotState[id].mount)
+        spec.channels === 96
+          ? ''
+          : `, ${formatPyStr(pipetteRobotState[id].mount)}`
       const pipetteName = isFlexPipette(name)
         ? getFlexNameConversion(spec)
         : name
@@ -208,7 +226,7 @@ export function getLoadPipettes(
 
       return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_instrument(${formatPyStr(
         pipetteName
-      )}, ${mount}${pythonTipRacks})`
+      )}${mount}${pythonTipRacks})`
     })
     .join('\n')
 
@@ -259,21 +277,53 @@ export function getLoadLiquids(
   return pythonLoadLiquids ? `# Load Liquids:\n${pythonLoadLiquids}` : ''
 }
 
+export function getLoadTrashBins(
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+): string {
+  const pythonLoadTrashBins = Object.values(additionalEquipmentEntities)
+    .filter(ae => ae.name === 'trashBin')
+    ?.map(trashBin => {
+      const location = formatPyStr(
+        getCutoutDisplayName(trashBin.location as CutoutId)
+      )
+      return `${trashBin.pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_trash_bin(${location})`
+    })
+    .join('\n')
+
+  return pythonLoadTrashBins ? `# Load Trash Bins:\n${pythonLoadTrashBins}` : ''
+}
+
+export function getLoadWasteChute(
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+): string {
+  const pythonLoadWasteChute = Object.values(additionalEquipmentEntities)
+    .filter(ae => ae.name === 'wasteChute')
+    ?.map(
+      wasteChute =>
+        `${wasteChute.pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_waste_chute()`
+    )
+
+  return pythonLoadWasteChute.length > 0
+    ? `# Load Waste Chute:\n${pythonLoadWasteChute}`
+    : ''
+}
+
 export function pythonDefRun(
   invariantContext: InvariantContext,
   robotState: TimelineFrame,
   robotStateTimeline: Timeline,
   liquidsByLabwareId: LabwareLiquidState,
-  labwareNicknamesById: Record<string, string>
+  labwareNicknamesById: Record<string, string>,
+  robotType: RobotType
 ): string {
   const {
     moduleEntities,
     labwareEntities,
     pipetteEntities,
     liquidEntities,
+    additionalEquipmentEntities,
   } = invariantContext
   const { modules, labware, pipettes } = robotState
-
   const sections: string[] = [
     getLoadModules(moduleEntities, modules),
     getLoadAdapters(moduleEntities, labwareEntities, labware),
@@ -284,6 +334,12 @@ export function pythonDefRun(
       labwareNicknamesById
     ),
     getLoadPipettes(pipetteEntities, labwareEntities, pipettes),
+    ...(robotType === FLEX_ROBOT_TYPE
+      ? [
+          getLoadTrashBins(additionalEquipmentEntities),
+          getLoadWasteChute(additionalEquipmentEntities),
+        ]
+      : []),
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     stepCommands(robotStateTimeline),

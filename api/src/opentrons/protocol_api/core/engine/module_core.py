@@ -43,7 +43,6 @@ from ..module import (
 from .exceptions import InvalidMagnetEngageHeightError
 from . import load_labware_params
 
-
 # Valid wavelength range for absorbance reader
 ABS_WAVELENGTH_MIN = 350
 ABS_WAVELENGTH_MAX = 1000
@@ -702,20 +701,6 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.FlexStacker]
 
-    def set_static_mode(self, static: bool) -> None:
-        """Set the Flex Stacker's static mode.
-
-        The Flex Stacker cannot retrieve and or store when in static mode.
-        This allows the Flex Stacker carriage to be used as a staging slot,
-        and allowed the labware to be loaded onto it.
-        """
-        self._engine_client.execute_command(
-            cmd.flex_stacker.ConfigureParams(
-                moduleId=self.module_id,
-                static=static,
-            )
-        )
-
     def retrieve(self) -> None:
         """Retrieve a labware from the Flex Stacker's hopper."""
         self._engine_client.execute_command(
@@ -774,7 +759,11 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore):
         )
 
         main_namespace, main_version = load_labware_params.resolve(
-            main_load_name, main_namespace, main_version, custom_labware_params
+            main_load_name,
+            main_namespace,
+            main_version,
+            custom_labware_params,
+            self._api_version,
         )
         main_labware = cmd.flex_stacker.StackerStoredLabwareDetails(
             loadName=main_load_name, namespace=main_namespace, version=main_version
@@ -784,7 +773,11 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore):
 
         if lid_load_name:
             lid_namespace, lid_version = load_labware_params.resolve(
-                lid_load_name, lid_namespace, lid_version, custom_labware_params
+                lid_load_name,
+                lid_namespace,
+                lid_version,
+                custom_labware_params,
+                self._api_version,
             )
             lid_labware = cmd.flex_stacker.StackerStoredLabwareDetails(
                 loadName=lid_load_name, namespace=lid_namespace, version=lid_version
@@ -798,6 +791,7 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore):
                 adapter_namespace,
                 adapter_version,
                 custom_labware_params,
+                self._api_version,
             )
             adapter_labware = cmd.flex_stacker.StackerStoredLabwareDetails(
                 loadName=adapter_load_name,

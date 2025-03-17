@@ -11,12 +11,15 @@ import {
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
+import {
+  getEnablePartialTipSupport,
+  getEnableReturnTip,
+} from '../../../../../../feature-flags/selectors'
 import {
   BlowoutLocationField,
   BlowoutOffsetField,
@@ -53,6 +56,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
   } = props
   const pipettes = useSelector(getPipetteEntities)
   const enableReturnTip = useSelector(getEnableReturnTip)
+  const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const labwares = useSelector(getLabwareEntities)
   const { t, i18n } = useTranslation(['application', 'form'])
   const aspirateTab = {
@@ -73,7 +77,10 @@ export function MixTools(props: StepFormProps): JSX.Element {
 
   const is96Channel =
     propsForFields.pipette.value != null &&
-    pipettes[String(propsForFields.pipette.value)].name === 'p1000_96'
+    pipettes[String(propsForFields.pipette.value)].spec.channels === 96
+  const is8Channel =
+    propsForFields.pipette.value != null &&
+    pipettes[String(propsForFields.pipette.value)].spec.channels === 8
   const userSelectedPickUpTipLocation =
     labwares[String(propsForFields.pickUpTip_location.value)] != null
   const userSelectedDropTipLocation =
@@ -88,7 +95,13 @@ export function MixTools(props: StepFormProps): JSX.Element {
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
-      {is96Channel ? <PartialTipField {...propsForFields.nozzles} /> : null}
+      {propsForFields.pipette.value != null &&
+      (is96Channel || (is8Channel && enablePartialTip)) ? (
+        <PartialTipField
+          {...propsForFields.nozzles}
+          pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+        />
+      ) : null}
       <Divider marginY="0" />
       <TiprackField
         {...propsForFields.tipRack}
@@ -230,6 +243,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
             t('form:step_edit_form.field.delay.label'),
             'capitalize'
           )}
+          testId="delay_checkbox"
           checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
           isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
           checkboxUpdateValue={
@@ -260,6 +274,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
                 t('form:step_edit_form.field.blowout.label'),
                 'capitalize'
               )}
+              testId="blowout_checkbox"
               checkboxValue={propsForFields.blowout_checkbox.value}
               isChecked={propsForFields.blowout_checkbox.value === true}
               checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
@@ -305,6 +320,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
                 t('form:step_edit_form.field.touchTip.label'),
                 'capitalize'
               )}
+              testId="touchTip_checkbox"
               checkboxValue={propsForFields.mix_touchTip_checkbox.value}
               isChecked={propsForFields.mix_touchTip_checkbox.value === true}
               checkboxUpdateValue={

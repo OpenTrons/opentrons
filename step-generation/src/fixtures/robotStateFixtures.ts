@@ -384,11 +384,13 @@ export const getStateAndContextTempTCModules = ({
       id: temperatureModuleId,
       type: TEMPERATURE_MODULE_TYPE,
       model: 'foo',
+      pythonName: 'mock_temperature_module_1',
     },
     [thermocyclerId]: {
       id: thermocyclerId,
       type: THERMOCYCLER_MODULE_TYPE,
       model: 'foo',
+      pythonName: 'mock_thermocycler',
     },
   }
   const robotState = makeState({

@@ -110,6 +110,20 @@ class TipStore(HasState[TipState], HandlesActions):
                 self._state.column_by_labware_id[labware_id] = [
                     column for column in definition.ordering
                 ]
+        if state_update.batch_loaded_labware != update_types.NO_CHANGE:
+            for labware_id in state_update.batch_loaded_labware.new_locations_by_id:
+                definition = state_update.batch_loaded_labware.definitions_by_id[
+                    labware_id
+                ]
+                if definition.parameters.isTiprack:
+                    self._state.tips_by_labware_id[labware_id] = {
+                        well_name: TipRackWellState.CLEAN
+                        for column in definition.ordering
+                        for well_name in column
+                    }
+                    self._state.column_by_labware_id[labware_id] = [
+                        column for column in definition.ordering
+                    ]
 
     def _set_used_tips(self, pipette_id: str, well_name: str, labware_id: str) -> None:
         columns = self._state.column_by_labware_id.get(labware_id, [])

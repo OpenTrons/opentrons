@@ -1,6 +1,12 @@
 """Tests for the module state store handling flex stacker state."""
+
 import pytest
 from typing import Optional, Dict, Set, cast
+from unittest.mock import sentinel
+
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+)
 
 from opentrons.protocol_engine.state.modules import ModuleStore, ModuleView
 from opentrons.protocol_engine.state.module_substates import (
@@ -112,10 +118,57 @@ def test_add_module_action(
 
     assert result == FlexStackerSubState(
         module_id=FlexStackerId("someModuleId"),
-        in_static_mode=False,
-        hopper_labware_ids=[],
         pool_primary_definition=None,
         pool_adapter_definition=None,
         pool_lid_definition=None,
         pool_count=0,
+        max_pool_count=0,
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["primary_def", "lid_def", "adapter_def", "result"],
+    argvalues=[
+        pytest.param(
+            sentinel.primary, None, None, [sentinel.primary], id="primary-only"
+        ),
+        pytest.param(
+            sentinel.primary,
+            sentinel.lid,
+            None,
+            [sentinel.lid, sentinel.primary],
+            id="primary-and-lid",
+        ),
+        pytest.param(
+            sentinel.primary,
+            None,
+            sentinel.adapter,
+            [sentinel.primary, sentinel.adapter],
+            id="primary-and-adapter",
+        ),
+        pytest.param(
+            sentinel.primary,
+            sentinel.lid,
+            sentinel.adapter,
+            [sentinel.lid, sentinel.primary, sentinel.adapter],
+            id="primary-and-adapter-and-lid",
+        ),
+        pytest.param(None, None, None, None, id="none"),
+    ],
+)
+def test_get_labware_definition_list(
+    primary_def: LabwareDefinition | None,
+    lid_def: LabwareDefinition | None,
+    adapter_def: LabwareDefinition | None,
+    result: list[LabwareDefinition] | None,
+) -> None:
+    """It should return definitions in proper order."""
+    subject = FlexStackerSubState(
+        module_id=FlexStackerId("someModuleId"),
+        pool_primary_definition=primary_def,
+        pool_adapter_definition=adapter_def,
+        pool_lid_definition=lid_def,
+        pool_count=0,
+        max_pool_count=5,
+    )
+    assert subject.get_pool_definition_ordered_list() == result

@@ -1,17 +1,31 @@
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import * as warningCreators from '../../warningCreators'
 import {
+  formatPyStr,
+  getCutoutIdByAddressableArea,
   getHasWasteChute,
-  getTiprackHasTips,
   getLabwareHasLiquid,
+  getTiprackHasTips,
+  OFF_DECK,
+  PROTOCOL_CONTEXT_NAME,
   uuid,
 } from '../../utils'
-import type { CreateCommand, MoveLabwareParams } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  CreateCommand,
+  CutoutId,
+  MoveLabwareParams,
+} from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
@@ -26,7 +40,11 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
 ) => {
   const { labwareId, strategy, newLocation } = args
   const useGripper = strategy === 'usingGripper'
-  const { additionalEquipmentEntities, labwareEntities } = invariantContext
+  const {
+    additionalEquipmentEntities,
+    labwareEntities,
+    moduleEntities,
+  } = invariantContext
   const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
   const tiprackHasTip =
     prevRobotState.tipState != null
@@ -211,8 +229,80 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     },
   ]
 
+  const labwarePythonName = labwareEntities[labwareId].pythonName
+  let location: string = ''
+  if (newLocation === 'offDeck') {
+    location = OFF_DECK
+  } else if (newLocation === 'systemLocation') {
+    location = 'system_location' // NOTE: i think this is for LPC but shouldn't be used in PD
+  } else if ('labwareId' in newLocation) {
+    location = labwareEntities[newLocation.labwareId].pythonName
+  } else if ('moduleId' in newLocation) {
+    location = moduleEntities[newLocation.moduleId].pythonName
+  } else if ('slotName' in newLocation) {
+    location = formatPyStr(newLocation.slotName)
+  } else if ('addressableAreaName' in newLocation) {
+    const is4thColumnSlot = COLUMN_4_SLOTS.includes(
+      newLocation.addressableAreaName
+    )
+
+    const isWasteChuteLocation = WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+      newLocation.addressableAreaName
+    )
+    const isOt2TrashLocation = newLocation.addressableAreaName === 'fixedTrash'
+    const isTrashBinLocation =
+      MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+        newLocation.addressableAreaName
+      ) || isOt2TrashLocation
+    const trashCutoutIds = isTrashBinLocation
+      ? Object.values(additionalEquipmentEntities)
+          .filter(ae => ae.name === 'trashBin')
+          ?.map(trash => trash.location as CutoutId)
+      : []
+
+    const cutoutIdFromAddressableAreaName =
+      !isWasteChuteLocation && !is4thColumnSlot
+        ? getCutoutIdByAddressableArea(
+            newLocation.addressableAreaName as AddressableAreaName,
+            isOt2TrashLocation ? 'fixedTrashSlot' : 'trashBinAdapter',
+            isOt2TrashLocation ? OT2_ROBOT_TYPE : FLEX_ROBOT_TYPE
+          )
+        : null
+
+    const matchingTrashCutoutId = trashCutoutIds.find(
+      cutoutId => cutoutId === cutoutIdFromAddressableAreaName
+    )
+    const matchingTrashId =
+      matchingTrashCutoutId != null
+        ? Object.values(additionalEquipmentEntities).find(
+            ae => ae.location === matchingTrashCutoutId
+          )?.id
+        : null
+
+    if (is4thColumnSlot) {
+      location = formatPyStr(newLocation.addressableAreaName)
+    } else if (matchingTrashId != null && !isWasteChuteLocation) {
+      location = additionalEquipmentEntities[matchingTrashId]?.pythonName ?? ''
+    } else if (matchingTrashId == null && isWasteChuteLocation) {
+      location =
+        Object.values(additionalEquipmentEntities).find(
+          ae => ae.name === 'wasteChute'
+        )?.pythonName ?? ''
+    } else {
+      location = ''
+    }
+  }
+
+  if (location === '') {
+    console.error('expected to find a python new location but could not')
+  }
+
+  const pythonUseGripper = useGripper ? ', use_gripper=True' : ''
+  const python = `${PROTOCOL_CONTEXT_NAME}.move_labware(${labwarePythonName}, ${location}${pythonUseGripper})`
+
   return {
     commands,
     warnings: warnings.length > 0 ? warnings : undefined,
+    python,
   }
 }

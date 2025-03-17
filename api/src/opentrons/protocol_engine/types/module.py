@@ -125,6 +125,8 @@ class ModuleDimensions(BaseModel):
     bareOverallHeight: float
     overLabwareHeight: float
     lidHeight: Optional[float] = None
+    maxStackerFillHeight: Optional[float] = None
+    maxStackerRetrievableHeight: Optional[float] = None
 
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.

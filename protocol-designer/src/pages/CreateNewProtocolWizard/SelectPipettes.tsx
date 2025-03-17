@@ -37,13 +37,15 @@ import { getAllowAllTipracks } from '../../feature-flags/selectors'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { setFeatureFlags } from '../../feature-flags/actions'
 import { createCustomTiprackDef } from '../../labware-defs/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
-import { IncompatibleTipsModal, PipetteInfoItem } from '../../organisms'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import {
+  IncompatibleTipsModal,
+  PipetteInfoItem,
+} from '../../components/organisms'
+import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
 import { getTiprackOptions } from './utils'
-import { HandleEnter } from '../../atoms/HandleEnter'
 import { removeOpentronsPhrases } from '../../utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
@@ -179,6 +181,17 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   } else if (page === 'add' && hasAPipette) {
     subHeader = t('which_pipette_second')
   }
+
+  useEffect(() => {
+    if (
+      pipettesByMount.left.pipetteName != null ||
+      pipettesByMount.left.tiprackDefURI != null ||
+      pipettesByMount.right.pipetteName != null ||
+      pipettesByMount.right.tiprackDefURI != null
+    ) {
+      setPage('overview')
+    }
+  }, [])
 
   return (
     <>

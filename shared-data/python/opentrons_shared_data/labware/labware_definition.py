@@ -480,7 +480,7 @@ WellSegment = Annotated[
 
 
 class InnerWellGeometry(BaseModel):
-    sections: list[WellSegment]
+    sections: Annotated[list[WellSegment], Field(min_length=1)]
 
 
 class LabwareDefinition2(BaseModel):

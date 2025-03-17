@@ -1,4 +1,4 @@
-import { COLUMN, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ALL, FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import {
   absorbanceReaderCollision,
@@ -13,6 +13,9 @@ import {
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
   getIsSafePipetteMovement,
+  formatPyStr,
+  formatPyWellLocation,
+  indentPyLines,
 } from '../../utils'
 import { COLUMN_4_SLOTS } from '../../constants'
 import type {
@@ -40,10 +43,10 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     labwareId,
     wellName,
     flowRate,
+    isAirGap,
     wellLocation,
     nozzles,
     tipRack,
-    isAirGap,
   } = args
   const actionName = 'dispense'
   const labwareState = prevRobotState.labware
@@ -110,13 +113,14 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
     }
   }
 
-  const is96Channel =
-    invariantContext.pipetteEntities[pipetteId]?.spec.channels === 96
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
 
   if (
-    is96Channel &&
-    nozzles === COLUMN &&
+    isMultiChannelPipette &&
+    nozzles !== ALL &&
     !getIsSafePipetteMovement(
+      nozzles,
       prevRobotState,
       invariantContext,
       pipetteId,
@@ -229,7 +233,28 @@ export const dispense: CommandCreator<DispenseAtomicCommandParams> = (
       ...(isAirGap && { meta: { isAirGap } }),
     },
   ]
+
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
+  const labwarePythonName =
+    invariantContext.labwareEntities[labwareId].pythonName
+  const pythonArgs = [
+    `volume=${volume}`,
+    `location=${labwarePythonName}[${formatPyStr(
+      wellName
+    )}]${formatPyWellLocation(wellLocation)}`,
+    // rate= is a ratio in the PAPI, and we have no good way to figure out what
+    // flowrate the PAPI has set the pipette to, so we just have to emit a division:
+    `rate=${flowRate} / ${pipettePythonName}.flow_rate.dispense`,
+    // PAPI has no way to indicate that we're dispensing air, so we don't do anything
+    // with the isAirGap parameter.
+  ]
+  const python = `${pipettePythonName}.dispense(\n${indentPyLines(
+    pythonArgs.join(',\n')
+  )},\n)`
+
   return {
     commands,
+    python,
   }
 }

@@ -1,5 +1,6 @@
 import type { AxiosRequestConfig } from 'axios'
 import type { ResponsePromise } from './request'
+import type { ModuleModel } from '@opentrons/shared-data'
 
 export interface HostConfig {
   hostname: string
@@ -39,3 +40,31 @@ export interface EmptyResponse {
   links?: ResourceLinks
   data: null
 }
+
+export interface BaseOffsetLocationSequenceComponent {
+  kind: string
+}
+
+export interface OnLabwareOffsetLocationSequenceComponent
+  extends BaseOffsetLocationSequenceComponent {
+  kind: 'onLabware'
+  labwareUri: string
+}
+
+export interface OnModuleOffsetLocationSequenceComponent
+  extends BaseOffsetLocationSequenceComponent {
+  kind: 'onModule'
+  moduleModel: ModuleModel
+}
+
+export interface OnAddressableAreaOffsetLocationSequenceComponent
+  extends BaseOffsetLocationSequenceComponent {
+  kind: 'onAddressableArea'
+  addressableAreaName: string
+}
+
+export type LabwareOffsetLocationSequenceComponent =
+  | OnAddressableAreaOffsetLocationSequenceComponent
+  | OnModuleOffsetLocationSequenceComponent
+  | OnLabwareOffsetLocationSequenceComponent
+export type LabwareOffsetLocationSequence = LabwareOffsetLocationSequenceComponent[]

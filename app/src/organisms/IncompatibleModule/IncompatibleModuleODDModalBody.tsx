@@ -37,7 +37,7 @@ export function IncompatibleModuleODDModalBody({
           maxHeight="196px"
         >
           {modules.map(module => (
-            <ListItem key={module.id} type="noActive">
+            <ListItem key={module.id} type="default">
               <LegacyStyledText
                 as="p"
                 key={module.id}

@@ -6,7 +6,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { ALL, COLUMN } from '@opentrons/shared-data'
+import { SINGLE } from '@opentrons/shared-data'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
   getDisabledFields,
@@ -220,6 +220,8 @@ export function getLabwareFieldForPositioningField(
     dispense_delay_mmFromBottom: 'dispense_labware',
     mix_mmFromBottom: 'labware',
     mix_touchTip_mmFromTop: 'labware',
+    aspirate_retract_mmFromBottom: 'aspirate_labware',
+    dispense_retract_mmFromBottom: 'dispense_labware',
   }
   return fieldMap[name]
 }
@@ -229,12 +231,10 @@ export const getNozzleType = (
   nozzles: string | null
 ): NozzleType | null => {
   const is8Channel = pipette != null && pipette.spec.channels === 8
-  if (is8Channel) {
+  if (is8Channel && nozzles !== SINGLE) {
     return '8-channel'
-  } else if (nozzles === COLUMN) {
-    return COLUMN
-  } else if (nozzles === ALL) {
-    return ALL
+  } else if (nozzles != null) {
+    return nozzles as NozzleType
   } else {
     return null
   }

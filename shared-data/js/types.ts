@@ -798,6 +798,7 @@ interface ByPipetteSetting {
 export interface LiquidClass {
   liquidClassName: string
   displayName: string
+  description: string
   schemaVersion: number
   namespace: string
   byPipette: ByPipetteSetting[]

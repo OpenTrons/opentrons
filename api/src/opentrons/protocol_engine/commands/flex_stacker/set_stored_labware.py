@@ -102,21 +102,16 @@ class SetStoredLabwareImpl(
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
-        error_messages: list[str] = []
-        if stacker_state.hopper_labware_ids != []:
-            error_messages.append(
-                f"{len(stacker_state.hopper_labware_ids)} unique labware"
-            )
+
         if stacker_state.pool_count != 0:
-            error_messages.append(f"a pool of {stacker_state.pool_count} labware")
-        if error_messages != []:
             # Note: this error catches if the protocol tells us the stacker is not empty, making this command
             # invalid at this point in the protocol. This error is not recoverable and should occur during
             # analysis; the protocol must be changed.
+
             raise FlexStackerNotLogicallyEmptyError(
                 message=(
                     "The Flex Stacker must be known to be empty before reconfiguring its labware pool, but it has "
-                    + " and ".join(error_messages)
+                    f"a pool of {stacker_state.pool_count} labware"
                 )
             )
 
@@ -144,14 +139,22 @@ class SetStoredLabwareImpl(
             labware_def, lid_def, adapter_def
         )
 
-        # TODO: propagate the limit on max height of the stacker
-        initial_count = params.initialCount if params.initialCount is not None else 5
-        count = min(initial_count, 5)
+        pool_height = self._state_view.geometry.get_height_of_labware_stack(
+            [x for x in [lid_def, labware_def, adapter_def] if x is not None]
+        )
+        max_pool_count = self._state_view.modules.stacker_max_pool_count_by_height(
+            params.moduleId, pool_height
+        )
+
+        initial_count = (
+            params.initialCount if params.initialCount is not None else max_pool_count
+        )
+        count = min(initial_count, max_pool_count)
 
         state_update = (
             update_types.StateUpdate()
             .update_flex_stacker_labware_pool_definition(
-                params.moduleId, labware_def, adapter_def, lid_def
+                params.moduleId, max_pool_count, labware_def, adapter_def, lid_def
             )
             .update_flex_stacker_labware_pool_count(params.moduleId, count)
         )

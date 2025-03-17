@@ -227,22 +227,28 @@
         {
           "shape": "conical",
           "topDiameter": 15.5,
-          "bottomDiameter": 14.78,
+          "bottomDiameter": 14.56,
           "topHeight": 117.8,
-          "bottomHeight": 109.03
+          "bottomHeight": 113.8
         },
         {
           "shape": "conical",
-          "topDiameter": 14.78,
+          "topDiameter": 14.56,
           "bottomDiameter": 13.8,
-          "topHeight": 109.03,
+          "topHeight": 113.8,
           "bottomHeight": 22.55
         },
         {
           "shape": "conical",
           "topDiameter": 13.8,
-          "bottomDiameter": 2.5,
+          "bottomDiameter": 2.38,
           "topHeight": 22.55,
+          "bottomHeight": 0.92
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 1.235,
+          "topHeight": 0.92,
           "bottomHeight": 0.0
         }
       ]
