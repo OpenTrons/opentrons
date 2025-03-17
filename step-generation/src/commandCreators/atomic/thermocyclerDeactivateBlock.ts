@@ -6,6 +6,7 @@ export const thermocyclerDeactivateBlock: CommandCreator<ModuleOnlyParams> = (
   invariantContext,
   prevRobotState
 ) => {
+  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
   return {
     commands: [
       {
@@ -16,5 +17,6 @@ export const thermocyclerDeactivateBlock: CommandCreator<ModuleOnlyParams> = (
         },
       },
     ],
+    python: `${pythonName}.deactivate_block()`,
   }
 }

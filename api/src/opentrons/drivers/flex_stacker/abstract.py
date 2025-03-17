@@ -3,6 +3,7 @@ from typing import List, Optional, Protocol
 from .types import (
     LEDPattern,
     LimitSwitchStatus,
+    MeasurementKind,
     MoveResult,
     StackerAxis,
     PlatformStatus,
@@ -11,6 +12,8 @@ from .types import (
     StackerInfo,
     LEDColor,
     StallGuardParams,
+    TOFMeasurement,
+    TOFMeasurementResult,
     TOFSensor,
     TOFSensorStatus,
 )
@@ -63,6 +66,19 @@ class AbstractFlexStackerDriver(Protocol):
 
     async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> bool:
         """Enable or disable the TOF sensor."""
+        ...
+
+    async def manage_tof_measurement(
+        self,
+        sensor: TOFSensor,
+        kind: MeasurementKind = MeasurementKind.HISTOGRAM,
+        start: bool = True,
+    ) -> TOFMeasurement:
+        """Start or stop Measurements from the TOF sensor."""
+        ...
+
+    async def get_tof_histogram(self, sensor: TOFSensor) -> TOFMeasurementResult:
+        """Get the full histogram measurement from the TOF sensor."""
         ...
 
     async def set_motor_driver_register(
@@ -123,6 +139,13 @@ class AbstractFlexStackerDriver(Protocol):
         """Get whether or not door is closed.
 
         :return: True if door is closed, False otherwise
+        """
+        ...
+
+    async def get_installation_detected(self) -> bool:
+        """Get whether or not installation is detected.
+
+        :return: True if installation is detected, False otherwise
         """
         ...
 

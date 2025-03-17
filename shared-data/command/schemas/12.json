@@ -863,34 +863,6 @@
       "title": "CommentParams",
       "type": "object"
     },
-    "ConfigureCreate": {
-      "description": "A request to execute a Flex Stacker Configure command.",
-      "properties": {
-        "commandType": {
-          "const": "flexStacker/configure",
-          "default": "flexStacker/configure",
-          "enum": ["flexStacker/configure"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/ConfigureParams"
-        }
-      },
-      "required": ["params"],
-      "title": "ConfigureCreate",
-      "type": "object"
-    },
     "ConfigureForVolumeCreate": {
       "description": "Configure for volume command creation request model.",
       "properties": {
@@ -1002,32 +974,6 @@
       },
       "required": ["pipetteId", "configurationParams"],
       "title": "ConfigureNozzleLayoutParams",
-      "type": "object"
-    },
-    "ConfigureParams": {
-      "description": "Input parameters for a configure command.",
-      "properties": {
-        "moduleId": {
-          "description": "Unique ID of the Flex Stacker.",
-          "title": "Moduleid",
-          "type": "string"
-        },
-        "static": {
-          "anyOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "description": "Whether the Flex Stacker should be in static mode.",
-          "title": "Static"
-        }
-      },
-      "required": ["moduleId"],
-      "title": "ConfigureParams",
       "type": "object"
     },
     "Coordinate": {
@@ -2519,11 +2465,11 @@
         "speed": {
           "anyOf": [
             {
-              "minimum": 0,
+              "exclusiveMinimum": 0,
               "type": "integer"
             },
             {
-              "minimum": 0.0,
+              "exclusiveMinimum": 0.0,
               "type": "number"
             }
           ],
@@ -6634,7 +6580,6 @@
       "evotipDispense": "#/$defs/EvotipDispenseCreate",
       "evotipSealPipette": "#/$defs/EvotipSealPipetteCreate",
       "evotipUnsealPipette": "#/$defs/EvotipUnsealPipetteCreate",
-      "flexStacker/configure": "#/$defs/ConfigureCreate",
       "flexStacker/empty": "#/$defs/EmptyCreate",
       "flexStacker/fill": "#/$defs/FillCreate",
       "flexStacker/retrieve": "#/$defs/RetrieveCreate",
@@ -6925,9 +6870,6 @@
     },
     {
       "$ref": "#/$defs/ReadAbsorbanceCreate"
-    },
-    {
-      "$ref": "#/$defs/ConfigureCreate"
     },
     {
       "$ref": "#/$defs/RetrieveCreate"

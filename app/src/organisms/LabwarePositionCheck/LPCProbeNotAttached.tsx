@@ -39,10 +39,16 @@ export function LPCProbeNotAttached(props: LPCWizardContentProps): JSX.Element {
       <Flex css={CONTAINER_STYLE}>
         <Icon name="alert-circle" css={ICON_STYLE} color={COLORS.red50} />
         <Flex css={COPY_CONTAINER_STYLE}>
-          <StyledText oddStyle="level3HeaderBold">
+          <StyledText
+            oddStyle="level3HeaderBold"
+            desktopStyle="headingSmallBold"
+          >
             {t('calibration_probe_not_detected')}
           </StyledText>
-          <StyledText oddStyle="level4HeaderRegular">
+          <StyledText
+            oddStyle="level4HeaderRegular"
+            desktopStyle="bodyDefaultRegular"
+          >
             {t('ensure_probe_attached')}
           </StyledText>
         </Flex>
@@ -68,8 +74,13 @@ const COPY_CONTAINER_STYLE = css`
 `
 
 const ICON_STYLE = css`
-  height: ${SPACING.spacing60};
-  width: ${SPACING.spacing60};
+  height: ${SPACING.spacing40};
+  width: ${SPACING.spacing40};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: ${SPACING.spacing60};
+    width: ${SPACING.spacing60};
+  }
 `
 
 // The design system makes a padding exception for this view.

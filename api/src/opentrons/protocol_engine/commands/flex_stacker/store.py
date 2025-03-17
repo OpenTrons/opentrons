@@ -27,6 +27,7 @@ from ...types import (
 )
 
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
+from opentrons.calibration_storage.helpers import uri_from_details
 
 
 if TYPE_CHECKING:
@@ -73,6 +74,18 @@ class StoreResult(BaseModel):
     )
     lidLabwareId: str | None = Field(
         None, description="The lid in the stack that was stored, if any."
+    )
+    primaryLabwareURI: str = Field(
+        ...,
+        description="The labware definition URI of the primary labware.",
+    )
+    adapterLabwareURI: str | None = Field(
+        None,
+        description="The labware definition URI of the adapter labware.",
+    )
+    lidLabwareURI: str | None = Field(
+        None,
+        description="The labware definition URI of the lid labware.",
     )
 
 
@@ -147,10 +160,6 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
-        if stacker_state.in_static_mode:
-            raise CannotPerformModuleAction(
-                "Cannot store labware in Flex Stacker while in static mode"
-            )
 
         if stacker_state.pool_count == stacker_state.max_pool_count:
             raise CannotPerformModuleAction(
@@ -209,12 +218,13 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             new_offset_ids_by_id={id: None for id in id_list},
         )
 
-        state_update.store_flex_stacker_labware(
-            module_id=params.moduleId, labware_id=primary_id
-        )
         state_update.update_flex_stacker_labware_pool_count(
             module_id=params.moduleId, count=stacker_state.pool_count + 1
         )
+        if stacker_state.pool_primary_definition is None:
+            raise FlexStackerLabwarePoolNotYetDefinedError(
+                "The Primary Labware must be defined in the stacker pool."
+            )
 
         return SuccessData(
             public=StoreResult(
@@ -235,6 +245,25 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                     else None
                 ),
                 lidLabwareId=maybe_lid_id,
+                primaryLabwareURI=uri_from_details(
+                    stacker_state.pool_primary_definition.namespace,
+                    stacker_state.pool_primary_definition.parameters.loadName,
+                    stacker_state.pool_primary_definition.version,
+                ),
+                adapterLabwareURI=uri_from_details(
+                    stacker_state.pool_adapter_definition.namespace,
+                    stacker_state.pool_adapter_definition.parameters.loadName,
+                    stacker_state.pool_adapter_definition.version,
+                )
+                if stacker_state.pool_adapter_definition is not None
+                else None,
+                lidLabwareURI=uri_from_details(
+                    stacker_state.pool_lid_definition.namespace,
+                    stacker_state.pool_lid_definition.parameters.loadName,
+                    stacker_state.pool_lid_definition.version,
+                )
+                if stacker_state.pool_lid_definition is not None
+                else None,
             ),
             state_update=state_update,
         )

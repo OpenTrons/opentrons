@@ -8,7 +8,7 @@ describe('The Redesigned Create Protocol Landing Page', () => {
     cy.closeAnalyticsModal()
   })
 
-  it('content and step 1 flow works', () => {
+  it('Checks onboarding flow for OT-2', () => {
     cy.verifyCreateNewHeader()
     cy.clickCreateNew()
     const steps: StepBuilder = new StepBuilder()

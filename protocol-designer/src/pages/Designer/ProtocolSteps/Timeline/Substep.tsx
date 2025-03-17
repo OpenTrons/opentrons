@@ -71,7 +71,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
       gridGap={SPACING.spacing4}
     >
       {isMix ? (
-        <ListItem type="noActive">
+        <ListItem type="default">
           <Flex
             gridGap={SPACING.spacing4}
             padding={SPACING.spacing12}
@@ -101,7 +101,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
       ) : (
         <>
           {source != null ? (
-            <ListItem type="noActive">
+            <ListItem type="default">
               <Flex
                 gridGap={SPACING.spacing4}
                 padding={SPACING.spacing12}
@@ -130,7 +130,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
             </ListItem>
           ) : null}
           {dest != null ? (
-            <ListItem type="noActive">
+            <ListItem type="default">
               <Flex
                 gridGap={SPACING.spacing4}
                 padding={SPACING.spacing12}

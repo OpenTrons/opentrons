@@ -67,8 +67,12 @@ const CONTAINER_STYLE = css`
 
 const HEADLINE_CONTENT_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
-  gap: ${SPACING.spacing8};
+  gap: ${SPACING.spacing4};
   flex-grow: 1;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    gap: ${SPACING.spacing8};
+  }
 `
 
 const BTN_CONTAINER_STYLE = css`

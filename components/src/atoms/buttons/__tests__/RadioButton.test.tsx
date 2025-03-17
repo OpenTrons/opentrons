@@ -96,4 +96,10 @@ describe('RadioButton', () => {
     )
     expect(buttonLabelIdRadioButton).not.toBeInTheDocument()
   })
+
+  it('renders subtext if supplied', () => {
+    props = { ...props, buttonSubLabel: { label: 'test label' } }
+
+    render(props)
+  })
 })

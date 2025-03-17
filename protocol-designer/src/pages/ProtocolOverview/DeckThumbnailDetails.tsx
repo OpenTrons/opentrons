@@ -13,7 +13,7 @@ import {
 } from '@opentrons/shared-data'
 import { getStagingAreaAddressableAreas } from '../../utils'
 import { getSlotIdsBlockedBySpanningForThermocycler } from '../../step-forms'
-import { LabwareOnDeck } from '../../organisms'
+import { LabwareOnDeck } from '../../components/organisms'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, SetStateAction } from 'react'

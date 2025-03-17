@@ -79,52 +79,6 @@ def test_get_serial_number(
     assert result == "12345"
 
 
-def test_load_labware_to_hopper(
-    decoy: Decoy,
-    mock_core: FlexStackerCore,
-    mock_protocol_core: ProtocolCore,
-    subject: FlexStackerContext,
-) -> None:
-    """It should create two labware to the core map."""
-    subject.load_labware_to_hopper(load_name="some-load-name", quantity=2)
-    decoy.verify(
-        mock_protocol_core.load_labware_to_flex_stacker_hopper(
-            module_core=mock_core,
-            load_name="some-load-name",
-            quantity=2,
-            label=None,
-            namespace=None,
-            version=None,
-            lid=None,
-        ),
-        times=1,
-    )
-
-
-def test_load_labware_with_lid_to_hopper(
-    decoy: Decoy,
-    mock_core: FlexStackerCore,
-    mock_protocol_core: ProtocolCore,
-    subject: FlexStackerContext,
-) -> None:
-    """It should create two labware to the core map."""
-    subject.load_labware_to_hopper(
-        load_name="some-load-name", quantity=2, lid="some-lid-name"
-    )
-    decoy.verify(
-        mock_protocol_core.load_labware_to_flex_stacker_hopper(
-            module_core=mock_core,
-            load_name="some-load-name",
-            quantity=2,
-            label=None,
-            namespace=None,
-            version=None,
-            lid="some-lid-name",
-        ),
-        times=1,
-    )
-
-
 def test_fill(
     decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:

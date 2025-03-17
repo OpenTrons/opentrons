@@ -18,11 +18,14 @@ class GCODE(str, Enum):
     GET_MOVE_PARAMS = "M120"
     GET_PLATFORM_SENSOR = "M121"
     GET_DOOR_SWITCH = "M122"
+    GET_INSTALL_DETECTED = "M123"
     GET_STALLGUARD_THRESHOLD = "M911"
     GET_MOTOR_DRIVER_REGISTER = "M920"
     GET_TOF_SENSOR_STATUS = "M215"
     GET_TOF_DRIVER_REGISTER = "M222"
+    GET_TOF_MEASUREMENT = "M226"
     ENABLE_TOF_SENSOR = "M224"
+    MANAGE_TOF_MEASUREMENT = "M225"
     SET_LED = "M200"
     SET_SERIAL_NUMBER = "M996"
     SET_RUN_CURRENT = "M906"
@@ -47,6 +50,7 @@ class HardwareRevision(Enum):
 
     NFF = "nff"
     EVT = "a1"
+    DVT = "b1"
 
 
 @dataclass
@@ -230,3 +234,37 @@ class MoveResult(str, Enum):
     NO_ERROR = "ok"
     STALL_ERROR = "stall"
     UNKNOWN_ERROR = "unknown"
+
+
+class MeasurementKind(Enum):
+    """The kind of measurement to request."""
+
+    HISTOGRAM = 0
+
+
+@dataclass
+class TOFMeasurement:
+    """The start measurement data."""
+
+    sensor: TOFSensor
+    kind: MeasurementKind
+    cancelled: bool
+    total_bytes: int
+
+
+@dataclass
+class TOFMeasurementFrame:
+    """Stacker TOF measurement frame."""
+
+    sensor: TOFSensor
+    frame_id: int
+    data: bytes
+
+
+@dataclass
+class TOFMeasurementResult:
+    """Stacker TOF measurement result."""
+
+    sensor: TOFSensor
+    kind: MeasurementKind
+    bins: Dict[int, List[int]]

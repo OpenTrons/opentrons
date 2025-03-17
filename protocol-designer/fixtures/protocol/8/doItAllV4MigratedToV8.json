@@ -7,6 +7,7 @@
     "description": "Test all v4 commands",
     "created": 1585930833548,
     "lastModified": 1740602484685,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
@@ -232,6 +233,7 @@
           "disposalVolume_volume": "20",
           "dropTip_location": "20fc9833-0363-4216-85ae-d0ec0e658beb:trashBin",
           "liquidClassesSupported": false,
+          "liquidClass": null,
           "nozzles": null,
           "path": "single",
           "pipette": "0b3f2210-75c7-11ea-b42f-4b64e50f43e5",
@@ -2676,7 +2678,7 @@
       "displayColor": "#b925ff"
     }
   },
-  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
       "key": "df8b37d8-e5d6-444c-8946-719a8e660334",

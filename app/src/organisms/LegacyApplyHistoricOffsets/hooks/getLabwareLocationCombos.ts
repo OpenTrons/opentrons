@@ -136,6 +136,37 @@ export function getLabwareLocationCombos(
             labwareId: command.params.labwareId,
           })
         }
+      } else if (command.commandType === 'flexStacker/retrieve') {
+        if (command?.result == null) {
+          return acc
+        }
+        const modLocation = resolveModuleLocation(
+          modules,
+          command.params.moduleId
+        )
+        if (modLocation == null) {
+          return acc
+        }
+
+        if (command.result.adapterId != null) {
+          return appendLocationComboIfUniq(acc, {
+            location: {
+              ...modLocation,
+              definitionUri: command.result.adapterLabwareURI,
+            },
+            definitionUri: command.result.primaryLabwareURI,
+            labwareId: command.result.labwareId,
+            moduleId: command.params.moduleId,
+            adapterId: command.result.adapterId,
+          })
+        } else {
+          return appendLocationComboIfUniq(acc, {
+            location: modLocation,
+            definitionUri: command.result.primaryLabwareURI,
+            labwareId: command.result.labwareId,
+            moduleId: command.params.moduleId,
+          })
+        }
       } else {
         return acc
       }

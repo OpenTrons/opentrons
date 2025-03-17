@@ -3,7 +3,6 @@
 import pytest
 from decoy import Decoy
 from typing import cast
-from unittest.mock import sentinel
 
 from opentrons.protocol_engine.state.update_types import (
     StateUpdate,
@@ -26,6 +25,7 @@ from opentrons.protocol_engine.errors import (
     FlexStackerLabwarePoolNotYetDefinedError,
     ModuleNotLoadedError,
 )
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 
@@ -38,12 +38,12 @@ def subject(state_view: StateView, run_control: RunControlHandler) -> FillImpl:
 @pytest.mark.parametrize(
     "current_count,count_param,max_pool_count",
     [
-        pytest.param(0, 5, 5, id="empty-to-full"),
-        pytest.param(5, 5, 5, id="full-noop"),
-        pytest.param(5, 4, 5, id="size-minimum"),
+        pytest.param(0, 6, 6, id="empty-to-full"),
+        pytest.param(6, 6, 6, id="full-noop"),
+        pytest.param(6, 4, 6, id="size-minimum"),
         pytest.param(3, 4, 4, id="fill-not-to-full"),
-        pytest.param(4, 6, 5, id="capped-by-max"),
-        pytest.param(3, None, 5, id="default-count"),
+        pytest.param(4, 7, 6, id="capped-by-max"),
+        pytest.param(3, None, 6, id="default-count"),
     ],
 )
 async def test_fill_happypath(
@@ -53,14 +53,13 @@ async def test_fill_happypath(
     current_count: int,
     count_param: int | None,
     max_pool_count: int,
+    flex_50uL_tiprack: LabwareDefinition,
 ) -> None:
     """It should fill a valid stacker's labware pool."""
     module_id = "some-module-id"
     stacker_state = FlexStackerSubState(
         module_id=cast(FlexStackerId, module_id),
-        in_static_mode=sentinel.in_static_mode,
-        hopper_labware_ids=[],
-        pool_primary_definition=sentinel.pool_primary_definition,
+        pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
         pool_count=current_count,
@@ -81,7 +80,10 @@ async def test_fill_happypath(
             module_id=module_id, pool_count=max_pool_count
         )
     )
-    assert result.public == FillResult(count=max_pool_count)
+    assert result.public == FillResult(
+        count=max_pool_count,
+        primaryLabwareURI="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+    )
 
 
 async def test_fill_requires_stacker(
@@ -109,8 +111,6 @@ async def test_fill_requires_constrained_pool(
     module_id = "module-id"
     stacker_state = FlexStackerSubState(
         module_id=cast(FlexStackerId, module_id),
-        in_static_mode=sentinel.in_static_mode,
-        hopper_labware_ids=[],
         pool_primary_definition=None,
         pool_adapter_definition=None,
         pool_lid_definition=None,
@@ -142,17 +142,16 @@ async def test_pause_strategy_pauses(
     state_view: StateView,
     run_control: RunControlHandler,
     subject: FillImpl,
+    flex_50uL_tiprack: LabwareDefinition,
 ) -> None:
     """It should pause the system when the pause strategy is used."""
     current_count = 3
-    count_param = 5
-    max_pool_count = 5
+    count_param = 6
+    max_pool_count = 6
     module_id = "some-module-id"
     stacker_state = FlexStackerSubState(
         module_id=cast(FlexStackerId, module_id),
-        in_static_mode=sentinel.in_static_mode,
-        hopper_labware_ids=[],
-        pool_primary_definition=sentinel.pool_primary_definition,
+        pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
         pool_count=current_count,
@@ -167,11 +166,15 @@ async def test_pause_strategy_pauses(
         message="some-message",
         strategy=StackerFillEmptyStrategy.MANUAL_WITH_PAUSE,
     )
+
     result = await subject.execute(params)
     assert result.state_update == StateUpdate(
         flex_stacker_state_update=FlexStackerStateUpdate(
             module_id=module_id, pool_count=max_pool_count
         )
     )
-    assert result.public == FillResult(count=max_pool_count)
+    assert result.public == FillResult(
+        count=max_pool_count,
+        primaryLabwareURI="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+    )
     decoy.verify(await run_control.wait_for_resume())

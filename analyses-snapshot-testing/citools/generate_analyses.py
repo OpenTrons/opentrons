@@ -79,9 +79,9 @@ class TargetProtocol:
         }
 
     def write_failed_analysis(self) -> None:
-        analysis = self.create_failed_analysis()
+        self.analysis = self.create_failed_analysis()
         with open(self.host_analysis_file, "w") as file:
-            json.dump(analysis, file, indent=4)
+            json.dump(self.analysis, file, indent=4)
 
     def set_analysis(self) -> None:
         if self.analysis_file_exists:
@@ -247,7 +247,7 @@ def get_container_instances(protocol_len: int) -> int:
     return instances
 
 
-def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> None:
+def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> List[TargetProtocol]:
     """Generate analyses from the tests."""
     start_time = time.time()
     protocols_to_process: List[TargetProtocol] = []
@@ -270,3 +270,4 @@ def generate_analyses_from_test(tag: str, protocols: List[Protocol]) -> None:
     analyze_against_image(tag, protocols_to_process, instance_count)
     end_time = time.time()
     console.print(f"Clock time to generate analyses: {end_time - start_time:.2f} seconds.")
+    return protocols_to_process

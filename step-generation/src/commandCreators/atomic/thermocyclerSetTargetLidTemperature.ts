@@ -7,6 +7,7 @@ export const thermocyclerSetTargetLidTemperature: CommandCreator<TemperaturePara
   prevRobotState
 ) => {
   const { moduleId, celsius } = args
+  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
   return {
     commands: [
       {
@@ -18,5 +19,6 @@ export const thermocyclerSetTargetLidTemperature: CommandCreator<TemperaturePara
         },
       },
     ],
+    python: `${pythonName}.set_lid_temperature(${celsius})`,
   }
 }

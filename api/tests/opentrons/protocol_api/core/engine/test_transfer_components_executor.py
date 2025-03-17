@@ -110,7 +110,6 @@ def test_submerge(
             rate=1,
             flow_rate=air_gap_removal_flow_rate,
             in_place=True,
-            is_meniscus=False,
             push_out=0,
             correction_volume=air_gap_correction_vol,
         ),
@@ -127,10 +126,10 @@ def test_submerge(
 
 
 @pytest.mark.parametrize(
-    argnames=["position_reference", "expected_is_meniscus"],
+    argnames=["position_reference"],
     argvalues=[
-        [PositionReference.WELL_BOTTOM, False],
-        [PositionReference.LIQUID_MENISCUS, True],
+        [PositionReference.WELL_BOTTOM],
+        [PositionReference.LIQUID_MENISCUS],
     ],
 )
 def test_aspirate_and_wait(
@@ -138,7 +137,6 @@ def test_aspirate_and_wait(
     mock_instrument_core: InstrumentCore,
     sample_transfer_props: TransferProperties,
     position_reference: PositionReference,
-    expected_is_meniscus: bool,
 ) -> None:
     """It should execute an aspirate and a delay according to properties."""
     source_well = decoy.mock(cls=WellCore)
@@ -166,7 +164,6 @@ def test_aspirate_and_wait(
             rate=1,
             flow_rate=aspirate_flow_rate,
             in_place=True,
-            is_meniscus=expected_is_meniscus,
             correction_volume=correction_volume,
         ),
         mock_instrument_core.delay(0.2),
@@ -198,10 +195,10 @@ def test_aspirate_and_wait_skips_delay(
 
 
 @pytest.mark.parametrize(
-    argnames=["position_reference", "expected_is_meniscus"],
+    argnames=["position_reference"],
     argvalues=[
-        [PositionReference.WELL_BOTTOM, False],
-        [PositionReference.LIQUID_MENISCUS, True],
+        [PositionReference.WELL_BOTTOM],
+        [PositionReference.LIQUID_MENISCUS],
     ],
 )
 def test_dispense_and_wait(
@@ -209,7 +206,6 @@ def test_dispense_and_wait(
     mock_instrument_core: InstrumentCore,
     sample_transfer_props: TransferProperties,
     position_reference: PositionReference,
-    expected_is_meniscus: bool,
 ) -> None:
     """It should execute a dispense and a delay according to properties."""
     source_well = decoy.mock(cls=WellCore)
@@ -242,7 +238,6 @@ def test_dispense_and_wait(
             flow_rate=dispense_flow_rate,
             in_place=True,
             push_out=123,
-            is_meniscus=expected_is_meniscus,
             correction_volume=correction_volume,
         ),
         mock_instrument_core.delay(0.5),
@@ -317,7 +312,6 @@ def test_mix(
             rate=1,
             flow_rate=aspirate_flow_rate,
             in_place=True,
-            is_meniscus=False,
             correction_volume=aspirate_correction_volume,
         ),
         mock_instrument_core.delay(0.2),
@@ -329,7 +323,6 @@ def test_mix(
             flow_rate=dispense_flow_rate,
             in_place=True,
             push_out=2.0,
-            is_meniscus=False,
             correction_volume=dispense_correction_volume,
         ),
         mock_instrument_core.delay(0.5),
@@ -370,7 +363,6 @@ def test_mix_disabled(
             rate=1,
             flow_rate=aspirate_flow_rate,
             in_place=True,
-            is_meniscus=False,
             correction_volume=correction_volume,
         ),
         times=0,
@@ -414,7 +406,6 @@ def test_pre_wet(
             rate=1,
             flow_rate=aspirate_flow_rate,
             in_place=True,
-            is_meniscus=False,
             correction_volume=aspirate_correction_volume,
         ),
         mock_instrument_core.delay(0.2),
@@ -426,7 +417,6 @@ def test_pre_wet(
             flow_rate=dispense_flow_rate,
             in_place=True,
             push_out=0,
-            is_meniscus=False,
             correction_volume=dispense_correction_volume,
         ),
         mock_instrument_core.delay(0.5),
@@ -465,7 +455,6 @@ def test_pre_wet_disabled(
             rate=1,
             flow_rate=aspirate_flow_rate,
             in_place=True,
-            is_meniscus=False,
             correction_volume=aspirate_correction_volume,
         ),
         times=0,

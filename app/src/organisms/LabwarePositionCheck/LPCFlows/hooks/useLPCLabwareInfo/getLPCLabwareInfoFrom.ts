@@ -2,8 +2,14 @@ import isEqual from 'lodash/isEqual'
 
 import { getLabwareDisplayName, getLabwareDefURI } from '@opentrons/shared-data'
 
+import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LPCLabwareInfo, OffsetDetails } from '/app/redux/protocol-runs'
+import type {
+  DefaultOffsetDetails,
+  LocationSpecificOffsetDetails,
+  LPCLabwareInfo,
+} from '/app/redux/protocol-runs'
 import type { LabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLabwareLocationCombos'
 import type { UseLPCLabwareInfoProps } from '.'
 
@@ -26,11 +32,26 @@ function getLabwareInfoRecords(
   const labwareDetails: LPCLabwareInfo['labware'] = {}
 
   params.lwURIs.forEach(uri => {
+    if (!labwareUriKnown({ ...params, uri })) {
+      console.warn(
+        `getLPCLabwareInfoFrom: No information about labware uri ${uri}, is there a command that loads labware that we're not handling?`
+      )
+      return
+    }
     if (!(uri in labwareDetails)) {
       labwareDetails[uri] = {
         id: getALabwareIdFromUri({ ...params, uri }),
         displayName: getDisplayNameFromUri({ ...params, uri }),
-        offsetDetails: getOffsetDetailsForLabware({ ...params, uri }),
+        defaultOffsetDetails: getDefaultOffsetDetailsForLabware({
+          ...params,
+          uri,
+        }),
+        locationSpecificOffsetDetails: getLocationSpecificOffsetDetailsForLabware(
+          {
+            ...params,
+            uri,
+          }
+        ),
       }
     }
   })
@@ -49,6 +70,13 @@ function getALabwareIdFromUri({
   return (
     lwLocationCombos.find(combo => combo.definitionUri === uri)?.labwareId ?? ''
   )
+}
+
+function labwareUriKnown({
+  uri,
+  labwareDefs,
+}: GetLPCLabwareInfoForURI): boolean {
+  return labwareDefs?.find(def => getLabwareDefURI(def) === uri) != null
 }
 
 function getDisplayNameFromUri({
@@ -71,30 +99,54 @@ function getDisplayNameFromUri({
 
 // NOTE: A lot of the logic here acts as temporary adapter that resolves the app's current way of getting offset data (scraping the run record)
 // and the end goal of treating labware as first class citizens.
-function getOffsetDetailsForLabware({
+function getLocationSpecificOffsetDetailsForLabware({
   currentOffsets,
   lwLocationCombos,
   uri,
-}: GetLPCLabwareInfoForURI): OffsetDetails[] {
-  return lwLocationCombos.flatMap(comboInfo => {
-    const { definitionUri, location, ...restInfo } = comboInfo
+}: GetLPCLabwareInfoForURI): LocationSpecificOffsetDetails[] {
+  // @ts-expect-error - Temporary util. No need to solve this completely here.
+  return lwLocationCombos
+    .flatMap(comboInfo => {
+      const { definitionUri, location, ...restInfo } = comboInfo
 
-    const existingOffset =
-      currentOffsets.find(
-        offset =>
-          uri === offset.definitionUri &&
-          isEqual(offset.location, comboInfo.location)
-      ) ?? null
+      const existingOffset =
+        currentOffsets.find(
+          offset =>
+            uri === offset.definitionUri &&
+            isEqual(offset.location, comboInfo.location)
+        ) ?? null
 
-    return {
-      existingOffset: existingOffset ?? null,
-      workingOffset: null,
-      locationDetails: {
-        ...location,
-        ...restInfo,
-        definitionUri,
-        kind: 'location-specific',
-      },
-    }
-  })
+      return {
+        existingOffset: existingOffset ?? null,
+        workingOffset: null,
+        locationDetails: {
+          ...location,
+          ...restInfo,
+          definitionUri,
+          kind: OFFSET_KIND_LOCATION_SPECIFIC,
+        },
+      }
+    })
+    .filter(detail => detail.locationDetails.definitionUri === uri)
+}
+
+// A temporary utility for getting a dummy default offset.
+function getDefaultOffsetDetailsForLabware({
+  lwLocationCombos,
+  uri,
+}: GetLPCLabwareInfoForURI): DefaultOffsetDetails {
+  const aLabwareId =
+    lwLocationCombos?.find(combo => combo.definitionUri === uri)?.labwareId ??
+    ''
+
+  return {
+    workingOffset: null,
+    existingOffset: null,
+    locationDetails: {
+      labwareId: aLabwareId,
+      definitionUri: uri,
+      kind: 'default',
+      slotName: 'C2',
+    },
+  }
 }

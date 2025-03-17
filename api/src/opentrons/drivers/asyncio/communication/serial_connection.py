@@ -2,17 +2,16 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional, List
+from typing import Optional, List, Type
 
 from opentrons.drivers.command_builder import CommandBuilder
 
 from .errors import (
-    MotorStall,
     NoResponse,
     AlarmResponse,
     ErrorResponse,
-    UnhandledGcode,
-    ErrorCodes,
+    BaseErrorCode,
+    DefaultErrorCodes,
 )
 from .async_serial import AsyncSerial
 
@@ -50,7 +49,8 @@ class SerialConnection:
         error_keyword: Optional[str] = None,
         alarm_keyword: Optional[str] = None,
         reset_buffer_before_write: bool = False,
-    ) -> SerialConnection:
+        error_codes: Type[BaseErrorCode] = DefaultErrorCodes,
+    ) -> "SerialConnection":
         """
         Create a connection.
 
@@ -70,6 +70,8 @@ class SerialConnection:
                            (default: alarm)
             reset_buffer_before_write: whether to reset the read buffer before
               every write
+            error_codes: Enum class for error codes
+                         (default: DefaultErrorCodes)
 
         Returns: SerialConnection
         """
@@ -89,6 +91,7 @@ class SerialConnection:
             retry_wait_time_seconds=retry_wait_time_seconds,
             error_keyword=error_keyword or "error",
             alarm_keyword=alarm_keyword or "alarm",
+            error_codes=error_codes,
         )
 
     def __init__(
@@ -100,6 +103,7 @@ class SerialConnection:
         retry_wait_time_seconds: float,
         error_keyword: str,
         alarm_keyword: str,
+        error_codes: Type[BaseErrorCode] = DefaultErrorCodes,
     ) -> None:
         """
         Constructor
@@ -114,6 +118,7 @@ class SerialConnection:
                            exception when detected
             alarm_keyword: string that will cause an AlarmResponse
                            exception when detected
+            error_codes: Enum class for error codes
         """
         self._serial = serial
         self._port = port
@@ -123,6 +128,7 @@ class SerialConnection:
         self._send_data_lock = asyncio.Lock()
         self._error_keyword = error_keyword.lower()
         self._alarm_keyword = alarm_keyword.lower()
+        self._error_codes = error_codes
 
     async def send_command(
         self, command: CommandBuilder, retries: int = 0, timeout: Optional[float] = None
@@ -244,8 +250,8 @@ class SerialConnection:
         Raise an error if the response contains an error
 
         Args:
-            gcode: the requesting gocde
             response: response
+            request: the requesting command
 
         Returns: None
 
@@ -257,15 +263,16 @@ class SerialConnection:
             raise AlarmResponse(port=self._port, response=response)
 
         if self._error_keyword.lower() in lower:
-            if ErrorCodes.UNHANDLED_GCODE.value.lower() in lower:
-                raise UnhandledGcode(
-                    port=self._port, response=response, command=request
-                )
+            # Check for specific error codes
+            error_codes_dict = self._error_codes.get_error_codes()
+            for code, error_code in error_codes_dict.items():
+                if code in lower:
+                    error_code.raise_exception(
+                        port=self._port, response=response, command=request
+                    )
 
-            elif ErrorCodes.MOTOR_STALL.value.lower() in lower:
-                raise MotorStall(port=self._port, response=response, command=request)
-            else:
-                raise ErrorResponse(port=self._port, response=response)
+            # If no specific error code was found, raise a generic ErrorResponse
+            raise ErrorResponse(port=self._port, response=response)
 
     async def on_retry(self) -> None:
         """
@@ -307,6 +314,7 @@ class AsyncResponseSerialConnection(SerialConnection):
         error_keyword: Optional[str] = None,
         alarm_keyword: Optional[str] = None,
         reset_buffer_before_write: bool = False,
+        error_codes: Type[BaseErrorCode] = DefaultErrorCodes,
         async_error_ack: Optional[str] = None,
         number_of_retries: int = 0,
     ) -> AsyncResponseSerialConnection:
@@ -331,6 +339,9 @@ class AsyncResponseSerialConnection(SerialConnection):
               every write
             async_error_ack: optional string that will indicate an asynchronous
                              error when detected (default: async)
+            number_of_retries: default number of retries
+            error_codes: Enum class for error codes
+                         (default: DefaultErrorCodes)
 
         Returns: AsyncResponseSerialConnection
         """
@@ -352,6 +363,7 @@ class AsyncResponseSerialConnection(SerialConnection):
             alarm_keyword=alarm_keyword or "alarm",
             async_error_ack=async_error_ack or "async",
             number_of_retries=number_of_retries,
+            error_codes=error_codes,
         )
 
     def __init__(
@@ -365,6 +377,7 @@ class AsyncResponseSerialConnection(SerialConnection):
         alarm_keyword: str,
         async_error_ack: str,
         number_of_retries: int = 0,
+        error_codes: Type[BaseErrorCode] = DefaultErrorCodes,
     ) -> None:
         """
         Constructor
@@ -381,6 +394,8 @@ class AsyncResponseSerialConnection(SerialConnection):
                            exception when detected
             async_error_ack: string that will indicate an asynchronous
                              error when detected
+            number_of_retries: default number of retries
+            error_codes: Enum class for error codes
         """
         super().__init__(
             serial=serial,
@@ -390,6 +405,7 @@ class AsyncResponseSerialConnection(SerialConnection):
             retry_wait_time_seconds=retry_wait_time_seconds,
             error_keyword=error_keyword,
             alarm_keyword=alarm_keyword,
+            error_codes=error_codes,
         )
         self._serial = serial
         self._port = port

@@ -3,7 +3,6 @@
 import pytest
 from decoy import Decoy
 from typing import cast
-from unittest.mock import sentinel
 
 from opentrons.protocol_engine.state.update_types import (
     StateUpdate,
@@ -26,6 +25,7 @@ from opentrons.protocol_engine.errors import (
     ModuleNotLoadedError,
     FlexStackerLabwarePoolNotYetDefinedError,
 )
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 
@@ -39,11 +39,11 @@ def subject(state_view: StateView, run_control: RunControlHandler) -> EmptyImpl:
     "current_count,count_param,target_count",
     [
         pytest.param(0, 0, 0, id="empty-to-empty"),
-        pytest.param(5, 0, 0, id="full-to-empty"),
-        pytest.param(5, 5, 5, id="full-noop"),
-        pytest.param(4, 5, 4, id="size-capped"),
+        pytest.param(6, 0, 0, id="full-to-empty"),
+        pytest.param(6, 6, 6, id="full-noop"),
+        pytest.param(4, 6, 4, id="size-capped"),
         pytest.param(4, 3, 3, id="not-full-empty"),
-        pytest.param(5, 6, 5, id="overfull"),
+        pytest.param(6, 7, 6, id="overfull"),
         pytest.param(3, None, 0, id="default-count"),
     ],
 )
@@ -54,14 +54,13 @@ async def test_empty_happypath(
     current_count: int,
     count_param: int | None,
     target_count: int,
+    flex_50uL_tiprack: LabwareDefinition,
 ) -> None:
     """It should empty a valid stacker's labware pool."""
     module_id = "some-module-id"
     stacker_state = FlexStackerSubState(
         module_id=cast(FlexStackerId, module_id),
-        in_static_mode=sentinel.in_static_mode,
-        hopper_labware_ids=[],
-        pool_primary_definition=sentinel.pool_primary_definition,
+        pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
         pool_count=current_count,
@@ -82,7 +81,10 @@ async def test_empty_happypath(
             module_id=module_id, pool_count=target_count
         )
     )
-    assert result.public == EmptyResult(count=target_count)
+    assert result.public == EmptyResult(
+        count=target_count,
+        primaryLabwareURI="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+    )
 
 
 async def test_empty_requires_stacker(
@@ -110,8 +112,6 @@ async def test_empty_requires_constrained_pool(
     module_id = "module-id"
     stacker_state = FlexStackerSubState(
         module_id=cast(FlexStackerId, module_id),
-        in_static_mode=sentinel.in_static_mode,
-        hopper_labware_ids=[],
         pool_primary_definition=None,
         pool_lid_definition=None,
         pool_adapter_definition=None,
@@ -143,6 +143,7 @@ async def test_pause_strategy_pauses(
     state_view: StateView,
     run_control: RunControlHandler,
     subject: EmptyImpl,
+    flex_50uL_tiprack: LabwareDefinition,
 ) -> None:
     """It should pause the system when the pause strategy is used."""
     module_id = "some-module-id"
@@ -151,9 +152,7 @@ async def test_pause_strategy_pauses(
     target_count = 1
     stacker_state = FlexStackerSubState(
         module_id=cast(FlexStackerId, module_id),
-        in_static_mode=sentinel.in_static_mode,
-        hopper_labware_ids=[],
-        pool_primary_definition=sentinel.pool_primary_definition,
+        pool_primary_definition=flex_50uL_tiprack,
         pool_adapter_definition=None,
         pool_lid_definition=None,
         pool_count=current_count,
@@ -174,5 +173,8 @@ async def test_pause_strategy_pauses(
             module_id=module_id, pool_count=target_count
         )
     )
-    assert result.public == EmptyResult(count=target_count)
+    assert result.public == EmptyResult(
+        count=target_count,
+        primaryLabwareURI="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+    )
     decoy.verify(await run_control.wait_for_resume())

@@ -11,7 +11,7 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { InputStepFormField } from '../../../../../../molecules'
+import { InputStepFormField } from '../../../../../../components/molecules'
 import { PositionField } from '../../PipetteFields'
 
 import type { FieldPropsByName } from '../../types'
@@ -65,7 +65,7 @@ export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
         </Flex>
         <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
       </Flex>
-      <ListItem type="noActive">
+      <ListItem type="default">
         <Flex
           padding={SPACING.spacing12}
           width="100%"

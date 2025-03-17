@@ -23,7 +23,7 @@ import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,

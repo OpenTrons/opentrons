@@ -75,7 +75,7 @@ export function BaseSettings(props: BaseSettingsProps): JSX.Element | null {
       {selectedSetting == null
         ? displayItems.map(displayItem => (
             <ListItem
-              type="noActive"
+              type="default"
               key={displayItem.option}
               onClick={displayItem.onClick}
             >

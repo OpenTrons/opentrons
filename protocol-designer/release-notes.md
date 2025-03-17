@@ -8,6 +8,20 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.4.2
+
+**Welcome to Protocol Designer 8.4.2!**
+
+This hotfix release addresses a bug during protocol analysis on the Opentrons App caused by an air gap after dispense.
+
+---
+
+## Opentrons Protocol Designer Changes in 8.4.1
+
+Version 8.4.1 was not released due to internal branching issues.
+
+---
+
 ## Opentrons Protocol Designer Changes in 8.4.0
 
 **Welcome to Protocol Designer 8.4.0!**

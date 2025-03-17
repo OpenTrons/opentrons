@@ -12,6 +12,7 @@ export const disengageMagnet: CommandCreator<ModuleOnlyParams> = (
   prevRobotState
 ) => {
   const { moduleId } = args
+  const { moduleEntities } = invariantContext
   const commandType = 'magneticModule/disengage'
 
   if (moduleId === null) {
@@ -21,9 +22,12 @@ export const disengageMagnet: CommandCreator<ModuleOnlyParams> = (
   }
 
   assert(
-    invariantContext.moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
-    `expected module ${moduleId} to be magdeck, got ${invariantContext.moduleEntities[moduleId]?.type}`
+    moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
+    `expected module ${moduleId} to be magdeck, got ${moduleEntities[moduleId]?.type}`
   )
+
+  const pythonName = moduleEntities[moduleId].pythonName
+
   return {
     commands: [
       {
@@ -34,5 +38,6 @@ export const disengageMagnet: CommandCreator<ModuleOnlyParams> = (
         },
       },
     ],
+    python: `${pythonName}.disengage()`,
   }
 }

@@ -1,5 +1,9 @@
+import base64
+from typing import Generator, Dict, List, Any
 import pytest
-from mock import AsyncMock
+from binascii import Error as BinError
+from decoy import Decoy
+from mock import AsyncMock, MagicMock
 from opentrons.drivers.asyncio.communication.serial_connection import (
     AsyncResponseSerialConnection,
 )
@@ -10,6 +14,7 @@ from opentrons.drivers.flex_stacker.driver import (
     FlexStackerDriver,
 )
 from opentrons.drivers.flex_stacker import types
+from opentrons.drivers.flex_stacker.errors import MotorStallDetected
 
 
 @pytest.fixture
@@ -20,6 +25,7 @@ def connection() -> AsyncMock:
 @pytest.fixture
 def subject(connection: AsyncMock) -> FlexStackerDriver:
     connection.send_command.return_value = ""
+    connection._serial = MagicMock()
     return FlexStackerDriver(connection)
 
 
@@ -153,7 +159,6 @@ async def test_enable_motors(subject: FlexStackerDriver, connection: AsyncMock) 
     move_to.add_element(types.StackerAxis.Z.value)
     move_to.add_element(types.StackerAxis.L.value)
 
-    print("MOVE TO", move_to)
     connection.send_command.assert_any_call(move_to)
     connection.reset_mock()
 
@@ -277,6 +282,34 @@ async def test_move_in_mm(subject: FlexStackerDriver, connection: AsyncMock) -> 
 
     move_to = types.GCODE.MOVE_TO.build_command().add_float("X", 10)
     connection.send_command.assert_any_call(move_to, timeout=FS_MOVE_TIMEOUT)
+    connection.reset_mock()
+
+
+@pytest.mark.parametrize(
+    "command,command_args",
+    [
+        ("home_axis", (types.StackerAxis.X, types.Direction.EXTEND)),
+        ("move_to_limit_switch", (types.StackerAxis.X, types.Direction.EXTEND)),
+        ("move_in_mm", (types.StackerAxis.X, 10)),
+    ],
+)
+async def test_move_stall(
+    subject: FlexStackerDriver,
+    connection: AsyncMock,
+    command: str,
+    command_args: list[Any],
+) -> None:
+    """It should handle motor stall exceptions during move commands."""
+    # raise a motor stall detected exception
+    connection.send_command.side_effect = MotorStallDetected(
+        port="port", response="response", command="move command"
+    )
+
+    response = await subject.__getattribute__(command)(*command_args)
+
+    connection.send_command.assert_called_once()
+    # Verify we got a stall error result
+    assert response == types.MoveResult.STALL_ERROR
     connection.reset_mock()
 
 
@@ -493,3 +526,189 @@ async def test_get_tof_sensor_status(
         types.TOFSensor.Z.name
     )
     connection.send_command.assert_any_call(tof_status)
+
+
+async def test_manage_tof_measurement(
+    subject: FlexStackerDriver, connection: AsyncMock
+) -> None:
+    """it should send a start tof measurement and receive payload info."""
+    connection.send_command.return_value = "M225 X K:0 C:0 L:3840"
+    response = await subject.manage_tof_measurement(types.TOFSensor.X)
+    assert response == types.TOFMeasurement(
+        sensor=types.TOFSensor.X,
+        kind=types.MeasurementKind.HISTOGRAM,
+        cancelled=False,
+        total_bytes=3840,
+    )
+
+    manage_measurement = (
+        types.GCODE.MANAGE_TOF_MEASUREMENT.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_int("K", types.MeasurementKind.HISTOGRAM.value)
+    )
+    connection.send_command.assert_any_call(manage_measurement)
+    connection.reset_mock()
+
+    # Test cancel transfer
+    connection.send_command.return_value = "M225 X K:0 C:1 L:0"
+    response = await subject.manage_tof_measurement(types.TOFSensor.X, start=False)
+    assert response == types.TOFMeasurement(
+        sensor=types.TOFSensor.X,
+        kind=types.MeasurementKind.HISTOGRAM,
+        cancelled=True,
+        total_bytes=0,
+    )
+
+    manage_measurement = (
+        types.GCODE.MANAGE_TOF_MEASUREMENT.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_int("K", types.MeasurementKind.HISTOGRAM.value)
+        .add_element("C")
+    )
+    connection.send_command.assert_any_call(manage_measurement)
+    connection.reset_mock()
+
+    # Test invalid response
+    connection.send_command.return_value = "M225 X K:0 LA0"
+
+    # This should raise ValueError
+    with pytest.raises(ValueError):
+        response = await subject.manage_tof_measurement(types.TOFSensor.X)
+
+    manage_measurement = (
+        types.GCODE.MANAGE_TOF_MEASUREMENT.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_int("K", types.MeasurementKind.HISTOGRAM.value)
+    )
+    connection.send_command.assert_any_call(manage_measurement)
+    connection.reset_mock()
+
+
+async def test_get_tof_histogram_frame(
+    subject: FlexStackerDriver, connection: AsyncMock
+) -> None:
+    """it should send a get tof measurement and receive a frame."""
+    connection.send_command.return_value = "M226 X I:30 D:gSGAAB2AAAAAAAAAAAAAA\
+            AAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
+            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
+            AAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    response = await subject._get_tof_histogram_frame(types.TOFSensor.X)
+    assert response == types.TOFMeasurementFrame(
+        sensor=types.TOFSensor.X,
+        frame_id=30,
+        data=b"\x81!\x80\x00\x1d\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+    )
+
+    get_measurement = types.GCODE.GET_TOF_MEASUREMENT.build_command().add_element(
+        types.TOFSensor.X.name
+    )
+    connection.send_command.assert_any_call(get_measurement)
+    connection.reset_mock()
+
+    # Test cancel transfer
+    connection.send_command.return_value = "M226 X I:30 D:gSGAAB2AAAAAAAAAAAAAA\
+            AAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
+            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
+            AAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    response = await subject._get_tof_histogram_frame(types.TOFSensor.X, resend=True)
+    assert response == types.TOFMeasurementFrame(
+        sensor=types.TOFSensor.X,
+        frame_id=30,
+        data=b"\x81!\x80\x00\x1d\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+    )
+
+    get_measurement = (
+        types.GCODE.GET_TOF_MEASUREMENT.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_element("R")
+    )
+    connection.send_command.assert_any_call(get_measurement)
+    connection.reset_mock()
+
+    # Test invalid index response
+    connection.send_command.return_value = "M226 X I:a D:asdsd3"
+
+    # This should raise ValueError
+    with pytest.raises(ValueError):
+        response = await subject._get_tof_histogram_frame(types.TOFSensor.X)
+
+    # Test invalid base64 frame
+    connection.send_command.return_value = "M226 X I:23 D:INVALID"
+
+    # This should raise binascii.Error
+    with pytest.raises(BinError):
+        response = await subject._get_tof_histogram_frame(types.TOFSensor.X)
+
+
+def get_histogram_payload(frames: int) -> Generator[str, None, None]:
+    """Helper to get histogram payload."""
+    length = 0
+    frame_id = 0
+    while length < frames:
+        first = bytearray(
+            b"\x81\x04\x00\x0f\x00\x80\x00\x01\x00\x03\x00\x02\x02\x02\x02\x06\x03\x07\x02\x04\x03\x0b\xcc\xe5CJ\xf07I-\x9aT%\xe2\xd3\xb3\xa7\x82\x8clGKE/%.+$%\x1a\x1a\x11\x12\x10\x12\x11\x0c\x0b\t\x07\x0c\n\t\x05\x06\x0b\x0b\x05\x05\x07\x01\x0b\x05\x08\x05\x08\x03\x05\x02\x04\t\x04\x02\x02\x07\x06\x05\x06\x03\x03\x03\x07\x02\x00\x06\x03\x06\x02\x03\x05\x04\x03\x04\x02\x07\x02\x01\x05\x04\x05\x03\x02\x01\x01\x02\x02\x01\x04\x04\x04\x06\x03\x02\x04\x03\x02\x03\x01\x05\x05\x03\x02\x04\x03\x04"
+        )
+        rest = bytearray(
+            b"\x81\x05\x80\x0e\x01\x80\x0020-*1$)213/-\x1e8\x14\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        )
+        rest[4] = frame_id
+        data = first if frame_id == 0 else rest
+        encoded = base64.b64encode(data).decode("utf-8")
+        yield f"M226 X I:{frame_id+1} D:{encoded}"
+        frame_id += 1
+        length += 1
+
+
+async def test_get_tof_histogram(
+    subject: FlexStackerDriver,
+    connection: AsyncMock,
+    decoy: Decoy,
+    histogram_bins: Dict[int, List[int]],
+) -> None:
+    """it should send a start and get tof measurements until full payload is transfered"""
+    connection.send_command.side_effect = [
+        "M215 X:1 T:2 M:3",
+        "M225 X K:0 C:0 L:3840",
+    ] + [p for p in get_histogram_payload(30)]
+    response = await subject.get_tof_histogram(types.TOFSensor.X)
+    assert response == types.TOFMeasurementResult(
+        sensor=types.TOFSensor.X,
+        kind=types.MeasurementKind.HISTOGRAM,
+        bins=histogram_bins,
+    )
+
+    manage_measurement = (
+        types.GCODE.MANAGE_TOF_MEASUREMENT.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_int("K", types.MeasurementKind.HISTOGRAM.value)
+    )
+    get_measurement = types.GCODE.GET_TOF_MEASUREMENT.build_command().add_element(
+        types.TOFSensor.X.name
+    )
+    connection.send_command.assert_any_call(manage_measurement)
+    connection.send_command.assert_any_call(get_measurement)
+    connection.reset_mock()
+
+    # Test invalid frame_id
+    payload = [p for p in get_histogram_payload(2)]
+    connection.send_command.side_effect = (
+        ["M215 X:1 T:2 M:3", "M225 X K:0 C:1 L:3840"]
+        + payload
+        + [payload[1], "M225 X K:0 C:1 L:0"]
+    )
+
+    # This should raise an exception
+    with pytest.raises(RuntimeError):
+        response = await subject.get_tof_histogram(types.TOFSensor.X)
+
+    manage_measurement = (
+        types.GCODE.MANAGE_TOF_MEASUREMENT.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_int("K", types.MeasurementKind.HISTOGRAM.value)
+    )
+    get_measurement = types.GCODE.GET_TOF_MEASUREMENT.build_command().add_element(
+        types.TOFSensor.X.name
+    )
+    connection.send_command.assert_any_call(manage_measurement)
+    connection.send_command.assert_any_call(get_measurement)
+    connection.reset_mock()

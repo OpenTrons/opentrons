@@ -1265,7 +1265,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -1365,6 +1365,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -1428,7 +1433,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -1528,6 +1533,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -1595,7 +1605,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -1695,6 +1705,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -1766,7 +1781,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -1866,6 +1881,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -1941,7 +1961,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -2041,6 +2061,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -11165,7 +11190,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11358,7 +11383,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11458,7 +11483,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11886,7 +11911,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12468,7 +12493,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12657,7 +12682,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12846,7 +12871,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -12946,7 +12971,7 @@
           "y": 181.24,
           "z": 18.0
         },
-        "z_position": 14.95
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -13513,7 +13538,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -13751,7 +13776,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -13851,7 +13876,7 @@
           "y": 181.24,
           "z": 18.0
         },
-        "z_position": 14.95
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

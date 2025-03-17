@@ -1,58 +1,41 @@
 import { describe, it, expect, vi } from 'vitest'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { curryCommandCreator } from '../utils'
-import { movableTrashCommandsUtil } from '../utils/movableTrashCommandsUtil'
 import {
-  aspirateInPlace,
+  airGapInMovableTrash,
+  blowOutInMovableTrash,
+  dispenseInMovableTrash,
+} from '../utils/movableTrashCommandsUtil'
+import {
+  airGapInPlace,
   blowOutInPlace,
   dispenseInPlace,
-  dropTipInPlace,
   moveToAddressableArea,
-  moveToAddressableAreaForDropTip,
+  prepareToAspirate,
 } from '../commandCreators/atomic'
-import type { PipetteEntities } from '../types'
+import type { CutoutId } from '@opentrons/shared-data'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 vi.mock('../utils/curryCommandCreator')
 
-const mockTrashBinId = 'mockTrashBinId'
 const mockId = 'mockId'
 
-const mockPipEntities: PipetteEntities = {
-  [mockId]: {
-    name: 'p50_single_flex',
-    id: mockId,
-  },
-} as any
-const mockCutout = 'cutoutA3'
+const mockCutout: CutoutId = 'cutoutA3'
 const mockMoveToAddressableAreaParams = {
   pipetteId: mockId,
   addressableAreaName: 'movableTrashA3',
   offset: { x: 0, y: 0, z: 0 },
 }
-const invariantContext = makeContext()
 
 const args = {
   pipetteId: mockId,
   volume: 10,
   flowRate: 10,
-  invariantContext: {
-    ...invariantContext,
-    pipetteEntities: mockPipEntities,
-    additionalEquipmentEntities: {
-      [mockTrashBinId]: {
-        name: 'trashBin' as const,
-        location: mockCutout,
-        id: mockTrashBinId,
-      },
-    },
-  },
-  prevRobotState: getInitialRobotStateStandard(invariantContext),
+  trashLocation: mockCutout,
 }
 
 describe('movableTrashCommandsUtil', () => {
   it('returns correct commands for dispensing', () => {
-    movableTrashCommandsUtil({ ...args, type: 'dispense' })
+    dispenseInMovableTrash({ ...args })
     expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
@@ -64,10 +47,7 @@ describe('movableTrashCommandsUtil', () => {
     })
   })
   it('returns correct commands for blow out', () => {
-    movableTrashCommandsUtil({
-      ...args,
-      type: 'blowOut',
-    })
+    blowOutInMovableTrash({ ...args })
     expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
@@ -78,40 +58,18 @@ describe('movableTrashCommandsUtil', () => {
       flowRate: 10,
     })
   })
-  it('returns correct commands for drop tip', () => {
-    movableTrashCommandsUtil({
-      ...args,
-      type: 'dropTip',
-      prevRobotState: {
-        ...args.prevRobotState,
-        tipState: { pipettes: { [mockId]: true } } as any,
-      },
-    })
-    expect(curryCommandCreator).toHaveBeenCalledWith(
-      moveToAddressableAreaForDropTip,
-      {
-        pipetteId: mockId,
-        addressableAreaName: 'movableTrashA3',
-      }
-    )
-    expect(curryCommandCreator).toHaveBeenCalledWith(dropTipInPlace, {
-      pipetteId: mockId,
-    })
-  })
   it('returns correct commands for aspirate in place (air gap)', () => {
-    movableTrashCommandsUtil({
+    airGapInMovableTrash({
       ...args,
-      type: 'airGap',
-      prevRobotState: {
-        ...args.prevRobotState,
-        tipState: { pipettes: { [mockId]: true } } as any,
-      },
     })
     expect(curryCommandCreator).toHaveBeenCalledWith(
       moveToAddressableArea,
       mockMoveToAddressableAreaParams
     )
-    expect(curryCommandCreator).toHaveBeenCalledWith(aspirateInPlace, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(prepareToAspirate, {
+      pipetteId: mockId,
+    })
+    expect(curryCommandCreator).toHaveBeenCalledWith(airGapInPlace, {
       pipetteId: mockId,
       volume: 10,
       flowRate: 10,
