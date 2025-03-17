@@ -20,15 +20,12 @@ describe('airGapInWell', () => {
   })
   it('air gap in 1 well for transfer', () => {
     const args = {
-      destinationId: DEST_LABWARE,
-      destWell: 'A1',
       flowRate: 10,
       offsetFromBottomMm: 1,
       pipetteId: 'p10SingleId',
       volume: 10,
-      sourceId: SOURCE_LABWARE,
-      sourceWell: 'B1',
-      blowOutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
+      labwareId: SOURCE_LABWARE,
+      wellName: 'B1',
     }
 
     const result = airGapInWell(args, invariantContext, robotStateWithTip)
@@ -71,8 +68,8 @@ describe('airGapInWell', () => {
   })
   it('air gap for multi wells for consolidate', () => {
     const args = {
-      destinationId: DEST_LABWARE,
-      destWell: 'A1',
+      labwareId: DEST_LABWARE,
+      wellName: 'A1',
       flowRate: 10,
       offsetFromBottomMm: 1,
       pipetteId: 'p10SingleId',

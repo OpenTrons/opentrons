@@ -1,21 +1,14 @@
-import {
-  curryCommandCreator,
-  getDispenseAirGapLocation,
-  reduceCommandCreators,
-} from '../../utils'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { airGapInPlace, moveToWell, prepareToAspirate } from '../atomic'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface AirGapInWellArgs {
-  destinationId: string
-  destWell: string
   flowRate: number
   offsetFromBottomMm: number
   pipetteId: string
   volume: number
-  blowOutLocation?: string | null
-  sourceId?: string
-  sourceWell?: string
+  labwareId: string
+  wellName: string
 }
 
 export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
@@ -24,36 +17,13 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
   prevRobotState
 ) => {
   const {
-    blowOutLocation,
-    destinationId,
-    destWell,
+    labwareId,
+    wellName,
     flowRate,
     offsetFromBottomMm,
     pipetteId,
-    sourceId,
-    sourceWell,
     volume,
   } = args
-
-  //    air gap for multi-wells for consolidate
-  let labwareId = destinationId
-  let wellName = destWell
-
-  //    air gap out of 1 well for transfer
-  if (sourceId != null && sourceWell != null) {
-    const {
-      dispenseAirGapLabware,
-      dispenseAirGapWell,
-    } = getDispenseAirGapLocation({
-      blowoutLocation: blowOutLocation,
-      sourceLabware: sourceId,
-      destLabware: destinationId,
-      sourceWell,
-      destWell: destWell,
-    })
-    labwareId = dispenseAirGapLabware
-    wellName = dispenseAirGapWell
-  }
 
   const commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(moveToWell, {

@@ -449,11 +449,11 @@ export function createTipLiquidState<T>(
 }
 // always return destination unless the blowout location is the source
 export const getDispenseAirGapLocation = (args: {
-  blowoutLocation: string | null | undefined
-  sourceLabware: string
   destLabware: string
-  sourceWell: string
   destWell: string
+  sourceWell?: string
+  sourceLabware?: string
+  blowoutLocation?: string | null
 }): {
   dispenseAirGapLabware: string
   dispenseAirGapWell: string
@@ -465,12 +465,18 @@ export const getDispenseAirGapLocation = (args: {
     sourceWell,
     destWell,
   } = args
-  return blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION
+  return blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION &&
+    //  note: sourceLabware & sourceWell != null for air gap in a transfer only
+    //  since transfer allows you to specify the blowout location as source well
+    sourceLabware != null &&
+    sourceWell != null
     ? {
         dispenseAirGapLabware: sourceLabware,
         dispenseAirGapWell: sourceWell,
       }
     : {
+        //  this case is for transfer and consolidate when blowout location is NOT
+        //  in a source well
         dispenseAirGapLabware: destLabware,
         dispenseAirGapWell: destWell,
       }
@@ -729,16 +735,23 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
 
   let commands: CurriedCommandCreator[] = []
   if (trashOrLabware === 'labware' && destWell != null) {
+    const {
+      dispenseAirGapLabware,
+      dispenseAirGapWell,
+    } = getDispenseAirGapLocation({
+      blowoutLocation: blowOutLocation,
+      sourceLabware: sourceId,
+      destLabware: destinationId,
+      sourceWell,
+      destWell: destWell,
+    })
     commands = [
       curryCommandCreator(airGapInWell, {
-        blowOutLocation,
-        destinationId,
-        destWell,
         flowRate,
         offsetFromBottomMm,
         pipetteId,
-        sourceId,
-        sourceWell,
+        labwareId: dispenseAirGapLabware,
+        wellName: dispenseAirGapWell,
         volume,
       }),
     ]
