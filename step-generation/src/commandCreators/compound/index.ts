@@ -1,5 +1,6 @@
 export { absorbanceReaderCloseInitialize } from './absorbanceReaderCloseInitialize'
 export { absorbanceReaderCloseRead } from './absorbanceReaderCloseRead'
+export { airGapInWell } from './airGapInWell'
 export { consolidate } from './consolidate'
 export { distribute } from './distribute'
 export { dropTipInTrash } from './dropTipInTrash'
