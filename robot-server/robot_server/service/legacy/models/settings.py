@@ -89,7 +89,7 @@ class LogLevels(str, Enum):
     error = ("error", logging.ERROR)
 
     @property
-    def level_id(self):
+    def level_id(self) -> int:
         """The log level id as defined in logging lib"""
         return self._level_id
 

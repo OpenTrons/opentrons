@@ -28,7 +28,7 @@ class BaseSession(ABC):
 
     def __init__(
         self, configuration: SessionConfiguration, instance_meta: SessionMetaData
-    ):
+    ) -> None:
         """
         Constructor
 
@@ -57,7 +57,7 @@ class BaseSession(ABC):
         """Get the response model"""
         ...
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         """Called before session is deleted"""
         pass
 

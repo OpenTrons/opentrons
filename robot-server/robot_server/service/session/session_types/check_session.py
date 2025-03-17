@@ -44,7 +44,7 @@ class CheckSession(BaseSession):
         instance_meta: SessionMetaData,
         calibration_check: CheckCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._calibration_check = calibration_check
         self._command_executor = CheckSessionCommandExecutor(
@@ -139,6 +139,6 @@ class CheckSession(BaseSession):
     def session_type(self) -> SessionType:
         return SessionType.calibration_check
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

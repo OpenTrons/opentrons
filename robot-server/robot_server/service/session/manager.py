@@ -37,7 +37,7 @@ class SessionManager:
         self,
         hardware: HardwareControlAPI,
         motion_lock: ThreadedAsyncLock,
-    ):
+    ) -> None:
         """
         Construct the session manager
 
@@ -79,7 +79,7 @@ class SessionManager:
             log.info(f"Removed session: {session}")
         return session
 
-    async def remove_all(self):
+    async def remove_all(self) -> None:
         """Remove all sessions"""
         # a copy must be made because self._session is altered during
         # iteration
@@ -148,7 +148,7 @@ class SessionManager:
 
 
 class ActiveSessionId:
-    def __init__(self):
+    def __init__(self) -> None:
         self._active_id: Optional[IdentifierType] = None
 
     @property

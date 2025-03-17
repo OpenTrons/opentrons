@@ -36,7 +36,7 @@ class TipLengthCalibration(BaseSession):
         instance_meta: SessionMetaData,
         tip_cal_user_flow: TipCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._tip_cal_user_flow = tip_cal_user_flow
         self._command_executor = TipLengthCalibrationCommandExecutor(
@@ -123,6 +123,6 @@ class TipLengthCalibration(BaseSession):
             supportedCommands=self._tip_cal_user_flow.supported_commands,
         )
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

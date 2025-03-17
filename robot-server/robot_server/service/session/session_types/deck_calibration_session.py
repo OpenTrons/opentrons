@@ -33,7 +33,7 @@ class DeckCalibrationSession(BaseSession):
         instance_meta: SessionMetaData,
         deck_cal_user_flow: DeckCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._deck_cal_user_flow = deck_cal_user_flow
         self._command_executor = DeckCalibrationCommandExecutor(
@@ -101,6 +101,6 @@ class DeckCalibrationSession(BaseSession):
             supportedCommands=supported_commands,
         )
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

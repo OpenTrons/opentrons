@@ -269,7 +269,7 @@ async def get_eap_options() -> EapOptions:
     responses={status.HTTP_200_OK: {"model": V1BasicResponse}},
     status_code=status.HTTP_207_MULTI_STATUS,
 )
-async def post_wifi_disconnect(wifi_ssid: WifiNetwork):
+async def post_wifi_disconnect(wifi_ssid: WifiNetwork) -> JSONResponse:
     ok, message = await nmcli.wifi_disconnect(wifi_ssid.ssid)
 
     result = V1BasicResponse(message=message)

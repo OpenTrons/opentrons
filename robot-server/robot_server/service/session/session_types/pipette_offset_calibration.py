@@ -43,7 +43,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
         instance_meta: SessionMetaData,
         pip_offset_cal_user_flow: PipetteOffsetCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._pip_offset_cal_user_flow = pip_offset_cal_user_flow
         self._command_executor = PipetteOffsetCalibrationCommandExecutor(
@@ -130,6 +130,6 @@ class PipetteOffsetCalibrationSession(BaseSession):
             supportedCommands=uf.supported_commands,
         )
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

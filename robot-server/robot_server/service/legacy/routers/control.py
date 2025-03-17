@@ -170,7 +170,7 @@ async def post_robot_light_state(
 
 async def _do_move(
     hardware: HardwareControlAPI, robot_move_target: control.RobotMoveTarget
-):
+) -> Point:
     """Perform the move"""
 
     await hardware.cache_instruments()

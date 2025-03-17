@@ -4,7 +4,7 @@ from robot_server.service.errors import RobotServerError, CommonErrorDef
 class SessionException(RobotServerError):
     """Base of all session exceptions"""
 
-    def __init__(self, reason: str):
+    def __init__(self, reason: str) -> None:
         super().__init__(definition=CommonErrorDef.ACTION_FORBIDDEN, reason=reason)
 
 
