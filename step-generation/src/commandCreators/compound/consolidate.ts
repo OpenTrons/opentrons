@@ -1,10 +1,10 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {
-  COLUMN,
   getWellDepth,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  ALL,
 } from '@opentrons/shared-data'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -33,7 +33,7 @@ import {
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
-
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
   CommandCreator,
@@ -86,8 +86,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   } = args
 
   const pipetteData = prevRobotState.pipettes[args.pipette]
-  const is96Channel =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels !== 1
 
   if (!pipetteData) {
     // bail out before doing anything else
@@ -129,10 +129,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
-    !getIsSafePipetteMovement(
+  if (isMultiChannelPipette && nozzles !== ALL) {
+    const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
+      args.nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,
@@ -140,16 +139,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       args.tipRack,
       { x: aspirateXOffset, y: aspirateYOffset }
     )
-  ) {
-    return {
-      errors: [errorCreators.possiblePipetteCollision()],
-    }
-  }
-
-  if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
-    !getIsSafePipetteMovement(
+    const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
+      args.nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,
@@ -157,9 +148,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       args.tipRack,
       { x: dispenseXOffset, y: dispenseYOffset }
     )
-  ) {
-    return {
-      errors: [errorCreators.possiblePipetteCollision()],
+    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
+      return {
+        errors: [errorCreators.possiblePipetteCollision()],
+      }
     }
   }
 
@@ -191,16 +183,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
 
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'wasteChute'
-  const isTrashBin =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'trashBin'
+  const dropTipEntity =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  const isWasteChute = dropTipEntity?.name === 'wasteChute'
+  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -489,7 +475,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       }
       if (isTrashBin) {
         dropTipCommand = [
-          curryCommandCreator(dropTipInTrash, { pipetteId: args.pipette }),
+          curryCommandCreator(dropTipInTrash, {
+            pipetteId: args.pipette,
+            trashLocation: dropTipEntity.location as CutoutId,
+          }),
         ]
       }
 

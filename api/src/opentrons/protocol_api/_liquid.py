@@ -7,6 +7,10 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
 
+from opentrons.protocols.advanced_control.transfers.common import (
+    NoLiquidClassPropertyError,
+)
+
 from ._liquid_properties import (
     TransferProperties,
     build_transfer_properties,
@@ -96,13 +100,13 @@ class LiquidClass:
         try:
             settings_for_pipette = self._by_pipette_setting[pipette_name]
         except KeyError:
-            raise ValueError(
+            raise NoLiquidClassPropertyError(
                 f"No properties found for {pipette_name} in {self._name} liquid class"
             )
         try:
             transfer_properties = settings_for_pipette[tiprack_uri]
         except KeyError:
-            raise ValueError(
-                f"No properties found for {tiprack_uri} in {self._name} liquid class"
+            raise NoLiquidClassPropertyError(
+                f"No properties found for {tiprack_uri} for {pipette_name} in {self._name} liquid class"
             )
         return transfer_properties

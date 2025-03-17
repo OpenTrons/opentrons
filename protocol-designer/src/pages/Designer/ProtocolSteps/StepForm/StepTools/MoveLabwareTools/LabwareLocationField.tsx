@@ -8,7 +8,7 @@ import {
   getUnoccupiedLabwareLocationOptions,
 } from '../../../../../../top-selectors/labware-locations'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
-import { DropdownStepFormField } from '../../../../../../molecules'
+import { DropdownStepFormField } from '../../../../../../components/molecules'
 import type { FieldProps } from '../../types'
 
 interface LabwareLocationFieldProps extends FieldProps {

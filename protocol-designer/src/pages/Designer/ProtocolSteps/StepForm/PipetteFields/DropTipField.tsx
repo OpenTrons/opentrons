@@ -7,7 +7,7 @@ import {
 } from '../../../../../step-forms/selectors'
 import { getAllTiprackOptions } from '../../../../../ui/labware/selectors'
 import { getEnableReturnTip } from '../../../../../feature-flags/selectors'
-import { DropdownStepFormField } from '../../../../../molecules'
+import { DropdownStepFormField } from '../../../../../components/molecules'
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../types'
 

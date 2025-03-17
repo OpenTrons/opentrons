@@ -347,6 +347,7 @@ def test_load_labware(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -421,6 +422,7 @@ def test_load_labware_on_staging_slot(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -498,6 +500,7 @@ def test_load_labware_on_labware(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -568,6 +571,7 @@ def test_load_labware_off_deck(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -632,6 +636,7 @@ def test_load_adapter(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -704,6 +709,7 @@ def test_load_adapter_on_staging_slot(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -778,6 +784,7 @@ def test_load_lid(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -849,6 +856,7 @@ def test_load_lid_stack(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -1193,6 +1201,7 @@ def test_load_labware_on_module(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -1270,6 +1279,7 @@ def test_load_labware_on_non_connected_module(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 

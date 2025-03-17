@@ -12,7 +12,7 @@ import {
   Icon,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { WellOrderModal } from '../../../../../organisms'
+import { WellOrderModal } from '../../../../../components/organisms'
 
 import type { FieldProps } from '../types'
 import type { WellOrderOption } from '../../../../../form-types'

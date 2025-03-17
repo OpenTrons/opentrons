@@ -13,7 +13,7 @@ import {
   getMultiSelectFieldValues,
   getMultiSelectItemIds,
 } from '../../../../ui/steps/selectors'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { deselectAllSteps } from '../../../../ui/steps/actions/actions'
 import {
   changeBatchEditField,

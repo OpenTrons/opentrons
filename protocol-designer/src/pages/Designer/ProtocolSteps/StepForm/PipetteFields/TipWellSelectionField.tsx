@@ -11,7 +11,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
-import { SelectWellsModal, getMainPagePortalEl } from '../../../../../organisms'
+import {
+  SelectWellsModal,
+  getMainPagePortalEl,
+} from '../../../../../components/organisms'
 import { getNozzleType } from '../utils'
 
 import type { FieldProps } from '../types'

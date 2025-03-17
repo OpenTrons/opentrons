@@ -8,7 +8,8 @@ import {
 import { ZERO_OFFSET } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { getTrashBinAddressableAreaName } from './misc'
-import type { InvariantContext, CurriedCommandCreator } from '../types'
+import type { CutoutId } from '@opentrons/shared-data'
+import type { CurriedCommandCreator } from '../types'
 
 /** Helper fn for movable trash commands for dispense, aspirate, air_gap, drop_tip and blow_out commands */
 
@@ -16,17 +17,12 @@ export function airGapInMovableTrash(args: {
   pipetteId: string
   volume: number
   flowRate: number
-  invariantContext: InvariantContext
+  trashLocation: CutoutId
 }): CurriedCommandCreator[] {
-  const { pipetteId, invariantContext, volume, flowRate } = args
+  const { pipetteId, trashLocation, volume, flowRate } = args
   const offset = ZERO_OFFSET
-  const addressableAreaName = getTrashBinAddressableAreaName(
-    invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for airGap')
-    return []
-  }
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
   return [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
@@ -48,17 +44,12 @@ export function dispenseInMovableTrash(args: {
   pipetteId: string
   volume: number
   flowRate: number
-  invariantContext: InvariantContext
+  trashLocation: CutoutId
 }): CurriedCommandCreator[] {
-  const { pipetteId, invariantContext, volume, flowRate } = args
+  const { pipetteId, trashLocation, volume, flowRate } = args
   const offset = ZERO_OFFSET
-  const addressableAreaName = getTrashBinAddressableAreaName(
-    invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for dispense')
-    return []
-  }
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
   return [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
@@ -76,17 +67,12 @@ export function dispenseInMovableTrash(args: {
 export function blowOutInMovableTrash(args: {
   pipetteId: string
   flowRate: number
-  invariantContext: InvariantContext
+  trashLocation: CutoutId
 }): CurriedCommandCreator[] {
-  const { pipetteId, invariantContext, flowRate } = args
+  const { pipetteId, trashLocation, flowRate } = args
   const offset = ZERO_OFFSET
-  const addressableAreaName = getTrashBinAddressableAreaName(
-    invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for blowOut')
-    return []
-  }
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
   return [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
@@ -102,17 +88,12 @@ export function blowOutInMovableTrash(args: {
 
 export function moveToMovableTrash(args: {
   pipetteId: string
-  invariantContext: InvariantContext
+  trashLocation: CutoutId
 }): CurriedCommandCreator[] {
-  const { pipetteId, invariantContext } = args
+  const { pipetteId, trashLocation } = args
   const offset = ZERO_OFFSET
-  const addressableAreaName = getTrashBinAddressableAreaName(
-    invariantContext.additionalEquipmentEntities
-  )
-  if (addressableAreaName == null) {
-    console.error('could not getTrashBinAddressableAreaName for moveTo')
-    return []
-  }
+  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+
   return [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
