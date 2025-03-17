@@ -390,16 +390,17 @@ class FlexStacker(mod_abc.AbstractModule):
         """Stores a labware in the stacker."""
         await self._prepare_for_action()
 
+        z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         # Move X then Z axis
         offset = OFFSET_MD if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
         distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT)
-        await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
+        # stalling during testing when tiprack crashes into the labware stack
+        await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance, z_speed)
 
         # Transfer
         await self.open_latch()
 
-        z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         await self.move_axis(
             StackerAxis.Z, Direction.EXTEND, (labware_height / 2), z_speed
         )
