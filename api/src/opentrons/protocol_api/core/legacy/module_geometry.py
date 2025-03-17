@@ -273,8 +273,13 @@ class ThermocyclerGeometry(ModuleGeometry):
             LegacyLabwareCore,
         )
 
-        # Block first three columns from being accessed
         definition = labware._core.get_definition()
+
+        # For type checking. This should always pass because
+        # opentrons.protocol_api.core.legacy should only load labware with schema 2.
+        assert definition["schemaVersion"] == 2
+
+        # Block first three columns from being accessed
         definition["ordering"] = definition["ordering"][2::]
         return Labware(
             core=LegacyLabwareCore(definition, super().location),

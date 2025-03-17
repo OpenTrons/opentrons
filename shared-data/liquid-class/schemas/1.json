@@ -448,6 +448,10 @@
       "type": "string",
       "description": "User-readable name of the liquid class."
     },
+    "description": {
+      "type": "string",
+      "description": "User-readable description of the liquid class"
+    },
     "schemaVersion": {
       "description": "Which schema version a liquid class is using",
       "type": "number",
@@ -500,6 +504,7 @@
   "required": [
     "liquidClassName",
     "displayName",
+    "description",
     "schemaVersion",
     "namespace",
     "byPipette"

@@ -3,14 +3,14 @@ import { UniversalSteps } from '../support/UniversalSteps'
 import { ModuleSteps, ModuleVerifications } from '../support/ModuleSteps'
 import { StepBuilder } from '../support/StepBuilder'
 
-describe('Modules happy path - will load modules to this over time', () => {
+describe('The Redesigned Create Protocol Landing Page', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
   })
 
-  it('Selects modules on the onboarding flow and then uses Temperatuer Module', () => {
+  it('content and step 1 flow works', () => {
     cy.clickCreateNew()
     cy.verifyCreateNewHeader()
 
@@ -49,13 +49,12 @@ describe('Modules happy path - will load modules to this over time', () => {
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.EditProtocolA())
-    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C2'))
+    steps.add(SetupSteps.ChoseDeckSlot('C2'))
     steps.add(SetupSteps.AddHardwareLabware())
     steps.add(SetupSteps.ClickLabwareHeader())
     steps.add(SetupSteps.ClickWellPlatesSection())
     steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
-    // steps.add(SetupSteps.ChoseDeckSlotLabware('C2'))
-    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C2'))
+    steps.add(SetupSteps.ChoseDeckSlotC2Labware())
     steps.add(SetupSteps.AddLiquid())
     steps.add(SetupSteps.ClickLiquidButton())
     steps.add(SetupSteps.DefineLiquid())
@@ -66,7 +65,7 @@ describe('Modules happy path - will load modules to this over time', () => {
     steps.add(UniversalSteps.Snapshot())
     steps.add(SetupSteps.SelectLiquidWells())
     steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
-    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C1'))
+    steps.add(SetupSteps.ChoseDeckSlot('C1'))
     steps.add(SetupSteps.EditHardwareLabwareOnDeck())
     steps.add(SetupSteps.ClickLabwareHeader())
     steps.add(SetupSteps.AddAdapters())

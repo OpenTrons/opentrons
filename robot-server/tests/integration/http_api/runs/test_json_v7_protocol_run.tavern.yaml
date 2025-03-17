@@ -409,3 +409,4 @@ stages:
                   y: 0
                   z: 0
               alternateDropLocation: false
+              scrape_tips: false

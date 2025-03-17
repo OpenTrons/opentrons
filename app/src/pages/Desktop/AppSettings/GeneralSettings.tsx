@@ -290,6 +290,7 @@ export function GeneralSettings(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_ROW}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
+              gridGap={SPACING.spacing24}
             >
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
                 <LegacyStyledText

@@ -409,6 +409,7 @@ stages:
                   y: 0
                   z: 0
               alternateDropLocation: false
+              scrape_tips: false
 
   - name: Verify commands succeeded with pageLength and cursor
     request:

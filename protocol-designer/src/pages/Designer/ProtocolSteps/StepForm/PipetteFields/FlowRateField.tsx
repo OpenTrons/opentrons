@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next'
 import { SPACING } from '@opentrons/components'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 import { getMatchingTipLiquidSpecs } from '../../../../../utils'
-import { InputStepFormField } from '../../../../../molecules'
+import { InputStepFormField } from '../../../../../components/molecules'
+
 import type { FieldProps } from '../types'
+import type { FlowRateType } from '../../../../../resources/types'
 
 interface FlowRateFieldProps extends FieldProps {
-  flowRateType: 'aspirate' | 'dispense' | 'blowout'
+  flowRateType: FlowRateType
   volume: unknown
   tiprack: unknown
   pipetteId?: string | null

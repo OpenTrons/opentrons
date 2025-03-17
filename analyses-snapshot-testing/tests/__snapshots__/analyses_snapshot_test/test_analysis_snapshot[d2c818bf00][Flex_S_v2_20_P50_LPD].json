@@ -1166,7 +1166,20 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "A2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutA2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -2324,7 +2337,20 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "B2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutB2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -3502,7 +3528,22 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "C3",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutC3",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "flexStackerModuleV1",
+              "singleRightSlot",
+              "stagingAreaRightSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -3595,7 +3636,22 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "D3",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutD3",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "flexStackerModuleV1",
+              "singleRightSlot",
+              "stagingAreaRightSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -3841,7 +3897,22 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "B3",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutB3",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "flexStackerModuleV1",
+              "singleRightSlot",
+              "stagingAreaRightSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4141,7 +4212,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 26.85
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4317,7 +4388,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 26.85
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4417,7 +4488,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 26.85
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4713,7 +4784,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4849,7 +4920,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -5005,7 +5076,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -5037,7 +5108,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

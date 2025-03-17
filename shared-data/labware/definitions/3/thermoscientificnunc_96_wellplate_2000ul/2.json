@@ -19,9 +19,9 @@
     "links": ["https://www.thermofisher.com/order/catalog/product/278743"]
   },
   "metadata": {
-    "displayName": "Thermo Scientific Nunc 96 Well Plate 2000 \u00b5L",
+    "displayName": "Thermo Scientific Nunc 96 Well Plate 2000 µL",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
@@ -1116,19 +1116,20 @@
     "conicalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 3.6,
-          "topHeight": 3.6,
-          "bottomHeight": 0.0
-        },
-        {
           "shape": "conical",
           "bottomDiameter": 7.2,
           "topDiameter": 8.5,
           "topHeight": 41.5,
           "bottomHeight": 3.6
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 3.6,
+          "topHeight": 3.6,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

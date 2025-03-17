@@ -21,7 +21,7 @@ from opentrons.protocol_api.core.legacy_simulator.legacy_protocol_core import (
     LegacyProtocolCoreSimulator,
 )
 
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 
@@ -101,7 +101,7 @@ def second_simulating_instrument_context(
 
 
 @pytest.fixture
-def labware(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
+def labware(minimal_labware_def: LabwareDefinition2) -> LegacyLabwareCore:
     """Labware fixture."""
     return LegacyLabwareCore(
         definition=minimal_labware_def,
@@ -110,7 +110,7 @@ def labware(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
 
 
 @pytest.fixture
-def tip_rack(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
+def tip_rack(minimal_labware_def: LabwareDefinition2) -> LegacyLabwareCore:
     tip_rack_definition = minimal_labware_def.copy()
     tip_rack_parameters = minimal_labware_def["parameters"].copy()
 
@@ -128,7 +128,7 @@ def tip_rack(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
 
 
 @pytest.fixture
-def second_labware(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
+def second_labware(minimal_labware_def: LabwareDefinition2) -> LegacyLabwareCore:
     """Labware fixture."""
     return LegacyLabwareCore(
         definition=minimal_labware_def,

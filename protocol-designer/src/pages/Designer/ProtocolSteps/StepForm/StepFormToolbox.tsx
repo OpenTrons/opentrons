@@ -21,10 +21,10 @@ import {
   LINK_BUTTON_STYLE,
   LINE_CLAMP_TEXT_STYLE,
   NAV_BAR_HEIGHT_REM,
-} from '../../../../atoms'
-import { FormAlerts } from '../../../../organisms'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { RenameStepModal } from '../../../../organisms/RenameStepModal'
+} from '../../../../components/atoms'
+import { FormAlerts } from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { RenameStepModal } from '../../../../components/organisms/RenameStepModal'
 import { getFormWarningsForSelectedStep } from '../../../../dismiss/selectors'
 import { getTimelineWarningsForSelectedStep } from '../../../../top-selectors/timelineWarnings'
 import { getRobotStateTimeline } from '../../../../file-data/selectors'
@@ -33,6 +33,7 @@ import {
   getFormLevelErrorsForUnsavedForm,
   getDynamicFieldFormErrorsForUnsavedForm,
 } from '../../../../step-forms/selectors'
+import { getEnableLiquidClasses } from '../../../../feature-flags/selectors'
 import {
   FORM_ERRORS_EVENT,
   FORM_WARNINGS_EVENT,
@@ -139,6 +140,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dependentFields: error.dependentProfileFields,
   }))
   const timeline = useSelector(getRobotStateTimeline)
+  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const moduleId = formData.moduleId
   const enableReadOrInitialization = useAbsorbanceReaderCommandType(
     moduleId as string | null
@@ -268,10 +270,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     }
   }
 
+  const step = formData.stepType === 'moveLiquid' && enableLiquidClasses
   const handleContinue = (): void => {
-    if (isMultiStepToolbox && toolboxStep === 0) {
+    if (isMultiStepToolbox && toolboxStep < (step ? 2 : 1)) {
       if (!isErrorOnCurrentPage) {
-        setToolboxStep(1)
+        setToolboxStep(prevStep => prevStep + 1)
         setShowFormErrors(false)
       } else {
         setShowFormErrors(true)
@@ -299,7 +302,10 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         subHeader={
           isMultiStepToolbox ? (
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-              {t('shared:part', { current: toolboxStep + 1, max: 2 })}
+              {t('shared:part', {
+                current: toolboxStep + 1,
+                max: step ? 3 : 2,
+              })}
             </StyledText>
           ) : null
         }
@@ -330,11 +336,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         closeButton={<Icon size="2rem" name="close" />}
         confirmButton={
           <Flex gridGap={SPACING.spacing8}>
-            {isMultiStepToolbox && toolboxStep === 1 ? (
+            {isMultiStepToolbox && toolboxStep >= 1 ? (
               <SecondaryButton
                 width="100%"
                 onClick={() => {
-                  setToolboxStep(0)
+                  setToolboxStep(currStep => currStep - 1)
                   setShowFormErrors(false)
                   handleScrollToTop()
                 }}
@@ -343,7 +349,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               </SecondaryButton>
             ) : null}
             <PrimaryButton onClick={handleContinue} width="100%">
-              {isMultiStepToolbox && toolboxStep === 0
+              {isMultiStepToolbox && toolboxStep < (step ? 2 : 1)
                 ? i18n.format(t('shared:continue'), 'capitalize')
                 : t('shared:save')}
             </PrimaryButton>
@@ -360,6 +366,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             </StyledText>
           </Flex>
         }
+        width="21.875rem"
       >
         <div
           ref={toolsComponentRef}

@@ -85,9 +85,8 @@ class AirGapInPlaceImplementation(
             PipetteNotReadyToAirGapError: pipette plunger is not ready.
         """
         ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
-            pipette_id=params.pipetteId,
+            pipette_id=params.pipetteId
         )
-
         if not ready_to_aspirate:
             raise PipetteNotReadyToAspirateError(
                 "Pipette cannot air gap in place because of a previous blow out."
@@ -148,7 +147,7 @@ class AirGapInPlace(
 
     commandType: AirGapInPlaceCommandType = "airGapInPlace"
     params: AirGapInPlaceParams
-    result: Optional[AirGapInPlaceResult]
+    result: Optional[AirGapInPlaceResult] = None
 
     _ImplementationCls: Type[AirGapInPlaceImplementation] = AirGapInPlaceImplementation
 

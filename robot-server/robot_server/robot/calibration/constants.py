@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from typing import Dict, Set, TYPE_CHECKING
+from typing import Dict, Final, Set
 from dataclasses import dataclass
 from opentrons.types import Point, Mount
 
-if TYPE_CHECKING:
-    from typing_extensions import Final
 
-
-STATE_WILDCARD = "*"
+STATE_WILDCARD: Final = "*"
 
 _lw_fmt = "opentrons_96_{}_{}ul"
 _filtertiprack = "filtertiprack"

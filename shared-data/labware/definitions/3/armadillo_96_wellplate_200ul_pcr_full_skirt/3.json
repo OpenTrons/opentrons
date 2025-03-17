@@ -9,9 +9,9 @@
     "isMagneticModuleCompatible": true
   },
   "metadata": {
-    "displayName": "Armadillo 96 Well Plate 200 \u00b5L PCR Full Skirt",
+    "displayName": "Armadillo 96 Well Plate 200 µL PCR Full Skirt",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "brand": {
@@ -1142,10 +1142,11 @@
     "conicalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 1.25,
-          "topHeight": 0.8,
-          "bottomHeight": 0.0
+          "shape": "conical",
+          "bottomDiameter": 5.5,
+          "topDiameter": 5.5,
+          "topHeight": 14.95,
+          "bottomHeight": 11.35
         },
         {
           "shape": "conical",
@@ -1155,13 +1156,13 @@
           "bottomHeight": 0.8
         },
         {
-          "shape": "conical",
-          "bottomDiameter": 5.5,
-          "topDiameter": 5.5,
-          "topHeight": 14.95,
-          "bottomHeight": 11.35
+          "shape": "spherical",
+          "radiusOfCurvature": 1.25,
+          "topHeight": 0.8,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

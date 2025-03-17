@@ -31,8 +31,20 @@
     "title": "Enable liquid classes",
     "description": "Enable liquid classes support"
   },
+  "OT_PD_ENABLE_TIMELINE_SCRUBBER": {
+    "title": "Enable timeline scrubber",
+    "description": "See the protocol timeline visualization in overview"
+  },
+  "OT_PD_ENABLE_PYTHON_EXPORT": {
+    "title": "Enable exporting python",
+    "description": "Enables the ability to export python for pd/python interop"
+  },
   "OT_PD_ENABLE_MULTIPLE_TEMPS_OT2": {
     "title": "Allow two temperature modules on OT-2",
     "description": "This experimental setting may cause collisions, and Opentrons will not be responsible for any damage resulting from its use."
+  },
+  "OT_PD_ENABLE_PARTIAL_TIP_SUPPORT": {
+    "title": "Enable partial tip support",
+    "description": "Partial tip configurations that are not released yet"
   }
 }

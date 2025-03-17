@@ -1,26 +1,25 @@
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import {
-  COLUMN,
+  getWellDepth,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
-  getWellDepth,
+  ALL,
 } from '@opentrons/shared-data'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInTrash } from './dropTipInTrash'
 import {
   blowoutUtil,
   curryCommandCreator,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
+  getTrashOrLabware,
   airGapHelper,
   dispenseLocationHelper,
   moveHelper,
   getIsSafePipetteMovement,
-  getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
-  getTrashOrLabware,
 } from '../../utils'
 import {
   airGapInPlace,
@@ -33,13 +32,13 @@ import {
 } from '../atomic'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
-
+import { dropTipInWasteChute } from './dropTipInWasteChute'
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
   CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 
 export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
@@ -87,8 +86,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   } = args
 
   const pipetteData = prevRobotState.pipettes[args.pipette]
-  const is96Channel =
-    invariantContext.pipetteEntities[args.pipette]?.spec.channels === 96
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[args.pipette]?.spec.channels !== 1
 
   if (!pipetteData) {
     // bail out before doing anything else
@@ -130,10 +129,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
-    !getIsSafePipetteMovement(
+  if (isMultiChannelPipette && nozzles !== ALL) {
+    const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
+      args.nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,
@@ -141,16 +139,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       args.tipRack,
       { x: aspirateXOffset, y: aspirateYOffset }
     )
-  ) {
-    return {
-      errors: [errorCreators.possiblePipetteCollision()],
-    }
-  }
-
-  if (
-    is96Channel &&
-    args.nozzles === COLUMN &&
-    !getIsSafePipetteMovement(
+    const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
+      args.nozzles,
       prevRobotState,
       invariantContext,
       args.pipette,
@@ -158,9 +148,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       args.tipRack,
       { x: dispenseXOffset, y: dispenseYOffset }
     )
-  ) {
-    return {
-      errors: [errorCreators.possiblePipetteCollision()],
+    if (!isAspirateSafePipetteMovement && !isDispenseSafePipetteMovement) {
+      return {
+        errors: [errorCreators.possiblePipetteCollision()],
+      }
     }
   }
 
@@ -179,6 +170,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   )
 
   const destinationWell = args.destWell
+
   const destLabwareDef =
     trashOrLabware === 'labware'
       ? invariantContext.labwareEntities[args.destLabware].def
@@ -191,20 +183,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
 
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'wasteChute'
-  const isTrashBin =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'trashBin'
-  const channels = invariantContext.pipetteEntities[args.pipette].spec.channels
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    channels
-  )
+  const dropTipEntity =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  const isWasteChute = dropTipEntity?.name === 'wasteChute'
+  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -276,9 +258,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   labwareId: args.sourceLabware,
                   wellName: sourceWell,
                   wellLocation: {
-                    origin: 'bottom',
+                    origin: 'top',
                     offset: {
-                      z: args.touchTipAfterAspirateOffsetMmFromBottom,
+                      z: args.touchTipAfterAspirateOffsetMmFromTop,
                     },
                   },
                 }),
@@ -324,6 +306,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           }),
         ]
       }
+
       //  can not touch tip in a waste chute
       const touchTipAfterDispenseCommands: CurriedCommandCreator[] =
         args.touchTipAfterDispense && destinationWell != null
@@ -333,9 +316,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 labwareId: args.destLabware,
                 wellName: destinationWell,
                 wellLocation: {
-                  origin: 'bottom',
+                  origin: 'top',
                   offset: {
-                    z: args.touchTipAfterDispenseOffsetMmFromBottom,
+                    z: args.touchTipAfterDispenseOffsetMmFromTop,
                   },
                 },
               }),
@@ -453,7 +436,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
-        prevRobotState,
       })
 
       const willReuseTip = args.changeTip !== 'always' && !isLastChunk
@@ -485,20 +467,19 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         }),
       ]
       if (isWasteChute) {
-        dropTipCommand = wasteChuteCommandsUtil({
-          type: 'dropTip',
-          pipetteId: args.pipette,
-          prevRobotState,
-          addressableAreaName: addressableAreaNameWasteChute,
-        })
+        dropTipCommand = [
+          curryCommandCreator(dropTipInWasteChute, {
+            pipetteId: args.pipette,
+          }),
+        ]
       }
       if (isTrashBin) {
-        dropTipCommand = movableTrashCommandsUtil({
-          type: 'dropTip',
-          pipetteId: args.pipette,
-          prevRobotState,
-          invariantContext,
-        })
+        dropTipCommand = [
+          curryCommandCreator(dropTipInTrash, {
+            pipetteId: args.pipette,
+            trashLocation: dropTipEntity.location as CutoutId,
+          }),
+        ]
       }
 
       // if using dispense > air gap, drop or change the tip at the end

@@ -18,10 +18,21 @@ class GCODE(str, Enum):
     GET_MOVE_PARAMS = "M120"
     GET_PLATFORM_SENSOR = "M121"
     GET_DOOR_SWITCH = "M122"
+    GET_INSTALL_DETECTED = "M123"
+    GET_STALLGUARD_THRESHOLD = "M911"
+    GET_MOTOR_DRIVER_REGISTER = "M920"
+    GET_TOF_SENSOR_STATUS = "M215"
+    GET_TOF_DRIVER_REGISTER = "M222"
+    GET_TOF_MEASUREMENT = "M226"
+    ENABLE_TOF_SENSOR = "M224"
+    MANAGE_TOF_MEASUREMENT = "M225"
     SET_LED = "M200"
     SET_SERIAL_NUMBER = "M996"
     SET_RUN_CURRENT = "M906"
     SET_IHOLD_CURRENT = "M907"
+    SET_STALLGUARD = "M910"
+    SET_MOTOR_DRIVER_REGISTER = "M921"
+    SET_TOF_DRIVER_REGISTER = "M223"
     ENTER_BOOTLOADER = "dfu"
 
     def build_command(self) -> CommandBuilder:
@@ -39,6 +50,7 @@ class HardwareRevision(Enum):
 
     NFF = "nff"
     EVT = "a1"
+    DVT = "b1"
 
 
 @dataclass
@@ -48,6 +60,7 @@ class StackerInfo:
     fw: str
     hw: HardwareRevision
     sn: str
+    rr: int = 0
 
     def to_dict(self) -> Dict[str, str]:
         """Build command."""
@@ -55,19 +68,23 @@ class StackerInfo:
             "serial": self.sn,
             "version": self.fw,
             "model": self.hw.value,
+            "reset_reason": str(self.rr),
         }
 
 
-class StackerAxis(Enum):
+class StackerAxis(str, Enum):
     """Stacker Axis."""
 
     X = "X"
     Z = "Z"
     L = "L"
 
-    def __str__(self) -> str:
-        """Name."""
-        return self.name
+
+class TOFSensor(str, Enum):
+    """Stacker TOF sensor."""
+
+    X = "X"
+    Z = "Z"
 
 
 class LEDColor(Enum):
@@ -77,13 +94,23 @@ class LEDColor(Enum):
     RED = 1
     GREEN = 2
     BLUE = 3
+    YELLOW = 4
+
+
+class LEDPattern(Enum):
+    """Stacker LED Pattern."""
+
+    STATIC = 0
+    FLASH = 1
+    PULSE = 2
+    CONFIRM = 3
 
 
 class Direction(Enum):
     """Direction."""
 
     RETRACT = 0  # negative
-    EXTENT = 1  # positive
+    EXTEND = 1  # positive
 
     def __str__(self) -> str:
         """Convert to tag for clear logging."""
@@ -91,11 +118,29 @@ class Direction(Enum):
 
     def opposite(self) -> "Direction":
         """Get opposite direction."""
-        return Direction.EXTENT if self == Direction.RETRACT else Direction.RETRACT
+        return Direction.EXTEND if self == Direction.RETRACT else Direction.RETRACT
 
     def distance(self, distance: float) -> float:
         """Get signed distance, where retract direction is negative."""
         return distance * -1 if self == Direction.RETRACT else distance
+
+
+class TOFSensorState(Enum):
+    """TOF Sensor state."""
+
+    DISABLED = 0
+    INITIALIZING = 1
+    IDLE = 2
+    MEASURING = 3
+    ERROR = 4
+
+
+class TOFSensorMode(Enum):
+    """The mode the sensor is in."""
+
+    UNKNOWN = 0
+    MEASURE = 0x03
+    BOOTLOADER = 0x80
 
 
 @dataclass
@@ -116,10 +161,10 @@ class LimitSwitchStatus:
     def get(self, axis: StackerAxis, direction: Direction) -> bool:
         """Get limit switch status."""
         if axis == StackerAxis.X:
-            return self.XE if direction == Direction.EXTENT else self.XR
+            return self.XE if direction == Direction.EXTEND else self.XR
         if axis == StackerAxis.Z:
-            return self.ZE if direction == Direction.EXTENT else self.ZR
-        if direction == Direction.EXTENT:
+            return self.ZE if direction == Direction.EXTEND else self.ZR
+        if direction == Direction.EXTEND:
             raise ValueError("Latch does not have extent limit switch")
         return self.LR
 
@@ -138,7 +183,7 @@ class PlatformStatus:
 
     def get(self, direction: Direction) -> bool:
         """Get platform status."""
-        return self.E if direction == Direction.EXTENT else self.R
+        return self.E if direction == Direction.EXTEND else self.R
 
     def to_dict(self) -> Dict[str, bool]:
         """Dict of the data."""
@@ -146,6 +191,16 @@ class PlatformStatus:
             "extent": self.E,
             "retract": self.R,
         }
+
+
+@dataclass
+class TOFSensorStatus:
+    """Stacker TOF sensor status."""
+
+    sensor: TOFSensor
+    state: TOFSensorState
+    mode: TOFSensorMode
+    ok: bool
 
 
 @dataclass
@@ -164,9 +219,52 @@ class MoveParams:
         return ["M", "V", "A", "D"]
 
 
+@dataclass
+class StallGuardParams:
+    """StallGuard Parameters."""
+
+    axis: StackerAxis
+    enabled: bool
+    threshold: int
+
+
 class MoveResult(str, Enum):
     """The result of a move command."""
 
     NO_ERROR = "ok"
     STALL_ERROR = "stall"
     UNKNOWN_ERROR = "unknown"
+
+
+class MeasurementKind(Enum):
+    """The kind of measurement to request."""
+
+    HISTOGRAM = 0
+
+
+@dataclass
+class TOFMeasurement:
+    """The start measurement data."""
+
+    sensor: TOFSensor
+    kind: MeasurementKind
+    cancelled: bool
+    total_bytes: int
+
+
+@dataclass
+class TOFMeasurementFrame:
+    """Stacker TOF measurement frame."""
+
+    sensor: TOFSensor
+    frame_id: int
+    data: bytes
+
+
+@dataclass
+class TOFMeasurementResult:
+    """Stacker TOF measurement result."""
+
+    sensor: TOFSensor
+    kind: MeasurementKind
+    bins: Dict[int, List[int]]

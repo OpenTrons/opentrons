@@ -26,7 +26,7 @@ from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.types import DeckSlotName
 
 from opentrons_shared_data.labware.types import (
-    LabwareDefinition as LabwareDefinitionDict,
+    LabwareDefinition2 as LabwareDefinition2Dict,
 )
 
 
@@ -181,7 +181,7 @@ async def test_equipment_broker_messages(
     mock_legacy_command_mapper: LegacyCommandMapper,
     mock_action_dispatcher: pe_actions.ActionDispatcher,
     subject: LegacyContextPlugin,
-    minimal_labware_def: LabwareDefinitionDict,
+    minimal_labware_def: LabwareDefinition2Dict,
 ) -> None:
     """It should dispatch commands from equipment broker messages."""
     # Capture the function that the plugin sets up as its labware load callback.

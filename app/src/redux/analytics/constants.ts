@@ -115,3 +115,10 @@ export const ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_MODAL: 'languageUpdatedDeskt
   'languageUpdatedDesktopAppModal'
 export const ANALYTICS_LANGUAGE_UPDATED_DESKTOP_APP_SETTINGS: 'languageUpdatedDesktopAppSettings' =
   'languageUpdatedDesktopAppSettings'
+
+/**
+ * LPC Analytics
+ */
+
+export const ANALYTICS_LPC_ANALYSIS_KIND: 'analytics:lpcAnalysisKind' =
+  'analytics:lpcAnalysisKind'

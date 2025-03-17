@@ -7,11 +7,12 @@ import {
   HEATERSHAKER_MODULE_V1,
   fixture96Plate,
 } from '@opentrons/shared-data'
+import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { deleteContainer } from '../../../../labware-ingred/actions'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { deleteModule } from '../../../../step-forms/actions'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { deleteModule } from '../../../../modules'
 import {
   getAdditionalEquipment,
   getSavedStepForms,
@@ -32,12 +33,12 @@ vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../modules')
 vi.mock('../../../../step-forms/actions/additionalItems')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../organisms/Kitchen/hooks')
+vi.mock('../../../../components/organisms/Kitchen/hooks')
 const render = (props: ComponentProps<typeof DeckSetupTools>) => {
   return renderWithProviders(<DeckSetupTools {...props} />, {
     i18nInstance: i18n,
@@ -126,12 +127,14 @@ describe('DeckSetupTools', () => {
           id: 'labId',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
         lab2: {
           slot: 'labId',
           id: 'labId2',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
       },
       pipettes: {},
@@ -142,6 +145,7 @@ describe('DeckSetupTools', () => {
           id: 'modId',
           slot: 'D3',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
       },
       additionalEquipmentOnDeck: {
@@ -182,7 +186,11 @@ describe('DeckSetupTools', () => {
   })
   it('should save plate reader if gripper configured', () => {
     vi.mocked(getAdditionalEquipment).mockReturnValue({
-      gripperUri: { name: 'gripper', id: 'gripperId' },
+      gripperUri: {
+        name: 'gripper',
+        id: 'gripperId',
+        location: GRIPPER_LOCATION,
+      },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedLabwareDefUri: null,

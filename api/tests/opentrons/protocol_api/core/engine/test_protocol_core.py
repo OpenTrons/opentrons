@@ -20,7 +20,10 @@ from opentrons_shared_data.labware.types import (
     LabwareDefinition as LabwareDefDict,
     LabwareUri,
 )
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition2,
+    labware_definition_type_adapter,
+)
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.types import DeckSlotName, StagingSlotName, Mount, MountType, Point
@@ -181,7 +184,7 @@ def subject(
     decoy.when(
         mock_engine_client.state.labware.get_definition("fixed-trash-123")
     ).then_return(
-        LabwareDefinition.model_construct(ordering=[["A1"]])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[["A1"]])  # type: ignore[call-arg]
     )
 
     return ProtocolCore(
@@ -344,6 +347,7 @@ def test_load_labware(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -358,15 +362,15 @@ def test_load_labware(
             )
         )
     ).then_return(
-        commands.LoadLabwareResult(
+        commands.LoadLabwareResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     result = subject.load_labware(
@@ -418,6 +422,7 @@ def test_load_labware_on_staging_slot(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -432,15 +437,15 @@ def test_load_labware_on_staging_slot(
             )
         )
     ).then_return(
-        commands.LoadLabwareResult(
+        commands.LoadLabwareResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     result = subject.load_labware(
@@ -495,6 +500,7 @@ def test_load_labware_on_labware(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -509,15 +515,15 @@ def test_load_labware_on_labware(
             )
         )
     ).then_return(
-        commands.LoadLabwareResult(
+        commands.LoadLabwareResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     decoy.when(
@@ -565,6 +571,7 @@ def test_load_labware_off_deck(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -579,15 +586,15 @@ def test_load_labware_off_deck(
             )
         )
     ).then_return(
-        commands.LoadLabwareResult(
+        commands.LoadLabwareResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     result = subject.load_labware(
@@ -629,6 +636,7 @@ def test_load_adapter(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -642,15 +650,15 @@ def test_load_adapter(
             )
         )
     ).then_return(
-        commands.LoadLabwareResult(
+        commands.LoadLabwareResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     result = subject.load_adapter(
@@ -701,6 +709,7 @@ def test_load_adapter_on_staging_slot(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -714,15 +723,15 @@ def test_load_adapter_on_staging_slot(
             )
         )
     ).then_return(
-        commands.LoadLabwareResult(
+        commands.LoadLabwareResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     result = subject.load_adapter(
@@ -775,6 +784,7 @@ def test_load_lid(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -788,14 +798,14 @@ def test_load_lid(
             )
         )
     ).then_return(
-        commands.LoadLidResult(
+        commands.LoadLidResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(ordering=[]),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(ordering=[]),  # type: ignore[call-arg]
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     result = subject.load_lid(
@@ -846,6 +856,7 @@ def test_load_lid_stack(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -860,16 +871,16 @@ def test_load_lid_stack(
             )
         )
     ).then_return(
-        commands.LoadLidStackResult(
+        commands.LoadLidStackResult.model_construct(
             stackLabwareId="abc123",
             labwareIds=["1", "2", "3", "4", "5"],
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     result = subject.load_lid_stack(
@@ -1010,7 +1021,7 @@ def test_move_labware(
     decoy.when(
         mock_engine_client.state.labware.get_definition("labware-id")
     ).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
     labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
     subject.move_labware(
@@ -1053,7 +1064,7 @@ def test_move_labware_on_staging_slot(
     decoy.when(
         mock_engine_client.state.labware.get_definition("labware-id")
     ).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
     labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
     subject.move_labware(
@@ -1094,7 +1105,7 @@ def test_move_labware_on_non_connected_module(
     decoy.when(
         mock_engine_client.state.labware.get_definition("labware-id")
     ).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
     labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
     non_connected_module_core = NonConnectedModuleCore(
@@ -1140,7 +1151,7 @@ def test_move_labware_off_deck(
     decoy.when(
         mock_engine_client.state.labware.get_definition("labware-id")
     ).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
     labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
 
@@ -1190,6 +1201,7 @@ def test_load_labware_on_module(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -1204,15 +1216,15 @@ def test_load_labware_on_module(
             )
         )
     ).then_return(
-        commands.LoadLabwareResult(
+        commands.LoadLabwareResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     module_core = ModuleCore(
@@ -1267,6 +1279,7 @@ def test_load_labware_on_non_connected_module(
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
+            subject.api_version,
         )
     ).then_return(("some_namespace", 9001))
 
@@ -1281,15 +1294,15 @@ def test_load_labware_on_non_connected_module(
             )
         )
     ).then_return(
-        commands.LoadLabwareResult(
+        commands.LoadLabwareResult.model_construct(
             labwareId="abc123",
-            definition=LabwareDefinition.model_construct(),  # type: ignore[call-arg]
+            definition=LabwareDefinition2.model_construct(),  # type: ignore[call-arg]
             offsetId=None,
         )
     )
 
     decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
-        LabwareDefinition.model_construct(ordering=[])  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
 
     non_connected_module_core = NonConnectedModuleCore(
@@ -1335,7 +1348,9 @@ def test_add_labware_definition(
     """It should add a labware definition to the engine."""
     decoy.when(
         mock_engine_client.add_labware_definition(
-            definition=LabwareDefinition.model_validate(minimal_labware_def)
+            definition=labware_definition_type_adapter.validate_python(
+                minimal_labware_def
+            )
         )
     ).then_return(LabwareUri("hello/world/123"))
 

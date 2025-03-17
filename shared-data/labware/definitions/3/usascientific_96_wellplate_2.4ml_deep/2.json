@@ -1214,23 +1214,24 @@
       "sections": [
         {
           "shape": "cuboidal",
-          "topXDimension": 7.52,
-          "topYDimension": 7.52,
-          "bottomXDimension": 0.25,
-          "bottomYDimension": 0.25,
-          "topHeight": 2.63,
-          "bottomHeight": 0.0
-        },
-        {
-          "shape": "cuboidal",
           "topXDimension": 8.2,
           "topYDimension": 8.2,
           "bottomXDimension": 7.52,
           "bottomYDimension": 7.52,
           "topHeight": 41.3,
           "bottomHeight": 2.63
+        },
+        {
+          "shape": "cuboidal",
+          "topXDimension": 7.52,
+          "topYDimension": 7.52,
+          "bottomXDimension": 0.25,
+          "bottomYDimension": 0.25,
+          "topHeight": 2.63,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

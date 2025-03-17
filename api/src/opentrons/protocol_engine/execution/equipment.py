@@ -1,8 +1,14 @@
 """Equipment command side-effect logic."""
-from dataclasses import dataclass
-from typing import Optional, overload, Union, List
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from dataclasses import dataclass
+from typing import Optional, overload, List
+from typing_extensions import assert_type
+
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
+)
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -42,13 +48,11 @@ from ..state.modules import HardwareModule
 from ..types import (
     LabwareLocation,
     DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
     LabwareOffset,
-    LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
     AddressableAreaLocation,
+    LoadedLabware,
 )
 
 
@@ -129,6 +133,79 @@ class EquipmentHandler:
             or pipette_data_provider.VirtualPipetteDataProvider()
         )
 
+    async def load_definition_for_details(
+        self, load_name: str, namespace: str, version: int
+    ) -> tuple[LabwareDefinition, str]:
+        """Load the definition for a labware from the parameters passed for it to a command.
+
+        Args:
+            load_name: The labware's load name.
+            namespace: The labware's namespace.
+            version: The labware's version.
+
+        Returns:
+            A tuple of the loaded LabwareDefinition object and its definition URI.
+        """
+        definition_uri = uri_from_details(
+            load_name=load_name,
+            namespace=namespace,
+            version=version,
+        )
+
+        try:
+            # Try to use existing definition in state.
+            return (
+                self._state_store.labware.get_definition_by_uri(definition_uri),
+                definition_uri,
+            )
+        except LabwareDefinitionDoesNotExistError:
+            definition = await self._labware_data_provider.get_labware_definition(
+                load_name=load_name,
+                namespace=namespace,
+                version=version,
+            )
+            return definition, definition_uri
+
+    async def load_labware_from_definition(
+        self,
+        definition: LabwareDefinition,
+        location: LabwareLocation,
+        labware_id: Optional[str],
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
+    ) -> LoadedLabwareData:
+        """Load labware from already-found definition."""
+        definition_uri = uri_from_details(
+            load_name=definition.parameters.loadName,
+            namespace=definition.namespace,
+            version=definition.version,
+        )
+        return await self._load_labware_from_def_and_uri(
+            definition, definition_uri, location, labware_id, labware_pending_load
+        )
+
+    async def _load_labware_from_def_and_uri(
+        self,
+        definition: LabwareDefinition,
+        definition_uri: str,
+        location: LabwareLocation,
+        labware_id: str | None,
+        labware_pending_load: dict[str, LoadedLabware] | None,
+    ) -> LoadedLabwareData:
+        labware_id = (
+            labware_id if labware_id is not None else self._model_utils.generate_id()
+        )
+
+        # Allow propagation of ModuleNotLoadedError.
+        offset_id = self.find_applicable_labware_offset_id(
+            labware_definition_uri=definition_uri,
+            labware_location=location,
+            labware_pending_load=labware_pending_load,
+        )
+
+        return LoadedLabwareData(
+            labware_id=labware_id, definition=definition, offsetId=offset_id
+        )
+
     async def load_labware(
         self,
         load_name: str,
@@ -154,34 +231,11 @@ class EquipmentHandler:
         Returns:
             A LoadedLabwareData object.
         """
-        definition_uri = uri_from_details(
-            load_name=load_name,
-            namespace=namespace,
-            version=version,
+        definition, definition_uri = await self.load_definition_for_details(
+            load_name, namespace, version
         )
-
-        try:
-            # Try to use existing definition in state.
-            definition = self._state_store.labware.get_definition_by_uri(definition_uri)
-        except LabwareDefinitionDoesNotExistError:
-            definition = await self._labware_data_provider.get_labware_definition(
-                load_name=load_name,
-                namespace=namespace,
-                version=version,
-            )
-
-        labware_id = (
-            labware_id if labware_id is not None else self._model_utils.generate_id()
-        )
-
-        # Allow propagation of ModuleNotLoadedError.
-        offset_id = self.find_applicable_labware_offset_id(
-            labware_definition_uri=definition_uri,
-            labware_location=location,
-        )
-
-        return LoadedLabwareData(
-            labware_id=labware_id, definition=definition, offsetId=offset_id
+        return await self._load_labware_from_def_and_uri(
+            definition, definition_uri, location, labware_id, None
         )
 
     async def reload_labware(self, labware_id: str) -> ReloadedLabwareData:
@@ -292,7 +346,7 @@ class EquipmentHandler:
     async def load_magnetic_block(
         self,
         model: ModuleModel,
-        location: Union[DeckSlotLocation, AddressableAreaLocation],
+        location: AddressableAreaLocation,
         module_id: Optional[str],
     ) -> LoadedModuleData:
         """Ensure the required magnetic block is attached.
@@ -323,7 +377,7 @@ class EquipmentHandler:
     async def load_module(
         self,
         model: ModuleModel,
-        location: DeckSlotLocation,
+        location: AddressableAreaLocation,
         module_id: Optional[str],
     ) -> LoadedModuleData:
         """Ensure the required module is attached.
@@ -357,12 +411,18 @@ class EquipmentHandler:
                 for hw_mod in self._hardware_api.attached_modules
             ]
 
-            serial_number_at_locaiton = self._state_store.geometry._addressable_areas.get_fixture_serial_from_deck_configuration_by_deck_slot(
-                location.slotName
+            serial_number_at_locaiton = self._state_store.geometry._addressable_areas.get_fixture_serial_from_deck_configuration_by_addressable_area(
+                addressable_area_name=location.addressableAreaName
             )
+            cutout_id = self._state_store.geometry._addressable_areas.get_cutout_id_by_deck_slot_name(
+                slot_name=self._state_store.geometry._addressable_areas.get_addressable_area_base_slot(
+                    location.addressableAreaName
+                )
+            )
+
             attached_module = self._state_store.modules.select_hardware_module_to_load(
                 model=model,
-                location=location,
+                location=cutout_id,
                 attached_modules=attached_modules,
                 expected_serial_number=serial_number_at_locaiton,
             )
@@ -381,7 +441,7 @@ class EquipmentHandler:
             definition=attached_module.definition,
         )
 
-    async def load_lids(
+    async def load_lids(  # noqa: C901
         self,
         load_name: str,
         namespace: str,
@@ -429,18 +489,23 @@ class EquipmentHandler:
                 f"Requested quantity {quantity} is greater than the stack limit of {stack_limit} provided by definition for {load_name}."
             )
 
-        # Allow propagation of ModuleNotLoadedError.
-        if (
-            isinstance(location, DeckSlotLocation)
-            and definition.parameters.isDeckSlotCompatible is not None
-            and not definition.parameters.isDeckSlotCompatible
-        ):
+        if isinstance(definition, LabwareDefinition2):
+            is_deck_slot_compatible = True
+        else:
+            assert_type(definition, LabwareDefinition3)
+            is_deck_slot_compatible = (
+                True
+                if definition.parameters.isDeckSlotCompatible is None
+                else definition.parameters.isDeckSlotCompatible
+            )
+
+        if isinstance(location, DeckSlotLocation) and not is_deck_slot_compatible:
             raise ValueError(
                 f"Lid Labware {load_name} cannot be loaded onto a Deck Slot."
             )
 
-        load_labware_data_list = []
-        ids = []
+        load_labware_data_list: list[LoadedLabwareData] = []
+        ids: list[str] = []
         if labware_ids is not None:
             if len(labware_ids) < quantity:
                 raise ValueError(
@@ -620,8 +685,11 @@ class EquipmentHandler:
         )
 
     def find_applicable_labware_offset_id(
-        self, labware_definition_uri: str, labware_location: LabwareLocation
-    ) -> Optional[str]:
+        self,
+        labware_definition_uri: str,
+        labware_location: LabwareLocation,
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
+    ) -> str | None:
         """Figure out what offset would apply to a labware in the given location.
 
         Raises:
@@ -633,8 +701,11 @@ class EquipmentHandler:
             or None if no labware offset will apply.
         """
         labware_offset_location = (
-            self._get_labware_offset_location_from_labware_location(labware_location)
+            self._state_store.geometry.get_projected_offset_location(
+                labware_location, labware_pending_load
+            )
         )
+
         if labware_offset_location is None:
             # No offset for off-deck location.
             # Returning None instead of raising an exception allows loading a labware
@@ -646,72 +717,6 @@ class EquipmentHandler:
             location=labware_offset_location,
         )
         return self._get_id_from_offset(offset)
-
-    def _get_labware_offset_location_from_labware_location(
-        self, labware_location: LabwareLocation
-    ) -> Optional[LabwareOffsetLocation]:
-        if isinstance(labware_location, DeckSlotLocation):
-            return LabwareOffsetLocation(slotName=labware_location.slotName)
-        elif isinstance(labware_location, ModuleLocation):
-            module_id = labware_location.moduleId
-            # Allow ModuleNotLoadedError to propagate.
-            # Note also that we match based on the module's requested model, not its
-            # actual model, to implement robot-server's documented HTTP API semantics.
-            module_model = self._state_store.modules.get_requested_model(
-                module_id=module_id
-            )
-
-            # If `module_model is None`, it probably means that this module was added by
-            # `ProtocolEngine.use_attached_modules()`, instead of an explicit
-            # `loadModule` command.
-            #
-            # This assert should never raise in practice because:
-            #   1. `ProtocolEngine.use_attached_modules()` is only used by
-            #      robot-server's "stateless command" endpoints, under `/commands`.
-            #   2. Those endpoints don't support loading labware, so this code will
-            #      never run.
-            #
-            # Nevertheless, if it does happen somehow, we do NOT want to pass the
-            # `None` value along to `LabwareView.find_applicable_labware_offset()`.
-            # `None` means something different there, which will cause us to return
-            # wrong results.
-            assert module_model is not None, (
-                "Can't find offsets for labware"
-                " that are loaded on modules"
-                " that were loaded with ProtocolEngine.use_attached_modules()."
-            )
-
-            module_location = self._state_store.modules.get_location(
-                module_id=module_id
-            )
-            slot_name = module_location.slotName
-            return LabwareOffsetLocation(slotName=slot_name, moduleModel=module_model)
-        elif isinstance(labware_location, OnLabwareLocation):
-            parent_labware_id = labware_location.labwareId
-            parent_labware_uri = self._state_store.labware.get_definition_uri(
-                parent_labware_id
-            )
-
-            base_location = self._state_store.labware.get_parent_location(
-                parent_labware_id
-            )
-            base_labware_offset_location = (
-                self._get_labware_offset_location_from_labware_location(base_location)
-            )
-            if base_labware_offset_location is None:
-                # No offset for labware sitting on labware off-deck
-                return None
-
-            # If labware is being stacked on itself, all labware in the stack will share a labware offset due to
-            # them sharing the same definitionUri in `LabwareOffsetLocation`. This will not be true for the
-            # bottom-most labware, which will have a `DeckSlotLocation` and have its definitionUri field empty.
-            return LabwareOffsetLocation(
-                slotName=base_labware_offset_location.slotName,
-                moduleModel=base_labware_offset_location.moduleModel,
-                definitionUri=parent_labware_uri,
-            )
-        else:  # Off deck
-            return None
 
     @staticmethod
     def _get_id_from_offset(labware_offset: Optional[LabwareOffset]) -> Optional[str]:

@@ -20,7 +20,7 @@ from opentrons_shared_data.errors.exceptions import InvalidProtocolData, PythonE
 from opentrons.types import MountType
 from opentrons.protocol_engine import (
     commands as pe_commands,
-    LabwareLocation,
+    LoadableLabwareLocation,
     ModuleModel,
     DeckSlotLocation,
     Liquid,
@@ -37,7 +37,9 @@ class CommandTranslatorError(Exception):
 # Each time a TypeAdapter is instantiated, it will construct a new validator and
 # serializer. To improve performance, TypeAdapters are instantiated once.
 # See https://docs.pydantic.dev/latest/concepts/performance/#typeadapter-instantiated-once
-LabwareLocationAdapter: TypeAdapter[LabwareLocation] = TypeAdapter(LabwareLocation)
+LabwareLocationAdapter: TypeAdapter[LoadableLabwareLocation] = TypeAdapter(
+    LoadableLabwareLocation
+)
 CommandAnnotationAdapter: TypeAdapter[CommandAnnotation] = TypeAdapter(
     CommandAnnotation
 )

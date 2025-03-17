@@ -16,7 +16,7 @@ env:
 
 jobs:
   js-unit-test:
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     permissions:
       id-token: write
       contents: read
@@ -53,8 +53,8 @@ jobs:
           make setup-js
       - name: 'build'
         env:
-            # inject dev id since this is for staging
-            OT_AI_CLIENT_MIXPANEL_ID: ${{ secrets.OT_AI_CLIENT_MIXPANEL_DEV_ID }}
+          # inject dev id since this is for staging
+          OT_AI_CLIENT_MIXPANEL_ID: ${{ secrets.OT_AI_CLIENT_MIXPANEL_DEV_ID }}
         run: |
           make -C opentrons-ai-client build-staging
       - name: Configure AWS Credentials

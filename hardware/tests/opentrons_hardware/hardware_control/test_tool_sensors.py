@@ -10,6 +10,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadFromSensorResponse,
     Acknowledgement,
     BindSensorOutputRequest,
+    AddLinearMoveRequest,
 )
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
@@ -49,6 +50,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorThresholdMode,
     SensorOutputBinding,
 )
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
 from opentrons_hardware.sensors.types import SensorDataType
@@ -214,6 +216,11 @@ async def test_liquid_probe(
         yield check_third_move
 
     responder_getter = get_responder()
+    z_offset_for_plunger_prep = 2.0
+    mount_speed = 10.0
+    expected_raise_duration = (
+        interrupts_per_sec * z_offset_for_plunger_prep / mount_speed
+    )
 
     def move_responder(
         node_id: NodeId, message: MessageDefinition
@@ -223,6 +230,12 @@ async def test_liquid_probe(
             responder = next(responder_getter)
             return responder(node_id, message)
         else:
+            if isinstance(message, AddLinearMoveRequest):
+                if message.payload.velocity_mm.value < 0:
+                    # value < 0 means the raise z move
+                    assert message.payload.duration.value == expected_raise_duration
+                    velocity = int(-1 * mount_speed / interrupts_per_sec * 2**31)
+                    assert message.payload.velocity_mm.value == velocity
             return []
 
     message_send_loopback.add_responder(move_responder)
@@ -232,12 +245,12 @@ async def test_liquid_probe(
         tool=target_node,
         head_node=motor_node,
         max_p_distance=70,
-        mount_speed=10,
+        mount_speed=mount_speed,
         plunger_speed=8,
         threshold_pascals=threshold_pascals,
         plunger_impulse_time=0.2,
         num_baseline_reads=20,
-        z_offset_for_plunger_prep=2.0,
+        z_offset_for_plunger_prep=z_offset_for_plunger_prep,
         sensor_id=SensorId.S0,
     )
     assert position[motor_node].positions_only()[0] == 14

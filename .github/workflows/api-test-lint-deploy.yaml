@@ -49,7 +49,7 @@ jobs:
   lint:
     name: 'opentrons package linting'
     timeout-minutes: 10
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -183,7 +183,7 @@ jobs:
   deploy:
     name: 'deploy opentrons package'
     needs: [test]
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v4'

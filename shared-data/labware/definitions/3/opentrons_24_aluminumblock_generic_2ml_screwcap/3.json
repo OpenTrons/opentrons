@@ -324,7 +324,30 @@
   },
   "innerLabwareGeometry": {
     "conicalWell": {
-      "sections": []
+      "sections": [
+        {
+          "shape": "conical",
+          "topDiameter": 8.5,
+          "bottomDiameter": 8.14,
+          "topHeight": 42.0,
+          "bottomHeight": 3.04
+        },
+        {
+          "shape": "conical",
+          "topDiameter": 8.14,
+          "bottomDiameter": 6.5,
+          "topHeight": 3.04,
+          "bottomHeight": 2.08
+        },
+        {
+          "shape": "conical",
+          "topDiameter": 6.5,
+          "bottomDiameter": 1.21,
+          "topHeight": 2.08,
+          "bottomHeight": 0.0
+        }
+      ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

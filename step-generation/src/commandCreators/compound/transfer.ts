@@ -8,17 +8,15 @@ import {
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { movableTrashCommandsUtil } from '../../utils/movableTrashCommandsUtil'
+import { dropTipInTrash } from './dropTipInTrash'
 import {
   blowoutUtil,
   curryCommandCreator,
   airGapHelper,
   reduceCommandCreators,
-  wasteChuteCommandsUtil,
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getWasteChuteAddressableAreaNamePip,
   getHasWasteChute,
 } from '../../utils'
 import {
@@ -33,13 +31,14 @@ import {
 } from '../atomic'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
-
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   TransferArgs,
   CurriedCommandCreator,
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,
@@ -168,20 +167,10 @@ export const transfer: CommandCreator<TransferArgs> = (
     }
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
 
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'wasteChute'
-  const isTrashBin =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'trashBin'
-
-  const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-    pipetteSpec.channels
-  )
+  const dropTipEntity =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  const isWasteChute = dropTipEntity?.name === 'wasteChute'
+  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -286,7 +275,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipette: args.pipette,
                   labware: args.sourceLabware,
                   well: sourceWell,
-                  volume: Math.max(subTransferVol),
+                  volume: subTransferVol,
                   times: 1,
                   offsetFromBottomMm: aspirateOffsetFromBottomMm,
                   aspirateFlowRateUlSec,
@@ -346,11 +335,14 @@ export const transfer: CommandCreator<TransferArgs> = (
                   labwareId: args.sourceLabware,
                   wellName: sourceWell,
                   wellLocation: {
-                    origin: 'bottom',
+                    origin: 'top',
                     offset: {
-                      z: args.touchTipAfterAspirateOffsetMmFromBottom,
+                      z: args.touchTipAfterAspirateOffsetMmFromTop,
                     },
                   },
+                  ...(args.touchTipAfterAspirateSpeed != null
+                    ? { speed: args.touchTipAfterAspirateSpeed }
+                    : {}),
                 }),
               ]
             : []
@@ -363,11 +355,14 @@ export const transfer: CommandCreator<TransferArgs> = (
                     labwareId: args.destLabware,
                     wellName: destinationWell,
                     wellLocation: {
-                      origin: 'bottom',
+                      origin: 'top',
                       offset: {
-                        z: args.touchTipAfterDispenseOffsetMmFromBottom,
+                        z: args.touchTipAfterDispenseOffsetMmFromTop,
                       },
                     },
+                    ...(args.touchTipAfterDispenseSpeed != null
+                      ? { speed: args.touchTipAfterDispenseSpeed }
+                      : {}),
                   }),
                 ]
               : []
@@ -434,9 +429,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                         y: 0,
                       },
                     },
+                    isAirGap: true,
                     tipRack: args.tipRack,
                     nozzles: args.nozzles,
-                    isAirGap: true,
                   }),
                   ...(dispenseDelay != null
                     ? [
@@ -524,7 +519,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             flowRate: blowoutFlowRateUlSec,
             offsetFromTopMm: blowoutOffsetFromTopMm,
             invariantContext,
-            prevRobotState,
           })
 
           const airGapAfterDispenseCommands =
@@ -558,20 +552,19 @@ export const transfer: CommandCreator<TransferArgs> = (
             }),
           ]
           if (isWasteChute) {
-            dropTipCommand = wasteChuteCommandsUtil({
-              type: 'dropTip',
-              pipetteId: args.pipette,
-              prevRobotState,
-              addressableAreaName: addressableAreaNameWasteChute,
-            })
+            dropTipCommand = [
+              curryCommandCreator(dropTipInWasteChute, {
+                pipetteId: args.pipette,
+              }),
+            ]
           }
           if (isTrashBin) {
-            dropTipCommand = movableTrashCommandsUtil({
-              type: 'dropTip',
-              pipetteId: args.pipette,
-              invariantContext,
-              prevRobotState,
-            })
+            dropTipCommand = [
+              curryCommandCreator(dropTipInTrash, {
+                pipetteId: args.pipette,
+                trashLocation: dropTipEntity.location as CutoutId,
+              }),
+            ]
           }
 
           // if using dispense > air gap, drop or change the tip at the end

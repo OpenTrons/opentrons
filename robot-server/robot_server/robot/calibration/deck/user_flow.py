@@ -41,7 +41,7 @@ from opentrons.protocols.api_support.deck_type import (
 from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
 
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons_shared_data.pipette.types import LabwareUri
 
 from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
@@ -98,7 +98,7 @@ def tuplefy_cal_point_dicts(
 
 
 class DeckCalibrationUserFlow:
-    def __init__(self, hardware: HardwareControlAPI):
+    def __init__(self, hardware: HardwareControlAPI) -> None:
         if not isinstance(hardware, API):
             raise HardwareNotSupportedError("This command is supported by OT-2 only.")
         self._hardware = cast(OT2HardwareControlAPI, hardware)
@@ -164,10 +164,10 @@ class DeckCalibrationUserFlow:
             )
 
     @tip_origin.setter
-    def tip_origin(self, new_val: Optional[Point]):
+    def tip_origin(self, new_val: Optional[Point]) -> None:
         self._tip_origin_pt = new_val
 
-    def reset_tip_origin(self):
+    def reset_tip_origin(self) -> None:
         self._tip_origin_pt = None
 
     @property
@@ -194,7 +194,7 @@ class DeckCalibrationUserFlow:
     def get_required_labware(self) -> List[RequiredLabware]:
         return [RequiredLabware.from_lw(self._tip_rack)]
 
-    def _set_current_state(self, to_state: State):
+    def _set_current_state(self, to_state: State) -> None:
         self._current_state = to_state
 
     def _select_target_pipette(self) -> Tuple[Pipette, Mount]:
@@ -230,7 +230,7 @@ class DeckCalibrationUserFlow:
             )[0]
 
     def _get_tip_rack_lw(
-        self, tiprack_definition: Optional[LabwareDefinition] = None
+        self, tiprack_definition: Optional[LabwareDefinition2] = None
     ) -> labware.Labware:
         if tiprack_definition:
             return labware.load_from_definition(
@@ -241,7 +241,7 @@ class DeckCalibrationUserFlow:
             lw_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
             return labware.load(lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
-    def _get_default_tipracks(self):
+    def _get_default_tipracks(self) -> list[LabwareDefinition2]:
         return uf.get_default_tipracks(
             cast(List[LabwareUri], self.hw_pipette.liquid_class.default_tipracks)
         )
@@ -257,7 +257,7 @@ class DeckCalibrationUserFlow:
         }
         return exp_pt
 
-    async def handle_command(self, name: Any, data: Dict[Any, Any]):
+    async def handle_command(self, name: Any, data: Dict[Any, Any]) -> None:
         """
         Handle a client command
 
@@ -289,24 +289,33 @@ class DeckCalibrationUserFlow:
     ) -> Point:
         return await self._hardware.gantry_position(self._mount, critical_point)
 
-    async def load_labware(self, tiprackDefinition: LabwareDefinition):
+    async def load_labware(
+        self,
+        # tiprackDefinition comes from the HTTP client and is not validated by the time
+        # it reaches here, hence us calling labware.verify_definition() below.
+        tiprackDefinition: LabwareDefinition2,
+    ) -> None:
         self._supported_commands.loadLabware = False
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)
+            # todo(mm, 2025-02-13): Move schema validation to the FastAPI layer and turn
+            # this schemaVersion assertion into a proper HTTP API 422 error.
+            # https://opentrons.atlassian.net/browse/EXEC-1230
+            assert verified_definition["schemaVersion"] == 2
             self._tip_rack = self._get_tip_rack_lw(verified_definition)
             if self._deck[TIP_RACK_SLOT]:
                 del self._deck[TIP_RACK_SLOT]
             self._deck[TIP_RACK_SLOT] = self._tip_rack
 
-    async def jog(self, vector):
+    async def jog(self, vector: tuple[float, float, float]) -> None:
         await self._hardware.move_rel(mount=self._mount, delta=Point(*vector))
 
-    async def move_to_tip_rack(self):
+    async def move_to_tip_rack(self) -> None:
         if self._current_state == State.labwareLoaded:
             await self.hardware.home()
         await self._move(Location(self.tip_origin, None))
 
-    async def move_to_deck(self):
+    async def move_to_deck(self) -> None:
         deck_pt = self._deck.get_slot_center(JOG_TO_DECK_SLOT)
         ydim = self._deck.get_slot_definition(JOG_TO_DECK_SLOT)["boundingBox"][
             "yDimension"
@@ -324,16 +333,16 @@ class DeckCalibrationUserFlow:
         loc = Location(Point(*coords), None)
         return loc.move(point=Point(0, 0, self._z_height_reference))
 
-    async def move_to_point_one(self):
+    async def move_to_point_one(self) -> None:
         await self._move(self._get_move_to_point_loc_by_state())
 
-    async def move_to_point_two(self):
+    async def move_to_point_two(self) -> None:
         await self._move(self._get_move_to_point_loc_by_state())
 
-    async def move_to_point_three(self):
+    async def move_to_point_three(self) -> None:
         await self._move(self._get_move_to_point_loc_by_state())
 
-    async def save_offset(self):
+    async def save_offset(self) -> None:
         cur_pt = await self.get_current_point(critical_point=None)
         if self.current_state == State.joggingToDeck:
             self._z_height_reference = cur_pt.z
@@ -346,7 +355,7 @@ class DeckCalibrationUserFlow:
                 # clear all pipette offset data
                 clear_pipette_offset_calibrations()
 
-    def _save_attitude_matrix(self):
+    def _save_attitude_matrix(self) -> None:
         e = tuplefy_cal_point_dicts(self._expected_points)
         a = tuplefy_cal_point_dicts(self._saved_points)
         tiprack_hash = helpers.hash_labware_def(self._tip_rack._core.get_definition())
@@ -359,29 +368,30 @@ class DeckCalibrationUserFlow:
     def _get_tip_length(self) -> float:
         pip_id = self._hw_pipette.pipette_id
         assert pip_id
+        definition = self._tip_rack._core.get_definition()
+        # Assert for type checking. We expect this to always pass because
+        # self._get_tip_rack_lw() limits itself to schema 2.
+        assert definition["schemaVersion"] == 2
         try:
-            return load_tip_length_calibration(
-                pip_id,
-                self._tip_rack._core.get_definition(),
-            ).tipLength
+            return load_tip_length_calibration(pip_id, definition).tipLength
         except cal_types.TipLengthCalNotFound:
             tip_overlap = self._hw_pipette.tip_overlap["v0"].get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
 
-    async def pick_up_tip(self):
+    async def pick_up_tip(self) -> None:
         await uf.pick_up_tip(self, tip_length=self._get_tip_length())
 
-    async def invalidate_tip(self):
+    async def invalidate_tip(self) -> None:
         await uf.invalidate_tip(self)
 
-    async def return_tip(self):
+    async def return_tip(self) -> None:
         await uf.return_tip(self, tip_length=self._get_tip_length())
 
-    async def _move(self, to_loc: Location):
+    async def _move(self, to_loc: Location) -> None:
         await uf.move(self, to_loc)
 
-    async def exit_session(self):
+    async def exit_session(self) -> None:
         if self.hw_pipette.has_tip:
             await self.move_to_tip_rack()
             await self.return_tip()
@@ -390,7 +400,7 @@ class DeckCalibrationUserFlow:
         self._hardware.reset_instrument()
         await self._hardware.home()
 
-    async def invalidate_last_action(self):
+    async def invalidate_last_action(self) -> None:
         await self.hardware.home()
         await self._hardware.gantry_position(self.mount, refresh=True)
         if self._current_state != State.preparingPipette:

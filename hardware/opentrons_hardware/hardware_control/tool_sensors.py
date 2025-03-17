@@ -337,7 +337,7 @@ async def liquid_probe(
         distance={head_node: float64(z_offset_for_plunger_prep)},
         velocity={head_node: float64(-1 * mount_speed)},
         acceleration={},
-        duration=float64(max_z_distance / mount_speed),
+        duration=float64(z_offset_for_plunger_prep / mount_speed),
         present_nodes=[head_node],
     )
 

@@ -114,6 +114,7 @@ class GantryMover(TypingProtocol):
         critical_point: Optional[Dict[MotorAxis, float]] = None,
         speed: Optional[float] = None,
         relative_move: bool = False,
+        expect_stalls: bool = False,
     ) -> Dict[MotorAxis, float]:
         """Move a set of axes a given distance."""
         ...
@@ -341,6 +342,7 @@ class HardwareGantryMover(GantryMover):
         critical_point: Optional[Dict[MotorAxis, float]] = None,
         speed: Optional[float] = None,
         relative_move: bool = False,
+        expect_stalls: bool = False,
     ) -> Dict[MotorAxis, float]:
         """Move a set of axes a given distance.
 
@@ -349,6 +351,7 @@ class HardwareGantryMover(GantryMover):
             critical_point: A critical point override for axes
             speed: Optional speed parameter for the move.
             relative_move: Whether the axis map needs to be converted from a relative to absolute move.
+            expect_stalls: Whether it is expected that the move triggers a stall error.
         """
         try:
             pos_hw = self._convert_axis_map_for_hw(axis_map)
@@ -385,6 +388,7 @@ class HardwareGantryMover(GantryMover):
             await self._hardware_api.move_axes(
                 position=absolute_pos,
                 speed=speed,
+                expect_stalls=expect_stalls,
             )
 
         except PositionUnknownError as e:
@@ -588,6 +592,7 @@ class VirtualGantryMover(GantryMover):
         critical_point: Optional[Dict[MotorAxis, float]] = None,
         speed: Optional[float] = None,
         relative_move: bool = False,
+        expect_stalls: bool = False,
     ) -> Dict[MotorAxis, float]:
         """Move the give axes map. No-op in virtual implementation."""
         mount = self.pick_mount_from_axis_map(axis_map)

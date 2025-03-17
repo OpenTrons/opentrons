@@ -1,4 +1,5 @@
 """A Protocol-Engine-friendly wrapper for opentrons.motion_planning.deck_conflict."""
+
 from __future__ import annotations
 import itertools
 import logging
@@ -24,6 +25,7 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
+    InStackerHopperLocation,
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
 )
@@ -249,6 +251,7 @@ def _map_labware(
     elif (
         location_from_engine == OFF_DECK_LOCATION
         or location_from_engine == SYSTEM_LOCATION
+        or isinstance(location_from_engine, InStackerHopperLocation)
     ):
         # This labware is off-deck. Exclude it from conflict checking.
         # todo(mm, 2023-02-23): Move this logic into wrapped_deck_conflict.

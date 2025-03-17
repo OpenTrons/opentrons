@@ -87,5 +87,6 @@ export const moduleEntities: ModuleEntities = {
     id: 'magneticModuleId',
     type: 'magneticModuleType',
     model: 'magneticModuleV1',
+    pythonName: 'mockPythonName',
   },
 }

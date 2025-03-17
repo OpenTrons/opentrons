@@ -3,27 +3,34 @@ import { useSelector } from 'react-redux'
 
 import { useCreateMaintenanceCommandMutation } from '@opentrons/react-api-client'
 
-import { moveRelativeCommand } from './commands'
+import { moveRelativeCommand, moveToWellCommands } from './commands'
+import { selectActivePipette } from '/app/redux/protocol-runs'
 
-import type { Coordinates } from '@opentrons/shared-data'
+import type { Coordinates, CreateCommand } from '@opentrons/shared-data'
 import type {
   Axis,
   Jog,
   Sign,
   StepSize,
 } from '/app/molecules/JogControls/types'
-import type { State } from '/app/redux/types'
-import type { UseLPCCommandChildProps } from './types'
+import type { UseLPCCommandWithChainRunChildProps } from './types'
+import type { VectorOffset } from '@opentrons/api-client'
+import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
 const JOG_COMMAND_TIMEOUT_MS = 10000
 const MAX_QUEUED_JOGS = 3
 
-interface UseHandleJogProps extends UseLPCCommandChildProps {
+interface UseHandleJogProps extends UseLPCCommandWithChainRunChildProps {
   setErrorMessage: (msg: string | null) => void
 }
 
 export interface UseHandleJogResult {
   handleJog: Jog
+  resetJog: (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    offset?: VectorOffset | null
+  ) => Promise<void>
 }
 
 // TODO(jh, 01-21-25): Extract the throttling logic into its own hook that lives elsewhere and is used by other Jog flows.
@@ -32,12 +39,12 @@ export function useHandleJog({
   runId,
   maintenanceRunId,
   setErrorMessage,
+  chainLPCCommands,
 }: UseHandleJogProps): UseHandleJogResult {
-  const { current: currentStep } =
-    useSelector((state: State) => state.protocolRuns[runId]?.lpc?.steps) ?? {}
-
   const [isJogging, setIsJogging] = useState(false)
   const [jogQueue, setJogQueue] = useState<Array<() => Promise<void>>>([])
+  const pipette = useSelector(selectActivePipette(runId))
+  const pipetteId = pipette?.id
   const {
     createMaintenanceCommand: createSilentCommand,
   } = useCreateMaintenanceCommandMutation()
@@ -50,11 +57,6 @@ export function useHandleJog({
       onSuccess?: (position: Coordinates | null) => void
     ): Promise<void> => {
       return new Promise<void>((resolve, reject) => {
-        const pipetteId =
-          currentStep != null && 'pipetteId' in currentStep
-            ? currentStep.pipetteId
-            : null
-
         if (pipetteId != null) {
           createSilentCommand({
             maintenanceRunId,
@@ -81,7 +83,7 @@ export function useHandleJog({
         }
       })
     },
-    [currentStep, maintenanceRunId, createSilentCommand, setErrorMessage]
+    [pipetteId, maintenanceRunId, createSilentCommand, setErrorMessage]
   )
 
   const processJogQueue = useCallback((): void => {
@@ -116,5 +118,19 @@ export function useHandleJog({
     [executeJog]
   )
 
-  return { handleJog }
+  const resetJog = (
+    offsetLocationDetails: OffsetLocationDetails,
+    pipetteId: string,
+    offset?: VectorOffset | null
+  ): Promise<void> => {
+    const resetJogCommands: CreateCommand[] = [
+      ...moveToWellCommands(offsetLocationDetails, pipetteId, offset),
+    ]
+
+    return chainLPCCommands(resetJogCommands, false).then(() =>
+      Promise.resolve()
+    )
+  }
+
+  return { handleJog, resetJog }
 }

@@ -1,4 +1,5 @@
 """Tests for Protocol API Flex Stacker contexts."""
+
 import pytest
 from decoy import Decoy
 
@@ -78,47 +79,38 @@ def test_get_serial_number(
     assert result == "12345"
 
 
-def test_load_labware_to_hopper(
-    decoy: Decoy,
-    mock_core: FlexStackerCore,
-    mock_protocol_core: ProtocolCore,
-    subject: FlexStackerContext,
+def test_fill(
+    decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
-    """It should create two labware to the core map."""
-    subject.load_labware_to_hopper(load_name="some-load-name", quantity=2)
-    decoy.verify(
-        mock_protocol_core.load_labware_to_flex_stacker_hopper(
-            module_core=mock_core,
-            load_name="some-load-name",
-            quantity=2,
-            label=None,
-            namespace=None,
-            version=None,
-            lid=None,
-        ),
-        times=1,
-    )
+    """It should pass args to the core."""
+    subject.fill("hello", 2)
+    decoy.verify(mock_core.fill("hello", 2))
 
 
-def test_load_labware_with_lid_to_hopper(
-    decoy: Decoy,
-    mock_core: FlexStackerCore,
-    mock_protocol_core: ProtocolCore,
-    subject: FlexStackerContext,
+def test_empty(
+    decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
 ) -> None:
-    """It should create two labware to the core map."""
-    subject.load_labware_to_hopper(
-        load_name="some-load-name", quantity=2, lid="some-lid-name"
-    )
+    """It should pass args to the core."""
+    subject.empty("goodbye")
+    decoy.verify(mock_core.empty("goodbye"))
+
+
+def test_set_stored_labware(
+    decoy: Decoy, mock_core: FlexStackerCore, subject: FlexStackerContext
+) -> None:
+    """It should route arguments appropriately."""
+    subject.set_stored_labware("load_name", "namespace", 1, "adapter", "lid", 2)
     decoy.verify(
-        mock_protocol_core.load_labware_to_flex_stacker_hopper(
-            module_core=mock_core,
-            load_name="some-load-name",
-            quantity=2,
-            label=None,
-            namespace=None,
-            version=None,
-            lid="some-lid-name",
-        ),
-        times=1,
+        mock_core.set_stored_labware(
+            main_load_name="load_name",
+            main_namespace="namespace",
+            main_version=1,
+            lid_load_name="lid",
+            lid_namespace="namespace",
+            lid_version=1,
+            adapter_load_name="adapter",
+            adapter_namespace="namespace",
+            adapter_version=1,
+            count=2,
+        )
     )

@@ -78,7 +78,9 @@ export function CurrentOffsetsTable(
         <tr>
           <OffsetTableHeader>{t('location')}</OffsetTableHeader>
           <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
-          <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
+          <OffsetTableHeader>
+            {t('legacy_labware_offset_data')}
+          </OffsetTableHeader>
         </tr>
       </thead>
       <tbody>

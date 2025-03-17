@@ -16,7 +16,7 @@ from opentrons.util.helpers import utc_now
 from .models import v1
 
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.labware.types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition2
 
 
 log = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ def tip_lengths_for_pipette(
 
 
 def load_tip_length_calibration(
-    pip_id: str, definition: "LabwareDefinition"
+    pip_id: str, definition: "LabwareDefinition2"
 ) -> v1.TipLengthModel:
     """
     Function used to grab the current tip length associated
@@ -127,7 +127,7 @@ def get_all_tip_length_calibrations() -> typing.List[v1.TipLengthCalibration]:
     return all_tip_lengths_available
 
 
-def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition":
+def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinition2":
     """
     Return the custom tiprack definition saved in the custom tiprack directory
     during tip length calibration
@@ -137,7 +137,7 @@ def get_custom_tiprack_definition_for_tlc(labware_uri: str) -> "LabwareDefinitio
     try:
         with open(custom_tiprack_path, "rb") as f:
             return typing.cast(
-                "LabwareDefinition",
+                "LabwareDefinition2",
                 json.loads(f.read().decode("utf-8")),
             )
     except FileNotFoundError:
@@ -213,7 +213,7 @@ def clear_tip_length_calibration() -> None:
 
 
 def create_tip_length_data(
-    definition: "LabwareDefinition",
+    definition: "LabwareDefinition2",
     length: float,
     cal_status: typing.Optional[
         typing.Union[local_types.CalibrationStatus, v1.CalibrationStatus]
@@ -251,7 +251,7 @@ def create_tip_length_data(
 
 def _save_custom_tiprack_definition(
     labware_uri: str,
-    definition: "LabwareDefinition",
+    definition: "LabwareDefinition2",
 ) -> None:
     namespace, load_name, version = labware_uri.split("/")
     custom_tr_dir_path = config.get_custom_tiprack_def_path()

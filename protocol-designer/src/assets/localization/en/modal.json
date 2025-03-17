@@ -79,7 +79,7 @@
       "body7": "Removing ability to dispense to off-deck labware or move off-deck labware with a gripper",
       "body8": "Removing quantity dropdown from all modules during the Flex setup flow to reduce deck setup conflicts",
       "body9": "All protocols now require Opentrons App version 8.3.0+ to run.",
-      "body10": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
+      "body10": "For more information, see the <link1>Protocol Designer Instruction Manual</link1> or the <link2>Release Notes.</link2>."
     }
   },
   "labware_selection": {
@@ -112,11 +112,13 @@
       "aspirate_mmFromBottom": "Change where in the well the robot aspirates from.",
       "dispense_mmFromBottom": "Change where in the well the robot dispenses from.",
       "mix_mmFromBottom": "Change from where in the well the robot aspirates and dispenses during the mix.",
-      "aspirate_touchTip_mmFromBottom": "Change from where in the well the robot performs the touch tip.",
-      "dispense_touchTip_mmFromBottom": "Change from where in the well the robot performs the touch tip.",
-      "mix_touchTip_mmFromBottom": "Change from where in the well the robot performs the touch tip.",
+      "aspirate_touchTip_mmFromTop": "Change from where in the well the robot performs the touch tip.",
+      "dispense_touchTip_mmFromTop": "Change from where in the well the robot performs the touch tip.",
+      "mix_touchTip_mmFromTop": "Change from where in the well the robot performs the touch tip.",
       "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating.",
-      "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing."
+      "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing.",
+      "aspirate_retract_mmFromBottom": "Change where in the well the robot retracts the tip to.",
+      "dispense_retract_mmFromBottom": "Change where in the well the robot retracts the tip from."
     },
     "field_titles": {
       "z_position": "Z position",

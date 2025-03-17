@@ -36,6 +36,7 @@
     "i18next": "^19.8.3",
     "lodash": "4.17.21",
     "react-i18next": "14.0.0",
+    "react-markdown": "9.0.3",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",

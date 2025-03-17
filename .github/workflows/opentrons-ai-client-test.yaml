@@ -35,7 +35,7 @@ env:
 
 jobs:
   js-unit-test:
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     name: 'opentrons ai frontend unit tests'
     timeout-minutes: 60
     steps:

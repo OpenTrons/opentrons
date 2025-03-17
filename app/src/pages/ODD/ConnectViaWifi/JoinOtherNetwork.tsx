@@ -18,7 +18,7 @@ export function JoinOtherNetwork({
   setCurrentOption,
   setSelectedSsid,
 }: JoinOtherNetworkProps): JSX.Element {
-  const { i18n, t } = useTranslation('device_settings')
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   const [inputSsid, setInputSsid] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -35,7 +35,7 @@ export function JoinOtherNetwork({
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <RobotSetupHeader
-        buttonText={i18n.format(t('continue'), 'capitalize')}
+        buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         header={t('join_other_network')}
         onClickBack={() => {
           setCurrentOption('WifiList')

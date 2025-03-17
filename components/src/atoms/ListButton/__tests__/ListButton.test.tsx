@@ -39,6 +39,12 @@ describe('ListButton', () => {
     const listButton = screen.getByTestId('ListButton_notConnected')
     expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.yellow30}`)
   })
+  it('should render correct style - onColor', () => {
+    props.type = 'onColor'
+    render(props)
+    const listButton = screen.getByTestId('ListButton_onColor')
+    expect(listButton).toHaveStyle(`backgroundColor: ${COLORS.white}`)
+  })
   it('should call on click when pressed', () => {
     render(props)
     fireEvent.click(screen.getByText('mock ListButton content'))

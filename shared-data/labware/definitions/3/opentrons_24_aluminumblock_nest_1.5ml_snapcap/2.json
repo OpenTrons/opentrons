@@ -326,26 +326,34 @@
     "conicalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 2.72,
-          "topHeight": 1.57,
-          "bottomHeight": 0.0
-        },
-        {
           "shape": "conical",
-          "topDiameter": 8.9,
-          "bottomDiameter": 3.69,
-          "topHeight": 17.7,
-          "bottomHeight": 1.57
+          "topDiameter": 9.9,
+          "bottomDiameter": 9.28,
+          "topHeight": 37.9,
+          "bottomHeight": 35.4
         },
         {
           "shape": "conical",
           "topDiameter": 9.28,
-          "bottomDiameter": 8.9,
-          "topHeight": 37.9,
-          "bottomHeight": 17.7
+          "bottomDiameter": 8.98,
+          "topHeight": 35.4,
+          "bottomHeight": 17.4
+        },
+        {
+          "shape": "conical",
+          "topDiameter": 8.98,
+          "bottomDiameter": 3.69,
+          "topHeight": 17.4,
+          "bottomHeight": 1.56
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 1.87,
+          "topHeight": 1.56,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

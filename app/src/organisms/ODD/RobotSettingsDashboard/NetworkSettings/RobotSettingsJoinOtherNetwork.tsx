@@ -21,7 +21,7 @@ export function RobotSettingsJoinOtherNetwork({
   setCurrentOption,
   setSelectedSsid,
 }: RobotSettingsJoinOtherNetworkProps): JSX.Element {
-  const { i18n, t } = useTranslation('device_settings')
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   const [inputSsid, setInputSsid] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -38,7 +38,7 @@ export function RobotSettingsJoinOtherNetwork({
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
-        buttonText={i18n.format(t('continue'), 'capitalize')}
+        buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         header={t('join_other_network')}
         onClickBack={() => {
           setCurrentOption('RobotSettingsWifi')

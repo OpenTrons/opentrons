@@ -30,7 +30,7 @@ import type {
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_MODULE_TYPE,
 } from './constants'
-import type { RunTimeCommand, LabwareLocation } from '../command/types'
+import type { RunTimeCommand, LoadedLabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
 import type { PipetteName } from './pipettes'
 import type { CommandAnnotation } from '../commandAnnotation/types'
@@ -126,6 +126,7 @@ export interface LabwareParameters {
   isTiprack: boolean
   tipLength?: number
   isMagneticModuleCompatible: boolean
+  isDeckSlotCompatible?: boolean
   magneticModuleEngageHeight?: number
   quirks?: string[]
 }
@@ -259,10 +260,14 @@ export interface LabwareDefinition2 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  stackLimit?: number
+  compatibleParentLabware?: string[]
+  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
 export interface LabwareDefinition3 {
   version: number
+  $otSharedSchema: '#/labware/schemas/3'
   schemaVersion: 3
   namespace: string
   metadata: LabwareMetadata
@@ -276,6 +281,8 @@ export interface LabwareDefinition3 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  stackLimit?: number
+  compatibleParentLabware?: string[]
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
@@ -682,7 +689,7 @@ export interface LoadedLabware {
   id: string
   loadName: string
   definitionUri: string
-  location: LabwareLocation
+  location: LoadedLabwareLocation
   offsetId?: string
   displayName?: string
 }
@@ -769,17 +776,17 @@ interface BaseLiquidHandlingProperties<RetractType> {
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
-interface AspirateProperties
+export interface AspirateProperties
   extends BaseLiquidHandlingProperties<RetractAspirate> {
   preWet: boolean
   mix: MixProperties
 }
-interface SingleDispenseProperties
+export interface SingleDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-interface MultiDispenseProperties {
+export interface MultiDispenseProperties {
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }
@@ -796,6 +803,7 @@ interface ByPipetteSetting {
 export interface LiquidClass {
   liquidClassName: string
   displayName: string
+  description: string
   schemaVersion: number
   namespace: string
   byPipette: ByPipetteSetting[]

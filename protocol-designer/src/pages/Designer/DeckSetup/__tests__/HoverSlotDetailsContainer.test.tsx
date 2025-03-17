@@ -3,12 +3,12 @@ import { screen } from '@testing-library/react'
 import { OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { SlotDetailsContainer } from '../../../../organisms'
+import { SlotDetailsContainer } from '../../../../components/organisms'
 import { HoverSlotDetailsContainer } from '../HoverSlotDetailsContainer'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../organisms')
+vi.mock('../../../../components/organisms')
 
 const render = (props: ComponentProps<typeof HoverSlotDetailsContainer>) => {
   return renderWithProviders(<HoverSlotDetailsContainer {...props} />)

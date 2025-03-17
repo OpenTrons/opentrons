@@ -104,10 +104,7 @@ export function LabwareListItem(
     adapterName: bottomLabwareName,
   } = getLocationInfoNames(topLabwareId, commands)
 
-  const isStacked =
-    labwareQuantity > 1 ||
-    bottomLabwareId !== topLabwareId ||
-    moduleModel != null
+  const isStacked = labwareQuantity > 1 || bottomLabwareId !== topLabwareId
 
   const { i18n, t } = useTranslation('protocol_setup')
   const [

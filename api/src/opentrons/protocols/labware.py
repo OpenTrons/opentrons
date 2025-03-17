@@ -4,7 +4,7 @@ import logging
 import json
 import os
 from pathlib import Path
-from typing import Any, AnyStr, Dict, Optional, Union, List
+from typing import Any, AnyStr, Dict, Mapping, Optional, Union, List, Sequence, Literal
 
 import jsonschema  # type: ignore
 
@@ -17,17 +17,37 @@ from opentrons.protocols.api_support.constants import (
     USER_DEFS_PATH,
 )
 from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.errors.exceptions import InvalidProtocolData
 
 
 MODULE_LOG = logging.getLogger(__name__)
+
+LabwareProblem = Literal[
+    "no-schema-id", "bad-schema-id", "schema-mismatch", "invalid-json"
+]
+
+
+class NotALabwareError(InvalidProtocolData):
+    def __init__(
+        self, problem: LabwareProblem, wrapping: Sequence[BaseException]
+    ) -> None:
+        messages: dict[LabwareProblem, str] = {
+            "no-schema-id": "No schema ID present in file",
+            "bad-schema-id": "Bad schema ID in file",
+            "invalid-json": "File does not contain valid JSON",
+            "schema-mismatch": "File does not match labware schema",
+        }
+        super().__init__(
+            message=messages[problem], detail={"kind": problem}, wrapping=wrapping
+        )
 
 
 def get_labware_definition(
     load_name: str,
     namespace: Optional[str] = None,
     version: Optional[int] = None,
-    bundled_defs: Optional[Dict[str, LabwareDefinition]] = None,
-    extra_defs: Optional[Dict[str, LabwareDefinition]] = None,
+    bundled_defs: Optional[Mapping[str, LabwareDefinition]] = None,
+    extra_defs: Optional[Mapping[str, LabwareDefinition]] = None,
 ) -> LabwareDefinition:
     """
     Look up and return a definition by load_name + namespace + version and
@@ -126,7 +146,7 @@ def save_definition(
         json.dump(labware_def, f)
 
 
-def verify_definition(
+def verify_definition(  # noqa: C901
     contents: Union[AnyStr, LabwareDefinition, Dict[str, Any]]
 ) -> LabwareDefinition:
     """Verify that an input string is a labware definition and return it.
@@ -134,8 +154,7 @@ def verify_definition(
     If the definition is invalid, an exception is raised; otherwise parse the
     json and return the valid definition.
 
-    :raises json.JsonDecodeError: If the definition is not valid json
-    :raises jsonschema.ValidationError: If the definition is not valid.
+    :raises NotALabwareError:
     :returns: The parsed definition
     """
     schemata_by_version = {
@@ -146,15 +165,24 @@ def verify_definition(
     if isinstance(contents, dict):
         to_return = contents
     else:
-        to_return = json.loads(contents)
+        try:
+            to_return = json.loads(contents)
+        except json.JSONDecodeError as e:
+            raise NotALabwareError("invalid-json", [e]) from e
     try:
         schema_version = to_return["schemaVersion"]
+    except KeyError as e:
+        raise NotALabwareError("no-schema-id", [e]) from e
+
+    try:
         schema = schemata_by_version[schema_version]
-    except KeyError:
-        raise RuntimeError(
-            f'Invalid or unknown labware schema version {to_return.get("schemaVersion", None)}'
-        )
-    jsonschema.validate(to_return, schema)
+    except KeyError as e:
+        raise NotALabwareError("bad-schema-id", [e]) from e
+
+    try:
+        jsonschema.validate(to_return, schema)
+    except jsonschema.ValidationError as e:
+        raise NotALabwareError("schema-mismatch", [e]) from e
 
     # we can type ignore this because if it passes the jsonschema it has
     # the correct structure
@@ -162,7 +190,7 @@ def verify_definition(
 
 
 def _get_labware_definition_from_bundle(
-    bundled_labware: Dict[str, LabwareDefinition],
+    bundled_labware: Mapping[str, LabwareDefinition],
     load_name: str,
     namespace: Optional[str] = None,
     version: Optional[int] = None,

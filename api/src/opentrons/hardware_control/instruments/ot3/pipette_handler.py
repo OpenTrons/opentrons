@@ -32,6 +32,7 @@ from opentrons.hardware_control.types import (
     HardwareAction,
     Axis,
     OT3Mount,
+    TipScrapeType,
 )
 from opentrons.hardware_control.constants import (
     SHAKE_OFF_TIPS_SPEED,
@@ -78,6 +79,8 @@ class TipActionMoveSpec:
     speed: Optional[
         float
     ]  # allow speed for a movement to default to its axes' speed settings
+    scrape_axis: Optional[Axis] = None
+    # add a scrape motion in the middle of a tip drop
 
 
 @dataclass(frozen=True)
@@ -604,6 +607,7 @@ class OT3PipetteHandler:
         volume: Optional[float],
         rate: float,
         push_out: Optional[float],
+        is_full_dispense: bool,
         correction_volume: float = 0.0,
     ) -> Optional[LiquidActionSpec]:
         """Check preconditions for dispense, parse args, and calculate positions.
@@ -641,7 +645,21 @@ class OT3PipetteHandler:
         # of the OT-2 version of this class. Protocol Engine does its own clamping,
         # so we don't expect this to trigger in practice.
         disp_vol = min(instrument.current_volume, disp_vol)
-        is_full_dispense = numpy.isclose(instrument.current_volume - disp_vol, 0)
+
+        # TODO (Ryan): Remove this check in the future.
+        # we moved this logic up to protocol_engine but replacing with this check to make sure
+        # we don't accidentally call this incorrectly from somewhere else.
+        if not is_full_dispense and numpy.isclose(
+            instrument.current_volume - disp_vol, 0
+        ):
+            raise CommandPreconditionViolated(
+                message="Command created a full-dispense without the full dispense argument",
+                detail={
+                    "command": "dispense",
+                    "current-volume": str(instrument.current_volume),
+                    "dispense-volume": str(disp_vol),
+                },
+            )
 
         if disp_vol == 0:
             return None
@@ -906,6 +924,7 @@ class OT3PipetteHandler:
     def plan_lt_drop_tip(
         self,
         mount: OT3Mount,
+        scrape_tips: TipScrapeType = TipScrapeType.NONE,
     ) -> TipActionSpec:
         instrument = self.get_pipette(mount)
         config = instrument.drop_configurations.plunger_eject
@@ -913,6 +932,20 @@ class OT3PipetteHandler:
             raise CommandPreconditionViolated(
                 f"No plunger-eject drop tip configurations for {instrument.name} on {mount.name}"
             )
+        scrape_move: Optional[TipActionMoveSpec] = None
+        match scrape_tips:
+            case TipScrapeType.LEFT_ONE_COL:
+                scrape_move = TipActionMoveSpec(
+                    distance=-11, currents=None, speed=None, scrape_axis=Axis.X
+                )
+            case TipScrapeType.RIGHT_ONE_COL:
+                scrape_move = TipActionMoveSpec(
+                    distance=11, currents=None, speed=None, scrape_axis=Axis.X
+                )
+            case TipScrapeType.NONE:
+                scrape_move = None
+            case _:
+                scrape_move = None
         drop_seq = [
             TipActionMoveSpec(
                 distance=instrument.plunger_positions.drop_tip,
@@ -931,6 +964,9 @@ class OT3PipetteHandler:
                 },
             ),
         ]
+        if scrape_move:
+            # Add the scrape move before the plunger moves back up
+            drop_seq.insert(1, scrape_move)
 
         return TipActionSpec(
             tip_action_moves=drop_seq,

@@ -7,17 +7,17 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data.robot.types import RobotTypeEnum, RobotType
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.types import Mount, DeckSlotName, StagingSlotName
-from opentrons.config import feature_flags as ff
 from opentrons.protocol_api import OFF_DECK
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.modules.types import (
     ModuleType,
     TemperatureModuleModel,
     FlexStackerModuleModel,
+    MagneticBlockModel,
 )
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
@@ -284,6 +284,7 @@ def test_load_instrument(
     ).then_return(mock_instrument_core)
 
     decoy.when(mock_instrument_core.get_pipette_name()).then_return("Gandalf the Grey")
+    decoy.when(mock_instrument_core.get_model()).then_return("wizard")
     decoy.when(mock_core.get_disposal_locations()).then_raise(
         NoTrashDefinedError("No trash!")
     )
@@ -795,6 +796,10 @@ def test_load_labware_with_lid(
     decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+
     result = subject.load_labware(
         load_name="UPPERCASE_LABWARE",
         location=42,
@@ -854,6 +859,179 @@ def test_load_lid_stack(
 
     assert isinstance(result, Labware)
     assert result.name == "STACK_OBJECT"
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 23)])
+def test_move_lids_from_stack(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should move all the lids from a lid stack down to the base slot."""
+    mock_lid_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID")).then_return(
+        "lowercase_lid"
+    )
+
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_C1)
+
+    decoy.when(
+        mock_core.load_lid_stack(
+            load_name="lowercase_lid",
+            location=DeckSlotName.SLOT_C1,
+            quantity=5,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid_core)
+
+    decoy.when(mock_lid_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid_core.get_display_name()).then_return("")
+    decoy.when(mock_lid_core.get_well_columns()).then_return([])
+
+    stack = subject.load_lid_stack(
+        load_name="UPPERCASE_LID",
+        location=42,
+        quantity=5,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(stack, Labware)
+    assert stack.name == "STACK_OBJECT"
+
+    for i in range(5):
+        subject.move_lid(stack, "D3")
+
+    # Load another labware where the lidstack once was, verifying its engine object is gone
+    mock_lw_core = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_labware",
+            location=DeckSlotName.SLOT_C1,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lw_core)
+
+    decoy.when(mock_lw_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lw_core.get_display_name()).then_return("")
+    decoy.when(mock_lw_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        load_name="UPPERCASE_LABWARE",
+        location=42,
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+    assert isinstance(result, Labware)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 22)])
+def test_move_labware_lids_old(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """This should use the original loading lids as labware for backwards compatibility."""
+    mock_lid_core = decoy.mock(cls=LabwareCore)
+    mock_lid2_core = decoy.mock(cls=LabwareCore)
+    mock_lid3_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID")).then_return(
+        "lowercase_lid"
+    )
+
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_C1)
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(43, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_C2)
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_lid",
+            location=DeckSlotName.SLOT_C1,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid_core)
+
+    decoy.when(mock_lid_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid_core.get_display_name()).then_return("")
+    decoy.when(mock_lid_core.get_well_columns()).then_return([])
+
+    lid_1 = subject.load_labware(
+        load_name="UPPERCASE_LID",
+        location=42,
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+    assert isinstance(lid_1, Labware)
+
+    decoy.when(
+        lid_1._protocol_core.load_labware(
+            load_name="lowercase_lid",
+            location=lid_1._core,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid2_core)
+    decoy.when(mock_lid2_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid2_core.get_display_name()).then_return("")
+    decoy.when(mock_lid2_core.get_well_columns()).then_return([])
+
+    lid_2 = lid_1.load_labware(
+        name="lowercase_lid",
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+    assert isinstance(lid_2, Labware)
+
+    decoy.when(
+        lid_2._protocol_core.load_labware(
+            load_name="lowercase_lid",
+            location=lid_2._core,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid3_core)
+    decoy.when(mock_lid3_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid3_core.get_display_name()).then_return("")
+    decoy.when(mock_lid3_core.get_well_columns()).then_return([])
+
+    lid_3 = lid_1.load_labware(
+        name="lowercase_lid",
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(lid_3, Labware)
+
+    subject.move_labware(lid_3, 43)
+    subject.move_labware(lid_2, lid_3)
+    subject.move_labware(lid_1, lid_2)
 
 
 def test_loaded_labware(
@@ -1349,6 +1527,159 @@ def test_load_flex_stacker_on_staging_slot(
     decoy.verify(mock_core_map.add(mock_module_core, result), times=1)
 
 
+@pytest.mark.parametrize(
+    ("invert_load_order"),
+    [
+        True,
+        False,
+    ],
+)
+def test_load_flex_stacker_and_mag_block_combinations(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+    invert_load_order: bool,
+) -> None:
+    """It should load a Flex stacker and a Magnetic block in both acceptable orders."""
+    mock_module_core_1: FlexStackerCore = decoy.mock(cls=FlexStackerCore)
+    mock_module_core_2: MagneticBlockCore = decoy.mock(cls=MagneticBlockCore)
+
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+
+    def _load_stacker() -> None:
+        # Load a Flex Stacker at "B4" -> CutoutB3
+        decoy.when(
+            mock_validation.ensure_module_model("flexStackerModuleV1")
+        ).then_return(FlexStackerModuleModel.FLEX_STACKER_V1)
+        decoy.when(
+            mock_validation.ensure_and_convert_deck_slot(
+                "B4", api_version, "OT-3 Standard"
+            )
+        ).then_return(StagingSlotName.SLOT_B4)
+        decoy.when(
+            mock_validation.convert_flex_stacker_load_slot(StagingSlotName.SLOT_B4)
+        ).then_return(DeckSlotName.SLOT_B3)
+
+        decoy.when(
+            mock_core.load_module(
+                model=FlexStackerModuleModel.FLEX_STACKER_V1,
+                deck_slot=DeckSlotName.SLOT_B3,
+                configuration=None,
+            )
+        ).then_return(mock_module_core_1)
+
+        decoy.when(mock_module_core_1.get_model()).then_return(
+            FlexStackerModuleModel.FLEX_STACKER_V1
+        )
+        decoy.when(mock_module_core_1.get_serial_number()).then_return("cap'n crunch")
+        decoy.when(mock_module_core_1.get_deck_slot()).then_return(DeckSlotName.SLOT_B3)
+
+        result = subject.load_module(module_name="flexStackerModuleV1", location="B4")
+
+        assert isinstance(result, ModuleContext)
+        decoy.verify(mock_core_map.add(mock_module_core_1, result), times=1)
+
+    def _load_mag() -> None:
+        # Load a Mag Block on the B3 slot
+        decoy.when(mock_validation.ensure_module_model("magneticBlockV1")).then_return(
+            MagneticBlockModel.MAGNETIC_BLOCK_V1
+        )
+        decoy.when(
+            mock_validation.ensure_and_convert_deck_slot(
+                "B3", api_version, "OT-3 Standard"
+            )
+        ).then_return(DeckSlotName.SLOT_B3)
+        decoy.when(
+            mock_core.load_module(
+                model=MagneticBlockModel.MAGNETIC_BLOCK_V1,
+                deck_slot=DeckSlotName.SLOT_B3,
+                configuration=None,
+            )
+        ).then_return(mock_module_core_2)
+        result = subject.load_module(module_name="magneticBlockV1", location="B3")
+
+        assert isinstance(result, ModuleContext)
+        decoy.verify(mock_core_map.add(mock_module_core_2, result), times=1)
+
+    if invert_load_order:
+        _load_mag()
+        _load_stacker()
+    elif invert_load_order is False:
+        _load_stacker()
+        _load_mag()
+
+
+@pytest.mark.parametrize(
+    ("invert_load_order"),
+    [
+        True,
+        False,
+    ],
+)
+def test_load_flex_stacker_and_waste_chute_combinations(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+    invert_load_order: bool,
+) -> None:
+    """It should load a Flex stacker and a Waste Chute in both acceptable orders."""
+
+    def _load_stacker() -> None:
+        mock_module_core: FlexStackerCore = decoy.mock(cls=FlexStackerCore)
+        decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+        # Load a Flex Stacker at "B4" -> CutoutB3
+        decoy.when(
+            mock_validation.ensure_module_model("flexStackerModuleV1")
+        ).then_return(FlexStackerModuleModel.FLEX_STACKER_V1)
+        decoy.when(
+            mock_validation.ensure_and_convert_deck_slot(
+                "D4", api_version, "OT-3 Standard"
+            )
+        ).then_return(StagingSlotName.SLOT_D4)
+        decoy.when(
+            mock_validation.convert_flex_stacker_load_slot(StagingSlotName.SLOT_D4)
+        ).then_return(DeckSlotName.SLOT_D3)
+
+        decoy.when(
+            mock_core.load_module(
+                model=FlexStackerModuleModel.FLEX_STACKER_V1,
+                deck_slot=DeckSlotName.SLOT_D3,
+                configuration=None,
+            )
+        ).then_return(mock_module_core)
+
+        decoy.when(mock_module_core.get_model()).then_return(
+            FlexStackerModuleModel.FLEX_STACKER_V1
+        )
+        decoy.when(mock_module_core.get_serial_number()).then_return(
+            "cooooookie crisp!"
+        )
+        decoy.when(mock_module_core.get_deck_slot()).then_return(DeckSlotName.SLOT_D3)
+
+        result = subject.load_module(module_name="flexStackerModuleV1", location="D4")
+
+        assert isinstance(result, ModuleContext)
+        decoy.verify(mock_core_map.add(mock_module_core, result), times=1)
+
+    def _load_chute() -> None:
+        # Load a Waste Chute on the Flex Stacker's B3 slot
+        mock_chute = decoy.mock(cls=WasteChute)
+        decoy.when(mock_core.load_waste_chute()).then_return(mock_chute)
+        result = subject.load_waste_chute()
+        assert result == mock_chute
+
+    if invert_load_order:
+        _load_chute()
+        _load_stacker()
+    elif invert_load_order is False:
+        _load_stacker()
+        _load_chute()
+
+
 def test_loaded_modules(
     decoy: Decoy,
     mock_core_map: LoadedCoreMap,
@@ -1456,7 +1787,6 @@ def test_define_liquid_class(
     mock_core: ProtocolCore,
     subject: ProtocolContext,
     robot_type: RobotType,
-    mock_feature_flags: None,
 ) -> None:
     """It should create the liquid class definition."""
     expected_liquid_class = LiquidClass(
@@ -1466,14 +1796,11 @@ def test_define_liquid_class(
         expected_liquid_class
     )
     decoy.when(mock_core.robot_type).then_return(robot_type)
-    decoy.when(
-        ff.allow_liquid_classes(RobotTypeEnum.robot_literal_to_enum(robot_type))
-    ).then_return(True)
     assert subject.define_liquid_class("volatile_90") == expected_liquid_class
 
 
 def test_bundled_data(
-    decoy: Decoy, mock_core_map: LoadedCoreMap, mock_deck: Deck, mock_core: ProtocolCore
+    mock_core_map: LoadedCoreMap, mock_deck: Deck, mock_core: ProtocolCore
 ) -> None:
     """It should return bundled data."""
     subject = ProtocolContext(

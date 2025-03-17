@@ -1,11 +1,16 @@
 """Legacy Well core implementation."""
-from typing import Optional
+from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from opentrons.protocols.api_support.util import APIVersionError
 
 from opentrons.types import Point
+
+from opentrons.protocol_engine.types.liquid_level_detection import (
+    SimulatedProbeResult,
+    LiquidTrackingType,
+)
 
 from .well_geometry import WellGeometry
 from ..well import AbstractWellCore
@@ -106,6 +111,10 @@ class LegacyWellCore(AbstractWellCore):
         """Get the coordinate of the well's center."""
         return self._geometry.center()
 
+    def get_meniscus(self) -> Union[Point, SimulatedProbeResult]:
+        """Get the coordinate of the well's center."""
+        raise APIVersionError(api_element="Getting a meniscus")
+
     def load_liquid(
         self,
         liquid: Liquid,
@@ -117,6 +126,21 @@ class LegacyWellCore(AbstractWellCore):
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """Gets point in deck coordinates based on percentage of the radius of each axis."""
         return self._geometry.from_center_cartesian(x, y, z)
+
+    def estimate_liquid_height_after_pipetting(
+        self,
+        operation_volume: float,
+    ) -> LiquidTrackingType:
+        """Estimate what the liquid height will be after pipetting, without raising an error."""
+        return 0.0
+
+    def current_liquid_height(self) -> LiquidTrackingType:
+        """Get the current liquid height."""
+        return 0.0
+
+    def get_liquid_volume(self) -> LiquidTrackingType:
+        """Get the current well volume."""
+        return 0.0
 
     # TODO(mc, 2022-10-28): is this used and/or necessary?
     def __repr__(self) -> str:

@@ -62,6 +62,7 @@ describe('LabwareTools', () => {
         name: 'p1000_single_flex',
         id: 'mockPipId',
         tiprackLabwareDef: [fixtureTiprack1000ul as LabwareDefinition2],
+        pythonName: 'mockPythonName',
       },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({

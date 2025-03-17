@@ -70,7 +70,7 @@ class closeGripperJaw(
 
     commandType: closeGripperJawCommandType = "robot/closeGripperJaw"
     params: closeGripperJawParams
-    result: Optional[closeGripperJawResult]
+    result: Optional[closeGripperJawResult] = None
 
     _ImplementationCls: Type[
         closeGripperJawImplementation

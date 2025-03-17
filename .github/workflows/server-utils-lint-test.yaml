@@ -39,7 +39,7 @@ jobs:
   lint:
     name: 'server-utils linting'
     timeout-minutes: 10
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -60,7 +60,7 @@ jobs:
     name: 'server-utils package tests'
     timeout-minutes: 10
     needs: [lint]
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
         with:

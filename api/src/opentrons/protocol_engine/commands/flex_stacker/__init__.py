@@ -1,13 +1,5 @@
 """Command models for Flex Stacker commands."""
 
-from .configure import (
-    ConfigureCommandType,
-    ConfigureParams,
-    ConfigureResult,
-    Configure,
-    ConfigureCreate,
-)
-
 from .store import (
     StoreCommandType,
     StoreParams,
@@ -24,14 +16,21 @@ from .retrieve import (
     RetrieveCreate,
 )
 
+from .set_stored_labware import (
+    SetStoredLabwareCommandType,
+    SetStoredLabwareParams,
+    SetStoredLabwareResult,
+    SetStoredLabware,
+    SetStoredLabwareCreate,
+    StackerStoredLabwareDetails,
+)
+
+from .fill import FillCommandType, FillParams, FillResult, Fill, FillCreate
+
+from .empty import EmptyCommandType, EmptyParams, EmptyResult, Empty, EmptyCreate
+
 
 __all__ = [
-    # flexStacker/configure
-    "ConfigureCommandType",
-    "ConfigureParams",
-    "ConfigureResult",
-    "Configure",
-    "ConfigureCreate",
     # flexStacker/store
     "StoreCommandType",
     "StoreParams",
@@ -44,4 +43,23 @@ __all__ = [
     "RetrieveResult",
     "Retrieve",
     "RetrieveCreate",
+    # flexStacker/setStoredLabware
+    "SetStoredLabwareCommandType",
+    "SetStoredLabwareParams",
+    "SetStoredLabwareResult",
+    "SetStoredLabware",
+    "SetStoredLabwareCreate",
+    "StackerStoredLabwareDetails",
+    # flexStacker/fill
+    "FillCommandType",
+    "FillParams",
+    "FillResult",
+    "Fill",
+    "FillCreate",
+    # flexStacker/empty
+    "EmptyCommandType",
+    "EmptyParams",
+    "EmptyResult",
+    "Empty",
+    "EmptyCreate",
 ]

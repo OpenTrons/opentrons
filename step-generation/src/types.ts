@@ -97,6 +97,7 @@ export interface LabwareEntity {
   id: string
   labwareDefURI: string
   def: LabwareDefinition2
+  pythonName: string
 }
 export interface LabwareEntities {
   [labwareId: string]: LabwareEntity
@@ -106,6 +107,7 @@ export interface ModuleEntity {
   id: string
   type: ModuleType
   model: ModuleModel
+  pythonName: string
 }
 
 export interface ModuleEntities {
@@ -120,6 +122,24 @@ export interface NormalizedPipetteById {
   }
 }
 
+export interface LiquidEntity {
+  displayName: string
+  displayColor: string
+  description: string | null
+  pythonName: string
+  liquidGroupId: string
+  liquidClass?: string
+}
+
+export interface LiquidEntities {
+  [liquidId: string]: LiquidEntity
+}
+
+export type Ingredient = Omit<LiquidEntity, 'pythonName'>
+export interface Ingredients {
+  [liquidId: string]: Ingredient
+}
+
 export type AdditionalEquipmentName =
   | 'gripper'
   | 'wasteChute'
@@ -129,7 +149,10 @@ export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
     id: string
-    location?: string
+    location: string
+    //  Note: leaving as optional since gripper and stagingArea
+    //  will never need a pythonName
+    pythonName?: string
   }
 }
 
@@ -146,6 +169,7 @@ export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteByI
 export type PipetteEntity = NormalizedPipette & {
   tiprackLabwareDef: LabwareDefinition2[]
   spec: PipetteV2Specs
+  pythonName: string
 }
 
 export interface PipetteEntities {
@@ -195,7 +219,9 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Touch tip after every aspirate */
   touchTipAfterAspirate: boolean
   /** Optional offset for touch tip after aspirate (if null, use PD default) */
-  touchTipAfterAspirateOffsetMmFromBottom: number
+  touchTipAfterAspirateOffsetMmFromTop: number
+  /** Optional speed for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterAspirateSpeed: number | null
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions
   /** Delay after every aspirate */
@@ -219,7 +245,9 @@ export type SharedTransferLikeArgs = CommonArgs & {
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
-  touchTipAfterDispenseOffsetMmFromBottom: number
+  touchTipAfterDispenseOffsetMmFromTop: number
+  /** Optional speed for touch tip after dispense (if null, use PD default) */
+  touchTipAfterDispenseSpeed: number | null
   /** Flow rate in uL/sec for all dispenses */
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
@@ -295,7 +323,7 @@ export type MixArgs = CommonArgs & {
   times: number
   /** Touch tip after mixing */
   touchTip: boolean
-  touchTipMmFromBottom: number
+  touchTipMmFromTop: number
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions
   /** drop tip location entity id */
@@ -515,6 +543,7 @@ export interface InvariantContext {
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
   additionalEquipmentEntities: AdditionalEquipmentEntities
+  liquidEntities: LiquidEntities
   config: Config
 }
 
@@ -619,6 +648,7 @@ export interface CommandsAndRobotState {
   commands: CreateCommand[]
   robotState: RobotState
   warnings?: CommandCreatorWarning[]
+  python?: string
 }
 
 export interface CommandCreatorErrorResponse {
@@ -629,6 +659,7 @@ export interface CommandCreatorErrorResponse {
 export interface CommandsAndWarnings {
   commands: CreateCommand[]
   warnings?: CommandCreatorWarning[]
+  python?: string
 }
 export type CommandCreatorResult =
   | CommandsAndWarnings

@@ -62,6 +62,7 @@ beforeEach(() => {
     id: moduleId,
     type: HEATERSHAKER_MODULE_TYPE,
     model: HEATERSHAKER_MODULE_V1,
+    pythonName: 'mockPythonName',
   }
   startRobotState = getInitialRobotStateStandard(invariantContext)
   startRobotState.modules[moduleId] = {

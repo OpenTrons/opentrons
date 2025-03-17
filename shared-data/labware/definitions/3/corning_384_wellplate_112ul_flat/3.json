@@ -437,8 +437,8 @@
     ]
   ],
   "metadata": {
-    "displayName": "Corning 384 Well Plate 112 \u00b5L Flat",
-    "displayVolumeUnits": "\u00b5L",
+    "displayName": "Corning 384 Well Plate 112 µL Flat",
+    "displayVolumeUnits": "µL",
     "displayCategory": "wellPlate",
     "tags": []
   },
@@ -457,7 +457,7 @@
   "gripHeightFromLabwareBottom": 12.4,
   "wells": {
     "P1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -468,7 +468,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -479,7 +479,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -490,7 +490,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -501,7 +501,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -512,7 +512,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -523,7 +523,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -534,7 +534,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -545,7 +545,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -556,7 +556,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -567,7 +567,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -578,7 +578,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -589,7 +589,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -600,7 +600,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -611,7 +611,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -622,7 +622,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A1": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -633,7 +633,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -644,7 +644,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -655,7 +655,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -666,7 +666,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -677,7 +677,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -688,7 +688,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -699,7 +699,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -710,7 +710,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -721,7 +721,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -732,7 +732,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -743,7 +743,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -754,7 +754,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -765,7 +765,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -776,7 +776,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -787,7 +787,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -798,7 +798,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A2": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -809,7 +809,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -820,7 +820,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -831,7 +831,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -842,7 +842,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -853,7 +853,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -864,7 +864,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -875,7 +875,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -886,7 +886,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -897,7 +897,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -908,7 +908,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -919,7 +919,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -930,7 +930,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -941,7 +941,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -952,7 +952,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -963,7 +963,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -974,7 +974,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A3": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -985,7 +985,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -996,7 +996,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1007,7 +1007,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1018,7 +1018,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1029,7 +1029,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1040,7 +1040,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1051,7 +1051,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1062,7 +1062,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1073,7 +1073,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1084,7 +1084,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1095,7 +1095,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1106,7 +1106,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1117,7 +1117,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1128,7 +1128,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1139,7 +1139,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1150,7 +1150,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A4": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1161,7 +1161,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1172,7 +1172,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1183,7 +1183,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1194,7 +1194,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1205,7 +1205,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1216,7 +1216,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1227,7 +1227,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1238,7 +1238,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1249,7 +1249,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1260,7 +1260,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1271,7 +1271,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1282,7 +1282,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1293,7 +1293,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1304,7 +1304,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1315,7 +1315,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1326,7 +1326,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A5": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1337,7 +1337,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1348,7 +1348,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1359,7 +1359,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1370,7 +1370,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1381,7 +1381,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1392,7 +1392,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1403,7 +1403,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1414,7 +1414,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1425,7 +1425,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1436,7 +1436,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1447,7 +1447,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1458,7 +1458,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1469,7 +1469,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1480,7 +1480,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1491,7 +1491,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1502,7 +1502,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A6": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1513,7 +1513,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1524,7 +1524,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1535,7 +1535,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1546,7 +1546,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1557,7 +1557,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1568,7 +1568,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1579,7 +1579,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1590,7 +1590,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1601,7 +1601,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1612,7 +1612,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1623,7 +1623,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1634,7 +1634,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1645,7 +1645,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1656,7 +1656,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1667,7 +1667,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1678,7 +1678,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A7": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1689,7 +1689,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1700,7 +1700,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1711,7 +1711,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1722,7 +1722,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1733,7 +1733,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1744,7 +1744,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1755,7 +1755,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1766,7 +1766,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1777,7 +1777,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1788,7 +1788,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1799,7 +1799,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1810,7 +1810,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1821,7 +1821,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1832,7 +1832,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1843,7 +1843,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1854,7 +1854,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A8": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1865,7 +1865,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1876,7 +1876,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1887,7 +1887,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1898,7 +1898,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1909,7 +1909,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1920,7 +1920,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1931,7 +1931,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1942,7 +1942,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1953,7 +1953,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1964,7 +1964,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1975,7 +1975,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1986,7 +1986,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -1997,7 +1997,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2008,7 +2008,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2019,7 +2019,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2030,7 +2030,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A9": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2041,7 +2041,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2052,7 +2052,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2063,7 +2063,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2074,7 +2074,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2085,7 +2085,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2096,7 +2096,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2107,7 +2107,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2118,7 +2118,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2129,7 +2129,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2140,7 +2140,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2151,7 +2151,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2162,7 +2162,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2173,7 +2173,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2184,7 +2184,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2195,7 +2195,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2206,7 +2206,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A10": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2217,7 +2217,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2228,7 +2228,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2239,7 +2239,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2250,7 +2250,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2261,7 +2261,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2272,7 +2272,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2283,7 +2283,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2294,7 +2294,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2305,7 +2305,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2316,7 +2316,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2327,7 +2327,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2338,7 +2338,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2349,7 +2349,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2360,7 +2360,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2371,7 +2371,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2382,7 +2382,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A11": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2393,7 +2393,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2404,7 +2404,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2415,7 +2415,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2426,7 +2426,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2437,7 +2437,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2448,7 +2448,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2459,7 +2459,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2470,7 +2470,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2481,7 +2481,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2492,7 +2492,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2503,7 +2503,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2514,7 +2514,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2525,7 +2525,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2536,7 +2536,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2547,7 +2547,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2558,7 +2558,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A12": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2569,7 +2569,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2580,7 +2580,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2591,7 +2591,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2602,7 +2602,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2613,7 +2613,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2624,7 +2624,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2635,7 +2635,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2646,7 +2646,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2657,7 +2657,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2668,7 +2668,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2679,7 +2679,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2690,7 +2690,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2701,7 +2701,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2712,7 +2712,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2723,7 +2723,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2734,7 +2734,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A13": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2745,7 +2745,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2756,7 +2756,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2767,7 +2767,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2778,7 +2778,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2789,7 +2789,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2800,7 +2800,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2811,7 +2811,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2822,7 +2822,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2833,7 +2833,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2844,7 +2844,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2855,7 +2855,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2866,7 +2866,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2877,7 +2877,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2888,7 +2888,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2899,7 +2899,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2910,7 +2910,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A14": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2921,7 +2921,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2932,7 +2932,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2943,7 +2943,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2954,7 +2954,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2965,7 +2965,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2976,7 +2976,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2987,7 +2987,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -2998,7 +2998,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3009,7 +3009,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3020,7 +3020,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3031,7 +3031,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3042,7 +3042,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3053,7 +3053,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3064,7 +3064,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3075,7 +3075,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3086,7 +3086,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A15": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3097,7 +3097,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3108,7 +3108,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3119,7 +3119,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3130,7 +3130,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3141,7 +3141,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3152,7 +3152,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3163,7 +3163,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3174,7 +3174,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3185,7 +3185,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3196,7 +3196,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3207,7 +3207,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3218,7 +3218,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3229,7 +3229,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3240,7 +3240,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3251,7 +3251,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3262,7 +3262,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A16": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3273,7 +3273,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3284,7 +3284,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3295,7 +3295,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3306,7 +3306,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3317,7 +3317,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3328,7 +3328,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3339,7 +3339,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3350,7 +3350,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3361,7 +3361,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3372,7 +3372,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3383,7 +3383,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3394,7 +3394,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3405,7 +3405,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3416,7 +3416,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3427,7 +3427,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3438,7 +3438,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A17": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3449,7 +3449,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3460,7 +3460,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3471,7 +3471,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3482,7 +3482,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3493,7 +3493,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3504,7 +3504,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3515,7 +3515,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3526,7 +3526,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3537,7 +3537,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3548,7 +3548,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3559,7 +3559,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3570,7 +3570,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3581,7 +3581,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3592,7 +3592,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3603,7 +3603,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3614,7 +3614,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A18": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3625,7 +3625,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3636,7 +3636,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3647,7 +3647,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3658,7 +3658,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3669,7 +3669,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3680,7 +3680,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3691,7 +3691,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3702,7 +3702,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3713,7 +3713,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3724,7 +3724,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3735,7 +3735,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3746,7 +3746,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3757,7 +3757,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3768,7 +3768,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3779,7 +3779,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3790,7 +3790,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A19": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3801,7 +3801,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3812,7 +3812,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3823,7 +3823,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3834,7 +3834,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3845,7 +3845,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3856,7 +3856,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3867,7 +3867,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3878,7 +3878,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3889,7 +3889,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3900,7 +3900,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3911,7 +3911,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3922,7 +3922,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3933,7 +3933,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3944,7 +3944,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3955,7 +3955,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3966,7 +3966,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A20": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3977,7 +3977,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3988,7 +3988,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -3999,7 +3999,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4010,7 +4010,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4021,7 +4021,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4032,7 +4032,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4043,7 +4043,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4054,7 +4054,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4065,7 +4065,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4076,7 +4076,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4087,7 +4087,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4098,7 +4098,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4109,7 +4109,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4120,7 +4120,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4131,7 +4131,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4142,7 +4142,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A21": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4153,7 +4153,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4164,7 +4164,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4175,7 +4175,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4186,7 +4186,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4197,7 +4197,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4208,7 +4208,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4219,7 +4219,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4230,7 +4230,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4241,7 +4241,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4252,7 +4252,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4263,7 +4263,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4274,7 +4274,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4285,7 +4285,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4296,7 +4296,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4307,7 +4307,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4318,7 +4318,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A22": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4329,7 +4329,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4340,7 +4340,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4351,7 +4351,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4362,7 +4362,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4373,7 +4373,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4384,7 +4384,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4395,7 +4395,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4406,7 +4406,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4417,7 +4417,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4428,7 +4428,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4439,7 +4439,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4450,7 +4450,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4461,7 +4461,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4472,7 +4472,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4483,7 +4483,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4494,7 +4494,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A23": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4505,7 +4505,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "P24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4516,7 +4516,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "O24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4527,7 +4527,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "N24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4538,7 +4538,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "M24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4549,7 +4549,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "L24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4560,7 +4560,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "K24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4571,7 +4571,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "J24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4582,7 +4582,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "I24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4593,7 +4593,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "H24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4604,7 +4604,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "G24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4615,7 +4615,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "F24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4626,7 +4626,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "E24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4637,7 +4637,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "D24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4648,7 +4648,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "C24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4659,7 +4659,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "B24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -4670,7 +4670,7 @@
       "geometryDefinitionId": "flatWell"
     },
     "A24": {
-      "shape": "circular",
+      "shape": "rectangular",
       "depth": 11.43,
       "xDimension": 3.63,
       "yDimension": 3.63,
@@ -5112,5 +5112,6 @@
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

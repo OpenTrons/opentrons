@@ -17,9 +17,9 @@
   "version": 3,
   "namespace": "opentrons",
   "metadata": {
-    "displayName": "Bio-Rad 96 Well Plate 200 \u00b5L PCR",
+    "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
@@ -1143,24 +1143,11 @@
     "conicalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 1.42,
-          "topHeight": 1.21,
-          "bottomHeight": 0.0
-        },
-        {
           "shape": "conical",
-          "topDiameter": 3.0,
-          "bottomDiameter": 2.81,
-          "topHeight": 1.87,
-          "bottomHeight": 1.21
-        },
-        {
-          "shape": "conical",
-          "topDiameter": 4.98,
-          "bottomDiameter": 3,
-          "topHeight": 8.58,
-          "bottomHeight": 1.87
+          "bottomDiameter": 5.44,
+          "topDiameter": 5.44,
+          "topHeight": 14.57,
+          "bottomHeight": 10.14
         },
         {
           "shape": "conical",
@@ -1171,12 +1158,26 @@
         },
         {
           "shape": "conical",
-          "bottomDiameter": 5.44,
-          "topDiameter": 5.44,
-          "topHeight": 14.57,
-          "bottomHeight": 10.14
+          "topDiameter": 4.98,
+          "bottomDiameter": 3,
+          "topHeight": 8.58,
+          "bottomHeight": 1.87
+        },
+        {
+          "shape": "conical",
+          "topDiameter": 3.0,
+          "bottomDiameter": 2.81,
+          "topHeight": 1.87,
+          "bottomHeight": 1.21
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 1.42,
+          "topHeight": 1.21,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

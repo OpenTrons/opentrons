@@ -1,53 +1,45 @@
-import { createPortal } from 'react-dom'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { ModalShell } from '@opentrons/components'
-
-import { getTopPortalEl } from '/app/App/portal'
 import {
   BeforeBeginning,
-  CheckItem,
+  HandleLabware,
   AttachProbe,
   DetachProbe,
-  ResultsSummary,
+  LPCComplete,
 } from '/app/organisms/LabwarePositionCheck/steps'
-import { ExitConfirmation } from './ExitConfirmation'
-import { RobotMotionLoader } from './RobotMotionLoader'
-import { WizardHeader } from '/app/molecules/WizardHeader'
-import { LPCErrorModal } from './LPCErrorModal'
+import { LPCRobotInMotion } from './LPCRobotInMotion'
+import { LPCFatalError } from './LPCFatalError'
+import { LPCProbeNotAttached } from './LPCProbeNotAttached'
+import { useLPCCommands } from '/app/organisms/LabwarePositionCheck/hooks'
 import {
-  useLPCCommands,
-  useLPCInitialState,
-} from '/app/organisms/LabwarePositionCheck/hooks'
-import { NAV_STEPS } from '/app/organisms/LabwarePositionCheck/constants'
-import { closeLPC, proceedStep } from '/app/redux/protocol-runs'
-import { getIsOnDevice } from '/app/redux/config'
+  closeLPC,
+  proceedStep as proceedStepDispatch,
+  goBackLastStep as goBackStepDispatch,
+  LPC_STEP,
+  selectCurrentStep,
+} from '/app/redux/protocol-runs'
+import { useLPCHeaderCommands } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
 
 import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type { State } from '/app/redux/types'
-import { useEffect } from 'react'
+import type { LPCStep } from '/app/redux/protocol-runs'
 
 export interface LPCWizardFlexProps extends Omit<LPCFlowsProps, 'robotType'> {}
 
 export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
-  const { onCloseClick, ...rest } = props
+  const proceedStep = (toStep?: LPCStep): void => {
+    dispatch(proceedStepDispatch(props.runId, toStep))
+  }
+  const goBackLastStep = (): void => {
+    dispatch(goBackStepDispatch(props.runId))
+  }
 
-  // TODO(jh, 01-14-25): Also inject goBack functionality once designs are finalized.
-  const proceed = (): void => {
-    dispatch(proceedStep(props.runId))
-  }
-  const onCloseClickDispatch = (): void => {
-    onCloseClick()
-  }
   const dispatch = useDispatch()
   const LPCHandlerUtils = useLPCCommands({
     ...props,
-    onCloseClick: onCloseClickDispatch,
   })
-
-  useLPCInitialState({ ...rest })
 
   // Clean up state on LPC close.
   useEffect(() => {
@@ -56,89 +48,42 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
     }
   }, [])
 
+  const headerCommands = useLPCHeaderCommands({
+    ...props,
+    LPCHandlerUtils,
+    proceedStep,
+    goBackLastStep,
+  })
+
   return (
-    <LPCWizardFlexComponent
+    <LPCWizardContent
       {...props}
-      proceed={proceed}
-      commandUtils={LPCHandlerUtils}
-      onCloseClick={onCloseClickDispatch}
-    />
-  )
-}
-
-function LPCWizardFlexComponent(props: LPCWizardContentProps): JSX.Element {
-  const isOnDevice = useSelector(getIsOnDevice)
-
-  return createPortal(
-    isOnDevice ? (
-      <ModalShell fullPage>
-        <LPCWizardHeader {...props} />
-        <LPCWizardContent {...props} />
-      </ModalShell>
-    ) : (
-      <ModalShell width="47rem" header={<LPCWizardHeader {...props} />}>
-        <LPCWizardContent {...props} />
-      </ModalShell>
-    ),
-    getTopPortalEl()
-  )
-}
-
-function LPCWizardHeader({
-  runId,
-  commandUtils,
-}: LPCWizardContentProps): JSX.Element {
-  const { t } = useTranslation('labware_position_check')
-  const { currentStepIndex, totalStepCount } = useSelector((state: State) => ({
-    currentStepIndex:
-      state.protocolRuns[runId]?.lpc?.steps.currentStepIndex ?? 0,
-    totalStepCount: state.protocolRuns[runId]?.lpc?.steps.totalStepCount ?? 0,
-  }))
-  const {
-    errorMessage,
-    showExitConfirmation,
-    isExiting,
-    confirmExitLPC,
-  } = commandUtils
-
-  // TODO(jh 01-15-24): Revisit the onExit conditions. Can we simplify?
-  return (
-    <WizardHeader
-      title={t('labware_position_check_title')}
-      currentStep={errorMessage != null ? undefined : currentStepIndex + 1}
-      totalSteps={errorMessage != null ? undefined : totalStepCount}
-      onExit={
-        showExitConfirmation || isExiting || errorMessage != null
-          ? undefined
-          : confirmExitLPC
-      }
+      proceedStep={proceedStep}
+      goBackLastStep={goBackLastStep}
+      commandUtils={{ ...LPCHandlerUtils, headerCommands }}
     />
   )
 }
 
 function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('shared')
-  const currentStep = useSelector(
-    (state: State) =>
-      state.protocolRuns[props.runId]?.lpc?.steps.current ?? null
-  )
-  const {
-    isRobotMoving,
-    errorMessage,
-    showExitConfirmation,
-  } = props.commandUtils
-
-  // TODO(jh, 01-14-25): Handle open door behavior.
+  const currentStep = useSelector(selectCurrentStep(props.runId))
+  const { isRobotMoving, errorMessage, unableToDetect } = props.commandUtils
 
   // Handle special cases that are shared by multiple steps first.
   if (isRobotMoving) {
-    return <RobotMotionLoader header={t('stand_back_robot_is_in_motion')} />
+    return (
+      <LPCRobotInMotion
+        header={t('stand_back_robot_is_in_motion')}
+        {...props}
+      />
+    )
   }
   if (errorMessage != null) {
-    return <LPCErrorModal {...props} />
+    return <LPCFatalError {...props} />
   }
-  if (showExitConfirmation) {
-    return <ExitConfirmation {...props} />
+  if (unableToDetect) {
+    return <LPCProbeNotAttached {...props} />
   }
   if (currentStep == null) {
     console.error('LPC store not properly initialized.')
@@ -146,24 +91,24 @@ function LPCWizardContent(props: LPCWizardContentProps): JSX.Element {
   }
 
   // Handle step-based routing.
-  switch (currentStep.section) {
-    case NAV_STEPS.BEFORE_BEGINNING:
-      return <BeforeBeginning step={currentStep} {...props} />
+  switch (currentStep) {
+    case LPC_STEP.BEFORE_BEGINNING:
+      return <BeforeBeginning {...props} />
 
-    case NAV_STEPS.CHECK_POSITIONS:
-      return <CheckItem step={currentStep} {...props} />
+    case LPC_STEP.ATTACH_PROBE:
+      return <AttachProbe {...props} />
 
-    case NAV_STEPS.ATTACH_PROBE:
-      return <AttachProbe step={currentStep} {...props} />
+    case LPC_STEP.HANDLE_LABWARE:
+      return <HandleLabware {...props} />
 
-    case NAV_STEPS.DETACH_PROBE:
-      return <DetachProbe step={currentStep} {...props} />
+    case LPC_STEP.DETACH_PROBE:
+      return <DetachProbe {...props} />
 
-    case NAV_STEPS.RESULTS_SUMMARY:
-      return <ResultsSummary step={currentStep} {...props} />
+    case LPC_STEP.LPC_COMPLETE:
+      return <LPCComplete {...props} />
 
     default:
       console.error('Unhandled LPC step.')
-      return <BeforeBeginning step={currentStep} {...props} />
+      return <BeforeBeginning {...props} />
   }
 }

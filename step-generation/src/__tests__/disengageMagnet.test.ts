@@ -17,6 +17,7 @@ describe('disengageMagnet', () => {
       id: moduleId,
       type: MAGNETIC_MODULE_TYPE,
       model: MAGNETIC_MODULE_V1,
+      pythonName: 'mock_magnetic_module_1',
     }
     robotState = getInitialRobotStateStandard(invariantContext)
     robotState.modules[moduleId] = {
@@ -45,6 +46,7 @@ describe('disengageMagnet', () => {
           },
         },
       ],
+      python: 'mock_magnetic_module_1.disengage()',
     })
   })
 })

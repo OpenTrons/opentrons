@@ -1,19 +1,17 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import styled from 'styled-components'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
-  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   InputField,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '../../components/atoms'
+import { TextAreaField } from '../../components/molecules'
 import { analyticsEvent } from '../../analytics/actions'
 import { ONBOARDING_FLOW_DURATION_EVENT } from '../../analytics/constants'
 import { WizardBody } from './WizardBody'
@@ -58,7 +56,11 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
         }}
         proceed={handleProceed}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+          padding={`0 ${SPACING.spacing4}`}
+        >
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
               {t('name')}
@@ -73,10 +75,12 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
             />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-              {t('description')}
-            </StyledText>
-            <DescriptionField {...register('fields.description')} />
+            <TextAreaField
+              title={t('description')}
+              {...register('fields.description')}
+              value={watch('fields.description')}
+              height="6.8125rem"
+            />
           </Flex>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
@@ -95,13 +99,3 @@ export function AddMetadata(props: AddMetadataProps): JSX.Element | null {
     </HandleEnter>
   )
 }
-
-export const DescriptionField = styled.textarea`
-  min-height: 5rem;
-  width: 100%;
-  border: 1px ${BORDERS.styleSolid} ${COLORS.grey50};
-  border-radius: ${BORDERS.borderRadius4};
-  padding: ${SPACING.spacing8};
-  font-size: ${TYPOGRAPHY.fontSizeP};
-  resize: none;
-`

@@ -24,6 +24,7 @@ import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 import type { PipetteEntity } from '@opentrons/step-generation'
 import type { StepFieldName } from '../../form-types'
 import type { ModuleEntities } from '../../step-forms'
+import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
 /*******************
  ** Error Messages **
  ********************/
@@ -60,7 +61,7 @@ export interface FormError {
   showAtField?: boolean
   showAtForm?: boolean
   page?: number
-  tab?: 'aspirate' | 'dispense'
+  tab?: LiquidHandlingTab
 }
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with pipette',
@@ -411,6 +412,20 @@ const MAGNETIC_MODULE_ID_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 0,
+}
+const ASPIRATE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
+  title: 'Touch tip speed required',
+  dependentFields: ['aspirate_touchTip_speed'],
+  showAtForm: false,
+  showAtField: true,
+  page: 1,
+}
+const DISPENSE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
+  title: 'Touch tip speed required',
+  dependentFields: ['dispense_touchTip_speed'],
+  showAtForm: false,
+  showAtField: true,
+  page: 1,
 }
 
 export interface HydratedFormData {
@@ -932,6 +947,22 @@ export const fileNameRequired = (
   const { absorbanceReaderFormType, fileName } = fields
   return !fileName && absorbanceReaderFormType === ABSORBANCE_READER_READ
     ? FILENAME_REQUIRED
+    : null
+}
+export const aspirateTouchTipSpeedRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { aspirate_touchTip_speed, aspirate_touchTip_checkbox } = fields
+  return aspirate_touchTip_checkbox && !aspirate_touchTip_speed
+    ? ASPIRATE_TOUCH_TIP_SPEED_REQUIRED
+    : null
+}
+export const dispenseTouchTipSpeedRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { dispense_touchTip_speed, dispense_touchTip_checkbox } = fields
+  return dispense_touchTip_checkbox && !dispense_touchTip_speed
+    ? DISPENSE_TOUCH_TIP_SPEED_REQUIRED
     : null
 }
 

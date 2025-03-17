@@ -38,7 +38,7 @@ import {
   deleteDeckFixture,
 } from '../../../step-forms/actions/additionalItems'
 import { getSavedStepForms } from '../../../step-forms/selectors'
-import { deleteModule } from '../../../step-forms/actions'
+import { deleteModule } from '../../../modules'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import {
   createContainer,
@@ -51,16 +51,19 @@ import {
   selectZoomedIntoSlot,
 } from '../../../labware-ingred/actions'
 import { getEnableMutlipleTempsOT2 } from '../../../feature-flags/selectors'
-import { useBlockingHint } from '../../../organisms/BlockingHintModal/useBlockingHint'
+import { useBlockingHint } from '../../../components/organisms/BlockingHintModal/useBlockingHint'
 import { selectors } from '../../../labware-ingred/selectors'
-import { useKitchen } from '../../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { getDismissedHints } from '../../../tutorial/selectors'
-import { LINK_BUTTON_STYLE, NAV_BAR_HEIGHT_REM } from '../../../atoms'
+import {
+  LINK_BUTTON_STYLE,
+  NAV_BAR_HEIGHT_REM,
+} from '../../../components/atoms'
 import {
   createContainerAboveModule,
   createModuleEntityAndChangeForm,
 } from '../../../step-forms/actions/thunks'
-import { ConfirmDeleteStagingAreaModal } from '../../../organisms'
+import { ConfirmDeleteStagingAreaModal } from '../../../components/organisms'
 import { getSlotInformation } from '../utils'
 import { ALL_ORDERED_CATEGORIES, FIXTURES, MOAM_MODELS } from './constants'
 import { LabwareTools } from './LabwareTools'
@@ -295,7 +298,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     if (slot !== 'offDeck') {
       //  clear module from slot
       if (createdModuleForSlot != null) {
-        dispatch(deleteModule(createdModuleForSlot.id))
+        dispatch(deleteModule({ moduleId: createdModuleForSlot.id }))
       }
       //  clear labware from slot
       if (

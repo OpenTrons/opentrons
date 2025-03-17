@@ -59,6 +59,7 @@ def test_max_speeds_userdict() -> None:
 
 def test_build_edges() -> None:
     lw_def = get_labware_definition("corning_96_wellplate_360ul_flat")
+    assert lw_def["schemaVersion"] == 2  # LegacyLabwareCore expects this.
     test_lw = Labware(
         core=LegacyLabwareCore(lw_def, Location(Point(0, 0, 0), None)),
         api_version=MAX_SUPPORTED_VERSION,

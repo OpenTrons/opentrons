@@ -32,8 +32,16 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
     case Constants.START_LPC:
     case Constants.FINISH_LPC:
     case Constants.PROCEED_STEP:
+    case Constants.GO_BACK_LAST_STEP:
+    case Constants.PROCEED_HANDLE_LW_SUBSTEP:
+    case Constants.GO_BACK_HANDLE_LW_SUBSTEP:
+    case Constants.SET_SELECTED_LABWARE_URI:
+    case Constants.SET_SELECTED_LABWARE:
     case Constants.SET_INITIAL_POSITION:
-    case Constants.SET_FINAL_POSITION: {
+    case Constants.SET_FINAL_POSITION:
+    case Constants.CLEAR_WORKING_OFFSETS:
+    case Constants.RESET_OFFSET_TO_DEFAULT:
+    case Constants.APPLY_WORKING_OFFSETS: {
       const runId = action.payload.runId
       const currentRunState = state[runId] || { lpc: undefined }
       const nextLpcState = LPCReducer(currentRunState.lpc, action)

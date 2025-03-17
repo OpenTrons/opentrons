@@ -1,4 +1,6 @@
 """Test absorbance reader initilize command."""
+import math
+from typing import Dict, List, Optional
 import pytest
 from decoy import Decoy
 
@@ -12,6 +14,7 @@ from opentrons.protocol_engine.errors import (
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.resources import FileProvider
 from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
     AbsorbanceReaderSubState,
@@ -25,6 +28,19 @@ from opentrons.protocol_engine.commands.absorbance_reader import (
 from opentrons.protocol_engine.commands.absorbance_reader.read import (
     ReadAbsorbanceImpl,
 )
+
+
+def _get_absorbance_map(data: Optional[List[float]] = None) -> Dict[str, float]:
+    raw_values = (data or [0] * 96).copy()
+    raw_values.reverse()
+    well_map: Dict[str, float] = {}
+    for i, value in enumerate(raw_values):
+        row = chr(ord("A") + i // 12)  # Convert index to row (A-H)
+        col = (i % 12) + 1  # Convert index to column (1-12)
+        well_key = f"{row}{col}"
+        # Truncate the value to the third decimal place
+        well_map[well_key] = math.floor(value * 1000) / 1000
+    return well_map
 
 
 async def test_absorbance_reader_implementation(
@@ -86,6 +102,48 @@ async def test_absorbance_reader_implementation(
             ),
         ),
     )
+
+
+async def test_convert_absorbance_reader_data_points() -> None:
+    """It should validate and convert the absorbance reader values."""
+    # Test valid values
+    raw_data = (
+        [0.04877041280269623, 0.046341221779584885]
+        + [0.43] * 92  # fill rest of the values with 0.43
+        + [0.03789025545120239, 2.8744750022888184]
+    )
+    expected = _get_absorbance_map(raw_data)
+    converted = ModuleView.convert_absorbance_reader_data_points(raw_data)
+    assert len(converted) == 96
+    assert converted == expected
+    assert converted["A1"] == 2.874
+    assert converted["A2"] == 0.037
+    assert converted["E1"] == 0.43
+    assert converted["H12"] == 0.048  # the data is flipped, so arr[0] == H12
+
+    # Test near-zero values in scientic notation
+    raw_data = (
+        [0.24877041280269623, -9.5000e-9]
+        + [0.11] * 92  # fill rest of the values with 0.11
+        + [1.3489025545120239, 8.2987e-9]
+    )
+    expected = _get_absorbance_map(raw_data)
+    converted = ModuleView.convert_absorbance_reader_data_points(raw_data)
+    assert len(converted) == 96
+    assert converted == expected
+    assert converted["A1"] == 0.0
+    assert converted["A2"] == 1.348
+    assert converted["E1"] == 0.11
+    assert converted["H11"] == -0.001
+    assert converted["H12"] == 0.248  # the data is flipped, so arr[0] == H12
+
+    # Test invalid data len 1
+    with pytest.raises(ValueError):
+        ModuleView.convert_absorbance_reader_data_points([0])
+
+    # Test invalid data len 107
+    with pytest.raises(ValueError):
+        ModuleView.convert_absorbance_reader_data_points([1] * 107)
 
 
 async def test_read_raises_cannot_preform_action(

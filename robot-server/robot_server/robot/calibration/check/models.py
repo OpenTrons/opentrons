@@ -104,6 +104,9 @@ class SessionCreateParams(BaseModel):
         description="Whether to use a calibration block in the"
         "calibration health check flow.",
     )
+    # todo(mm, 2025-02-13): This should restrict input to labware schema 2 to protect
+    # robot_server.robot.calibration legacy internals.
+    # https://opentrons.atlassian.net/browse/EXEC-1230
     tipRacks: List[Dict[str, Any]] = Field(
         [],
         description="A list of labware definitions to use in"

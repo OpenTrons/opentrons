@@ -202,9 +202,10 @@ export function createQuickTransferFile(
       subcategory: null,
       tags: [],
     },
+    // see QuickTransferFlow/README.md for versioning details
     designerApplication: {
       name: 'opentrons/quick-transfer',
-      version: '1.0.0',
+      version: '1.1.0',
       data: quickTransferState,
     },
   }

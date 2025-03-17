@@ -13,7 +13,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import {
+  LINK_BUTTON_STYLE,
+  LINE_CLAMP_TEXT_STYLE,
+} from '../../components/atoms'
 
 const REQUIRED_APP_VERSION = '8.3.0'
 
@@ -61,7 +64,7 @@ export function ProtocolMetadata({
           const [title, value] = Object.entries(info)[0]
 
           return (
-            <ListItem type="noActive" key={`ProtocolOverview_${title}`}>
+            <ListItem type="default" key={`ProtocolOverview_${title}`}>
               <ListItemDescriptor
                 type="large"
                 description={
@@ -86,7 +89,7 @@ export function ProtocolMetadata({
             </ListItem>
           )
         })}
-        <ListItem type="noActive" key="ProtocolOverview_robotVersion">
+        <ListItem type="default" key="ProtocolOverview_robotVersion">
           <ListItemDescriptor
             type="large"
             description={

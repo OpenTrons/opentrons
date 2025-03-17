@@ -92,15 +92,16 @@ stages:
             runTimeParameters: []
             commandAnnotations:
               - annotationType: custom
-                commandKeys: [
-                  1abc123,
-                  2abc123,
-                  3abc123,
-                  4abc123,
-                  5abc123,
-                  6abc123,
-                  7abc123,
-                ]
+                commandKeys:
+                  [
+                    1abc123,
+                    2abc123,
+                    3abc123,
+                    4abc123,
+                    5abc123,
+                    6abc123,
+                    7abc123,
+                  ]
             pipettes:
               - id: pipetteId
                 pipetteName: p1000_96
@@ -217,6 +218,14 @@ stages:
                 result:
                   labwareId: sourcePlateId
                   definition: !anydict
+                  locationSequence:
+                    - kind: onAddressableArea
+                      addressableAreaName: temperatureModuleV2D1
+                    - kind: onModule
+                      moduleId: temperatureModuleId
+                    - kind: onCutoutFixture
+                      cutoutId: cutoutD1
+                      possibleCutoutFixtureIds: ["temperatureModuleV2"]
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -236,6 +245,14 @@ stages:
                 result:
                   labwareId: destPlateId
                   definition: !anydict
+                  locationSequence:
+                    - kind: onAddressableArea
+                      addressableAreaName: magneticBlockV1D3
+                    - kind: onModule
+                      moduleId: magneticBlockId
+                    - kind: onCutoutFixture
+                      cutoutId: cutoutD3
+                      possibleCutoutFixtureIds: ["flexStackerModuleV1WithMagneticBlockV1", "magneticBlockV1", "stagingAreaSlotWithMagneticBlockV1"]
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -255,6 +272,13 @@ stages:
                 result:
                   labwareId: tipRackId
                   definition: !anydict
+                  locationSequence:
+                    - kind: onAddressableArea
+                      addressableAreaName: B2
+                    - kind: onCutoutFixture
+                      cutoutId: cutoutB2
+                      possibleCutoutFixtureIds:
+                        - singleCenterSlot
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -274,6 +298,15 @@ stages:
                 result:
                   labwareId: fixedTrash
                   definition: !anydict
+                  locationSequence:
+                    - kind: onAddressableArea
+                      addressableAreaName: A3
+                    - kind: onCutoutFixture
+                      cutoutId: cutoutA3
+                      possibleCutoutFixtureIds:
+                        - flexStackerModuleV1
+                        - singleRightSlot
+                        - stagingAreaRightSlot
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -508,6 +541,7 @@ stages:
                       y: 0
                       z: 0
                   alternateDropLocation: false
+                  scrape_tips: false
                 result:
                   position: { 'x': 410.84000000000003, 'y': 374.56, 'z': 82.0 }
                 notes: []

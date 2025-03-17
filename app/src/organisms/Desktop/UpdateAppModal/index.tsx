@@ -16,6 +16,7 @@ import {
   SecondaryButton,
   SPACING,
   LegacyStyledText,
+  ReleaseNotes,
   Modal,
 } from '@opentrons/components'
 
@@ -25,9 +26,8 @@ import {
   downloadShellUpdate,
   applyShellUpdate,
 } from '/app/redux/shell'
-
+import { useIsOEMMode } from '/app/resources/robot-settings'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { ProgressBar } from '/app/atoms/ProgressBar'
 import { useRemoveActiveAppUpdateToast } from '../Alerts'
 
@@ -85,6 +85,7 @@ export interface UpdateAppModalProps {
 export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
   const { closeModal } = props
   const dispatch = useDispatch<Dispatch>()
+  const isOEMMode = useIsOEMMode()
   const updateState = useSelector(getShellUpdateState)
   const {
     downloaded,
@@ -199,7 +200,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
             <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
               {t('branded:update_requires_restarting_app')}
             </UpdateAppBanner>
-            <ReleaseNotes source={releaseNotesText} />
+            <ReleaseNotes source={releaseNotesText} isOEMMode={isOEMMode} />
           </Flex>
         </Modal>
       ) : null}

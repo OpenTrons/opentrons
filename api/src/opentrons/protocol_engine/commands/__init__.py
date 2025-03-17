@@ -397,6 +397,28 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
+from .evotip_seal_pipette import (
+    EvotipSealPipette,
+    EvotipSealPipetteParams,
+    EvotipSealPipetteCreate,
+    EvotipSealPipetteResult,
+    EvotipSealPipetteCommandType,
+)
+from .evotip_unseal_pipette import (
+    EvotipUnsealPipette,
+    EvotipUnsealPipetteParams,
+    EvotipUnsealPipetteCreate,
+    EvotipUnsealPipetteResult,
+    EvotipUnsealPipetteCommandType,
+)
+from .evotip_dispense import (
+    EvotipDispense,
+    EvotipDispenseParams,
+    EvotipDispenseCreate,
+    EvotipDispenseResult,
+    EvotipDispenseCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -700,4 +722,22 @@ __all__ = [
     "TryLiquidProbeCreate",
     "TryLiquidProbeResult",
     "TryLiquidProbeCommandType",
+    # evotip seal command bundle
+    "EvotipSealPipette",
+    "EvotipSealPipetteParams",
+    "EvotipSealPipetteCreate",
+    "EvotipSealPipetteResult",
+    "EvotipSealPipetteCommandType",
+    # evotip unseal command bundle
+    "EvotipUnsealPipette",
+    "EvotipUnsealPipetteParams",
+    "EvotipUnsealPipetteCreate",
+    "EvotipUnsealPipetteResult",
+    "EvotipUnsealPipetteCommandType",
+    # evotip dispense command bundle
+    "EvotipDispense",
+    "EvotipDispenseParams",
+    "EvotipDispenseCreate",
+    "EvotipDispenseResult",
+    "EvotipDispenseCommandType",
 ]

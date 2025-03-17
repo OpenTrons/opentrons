@@ -6,17 +6,19 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from typing import Dict, List, Optional, Union
 from math import sqrt, asin
+from typing import Final
 from numpy import pi, trapz
 from functools import cached_property
 
 from pydantic import (
     ConfigDict,
     BaseModel,
+    Discriminator,
     Field,
     StrictInt,
     StrictFloat,
+    TypeAdapter,
 )
 from typing_extensions import Annotated, Literal
 
@@ -38,7 +40,7 @@ _StrictNonNegativeInt = Annotated[int, Field(strict=True, ge=0)]
 _StrictNonNegativeFloat = Annotated[float, Field(strict=True, ge=0.0)]
 
 
-_Number = Union[StrictInt, StrictFloat]
+_Number = StrictInt | StrictFloat
 """JSON number type, written to preserve lack of decimal point.
 
 For labware definition hashing, which is an older part of the codebase,
@@ -46,60 +48,25 @@ this ensures that Pydantic won't change `"someFloatField: 0` to
 `"someFloatField": 0.0`, which would hash differently.
 """
 
-_NonNegativeNumber = Union[_StrictNonNegativeInt, _StrictNonNegativeFloat]
+_NonNegativeNumber = _StrictNonNegativeInt | _StrictNonNegativeFloat
 """Non-negative JSON number type, written to preserve lack of decimal point."""
 
 
-class CornerOffsetFromSlot(BaseModel):
-    """
-    Distance from left-front-bottom corner of slot to left-front-bottom corner
-     of labware bounding box. Used for labware that spans multiple slots. For
-      labware that does not span multiple slots, x/y/z should all be zero.
-    """
-
-    x: _Number
-    y: _Number
-    z: _Number
-
-
-class OverlapOffset(BaseModel):
-    """
-    Overlap dimensions of labware with another labware/module that it can be stacked on top of.
-    """
-
-    x: _Number
-    y: _Number
-    z: _Number
-
-
-class OffsetVector(BaseModel):
-    """
-    A generic 3-D offset vector.
-    """
-
+class Vector(BaseModel):
     x: _Number
     y: _Number
     z: _Number
 
 
 class GripperOffsets(BaseModel):
-    """
-    Offsets used when calculating coordinates for gripping labware during labware movement.
-    """
-
-    pickUpOffset: OffsetVector
-    dropOffset: OffsetVector
+    pickUpOffset: Vector
+    dropOffset: Vector
 
 
 class BrandData(BaseModel):
-    brand: str = Field(..., description="Brand/manufacturer name")
-    brandId: Optional[List[str]] = Field(
-        None,
-        description="An array of manufacture numbers pertaining to a given labware",
-    )
-    links: Optional[List[str]] = Field(
-        None, description="URLs for manufacturer page(s)"
-    )
+    brand: str
+    brandId: list[str] | None = None
+    links: list[str] | None = None
 
 
 class DisplayCategory(str, Enum):
@@ -125,145 +92,83 @@ class LabwareRole(str, Enum):
 
 
 class Metadata(BaseModel):
-    """
-    Properties used for search and display
-    """
-
-    displayName: str = Field(..., description="Easy to remember name of labware")
-    displayCategory: DisplayCategory = Field(
-        ..., description="Label(s) used in UI to categorize labware"
-    )
-    displayVolumeUnits: Literal["µL", "mL", "L"] = Field(
-        ..., description="Volume units for display"
-    )
-    tags: Optional[List[str]] = Field(
-        None, description="List of descriptions for a given labware"
-    )
+    displayName: str
+    displayCategory: DisplayCategory
+    displayVolumeUnits: Literal["µL", "mL", "L"]
+    tags: list[str] | None = None
 
 
-class Parameters(BaseModel):
-    """
-    Internal describers used to determine pipette movement to labware
-    """
+class Parameters2(BaseModel):
+    format: Literal["96Standard", "384Standard", "trough", "irregular", "trash"]
+    quirks: list[str] | None = None
+    isTiprack: bool
+    tipLength: _NonNegativeNumber | None = None
+    tipOverlap: _NonNegativeNumber | None = None
+    loadName: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
+    isMagneticModuleCompatible: bool
+    isDeckSlotCompatible: bool | None = None
+    magneticModuleEngageHeight: _NonNegativeNumber | None = None
 
-    format: Literal[
-        "96Standard", "384Standard", "trough", "irregular", "trash"
-    ] = Field(
-        ..., description="Property to determine compatibility with multichannel pipette"
-    )
-    quirks: Optional[List[str]] = Field(
-        None,
-        description="Property to classify a specific behavior this labware "
-        "should have",
-    )
-    isTiprack: bool = Field(
-        ..., description="Flag marking whether a labware is a tiprack or not"
-    )
-    tipLength: Optional[_NonNegativeNumber] = Field(
-        None,
-        description="Required if labware is tiprack, specifies length of tip"
-        " from drawing or as measured with calipers",
-    )
-    tipOverlap: Optional[_NonNegativeNumber] = Field(
-        None,
-        description="Required if labware is tiprack, specifies the length of "
-        "the area of the tip that overlaps the nozzle of the pipette",
-    )
-    loadName: str = Field(
-        ...,
-        description="Name used to reference a labware definition",
-        pattern=SAFE_STRING_REGEX,
-    )
-    isMagneticModuleCompatible: bool = Field(
-        ...,
-        description="Flag marking whether a labware is compatible by default "
-        "with the Magnetic Module",
-    )
-    magneticModuleEngageHeight: Optional[_NonNegativeNumber] = Field(
-        None, description="Distance to move magnetic module magnets to engage"
-    )
-    isDeckSlotCompatible: Optional[bool] = Field(
-        None,
-        description="Flag marking whether a labware is compatible with placement"
-        " or load into a base deck slot, will be treated as true if unspecified.",
-    )
+
+class Parameters3(Parameters2, BaseModel):
+    pass  # Currently equivalent to Parameters2.
 
 
 class Dimensions(BaseModel):
-    """
-    Outer dimensions of a labware
-    """
-
-    yDimension: _NonNegativeNumber = Field(...)
-    zDimension: _NonNegativeNumber = Field(...)
-    xDimension: _NonNegativeNumber = Field(...)
+    yDimension: _NonNegativeNumber
+    zDimension: _NonNegativeNumber
+    xDimension: _NonNegativeNumber
 
 
-class WellDefinition(BaseModel):
+class _WellCommon2(BaseModel):
     model_config = ConfigDict(extra="allow")
 
-    depth: _NonNegativeNumber = Field(...)
-    x: _NonNegativeNumber = Field(
-        ...,
-        description="x location of center-bottom of well in reference to "
-        "left-front-bottom of labware",
-    )
-    y: _NonNegativeNumber = Field(
-        ...,
-        description="y location of center-bottom of well in reference to "
-        "left-front-bottom of labware",
-    )
-    z: _NonNegativeNumber = Field(
-        ...,
-        description="z location of center-bottom of well in reference to "
-        "left-front-bottom of labware",
-    )
-    totalLiquidVolume: _NonNegativeNumber = Field(
-        ..., description="Total well, tube, or tip volume in microliters"
-    )
-    xDimension: Optional[_NonNegativeNumber] = Field(
-        None,
-        description="x dimension of rectangular wells",
-    )
-    yDimension: Optional[_NonNegativeNumber] = Field(
-        None,
-        description="y dimension of rectangular wells",
-    )
-    diameter: Optional[_NonNegativeNumber] = Field(
-        None,
-        description="diameter of circular wells",
-    )
-    shape: Literal["rectangular", "circular"] = Field(
-        ...,
-        description="If 'rectangular', use xDimension and "
-        "yDimension; if 'circular' use diameter",
-    )
-    geometryDefinitionId: Optional[str] = Field(
-        None, description="str id of the well's corresponding" "innerWellGeometry"
-    )
+    depth: _NonNegativeNumber
+    totalLiquidVolume: _NonNegativeNumber
+    x: _NonNegativeNumber
+    y: _NonNegativeNumber
+    z: _NonNegativeNumber
+    geometryDefinitionId: str | None = None
+
+
+class CircularWellDefinition2(_WellCommon2, BaseModel):
+    shape: Literal["circular"]
+    diameter: _NonNegativeNumber
+
+
+class RectangularWellDefinition2(_WellCommon2, BaseModel):
+    shape: Literal["rectangular"]
+    xDimension: _NonNegativeNumber
+    yDimension: _NonNegativeNumber
+
+
+WellDefinition2 = Annotated[
+    CircularWellDefinition2 | RectangularWellDefinition2, Discriminator("shape")
+]
+
+
+class CircularWellDefinition3(CircularWellDefinition2):
+    # Currently equivalent to CircularWellDefinition2.
+    pass
+
+
+class RectangularWellDefinition3(RectangularWellDefinition2):
+    # Currently equivalent to RectangularWellDefinition2.
+    pass
+
+
+WellDefinition3 = Annotated[
+    CircularWellDefinition3 | RectangularWellDefinition3, Discriminator("shape")
+]
 
 
 class SphericalSegment(BaseModel):
-    shape: Spherical = Field(..., description="Denote shape as spherical")
-    radiusOfCurvature: _NonNegativeNumber = Field(
-        ...,
-        description="radius of curvature of bottom subsection of wells",
-    )
-    topHeight: _NonNegativeNumber = Field(
-        ..., description="The depth of a spherical bottom of a well"
-    )
-    bottomHeight: _NonNegativeNumber = Field(
-        ...,
-        description="Height of the bottom of the segment, must be 0.0",
-    )
-    xCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
-    yCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
+    shape: Spherical
+    radiusOfCurvature: _NonNegativeNumber
+    topHeight: _NonNegativeNumber
+    bottomHeight: _NonNegativeNumber
+    xCount: _StrictNonNegativeInt = 1
+    yCount: _StrictNonNegativeInt = 1
 
     @cached_property
     def count(self) -> int:
@@ -273,40 +178,22 @@ class SphericalSegment(BaseModel):
 
 
 class ConicalFrustum(BaseModel):
-    shape: Conical = Field(..., description="Denote shape as conical")
-    bottomDiameter: _NonNegativeNumber = Field(
-        ...,
-        description="The diameter at the bottom cross-section of a circular frustum",
-    )
-    topDiameter: _NonNegativeNumber = Field(
-        ..., description="The diameter at the top cross-section of a circular frustum"
-    )
-    topHeight: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the top of a bounded subsection of a well, relative to the bottom"
-        "of the well",
-    )
-    bottomHeight: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
-    )
-    xCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
-    yCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
+    shape: Conical
+    bottomDiameter: _NonNegativeNumber
+    topDiameter: _NonNegativeNumber
+    topHeight: _NonNegativeNumber
+    bottomHeight: _NonNegativeNumber
+    xCount: _StrictNonNegativeInt = 1
+    yCount: _StrictNonNegativeInt = 1
 
     @cached_property
-    def height_to_volume_table(self) -> Dict[float, float]:
+    def height_to_volume_table(self) -> dict[float, float]:
         """Return a lookup table of heights to volumes."""
         # the accuracy of this method is approximately +- 10*dx so for dx of 0.001 we have a +- 0.01 ul
         dx = 0.005
         total_height = self.topHeight - self.bottomHeight
         y = 0.0
-        table: Dict[float, float] = {}
+        table: dict[float, float] = {}
         # fill in the table
         a = self.topDiameter / 2
         b = self.bottomDiameter / 2
@@ -320,7 +207,7 @@ class ConicalFrustum(BaseModel):
         return table
 
     @cached_property
-    def volume_to_height_table(self) -> Dict[float, float]:
+    def volume_to_height_table(self) -> dict[float, float]:
         return dict((v, k) for k, v in self.height_to_volume_table.items())
 
     @cached_property
@@ -331,40 +218,15 @@ class ConicalFrustum(BaseModel):
 
 
 class CuboidalFrustum(BaseModel):
-    shape: Cuboidal = Field(..., description="Denote shape as cuboidal")
-    bottomXDimension: _NonNegativeNumber = Field(
-        ...,
-        description="x dimension of the bottom cross-section of a rectangular frustum",
-    )
-    bottomYDimension: _NonNegativeNumber = Field(
-        ...,
-        description="y dimension of the bottom cross-section of a rectangular frustum",
-    )
-    topXDimension: _NonNegativeNumber = Field(
-        ...,
-        description="x dimension of the top cross-section of a rectangular frustum",
-    )
-    topYDimension: _NonNegativeNumber = Field(
-        ...,
-        description="y dimension of the top cross-section of a rectangular frustum",
-    )
-    topHeight: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the top of a bounded subsection of a well, relative to the bottom"
-        "of the well",
-    )
-    bottomHeight: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
-    )
-    xCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
-    yCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
+    shape: Cuboidal
+    bottomXDimension: _NonNegativeNumber
+    bottomYDimension: _NonNegativeNumber
+    topXDimension: _NonNegativeNumber
+    topYDimension: _NonNegativeNumber
+    topHeight: _NonNegativeNumber
+    bottomHeight: _NonNegativeNumber
+    xCount: _StrictNonNegativeInt = 1
+    yCount: _StrictNonNegativeInt = 1
 
     @cached_property
     def count(self) -> int:
@@ -391,43 +253,15 @@ module RectangularPrismToCone(bottom_shape, diameter, x, y, z) {
 
 
 class SquaredConeSegment(BaseModel):
-    shape: SquaredCone = Field(
-        ..., description="Denote shape as a squared conical segment"
-    )
-    bottomCrossSection: WellShape = Field(
-        ...,
-        description="Denote if the shape is going from circular to rectangular or vise versa",
-    )
-    circleDiameter: _NonNegativeNumber = Field(
-        ...,
-        description="diameter of the circular face of a truncated circular segment",
-    )
-
-    rectangleXDimension: _NonNegativeNumber = Field(
-        ...,
-        description="x dimension of the rectangular face of a truncated circular segment",
-    )
-    rectangleYDimension: _NonNegativeNumber = Field(
-        ...,
-        description="y dimension of the rectangular face of a truncated circular segment",
-    )
-    topHeight: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the top of a bounded subsection of a well, relative to the bottom"
-        "of the well",
-    )
-    bottomHeight: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
-    )
-    xCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
-    yCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
+    shape: SquaredCone
+    bottomCrossSection: WellShape
+    circleDiameter: _NonNegativeNumber
+    rectangleXDimension: _NonNegativeNumber
+    rectangleYDimension: _NonNegativeNumber
+    topHeight: _NonNegativeNumber
+    bottomHeight: _NonNegativeNumber
+    xCount: _StrictNonNegativeInt = 1
+    yCount: _StrictNonNegativeInt = 1
 
     @staticmethod
     def _area_trap_points(
@@ -436,7 +270,7 @@ class SquaredConeSegment(BaseModel):
         rectangle_x: float,
         rectangle_y: float,
         dx: float,
-    ) -> List[float]:
+    ) -> list[float]:
         """Grab a bunch of data points of area at given heights."""
 
         def _area_arcs(r: float, c: float, d: float) -> float:
@@ -473,7 +307,7 @@ class SquaredConeSegment(BaseModel):
         return points
 
     @cached_property
-    def height_to_volume_table(self) -> Dict[float, float]:
+    def height_to_volume_table(self) -> dict[float, float]:
         """Return a lookup table of heights to volumes."""
         # the accuracy of this method is approximately +- 10*dx so for dx of 0.001 we have a +- 0.01 ul
         dx = 0.001
@@ -493,7 +327,7 @@ class SquaredConeSegment(BaseModel):
                 "If you see this error a new well shape has been added without updating this code"
             )
         y = 0.0
-        table: Dict[float, float] = {}
+        table: dict[float, float] = {}
         # fill in the table
         while y < total_height:
             table[y] = trapz(points[0 : int(y / dx)], dx=dx)
@@ -504,7 +338,7 @@ class SquaredConeSegment(BaseModel):
         return table
 
     @cached_property
-    def volume_to_height_table(self) -> Dict[float, float]:
+    def volume_to_height_table(self) -> dict[float, float]:
         return dict((v, k) for k, v in self.height_to_volume_table.items())
 
     @cached_property
@@ -595,42 +429,15 @@ module filitedCuboid(bottom_shape, diameter, width, length, height) {
 
 
 class RoundedCuboidSegment(BaseModel):
-    shape: RoundedCuboid = Field(
-        ..., description="Denote shape as a rounded cuboidal segment"
-    )
-    bottomCrossSection: WellShape = Field(
-        ...,
-        description="Denote if the shape is going from circular to rectangular or vise versa",
-    )
-    circleDiameter: _NonNegativeNumber = Field(
-        ...,
-        description="diameter of the circular face of a rounded rectangular segment",
-    )
-    rectangleXDimension: _NonNegativeNumber = Field(
-        ...,
-        description="x dimension of the rectangular face of a rounded rectangular segment",
-    )
-    rectangleYDimension: _NonNegativeNumber = Field(
-        ...,
-        description="y dimension of the rectangular face of a rounded rectangular segment",
-    )
-    topHeight: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the top of a bounded subsection of a well, relative to the bottom"
-        "of the well",
-    )
-    bottomHeight: _NonNegativeNumber = Field(
-        ...,
-        description="The height at the bottom of a bounded subsection of a well, relative to the bottom of the well",
-    )
-    xCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
-    yCount: _StrictNonNegativeInt = Field(
-        default=1,
-        description="Number of instances of this shape in the stackup, used for wells that have multiple sub-wells",
-    )
+    shape: RoundedCuboid
+    bottomCrossSection: WellShape
+    circleDiameter: _NonNegativeNumber
+    rectangleXDimension: _NonNegativeNumber
+    rectangleYDimension: _NonNegativeNumber
+    topHeight: _NonNegativeNumber
+    bottomHeight: _NonNegativeNumber
+    xCount: _StrictNonNegativeInt = 1
+    yCount: _StrictNonNegativeInt = 1
 
     @cached_property
     def count(self) -> int:
@@ -639,134 +446,87 @@ class RoundedCuboidSegment(BaseModel):
     model_config = ConfigDict(ignored_types=(cached_property,))
 
 
-class Metadata1(BaseModel):
-    """
-    Metadata specific to a grid of wells in a labware
-    """
-
-    displayName: Optional[str] = Field(
-        None, description="User-readable name for the well group"
-    )
-    displayCategory: Optional[DisplayCategory] = Field(
-        None, description="Label(s) used in UI to categorize well groups"
-    )
-    wellBottomShape: Optional[Literal["flat", "u", "v"]] = Field(
-        None, description="Bottom shape of the well for UI purposes"
-    )
+class GroupMetadata(BaseModel):
+    displayName: str | None = None
+    displayCategory: DisplayCategory | None = None
+    wellBottomShape: Literal["flat", "u", "v"] | None = None
 
 
 class Group(BaseModel):
-    wells: List[str] = Field(
-        ..., description="An array of wells that contain the same metadata"
-    )
-    metadata: Metadata1 = Field(
-        ..., description="Metadata specific to a grid of wells in a labware"
-    )
-    brand: Optional[BrandData] = Field(
-        None, description="Brand data for the well group (e.g. for tubes)"
-    )
+    wells: list[str]
+    metadata: GroupMetadata
+    brand: BrandData | None = None
 
 
-WellSegment = Union[
-    ConicalFrustum,
-    CuboidalFrustum,
-    SquaredConeSegment,
-    RoundedCuboidSegment,
-    SphericalSegment,
+WellSegment = Annotated[
+    ConicalFrustum
+    | CuboidalFrustum
+    | SquaredConeSegment
+    | RoundedCuboidSegment
+    | SphericalSegment,
+    Discriminator("shape"),
 ]
 
 
 class InnerWellGeometry(BaseModel):
-    sections: List[WellSegment] = Field(
-        ...,
-        description="A list of all of the sections of the well that have a contiguous shape",
-    )
+    sections: Annotated[list[WellSegment], Field(min_length=1)]
 
 
-class LabwareDefinition(BaseModel):
-    schemaVersion: Literal[1, 2, 3] = Field(
-        ..., description="Which schema version a labware is using"
-    )
-    version: int = Field(
-        ...,
-        description="Version of the labware definition itself "
-        "(eg myPlate v1/v2/v3). An incrementing integer",
-        ge=1,
-    )
-    namespace: str = Field(..., pattern=SAFE_STRING_REGEX)
-    metadata: Metadata = Field(
-        ..., description="Properties used for search and display"
-    )
-    brand: BrandData = Field(
-        ...,
-        description="Real-world labware that the definition is modeled "
-        "from and/or compatible with",
-    )
-    parameters: Parameters = Field(
-        ...,
-        description="Internal describers used to determine pipette movement "
-        "to labware",
-    )
-    ordering: List[List[str]] = Field(
-        ...,
-        description="Generated array that keeps track of how wells should be "
-        "ordered in a labware",
-    )
-    cornerOffsetFromSlot: CornerOffsetFromSlot = Field(
-        ...,
-        description="Distance from left-front-bottom corner of slot to "
-        "left-front-bottom corner of labware bounding box. Used for "
-        "labware that spans multiple slots. For labware that does "
-        "not span multiple slots, x/y/z should all be zero.",
-    )
-    dimensions: Dimensions = Field(..., description="Outer dimensions of a labware")
-    wells: Dict[str, WellDefinition] = Field(
-        ...,
-        description="Unordered object of well objects with position and "
-        "dimensional information",
-    )
-    groups: List[Group] = Field(
-        ...,
-        description="Logical well groupings for metadata/display purposes; "
-        "changes in groups do not affect protocol execution",
-    )
-    allowedRoles: List[LabwareRole] = Field(
-        default_factory=list,
-        description="Allowed behaviors and usage of a labware in a protocol.",
-    )
-    stackingOffsetWithLabware: Dict[str, OverlapOffset] = Field(
-        default_factory=dict,
-        description="Supported labware that can be stacked upon,"
-        " with overlap vector offset between both labware.",
-    )
-    stackingOffsetWithModule: Dict[str, OverlapOffset] = Field(
-        default_factory=dict,
-        description="Supported module that can be stacked upon,"
-        " with overlap vector offset between labware and module.",
-    )
-    gripperOffsets: Dict[str, GripperOffsets] = Field(
-        default_factory=dict,
-        description="Offsets use when calculating coordinates for gripping labware "
-        "during labware movement.",
-    )
-    gripHeightFromLabwareBottom: Optional[float] = Field(
-        default=None,
-        description="The Z-height, from labware bottom, where the gripper should grip the labware.",
-    )
-    gripForce: Optional[float] = Field(
-        default=None,
-        description="Force, in Newtons, with which the gripper should grip the labware.",
-    )
-    innerLabwareGeometry: Optional[Dict[str, InnerWellGeometry]] = Field(
-        None,
-        description="A dictionary holding all unique inner well geometries in a labware.",
-    )
-    stackLimit: Optional[int] = Field(
-        None,
-        description="The limit representing the maximum stack size for a given labware,"
-        " defaults to 1 when unspecified indicating a single labware with no labware below it.",
-    )
-    compatibleParentLabware: Optional[List[str]] = Field(
-        None,
-        description="List of parent Labware on which a labware may be loaded, primarily the labware which owns a lid.",
-    )
+class LabwareDefinition2(BaseModel):
+    schemaVersion: Literal[2]
+    version: Annotated[int, Field(ge=1)]
+    namespace: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
+    metadata: Metadata
+    brand: BrandData
+    parameters: Parameters2
+    cornerOffsetFromSlot: Vector
+    ordering: list[list[str]]
+    dimensions: Dimensions
+    wells: dict[str, WellDefinition2]
+    groups: list[Group]
+    stackingOffsetWithLabware: dict[str, Vector] = Field(default_factory=dict)
+    stackingOffsetWithModule: dict[str, Vector] = Field(default_factory=dict)
+    allowedRoles: list[LabwareRole] = Field(default_factory=list)
+    gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
+    gripForce: float | None = None
+    gripHeightFromLabwareBottom: float | None = None
+    stackLimit: int | None = None
+    compatibleParentLabware: list[str] | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
+
+
+class LabwareDefinition3(BaseModel):
+    otSharedSchema: Annotated[
+        Literal["#/labware/schemas/3"], Field(alias="$otSharedSchema")
+    ]
+    schemaVersion: Literal[3]
+    version: Annotated[int, Field(ge=1)]
+    namespace: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
+    metadata: Metadata
+    brand: BrandData
+    parameters: Parameters3
+    cornerOffsetFromSlot: Vector
+    ordering: list[list[str]]
+    dimensions: Dimensions
+    wells: dict[str, WellDefinition3]
+    groups: list[Group]
+    stackingOffsetWithLabware: dict[str, Vector] = Field(default_factory=dict)
+    stackingOffsetWithModule: dict[str, Vector] = Field(default_factory=dict)
+    allowedRoles: list[LabwareRole] = Field(default_factory=list)
+    gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
+    gripForce: float | None = None
+    gripHeightFromLabwareBottom: float | None = None
+    stackLimit: int | None = None
+    compatibleParentLabware: list[str] | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
+
+
+LabwareDefinition = Annotated[
+    LabwareDefinition2 | LabwareDefinition3,
+    Discriminator("schemaVersion"),
+]
+
+
+labware_definition_type_adapter: Final = TypeAdapter[LabwareDefinition](
+    LabwareDefinition
+)

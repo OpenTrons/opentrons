@@ -28,7 +28,7 @@ import type {
   SmallButtonTypes,
 } from '/app/atoms/buttons/SmallButton'
 
-interface ChildNavigationProps extends StyleProps {
+export interface ChildNavigationProps extends StyleProps {
   header: string
   onClickBack?: MouseEventHandler
   buttonText?: ReactNode

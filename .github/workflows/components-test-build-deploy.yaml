@@ -41,7 +41,7 @@ jobs:
   js-unit-test:
     name: 'components unit tests'
     timeout-minutes: 30
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
       - uses: 'actions/setup-node@v4'
@@ -75,7 +75,7 @@ jobs:
 
   build-components-storybook:
     name: 'build components artifact'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     if: github.event_name != 'pull_request'
     needs: ['js-unit-test']
     steps:
@@ -135,7 +135,7 @@ jobs:
 
   deploy-components:
     name: 'deploy components storybook artifact to S3'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     needs:
       ['js-unit-test', 'build-components-storybook', 'determine-build-type']
     if: needs.determine-build-type.outputs.type != 'none'

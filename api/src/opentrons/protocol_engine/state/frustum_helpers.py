@@ -5,6 +5,10 @@ from math import isclose
 
 from ..errors.exceptions import InvalidLiquidHeightFound
 
+from opentrons.protocol_engine.types.liquid_level_detection import (
+    LiquidTrackingType,
+    SimulatedProbeResult,
+)
 from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     WellSegment,
@@ -241,9 +245,8 @@ def _get_segment_capacity(segment: WellSegment) -> float:
 def get_well_volumetric_capacity(
     well_geometry: InnerWellGeometry,
 ) -> List[Tuple[float, float]]:
-    """Return the total volumetric capacity of a well as a map of height borders to volume."""
-    # dictionary map of heights to volumetric capacities within their respective segment
-    # {top_height_0: volume_0, top_height_1: volume_1, top_height_2: volume_2}
+    """Return the volumetric capacity of a well as a list of pairs relating segment heights to volumes."""
+    #  [(top_height_0, section_0_volume), (top_height_1, section_1_volume), ...]
     well_volume = []
 
     # get the well segments sorted in ascending order
@@ -356,9 +359,13 @@ def _find_volume_in_partial_frustum(
 
 
 def find_volume_at_well_height(
-    target_height: float, well_geometry: InnerWellGeometry
-) -> float:
+    target_height: LiquidTrackingType,
+    well_geometry: InnerWellGeometry,
+) -> LiquidTrackingType:
     """Find the volume within a well, at a known height."""
+    # comparisons with SimulatedProbeResult objects aren't meaningful, just return
+    if isinstance(target_height, SimulatedProbeResult):
+        return target_height
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
     max_height = volumetric_capacity[-1][0]
     if target_height < 0 or target_height > max_height:
@@ -417,13 +424,22 @@ def _find_height_in_partial_frustum(
 
 
 def find_height_at_well_volume(
-    target_volume: float, well_geometry: InnerWellGeometry
-) -> float:
+    target_volume: LiquidTrackingType,
+    well_geometry: InnerWellGeometry,
+    raise_error_if_result_invalid: bool = True,
+) -> LiquidTrackingType:
     """Find the height within a well, at a known volume."""
+    # comparisons with SimulatedProbeResult objects aren't meaningful, just
+    # return if we have one of those
+    if isinstance(target_volume, SimulatedProbeResult):
+        return target_volume
+
     volumetric_capacity = get_well_volumetric_capacity(well_geometry)
     max_volume = sum(row[1] for row in volumetric_capacity)
-    if target_volume < 0 or target_volume > max_volume:
-        raise InvalidLiquidHeightFound("Invalid target volume.")
+
+    if raise_error_if_result_invalid:
+        if target_volume < 0 or target_volume > max_volume:
+            raise InvalidLiquidHeightFound("Invalid target volume.")
 
     sorted_well = sorted(well_geometry.sections, key=lambda section: section.topHeight)
     # find the section the target volume is in and compute the height

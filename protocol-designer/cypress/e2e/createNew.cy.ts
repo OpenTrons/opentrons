@@ -2,7 +2,7 @@ import { UniversalSteps } from '../support/UniversalSteps'
 import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
 import { StepBuilder } from '../support/StepBuilder'
 
-describe('Create New OT-2 and Flex onboarding flow WIP', () => {
+describe('The Redesigned Create Protocol Landing Page', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.closeAnalyticsModal()

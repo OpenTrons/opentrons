@@ -8,7 +8,7 @@
   "metadata": {
     "displayName": "Protocol Engine Lid Stack",
     "displayCategory": "system",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
@@ -44,5 +44,6 @@
       "y": 0,
       "z": 34
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

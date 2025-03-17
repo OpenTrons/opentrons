@@ -11,7 +11,7 @@ import type {
   CreateCommand,
 } from '@opentrons/shared-data'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
-import type { BuildMoveLabwareOffDeckParams } from './commands'
+import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
 interface UseHandleConfirmPositionProps
   extends UseLPCCommandWithChainRunChildProps {
@@ -22,11 +22,9 @@ export interface UseHandleConfirmPositionResult {
   /* Initiate commands to return specific modules to a post-run condition before
    * non-plunger homing the utilized pipette and saving the LPC position. */
   handleConfirmLwFinalPosition: (
-    params: BuildMoveLabwareOffDeckParams & {
-      onSuccess: () => void
-      pipette: LoadedPipette | null
-    }
-  ) => Promise<Coordinates | null>
+    offsetLocationDetails: OffsetLocationDetails,
+    pipette: LoadedPipette
+  ) => Promise<Coordinates>
 }
 
 export function useHandleConfirmLwFinalPosition({
@@ -34,32 +32,29 @@ export function useHandleConfirmLwFinalPosition({
   chainLPCCommands,
 }: UseHandleConfirmPositionProps): UseHandleConfirmPositionResult {
   const handleConfirmLwFinalPosition = (
-    params: BuildMoveLabwareOffDeckParams & {
-      onSuccess: () => void
-      pipette: LoadedPipette | null
-    }
-  ): Promise<Coordinates | null> => {
-    const { onSuccess, pipette, step } = params
-    const { pipetteId } = step
-
+    offsetLocationDetails: OffsetLocationDetails,
+    pipette: LoadedPipette
+  ): Promise<Coordinates> => {
     const confirmCommands: CreateCommand[] = [
-      ...savePositionCommands(pipetteId),
+      ...savePositionCommands(pipette.id),
       ...retractPipetteAxesSequentiallyCommands(pipette),
-      ...moduleCleanupDuringLPCCommands(step),
-      ...moveLabwareOffDeckCommands(params),
+      ...moduleCleanupDuringLPCCommands(offsetLocationDetails),
+      ...moveLabwareOffDeckCommands(offsetLocationDetails),
     ]
 
     return chainLPCCommands(confirmCommands, false).then(responses => {
       const firstResponse = responses[0]
-      if (firstResponse.data.commandType === 'savePosition') {
-        const { position } = firstResponse.data?.result ?? { position: null }
-        onSuccess()
+      if (
+        firstResponse.data.commandType === 'savePosition' &&
+        firstResponse.data?.result != null
+      ) {
+        const { position } = firstResponse.data?.result
 
         return Promise.resolve(position)
       } else {
-        setErrorMessage('CheckItem failed to save final position with message')
+        setErrorMessage('CheckItem failed to save final position.')
         return Promise.reject(
-          new Error('CheckItem failed to save final position with message')
+          new Error('CheckItem failed to save final position.')
         )
       }
     })

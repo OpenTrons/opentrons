@@ -13,7 +13,11 @@ import type {
   LabwareDefinition2,
   LabwareDefinition3,
 } from '@opentrons/shared-data'
-import type { ResourceLink, ErrorDetails } from '../types'
+import type {
+  ResourceLink,
+  ErrorDetails,
+  LabwareOffsetLocationSequence,
+} from '../types'
 export * from './commands/types'
 
 export const RUN_STATUS_IDLE = 'idle' as const
@@ -85,7 +89,8 @@ export interface LabwareOffset {
   id: string
   createdAt: string
   definitionUri: string
-  location: LabwareOffsetLocation
+  location: LegacyLabwareOffsetLocation
+  locationSequence?: LabwareOffsetLocationSequence
   vector: VectorOffset
 }
 
@@ -156,14 +161,20 @@ export interface CreateRunActionData {
   actionType: RunActionType
 }
 
-export interface LabwareOffsetLocation {
+export interface LegacyLabwareOffsetLocation {
   slotName: string
   moduleModel?: ModuleModel
   definitionUri?: string
 }
+export interface LegacyLabwareOffsetCreateData {
+  definitionUri: string
+  location: LegacyLabwareOffsetLocation
+  vector: VectorOffset
+}
+
 export interface LabwareOffsetCreateData {
   definitionUri: string
-  location: LabwareOffsetLocation
+  locationSequence: LabwareOffsetLocationSequence
   vector: VectorOffset
 }
 

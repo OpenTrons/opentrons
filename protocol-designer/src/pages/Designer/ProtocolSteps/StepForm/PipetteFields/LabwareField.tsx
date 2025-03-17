@@ -5,7 +5,7 @@ import {
   getLabwareOptions,
 } from '../../../../../ui/labware/selectors'
 import { hoverSelection } from '../../../../../ui/steps/actions/actions'
-import { DropdownStepFormField } from '../../../../../molecules'
+import { DropdownStepFormField } from '../../../../../components/molecules'
 import { getRobotStateAtActiveItem } from '../../../../../top-selectors/labware-locations'
 import type { FieldProps } from '../types'
 
@@ -41,6 +41,7 @@ export function LabwareField(props: FieldProps): JSX.Element {
       onExit={() => {
         dispatch(hoverSelection({ id: null, text: null }))
       }}
+      width="100%"
     />
   )
 }

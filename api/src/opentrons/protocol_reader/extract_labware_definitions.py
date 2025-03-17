@@ -6,7 +6,10 @@ from typing import List
 
 import anyio
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    labware_definition_type_adapter,
+)
 
 from .protocol_source import ProtocolFileRole, ProtocolSource, ProtocolType
 
@@ -42,7 +45,7 @@ async def extract_labware_definitions(
 
 async def _extract_from_labware_file(path: Path) -> LabwareDefinition:
     def _do_parse() -> LabwareDefinition:
-        return LabwareDefinition.model_validate_json(path.read_bytes())
+        return labware_definition_type_adapter.validate_json(path.read_bytes())
 
     return await anyio.to_thread.run_sync(_do_parse)
 
@@ -55,7 +58,8 @@ async def _extract_from_json_protocol_file(path: Path) -> List[LabwareDefinition
             # which require this labwareDefinitions key.
             unvalidated_definitions = json_contents["labwareDefinitions"].values()
             validated_definitions = [
-                LabwareDefinition.model_validate(u) for u in unvalidated_definitions
+                labware_definition_type_adapter.validate_python(u)
+                for u in unvalidated_definitions
             ]
             return validated_definitions
 

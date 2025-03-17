@@ -25,7 +25,7 @@ import {
   getModuleEntities,
 } from '../../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../../components/atoms'
 import { formatTime } from '../utils'
 
 import type { FormData } from '../../../form-types'
@@ -438,12 +438,12 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       height="100%"
     >
       {stepSummaryContent != null ? (
-        <ListItem type="noActive">
+        <ListItem type="default">
           <Flex padding={SPACING.spacing12}>{stepSummaryContent}</Flex>
         </ListItem>
       ) : null}
       {stepDetails != null && stepDetails !== '' ? (
-        <ListItem type="noActive">
+        <ListItem type="default">
           <Flex padding={SPACING.spacing12}>
             <StyledText
               desktopStyle="bodyDefaultRegular"

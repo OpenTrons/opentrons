@@ -3,14 +3,15 @@ import pick from 'lodash/pick'
 import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
+  getCutoutIdByAddressableArea,
 } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
   ALL,
   COLUMN,
   OT2_ROBOT_TYPE,
+  SINGLE,
 } from '@opentrons/shared-data'
-import { getCutoutIdByAddressableArea } from '../utils'
 
 import type { Channels } from '@opentrons/components'
 import type {
@@ -67,6 +68,9 @@ const _createNextTimelineFrame = (args: {
     volume: args.volume,
     activeTips: _getNewActiveTips(args.nextFrame.commands.slice(0, args.index)),
   }
+  const command = args.command
+  const isAirGapCommand =
+    'meta' in command && command.meta != null && 'isAirGap' in command.meta
 
   const newTimelineFrame =
     args.command.commandType === 'aspirate' ||
@@ -74,10 +78,12 @@ const _createNextTimelineFrame = (args: {
       ? {
           ..._newTimelineFrameKeys,
           source: args.wellInfo,
+          isAirGap: isAirGapCommand,
         }
       : {
           ..._newTimelineFrameKeys,
           dest: args.wellInfo,
+          isAirGap: isAirGapCommand,
         }
   return newTimelineFrame
 }
@@ -256,10 +262,12 @@ export const substepTimelineMultiChannel = (
             : null
 
         let numChannels = channels
-        if (nozzles === ALL) {
+        if (nozzles === ALL && channels !== 8) {
           numChannels = 96
         } else if (nozzles === COLUMN) {
           numChannels = 8
+        } else if (nozzles === SINGLE) {
+          numChannels = 1
         }
         const wellsForTips =
           numChannels &&

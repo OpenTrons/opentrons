@@ -40,7 +40,7 @@ import {
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
 import { getNewProtocolModal } from '../../navigation/selectors'
-import { SelectModules } from '../../organisms/SelectModules'
+import { SelectModules } from '../../components/organisms/SelectModules'
 import { SelectRobot } from './SelectRobot'
 import { SelectPipettes } from './SelectPipettes'
 import { SelectGripper } from './SelectGripper'
@@ -90,7 +90,7 @@ const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 type PipetteFieldsData = Omit<
   PipetteOnDeck,
-  'id' | 'spec' | 'tiprackLabwareDef'
+  'id' | 'spec' | 'tiprackLabwareDef' | 'pythonName'
 >
 
 interface ModuleCreationArgs {

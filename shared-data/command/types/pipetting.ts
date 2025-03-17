@@ -13,6 +13,7 @@ export type PipettingRunTimeCommand =
   | DropTipInPlaceRunTimeCommand
   | DropTipRunTimeCommand
   | GetTipPresenceRunTimeCommand
+  | GetNextTipRunTimeCommand
   | MoveToAddressableAreaForDropTipRunTimeCommand
   | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
@@ -21,6 +22,9 @@ export type PipettingRunTimeCommand =
   | LiquidProbeRunTimeCommand
   | TryLiquidProbeRunTimeCommand
   | AirGapInPlaceRunTimeCommand
+  | EvotipSealRunTimeCommand
+  | EvotipUnsealRunTimeCommand
+  | EvotipPressurizeRunTimeCommand
 
 export type PipettingCreateCommand =
   | AspirateCreateCommand
@@ -33,6 +37,7 @@ export type PipettingCreateCommand =
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
   | GetTipPresenceCreateCommand
+  | GetNextTipCreateCommand
   | MoveToAddressableAreaForDropTipCreateCommand
   | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
@@ -41,6 +46,9 @@ export type PipettingCreateCommand =
   | LiquidProbeCreateCommand
   | TryLiquidProbeCreateCommand
   | AirGapInPlaceCreateCommand
+  | EvotipSealCreateCommand
+  | EvotipUnsealCreateCommand
+  | EvotipPressurizeCreateCommand
 
 export interface ConfigureForVolumeCreateCommand
   extends CommonCommandCreateInfo {
@@ -206,6 +214,16 @@ export interface GetTipPresenceRunTimeCommand
   result?: TipPresenceResult
 }
 
+export interface GetNextTipCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'getNextTip'
+  params: GetNextTipParams
+}
+export interface GetNextTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    GetNextTipCreateCommand {
+  result?: GetNextTipResult
+}
+
 export interface VerifyTipPresenceCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'verifyTipPresence'
@@ -237,6 +255,37 @@ export interface TryLiquidProbeRunTimeCommand
   result?: Record<string, unknown>
 }
 
+export interface EvotipSealCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'evotipSealPipette'
+  params: PipetteAccessParams & WellLocationParam
+}
+export interface EvotipUnsealCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'evotipUnsealPipette'
+  params: PipetteAccessParams & WellLocationParam
+}
+
+export interface EvotipPressurizeCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'evotipDispense'
+  params: PipetteAccessParams &
+    WellLocationParam &
+    FlowRateParams &
+    VolumeParams
+}
+export interface EvotipSealRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    EvotipSealCreateCommand {
+  result?: EvotipSealResult
+}
+export interface EvotipUnsealRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    EvotipUnsealCreateCommand {
+  result?: EvotipUnsealResult
+}
+export interface EvotipPressurizeRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    EvotipPressurizeCreateCommand {
+  result?: BasicLiquidHandlingResult
+}
 export type AspDispAirgapParams = FlowRateParams &
   PipetteAccessParams &
   VolumeParams &
@@ -244,9 +293,23 @@ export type AspDispAirgapParams = FlowRateParams &
 export type BlowoutParams = FlowRateParams &
   PipetteAccessParams &
   WellLocationParam
-export type TouchTipParams = PipetteAccessParams & WellLocationParam
+export type TouchTipParams = PipetteAccessParams &
+  WellLocationParam & {
+    speed?: number
+  }
 export type DropTipParams = PipetteAccessParams & DropTipWellLocationParam
-export type PickUpTipParams = TouchTipParams
+export interface GetNextTipParams {
+  pipetteId: string
+  labwareIds: string[]
+}
+
+export interface GetNextTipResult {
+  nextTipInfo: {
+    labwareId: string
+    tipStartingWell: string
+  }
+}
+export type PickUpTipParams = PipetteAccessParams & WellLocationParam
 export type PrepareToAspirateParams = PipetteIdentityParams
 
 interface AddressableOffsetVector {
@@ -321,4 +384,14 @@ interface BasicLiquidHandlingResult {
 interface TipPresenceResult {
   // ot2 should alwasy return unknown
   status?: 'present' | 'absent' | 'unknown'
+}
+
+interface EvotipSealResult {
+  position: AddressableOffsetVector
+  tipVolume: number
+  tipLength: number
+  tipDiameter: number
+}
+interface EvotipUnsealResult {
+  position: AddressableOffsetVector
 }

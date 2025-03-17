@@ -12,12 +12,14 @@ import {
   Icon,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { WellOrderModal } from '../../../../../organisms'
-import type { WellOrderOption } from '../../../../../form-types'
+import { WellOrderModal } from '../../../../../components/organisms'
+
 import type { FieldProps } from '../types'
+import type { WellOrderOption } from '../../../../../form-types'
+import type { MoveLiquidPrefixType } from '../../../../../resources/types'
 
 export interface WellsOrderFieldProps {
-  prefix: 'aspirate' | 'dispense' | 'mix'
+  prefix: MoveLiquidPrefixType
   firstName: string
   secondName: string
   updateFirstWellOrder: FieldProps['updateValue']
@@ -79,6 +81,7 @@ export function WellsOrderField(props: WellsOrderFieldProps): JSX.Element {
           padding={SPACING.spacing12}
           gridGap={SPACING.spacing8}
           alignItems={ALIGN_CENTER}
+          testId={`WellsOrderField_ListButton_${prefix}`}
         >
           <Icon name="well-order" size="1.25rem" />
           <StyledText desktopStyle="bodyDefaultRegular">

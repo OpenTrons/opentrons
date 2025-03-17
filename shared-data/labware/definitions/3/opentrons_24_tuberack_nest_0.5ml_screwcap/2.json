@@ -325,31 +325,11 @@
     "conicalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 3.64,
-          "topHeight": 0.14,
-          "bottomHeight": 0.0
-        },
-        {
           "shape": "conical",
-          "topDiameter": 3,
-          "bottomDiameter": 2,
-          "topHeight": 0.95,
-          "bottomHeight": 0.14
-        },
-        {
-          "shape": "conical",
-          "topDiameter": 5.8,
-          "bottomDiameter": 3,
-          "topHeight": 10.2,
-          "bottomHeight": 0.95
-        },
-        {
-          "shape": "conical",
-          "topDiameter": 7.9,
-          "bottomDiameter": 5.8,
-          "topHeight": 11.9,
-          "bottomHeight": 10.2
+          "topDiameter": 8.56,
+          "bottomDiameter": 8.56,
+          "topHeight": 25.2,
+          "bottomHeight": 13.95
         },
         {
           "shape": "conical",
@@ -360,12 +340,33 @@
         },
         {
           "shape": "conical",
-          "topDiameter": 8.56,
-          "bottomDiameter": 8.56,
-          "topHeight": 25.2,
-          "bottomHeight": 13.95
+          "topDiameter": 7.9,
+          "bottomDiameter": 5.8,
+          "topHeight": 11.9,
+          "bottomHeight": 10.2
+        },
+        {
+          "shape": "conical",
+          "topDiameter": 5.8,
+          "bottomDiameter": 3,
+          "topHeight": 10.2,
+          "bottomHeight": 0.95
+        },
+        {
+          "shape": "conical",
+          "topDiameter": 3,
+          "bottomDiameter": 2,
+          "topHeight": 0.95,
+          "bottomHeight": 0.14
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 3.64,
+          "topHeight": 0.14,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

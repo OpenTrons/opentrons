@@ -8,11 +8,11 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.types import (
     LabwareUri,
-    LabwareDefinition as LabwareDefDict,
+    LabwareDefinition2 as LabwareDef2Dict,
 )
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    Parameters,
+    LabwareDefinition2,
+    Parameters2,
 )
 
 
@@ -44,21 +44,21 @@ def _use_mock_calibration_storage(
 
 
 @pytest.fixture
-def tip_rack_dict() -> LabwareDefDict:
+def tip_rack_dict() -> LabwareDef2Dict:
     """Get a tip rack dictionary definition value object."""
     return cast(
-        LabwareDefDict,
+        LabwareDef2Dict,
         {"namespace": "test", "version": 1, "parameters": {"loadName": "cool-labware"}},
     )
 
 
 @pytest.fixture
-def tip_rack_model() -> LabwareDefinition:
+def tip_rack_model() -> LabwareDefinition2:
     """Get a tip rack Pydantic model definition value object."""
-    return LabwareDefinition.model_construct(  # type: ignore[call-arg]
+    return LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         namespace="test",
         version=1,
-        parameters=Parameters.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
             loadName="cool-labware",
             tipOverlap=None,  # add a None value to validate serialization to dictionary
         ),
@@ -74,8 +74,8 @@ def tip_rack_model() -> LabwareDefinition:
 )
 def test_load_tip_length(
     decoy: Decoy,
-    tip_rack_dict: LabwareDefDict,
-    tip_rack_definition: Union[LabwareDefDict, LabwareDefinition],
+    tip_rack_dict: LabwareDef2Dict,
+    tip_rack_definition: Union[LabwareDef2Dict, LabwareDefinition2],
 ) -> None:
     """Test that a tip length can be laoded for a pipette / tiprack combination."""
     tip_length_data = v1_models.TipLengthModel(

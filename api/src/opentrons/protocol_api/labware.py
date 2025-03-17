@@ -19,23 +19,34 @@ from typing import (
     List,
     Dict,
     Optional,
-    Union,
     Tuple,
     cast,
     Sequence,
     Mapping,
+    Union,
+    Literal,
 )
 
-from opentrons_shared_data.labware.types import LabwareDefinition, LabwareParameters
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareParameters2,
+    LabwareParameters3,
+)
 
-from opentrons.types import Location, Point, NozzleMapInterface
+from opentrons.types import (
+    Location,
+    Point,
+    NozzleMapInterface,
+    MeniscusTrackingTarget,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
     UnsupportedAPIError,
 )
-
+from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
 
 # TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
 # remove when their usage is no longer needed
@@ -49,7 +60,10 @@ from . import validation
 from ._liquid import Liquid
 from ._types import OffDeckType
 from .core import well_grid
-from .core.engine import ENGINE_CORE_API_VERSION, SET_OFFSET_RESTORED_API_VERSION
+from .core.engine import (
+    ENGINE_CORE_API_VERSION,
+    SET_OFFSET_RESTORED_API_VERSION,
+)
 from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
 from .core.core_map import LoadedCoreMap
@@ -115,8 +129,23 @@ class Well:
     @property
     @requires_version(2, 0)
     def has_tip(self) -> bool:
-        """Whether this well contains a tip. Always ``False`` if the parent labware
-        isn't a tip rack."""
+        """Whether this well contains an unused tip.
+
+        From API v2.2 on:
+
+        - Returns ``False`` if:
+
+          - the well has no tip present, or
+          - the well has a tip that's been used by the protocol previously
+
+        - Returns ``True`` if the well has an unused tip.
+
+        Before API v2.2:
+
+        - Returns ``True`` as long as the well has a tip, even if it is used.
+
+        Always ``False`` if the parent labware isn't a tip rack.
+        """
         return self._core.has_tip()
 
     @has_tip.setter
@@ -233,16 +262,21 @@ class Well:
         return Location(self._core.get_center(), self)
 
     @requires_version(2, 21)
-    def meniscus(self, z: float = 0.0) -> Location:
+    def meniscus(
+        self, target: Literal["start", "end", "dynamic"], z: float = 0.0
+    ) -> Location:
         """
         :param z: An offset on the z-axis, in mm. Positive offsets are higher and
             negative offsets are lower.
+        :param target: The relative position inside the well to target when performing a liquid handling operation.
         :return: A :py:class:`~opentrons.types.Location` that indicates location is meniscus and that holds the ``z`` offset in its point.z field.
 
         :meta private:
         """
         return Location(
-            point=Point(x=0, y=0, z=z), labware=self, _ot_internal_is_meniscus=True
+            point=Point(x=0, y=0, z=z),
+            labware=self,
+            _meniscus_tracking=MeniscusTrackingTarget(target),
         )
 
     @requires_version(2, 8)
@@ -300,6 +334,35 @@ class Well:
             liquid=liquid,
             volume=volume,
         )
+
+    @requires_version(2, 21)
+    def current_liquid_height(self) -> LiquidTrackingType:
+        """Get the current liquid height in a well."""
+        return self._core.current_liquid_height()
+
+    @requires_version(2, 21)
+    def current_liquid_volume(self) -> LiquidTrackingType:
+        """Get the current liquid volume in a well."""
+        return self._core.get_liquid_volume()
+
+    @requires_version(2, 21)
+    def estimate_liquid_height_after_pipetting(
+        self,
+        operation_volume: float,
+    ) -> LiquidTrackingType:
+        """Check the height of the liquid within a well.
+
+        :returns: The height, in mm, of the liquid from the deck.
+
+        :meta private:
+
+        This is intended for Opentrons internal use only and is not a guaranteed API.
+        """
+
+        projected_final_height = self._core.estimate_liquid_height_after_pipetting(
+            operation_volume=operation_volume,
+        )
+        return projected_final_height
 
     def _from_center_cartesian(self, x: float, y: float, z: float) -> Point:
         """
@@ -494,7 +557,7 @@ class Labware:
 
     @property
     @requires_version(2, 0)
-    def parameters(self) -> "LabwareParameters":
+    def parameters(self) -> "LabwareParameters2 | LabwareParameters3":
         """Internal properties of a labware including type and quirks."""
         return self._core.get_parameters()
 
@@ -643,6 +706,8 @@ class Labware:
             automatically.
 
         :return: The initialized and loaded labware object representing the Lid Stack.
+
+        :meta private:
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
@@ -1402,7 +1467,7 @@ def next_available_tip(
 # TODO(mc, 2022-11-09): implementation detail, move somewhere else
 # only used in old calibration flows by robot-server
 def load_from_definition(
-    definition: "LabwareDefinition",
+    definition: "LabwareDefinition2",
     parent: Location,
     label: Optional[str] = None,
     api_level: Optional[APIVersion] = None,
@@ -1446,8 +1511,8 @@ def load(
     label: Optional[str] = None,
     namespace: Optional[str] = None,
     version: int = 1,
-    bundled_defs: Optional[Dict[str, LabwareDefinition]] = None,
-    extra_defs: Optional[Dict[str, LabwareDefinition]] = None,
+    bundled_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
+    extra_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
     api_level: Optional[APIVersion] = None,
 ) -> Labware:
     """
@@ -1484,5 +1549,15 @@ def load(
         bundled_defs=bundled_defs,
         extra_defs=extra_defs,
     )
+
+    # The legacy `load_from_definition()` function that we're calling only supports
+    # schemaVersion==2 labware. Fortunately, when robot-server calls this function,
+    # we only expect it to try to load schemaVersion==2 labware, so we never expect
+    # this ValueError to be raised in practice.
+    if definition["schemaVersion"] != 2:
+        raise ValueError(
+            f"{namespace}/{load_name}/{version} has schema {definition['schemaVersion']}."
+            " Only schema 2 is supported."
+        )
 
     return load_from_definition(definition, parent, label, api_level)

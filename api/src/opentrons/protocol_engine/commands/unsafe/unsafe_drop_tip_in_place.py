@@ -99,7 +99,7 @@ class UnsafeDropTipInPlace(
 
     commandType: UnsafeDropTipInPlaceCommandType = "unsafe/dropTipInPlace"
     params: UnsafeDropTipInPlaceParams
-    result: Optional[UnsafeDropTipInPlaceResult]
+    result: Optional[UnsafeDropTipInPlaceResult] = None
 
     _ImplementationCls: Type[
         UnsafeDropTipInPlaceImplementation

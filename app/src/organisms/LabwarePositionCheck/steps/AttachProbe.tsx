@@ -1,139 +1,97 @@
 import { Trans, useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 
-import {
-  RESPONSIVENESS,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { LegacyStyledText } from '@opentrons/components'
 
-import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import {
-  selectActivePipette,
-  selectActivePipetteChannelCount,
-} from '/app/redux/protocol-runs'
-import { getIsOnDevice } from '/app/redux/config'
+import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import { selectActivePipetteChannelCount } from '/app/redux/protocol-runs'
 
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
 
-import type { AttachProbeStep, LPCStepProps } from '../types'
-import type { State } from '/app/redux/types'
-import type { LPCWizardState } from '/app/redux/protocol-runs'
+import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
+import styled from 'styled-components'
 
-const StyledVideo = styled.video`
-  padding-top: ${SPACING.spacing4};
-  width: 100%;
-  min-height: 18rem;
-`
-
-const StyledBody = styled(LegacyStyledText)`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
-
-export function AttachProbe({
-  runId,
-  proceed,
-  commandUtils,
-  step,
-}: LPCStepProps<AttachProbeStep>): JSX.Element {
-  const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
-  const isOnDevice = useSelector(getIsOnDevice)
-  const { steps } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
-  )
-  const { pipetteId } = step
+export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
   const {
-    createProbeAttachmentHandler,
-    handleCheckItemsPrepModules,
-    toggleRobotMoving,
-    setShowUnableToDetect,
-    unableToDetect,
-  } = commandUtils
-  const pipette = useSelector((state: State) =>
-    selectActivePipette(step, runId, state)
-  )
-  const channels = useSelector((state: State) =>
-    selectActivePipetteChannelCount(step, runId, state)
-  )
+    handleAttachProbeCheck,
+    handleCloseWithoutHome,
+  } = props.commandUtils.headerCommands
+  const { t } = useTranslation('labware_position_check')
+  const channelCount = useSelector(selectActivePipetteChannelCount(props.runId))
 
-  const handleProbeAttached = createProbeAttachmentHandler(
-    pipetteId,
-    pipette,
-    proceed
-  )
-
-  const { probeLocation, probeVideoSrc } = ((): {
-    probeLocation: string
-    probeVideoSrc: string
-  } => {
-    switch (channels) {
+  const probeVideo = (): string => {
+    switch (channelCount) {
       case 1:
-        return { probeLocation: '', probeVideoSrc: attachProbe1 }
+        return attachProbe1
       case 8:
-        return { probeLocation: t('backmost'), probeVideoSrc: attachProbe8 }
+        return attachProbe8
       case 96:
-        return {
-          probeLocation: t('ninety_six_probe_location'),
-          probeVideoSrc: attachProbe96,
-        }
+        return attachProbe96
+      default: {
+        console.error('Unexpected channel count.')
+        return attachProbe1
+      }
     }
-  })()
-
-  const handleProbeCheck = (): void => {
-    void toggleRobotMoving(true)
-      .then(() => handleProbeAttached())
-      .finally(() => toggleRobotMoving(false))
   }
 
-  const handleProceed = (): void => {
-    void toggleRobotMoving(true)
-      .then(() => handleProbeAttached())
-      .then(() => handleCheckItemsPrepModules(steps.next))
-      .finally(() => toggleRobotMoving(false))
+  const probei18nString = (): string => {
+    switch (channelCount) {
+      case 1:
+        return 'install_probe_1ch'
+      case 8:
+        return 'install_probe_8ch'
+      case 96:
+        return 'install_probe_96ch'
+      default: {
+        console.error('Unexpected channel count.')
+        return 'install_probe_1ch'
+      }
+    }
   }
 
-  if (unableToDetect) {
-    return (
-      <ProbeNotAttached
-        handleOnClick={handleProbeCheck}
-        setShowUnableToDetect={setShowUnableToDetect}
-        isOnDevice={isOnDevice}
-      />
-    )
-  } else {
-    return (
-      <GenericWizardTile
-        header={i18n.format(t('attach_probe'), 'capitalize')}
-        rightHandBody={
-          <StyledVideo autoPlay loop controls={false}>
-            <source src={probeVideoSrc} />
-          </StyledVideo>
-        }
-        bodyText={
-          <StyledBody>
+  return (
+    <LPCContentContainer
+      {...props}
+      header={t('labware_position_check_title')}
+      onClickButton={handleAttachProbeCheck}
+      buttonText={t('continue')}
+      secondaryButtonProps={{
+        buttonText: t('exit'),
+        buttonCategory: 'rounded',
+        buttonType: 'tertiaryLowLight',
+        onClick: handleCloseWithoutHome,
+      }}
+    >
+      <TwoColumn>
+        <DescriptionContent
+          headline={t('attach_probe')}
+          message={
             <Trans
               t={t}
-              i18nKey={'install_probe'}
-              values={{ location: probeLocation }}
+              i18nKey={probei18nString()}
               components={{
+                block: <LegacyStyledText as="p" />,
                 bold: <strong />,
               }}
             />
-          </StyledBody>
-        }
-        proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-        proceed={handleProceed}
-      />
-    )
-  }
+          }
+        />
+        <StyledVideo
+          autoPlay
+          loop
+          controls={false}
+          src={probeVideo()}
+          data-testid="probe-video"
+        />
+      </TwoColumn>
+    </LPCContentContainer>
+  )
 }
+
+const StyledVideo = styled.video`
+  height: 100%;
+  width: 100%;
+`

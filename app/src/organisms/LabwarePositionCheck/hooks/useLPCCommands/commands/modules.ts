@@ -5,30 +5,26 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import type { CheckPositionsStep } from '/app/organisms/LabwarePositionCheck/types'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
 } from '@opentrons/shared-data'
-import type { LabwareOffsetLocation } from '@opentrons/api-client'
+import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
-export interface BuildModulePrepCommandsParams {
-  step: CheckPositionsStep
-}
-
-export function modulePrepCommands({
-  step,
-}: BuildModulePrepCommandsParams): CreateCommand[] {
-  const { moduleId, location } = step
+export function modulePrepCommands(
+  offsetLocationDetails: OffsetLocationDetails
+): CreateCommand[] {
+  const {
+    closestBeneathModuleId,
+    closestBeneathModuleModel,
+  } = offsetLocationDetails
 
   const moduleType =
-    (moduleId != null &&
-      'moduleModel' in location &&
-      location.moduleModel != null &&
-      getModuleType(location.moduleModel)) ??
-    null
+    closestBeneathModuleModel != null
+      ? getModuleType(closestBeneathModuleModel)
+      : null
 
-  if (moduleId == null || moduleType == null) {
+  if (closestBeneathModuleId == null || moduleType == null) {
     return []
   } else {
     switch (moduleType) {
@@ -36,22 +32,22 @@ export function modulePrepCommands({
         return [
           {
             commandType: 'thermocycler/openLid',
-            params: { moduleId },
+            params: { moduleId: closestBeneathModuleId },
           },
         ]
       case HEATERSHAKER_MODULE_TYPE:
         return [
           {
             commandType: 'heaterShaker/closeLabwareLatch',
-            params: { moduleId },
+            params: { moduleId: closestBeneathModuleId },
           },
           {
             commandType: 'heaterShaker/deactivateShaker',
-            params: { moduleId },
+            params: { moduleId: closestBeneathModuleId },
           },
           {
             commandType: 'heaterShaker/openLabwareLatch',
-            params: { moduleId },
+            params: { moduleId: closestBeneathModuleId },
           },
         ]
       default:
@@ -79,11 +75,9 @@ export const moduleInitDuringLPCCommands = (
 
 // Not all modules require cleanup after each labware LPC.
 export const moduleCleanupDuringLPCCommands = (
-  step: CheckPositionsStep
+  offsetLocationDetails: OffsetLocationDetails
 ): CreateCommand[] => {
-  const { moduleId, location } = step
-
-  return [...heaterShakerCleanupCommands(moduleId, location)]
+  return [...heaterShakerCleanupCommands(offsetLocationDetails)]
 }
 
 const heaterShakerInitCommands = (
@@ -127,23 +121,25 @@ const thermocyclerInitCommands = (
 }
 
 const heaterShakerCleanupCommands = (
-  moduleId: string | undefined,
-  location: LabwareOffsetLocation
+  offsetLocationDetails: OffsetLocationDetails
 ): CreateCommand[] => {
-  const moduleType =
-    (moduleId != null &&
-      'moduleModel' in location &&
-      location.moduleModel != null &&
-      getModuleType(location.moduleModel)) ??
-    null
+  const {
+    closestBeneathModuleId,
+    closestBeneathModuleModel,
+  } = offsetLocationDetails
 
-  return moduleId != null &&
+  const moduleType =
+    closestBeneathModuleModel != null
+      ? getModuleType(closestBeneathModuleModel)
+      : null
+
+  return closestBeneathModuleId != null &&
     moduleType != null &&
     moduleType === HEATERSHAKER_MODULE_TYPE
     ? [
         {
           commandType: 'heaterShaker/openLabwareLatch',
-          params: { moduleId },
+          params: { moduleId: closestBeneathModuleId },
         },
       ]
     : []

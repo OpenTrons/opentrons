@@ -93,7 +93,7 @@ export function WifiConnectionDetails({
             />
             <MediumButton
               flex="1"
-              buttonText={i18n.format(t('continue'), 'capitalize')}
+              buttonText={i18n.format(t('shared:continue'), 'capitalize')}
               onClick={() => {
                 navigate('/robot-settings/update-robot-during-onboarding')
               }}

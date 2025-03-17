@@ -98,6 +98,14 @@ describe('aspirate', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mockPythonName.aspirate(
+    volume=50,
+    location=mockPythonName["A1"].bottom(z=5),
+    rate=6 / mockPythonName.flow_rate.aspirate,
+)`.trimStart()
+    )
   })
   it('aspirate with volume > tip max volume should throw error', () => {
     invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackDefURI = [

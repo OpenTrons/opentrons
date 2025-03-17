@@ -40,7 +40,7 @@ jobs:
   js-unit-test:
     name: 'labware library unit tests'
     timeout-minutes: 20
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
       - uses: 'actions/setup-node@v4'
@@ -83,7 +83,7 @@ jobs:
     name: 'labware library e2e tests'
     needs: ['js-unit-test']
     timeout-minutes: 30
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
       # https://github.com/actions/checkout/issues/290
@@ -123,7 +123,7 @@ jobs:
     name: 'build labware library artifact'
     needs: ['js-unit-test']
     timeout-minutes: 30
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     if: github.event_name != 'pull_request'
     steps:
       - uses: 'actions/checkout@v4'
@@ -170,7 +170,7 @@ jobs:
           path: labware-library/dist
   deploy-ll:
     name: 'deploy LL artifact to S3'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     needs: ['js-unit-test', 'e2e-test', 'build-ll']
     if: github.event_name != 'pull_request'
     steps:

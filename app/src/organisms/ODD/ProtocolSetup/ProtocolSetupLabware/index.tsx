@@ -83,7 +83,7 @@ export function ProtocolSetupLabware({
   setIsConfirmed,
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const [showMapView, setShowMapView] = useState<boolean>(false)
+  const [showMapView, setShowMapView] = useState<boolean>(true)
   const [
     showLabwareDetailsModal,
     setShowLabwareDetailsModal,
@@ -464,8 +464,7 @@ function RowLabware({
     matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
       ? matchedModule.attachedModuleMatch
       : null
-  const isStacked =
-    topLabwareQuantity > 1 || adapterName != null || matchedModule != null
+  const isStacked = topLabwareQuantity > 1 || adapterName != null
 
   let slotName: string = slot
   let location: JSX.Element = <DeckInfoLabel deckLabel={slotName} />

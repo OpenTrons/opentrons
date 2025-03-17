@@ -5,10 +5,10 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Point, Location
 
 if typing.TYPE_CHECKING:
-    from opentrons_shared_data.labware.types import LabwareDefinition
+    from opentrons_shared_data.labware.types import LabwareDefinition2
 
 
-def test_wells_rebuilt_with_offset(minimal_labware_def: "LabwareDefinition") -> None:
+def test_wells_rebuilt_with_offset(minimal_labware_def: "LabwareDefinition2") -> None:
     test_labware = labware.Labware(
         core=LegacyLabwareCore(minimal_labware_def, Location(Point(0, 0, 0), "deck")),
         api_version=APIVersion(2, 13),  # set_offset() is not implemented in 2.14.

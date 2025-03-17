@@ -128,7 +128,7 @@ class LoadLiquidClass(
 
     commandType: LoadLiquidClassCommandType = "loadLiquidClass"
     params: LoadLiquidClassParams
-    result: Optional[LoadLiquidClassResult]
+    result: Optional[LoadLiquidClassResult] = None
 
     _ImplementationCls: Type[
         LoadLiquidClassImplementation

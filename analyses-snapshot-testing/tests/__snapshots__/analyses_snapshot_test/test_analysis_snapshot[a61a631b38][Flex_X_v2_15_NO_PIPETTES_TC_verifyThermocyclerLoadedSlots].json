@@ -1,0 +1,201 @@
+{
+  "commandAnnotations": [],
+  "commands": [
+    {
+      "commandType": "home",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "50c7ae73a4e3f7129874f39dfb514803",
+      "notes": [],
+      "params": {},
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "loadModule",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "8511b05ba5565bf0e6dcccd800e2ee23",
+      "notes": [],
+      "params": {
+        "location": {
+          "slotName": "B1"
+        },
+        "model": "thermocyclerModuleV2"
+      },
+      "result": {
+        "definition": {
+          "calibrationPoint": {
+            "x": 14.4,
+            "y": 64.93,
+            "z": 97.8
+          },
+          "compatibleWith": [],
+          "dimensions": {
+            "bareOverallHeight": 108.96,
+            "lidHeight": 61.7,
+            "overLabwareHeight": 0.0
+          },
+          "displayName": "Thermocycler Module GEN2",
+          "gripperOffsets": {
+            "default": {
+              "dropOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 5.6
+              },
+              "pickUpOffset": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 4.6
+              }
+            }
+          },
+          "labwareOffset": {
+            "x": 0.0,
+            "y": 68.8,
+            "z": 108.96
+          },
+          "model": "thermocyclerModuleV2",
+          "moduleType": "thermocyclerModuleType",
+          "otSharedSchema": "module/schemas/2",
+          "quirks": [],
+          "slotTransforms": {
+            "ot3_standard": {
+              "B1": {
+                "cornerOffsetFromSlot": [
+                  [
+                    -98,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -20.005,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -0.84,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ],
+                "labwareOffset": [
+                  [
+                    -98,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -20.005,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    -0.84,
+                    0,
+                    0,
+                    1
+                  ],
+                  [
+                    0,
+                    0,
+                    0,
+                    1
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "model": "thermocyclerModuleV2",
+        "moduleId": "UUID",
+        "serialNumber": "UUID"
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    }
+  ],
+  "config": {
+    "apiVersion": [
+      2,
+      15
+    ],
+    "protocolType": "python"
+  },
+  "createdAt": "TIMESTAMP",
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "AssertionError [line 13]: ",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "AssertionError",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "()",
+            "class": "AssertionError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots.py\", line N, in run\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "name": "Flex_X_v2_15_NO_PIPETTES_TC_verifyThermocyclerLoadedSlots.py",
+      "role": "main"
+    }
+  ],
+  "labware": [
+    {
+      "definitionUri": "opentrons/opentrons_1_trash_3200ml_fixed/1",
+      "id": "UUID",
+      "loadName": "opentrons_1_trash_3200ml_fixed",
+      "location": {
+        "slotName": "A3"
+      }
+    }
+  ],
+  "liquidClasses": [],
+  "liquids": [],
+  "metadata": {},
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "B1"
+      },
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
+  "pipettes": [],
+  "result": "not-ok",
+  "robotType": "OT-3 Standard",
+  "runTimeParameters": []
+}

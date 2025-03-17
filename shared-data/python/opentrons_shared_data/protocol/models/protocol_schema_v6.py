@@ -6,7 +6,7 @@ from pydantic import (
 )
 from typing import Any, List, Optional, Dict, Union
 from typing_extensions import Literal
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 from .shared_models import (
     Liquid,
@@ -80,7 +80,7 @@ class ProtocolSchemaV6(BaseModel):
     labware: Dict[str, Labware]
     modules: Optional[Dict[str, Module]] = None
     liquids: Optional[Dict[str, Liquid]] = None
-    labwareDefinitions: Dict[str, LabwareDefinition]
+    labwareDefinitions: Dict[str, LabwareDefinition2]
     # commands must be after pipettes, labware, etc. for its @validator to work.
     commands: List[Command]
     commandAnnotations: Optional[List[CommandAnnotation]] = None

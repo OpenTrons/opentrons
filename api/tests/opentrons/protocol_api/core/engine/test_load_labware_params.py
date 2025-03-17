@@ -1,10 +1,12 @@
 """Tests for Protocol API engine parameter validation."""
+
 import pytest
 from typing import List, Optional
 
 from opentrons.protocol_api.core.engine import load_labware_params as subject
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.mark.parametrize(
@@ -15,12 +17,13 @@ from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
         "custom_labware_params",
         "expected_namespace",
         "expected_version",
+        "current_api_version",
     ],
     argvalues=[
-        ("hello", "world", 123, [], "world", 123),
-        ("hello", "world", None, [], "world", 1),
-        ("hello", None, 123, [], OPENTRONS_NAMESPACE, 123),
-        ("hello", None, None, [], OPENTRONS_NAMESPACE, 1),
+        ("hello", "world", 123, [], "world", 123, APIVersion(2, 15)),
+        ("hello", "world", None, [], "world", 1, APIVersion(2, 22)),
+        ("hello", None, 123, [], OPENTRONS_NAMESPACE, 123, APIVersion(2, 14)),
+        ("hello", None, None, [], OPENTRONS_NAMESPACE, 1, APIVersion(2, 16)),
         (
             "hello",
             "world",
@@ -31,6 +34,7 @@ from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
             ],
             "world",
             123,
+            APIVersion(2, 17),
         ),
         (
             "hello",
@@ -42,6 +46,7 @@ from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
             ],
             "world",
             123,
+            APIVersion(2, 19),
         ),
         (
             "hello",
@@ -53,6 +58,7 @@ from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
             ],
             "world",
             123,
+            APIVersion(2, 21),
         ),
     ],
 )
@@ -63,9 +69,12 @@ def test_resolve_load_labware_params(
     custom_labware_params: List[LabwareLoadParams],
     expected_namespace: str,
     expected_version: int,
+    current_api_version: APIVersion,
 ) -> None:
     """It should get a namespace and version based on custom labware available or defaults."""
-    result = subject.resolve(load_name, namespace, version, custom_labware_params)
+    result = subject.resolve(
+        load_name, namespace, version, custom_labware_params, current_api_version
+    )
 
     assert result == (expected_namespace, expected_version)
 
@@ -82,6 +91,8 @@ def test_resolve_load_labware_params(
         "nest_96_wellplate_2ml_deep",
         "opentrons_96_wellplate_200ul_pcr_full_skirt",
         "biorad_96_wellplate_200ul_pcr",
+        "evotips_opentrons_96_labware",
+        "evotips_flex_96_tiprack_adapter",
     ],
 )
 @pytest.mark.parametrize("namespace", [OPENTRONS_NAMESPACE, None])
@@ -107,6 +118,7 @@ def test_version_two_and_above_default_versioning(
         namespace=namespace,
         version=version,
         custom_load_labware_params=[],
+        api_version=APIVersion(2, 23),
     )
     assert result == (OPENTRONS_NAMESPACE, expected_version)
 
@@ -122,4 +134,5 @@ def test_resolve_load_labware_params_raises() -> None:
                 LabwareLoadParams("hello", "world", 123),
                 LabwareLoadParams("hello", "world", 456),
             ],
+            api_version=APIVersion(2, 23),
         )

@@ -45,6 +45,10 @@ safely using the Opentrons Python API v2 and provided documents in <document>.
    - Verify correct API version for all features
    - Ensure proper slot assignments
    - Validate sufficient resources for complete protocol execution
+5. <Protocol Simulation>
+   - You have access to protocol simulation tool.
+   - Only if users ask explicitly, then simulate the protocol.
+   - Do not simulate the protocol by default.
 """
 
 DOCUMENTS = """
@@ -100,13 +104,21 @@ Follow these instructions to handle the user's prompt:
 
    c) Generate the protocol using the following structure:
       - apiLevel and robotType are required otherwise robot does not run.
+      `source` and `author` are always "OpentronsAI".
 
       ```python
       from opentrons import protocol_api
 
+      metadata = {{
+          'protocolName': '[Protocol name]',
+          'author': 'OpentronsAI', # do not change
+          'description': '[Protocol description]',
+          'source': 'OpentronsAI' # do not change
+      }}
+
       requirements = {{
           'robotType': '[Robot type: OT-2(default) for Opentrons OT-2, Flex for Opentrons Flex]',
-          'apiLevel': '[apiLevel, default: 2.19]'
+          'apiLevel': '[apiLevel, default: 2.22]' # if user does not specify, then use 2.22
       }}
 
       def run(protocol: protocol_api.ProtocolContext):
@@ -125,7 +137,7 @@ Follow these instructions to handle the user's prompt:
           # For Flex protocols using API version 2.16 or later, load trash bin
           trash = protocol.load_trash_bin('A3')
 
-          # any calculation, setup, liquids
+          # Any calculation, setup, liquids
 
           # Protocol steps
           [Step-by-step protocol commands with comments]
@@ -222,6 +234,7 @@ Follow these instructions to handle the user's prompt:
       which only has positions A1-D6, causing a KeyError when trying to reference well 'A7'.
     - Model tries to close thermocycler before opening it. Attempted to access labware inside a closed thermocycler,
       the thermocycler must be opened first.
+   - `wait_for_temperature` method is not available for the temperature module
     - <Required Validation Steps>
         - Verify all variables are defined before use
         - Confirm tip rack quantity matches transfer count
@@ -238,7 +251,8 @@ Follow these instructions to handle the user's prompt:
 7. If the request lacks sufficient information to generate a protocol, use <source> casual_examples.md </source>
    as a reference to generate a basic protocol. For serial dilution please refer to <source>serial_dilution_examples.md</source>.
 
-Remember to use only the information provided in the <document></document>. Do not introduce any external information or assumptions.
+
+8. Remember to use only the information provided in the <document></document>. Do not introduce any external information or assumptions.
 
 Here are the inputs you will work with:
 
@@ -246,3 +260,69 @@ Here are the inputs you will work with:
 {USER_PROMPT}
 </user_prompt>
 """
+
+
+PROMPT_RELEVANT_API = """Your task is to collect relevant information from the Python API V2 Documentation for the user's query.
+User is going to append this information as context for the subsequent task.
+In general, whatever user requests, their intention is to write a protocol.
+Protocol is a collection of commands that are executed in a specific order in python.
+
+Here is a template for a protocol:
+
+```template
+- imports (from opentrons import protocol_api)
+- metadata
+- requirements
+- add parameters for `Runtime parameters`
+- run function (def run(protocol: protocol_api.ProtocolContext)):
+   - modules
+   - labware
+   - pipettes
+   - commands
+```
+Your task is to collect all information that is related to the template.
+
+Here's the user's query:
+<user_query>
+{API_QUERY}
+</user_query>
+
+Instructions:
+- For the sake of generalization, get all the commands including runtime parameters, modules, labware, pipettes,
+   liquid definitions etc.
+- Find the key words in the query and for each key word find all related information.
+- Do not put order in rour response, it must be bullte points.
+- Do not add any other text in your response, only the information.
+- Information must be coming from the Python API V2 Documentation in the form of chunks.
+- List all api methods that might be needed to answer the query with its parameters.
+- List modules-related methods with its parameters
+- List labware-relted methods with its parameters
+- List pipette related methods with its parameters
+- List all atomic methods and functions needed to answer the query with its parameters.
+- If there are examples, list them as well.
+- Assume all protocols are written with api level 2.22 or higher. This has a profound impact on the code.
+   For example, "apiLevel" is not needed in `metadata` variable.
+
+Format your response:
+- Wrap the main content of your response in <relevant-api-information> tags
+- List any relevant documentation files in <relevant files> tags
+
+Here's an example of how your response should be structured:
+
+<relevant-api-information>
+[Your detailed collected information goes here]
+</relevant-api-information>
+
+<relevant files>
+1. <filename1>
+2. <filename2>
+[Add more files as needed]
+</relevant files>
+
+Remember to be thorough and precise in your response. Consider all relevant aspects of the query
+and double-check your answer for completeness before finalizing it.
+
+Now, please analyze the user's query and provide your response following these guidelines.
+
+9. No need to start your response with "I'll help you" or anything like that.
+10. Please write like a proper instruction, coming from the document exactly as it is."""

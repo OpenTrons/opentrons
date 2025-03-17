@@ -8,7 +8,7 @@ import {
   CheckboxExpandStepFormField,
   DropdownStepFormField,
   InputStepFormField,
-} from '../../../../../molecules'
+} from '../../../../../components/molecules'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { FlowRateField } from './FlowRateField'
 import { BlowoutOffsetField } from './BlowoutOffsetField'
@@ -93,7 +93,7 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
             options={disposalDestinationOptions}
             title={t('protocol_steps:blowout_location')}
             padding="0"
-            width="16.5rem"
+            width="100%"
           />
           <FlowRateField
             {...propsForFields.blowout_flowRate}

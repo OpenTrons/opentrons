@@ -59,6 +59,7 @@ describe('form casting', () => {
       dropTip_location: 'some location',
       nozzles: null,
       tipRack: 'some tiprack',
+      liquidClassesSupported: true,
     }
     expect(_castForm(input)).toEqual({
       ...input,
@@ -94,6 +95,7 @@ describe('form casting', () => {
       mix_touchTip_checkbox: false,
       nozzles: null,
       tipRack: 'some tiprack',
+      liquidClassesSupported: true,
     }
 
     expect(_castForm(input)).toEqual({

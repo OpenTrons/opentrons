@@ -38,7 +38,7 @@ const getModulePosition = (
   )
   if (modSlot == null) return null
 
-  const modPosition = getPositionFromSlotId(loadedModule.id, deckDef)
+  const modPosition = getPositionFromSlotId(modSlot.id, deckDef)
   if (modPosition == null) return null
   const [modX, modY] = modPosition
 

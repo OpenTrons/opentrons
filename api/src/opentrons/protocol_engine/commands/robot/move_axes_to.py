@@ -86,7 +86,7 @@ class MoveAxesTo(BaseCommand[MoveAxesToParams, MoveAxesToResult, ErrorOccurrence
 
     commandType: MoveAxesToCommandType = "robot/moveAxesTo"
     params: MoveAxesToParams
-    result: Optional[MoveAxesToResult]
+    result: Optional[MoveAxesToResult] = None
 
     _ImplementationCls: Type[MoveAxesToImplementation] = MoveAxesToImplementation
 

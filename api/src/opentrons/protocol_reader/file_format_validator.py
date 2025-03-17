@@ -6,7 +6,9 @@ from typing import Iterable
 import anyio
 from pydantic import ValidationError as PydanticValidationError
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    labware_definition_type_adapter,
+)
 from opentrons_shared_data.protocol.models import (
     ProtocolSchemaV6 as JsonProtocolV6,
     ProtocolSchemaV7 as JsonProtocolV7,
@@ -60,7 +62,7 @@ class FileFormatValidator:
 async def _validate_labware_definition(info: IdentifiedLabwareDefinition) -> None:
     def validate_sync() -> None:
         try:
-            LabwareDefinition.model_validate(info.unvalidated_json)
+            labware_definition_type_adapter.validate_python(info.unvalidated_json)
         except PydanticValidationError as e:
             raise FileFormatValidationError(
                 message=f"{info.original_file.name} could not be read as a labware definition.",

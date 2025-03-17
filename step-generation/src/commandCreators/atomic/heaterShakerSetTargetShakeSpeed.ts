@@ -7,6 +7,7 @@ import type { CommandCreator } from '../../types'
 export const heaterShakerSetTargetShakeSpeed: CommandCreator<
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand['params']
 > = (args, invariantContext, prevRobotState) => {
+  const { moduleEntities } = invariantContext
   const { moduleId, rpm } = args
 
   if (moduleId === null) {
@@ -16,10 +17,10 @@ export const heaterShakerSetTargetShakeSpeed: CommandCreator<
   }
 
   assert(
-    invariantContext.moduleEntities[moduleId]?.type ===
-      HEATERSHAKER_MODULE_TYPE,
-    `expected module ${moduleId} to be heaterShaker, got ${invariantContext.moduleEntities[moduleId]?.type}`
+    moduleEntities[moduleId]?.type === HEATERSHAKER_MODULE_TYPE,
+    `expected module ${moduleId} to be heaterShaker, got ${moduleEntities[moduleId]?.type}`
   )
+  const pythonName = moduleEntities[moduleId].pythonName
 
   return {
     commands: [
@@ -32,5 +33,6 @@ export const heaterShakerSetTargetShakeSpeed: CommandCreator<
         },
       },
     ],
+    python: `${pythonName}.set_and_wait_for_shake_speed(${rpm})`,
   }
 }

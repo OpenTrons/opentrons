@@ -132,7 +132,7 @@ class CloseLid(BaseCommand[CloseLidParams, CloseLidResult, ErrorOccurrence]):
 
     commandType: CloseLidCommandType = "absorbanceReader/closeLid"
     params: CloseLidParams
-    result: Optional[CloseLidResult]
+    result: Optional[CloseLidResult] = None
 
     _ImplementationCls: Type[CloseLidImpl] = CloseLidImpl
 

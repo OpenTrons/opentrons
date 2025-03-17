@@ -38,6 +38,9 @@ export type FlagTypes =
   | 'OT_PD_ENABLE_REACT_SCAN'
   | 'OT_PD_ENABLE_LIQUID_CLASSES'
   | 'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2'
+  | 'OT_PD_ENABLE_TIMELINE_SCRUBBER'
+  | 'OT_PD_ENABLE_PYTHON_EXPORT'
+  | 'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
@@ -52,5 +55,8 @@ export const allFlags: FlagTypes[] = [
   'OT_PD_ENABLE_RETURN_TIP',
   'OT_PD_ENABLE_REACT_SCAN',
   'OT_PD_ENABLE_LIQUID_CLASSES',
+  'OT_PD_ENABLE_TIMELINE_SCRUBBER',
+  'OT_PD_ENABLE_PYTHON_EXPORT',
+  'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
 ]
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

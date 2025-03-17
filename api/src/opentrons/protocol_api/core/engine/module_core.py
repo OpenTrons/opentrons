@@ -1,4 +1,5 @@
 """Protocol API module implementation logic."""
+
 from __future__ import annotations
 
 from typing import Optional, List, Dict, Union
@@ -17,7 +18,7 @@ from opentrons.drivers.types import (
 )
 
 from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import ABSMeasureMode
+from opentrons.protocol_engine.types import ABSMeasureMode, StackerFillEmptyStrategy
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors.exceptions import (
@@ -40,7 +41,7 @@ from ..module import (
     AbstractFlexStackerCore,
 )
 from .exceptions import InvalidMagnetEngageHeightError
-
+from . import load_labware_params
 
 # Valid wavelength range for absorbance reader
 ABS_WAVELENGTH_MIN = 350
@@ -700,20 +701,6 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.FlexStacker]
 
-    def set_static_mode(self, static: bool) -> None:
-        """Set the Flex Stacker's static mode.
-
-        The Flex Stacker cannot retrieve and or store when in static mode.
-        This allows the Flex Stacker carriage to be used as a staging slot,
-        and allowed the labware to be loaded onto it.
-        """
-        self._engine_client.execute_command(
-            cmd.flex_stacker.ConfigureParams(
-                moduleId=self.module_id,
-                static=static,
-            )
-        )
-
     def retrieve(self) -> None:
         """Retrieve a labware from the Flex Stacker's hopper."""
         self._engine_client.execute_command(
@@ -727,5 +714,97 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore):
         self._engine_client.execute_command(
             cmd.flex_stacker.StoreParams(
                 moduleId=self.module_id,
+            )
+        )
+
+    def fill(self, message: str, count: int | None) -> None:
+        """Pause the protocol to add more labware to the Flex Stacker's hopper."""
+        self._engine_client.execute_command(
+            cmd.flex_stacker.FillParams(
+                moduleId=self.module_id,
+                strategy=StackerFillEmptyStrategy.MANUAL_WITH_PAUSE,
+                message=message,
+                count=count,
+            )
+        )
+
+    def empty(self, message: str) -> None:
+        """Pause the protocol to remove labware from the Flex Stacker's hopper."""
+        self._engine_client.execute_command(
+            cmd.flex_stacker.EmptyParams(
+                moduleId=self.module_id,
+                strategy=StackerFillEmptyStrategy.MANUAL_WITH_PAUSE,
+                message=message,
+                count=0,
+            )
+        )
+
+    def set_stored_labware(
+        self,
+        main_load_name: str,
+        main_namespace: str | None,
+        main_version: int | None,
+        lid_load_name: str | None,
+        lid_namespace: str | None,
+        lid_version: int | None,
+        adapter_load_name: str | None,
+        adapter_namespace: str | None,
+        adapter_version: int | None,
+        count: int | None,
+    ) -> None:
+        """Configure the kind of labware that the stacker stores."""
+
+        custom_labware_params = (
+            self._engine_client.state.labware.find_custom_labware_load_params()
+        )
+
+        main_namespace, main_version = load_labware_params.resolve(
+            main_load_name,
+            main_namespace,
+            main_version,
+            custom_labware_params,
+            self._api_version,
+        )
+        main_labware = cmd.flex_stacker.StackerStoredLabwareDetails(
+            loadName=main_load_name, namespace=main_namespace, version=main_version
+        )
+
+        lid_labware: cmd.flex_stacker.StackerStoredLabwareDetails | None = None
+
+        if lid_load_name:
+            lid_namespace, lid_version = load_labware_params.resolve(
+                lid_load_name,
+                lid_namespace,
+                lid_version,
+                custom_labware_params,
+                self._api_version,
+            )
+            lid_labware = cmd.flex_stacker.StackerStoredLabwareDetails(
+                loadName=lid_load_name, namespace=lid_namespace, version=lid_version
+            )
+
+        adapter_labware: cmd.flex_stacker.StackerStoredLabwareDetails | None = None
+
+        if adapter_load_name:
+            adapter_namespace, adapter_version = load_labware_params.resolve(
+                adapter_load_name,
+                adapter_namespace,
+                adapter_version,
+                custom_labware_params,
+                self._api_version,
+            )
+            adapter_labware = cmd.flex_stacker.StackerStoredLabwareDetails(
+                loadName=adapter_load_name,
+                namespace=adapter_namespace,
+                version=adapter_version,
+            )
+
+        self._engine_client.execute_command(
+            cmd.flex_stacker.SetStoredLabwareParams(
+                moduleId=self.module_id,
+                initialCount=count,
+                primaryLabware=main_labware,
+                lidLabware=lid_labware,
+                adapterLabware=adapter_labware,
             )
         )

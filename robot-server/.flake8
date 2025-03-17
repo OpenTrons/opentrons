@@ -28,7 +28,7 @@ per-file-ignores =
     robot_server/dependencies.py:ANN,D
     robot_server/util.py:ANN,D
     robot_server/settings.py:ANN,D
-    robot_server/robot/*:ANN,D
+    robot_server/robot/*:D
     robot_server/service/*:ANN,D
     tests/integration/*:ANN,D
     tests/robot/*:ANN,D

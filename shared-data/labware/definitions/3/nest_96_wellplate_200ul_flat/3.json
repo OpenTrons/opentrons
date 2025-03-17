@@ -19,9 +19,9 @@
     "links": ["https://www.nest-biotech.com/cell-culture-plates/59415537.html"]
   },
   "metadata": {
-    "displayName": "NEST 96 Well Plate 200 \u00b5L Flat",
+    "displayName": "NEST 96 Well Plate 200 µL Flat",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
@@ -1136,5 +1136,6 @@
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

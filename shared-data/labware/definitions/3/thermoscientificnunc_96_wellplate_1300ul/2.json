@@ -19,9 +19,9 @@
     "links": ["https://www.thermofisher.com/order/catalog/product/260251"]
   },
   "metadata": {
-    "displayName": "Thermo Scientific Nunc 96 Well Plate 1300 \u00b5L",
+    "displayName": "Thermo Scientific Nunc 96 Well Plate 1300 µL",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
@@ -1116,19 +1116,20 @@
     "conicalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 3.6,
-          "topHeight": 3.6,
-          "bottomHeight": 0.0
-        },
-        {
           "shape": "conical",
           "bottomDiameter": 7.2,
           "topDiameter": 8.4,
           "topHeight": 29.1,
           "bottomHeight": 3.6
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 3.6,
+          "topHeight": 3.6,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

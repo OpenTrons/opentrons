@@ -157,7 +157,7 @@ class RunExtendedProfile(
 
     commandType: RunExtendedProfileCommandType = "thermocycler/runExtendedProfile"
     params: RunExtendedProfileParams
-    result: Optional[RunExtendedProfileResult]
+    result: Optional[RunExtendedProfileResult] = None
 
     _ImplementationCls: Type[RunExtendedProfileImpl] = RunExtendedProfileImpl
 

@@ -72,10 +72,10 @@ export enum SetupLocators {
   MagblockImage = 'img[alt="magneticBlockType"]',
   HeaterShakerImage = 'img[alt="heaterShakerModuleType"]',
   TemperatureModuleImage = 'img[alt="temperatureModuleType"]',
-  LiquidNameInput = 'input[name="name"]',
+  LiquidNameInput = 'input[name="displayName"]',
   ModalShellArea = 'div[aria-label="ModalShell_ModalArea"]',
   SaveButton = 'button[type="submit"]',
-  LiquidsDropdown = 'div[tabindex="0"].sc-bqWxrE',
+  LiquidsDropdown = 'div[tabindex="0"].sc-ksBlkl',
   Div = 'div',
   Button = 'button',
   TempdeckTempInput = 'input[name="targetTemperature"]',
@@ -317,9 +317,48 @@ export const SetupSteps = {
     },
   }),
 
+  /**
+   * Choose deck slot A1.
+   */
+  ChoseDeckSlotA1: (): StepThunk => ({
+    call: () => {
+      chooseDeckSlot('A1').click()
+    },
+  }),
+
+  /**
+   * Choose deck slot A2.
+   */
+  ChoseDeckSlotA2: (): StepThunk => ({
+    call: () => {
+      chooseDeckSlot('A2').click()
+    },
+  }),
+
+  /**
+   * Choose deck slot A3.
+   */
+  ChoseDeckSlotA3: (): StepThunk => ({
+    call: () => {
+      chooseDeckSlot('A3').click()
+    },
+  }),
+
+  ChoseDeckSlotC2Labware: (): StepThunk => ({
+    call: () => {
+      chooseDeckSlot('C2')
+        .find('.Box-sc-8ozbhb-0.kIDovv')
+        .find('a[role="button"]')
+        .contains(RegexSetupContent.slotText)
+        .click({ force: true })
+    },
+  }),
+  /**
+   * Choose deck slot.
+   */
   ChoseDeckSlot: (deckSlot: string): StepThunk => ({
     call: () => {
-      chooseDeckSlot(deckSlot).click({ force: true })
+      chooseDeckSlot(deckSlot).click()
     },
   }),
 
@@ -342,22 +381,8 @@ export const SetupSteps = {
   }),
 
   /**
-   * Choose deck slot A2.
+   * Clicks the "Labware" header.
    */
-  ChoseDeckSlotA2: (): StepThunk => ({
-    call: () => {
-      chooseDeckSlot('A2').click()
-    },
-  }),
-
-  /**
-   * Choose deck slot A3.
-   */
-  ChoseDeckSlotA3: (): StepThunk => ({
-    call: () => {
-      chooseDeckSlot('A3').click()
-    },
-  }),
   ClickLabwareHeader: (): StepThunk => ({
     call: () => {
       cy.contains(SetupContent.LabwareH).click()
@@ -948,7 +973,7 @@ export const SetupVerifications = {
     // Verifies that the "Delay" button has an associated SVG icon with proper attributes
     call: () => {
       cy.contains('Delay')
-        .closest('div[data-testid="ListItem_noActive"]')
+        .closest('div[data-testid="ListItem_default"]')
         .find('path[aria-roledescription="ot-checkbox"]')
     },
   }),
@@ -957,7 +982,7 @@ export const SetupVerifications = {
     // Verifies that the "Pre-wet tip" button has an associated SVG icon with proper attributes
     call: () => {
       cy.contains('PreWet')
-        .closest('div[data-testid="ListButton_noActive"]')
+        .closest('div[data-testid="ListButton_default"]')
         .find('path[aria-roledescription="ot-checkbox"]')
     },
   }),
@@ -966,7 +991,7 @@ export const SetupVerifications = {
     // Verifies that the "Touch tip" button has an associated SVG icon with proper attributes
     call: () => {
       cy.contains('Touch tip')
-        .closest('div[data-testid="ListItem_noActive"]')
+        .closest('div[data-testid="ListItem_default"]')
         .find('path[aria-roledescription="ot-checkbox"]')
     },
   }),
@@ -975,7 +1000,7 @@ export const SetupVerifications = {
     // Verifies that the "Mix" button has an associated SVG icon with proper attributes
     call: () => {
       cy.contains('Mix')
-        .closest('div[data-testid="ListItem_noActive"]')
+        .closest('div[data-testid="ListItem_default"]')
         .find('path[aria-roledescription="ot-checkbox"]')
     },
   }),
@@ -984,7 +1009,7 @@ export const SetupVerifications = {
     // Verifies that the "Air gap" button has an associated SVG icon with proper attributes
     call: () => {
       cy.contains('Air gap')
-        .closest('div[data-testid="ListItem_noActive"]')
+        .closest('div[data-testid="ListItem_default"]')
         .find('path[aria-roledescription="ot-checkbox"]')
     },
   }),

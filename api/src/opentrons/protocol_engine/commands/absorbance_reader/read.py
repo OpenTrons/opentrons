@@ -182,6 +182,9 @@ class ReadAbsorbanceImpl(
                     )
                     file_ids.append(file_id)
 
+                state_update.files_added = update_types.FilesAddedUpdate(
+                    file_ids=file_ids
+                )
                 # Return success data to api
                 return SuccessData(
                     public=ReadAbsorbanceResult(
@@ -209,7 +212,7 @@ class ReadAbsorbance(
 
     commandType: ReadAbsorbanceCommandType = "absorbanceReader/read"
     params: ReadAbsorbanceParams
-    result: Optional[ReadAbsorbanceResult]
+    result: Optional[ReadAbsorbanceResult] = None
 
     _ImplementationCls: Type[ReadAbsorbanceImpl] = ReadAbsorbanceImpl
 

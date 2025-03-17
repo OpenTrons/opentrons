@@ -372,6 +372,7 @@ describe('...8-channel pipette', () => {
           id: SOURCE_LABWARE,
           labwareDefURI: labwareType,
           def,
+          pythonName: 'mockPythonName',
         }
         const blankLiquidState = createEmptyLiquidState(customInvariantContext)
         const initialLiquidState = merge({}, blankLiquidState, {

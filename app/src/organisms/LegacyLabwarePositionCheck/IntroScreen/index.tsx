@@ -108,7 +108,7 @@ export const IntroScreen = (props: {
       body={
         <Trans
           t={t}
-          i18nKey="labware_position_check_description"
+          i18nKey="legacy_labware_position_check_description"
           components={{ block: <LegacyStyledText as="p" /> }}
         />
       }

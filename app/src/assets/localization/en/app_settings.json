@@ -117,7 +117,7 @@
   "usb_to_ethernet_unknown_manufacturer": "Unknown Manufacturer",
   "usb_to_ethernet_unknown_product": "Unknown Adapter",
   "use_system_language": "Use system language",
-  "view_software_update": "View software update",
   "view_adapter_info": "view adapter info",
+  "view_software_update": "View software update",
   "view_update": "View Update"
 }

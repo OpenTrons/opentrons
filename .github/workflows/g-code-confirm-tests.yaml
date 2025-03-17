@@ -33,7 +33,7 @@ jobs:
       matrix:
         command: ['2-modules', 'swift-smoke', 'swift-turbo', 'omega', 'fast']
     name: 'Confirm G-Code (${{ matrix.command }})'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
         with:

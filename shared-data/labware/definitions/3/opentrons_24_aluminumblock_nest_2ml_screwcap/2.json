@@ -325,10 +325,10 @@
       "sections": [
         {
           "shape": "conical",
-          "bottomDiameter": 1.21,
-          "topDiameter": 6.5,
-          "topHeight": 2.08,
-          "bottomHeight": 0.0
+          "bottomDiameter": 8.14,
+          "topDiameter": 8.55,
+          "topHeight": 43.4,
+          "bottomHeight": 3.04
         },
         {
           "shape": "conical",
@@ -339,12 +339,13 @@
         },
         {
           "shape": "conical",
-          "bottomDiameter": 8.14,
-          "topDiameter": 8.55,
-          "topHeight": 43.4,
-          "bottomHeight": 3.04
+          "bottomDiameter": 1.21,
+          "topDiameter": 6.5,
+          "topHeight": 2.08,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

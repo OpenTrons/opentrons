@@ -1,0 +1,405 @@
+{
+  "aspirate_airGap_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_airGap_checkbox",
+    "value": false,
+    "tooltipContent": "Draw air into the tip after aspirating"
+  },
+  "aspirate_airGap_volume": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_airGap_volume",
+    "value": "1",
+    "tooltipContent": "step_fields.defaults.aspirate_airGap_volume"
+  },
+  "aspirate_delay_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_delay_checkbox",
+    "value": false,
+    "tooltipContent": "Delay after each aspiration"
+  },
+  "aspirate_delay_mmFromBottom": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_delay_mmFromBottom",
+    "value": null,
+    "tooltipContent": "Distance from the bottom of the well"
+  },
+  "aspirate_delay_seconds": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_delay_seconds",
+    "value": "1",
+    "tooltipContent": "step_fields.defaults.aspirate_delay_seconds"
+  },
+  "aspirate_flowRate": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_flowRate",
+    "value": null,
+    "tooltipContent": "The speed at which the pipette aspirates"
+  },
+  "aspirate_labware": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_labware",
+    "value": "4d7e45e2-b962-45ca-8ace-8a5a683591d5:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/2",
+    "tooltipContent": "Pipette unable to access labware in staging area"
+  },
+  "aspirate_mix_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_mix_checkbox",
+    "value": false,
+    "tooltipContent": "Aspirate and dispense repeatedly before main aspiration"
+  },
+  "aspirate_mix_times": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_mix_times",
+    "value": null,
+    "tooltipContent": "step_fields.defaults.aspirate_mix_times"
+  },
+  "aspirate_mix_volume": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_mix_volume",
+    "value": null,
+    "tooltipContent": "step_fields.defaults.aspirate_mix_volume"
+  },
+  "aspirate_mmFromBottom": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_mmFromBottom",
+    "value": null,
+    "tooltipContent": "Adjust tip position for aspirate"
+  },
+  "aspirate_submerge_delay_seconds": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_submerge_delay_seconds",
+    "value": null,
+    "tooltipContent": "step_fields.defaults.aspirate_submerge_delay_seconds"
+  },
+  "aspirate_submerge_speed": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_submerge_speed",
+    "value": null,
+    "tooltipContent": "step_fields.defaults.aspirate_submerge_speed"
+  },
+  "aspirate_touchTip_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_touchTip_checkbox",
+    "value": false,
+    "tooltipContent": "Touch tip to each side of the well after aspirating"
+  },
+  "aspirate_touchTip_mmFromTop": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_touchTip_mmFromTop",
+    "value": null,
+    "tooltipContent": "Distance from the top of the well"
+  },
+  "aspirate_wellOrder_first": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_wellOrder_first",
+    "value": "t2b",
+    "tooltipContent": "step_fields.defaults.aspirate_wellOrder_first"
+  },
+  "aspirate_wellOrder_second": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_wellOrder_second",
+    "value": "l2r",
+    "tooltipContent": "step_fields.defaults.aspirate_wellOrder_second"
+  },
+  "aspirate_wells_grouped": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_wells_grouped",
+    "value": false,
+    "tooltipContent": "step_fields.defaults.aspirate_wells_grouped"
+  },
+  "aspirate_wells": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_wells",
+    "value": ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+    "tooltipContent": "First select a source labware"
+  },
+  "aspirate_x_position": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_x_position",
+    "value": 0,
+    "tooltipContent": "step_fields.defaults.aspirate_x_position"
+  },
+  "aspirate_y_position": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "aspirate_y_position",
+    "value": 0,
+    "tooltipContent": "step_fields.defaults.aspirate_y_position"
+  },
+  "blowout_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "blowout_checkbox",
+    "value": false,
+    "tooltipContent": "Blow extra air through the tip"
+  },
+  "blowout_flowRate": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "blowout_flowRate",
+    "value": null,
+    "tooltipContent": "Blowout speed"
+  },
+  "blowout_location": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "blowout_location",
+    "value": null,
+    "tooltipContent": "Where to dispose of remaining volume in tip"
+  },
+  "blowout_z_offset": {
+    "disabled": true,
+    "errorToShow": null,
+    "name": "blowout_z_offset",
+    "value": 0,
+    "tooltipContent": "Blowout location, source, and destination labware must first be selected"
+  },
+  "changeTip": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "changeTip",
+    "value": "always",
+    "tooltipContent": "Choose when the robot picks up fresh tips"
+  },
+  "dispense_airGap_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_airGap_checkbox",
+    "value": false,
+    "tooltipContent": "Draw in air before moving to trash to dispose of tip."
+  },
+  "dispense_airGap_volume": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_airGap_volume",
+    "value": "1",
+    "tooltipContent": "step_fields.defaults.dispense_airGap_volume"
+  },
+  "dispense_delay_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_delay_checkbox",
+    "value": false,
+    "tooltipContent": "Delay after each dispense"
+  },
+  "dispense_delay_mmFromBottom": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_delay_mmFromBottom",
+    "value": null,
+    "tooltipContent": "Distance from the bottom of the well"
+  },
+  "dispense_delay_seconds": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_delay_seconds",
+    "value": "1",
+    "tooltipContent": "step_fields.defaults.dispense_delay_seconds"
+  },
+  "dispense_flowRate": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_flowRate",
+    "value": null,
+    "tooltipContent": "The speed at which the pipette dispenses"
+  },
+  "dispense_labware": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_labware",
+    "value": "83a383e5-6a5a-4dae-9da4-5c21bd3835dc:opentrons/nest_96_wellplate_2ml_deep/2",
+    "tooltipContent": "Pipette unable to access labware in staging area"
+  },
+  "dispense_mix_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_mix_checkbox",
+    "value": false,
+    "tooltipContent": "Aspirate and dispense repeatedly after main dispense"
+  },
+  "dispense_mix_times": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_mix_times",
+    "value": null,
+    "tooltipContent": "step_fields.defaults.dispense_mix_times"
+  },
+  "dispense_mix_volume": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_mix_volume",
+    "value": null,
+    "tooltipContent": "step_fields.defaults.dispense_mix_volume"
+  },
+  "dispense_mmFromBottom": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_mmFromBottom",
+    "value": null,
+    "tooltipContent": "Adjust tip position for dispense"
+  },
+  "dispense_submerge_delay_seconds": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_submerge_delay_seconds",
+    "value": null,
+    "tooltipContent": "step_fields.defaults.dispense_submerge_delay_seconds"
+  },
+  "dispense_submerge_speed": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_submerge_speed",
+    "value": null,
+    "tooltipContent": "step_fields.defaults.dispense_submerge_speed"
+  },
+  "dispense_touchTip_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_touchTip_checkbox",
+    "value": false,
+    "tooltipContent": "Touch tip to each side of the well after dispensing"
+  },
+  "dispense_touchTip_mmFromTop": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_touchTip_mmFromTop",
+    "value": null,
+    "tooltipContent": "Distance from the top of the well"
+  },
+  "dispense_wellOrder_first": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_wellOrder_first",
+    "value": "t2b",
+    "tooltipContent": "step_fields.defaults.dispense_wellOrder_first"
+  },
+  "dispense_wellOrder_second": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_wellOrder_second",
+    "value": "l2r",
+    "tooltipContent": "step_fields.defaults.dispense_wellOrder_second"
+  },
+  "dispense_wells": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_wells",
+    "value": ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+    "tooltipContent": "First select a destination labware"
+  },
+  "dispense_x_position": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_x_position",
+    "value": 0,
+    "tooltipContent": "step_fields.defaults.dispense_x_position"
+  },
+  "dispense_y_position": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dispense_y_position",
+    "value": 0,
+    "tooltipContent": "step_fields.defaults.dispense_y_position"
+  },
+  "disposalVolume_checkbox": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "disposalVolume_checkbox",
+    "value": true,
+    "tooltipContent": "Aspirate extra volume that is disposed of after a multi-dispense is complete. We recommend a disposal volume of at least the pipette's minimum."
+  },
+  "disposalVolume_volume": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "disposalVolume_volume",
+    "value": "1",
+    "tooltipContent": "step_fields.defaults.disposalVolume_volume"
+  },
+  "dropTip_location": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dropTip_location",
+    "value": "3a79c2ec-9df7-4dc3-be34-daf86cce3028:trashBin",
+    "tooltipContent": "Choose where you would like to drop tip"
+  },
+  "dropTip_wellNames": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "dropTip_wellNames",
+    "tooltipContent": "step_fields.defaults.dropTip_wellNames"
+  },
+  "nozzles": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "nozzles",
+    "value": null,
+    "tooltipContent": "Partial pickup requires a tip rack directly on the deck. Full rack pickup requires the Flex 96 Tip Rack Adapter."
+  },
+  "path": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "path",
+    "value": "single",
+    "tooltipContent": "step_fields.defaults.path"
+  },
+  "pickUpTip_location": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "pickUpTip_location",
+    "tooltipContent": "step_fields.defaults.pickUpTip_location"
+  },
+  "pickUpTip_wellNames": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "pickUpTip_wellNames",
+    "tooltipContent": "step_fields.defaults.pickUpTip_wellNames"
+  },
+  "pipette": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "pipette",
+    "value": "mockPipetteId",
+    "tooltipContent": "Select the pipette you want to use"
+  },
+  "preWetTip": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "preWetTip",
+    "value": false,
+    "tooltipContent": "Pre-wet by aspirating and dispensing the total aspiration volume"
+  },
+  "tipRack": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "tipRack",
+    "value": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+    "tooltipContent": "step_fields.defaults.tipRack"
+  },
+  "volume": {
+    "disabled": false,
+    "errorToShow": null,
+    "name": "volume",
+    "value": "10",
+    "tooltipContent": "Volume to dispense in each well"
+  }
+}

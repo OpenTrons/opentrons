@@ -9,12 +9,12 @@ from opentrons.calibration_storage import types, helpers
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import OT3Mount
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 if typing.TYPE_CHECKING:
     from opentrons_shared_data.pipette.types import LabwareUri
     from opentrons_shared_data.labware.types import (
-        LabwareDefinition as TypeDictLabwareDef,
+        LabwareDefinition2 as TypeDictLabwareDef2,
     )
 
 # These type aliases aid typechecking in tests that work the same on this and
@@ -119,12 +119,16 @@ def save_pipette_offset_calibration(
 # TODO (lc 09-26-2022) We should ensure that only LabwareDefinition models are passed
 # into this function instead of a mixture of TypeDicts and BaseModels
 def load_tip_length_for_pipette(
-    pipette_id: str, tiprack: typing.Union["TypeDictLabwareDef", LabwareDefinition]
+    pipette_id: str, tiprack: typing.Union["TypeDictLabwareDef2", LabwareDefinition2]
 ) -> TipLengthCalibration:
-    if isinstance(tiprack, LabwareDefinition):
+    if isinstance(tiprack, LabwareDefinition2):
         tiprack = typing.cast(
-            "TypeDictLabwareDef",
-            tiprack.model_dump(exclude_none=True, exclude_unset=True),
+            "TypeDictLabwareDef2",
+            tiprack.model_dump(
+                exclude_none=True,
+                exclude_unset=True
+                # todo(mm, 2025-02-13): Do we need by_alias=True here?
+            ),
         )
 
     tip_length_data = calibration_storage.load_tip_length_calibration(

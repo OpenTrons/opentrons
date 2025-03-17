@@ -67,7 +67,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
       marginTop="192px"
     >
       {displayItems.map(displayItem => (
-        <ListItem type="noActive" key={displayItem.option} onClick={onClick}>
+        <ListItem type="default" key={displayItem.option} onClick={onClick}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             <LegacyStyledText
               css={TYPOGRAPHY.level4HeaderSemiBold}

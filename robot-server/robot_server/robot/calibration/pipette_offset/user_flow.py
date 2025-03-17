@@ -5,6 +5,7 @@ from typing import (
     Callable,
     Dict,
     List,
+    NoReturn,
     Optional,
     Union,
     Tuple,
@@ -56,7 +57,7 @@ from .state_machine import (
     PipetteOffsetWithTipLengthStateMachine,
 )
 
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -84,9 +85,8 @@ class PipetteOffsetCalibrationUserFlow:
         mount: Mount = Mount.RIGHT,
         recalibrate_tip_length: bool = False,
         has_calibration_block: bool = False,
-        tip_rack_def: Optional[LabwareDefinition] = None,
-    ):
-
+        tip_rack_def: Optional[LabwareDefinition2] = None,
+    ) -> None:
         self._hardware = hardware
         self._mount = mount
 
@@ -189,7 +189,7 @@ class PipetteOffsetCalibrationUserFlow:
         return self._should_perform_tip_length
 
     @should_perform_tip_length.setter
-    def should_perform_tip_length(self, value: bool):
+    def should_perform_tip_length(self, value: bool) -> None:
         self._should_perform_tip_length = value
 
     def get_pipette(self) -> AttachedPipette:
@@ -200,7 +200,7 @@ class PipetteOffsetCalibrationUserFlow:
             tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,
-            defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
+            defaultTipracks=self._default_tipracks,
         )
 
     def get_required_labware(self) -> List[RequiredLabware]:
@@ -211,7 +211,7 @@ class PipetteOffsetCalibrationUserFlow:
             for s, lw in lw_by_slot.items()
         ]
 
-    async def set_has_calibration_block(self, hasBlock: bool):
+    async def set_has_calibration_block(self, hasBlock: bool) -> None:
         if self._has_calibration_block and not hasBlock:
             self._remove_calibration_block()
         elif hasBlock and not self._has_calibration_block:
@@ -223,7 +223,7 @@ class PipetteOffsetCalibrationUserFlow:
         lw_load_name = TIP_RACK_LOOKUP_BY_MAX_VOL[str(pip_vol)].load_name
         return labware.load(lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
-    async def handle_command(self, name: Any, data: Dict[Any, Any]):
+    async def handle_command(self, name: Any, data: Dict[Any, Any]) -> None:
         """
         Handle a client command
 
@@ -240,7 +240,11 @@ class PipetteOffsetCalibrationUserFlow:
         handler = self._command_map.get(name)
         if handler is not None:
             await handler(**data)
-        self._sm.set_state(next_state)
+        self._sm.set_state(
+            # This `type: ignore` is because self._sm can be one of two types.
+            # This should be safe in practice since we got next_state from self._sm.
+            next_state  # type: ignore[arg-type]
+        )
         MODULE_LOG.debug(
             f"PipetteOffsetCalUserFlow handled command {name}, transitioned"
             f"from {self._sm.current_state} to {next_state}"
@@ -259,15 +263,21 @@ class PipetteOffsetCalibrationUserFlow:
 
     async def load_labware(
         self,
-        tiprackDefinition: Optional[LabwareDefinition] = None,
-    ):
+        # tiprackDefinition comes from the HTTP client and is not validated by the time
+        # it reaches here, hence us calling labware.verify_definition() below.
+        tiprackDefinition: Optional[LabwareDefinition2] = None,
+    ) -> None:
         self._supported_commands.loadLabware = False
         if tiprackDefinition:
             verified_definition = labware.verify_definition(tiprackDefinition)
+            # todo(mm, 2025-02-13): Move schema validation to the FastAPI layer and turn
+            # this schemaVersion assertion into a proper HTTP API 422 error.
+            # https://opentrons.atlassian.net/browse/EXEC-1230
+            assert verified_definition["schemaVersion"] == 2
             existing_offset_calibration = self._get_stored_pipette_offset_cal()
             self._load_tip_rack(verified_definition, existing_offset_calibration)
 
-    async def jog(self, vector):
+    async def jog(self, vector: tuple[float, float, float]) -> None:
         await self._hardware.move_rel(mount=self._mount, delta=Point(*vector))
 
     @property
@@ -280,17 +290,17 @@ class PipetteOffsetCalibrationUserFlow:
             )
 
     @tip_origin.setter
-    def tip_origin(self, new_val: Point):
+    def tip_origin(self, new_val: Point) -> None:
         self._tip_origin_pt = new_val
 
-    def reset_tip_origin(self):
+    def reset_tip_origin(self) -> None:
         self._tip_origin_pt = None
 
     @property
     def supported_commands(self) -> List[str]:
         return self._supported_commands.supported()
 
-    async def move_to_tip_rack(self):
+    async def move_to_tip_rack(self) -> None:
         if (
             self._sm.current_state == self._sm.state.labwareLoaded
             and not self.has_calibrated_tip_length
@@ -311,9 +321,12 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _get_stored_tip_length_cal(self) -> Optional[float]:
         try:
+            definition = self._tip_rack._core.get_definition()
+            # Assert for type checking. This should always pass because
+            # self._get_tr_lw() limits itself to schema 2.
+            assert definition["schemaVersion"] == 2
             return load_tip_length_calibration(
-                self._hw_pipette.pipette_id or "",
-                self._tip_rack._core.get_definition(),
+                self._hw_pipette.pipette_id or "", definition
             ).tipLength
         except TipLengthCalNotFound:
             return None
@@ -334,19 +347,19 @@ class PipetteOffsetCalibrationUserFlow:
         else:
             return stored_tip_length_cal
 
-    def _load_calibration_block(self):
+    def _load_calibration_block(self) -> None:
         cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
         self._deck[cb_setup.slot] = labware.load(
             cb_setup.load_name, self._deck.position_for(cb_setup.slot)
         )
 
-    def _remove_calibration_block(self):
+    def _remove_calibration_block(self) -> None:
         cb_setup = CAL_BLOCK_SETUP_BY_MOUNT[self._mount]
         del self._deck[cb_setup.slot]
 
     @staticmethod
     def _get_tr_lw(
-        tip_rack_def: Optional[LabwareDefinition],
+        tip_rack_def: Optional[LabwareDefinition2],
         existing_calibration: Optional[models.v1.InstrumentOffsetModel],
         volume: float,
         position: Location,
@@ -375,9 +388,9 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _load_tip_rack(
         self,
-        tip_rack_def: Optional[LabwareDefinition],
+        tip_rack_def: Optional[LabwareDefinition2],
         existing_calibration: Optional[models.v1.InstrumentOffsetModel],
-    ):
+    ) -> None:
         """
         load onto the deck the default opentrons tip rack labware for this
         pipette and return the tip rack labware. If tip_rack_def is supplied,
@@ -393,7 +406,9 @@ class PipetteOffsetCalibrationUserFlow:
             del self._deck[TIP_RACK_SLOT]
         self._deck[TIP_RACK_SLOT] = self._tip_rack
 
-    def _flag_unmet_transition_req(self, command_handler: str, unmet_condition: str):
+    def _flag_unmet_transition_req(
+        self, command_handler: str, unmet_condition: str
+    ) -> NoReturn:
         raise RobotServerError(
             definition=CalibrationError.UNMET_STATE_TRANSITION_REQ,
             handler=command_handler,
@@ -401,7 +416,7 @@ class PipetteOffsetCalibrationUserFlow:
             condition=unmet_condition,
         )
 
-    async def move_to_deck(self):
+    async def move_to_deck(self) -> None:
         current_state = self._sm.current_state
         if (
             not self.has_calibrated_tip_length
@@ -430,7 +445,7 @@ class PipetteOffsetCalibrationUserFlow:
         await self._move(to_loc)
         self._should_perform_tip_length = False
 
-    async def move_to_point_one(self):
+    async def move_to_point_one(self) -> None:
         assert (
             self._z_height_reference is not None
         ), "saveOffset has not been called yet"
@@ -438,7 +453,7 @@ class PipetteOffsetCalibrationUserFlow:
         target = target_loc.move(point=Point(0, 0, self._z_height_reference))
         await self._move(target)
 
-    async def save_offset(self):
+    async def save_offset(self) -> None:
         cur_pt = await self.get_current_point(critical_point=None)
         current_state = self._sm.current_state
         if current_state == self._sm.state.joggingToDeck:
@@ -487,7 +502,7 @@ class PipetteOffsetCalibrationUserFlow:
             )
             await self.hardware.retract(self._mount, 20)
 
-    async def move_to_reference_point(self):
+    async def move_to_reference_point(self) -> None:
         if not self.should_perform_tip_length and self._sm.current_state in (
             self._sm.state.labwareLoaded,
             self._sm.state.inspectingTip,
@@ -508,7 +523,7 @@ class PipetteOffsetCalibrationUserFlow:
         )
         await self._move(ref_loc)
 
-    async def invalidate_last_action(self):
+    async def invalidate_last_action(self) -> None:
         if self._sm.current_state == POWTState.measuringNozzleOffset:
             await self._hardware.home()
             await self._hardware.gantry_position(self.mount, refresh=True)
@@ -527,19 +542,19 @@ class PipetteOffsetCalibrationUserFlow:
             await self.hardware.drop_tip(self.mount)
             await self.move_to_tip_rack()
 
-    async def pick_up_tip(self):
+    async def pick_up_tip(self) -> None:
         await util.pick_up_tip(self, tip_length=self._get_tip_length())
 
-    async def invalidate_tip(self):
+    async def invalidate_tip(self) -> None:
         await util.invalidate_tip(self)
 
-    async def return_tip(self):
+    async def return_tip(self) -> None:
         await util.return_tip(self, tip_length=self._get_tip_length())
 
-    async def _move(self, to_loc: Location):
+    async def _move(self, to_loc: Location) -> None:
         await util.move(self, to_loc)
 
-    async def exit_session(self):
+    async def exit_session(self) -> None:
         if self.hw_pipette.has_tip:
             await self.move_to_tip_rack()
             await self.return_tip()

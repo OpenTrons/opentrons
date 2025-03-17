@@ -51,7 +51,7 @@ jobs:
   lint-test:
     name: 'robot server package linting and tests'
     timeout-minutes: 40
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     strategy:
       matrix:
         with-ot-hardware: ['true', 'false']

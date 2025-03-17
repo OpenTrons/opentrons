@@ -7,7 +7,7 @@ It's only for internal Opentrons use.
 
 from dataclasses import dataclass
 from typing import Optional, Union
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules.types import ModuleModel
@@ -18,13 +18,11 @@ from opentrons.types import Mount, DeckSlotName
 class LabwareLoadInfo:
     """Information about a successful labware load.
 
-    :meta private:
-
     This is a separate class from the main user-facing `Labware` class
     because this is easier to construct in unit tests.
     """
 
-    labware_definition: LabwareDefinition
+    labware_definition: LabwareDefinition2
 
     # todo(mm, 2021-10-11): Namespace, load name, and version can be derived from the
     # definition. Should they be removed from here?
@@ -47,10 +45,7 @@ class LabwareLoadInfo:
 
 @dataclass(frozen=True)
 class InstrumentLoadInfo:
-    """Like `LabwareLoadInfo`, but for instruments (pipettes).
-
-    :meta private:
-    """
+    """Like `LabwareLoadInfo`, but for instruments (pipettes)."""
 
     instrument_load_name: str
     mount: Mount
@@ -59,10 +54,7 @@ class InstrumentLoadInfo:
 
 @dataclass(frozen=True)
 class ModuleLoadInfo:
-    """Like `LabwareLoadInfo`, but for hardware modules.
-
-    :meta private:
-    """
+    """Like `LabwareLoadInfo`, but for hardware modules."""
 
     requested_model: ModuleModel
     loaded_model: ModuleModel

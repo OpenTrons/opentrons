@@ -73,6 +73,7 @@ describe('_getNextTip', () => {
       id: tiprackId,
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
+      pythonName: 'mockPythonName',
     }
     const robotState = makeState({
       invariantContext: _invariantContext,

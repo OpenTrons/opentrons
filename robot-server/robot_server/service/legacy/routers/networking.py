@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import subprocess
 from typing import Annotated, Optional
 
@@ -96,6 +97,13 @@ async def get_wifi_networks(
     return WifiNetworks(list=[WifiNetworkFull(**n) for n in networks])
 
 
+def _massage_nmcli_error(error_string: str) -> str:
+    """Raises a better-formatted error message from an nmcli error string."""
+    if re.search("password.*802-11-wireless-security\\.psk.*not given", error_string):
+        return "Could not connect to network. Please double-check network credentials."
+    return error_string
+
+
 @router.post(
     path="/wifi/configure",
     summary="Configure the robot's Wi-Fi",
@@ -129,7 +137,8 @@ async def post_wifi_configure(
 
     if not ok:
         raise LegacyErrorResponse(
-            message=message, errorCode=ErrorCodes.GENERAL_ERROR.value.code
+            message=_massage_nmcli_error(message),
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ).as_error(status.HTTP_401_UNAUTHORIZED)
 
     return WifiConfigurationResponse(message=message, ssid=configuration.ssid)

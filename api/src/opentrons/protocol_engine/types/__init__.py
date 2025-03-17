@@ -65,6 +65,7 @@ from .module import (
     ABSMeasureMode,
     ModuleOffsetVector,
     ModuleOffsetData,
+    StackerFillEmptyStrategy,
 )
 from .location import (
     DeckSlotLocation,
@@ -78,15 +79,34 @@ from .location import (
     OnDeckLabwareLocation,
     NonStackedLocation,
     DeckPoint,
+    InStackerHopperLocation,
+    OnLabwareLocationSequenceComponent,
+    OnModuleLocationSequenceComponent,
+    OnAddressableAreaLocationSequenceComponent,
+    NotOnDeckLocationSequenceComponent,
+    OnCutoutFixtureLocationSequenceComponent,
+    LabwareLocationSequence,
+    LoadableLabwareLocation,
+    labware_location_is_system,
+    labware_location_is_off_deck,
 )
 from .labware import (
     OverlapOffset,
     LabwareOffset,
     LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+    LabwareOffsetCreateInternal,
     LoadedLabware,
 )
 from .liquid import HexColor, EmptyLiquidId, LiquidId, Liquid, FluidKind, AspiratedFluid
-from .labware_offset_location import LabwareOffsetLocation
+from .labware_offset_location import (
+    LegacyLabwareOffsetLocation,
+    LabwareOffsetLocationSequence,
+    OnLabwareOffsetLocationSequenceComponent,
+    OnModuleOffsetLocationSequenceComponent,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    LabwareOffsetLocationSequenceComponents,
+)
 from .labware_offset_vector import LabwareOffsetVector
 from .well_position import (
     WellOrigin,
@@ -181,6 +201,7 @@ __all__ = [
     "ABSMeasureMode",
     "ModuleOffsetVector",
     "ModuleOffsetData",
+    "StackerFillEmptyStrategy",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",
@@ -193,14 +214,33 @@ __all__ = [
     "OnDeckLabwareLocation",
     "NonStackedLocation",
     "DeckPoint",
+    "OffDeckLocationType",
+    "SystemLocationType",
+    "InStackerHopperLocation",
+    "OnLabwareLocationSequenceComponent",
+    "OnModuleLocationSequenceComponent",
+    "OnAddressableAreaLocationSequenceComponent",
+    "NotOnDeckLocationSequenceComponent",
+    "OnCutoutFixtureLocationSequenceComponent",
+    "LabwareLocationSequence",
+    "LoadableLabwareLocation",
+    "labware_location_is_off_deck",
+    "labware_location_is_system",
     # Labware offset location
-    "LabwareOffsetLocation",
+    "LegacyLabwareOffsetLocation",
+    "LabwareOffsetLocationSequence",
+    "LabwareOffsetLocationSequenceComponents",
+    "OnLabwareOffsetLocationSequenceComponent",
+    "OnModuleOffsetLocationSequenceComponent",
+    "OnAddressableAreaOffsetLocationSequenceComponent",
     # Labware offset vector
     "LabwareOffsetVector",
     # Labware
     "OverlapOffset",
     "LabwareOffset",
     "LabwareOffsetCreate",
+    "LegacyLabwareOffsetCreate",
+    "LabwareOffsetCreateInternal",
     "LoadedLabware",
     "LabwareOffsetVector",
     # Liquids

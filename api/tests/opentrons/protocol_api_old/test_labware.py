@@ -3,8 +3,7 @@ from typing import Dict
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.types import WellDefinition
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2, WellDefinition2
 from opentrons.protocol_api import Labware
 
 from opentrons.hardware_control.modules.types import (
@@ -27,7 +26,7 @@ from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 from opentrons.calibration_storage import helpers
 from opentrons.types import Point, Location
 
-test_data: Dict[str, WellDefinition] = {
+test_data: Dict[str, WellDefinition2] = {
     "circular_well_json": {
         "shape": "circular",
         "depth": 40,
@@ -212,14 +211,16 @@ def test_from_center_cartesian() -> None:
 
 
 @pytest.fixture
-def corning_96_wellplate_360ul_flat_def() -> LabwareDefinition:
+def corning_96_wellplate_360ul_flat_def() -> LabwareDefinition2:
     labware_name = "corning_96_wellplate_360ul_flat"
-    return labware.get_labware_definition(labware_name)
+    result = labware.get_labware_definition(labware_name)
+    assert result["schemaVersion"] == 2
+    return result
 
 
 @pytest.fixture
 def corning_96_wellplate_360ul_flat(
-    corning_96_wellplate_360ul_flat_def: LabwareDefinition,
+    corning_96_wellplate_360ul_flat_def: LabwareDefinition2,
 ) -> Labware:
     return labware.Labware(
         core=LegacyLabwareCore(
@@ -233,14 +234,16 @@ def corning_96_wellplate_360ul_flat(
 
 
 @pytest.fixture
-def opentrons_96_tiprack_300ul_def() -> LabwareDefinition:
+def opentrons_96_tiprack_300ul_def() -> LabwareDefinition2:
     labware_name = "opentrons_96_tiprack_300ul"
-    return labware.get_labware_definition(labware_name)
+    result = labware.get_labware_definition(labware_name)
+    assert result["schemaVersion"] == 2
+    return result
 
 
 @pytest.fixture
 def opentrons_96_tiprack_300ul(
-    opentrons_96_tiprack_300ul_def: LabwareDefinition,
+    opentrons_96_tiprack_300ul_def: LabwareDefinition2,
 ) -> Labware:
     return labware.Labware(
         core=LegacyLabwareCore(
@@ -379,7 +382,7 @@ def test_use_tips(opentrons_96_tiprack_300ul: Labware) -> None:
 
 def test_select_next_tip(
     opentrons_96_tiprack_300ul: Labware,
-    opentrons_96_tiprack_300ul_def: LabwareDefinition,
+    opentrons_96_tiprack_300ul_def: LabwareDefinition2,
 ) -> None:
     tiprack = opentrons_96_tiprack_300ul
     well_list = tiprack.wells()
@@ -521,6 +524,7 @@ def test_module_load_labware(module_name: str) -> None:
         None,
     )
     old_z = mod.highest_z
+    assert labware_def["schemaVersion"] == 2  # load_from_definition() expects this.
     lw = labware.load_from_definition(labware_def, mod.location)
     mod.add_labware(lw)
     assert mod.labware == lw
@@ -539,6 +543,7 @@ def test_module_load_labware(module_name: str) -> None:
 def test_tiprack_list() -> None:
     labware_name = "opentrons_96_tiprack_300ul"
     labware_def = labware.get_labware_definition(labware_name)
+    assert labware_def["schemaVersion"] == 2  # LegacyLabwareCore expects this.
     tiprack = labware.Labware(
         core=LegacyLabwareCore(labware_def, Location(Point(0, 0, 0), "Test Slot")),
         api_version=APIVersion(2, 13),
@@ -585,6 +590,7 @@ def test_uris() -> None:
     defn = labware.get_labware_definition(
         details[1], details[0], details[2]  # type: ignore[arg-type]
     )
+    assert defn["schemaVersion"] == 2  # LegacyLabwareCore expects this.
     assert helpers.uri_from_definition(defn) == uri
     lw = labware.Labware(
         core=LegacyLabwareCore(defn, Location(Point(0, 0, 0), "Test Slot")),
@@ -596,7 +602,7 @@ def test_uris() -> None:
 
 
 def test_labware_hash_func_same_implementation(
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinition2,
 ) -> None:
     """Test that multiple Labware objects with same implementation and version
     have the same __hash__"""
@@ -614,7 +620,7 @@ def test_labware_hash_func_same_implementation(
 
 
 def test_labware_hash_func_same_implementation_different_version(
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinition2,
 ) -> None:
     """Test that multiple Labware objects with same implementation yet
     different version have different __hash__"""
@@ -637,7 +643,7 @@ def test_labware_hash_func_same_implementation_different_version(
 
 
 def test_labware_hash_func_diff_implementation_same_version(
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinition2,
 ) -> None:
     """Test that multiple Labware objects with different implementation yet
     sane version have different __hash__"""

@@ -205,11 +205,13 @@
     "cuboidalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 1.5362,
-          "topHeight": 0.25,
-          "bottomHeight": 0.0,
-          "yCount": 8
+          "shape": "cuboidal",
+          "topXDimension": 8.34,
+          "topYDimension": 71.85,
+          "bottomXDimension": 7.9,
+          "bottomYDimension": 71.75,
+          "topHeight": 41.75,
+          "bottomHeight": 4.0
         },
         {
           "shape": "squaredcone",
@@ -223,15 +225,14 @@
           "yCount": 8
         },
         {
-          "shape": "cuboidal",
-          "topXDimension": 8.34,
-          "topYDimension": 71.85,
-          "bottomXDimension": 7.9,
-          "bottomYDimension": 71.75,
-          "topHeight": 41.75,
-          "bottomHeight": 4.0
+          "shape": "spherical",
+          "radiusOfCurvature": 1.5362,
+          "topHeight": 0.25,
+          "bottomHeight": 0.0,
+          "yCount": 8
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

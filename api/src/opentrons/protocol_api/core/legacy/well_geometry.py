@@ -4,9 +4,9 @@ from typing import Optional, cast, TYPE_CHECKING
 
 from opentrons.types import Point
 from opentrons_shared_data.labware.types import (
-    WellDefinition,
-    CircularWellDefinition,
-    RectangularWellDefinition,
+    WellDefinition2 as WellDefinition,
+    CircularWellDefinition2 as CircularWellDefinition,
+    RectangularWellDefinition2 as RectangularWellDefinition,
 )
 
 if TYPE_CHECKING:

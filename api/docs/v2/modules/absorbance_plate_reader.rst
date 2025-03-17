@@ -69,7 +69,7 @@ Now the reader is prepared to read at 450 nm. Note that the ``wavelengths`` para
 This example can be extended by adding a reference wavelength::
 
     pr_mod.initialize(
-        mode="single", wavelengths=[450], reference_wavelength=[562]
+        mode="single", wavelengths=[450], reference_wavelength=562
     )
 
 When configured this way, the module will read twice. In the :ref:`output data <plate-reader-data>`, the values read for ``reference_wavelength`` will be subtracted from the values read for the single member of ``wavelengths``. This is useful for normalization, or to correct for background interference in wavelength measurements.

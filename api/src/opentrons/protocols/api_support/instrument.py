@@ -2,7 +2,7 @@ import logging
 from typing import Optional, Any
 
 from opentrons_shared_data.labware.types import (
-    LabwareDefinition as LabwareDefinitionDict,
+    LabwareDefinition2 as LabwareDefinition2Dict,
 )
 
 from opentrons import types
@@ -56,7 +56,7 @@ def validate_blowout_location(
 
 
 def tip_length_for(
-    pipette: PipetteDict, tip_rack_definition: LabwareDefinitionDict
+    pipette: PipetteDict, tip_rack_definition: LabwareDefinition2Dict
 ) -> float:
     """Get the tip length, including overlap, for a tip from this rack"""
     try:
@@ -99,7 +99,20 @@ def validate_tiprack(
         gen_lookup = (
             "FLEX" if ("flex" in instr_metadata or "96" in instr_metadata) else "OT2"
         )
-        valid_vols = VALID_PIP_TIPRACK_VOL[gen_lookup][instrument_name.split("_")[0]]
+
+        # TODO (spp, 2025-01-30): do what AA's note above says or at least,
+        #  fetch the 'pip_type' below from the 'model' field in pipette definitions
+        #  so that we don't have to figure it out from pipette names
+        if instrument_name.split("_")[0] == "flex":
+            # Flex's API load names have the format 'flex_1channel_1000'
+            # From API v2.23 on, this is the name returned by InstrumentContext.name
+            pip_type = "p" + instrument_name.split("_")[2]
+        else:
+            # Until API v2.23, InstrumentContext.name returned the engine-specific names
+            # of Flex pipettes. These names, as well as OT2 pipette names,
+            # have the format- 'p1000_single_gen2' or 'p1000_single_flex'
+            pip_type = instrument_name.split("_")[0]
+        valid_vols = VALID_PIP_TIPRACK_VOL[gen_lookup][pip_type]
         if tiprack_vol not in valid_vols:
             log.warning(
                 f"The pipette {instrument_name} and its tip rack {tip_rack.load_name}"

@@ -65,6 +65,7 @@ beforeEach(() => {
     id: moduleId,
     type: THERMOCYCLER_MODULE_TYPE,
     model: THERMOCYCLER_MODULE_V1,
+    pythonName: 'mockPythonName',
   }
   lidOpenRobotState = getInitialRobotStateStandard(invariantContext)
   lidOpenRobotState.modules[moduleId] = {

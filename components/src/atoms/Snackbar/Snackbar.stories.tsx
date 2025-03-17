@@ -15,7 +15,7 @@ import { Snackbar } from './index'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Atoms/Snackbar',
+  title: 'Helix/Atoms/Snackbar',
   component: Snackbar,
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta

@@ -1,4 +1,5 @@
 """Exception hierarchy for error codes."""
+
 from typing import Dict, Any, Optional, List, Iterator, Union, Sequence, overload
 from logging import getLogger
 from traceback import format_exception_only, format_tb
@@ -379,6 +380,28 @@ class StallOrCollisionDetectedError(RoboticsControlError):
         """Build a StallOrCollisionDetectedError."""
         super().__init__(
             ErrorCodes.STALL_OR_COLLISION_DETECTED, message, detail, wrapping
+        )
+
+
+class FlexStackerStallError(RoboticsControlError):
+    """An error indicating that a stall or collision occurred in the flex stacker."""
+
+    def __init__(
+        self,
+        serial: str,
+        axis: str,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        self.serial = serial
+        self.axis = axis
+        super().__init__(
+            ErrorCodes.FLEX_STACKER_STALL_OR_COLLISION_DETECTED,
+            message,
+            detail,
+            wrapping,
         )
 
 
@@ -1099,7 +1122,7 @@ class InvalidProtocolData(GeneralError):
         self,
         message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
     ) -> None:
         """Build an InvalidProtocolData."""
         super().__init__(ErrorCodes.INVALID_PROTOCOL_DATA, message, detail, wrapping)

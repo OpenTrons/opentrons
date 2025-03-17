@@ -34,9 +34,16 @@ describe('getDefaultsForStepType', () => {
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
         aspirate_mmFromBottom: null,
+        aspirate_retract_delay_seconds: null,
+        aspirate_retract_mmFromBottom: null,
+        aspirate_retract_speed: null,
+        aspirate_retract_x_position: 0,
+        aspirate_retract_y_position: 0,
+        aspirate_submerge_delay_seconds: null,
+        aspirate_submerge_speed: null,
         aspirate_touchTip_checkbox: false,
-        aspirate_touchTip_mmFromBottom: null,
-
+        aspirate_touchTip_mmFromTop: null,
+        aspirate_touchTip_speed: null,
         dispense_flowRate: null,
         dispense_labware: null,
         dispense_wells: [],
@@ -46,9 +53,16 @@ describe('getDefaultsForStepType', () => {
         dispense_mix_times: null,
         dispense_mix_volume: null,
         dispense_mmFromBottom: null,
+        dispense_retract_delay_seconds: null,
+        dispense_retract_mmFromBottom: null,
+        dispense_retract_speed: null,
+        dispense_retract_x_position: 0,
+        dispense_retract_y_position: 0,
+        dispense_submerge_delay_seconds: null,
+        dispense_submerge_speed: null,
         dispense_touchTip_checkbox: false,
-        dispense_touchTip_mmFromBottom: null,
-
+        dispense_touchTip_mmFromTop: null,
+        dispense_touchTip_speed: null,
         disposalVolume_checkbox: false,
         disposalVolume_volume: null,
 
@@ -73,6 +87,8 @@ describe('getDefaultsForStepType', () => {
         dispense_x_position: 0,
         dispense_y_position: 0,
         blowout_z_offset: 0,
+        liquidClassesSupported: true,
+        liquidClass: null,
       })
     })
   })
@@ -95,7 +111,7 @@ describe('getDefaultsForStepType', () => {
         blowout_location: null,
         blowout_flowRate: null,
         mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
-        mix_touchTip_mmFromBottom: null,
+        mix_touchTip_mmFromTop: null,
         mix_touchTip_checkbox: false,
         pipette: null,
         nozzles: null,
@@ -108,6 +124,7 @@ describe('getDefaultsForStepType', () => {
         mix_x_position: 0,
         mix_y_position: 0,
         blowout_z_offset: 0,
+        liquidClassesSupported: true,
       })
     })
   })
@@ -128,6 +145,10 @@ describe('getDefaultsForStepType', () => {
         labwareLocationUpdate: {},
         pipetteLocationUpdate: {},
         moduleLocationUpdate: {},
+        trashBinLocationUpdate: {},
+        wasteChuteLocationUpdate: {},
+        stagingAreaLocationUpdate: {},
+        gripperLocationUpdate: {},
       })
     })
   })

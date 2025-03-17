@@ -4,6 +4,7 @@ DEPRECATED: Testing LabwareStore independently of LabwareView is no
 longer helpful. Try to add new tests to test_labware_state.py, where they can be
 tested together, treating LabwareState as a private implementation detail.
 """
+
 from typing import Optional
 from opentrons.protocol_engine.state import update_types
 import pytest
@@ -12,14 +13,19 @@ from datetime import datetime
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    Parameters2,
+)
 from opentrons.types import DeckSlotName
 
 from opentrons.protocol_engine.types import (
     LabwareOffset,
-    LabwareOffsetCreate,
+    LabwareOffsetCreateInternal,
     LabwareOffsetVector,
-    LabwareOffsetLocation,
+    LegacyLabwareOffsetLocation,
+    OnAddressableAreaOffsetLocationSequenceComponent,
     DeckSlotLocation,
     LoadedLabware,
     OFF_DECK_LOCATION,
@@ -64,9 +70,12 @@ def test_handles_add_labware_offset(
     subject: LabwareStore,
 ) -> None:
     """It should add the labware offset to the state and add the ID."""
-    request = LabwareOffsetCreate(
+    request = LabwareOffsetCreateInternal(
         definitionUri="offset-definition-uri",
-        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        legacyLocation=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        locationSequence=[
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1")
+        ],
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -74,7 +83,10 @@ def test_handles_add_labware_offset(
         id="offset-id",
         createdAt=datetime(year=2021, month=1, day=2),
         definitionUri="offset-definition-uri",
-        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        location=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        locationSequence=[
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1")
+        ],
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -99,9 +111,12 @@ def test_handles_load_labware(
     offset_id: Optional[str],
 ) -> None:
     """It should add the labware data to the state."""
-    offset_request = LabwareOffsetCreate(
+    offset_request = LabwareOffsetCreateInternal(
         definitionUri="offset-definition-uri",
-        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        legacyLocation=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        locationSequence=[
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1")
+        ],
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -180,9 +195,12 @@ def test_handles_reload_labware(
         == expected_definition_uri
     )
 
-    offset_request = LabwareOffsetCreate(
+    offset_request = LabwareOffsetCreateInternal(
         definitionUri="offset-definition-uri",
-        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        legacyLocation=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        locationSequence=[
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1")
+        ],
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
     subject.handle_action(
@@ -242,9 +260,12 @@ def test_handles_move_labware(
 ) -> None:
     """It should update labware state with new location & offset."""
     comment_command = create_comment_command()
-    offset_request = LabwareOffsetCreate(
+    offset_request = LabwareOffsetCreateInternal(
         definitionUri="offset-definition-uri",
-        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        legacyLocation=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        locationSequence=[
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1")
+        ],
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
     subject.handle_action(
@@ -297,9 +318,12 @@ def test_handles_move_labware_off_deck(
 ) -> None:
     """It should update labware state with new location & offset."""
     comment_command = create_comment_command()
-    offset_request = LabwareOffsetCreate(
+    offset_request = LabwareOffsetCreateInternal(
         definitionUri="offset-definition-uri",
-        location=LabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        legacyLocation=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        locationSequence=[
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1")
+        ],
         vector=LabwareOffsetVector(x=1, y=2, z=3),
     )
     subject.handle_action(
@@ -341,3 +365,173 @@ def test_handles_move_labware_off_deck(
     )
     assert subject.state.labware_by_id["my-labware-id"].location == OFF_DECK_LOCATION
     assert subject.state.labware_by_id["my-labware-id"].offsetId is None
+
+
+def test_handle_batch_labware_loaded_update(
+    subject: LabwareStore,
+    well_plate_def: LabwareDefinition,
+) -> None:
+    """It should consume batch_loaded_labware updates."""
+    request = LabwareOffsetCreateInternal(
+        definitionUri="offset-definition-uri",
+        legacyLocation=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        locationSequence=[
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1")
+        ],
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+    subject.handle_action(
+        AddLabwareOffsetAction(
+            labware_offset_id="some-offset-id",
+            created_at=datetime(year=2021, month=1, day=2),
+            request=request,
+        )
+    )
+    comment_command = create_comment_command()
+    subject.handle_action(
+        SucceedCommandAction(
+            command=comment_command,
+            state_update=update_types.StateUpdate(
+                batch_loaded_labware=update_types.BatchLoadedLabwareUpdate(
+                    new_locations_by_id={
+                        "some-labware-id": DeckSlotLocation(
+                            slotName=DeckSlotName.SLOT_1
+                        ),
+                        "some-other-labware-id": OFF_DECK_LOCATION,
+                    },
+                    offset_ids_by_id={
+                        "some-labware-id": "some-offset-id",
+                        "some-other-labware-id": None,
+                    },
+                    display_names_by_id={
+                        "some-labware-id": "some-display-name",
+                        "some-other-labware-id": None,
+                    },
+                    definitions_by_id={
+                        "some-labware-id": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                            schemaVersion=2,
+                            namespace="namespace-1",
+                            version=1,
+                            parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                                loadName="load-name-1"
+                            ),
+                        ),
+                        "some-other-labware-id": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                            schemaVersion=2,
+                            namespace="namespace-2",
+                            version=2,
+                            parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                                loadName="load-name-2"
+                            ),
+                        ),
+                    },
+                )
+            ),
+        )
+    )
+    some_labware = subject.state.labware_by_id["some-labware-id"]
+    some_other_labware = subject.state.labware_by_id["some-other-labware-id"]
+    assert some_labware.id == "some-labware-id"
+    assert some_labware.location == DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    assert some_labware.loadName == "load-name-1"
+    assert some_labware.definitionUri == "namespace-1/load-name-1/1"
+    assert some_labware.offsetId == "some-offset-id"
+    assert some_labware.displayName == "some-display-name"
+
+    assert some_other_labware.id == "some-other-labware-id"
+    assert some_other_labware.location == OFF_DECK_LOCATION
+    assert some_other_labware.loadName == "load-name-2"
+    assert some_other_labware.definitionUri == "namespace-2/load-name-2/2"
+    assert some_other_labware.offsetId is None
+    assert some_other_labware.displayName is None
+
+
+def test_handle_batch_labware_location_update(
+    subject: LabwareStore,
+    well_plate_def: LabwareDefinition,
+) -> None:
+    """It should consume batch_labware_location updates."""
+    request = LabwareOffsetCreateInternal(
+        definitionUri="offset-definition-uri",
+        legacyLocation=LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_1),
+        locationSequence=[
+            OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="1")
+        ],
+        vector=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+    subject.handle_action(
+        AddLabwareOffsetAction(
+            labware_offset_id="some-offset-id",
+            created_at=datetime(year=2021, month=1, day=2),
+            request=request,
+        )
+    )
+    comment_command = create_comment_command()
+    subject.handle_action(
+        SucceedCommandAction(
+            command=comment_command,
+            state_update=update_types.StateUpdate(
+                batch_loaded_labware=update_types.BatchLoadedLabwareUpdate(
+                    new_locations_by_id={
+                        "some-labware-id": DeckSlotLocation(
+                            slotName=DeckSlotName.SLOT_1
+                        ),
+                        "some-other-labware-id": OFF_DECK_LOCATION,
+                    },
+                    offset_ids_by_id={
+                        "some-labware-id": "some-offset-id",
+                        "some-other-labware-id": None,
+                    },
+                    display_names_by_id={
+                        "some-labware-id": "some-display-name",
+                        "some-other-labware-id": None,
+                    },
+                    definitions_by_id={
+                        "some-labware-id": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                            schemaVersion=2,
+                            namespace="namespace-1",
+                            version=1,
+                            parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                                loadName="load-name-1"
+                            ),
+                        ),
+                        "some-other-labware-id": LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                            schemaVersion=2,
+                            namespace="namespace-2",
+                            version=2,
+                            parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+                                loadName="load-name-2"
+                            ),
+                        ),
+                    },
+                )
+            ),
+        )
+    )
+    comment_command2 = create_comment_command()
+    subject.handle_action(
+        SucceedCommandAction(
+            command=comment_command2,
+            state_update=update_types.StateUpdate(
+                batch_labware_location=update_types.BatchLabwareLocationUpdate(
+                    new_locations_by_id={
+                        "some-labware-id": OFF_DECK_LOCATION,
+                        "some-other-labware-id": DeckSlotLocation(
+                            slotName=DeckSlotName.SLOT_1
+                        ),
+                    },
+                    new_offset_ids_by_id={
+                        "some-labware-id": None,
+                        "some-other-labware-id": "some-offset-id",
+                    },
+                )
+            ),
+        )
+    )
+    some_labware = subject.state.labware_by_id["some-labware-id"]
+    some_other_labware = subject.state.labware_by_id["some-other-labware-id"]
+    assert some_labware.location == OFF_DECK_LOCATION
+    assert some_labware.offsetId is None
+
+    assert some_other_labware.location == DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+    assert some_other_labware.offsetId == "some-offset-id"

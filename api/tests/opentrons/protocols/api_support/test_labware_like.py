@@ -10,16 +10,18 @@ from opentrons.types import Location, Point
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 
 
 @pytest.fixture(scope="session")
-def trough_definition() -> LabwareDefinition:
-    return labware.get_labware_definition("usascientific_12_reservoir_22ml")
+def trough_definition() -> LabwareDefinition2:
+    result = labware.get_labware_definition("usascientific_12_reservoir_22ml")
+    assert result["schemaVersion"] == 2  # For type checking.
+    return result
 
 
 @pytest.fixture(scope="session")
-def trough(trough_definition: LabwareDefinition) -> Labware:
+def trough(trough_definition: LabwareDefinition2) -> Labware:
     deck = Deck(deck_type=STANDARD_OT2_DECK)
     return labware.load_from_definition(trough_definition, deck.position_for(1))
 
@@ -38,7 +40,9 @@ def module() -> ModuleGeometry:
 
 
 @pytest.fixture(scope="session")
-def mod_trough(trough_definition: LabwareDefinition, module: ModuleGeometry) -> Labware:
+def mod_trough(
+    trough_definition: LabwareDefinition2, module: ModuleGeometry
+) -> Labware:
     mod_trough = module.add_labware(
         labware.load_from_definition(trough_definition, module.location)
     )

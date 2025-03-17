@@ -149,6 +149,7 @@
         "id": "A3",
         "areaType": "slot",
         "offsetFromCutoutFixture": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -1023,7 +1024,11 @@
       "mayMountTo": ["cutoutD3"],
       "displayName": "Flex Stacker With Waste Chute Adapter for 96 Channel Pipette or Gripper",
       "providesAddressableAreas": {
-        "cutoutD3": ["1ChannelWasteChute", "8ChannelWasteChute", "D4"]
+        "cutoutD3": [
+          "1ChannelWasteChute",
+          "8ChannelWasteChute",
+          "flexStackerModuleV1D4"
+        ]
       },
       "fixtureGroup": {},
       "height": 124.5
@@ -1044,6 +1049,20 @@
       },
       "fixtureGroup": {},
       "height": 124.5
+    },
+    {
+      "id": "flexStackerModuleV1WithMagneticBlockV1",
+      "expectOpentronsModuleSerialNumber": true,
+      "mayMountTo": ["cutoutD3", "cutoutC3", "cutoutB3", "cutoutA3"],
+      "displayName": "Flex Stacker With Magnetic Block",
+      "providesAddressableAreas": {
+        "cutoutD3": ["flexStackerModuleV1D4", "magneticBlockV1D3"],
+        "cutoutC3": ["flexStackerModuleV1C4", "magneticBlockV1C3"],
+        "cutoutB3": ["flexStackerModuleV1B4", "magneticBlockV1B3"],
+        "cutoutA3": ["flexStackerModuleV1A4", "magneticBlockV1A3"]
+      },
+      "fixtureGroup": {},
+      "height": 38.0
     },
     {
       "id": "thermocyclerModuleV2Rear",

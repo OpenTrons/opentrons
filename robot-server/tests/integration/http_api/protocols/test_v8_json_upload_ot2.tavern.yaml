@@ -90,15 +90,16 @@ stages:
             runTimeParameters: []
             commandAnnotations:
               - annotationType: custom
-                commandKeys: [
-                  1abc123,
-                  2abc123,
-                  3abc123,
-                  4abc123,
-                  5abc123,
-                  6abc123,
-                  7abc123,
-                ]
+                commandKeys:
+                  [
+                    1abc123,
+                    2abc123,
+                    3abc123,
+                    4abc123,
+                    5abc123,
+                    6abc123,
+                    7abc123,
+                  ]
             pipettes:
               - id: pipetteId
                 pipetteName: p10_single
@@ -217,6 +218,15 @@ stages:
                 result:
                   labwareId: sourcePlateId
                   definition: !anydict
+                  locationSequence:
+                    - kind: onModule
+                      moduleId: temperatureModuleId
+                    - kind: onAddressableArea
+                      addressableAreaName: '1'
+                    - kind: onCutoutFixture
+                      cutoutId: cutout1
+                      possibleCutoutFixtureIds:
+                        - singleStandardSlot
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -236,6 +246,15 @@ stages:
                 result:
                   labwareId: destPlateId
                   definition: !anydict
+                  locationSequence:
+                    - kind: onModule
+                      moduleId: magneticModuleId
+                    - kind: onAddressableArea
+                      addressableAreaName: '3'
+                    - kind: onCutoutFixture
+                      cutoutId: cutout3
+                      possibleCutoutFixtureIds:
+                        - singleStandardSlot
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -255,6 +274,13 @@ stages:
                 result:
                   labwareId: tipRackId
                   definition: !anydict
+                  locationSequence:
+                    - kind: onAddressableArea
+                      addressableAreaName: '8'
+                    - kind: onCutoutFixture
+                      cutoutId: cutout8
+                      possibleCutoutFixtureIds:
+                        - singleStandardSlot
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -274,6 +300,13 @@ stages:
                 result:
                   labwareId: fixedTrash
                   definition: !anydict
+                  locationSequence:
+                    - kind: onAddressableArea
+                      addressableAreaName: '12'
+                    - kind: onCutoutFixture
+                      cutoutId: cutout12
+                      possibleCutoutFixtureIds:
+                        - singleStandardSlot
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -511,6 +544,7 @@ stages:
                       y: 0
                       z: 0
                   alternateDropLocation: false
+                  scrape_tips: false
                 result:
                   position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
                 notes: []
