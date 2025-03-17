@@ -776,17 +776,17 @@ interface BaseLiquidHandlingProperties<RetractType> {
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
-interface AspirateProperties
+export interface AspirateProperties
   extends BaseLiquidHandlingProperties<RetractAspirate> {
   preWet: boolean
   mix: MixProperties
 }
-interface SingleDispenseProperties
+export interface SingleDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-interface MultiDispenseProperties {
+export interface MultiDispenseProperties {
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }
