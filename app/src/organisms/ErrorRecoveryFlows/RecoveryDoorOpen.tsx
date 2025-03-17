@@ -60,50 +60,47 @@ export function RecoveryDoorOpen({
   }
 
   const primaryOnClick = (): void => {
-    if (
-      recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
-    ) {
-      handleHomeAllAndRoute(
-        RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
-        RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
-      )
-    } else {
-      void resumeRecovery().then(() => {
-        // See comments above for why we do this.
-        if (stashedMap != null) {
-          void proceedToRouteAndStep(stashedMap.route, stashedMap.step)
-        }
-      })
+    switch (recoveryMap.route) {
+      case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        handleHomeAllAndRoute(
+          RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE,
+          RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
+        )
+        break
+      default:
+        void resumeRecovery().then(() => {
+          // See comments above for why we do this.
+          if (stashedMap != null) {
+            void proceedToRouteAndStep(stashedMap.route, stashedMap.step)
+          }
+        })
     }
   }
 
   const buildSubtext = (): string => {
-    if (
-      recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
-    ) {
-      return t('stacker_door_open_robot_home')
-    } else {
-      return t('close_the_robot_door')
+    switch (recoveryMap.route) {
+      case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        return t('stacker_door_open_robot_home')
+      default:
+        return t('close_the_robot_door')
     }
   }
 
   const buildTitletext = (): string => {
-    if (
-      recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
-    ) {
-      return t('close_robot_and_stacker_door')
-    } else {
-      return t('robot_door_is_open')
+    switch (recoveryMap.route) {
+      case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        return t('close_robot_and_stacker_door')
+      default:
+        return t('robot_door_is_open')
     }
   }
 
   const buildPrimaryButtonText = (): string => {
-    if (
-      recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
-    ) {
-      return t('continue')
-    } else {
-      return t('resume')
+    switch (recoveryMap.route) {
+      case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        return t('continue')
+      default:
+        return t('resume')
     }
   }
 
