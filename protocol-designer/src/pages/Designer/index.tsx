@@ -20,7 +20,7 @@ import { getDesignerTab, getFileMetadata } from '../../file-data/selectors'
 import { selectors } from '../../labware-ingred/selectors'
 import { LiquidsOverflowMenu } from './LiquidsOverflowMenu'
 import { ProtocolSteps } from './ProtocolSteps'
-import { ProtocolStartingDeck } from './ProtocolStartingDeck'
+import { ProtocolStartingDeck } from '../../components/organisms/ProtocolStartingDeck'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'

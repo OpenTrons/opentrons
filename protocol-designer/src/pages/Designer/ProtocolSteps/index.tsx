@@ -30,7 +30,6 @@ import {
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
 } from '../../../ui/steps/selectors'
-import { DeckSetupContainer } from '../DeckSetup'
 import { OffDeck } from '../OffDeck'
 import { SubStepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
@@ -42,6 +41,7 @@ import {
 } from '../../../file-data/selectors'
 import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
+import { ProtocolStepsDeck } from '../DeckSetup/ProtocolStepsDeck'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 
@@ -149,7 +149,8 @@ export function ProtocolSteps(): JSX.Element {
             height="100%"
           >
             {deckView === leftString ? (
-              <DeckSetupContainer tab="protocolSteps" />
+              // <DeckSetupContainer tab="protocolSteps" />
+              <ProtocolStepsDeck />
             ) : (
               <OffDeck tab="protocolSteps" />
             )}

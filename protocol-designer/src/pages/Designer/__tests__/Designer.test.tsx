@@ -10,13 +10,12 @@ import { generateNewProtocol } from '../../../labware-ingred/actions'
 import { Designer } from '../index'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
 import { ProtocolSteps } from '../ProtocolSteps'
-import { ProtocolStartingDeck } from '../ProtocolStartingDeck'
+import { ProtocolStartingDeck } from '../../../components/organisms/ProtocolStartingDeck'
 
 import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
-vi.mock('../ProtocolStartingDeck')
 vi.mock('../OffDeck')
 vi.mock('../ProtocolSteps')
 vi.mock('../../../labware-ingred/actions')
@@ -25,6 +24,7 @@ vi.mock('../LiquidsOverflowMenu')
 vi.mock('../DeckSetup')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../top-selectors/labware-locations')
+vi.mock('../../../components/organisms/ProtocolStartingDeck')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
