@@ -9,7 +9,6 @@
   "cancel_run": "取消运行",
   "canceling_run": "正在取消运行",
   "carefully_move_labware": "<block>小心地移开放错位置的实验用品并清理溢出的液体。</block><block>继续操作之前请关闭设备前门。</block>",
-  "carefully_clear_track": "<block>Carefully clear the track of any dislodged labware or obstructions.</block><block>Close the robot door before proceeding.</block>",
   "change_location": "更改位置",
   "change_tip_pickup_location": "更换拾取吸头的位置",
   "choose_a_recovery_action": "选择恢复操作",
