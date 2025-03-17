@@ -6,7 +6,6 @@ import {
   SOURCE_LABWARE,
   DEST_LABWARE,
 } from '../fixtures'
-import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../utils'
 import { airGapInWell } from '../commandCreators/compound'
 import type { RobotState, InvariantContext } from '../types'
 
