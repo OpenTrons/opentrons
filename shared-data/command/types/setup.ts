@@ -6,6 +6,9 @@ import type {
   LabwareOffset,
   PipetteName,
   ModuleModel,
+  AspirateProperties,
+  MultiDispenseProperties,
+  SingleDispenseProperties,
 } from '../../js'
 
 export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
@@ -87,6 +90,16 @@ export interface LoadLiquidRunTimeCommand
   result?: LoadLiquidResult
 }
 
+export interface LoadLiquidClassCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'loadLiquidClass'
+  params: LoadLiquidClassParams
+}
+export interface LoadLiquidClassRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    LoadLiquidClassCreateCommand {
+  result?: LoadLiquidClassResult
+}
+
 export interface ConfigureNozzleLayoutCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'configureNozzleLayout'
@@ -106,6 +119,7 @@ export type SetupRunTimeCommand =
   | ReloadLabwareRunTimeCommand
   | LoadModuleRunTimeCommand
   | LoadLiquidRunTimeCommand
+  | LoadLiquidClassRunTimeCommand
   | MoveLabwareRunTimeCommand
   | LoadLidRunTimeCommand
   | LoadLidStackRunTimeCommand
@@ -117,6 +131,7 @@ export type SetupCreateCommand =
   | ReloadLabwareCreateCommand
   | LoadModuleCreateCommand
   | LoadLiquidCreateCommand
+  | LoadLiquidClassCreateCommand
   | MoveLabwareCreateCommand
   | LoadLidCreateCommand
   | LoadLidStackCreateCommand
@@ -165,7 +180,7 @@ export interface OnModuleLocationSequenceComponent {
 
 export interface OnAddressableAreaLocationSequenceComponent {
   kind: 'onAddressableArea'
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }
 
 export interface NotOnDeckLocationSequenceComponent {
@@ -251,6 +266,23 @@ interface LoadLiquidParams {
 interface LoadLiquidResult {
   liquidId: string
 }
+interface LoadLiquidClassParams {
+  liquidClassId?: string
+  liquidClassRecord: LiquidClassRecord
+}
+
+interface LiquidClassRecord {
+  aspirate: AspirateProperties
+  liquidClassName: string
+  multiDispense?: MultiDispenseProperties
+  pipetteModel: string
+  singleDispense: SingleDispenseProperties
+  tiprack: string
+}
+
+interface LoadLiquidClassResult {
+  liquidClassId: string
+}
 
 export const COLUMN = 'COLUMN'
 export const SINGLE = 'SINGLE'
@@ -287,6 +319,7 @@ interface LoadLidStackResult {
   stackLabwareId: string
   labwareIds: string[]
   definition: LabwareDefinition2
+  lidStackDefinition: LabwareDefinition2
   location: LabwareLocation
   stackLocationSequence?: LabwareLocationSequence
   locationSequences?: LabwareLocationSequence[]

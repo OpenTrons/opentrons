@@ -44,7 +44,7 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   getMainPagePortalEl,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,

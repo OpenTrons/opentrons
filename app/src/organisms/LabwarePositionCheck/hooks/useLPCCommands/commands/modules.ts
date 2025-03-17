@@ -14,17 +14,17 @@ import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 export function modulePrepCommands(
   offsetLocationDetails: OffsetLocationDetails
 ): CreateCommand[] {
-  const { moduleId, moduleModel } = offsetLocationDetails
+  const {
+    closestBeneathModuleId,
+    closestBeneathModuleModel,
+  } = offsetLocationDetails
 
   const moduleType =
-    (moduleId != null &&
-      moduleModel != null &&
-      'moduleModel' in location &&
-      location.moduleModel != null &&
-      getModuleType(moduleModel)) ??
-    null
+    closestBeneathModuleModel != null
+      ? getModuleType(closestBeneathModuleModel)
+      : null
 
-  if (moduleId == null || moduleType == null) {
+  if (closestBeneathModuleId == null || moduleType == null) {
     return []
   } else {
     switch (moduleType) {
@@ -32,22 +32,22 @@ export function modulePrepCommands(
         return [
           {
             commandType: 'thermocycler/openLid',
-            params: { moduleId },
+            params: { moduleId: closestBeneathModuleId },
           },
         ]
       case HEATERSHAKER_MODULE_TYPE:
         return [
           {
             commandType: 'heaterShaker/closeLabwareLatch',
-            params: { moduleId },
+            params: { moduleId: closestBeneathModuleId },
           },
           {
             commandType: 'heaterShaker/deactivateShaker',
-            params: { moduleId },
+            params: { moduleId: closestBeneathModuleId },
           },
           {
             commandType: 'heaterShaker/openLabwareLatch',
-            params: { moduleId },
+            params: { moduleId: closestBeneathModuleId },
           },
         ]
       default:
@@ -123,23 +123,23 @@ const thermocyclerInitCommands = (
 const heaterShakerCleanupCommands = (
   offsetLocationDetails: OffsetLocationDetails
 ): CreateCommand[] => {
-  const { moduleId, moduleModel } = offsetLocationDetails
+  const {
+    closestBeneathModuleId,
+    closestBeneathModuleModel,
+  } = offsetLocationDetails
 
   const moduleType =
-    (moduleId != null &&
-      moduleModel != null &&
-      'moduleModel' in location &&
-      location.moduleModel != null &&
-      getModuleType(moduleModel)) ??
-    null
+    closestBeneathModuleModel != null
+      ? getModuleType(closestBeneathModuleModel)
+      : null
 
-  return moduleId != null &&
+  return closestBeneathModuleId != null &&
     moduleType != null &&
     moduleType === HEATERSHAKER_MODULE_TYPE
     ? [
         {
           commandType: 'heaterShaker/openLabwareLatch',
-          params: { moduleId },
+          params: { moduleId: closestBeneathModuleId },
         },
       ]
     : []

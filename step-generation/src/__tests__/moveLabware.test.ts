@@ -13,7 +13,7 @@ import {
   SOURCE_LABWARE,
   TIPRACK_1,
 } from '../fixtures'
-import { DEST_LABWARE, moveLabware } from '..'
+import { DEST_LABWARE, GRIPPER_LOCATION, moveLabware } from '..'
 
 import type {
   LabwareDefinition2,
@@ -38,6 +38,7 @@ describe('moveLabware', () => {
         mockGripperId: {
           name: 'gripper',
           id: mockGripperId,
+          location: GRIPPER_LOCATION,
         },
         mockTrashBinId: {
           name: 'trashBin',
@@ -373,6 +374,7 @@ describe('moveLabware', () => {
         mockGripperId: {
           name: 'gripper',
           id: mockGripperId,
+          location: GRIPPER_LOCATION,
         },
       },
       labwareEntities: {
