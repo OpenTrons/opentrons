@@ -6,6 +6,7 @@ from opentrons.drivers.asyncio.communication.errors import (
     UnhandledGcode,
 )
 
+
 class EStopTriggered(ErrorResponse):
     """Raised when the estop is triggered during a move."""
 
