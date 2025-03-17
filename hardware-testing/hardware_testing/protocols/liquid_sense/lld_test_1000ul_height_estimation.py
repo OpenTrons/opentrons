@@ -476,10 +476,11 @@ def run(ctx: ProtocolContext) -> None:
         [t.ul_to_add for tl in test_trials_by_labware.values() for t in tl]
     )
     min_dye_required_in_reservoir = dead_vol_for_reservoir + total_dye_transferred
-    assert dye_src_well.current_liquid_volume() >= min_dye_required_in_reservoir, (
-        f"must have >= {int(min_dye_required_in_reservoir)} uL "
-        f"(detected {int(dye_src_well.current_liquid_volume())} uL)"
-    )
+    if not ctx.is_simulating():
+        assert dye_src_well.current_liquid_volume() >= min_dye_required_in_reservoir, (
+            f"must have >= {int(min_dye_required_in_reservoir)} uL "
+            f"(detected {int(dye_src_well.current_liquid_volume())} uL)"
+        )
 
     # RUN
     _detected_src = False
@@ -513,7 +514,7 @@ def run(ctx: ProtocolContext) -> None:
             if trial.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
                 pipette.require_liquid_presence(trial.test_well)
             pipette.aspirate(
-                trial.ul_to_remove, trial.test_well.meniscus(trial.submerge_mm)
+                trial.ul_to_remove, trial.test_well.meniscus(target="dynamic", z=trial.submerge_mm)
             )
 
             # MULTI-DISPENSE TO PLATE
