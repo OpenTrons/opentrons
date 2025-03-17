@@ -29,6 +29,12 @@ Passing different values to ``configure_for_volume()`` changes the minimum and m
       - 5
       - 50
 
+When you use ``configure_for_volume()`` for a Flex 50 µL pipette, you also define the default push out volume:
+* For **low volume mode** (1-4.9 µL): 7 µL
+* For 5-50 µL: 2 µL
+
+For more, see :ref:`_push-out-dispense`.
+
 .. note::
     The pipette must not contain liquid when you call ``configure_for_volume()``, or the API will raise an error.
     
