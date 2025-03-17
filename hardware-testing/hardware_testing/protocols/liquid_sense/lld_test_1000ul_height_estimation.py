@@ -20,12 +20,15 @@ requirements = {"robotType": "Flex", "apiLevel": "2.22"}
 
 SLOTS = {
     "trash": "A3",
-    "tips_1": "B1",
-    "tips_2": "B2",
-    "tips_3": "B3",
-    "src_reservoir": "D2",
+    "tips_1": "A1",
+    "tips_2": "A2",
+    "tips_3": "B1",
+    "tips_4": "B2",
+    "src_reservoir": "C2",
     "test_labware_1": "D1",
-    "dst_plate_1": "D3",
+    "dst_plate_1": "D2",
+    "dst_plate_stack_start": "C1",  # FIXME: stack plates + lids
+    "dst_plate_stack_end": "B3",  # FIXME: stack plates + lids
 }
 
 P1000_MAX_PUSH_OUT_UL = 79.0
@@ -285,6 +288,7 @@ def _helper_load_all_labware(
         )
         for i in range(num_plates)
     ]
+    # FIXME: make this a stack of plates and lids
     dst_plates = [
         _load_labware(
             ctx,
