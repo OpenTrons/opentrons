@@ -72,7 +72,7 @@ STACKER_MOTION_CONFIG = {
             ),
         ),
         "move": AxisParams(
-            run_current=1.5,
+            run_current=1.0,
             hold_current=0.75,
             move_params=MoveParams(
                 max_speed=200.0,
@@ -83,7 +83,7 @@ STACKER_MOTION_CONFIG = {
     },
     StackerAxis.Z: {
         "home": AxisParams(
-            run_current=1.5,
+            run_current=1.4,
             hold_current=1.8,
             move_params=MoveParams(
                 max_speed=25.0,
@@ -92,7 +92,7 @@ STACKER_MOTION_CONFIG = {
             ),
         ),
         "move": AxisParams(
-            run_current=1.5,
+            run_current=1.4,
             hold_current=0.5,
             move_params=MoveParams(
                 max_speed=150.0,
@@ -103,7 +103,7 @@ STACKER_MOTION_CONFIG = {
     },
     StackerAxis.L: {
         "home": AxisParams(
-            run_current=1.5,
+            run_current=0.8,
             hold_current=0.15,
             move_params=MoveParams(
                 max_speed=100.0,
@@ -112,7 +112,7 @@ STACKER_MOTION_CONFIG = {
             ),
         ),
         "move": AxisParams(
-            run_current=1.5,
+            run_current=0.6,
             hold_current=0.15,
             move_params=MoveParams(
                 max_speed=100.0,
