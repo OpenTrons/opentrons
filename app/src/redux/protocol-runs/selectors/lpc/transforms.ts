@@ -112,28 +112,25 @@ export const getDefaultOffsetDetailsForAllLabware = (
     (details: LwGeometryDetails) => details.defaultOffsetDetails
   )
 }
-type LabwareURI = string
 
-export interface MisingDefaultOffsets {
-  [uri: LabwareURI]: DefaultOffsetLocationDetails
-}
 export interface MissingLocationSpecificOffsets {
-  [uri: LabwareURI]: LocationSpecificOffsetLocationDetails[]
+  [uri: string]: LocationSpecificOffsetLocationDetails[]
 }
 
 export interface MissingOffsets {
-  defaultOffsets: MisingDefaultOffsets
   locationSpecificOffsets: MissingLocationSpecificOffsets
+  totalCount: number
 }
 
 // Derive missing offsets for every labware by checking to see if an "existing offset" value
 // does not exist. Note: only offsets persisted on the robot-server are "not missing."
+// Hardcoded offsets are not missing.
 export const getMissingOffsets = (
   labware: LPCLabwareInfo['labware'] | undefined
 ): MissingOffsets => {
   const missingOffsets: MissingOffsets = {
-    defaultOffsets: {},
     locationSpecificOffsets: {},
+    totalCount: 0,
   }
 
   if (labware != null) {
@@ -141,8 +138,11 @@ export const getMissingOffsets = (
     Object.entries(labware).forEach(([uri, lwDetails]) => {
       lwDetails.locationSpecificOffsetDetails.forEach(detail => {
         const locationDetails = detail.locationDetails
+        const isHardcoded = detail.locationDetails.hardCodedOffsetId != null
 
-        if (detail.existingOffset == null) {
+        if (detail.existingOffset == null && !isHardcoded) {
+          missingOffsets.totalCount += 1
+
           missingOffsets.locationSpecificOffsets[uri] =
             missingOffsets.locationSpecificOffsets[uri] != null
               ? [
@@ -152,12 +152,6 @@ export const getMissingOffsets = (
               : [locationDetails]
         }
       })
-
-      // Default missing offsets.
-      if (lwDetails.defaultOffsetDetails.existingOffset == null) {
-        missingOffsets.defaultOffsets[uri] =
-          lwDetails.defaultOffsetDetails.locationDetails
-      }
     })
   }
 

@@ -5,6 +5,10 @@ import type {
 } from './offsets'
 
 export interface LPCLabwareInfo {
+  // Whether the user has confirmed offsets should be applied to the run.
+  areOffsetsApplied: boolean
+  // If current run offsets are stale, the run timestamp when they were not stale.
+  lastFreshOffsetRunTimestamp: string | null
   selectedLabware: SelectedLwOverview | null
   labware: { [uri: string]: LwGeometryDetails }
 }

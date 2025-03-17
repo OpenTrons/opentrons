@@ -15,7 +15,7 @@ import type { UseLPCLabwareInfoProps } from '..'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
 
 interface GetLPCLabwareInfoParams {
-  currentOffsets: StoredLabwareOffset[]
+  currentOffsets: StoredLabwareOffset[] | undefined
   lwLocInfo: LabwareLocationInfo[]
   labwareDefs: UseLPCLabwareInfoProps['labwareDefs']
   protocolData: CompletedProtocolAnalysis | null
@@ -25,7 +25,12 @@ interface GetLPCLabwareInfoParams {
 export function getLPCLabwareInfoFrom(
   params: GetLPCLabwareInfoParams
 ): LPCLabwareInfo {
-  return { selectedLabware: null, labware: getLabwareInfoRecords(params) }
+  return {
+    areOffsetsApplied: false,
+    selectedLabware: null,
+    labware: getLabwareInfoRecords(params),
+    lastFreshOffsetRunTimestamp: null, // Accurate data injected downstream.
+  }
 }
 
 function getLabwareInfoRecords(

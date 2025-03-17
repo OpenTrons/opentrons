@@ -23,6 +23,7 @@ export interface UseLPCInitialStateProps {
   labwareInfo: LPCLabwareInfo
   deckConfig: DeckConfiguration | undefined
   robotType: RobotType
+  lastFreshOffsetRunTs: string | null
 }
 
 // Initialize the LPC store if store data is sufficiently present.
@@ -33,6 +34,7 @@ export function useInitLPCStore({
   protocolName,
   deckConfig,
   robotType,
+  lastFreshOffsetRunTs,
   ...rest
 }: UseLPCInitialStateProps): void {
   const dispatch = useDispatch()
@@ -51,6 +53,10 @@ export function useInitLPCStore({
         activePipetteId,
         protocolName,
         deckConfig,
+        labwareInfo: {
+          ...rest.labwareInfo,
+          lastFreshOffsetRunTimestamp: lastFreshOffsetRunTs,
+        },
         steps: {
           currentStepIndex: 0,
           totalStepCount: LPC_STEPS.length,
@@ -62,5 +68,5 @@ export function useInitLPCStore({
 
       dispatch(startLPC(runId, initialState))
     }
-  }, [isReadyToInit, deckConfig])
+  }, [isReadyToInit, deckConfig, rest.labwareInfo, lastFreshOffsetRunTs])
 }

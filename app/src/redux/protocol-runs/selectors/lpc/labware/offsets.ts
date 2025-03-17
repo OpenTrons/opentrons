@@ -36,6 +36,15 @@ import type {
 } from '/app/redux/protocol-runs'
 import type { MissingOffsets, WorkingOffsetsByUri } from '../transforms'
 
+export const selectAreOffsetsApplied = (
+  runId: string
+): Selector<State, boolean> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.areOffsetsApplied,
+    areOffsetsApplied => areOffsetsApplied ?? false
+  )
+
 // Get the location specific offset details for the currently user-selected labware geometry.
 export const selectSelectedLwLocationSpecificOffsetDetails = (
   runId: string
@@ -198,6 +207,26 @@ export const selectCountNonHardcodedLocationSpecificOffsetsForLw = (
         : 0
   )
 
+// The total count of all location specific offsets utilized in a run.
+export const selectCountTotalLocationSpecificOffsets = (
+  runId: string
+): Selector<State, number> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => {
+      if (labware == null) {
+        return 0
+      }
+
+      let count = 0
+
+      Object.values(labware).forEach(lw => {
+        count += lw.locationSpecificOffsetDetails.length
+      })
+
+      return count
+    }
+  )
 // Whether the default offset is "absent" for the given labware geometry.
 // The default offset only needs to be added client-side to be considered "not absent".
 // Note that the default offset is not considered absent if all locations that would
@@ -264,7 +293,6 @@ export const selectIsAnyOffsetHardCoded = (
       ) ?? false
   )
 
-// TODO(jh, 03-14-24): Ensure we don't count hardcoded offsets as missing!
 // Returns the offset details for missing offsets, keyed by the labware URI.
 // Note: only offsets persisted on the robot-server are "not missing".
 export const selectMissingOffsets = (
