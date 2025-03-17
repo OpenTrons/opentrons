@@ -7,7 +7,7 @@ import {
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
-import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
+import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
 
 import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
@@ -17,7 +17,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
 vi.mock('../useAllHistoricOffsets')
-vi.mock('../getLabwareLocationCombos')
+vi.mock('../getLegacyLabwareLocationCombos')
 vi.mock('@opentrons/shared-data')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/useNotifyDataReady')
@@ -72,7 +72,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
         mockFirstCandidate,
       ])
     when(useAllHistoricOffsets).calledWith(null).thenReturn([])
-    when(getLabwareLocationCombos)
+    when(getLegacyLabwareLocationCombos)
       .calledWith(expect.any(Array), expect.any(Array), expect.any(Array))
       .thenReturn([
         {

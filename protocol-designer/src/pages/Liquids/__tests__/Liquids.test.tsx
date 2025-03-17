@@ -4,7 +4,10 @@ import { screen } from '@testing-library/react'
 import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { AssignLiquidsModal, DesignerNavigation } from '../../../organisms'
+import {
+  AssignLiquidsModal,
+  DesignerNavigation,
+} from '../../../components/organisms'
 import { LiquidsOverflowMenu } from '../../Designer/LiquidsOverflowMenu'
 import { Liquids } from '..'
 
@@ -13,7 +16,7 @@ import type { NavigateFunction } from 'react-router-dom'
 const mockNavigate = vi.fn()
 
 vi.mock('../../Designer/LiquidsOverflowMenu')
-vi.mock('../../../organisms')
+vi.mock('../../../components/organisms')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()

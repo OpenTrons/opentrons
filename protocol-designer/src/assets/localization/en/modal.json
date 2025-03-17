@@ -66,7 +66,20 @@
       "body4": "Bug fix for mismatched x- and y-offset values for aspirate and dispense during Mix steps",
       "body5": "Bug fix for Move steps not using the gripper by default",
       "body6": "All protocols now require Opentrons App version 8.2.0+ to run.",
-      "body7": "For more information, see the <link1>Protocol Designer Instruction Manual</link1> or the <link2>Release Notes.</link2>"
+      "body7": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
+    },
+    "dragDropAndHotFix": {
+      "heading": "{{version}} Release Notes",
+      "body1": "Welcome to Protocol Designer {{version}}!",
+      "body2": "This release includes the following improvements:",
+      "body3": "Adding drag and drop functionality for labware during deck setup",
+      "body4": "Adding error-handling for when labware or module used in a protocol step is deleted",
+      "body5": "Adding module highlighting when moving labware and editing a module step",
+      "body6": "Removing option to touch tip when dispensing into a trash bin",
+      "body7": "Removing ability to dispense to off-deck labware or move off-deck labware with a gripper",
+      "body8": "Removing quantity dropdown from all modules during the Flex setup flow to reduce deck setup conflicts",
+      "body9": "All protocols now require Opentrons App version 8.3.0+ to run.",
+      "body10": "For more information, see the <link1>Protocol Designer Instruction Manual</link1> or the <link2>Release Notes.</link2>."
     }
   },
   "labware_selection": {

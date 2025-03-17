@@ -21,6 +21,7 @@ describe('thermocyclerProfileStep', () => {
     initialThermocyclerModuleState?: ThermocyclerModuleState
     args: ThermocyclerProfileStepArgs
     expected: CreateCommand[]
+    expectedPython: string
   }> = [
     {
       testName: 'should generate expected commands',
@@ -96,6 +97,19 @@ describe('thermocyclerProfileStep', () => {
           },
         },
       ],
+      expectedPython: `
+mock_thermocycler.close_lid()
+mock_thermocycler.set_lid_temperature(55)
+mock_thermocycler.execute_profile(
+    [
+
+    ],
+    1,
+    block_max_volume=42,
+)
+mock_thermocycler.open_lid()
+mock_thermocycler.set_block_temperature(4)
+mock_thermocycler.deactivate_lid()`.trimStart(),
     },
     {
       testName:
@@ -156,6 +170,17 @@ describe('thermocyclerProfileStep', () => {
           },
         },
       ],
+      expectedPython: `
+mock_thermocycler.execute_profile(
+    [
+        {"temperature": 61, "hold_time_seconds": 99},
+    ],
+    1,
+    block_max_volume=42,
+)
+mock_thermocycler.open_lid()
+mock_thermocycler.set_block_temperature(4)
+mock_thermocycler.deactivate_lid()`.trimStart(),
     },
     {
       testName:
@@ -223,6 +248,18 @@ describe('thermocyclerProfileStep', () => {
           },
         },
       ],
+      expectedPython: `
+mock_thermocycler.close_lid()
+mock_thermocycler.execute_profile(
+    [
+        {"temperature": 61, "hold_time_seconds": 99},
+    ],
+    1,
+    block_max_volume=42,
+)
+mock_thermocycler.open_lid()
+mock_thermocycler.set_block_temperature(4)
+mock_thermocycler.deactivate_lid()`.trimStart(),
     },
     {
       testName:
@@ -283,11 +320,28 @@ describe('thermocyclerProfileStep', () => {
           },
         },
       ],
+      expectedPython: `
+mock_thermocycler.execute_profile(
+    [
+        {"temperature": 61, "hold_time_seconds": 99},
+    ],
+    1,
+    block_max_volume=42,
+)
+mock_thermocycler.open_lid()
+mock_thermocycler.set_block_temperature(4)
+mock_thermocycler.deactivate_lid()`.trimStart(),
     },
   ]
 
   testCases.forEach(
-    ({ testName, args, expected, initialThermocyclerModuleState }) => {
+    ({
+      testName,
+      args,
+      expected,
+      initialThermocyclerModuleState,
+      expectedPython,
+    }) => {
       it(testName, () => {
         const {
           robotState,
@@ -308,8 +362,9 @@ describe('thermocyclerProfileStep', () => {
           invariantContext,
           robotState
         )
-        const { commands } = getSuccessResult(result)
+        const { commands, python } = getSuccessResult(result)
         expect(commands).toEqual(expected)
+        expect(python).toEqual(expectedPython)
       })
     }
   )

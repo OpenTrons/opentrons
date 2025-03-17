@@ -111,6 +111,7 @@ def run(protocol: ProtocolContext) -> None:
         pvt1abr7_labware = [res1, elution_plate, sample_plate]
         for lw in pvt1abr7_labware:
             protocol.move_labware(lw, OFF_DECK, use_gripper=False)
+        pipette.reset_tipracks()
     if pvt1abr9:
         protocol.pause("SET UP PVT1ABR9")
         res1 = protocol.load_labware(

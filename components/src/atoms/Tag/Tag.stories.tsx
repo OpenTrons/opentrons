@@ -4,7 +4,7 @@ import { Tag as TagComponent } from './index'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof TagComponent> = {
-  title: 'Library/Atoms/Tag',
+  title: 'Helix/Atoms/Tag',
   argTypes: {
     type: {
       options: ['default', 'interactive', 'branded'],

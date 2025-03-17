@@ -106,6 +106,7 @@
   "select_volume": "Select a volume",
   "shake": "Shake",
   "single": "Single path",
+  "single_nozzle": "Single",
   "speed": "Speed",
   "starting_deck": "Starting deck",
   "step_substeps": "{{stepType}} details",

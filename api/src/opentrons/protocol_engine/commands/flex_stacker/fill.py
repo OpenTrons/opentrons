@@ -13,6 +13,7 @@ from ...errors import (
 from ...errors.exceptions import FlexStackerLabwarePoolNotYetDefinedError
 from ...state import update_types
 from ...types import StackerFillEmptyStrategy
+from opentrons.calibration_storage.helpers import uri_from_details
 
 if TYPE_CHECKING:
     from ...state.state import StateView
@@ -61,6 +62,18 @@ class FillResult(BaseModel):
     count: int = Field(
         ..., description="The new amount of labware stored in the stacker labware pool."
     )
+    primaryLabwareURI: str = Field(
+        ...,
+        description="The labware definition URI of the primary labware.",
+    )
+    adapterLabwareURI: str | None = Field(
+        None,
+        description="The labware definition URI of the adapter labware.",
+    )
+    lidLabwareURI: str | None = Field(
+        None,
+        description="The labware definition URI of the lid labware.",
+    )
 
 
 class FillImpl(AbstractCommandImpl[FillParams, SuccessData[FillResult]]):
@@ -100,8 +113,35 @@ class FillImpl(AbstractCommandImpl[FillParams, SuccessData[FillResult]]):
         if params.strategy == StackerFillEmptyStrategy.MANUAL_WITH_PAUSE:
             await self._run_control.wait_for_resume()
 
+        if stacker_state.pool_primary_definition is None:
+            raise FlexStackerLabwarePoolNotYetDefinedError(
+                "The Primary Labware must be defined in the stacker pool."
+            )
+
         return SuccessData(
-            public=FillResult(count=new_count), state_update=state_update
+            public=FillResult(
+                count=new_count,
+                primaryLabwareURI=uri_from_details(
+                    stacker_state.pool_primary_definition.namespace,
+                    stacker_state.pool_primary_definition.parameters.loadName,
+                    stacker_state.pool_primary_definition.version,
+                ),
+                adapterLabwareURI=uri_from_details(
+                    stacker_state.pool_adapter_definition.namespace,
+                    stacker_state.pool_adapter_definition.parameters.loadName,
+                    stacker_state.pool_adapter_definition.version,
+                )
+                if stacker_state.pool_adapter_definition is not None
+                else None,
+                lidLabwareURI=uri_from_details(
+                    stacker_state.pool_lid_definition.namespace,
+                    stacker_state.pool_lid_definition.parameters.loadName,
+                    stacker_state.pool_lid_definition.version,
+                )
+                if stacker_state.pool_lid_definition is not None
+                else None,
+            ),
+            state_update=state_update,
         )
 
 

@@ -180,7 +180,7 @@ export interface OnModuleLocationSequenceComponent {
 
 export interface OnAddressableAreaLocationSequenceComponent {
   kind: 'onAddressableArea'
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }
 
 export interface NotOnDeckLocationSequenceComponent {
@@ -319,6 +319,7 @@ interface LoadLidStackResult {
   stackLabwareId: string
   labwareIds: string[]
   definition: LabwareDefinition2
+  lidStackDefinition: LabwareDefinition2
   location: LabwareLocation
   stackLocationSequence?: LabwareLocationSequence
   locationSequences?: LabwareLocationSequence[]

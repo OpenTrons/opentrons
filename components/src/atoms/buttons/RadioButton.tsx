@@ -84,6 +84,20 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
       background-color: ${disabled ? COLORS.grey35 : COLORS.blue60};
     }
   `
+  //  TODO: the max line to clamp for subtext
+  const SUBBUTTON_LABEL_STYLE = css`
+    color: ${disabled
+      ? COLORS.grey50
+      : isSelected
+      ? COLORS.white
+      : COLORS.grey60};
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: ${buttonSubLabel?.align === 'vertical' ? 2 : 1};
+    overflow: hidden;
+    word-break: break-all;
+    text-overflow: ellipsis;
+  `
 
   const getButtonStyle = (
     isSelected: boolean,
@@ -144,13 +158,15 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
               buttonLabel
             )}
             {buttonSubLabel && (
-              <StyledText
-                color={COLORS.grey60}
-                oddStyle="bodyTextRegular"
-                desktopStyle="bodyDefaultRegular"
-              >
-                {buttonSubLabel.label}
-              </StyledText>
+              <Flex css={SUBBUTTON_LABEL_STYLE}>
+                <StyledText
+                  color={isSelected ? COLORS.white : COLORS.grey60}
+                  oddStyle="bodyTextRegular"
+                  desktopStyle="bodyDefaultRegular"
+                >
+                  {buttonSubLabel.label}
+                </StyledText>
+              </Flex>
             )}
           </Flex>
         </Flex>
