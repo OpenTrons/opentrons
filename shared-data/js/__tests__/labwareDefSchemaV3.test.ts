@@ -66,7 +66,10 @@ describe(`test labware definitions with schema v3`, () => {
   const allPaths = definitionPaths.concat(fixturePaths)
 
   test("paths didn't break, which would give false positives", () => {
-    expect(definitionPaths.length).toBeGreaterThan(0)
+    // todo(mm, 2025-03-17): Update this to .toBeGreaterThan(0) when some
+    // schema 3 definitions exist.
+    expect(definitionPaths.length).toStrictEqual(0)
+
     expect(fixturePaths.length).toBeGreaterThan(0)
   })
 
@@ -84,83 +87,3 @@ describe(`test labware definitions with schema v3`, () => {
     checkGeometryDefinitions(labwareDef)
   })
 })
-
-describe('check groups of labware that should have the same geometry', () => {
-  describe.each(
-    Object.entries(SHARED_GEOMETRY_GROUPS).map(([groupName, groupEntries]) => ({
-      groupName,
-      groupEntries,
-    }))
-  )('$groupName', ({ groupEntries }) => {
-    const normalizedGroupEntries = groupEntries.map(entry => ({
-      loadName: typeof entry === 'string' ? entry : entry.loadName,
-      geometryKey: typeof entry === 'string' ? undefined : entry.geometryKey,
-    }))
-    test.each(normalizedGroupEntries)(
-      '$loadName',
-      ({ loadName, geometryKey }) => {
-        // We arbitrarily pick the first labware in the group to compare the rest against.
-        const otherLabwareGeometry = getGeometry(
-          normalizedGroupEntries[0].loadName,
-          normalizedGroupEntries[0].geometryKey
-        )
-        const thisLabwareGeometry = getGeometry(loadName, geometryKey)
-        expect(thisLabwareGeometry).toEqual(otherLabwareGeometry)
-      }
-    )
-  })
-})
-
-/**
- * Return the latest version of the given labware that's defined in schema 3.
- *
- * todo(mm, 2025-02-27): We already have a "production" getLatestLabwareDef() function
- * elsewhere, and it would be nice to reuse that, but it looks like that one currently
- * relies on a hard-coded list of labware.
- */
-function findLatestDefinition(loadName: string): LabwareDefinition3 {
-  const candidates: LabwareDefinition3[] = glob
-    .sync('*.json', {
-      cwd: path.join(definitionsDir, loadName),
-      absolute: true,
-    })
-    .map(require)
-  if (candidates.length === 0) {
-    throw new Error(`No definitions found for ${loadName}.`)
-  }
-  candidates.sort((a, b) => a.version - b.version)
-  const latest = candidates[candidates.length - 1]
-  return latest
-}
-
-/**
- * Extract the given geometry from the given definition.
- *
- * If geometryKey is unspecified, the definition is expected to have exactly one
- * geometry key, and that one is extracted and returned.
- */
-function getGeometry(
-  loadName: string,
-  geometryKey: string | undefined
-): InnerWellGeometry {
-  const definition = findLatestDefinition(loadName)
-  const availableGeometries = definition.innerLabwareGeometry ?? {}
-
-  if (geometryKey === undefined) {
-    const availableGeometryEntries = Object.entries(availableGeometries)
-    if (availableGeometryEntries.length !== 1) {
-      throw new Error(
-        `Expected exactly 1 geometry in ${definition.parameters.loadName} but found ${availableGeometryEntries.length}.`
-      )
-    }
-    return availableGeometryEntries[0][1]
-  } else {
-    const result = availableGeometries[geometryKey]
-    if (result === undefined) {
-      throw new Error(
-        `No geometry found in ${definition.parameters.loadName} with key ${geometryKey}.`
-      )
-    }
-    return result
-  }
-}
