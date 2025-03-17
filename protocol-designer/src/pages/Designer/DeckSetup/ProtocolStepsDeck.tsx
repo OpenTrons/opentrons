@@ -1,6 +1,5 @@
 import { useMemo, useState, Fragment } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import round from 'lodash/round'
+import { useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -20,7 +19,6 @@ import {
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
-  getPositionFromSlotId,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
   STAGING_AREA_CUTOUTS,
@@ -31,15 +29,11 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupDetails } from './DeckSetupDetails'
-import { DECK_SETUP_TOOLS_WIDTH_REM } from './DeckSetupTools'
 import {
-  animateZoom,
   getCutoutIdForAddressableArea,
   useDeckSetupWindowBreakPoint,
-  zoomInOnCoordinate,
 } from './utils'
 import { HoverSlotDetailsContainer } from './HoverSlotDetailsContainer'
 
@@ -50,12 +44,7 @@ import type {
   DeckSlot,
 } from '@opentrons/step-generation'
 
-const WASTE_CHUTE_SPACE = 30
-const DETAILS_HOVER_SPACE = 60
-// Note (02/02/25:kk) the size is different from the design but the product team requested keep the current size
-// const STARTING_DECK_VIEW_MIN_WIDTH = '75%'
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem' // for Protocol Steps
-
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
   'fixedBase',
@@ -71,7 +60,6 @@ export const darkFill = COLORS.grey60
 
 export function ProtocolStepsDeck(): JSX.Element {
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const dispatch = useDispatch<any>()
   const breakPointSize = useDeckSetupWindowBreakPoint()
   const zoomIn = useSelector(selectors.getZoomedInSlot)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
@@ -98,38 +86,6 @@ export function ProtocolStepsDeck(): JSX.Element {
       wasteChuteFixtures.length > 0
   )
 
-  const hasWasteChute =
-    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
-
-  const windowInnerWidthRem = window.innerWidth / 16
-  const deckMapRatio = round(
-    (windowInnerWidthRem - DECK_SETUP_TOOLS_WIDTH_REM) / windowInnerWidthRem,
-    2
-  )
-
-  const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
-  const viewBoxY = hasWasteChute
-    ? deckDef.cornerOffsetFromOrigin[1] -
-      WASTE_CHUTE_SPACE -
-      DETAILS_HOVER_SPACE
-    : deckDef.cornerOffsetFromOrigin[1]
-  const viewBoxWidth = deckDef.dimensions[0] / deckMapRatio
-  const viewBoxHeight = deckDef.dimensions[1] + DETAILS_HOVER_SPACE
-  const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
-
-  const [viewBox, setViewBox] = useState<string>(initialViewBox)
-
-  const viewBoxNumerical = viewBox?.split(' ').map(val => Number(val)) ?? []
-  const viewBoxAdjustedNumerical = [
-    ...viewBoxNumerical.slice(0, 2),
-    (viewBoxNumerical[2] - viewBoxNumerical[0]) / deckMapRatio +
-      viewBoxNumerical[0],
-    viewBoxNumerical[3],
-  ]
-  const viewBoxAdjusted = viewBoxAdjustedNumerical.reduce((acc, num, i) => {
-    return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
-  }, '')
-
   const addEquipment = (slotId: string): void => {
     const cutoutId =
       getCutoutIdForAddressableArea(
@@ -138,25 +94,6 @@ export function ProtocolStepsDeck(): JSX.Element {
       ) ?? null
     if (cutoutId == null) {
       console.error('expected to find a cutoutId but could not')
-    }
-    dispatch(selectZoomedIntoSlot({ slot: slotId, cutout: cutoutId }))
-
-    const zoomInSlotPosition = getPositionFromSlotId(slotId ?? '', deckDef)
-    if (zoomInSlotPosition != null) {
-      const zoomedInViewBox = zoomInOnCoordinate({
-        x: zoomInSlotPosition[0],
-        y: zoomInSlotPosition[1],
-
-        deckDef,
-      })
-      //  TODO(ja, 9/3/24): re-examine this usage. It is causing
-      //  a handful of rerendering of the DeckSetupTools which may
-      //  cause optimization issues??
-      animateZoom({
-        targetViewBox: zoomedInViewBox,
-        viewBox,
-        setViewBox,
-      })
     }
   }
 
@@ -225,7 +162,7 @@ export function ProtocolStepsDeck(): JSX.Element {
               width="100%"
               minWidth="auto"
               deckDef={deckDef}
-              viewBox={viewBoxAdjusted}
+              // viewBox={initialViewBox}
               transform={
                 robotType === OT2_ROBOT_TYPE
                   ? 'scale(1.3, -1.3)'
