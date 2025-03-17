@@ -15,12 +15,7 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { ZERO_OFFSET } from '../constants'
-import {
-  airGapInWasteChute,
-  blowoutInWasteChute,
-  dispenseInWasteChute,
-  reduceCommandCreators,
-} from './index'
+import { reduceCommandCreators } from './index'
 import {
   dispense,
   moveToAddressableArea,
@@ -31,6 +26,9 @@ import {
   blowOutInTrash,
   dispenseInTrash,
   airGapInWell,
+  airGapInWasteChute,
+  blowOutInWasteChute,
+  dispenseInWasteChute,
 } from '../commandCreators/compound'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -381,11 +379,12 @@ export const blowoutUtil = (args: {
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    return blowoutInWasteChute({
-      pipetteId: pipette,
-      flowRate,
-      invariantContext,
-    })
+    return [
+      curryCommandCreator(blowOutInWasteChute, {
+        pipetteId: pipette,
+        flowRate,
+      }),
+    ]
   } else {
     const trashBin = Object.values(additionalEquipmentEntities).find(
       ae => ae.name === 'trashBin'
@@ -610,12 +609,13 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    commands = dispenseInWasteChute({
-      pipetteId,
-      volume,
-      flowRate,
-      invariantContext,
-    })
+    commands = [
+      curryCommandCreator(dispenseInWasteChute, {
+        pipetteId,
+        volume,
+        flowRate,
+      }),
+    ]
   } else {
     commands = [
       curryCommandCreator(dispenseInTrash, {
@@ -743,12 +743,14 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    commands = airGapInWasteChute({
-      pipetteId,
-      volume,
-      flowRate,
-      invariantContext,
-    })
+    commands = [
+      curryCommandCreator(airGapInWasteChute, {
+        pipetteId,
+        volume,
+        flowRate,
+        invariantContext,
+      }),
+    ]
   } else {
     commands = [
       curryCommandCreator(airGapInTrash, {
