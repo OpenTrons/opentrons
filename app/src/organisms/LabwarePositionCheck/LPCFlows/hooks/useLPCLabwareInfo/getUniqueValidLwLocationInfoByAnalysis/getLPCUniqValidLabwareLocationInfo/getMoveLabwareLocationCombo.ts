@@ -22,8 +22,6 @@ export function getMoveLabwareLocationCombo(
   lw: LoadedLabware[],
   modules: LoadedModule[]
 ): LabwareLocationInfoWithLocSeq | null {
-  // TOME TODO: Confirm in PR that this is a fine check AND we care about the eventual rather
-  //  than the immediate.
   if (command.result?.eventualDestinationLocationSequence == null) {
     return null
   } else {

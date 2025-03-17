@@ -51,9 +51,7 @@ function isValidLocCombo(
 
   if (notLPCable) {
     return false
-  }
-  // TOME TODO: Ask if this is a good assumption in the PR review.
-  else if (lwDef.allowedRoles == null) {
+  } else if (lwDef.allowedRoles == null) {
     return true
   } else {
     return !(
