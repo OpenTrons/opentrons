@@ -6,11 +6,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import {
-  PIPETTE_NAMES_MAP,
-  SINGLE,
-  getIncompatibleLiquidClasses,
-} from '@opentrons/shared-data'
+import { SINGLE } from '@opentrons/shared-data'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
   getDisabledFields,
@@ -18,7 +14,7 @@ import {
 } from '../../../../steplist/formLevel'
 import { i18n } from '../../../../assets/localization'
 import { PROFILE_CYCLE } from '../../../../form-types'
-import type { PipetteEntities, PipetteEntity } from '@opentrons/step-generation'
+import type { PipetteEntity } from '@opentrons/step-generation'
 import type { DropdownOption } from '@opentrons/components'
 import type { ProfileFormError } from '../../../../steplist/formLevel/profileErrors'
 import type { FormWarning } from '../../../../steplist/formLevel/warnings'
@@ -30,7 +26,6 @@ import type {
   StepType,
   PathOption,
   HydratedFormData,
-  LiquidClassesOption,
 } from '../../../../form-types'
 import type { FormError } from '../../../../steplist/formLevel'
 import type { NozzleType } from '../../../../types'

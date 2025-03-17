@@ -7,6 +7,9 @@ import {
   maxDispenseWellVolume,
   tipPositionInTube,
   mixTipPositionInTube,
+  lowVolumeTransfer,
+  incompatiblePipettePath,
+  incompatiblePipetteTiprack,
 } from '../warnings'
 import type { LabwareEntity } from '@opentrons/step-generation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -331,5 +334,76 @@ describe('Max dispense well volume', () => {
       expect(tipPositionInTube(fields)).toBe(null)
       expect(mixTipPositionInTube(fields)).toBe(null)
     })
+  })
+})
+
+describe('Incompatible liquid classes', () => {
+  let fieldsWithPipette: {
+    pipette: { name: string }
+    path: string
+    tipRack: string
+  }
+  beforeEach(() => {
+    fieldsWithPipette = {
+      pipette: {
+        name: 'p50_single_flex',
+      },
+      path: 'multiDispense',
+      tipRack: 'opentrons/opentrons_flex_96_tiprack_50ul/1',
+    }
+  })
+  it('should NOT return a warning when volume is greater than or equals to 10', () => {
+    const fields = {
+      ...fieldsWithPipette,
+      volume: 11,
+    }
+    expect(lowVolumeTransfer(fields)).toBe(null)
+  })
+  it('should return a warning when volume is less than 10', () => {
+    const fields = {
+      ...fieldsWithPipette,
+      volume: 5,
+    }
+    expect(lowVolumeTransfer(fields)?.type).toBe('LOW_VOLUME_TRANSFER')
+  })
+  it('should NOT return a warning when path is compatible', () => {
+    const fields = {
+      ...fieldsWithPipette,
+    }
+
+    expect(incompatiblePipettePath(fields)).toBe(null)
+  })
+  it('should return a warning when tiprack is incompatible and path is multiDispense', () => {
+    const fields = {
+      ...fieldsWithPipette,
+      tipRack: 'mockTiprack',
+    }
+    expect(incompatiblePipettePath(fields)?.type).toBe(
+      'INCOMPATIBLE_PIPETTE_PATH'
+    )
+  })
+  it('should return a warning when pipette is incompatible with all liquid classes', () => {
+    const fields = {
+      ...fieldsWithPipette,
+      pipette: { name: 'mockPipette' },
+    }
+    expect(incompatiblePipetteTiprack(fields)?.type).toBe(
+      'INCOMPATIBLE_ALL_PIPETTE_LABWARE'
+    )
+    expect(incompatiblePipetteTiprack(fields)?.title).toBe(
+      'The selected pipette is incompatible with liquid classes.'
+    )
+  })
+  it('should return a warning when tiprack is incompatible with all liquid classes', () => {
+    const fields = {
+      ...fieldsWithPipette,
+      tipRack: 'mockTiprack',
+    }
+    expect(incompatiblePipetteTiprack(fields)?.type).toBe(
+      'INCOMPATIBLE_ALL_PIPETTE_LABWARE'
+    )
+    expect(incompatiblePipetteTiprack(fields)?.title).toBe(
+      'The selected tiprack is incompatible with liquid classes.'
+    )
   })
 })

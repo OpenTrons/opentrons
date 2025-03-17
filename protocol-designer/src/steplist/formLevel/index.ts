@@ -64,7 +64,7 @@ import {
   tipPositionInTube,
   lowVolumeTransfer,
   incompatiblePipetteTiprack,
-  incompatiblePipettePath
+  incompatiblePipettePath,
 } from './warnings'
 
 import type { FormWarning, FormWarningType } from './warnings'
