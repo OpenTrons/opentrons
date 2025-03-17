@@ -391,7 +391,6 @@ async def dispense_in_place(
             ),
         )
     else:
-        print(f"Volume {volume}")
         return SuccessData(
             public=BaseLiquidHandlingResult(volume=volume),
             state_update=StateUpdate()
