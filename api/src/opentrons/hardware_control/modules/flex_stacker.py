@@ -52,17 +52,6 @@ MAX_TRAVEL = {
     StackerAxis.L: 22.0,
 }
 
-FAST_HOME_OFFSETS = {
-    StackerAxis.X: {
-        Direction.EXTEND: 5.0,
-        Direction.RETRACT: 5.0,
-    },
-    StackerAxis.Z: {
-        Direction.EXTEND: 6.0,
-        Direction.RETRACT: 10.25,
-    },
-}
-
 # The offset in mm to subtract from MAX_TRAVEL when moving an axis before we home.
 # This lets us use `move_axis` to move fast, leaving the axis OFFSET mm
 # from the limit switch. Then we can use `home_axis` to move the axis the rest
@@ -372,8 +361,8 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._prepare_for_action()
 
         # Move platform along the X then Z axis
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT)
-        await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND, OFFSET_SM)
 
         # Transfer
         await self.open_latch()
@@ -383,24 +372,22 @@ class FlexStacker(mod_abc.AbstractModule):
         # Move platform along the Z then X axis
         offset = labware_height / 2 + OFFSET_MD
         await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, offset)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
         return True
 
     async def store_labware(self, labware_height: float) -> bool:
         """Stores a labware in the stacker."""
         await self._prepare_for_action()
 
-        z_speed = STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed / 2
         # Move X then Z axis
         offset = OFFSET_MD if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
         distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
-        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT)
-        # stalling during testing when tiprack crashes into the labware stack
-        await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance, z_speed)
+        await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
+        await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
         # Transfer
         await self.open_latch()
-
+        z_speed = (STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed or 0) / 2
         await self.move_axis(
             StackerAxis.Z, Direction.EXTEND, (labware_height / 2), z_speed
         )
@@ -408,15 +395,13 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.close_latch()
 
         # Move Z then X axis
-        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND)
+        await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, OFFSET_LG)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
         return True
 
     async def _move_and_home_axis(
-        self, axis: StackerAxis, direction: Direction, offset: Optional[float] = None
+        self, axis: StackerAxis, direction: Direction, offset: float = 0
     ) -> bool:
-        if not offset:
-            offset = FAST_HOME_OFFSETS[axis][direction]
         distance = MAX_TRAVEL[axis] - offset
         await self.move_axis(axis, direction, distance)
         return await self.home_axis(axis, direction)

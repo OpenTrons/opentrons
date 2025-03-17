@@ -66,7 +66,7 @@ STACKER_MOTION_CONFIG = {
             run_current=1.5,  # mAmps
             hold_current=0.75,
             move_params=MoveParams(
-                max_speed=40.0,  # mm/s
+                max_speed=10.0,  # mm/s
                 acceleration=100.0,  # mm/s^2
                 max_speed_discont=40.0,  # mm/s
             ),
@@ -86,7 +86,7 @@ STACKER_MOTION_CONFIG = {
             run_current=1.5,
             hold_current=1.8,
             move_params=MoveParams(
-                max_speed=25.0,
+                max_speed=10.0,
                 acceleration=100.0,
                 max_speed_discont=25.0,
             ),
@@ -107,8 +107,8 @@ STACKER_MOTION_CONFIG = {
             hold_current=0.15,
             move_params=MoveParams(
                 max_speed=100.0,
-                acceleration=500.0,
-                max_speed_discont=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
             ),
         ),
         "move": AxisParams(
@@ -116,8 +116,8 @@ STACKER_MOTION_CONFIG = {
             hold_current=0.15,
             move_params=MoveParams(
                 max_speed=100.0,
-                acceleration=500.0,
-                max_speed_discont=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
             ),
         ),
     },
