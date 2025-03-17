@@ -165,7 +165,7 @@ export interface OnModuleLocationSequenceComponent {
 
 export interface OnAddressableAreaLocationSequenceComponent {
   kind: 'onAddressableArea'
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }
 
 export interface NotOnDeckLocationSequenceComponent {

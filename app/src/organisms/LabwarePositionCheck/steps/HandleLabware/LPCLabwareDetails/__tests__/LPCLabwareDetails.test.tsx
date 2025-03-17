@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -9,7 +9,6 @@ import {
   mockLPCContentProps,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { LPCLabwareDetails } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails'
-import { InlineNotification } from '/app/atoms/InlineNotification'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   selectSelectedLwOverview,
@@ -19,8 +18,9 @@ import {
   selectStepInfo,
   goBackEditOffsetSubstep,
   applyWorkingOffsets,
+  selectCountNonHardcodedLocationSpecificOffsetsForLw,
+  selectIsAnyOffsetHardCoded,
 } from '/app/redux/protocol-runs'
-import { handleUnsavedOffsetsModalODD } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/UnsavedOffsets'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -77,6 +77,8 @@ vi.mock('/app/redux/protocol-runs', () => ({
   selectSelectedLwDisplayName: vi.fn(),
   selectWorkingOffsetsByUri: vi.fn(),
   selectIsDefaultOffsetAbsent: vi.fn(),
+  selectCountNonHardcodedLocationSpecificOffsetsForLw: vi.fn(),
+  selectIsAnyOffsetHardCoded: vi.fn(),
   selectStepInfo: vi.fn(),
   goBackEditOffsetSubstep: vi.fn(),
   applyWorkingOffsets: vi.fn(),
@@ -105,19 +107,21 @@ const render = (props: ComponentProps<typeof LPCLabwareDetails>) => {
 describe('LPCLabwareDetails', () => {
   let props: ComponentProps<typeof LPCLabwareDetails>
   let mockDispatch: Mock
-  let mockHandleUnsavedOffsetsModalODD: Mock
+  let mockSaveWorkingOffsets: Mock
 
   beforeEach(() => {
     mockDispatch = vi.fn()
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
-    mockHandleUnsavedOffsetsModalODD = vi.mocked(handleUnsavedOffsetsModalODD)
+    mockSaveWorkingOffsets = vi.fn(() => Promise.resolve('mock-data'))
 
     props = {
       ...mockLPCContentProps,
+      commandUtils: {
+        saveWorkingOffsets: mockSaveWorkingOffsets,
+        isSavingWorkingOffsetsLoading: false,
+      } as any,
     }
 
-    vi.mocked(InlineNotification).mockClear()
-    mockHandleUnsavedOffsetsModalODD.mockClear()
     vi.mocked(getIsOnDevice).mockReturnValue(false)
 
     vi.mocked(
@@ -131,8 +135,16 @@ describe('LPCLabwareDetails', () => {
     vi.mocked(selectSelectedLwDisplayName).mockImplementation(() => () =>
       'Test Labware'
     )
-    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () => ({}))
+    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () =>
+      ({
+        test: {},
+      } as any)
+    )
     vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => false)
+    vi.mocked(
+      selectCountNonHardcodedLocationSpecificOffsetsForLw
+    ).mockImplementation(() => () => 0)
+    vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => false)
     vi.mocked(goBackEditOffsetSubstep).mockReturnValue({
       type: 'GO_BACK_HANDLE_LW_SUBSTEP',
     } as any)
@@ -175,29 +187,34 @@ describe('LPCLabwareDetails', () => {
     )
   })
 
-  it('does not show InlineNotification when default offset is present', () => {
+  it('does not show the default InlineNotification when default offset is present', () => {
     render(props)
 
     expect(screen.queryByTestId('inline-notification')).not.toBeInTheDocument()
   })
 
-  it('dispatches actions when save is clicked with working offsets', () => {
-    vi.mocked(selectWorkingOffsetsByUri).mockImplementation(() => () =>
-      ({
-        'labware-uri-1': true,
-      } as any)
-    )
-
+  it('dispatches actions when save is clicked with working offsets', async () => {
     render(props)
 
     const primaryButton = screen.getByTestId('primary-button')
     primaryButton.click()
 
+    await act(async () => {
+      await expect(mockSaveWorkingOffsets).toHaveBeenCalled()
+    })
+
     expect(mockDispatch).toHaveBeenCalledTimes(2)
-    expect(applyWorkingOffsets).toHaveBeenCalledWith(
-      props.runId,
-      'labware-uri-1'
-    )
+    expect(applyWorkingOffsets).toHaveBeenCalledWith(props.runId, 'mock-data')
     expect(goBackEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
+  })
+
+  it('shows the hardcoded InlineNotification when there is a hardcoded offset present', () => {
+    vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => true)
+
+    render(props)
+
+    screen.getByText(
+      'Hardcoded offsets must be changed in your Python protocol'
+    )
   })
 })

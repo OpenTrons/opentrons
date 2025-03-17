@@ -11,20 +11,23 @@ import type {
 } from '@opentrons/shared-data'
 import type { LegacyLabwareOffsetLocation } from '@opentrons/api-client'
 
-export interface LabwareLocationCombo {
+export interface LegacyLabwareLocationCombo {
   location: LegacyLabwareOffsetLocation
   definitionUri: string
   labwareId: string
   moduleId?: string
   adapterId?: string
 }
-export function getLabwareLocationCombos(
+
+// Dev note: This only needs to be updated if analysis output changes affect the OT-2.
+// The flex does not make use of this util!
+export function getLegacyLabwareLocationCombos(
   commands: RunTimeCommand[],
   labware: ProtocolAnalysisOutput['labware'],
   modules: ProtocolAnalysisOutput['modules']
-): LabwareLocationCombo[] {
+): LegacyLabwareLocationCombo[] {
   return commands
-    .reduce<LabwareLocationCombo[]>((acc, command) => {
+    .reduce<LegacyLabwareLocationCombo[]>((acc, command) => {
       if (command.commandType === 'loadLabware') {
         if (
           command.result?.definition == null ||
@@ -183,9 +186,9 @@ export function getLabwareLocationCombos(
 }
 
 function appendLocationComboIfUniq(
-  acc: LabwareLocationCombo[],
-  locationCombo: LabwareLocationCombo
-): LabwareLocationCombo[] {
+  acc: LegacyLabwareLocationCombo[],
+  locationCombo: LegacyLabwareLocationCombo
+): LegacyLabwareLocationCombo[] {
   const locationComboAlreadyExists = acc.some(
     combo =>
       combo.labwareId === locationCombo.labwareId &&

@@ -10,7 +10,7 @@ import {
   BORDERS,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { getModuleType } from '@opentrons/shared-data'
+import { FLEX_STACKER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 
 import {
   OFFSET_KIND_DEFAULT,
@@ -44,6 +44,7 @@ export function LabwareLocationItem({
   const { toggleRobotMoving, handleCheckItemsPrepModules } = commandUtils
   const { locationDetails } = locationSpecificOffsetDetails
   const { definitionUri } = locationDetails
+  const isHardcodedOffset = locationDetails.hardCodedOffsetId != null
   const dispatch = useDispatch()
 
   const mostRecentOffset = useSelector(
@@ -80,7 +81,9 @@ export function LabwareLocationItem({
   }
 
   const buildOffsetTagProps = (): OffsetTagProps => {
-    if (mostRecentOffset == null) {
+    if (isHardcodedOffset) {
+      return { kind: 'hardcoded' }
+    } else if (mostRecentOffset == null) {
       return { kind: 'noOffset' }
     } else if (mostRecentOffset?.kind === OFFSET_KIND_DEFAULT) {
       return { kind: 'default' }
@@ -89,11 +92,9 @@ export function LabwareLocationItem({
     }
   }
 
-  // TODO(jh, 03-06-25): Add the stacked label after integrating the new API work.
-  //  Note that it is the same as the Flex stacker module type.
   const buildDeckInfoLabels = (): JSX.Element[] => {
     const moduleIconType = (): ModuleType | null => {
-      const moduleModel = locationDetails.moduleModel
+      const moduleModel = locationDetails.closestBeneathModuleModel
 
       if (moduleModel != null) {
         return getModuleType(moduleModel)
@@ -102,9 +103,28 @@ export function LabwareLocationItem({
       }
     }
 
+    const isLabwareInLwStackup = (): boolean => {
+      const { lwModOnlyStackupDetails } = locationDetails
+      const lwOnlyStackup = lwModOnlyStackupDetails.filter(
+        component => component.kind === 'labware'
+      )
+
+      return lwOnlyStackup.length > 1
+    }
+
     const deckInfoLabels = [
       <DeckInfoLabel deckLabel={slotCopy} key={slotCopy} />,
     ]
+
+    if (isLabwareInLwStackup()) {
+      // We use the flex stacker's stacked icon to represent stacked labware.
+      deckInfoLabels.push(
+        <DeckInfoLabel
+          iconName={MODULE_ICON_NAME_BY_TYPE[FLEX_STACKER_MODULE_TYPE]}
+          key="stacked-icon"
+        />
+      )
+    }
 
     const moduleType = moduleIconType()
     if (moduleType !== null) {
@@ -128,13 +148,15 @@ export function LabwareLocationItem({
           buttonText: lpcTextT('adjust'),
           onClick: handleLaunchEditOffset,
           buttonType: 'secondary',
-          disabled: isMissingDefaultOffset,
+          disabled: isMissingDefaultOffset || isHardcodedOffset,
         }}
         colThreeSecondaryBtn={{
           buttonText: lpcTextT('reset_to_default'),
           onClick: handleResetOffset,
           buttonType: 'tertiaryHighLight',
-          disabled: mostRecentOffset?.kind !== OFFSET_KIND_LOCATION_SPECIFIC,
+          disabled:
+            mostRecentOffset?.kind !== OFFSET_KIND_LOCATION_SPECIFIC ||
+            isHardcodedOffset,
         }}
       />
     </Flex>

@@ -172,6 +172,12 @@ export interface LegacyLabwareOffsetCreateData {
   vector: VectorOffset
 }
 
+export interface LabwareOffsetCreateData {
+  definitionUri: string
+  locationSequence: LabwareOffsetLocationSequence
+  vector: VectorOffset
+}
+
 type RunTimeParameterValuesType = string | number | boolean | { id: string }
 export type RunTimeParameterValuesCreateData = Record<
   string,
