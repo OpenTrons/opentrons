@@ -5,7 +5,10 @@ import type {
   OnModuleOffsetLocationSequenceComponent,
   VectorOffset,
 } from '@opentrons/api-client'
-import type { ModuleModel } from '@opentrons/shared-data'
+import type {
+  FlexAddressableAreaName,
+  ModuleModel,
+} from '@opentrons/shared-data'
 
 export type LabwareOffsetLocSeqOrAnyLoc =
   | LabwareOffsetLocationSequence
@@ -37,7 +40,7 @@ export interface LabwareLocationInfo {
   // A labware id in the run that is an instance of the labware geometry (the definitionUri).
   labwareId: string
   // The base slot in which the top-most labware resides.
-  slotName: string
+  addressableAreaName: FlexAddressableAreaName
   // The actual offset location sequence used for querying or updating the offset related
   // to the labware location info.
   lwOffsetLocSeq: LabwareOffsetLocSeqOrAnyLoc
@@ -67,7 +70,7 @@ export type OffsetLocationDetails =
 
 export interface DefaultOffsetLocationDetails
   extends BaseOffsetLocationDetails {
-  slotName: 'C2'
+  addressableAreaName: 'C2'
   kind: 'default'
   lwOffsetLocSeq: typeof ANY_LOCATION
   hardCodedOffsetId?: undefined
@@ -75,7 +78,7 @@ export interface DefaultOffsetLocationDetails
 
 export interface LocationSpecificOffsetLocationDetails
   extends BaseOffsetLocationDetails {
-  slotName: string
+  addressableAreaName: FlexAddressableAreaName
   kind: 'location-specific'
   lwOffsetLocSeq: LabwareOffsetLocationSequence
   hardCodedOffsetId: string | null

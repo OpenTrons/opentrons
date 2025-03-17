@@ -9,7 +9,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
       workingOffset: null,
       locationDetails: {
         kind: 'default',
-        slotName: 'C2',
+        addressableAreaName: 'C2',
         labwareId: 'labware-1',
         definitionUri: 'def-uri-1',
         lwOffsetLocSeq: 'anyLocation',
@@ -32,7 +32,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
       workingOffset: null,
       locationDetails: {
         kind: 'default',
-        slotName: 'C2',
+        addressableAreaName: 'C2',
         labwareId: 'labware-2',
         definitionUri: 'def-uri-2',
         lwOffsetLocSeq: 'anyLocation',
@@ -52,7 +52,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
         locationDetails: {
           kind: 'location-specific',
           hardCodedOffsetId: null,
-          slotName: 'A1',
+          addressableAreaName: 'A1',
           labwareId: 'labware-2',
           definitionUri: 'def-uri-2',
           lwOffsetLocSeq: [
@@ -71,7 +71,7 @@ export const mockLabwareInfo: Record<string, LwGeometryDetails> = {
         workingOffset: null,
         locationDetails: {
           kind: 'location-specific',
-          slotName: 'B2',
+          addressableAreaName: 'B2',
           labwareId: 'labware-2',
           definitionUri: 'def-uri-2',
           lwOffsetLocSeq: [

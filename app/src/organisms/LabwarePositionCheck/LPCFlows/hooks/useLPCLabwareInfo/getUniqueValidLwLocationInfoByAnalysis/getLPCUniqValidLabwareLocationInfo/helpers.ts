@@ -1,4 +1,5 @@
 import type {
+  FlexAddressableAreaName,
   LabwareLocationSequence,
   LoadedModule,
   ModuleModel,
@@ -37,15 +38,15 @@ export function getClosestBeneathAdapterId(
 }
 
 // Get the slot name from the location sequence. If there is no slot name, returns null.
-export function getSlotNameFrom(
+export function getAddressableAreaNameFrom(
   locSeq: LabwareLocationSequence
-): string | null {
+): FlexAddressableAreaName | null {
   const matchingComponent = locSeq.findLast(
     locSeqComponent => locSeqComponent.kind === 'onAddressableArea'
   )
 
   return matchingComponent?.kind === 'onAddressableArea'
-    ? matchingComponent.addressableAreaName
+    ? (matchingComponent.addressableAreaName as FlexAddressableAreaName)
     : null
 }
 

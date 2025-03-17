@@ -101,7 +101,9 @@ function buildMoveLabwareCommand(
         } else if (closestBeneathLwId != null) {
           return { labwareId: closestBeneathLwId }
         } else {
-          return { slotName: offsetLocationDetails.slotName }
+          return {
+            addressableAreaName: offsetLocationDetails.addressableAreaName,
+          }
         }
       }
 

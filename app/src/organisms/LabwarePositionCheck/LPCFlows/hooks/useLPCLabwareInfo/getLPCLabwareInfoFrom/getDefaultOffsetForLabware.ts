@@ -27,7 +27,7 @@ export function getDefaultOffsetDetailsForLabware({
       definitionUri: uri,
       kind: OFFSET_KIND_DEFAULT,
       // We always do default offset LPCing in this slot.
-      slotName: 'C2',
+      addressableAreaName: 'C2',
       lwOffsetLocSeq: ANY_LOCATION,
       // The only labware present on deck when configuring the default offset is the top-most labware itself.
       lwModOnlyStackupDetails: [

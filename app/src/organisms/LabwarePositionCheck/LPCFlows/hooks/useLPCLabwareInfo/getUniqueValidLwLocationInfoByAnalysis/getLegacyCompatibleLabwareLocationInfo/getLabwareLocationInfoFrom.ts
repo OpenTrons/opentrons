@@ -21,7 +21,7 @@ export function getLabwareLocationInfoFrom(
     return {
       definitionUri: legacyCombo.definitionUri,
       labwareId: legacyCombo.labwareId,
-      slotName: legacyCombo.location.slotName,
+      addressableAreaName: legacyCombo.location.slotName,
       lwOffsetLocSeq,
       lwModOnlyStackupDetails: buildLwModOnlyStackupDetails(
         legacyCombo,

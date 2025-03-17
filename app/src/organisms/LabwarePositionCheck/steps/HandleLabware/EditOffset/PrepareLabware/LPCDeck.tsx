@@ -73,7 +73,7 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
       return allModulesOnDeck.filter(
         moduleOnDeck =>
           moduleOnDeck.moduleLocation.slotName !==
-          offsetLocationDetails.slotName
+          offsetLocationDetails.addressableAreaName
       )
     } else {
       return allModulesOnDeck

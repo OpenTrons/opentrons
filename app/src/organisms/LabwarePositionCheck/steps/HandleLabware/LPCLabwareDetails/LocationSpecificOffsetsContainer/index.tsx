@@ -41,7 +41,7 @@ export function LocationSpecificOffsetsContainer(
       loadedLabwares: protocolData.labware,
       robotType: FLEX_ROBOT_TYPE,
       location: {
-        slotName: offset.locationDetails.slotName,
+        addressableAreaName: offset.locationDetails.addressableAreaName,
       },
       detailLevel: 'slot-only',
     }).slice(-2) // ex, "C1" instead of "Slot C1"
@@ -75,7 +75,7 @@ export function LocationSpecificOffsetsContainer(
 
             return (
               <LabwareLocationItem
-                key={`${offset.locationDetails.slotName}${offset.locationDetails.closestBeneathModuleId}${offset.locationDetails.closestBeneathAdapterId}`}
+                key={`${offset.locationDetails.addressableAreaName}${offset.locationDetails.closestBeneathModuleId}${offset.locationDetails.closestBeneathAdapterId}`}
                 {...props}
                 locationSpecificOffsetDetails={details}
                 slotCopy={slotCopy}

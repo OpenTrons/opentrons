@@ -13,7 +13,7 @@ export const mockDefaultOffsetDetails: DefaultOffsetDetails = {
   workingOffset: null,
   locationDetails: {
     kind: 'default',
-    slotName: 'C2',
+    addressableAreaName: 'C2',
     labwareId: 'labware-1',
     definitionUri: 'def-uri-1',
     lwOffsetLocSeq: 'anyLocation',
@@ -32,7 +32,7 @@ export const mockDefaultOffsetDetailsWithOffset: DefaultOffsetDetails = {
   workingOffset: null,
   locationDetails: {
     kind: 'default',
-    slotName: 'C2',
+    addressableAreaName: 'C2',
     labwareId: 'labware-1',
     definitionUri: 'def-uri-1',
     lwOffsetLocSeq: 'anyLocation',
@@ -52,7 +52,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
     workingOffset: null,
     locationDetails: {
       kind: 'location-specific',
-      slotName: 'C1',
+      addressableAreaName: 'C1',
       labwareId: 'labware-1',
       definitionUri: 'def-uri-1',
       hardCodedOffsetId: null,
@@ -72,7 +72,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
     workingOffset: null,
     locationDetails: {
       kind: 'location-specific',
-      slotName: 'A2',
+      addressableAreaName: 'A2',
       labwareId: 'labware-1',
       definitionUri: 'def-uri-1',
       hardCodedOffsetId: null,
@@ -96,7 +96,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
     workingOffset: null,
     locationDetails: {
       kind: 'location-specific',
-      slotName: 'B3',
+      addressableAreaName: 'B3',
       closestBeneathModuleId: 'module-1',
       labwareId: 'labware-2',
       definitionUri: 'def-uri-2',
