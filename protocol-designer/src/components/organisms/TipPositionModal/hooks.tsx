@@ -10,6 +10,7 @@ import type { PositionReference } from '@opentrons/shared-data'
 interface UsePositionReferenceResult {
   positionReferenceDropdown: JSX.Element
   reference: PositionReference
+  setReference: Dispatch<SetStateAction<PositionReference>>
 }
 
 export function usePositionReference(args: {
@@ -100,5 +101,6 @@ export function usePositionReference(args: {
       />
     ),
     reference,
+    setReference,
   }
 }

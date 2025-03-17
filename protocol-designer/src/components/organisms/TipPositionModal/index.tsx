@@ -97,7 +97,11 @@ export function TipPositionModal(
   const [xValue, setXValue] = useState<string | null>(
     xSpec?.value == null ? null : String(xSpec?.value)
   )
-  const { positionReferenceDropdown, reference } = usePositionReference({
+  const {
+    positionReferenceDropdown,
+    reference,
+    setReference,
+  } = usePositionReference({
     initialReference: referenceSpec?.value as PositionReference,
     zValue: Number(zValue),
     updateZValue: setZValue,
@@ -249,6 +253,7 @@ export function TipPositionModal(
               setXValue('0')
               setYValue('0')
               setZValue('1')
+              setReference(WELL_BOTTOM)
             }}
             css={LINK_BUTTON_STYLE}
           >
@@ -347,7 +352,7 @@ export function TipPositionModal(
           >
             <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {view === 'side' ? 'Side view' : 'Top view'}
+                {t(`modal:tip_position.view.${view}`)}
               </StyledText>
               <Btn
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}

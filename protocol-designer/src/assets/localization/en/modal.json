@@ -138,7 +138,11 @@
       "TOO_MANY_DECIMALS": "a max of 1 decimal place is allowed",
       "OUT_OF_BOUNDS": "accepted range is {{minMm}} to {{maxMm}}"
     },
-    "field_label": "Distance from bottom of well"
+    "field_label": "Distance from bottom of well",
+    "view": {
+      "side": "Side view",
+      "top": "Top view"
+    }
   },
   "labware_upload_message": {
     "title": {
