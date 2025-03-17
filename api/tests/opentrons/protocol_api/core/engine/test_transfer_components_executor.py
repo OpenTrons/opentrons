@@ -1,6 +1,6 @@
 """Tests for complex commands executor."""
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
     PositionReference,
@@ -20,9 +20,14 @@ from opentrons.protocol_api.core.engine.transfer_components_executor import (
     TransferType,
     LiquidAndAirGapPair,
 )
-from opentrons.protocol_engine.errors import LiquidHeightUnknownError
-from opentrons.types import Location, Point
 from opentrons.protocol_api.labware import Well
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as tx_utils,
+)
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    _LocationCheckDescriptors,
+)
+from opentrons.types import Location, Point
 
 
 @pytest.fixture
@@ -39,6 +44,15 @@ def sample_transfer_props(
     return LiquidClass.create(maximal_liquid_class_def).get_for(
         pipette="flex_1channel_50", tip_rack="opentrons_flex_96_tiprack_50ul"
     )
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_raise_if_location_inside_liquid(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Replace raise_if_location_inside_liquid() with a mock."""
+    mock = decoy.mock(func=tx_utils.raise_if_location_inside_liquid)
+    monkeypatch.setattr(tx_utils, "raise_if_location_inside_liquid", mock)
 
 
 """ Test aspirate properties:
@@ -94,13 +108,23 @@ def test_submerge_without_lpd(
     decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(source_well.get_top(0)).then_return(well_top_point)
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
-    decoy.when(source_well.current_liquid_height()).then_return(1)
+    # decoy.when(source_well.current_liquid_height()).then_return(1)
     subject.submerge(
         submerge_properties=sample_transfer_props.aspirate.submerge,
         volume_for_pipette_mode_configuration=123,
     )
 
     decoy.verify(
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(x=2, y=4, z=7), labware=None),
+            well_location=Location(Point(x=1, y=2, z=3), labware=None),
+            well_core=source_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="submerge start",
+                pipetting_action="aspirate",
+            ),
+            logger=matchers.Anything(),
+        ),
         mock_instrument_core.move_to(
             location=Location(Point(x=2, y=4, z=7), labware=None),
             well_core=source_well,
@@ -148,7 +172,6 @@ def test_submerge_with_lpd(
     air_gap_correction_vol = (
         sample_transfer_props.dispense.correction_by_volume.get_for_volume(123)
     )
-
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
         transfer_properties=sample_transfer_props,
@@ -163,86 +186,15 @@ def test_submerge_with_lpd(
     decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(source_well.get_top(0)).then_return(well_top_point)
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(True)
-    decoy.when(source_well.current_liquid_height()).then_return(1)
     subject.submerge(
         submerge_properties=sample_transfer_props.aspirate.submerge,
         volume_for_pipette_mode_configuration=123,
     )
 
     decoy.verify(
-        mock_instrument_core.move_to(
-            location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_core=source_well,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
-        ),
-        mock_instrument_core.dispense(
-            location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_core=None,
-            volume=123,
-            rate=1,
-            flow_rate=air_gap_removal_flow_rate,
-            in_place=True,
-            is_meniscus=False,
-            push_out=0,
-            correction_volume=air_gap_correction_vol,
-        ),
-        mock_instrument_core.delay(0.5),
-        mock_instrument_core.configure_for_volume(123),
         mock_instrument_core.liquid_probe_with_recovery(
             source_well, Location(Point(x=2, y=4, z=7), labware=None)
         ),
-        mock_instrument_core.move_to(
-            location=Location(Point(1, 2, 3), labware=None),
-            well_core=source_well,
-            force_direct=True,
-            minimum_z_height=None,
-            speed=100,
-        ),
-        mock_instrument_core.delay(10),
-    )
-
-
-def test_submerge_without_liquid_height_info(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    sample_transfer_props: TransferProperties,
-) -> None:
-    """Should perform the expected submerge steps."""
-    source_well = decoy.mock(cls=WellCore)
-    well_top_point = Point(1, 2, 4)
-    well_bottom_point = Point(4, 5, 6)
-    air_gap_removal_flow_rate = (
-        sample_transfer_props.dispense.flow_rate_by_volume.get_for_volume(123)
-    )
-    air_gap_correction_vol = (
-        sample_transfer_props.dispense.correction_by_volume.get_for_volume(123)
-    )
-
-    subject = TransferComponentsExecutor(
-        instrument_core=mock_instrument_core,
-        transfer_properties=sample_transfer_props,
-        target_location=Location(Point(1, 2, 3), labware=None),
-        target_well=source_well,
-        tip_state=TipState(
-            ready_to_aspirate=True,
-            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(liquid=0, air_gap=123),
-        ),
-        transfer_type=TransferType.ONE_TO_ONE,
-    )
-    decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
-    decoy.when(source_well.get_top(0)).then_return(well_top_point)
-    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
-    decoy.when(source_well.current_liquid_height()).then_raise(
-        LiquidHeightUnknownError("Oh no!")
-    )
-    subject.submerge(
-        submerge_properties=sample_transfer_props.aspirate.submerge,
-        volume_for_pipette_mode_configuration=123,
-    )
-
-    decoy.verify(
         mock_instrument_core.move_to(
             location=Location(Point(x=2, y=4, z=7), labware=None),
             well_core=source_well,
@@ -275,43 +227,14 @@ def test_submerge_without_liquid_height_info(
     )
 
 
-def test_submerge_raises_when_submerge_point_below_aspirate_point(
+def test_submerge_raises_when_submerge_point_is_invalid(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
     sample_transfer_props: TransferProperties,
 ) -> None:
-    """Should perform the expected submerge steps."""
+    """Should raise an error when submerge start point is invalid."""
     source_well = decoy.mock(cls=WellCore)
-    well_top_point = Point(1, 2, 7)
-    well_bottom_point = Point(4, 5, 6)
-    subject = TransferComponentsExecutor(
-        instrument_core=mock_instrument_core,
-        transfer_properties=sample_transfer_props,
-        target_location=Location(Point(1, 2, 13), labware=None),
-        target_well=source_well,
-        tip_state=TipState(
-            ready_to_aspirate=True,
-            last_liquid_and_air_gap_in_tip=LiquidAndAirGapPair(liquid=0, air_gap=123),
-        ),
-        transfer_type=TransferType.ONE_TO_ONE,
-    )
-    decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
-    decoy.when(source_well.get_top(0)).then_return(well_top_point)
-    with pytest.raises(RuntimeError, match="location z should not be lower"):
-        subject.submerge(
-            submerge_properties=sample_transfer_props.aspirate.submerge,
-            volume_for_pipette_mode_configuration=123,
-        )
-
-
-def test_submerge_raises_when_submerge_point_inside_liquid(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    sample_transfer_props: TransferProperties,
-) -> None:
-    """Should perform the expected submerge steps."""
-    source_well = decoy.mock(cls=WellCore)
-    well_top_point = Point(1, 2, 7)
+    well_top_point = Point(1, 2, 4)
     well_bottom_point = Point(4, 5, 6)
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
@@ -326,9 +249,20 @@ def test_submerge_raises_when_submerge_point_inside_liquid(
     )
     decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(source_well.get_top(0)).then_return(well_top_point)
-    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(True)
-    decoy.when(source_well.current_liquid_height()).then_return(10)
-    with pytest.raises(RuntimeError, match="is inside the liquid in well"):
+    decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
+    decoy.when(
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(x=2, y=4, z=7), labware=None),
+            well_location=Location(Point(x=1, y=2, z=3), labware=None),
+            well_core=source_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="submerge start",
+                pipetting_action="aspirate",
+            ),
+            logger=matchers.Anything(),
+        )
+    ).then_raise(RuntimeError("Oh no!"))
+    with pytest.raises(RuntimeError, match="Oh no!"):
         subject.submerge(
             submerge_properties=sample_transfer_props.aspirate.submerge,
             volume_for_pipette_mode_configuration=123,
@@ -710,10 +644,19 @@ def test_retract_after_aspiration(
     )
     decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(source_well.get_top(0)).then_return(well_top_point)
-
     subject.retract_after_aspiration(volume=40)
 
     decoy.verify(
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(x=4, y=4, z=4), labware=None),
+            well_location=Location(Point(x=1, y=1, z=1), labware=None),
+            well_core=source_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="aspirate",
+            ),
+            logger=matchers.Anything(),
+        ),
         mock_instrument_core.move_to(
             location=Location(Point(x=4, y=4, z=4), labware=None),
             well_core=source_well,
@@ -744,6 +687,41 @@ def test_retract_after_aspiration(
         ),
         mock_instrument_core.delay(0.2),
     )
+
+
+def test_post_aspirate_retract_raises_when_retract_point_is_invalid(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+) -> None:
+    """Should raise an error when the retract point is deemed bad."""
+    source_well = decoy.mock(cls=WellCore)
+    well_top_point = Point(1, 2, 3)
+    well_bottom_point = Point(4, 5, 6)
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=Location(Point(1, 1, 1), labware=None),
+        target_well=source_well,
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+    decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
+    decoy.when(source_well.get_top(0)).then_return(well_top_point)
+    decoy.when(
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(x=4, y=4, z=4), labware=None),
+            well_location=Location(Point(x=1, y=1, z=1), labware=None),
+            well_core=source_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="aspirate",
+            ),
+            logger=matchers.Anything(),
+        )
+    ).then_raise(RuntimeError("Oh no!"))
+    with pytest.raises(RuntimeError, match="Oh no!"):
+        subject.retract_after_aspiration(volume=40)
 
 
 def test_retract_after_aspiration_without_touch_tip_and_delay(
@@ -1308,6 +1286,49 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
     )
 
 
+def test_retract_after_dispense_raises_for_invalid_retract_point(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+) -> None:
+    """It should raise an error if the retract end point is deemed bad."""
+    source_location = Location(Point(1, 2, 3), labware=None)
+    source_well = decoy.mock(cls=WellCore)
+    dest_well = decoy.mock(cls=WellCore)
+    well_top_point = Point(1, 2, 3)
+    well_bottom_point = Point(4, 5, 6)
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=Location(Point(1, 1, 1), labware=None),
+        target_well=dest_well,
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+    decoy.when(dest_well.get_bottom(0)).then_return(well_bottom_point)
+    decoy.when(dest_well.get_top(0)).then_return(well_top_point)
+    decoy.when(source_well.get_top(0)).then_return(Point(10, 20, 30))
+    decoy.when(
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(12, 24, 36), labware=None),
+            well_location=Location(Point(1, 1, 1), labware=None),
+            well_core=dest_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="dispense",
+            ),
+            logger=matchers.Anything(),
+        )
+    ).then_raise(RuntimeError("Oh no!"))
+    with pytest.raises(RuntimeError, match="Oh no!"):
+        subject.retract_after_dispensing(
+            trash_location=Location(Point(), labware=None),
+            source_location=source_location,
+            source_well=source_well,
+            add_final_air_gap=True,
+        )
+
+
 @pytest.mark.parametrize(
     argnames=["is_last_retract", "add_final_air_gap", "expect_air_gap"],
     argvalues=[
@@ -1361,6 +1382,16 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
         is_last_retract=is_last_retract,
     )
     decoy.verify(
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(3, 5, 4), labware=None),
+            well_location=Location(Point(1, 1, 1), labware=None),
+            well_core=dest_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="dispense",
+            ),
+            logger=matchers.Anything(),
+        ),
         mock_instrument_core.move_to(
             location=Location(Point(3, 5, 4), labware=None),
             well_core=dest_well,
@@ -1459,6 +1490,16 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
         is_last_retract=is_last_retract,
     )
     decoy.verify(
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(3, 5, 4), labware=None),
+            well_location=Location(Point(1, 1, 1), labware=None),
+            well_core=dest_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="dispense",
+            ),
+            logger=matchers.Anything(),
+        ),
         mock_instrument_core.move_to(
             location=Location(Point(3, 5, 4), labware=None),
             well_core=dest_well,
@@ -1513,6 +1554,48 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
             or []
         ),
     )
+
+
+def test_multi_dispense_retract_raises_for_invalid_retract_point(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+) -> None:
+    """It should raise an error if the retract end point is deemed bad."""
+    source_location = Location(Point(1, 2, 3), labware=None)
+    source_well = decoy.mock(cls=WellCore)
+    dest_well = decoy.mock(cls=WellCore)
+    well_top_point = Point(1, 2, 3)
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=Location(Point(1, 1, 1), labware=None),
+        target_well=dest_well,
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_MANY,
+    )
+    decoy.when(dest_well.get_top(0)).then_return(well_top_point)
+    decoy.when(
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(3, 5, 4), labware=None),
+            well_location=Location(Point(1, 1, 1), labware=None),
+            well_core=dest_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="dispense",
+            ),
+            logger=matchers.Anything(),
+        )
+    ).then_raise(RuntimeError("Oh no!"))
+    with pytest.raises(RuntimeError, match="Oh no!"):
+        subject.retract_during_multi_dispensing(
+            trash_location=Location(Point(), labware=None),
+            source_location=source_location,
+            source_well=source_well,
+            conditioning_volume=0,
+            add_final_air_gap=True,
+            is_last_retract=False,
+        )
 
 
 @pytest.mark.parametrize(
