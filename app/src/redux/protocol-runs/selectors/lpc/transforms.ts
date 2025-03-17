@@ -218,6 +218,15 @@ export function getWorkingOffsetsByUri(
   return workingOffsetsByUri
 }
 
+// "Missing" means the existing offset is not present (the offsets are persisted on the server).
+export function getAreAnyLocationSpecificOffsetsMissing(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): boolean {
+  return (
+    lsDetails?.some(detail => detail.existingOffset?.vector == null) ?? false
+  )
+}
+
 export function getAreAllOffsetsHardCoded(
   lsDetails: LocationSpecificOffsetDetails[] | undefined
 ): boolean {
