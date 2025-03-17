@@ -277,10 +277,8 @@ export interface SelectOffsetsToApplyResult {
   toDelete: string[] // existing offset ids
 }
 
-// TOME TODO: Update this naming to save, not apply.
-
 // Get all the offset data that requires server-side updating.
-export const selectOffsetsToApply = (
+export const selectPendingOffsetOperations = (
   runId: string
 ): Selector<State, SelectOffsetsToApplyResult> =>
   createSelector(

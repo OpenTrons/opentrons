@@ -6,7 +6,7 @@ import {
   useDeleteLabwareOffsetMutation,
 } from '@opentrons/react-api-client'
 
-import { selectOffsetsToApply } from '/app/redux/protocol-runs'
+import { selectPendingOffsetOperations } from '/app/redux/protocol-runs'
 
 import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type { UseLPCCommandChildProps } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/types'
@@ -22,7 +22,9 @@ export function useSaveWorkingOffsets({
 }: UseLPCCommandChildProps): UseBuildOffsetsToApplyResult {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { toUpdate, toDelete } = useSelector(selectOffsetsToApply(runId))
+  const { toUpdate, toDelete } = useSelector(
+    selectPendingOffsetOperations(runId)
+  )
   const { createLabwareOffsets } = useCreateLabwareOffsetsMutation()
   const { deleteLabwareOffset } = useDeleteLabwareOffsetMutation()
 
