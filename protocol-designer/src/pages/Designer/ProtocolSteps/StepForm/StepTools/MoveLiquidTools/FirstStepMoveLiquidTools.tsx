@@ -129,7 +129,11 @@ export function FirstStepMoveLiquidTools({
         {isDisposalLocation ? null : (
           <WellSelectionField
             {...propsForFields.dispense_wells}
-            labwareId={String(propsForFields.dispense_labware.value)}
+            labwareId={
+              typeof propsForFields.dispense_labware.value === 'string'
+                ? propsForFields.dispense_labware.value
+                : null
+            }
             pipetteId={formData.pipette}
             nozzles={
               typeof propsForFields.nozzles.value === 'string'
