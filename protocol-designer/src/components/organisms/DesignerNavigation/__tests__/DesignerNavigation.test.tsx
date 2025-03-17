@@ -40,16 +40,6 @@ describe('DesignerNavigation', () => {
   beforeEach(() => {
     props = {
       hasZoomInSlot: false,
-      tabs: [
-        {
-          text: 'Protocol starting deck',
-          isActive: true,
-        },
-        {
-          text: 'Protocol steps',
-          isActive: false,
-        },
-      ] as TabProps[],
       hasTrashEntity: false,
       showLiquidOverflowMenu: vi.fn(),
     }
