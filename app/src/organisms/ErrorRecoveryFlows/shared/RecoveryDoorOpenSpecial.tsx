@@ -55,7 +55,6 @@ export function RecoveryDoorOpenSpecial({
       case RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE:
       case RECOVERY_MAP.HOME_AND_RETRY.ROUTE:
         return t('door_open_robot_home')
-      case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('close_robot_and_stacker_door')
       default: {
         console.error(
