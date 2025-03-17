@@ -234,13 +234,40 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
 
       expect(wellGeometryId in labwareDef.innerLabwareGeometry).toBe(true)
 
-      // FIXME(mm, 2025-02-04):
-      // `wellDepth` != `topFrustumHeight` for ~23/60 definitions.
-      //
-      // const wellDepth = labwareDef.wells[wellName].depth
-      // const topFrustumHeight =
-      //   labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
-      // expect(wellDepth).toEqual(topFrustumHeight)
+      const wellDepth = labwareDef.wells[wellName].depth
+      const topFrustumHeight =
+        labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
+      const labwareWithWellDepthMismatches = [
+        // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
+        'agilent_1_reservoir_290ml/2',
+        'corning_24_wellplate_3.4ml_flat/3',
+        'corning_6_wellplate_16.8ml_flat/3',
+        'corning_96_wellplate_360ul_flat/3',
+        'nest_96_wellplate_2ml_deep/3',
+        'opentrons_15_tuberack_falcon_15ml_conical/2',
+        'opentrons_24_aluminumblock_nest_1.5ml_screwcap/2',
+        'opentrons_24_aluminumblock_nest_2ml_screwcap/2',
+        'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/2',
+        'opentrons_6_tuberack_falcon_50ml_conical/2',
+        'opentrons_6_tuberack_nest_50ml_conical/2',
+      ]
+      if (
+        labwareDef.parameters.loadName ===
+          'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical' &&
+        labwareDef.version === 2
+      ) {
+        // todo(mm, 2025-03-17): Some of the well heights in this definition do match
+        // and some of them don't, so we can't assert either way. Investigate and
+        // resolve the mismatches.
+      } else if (
+        labwareWithWellDepthMismatches.includes(
+          labwareDef.parameters.loadName + '/' + labwareDef.version
+        )
+      ) {
+        expect(wellDepth).not.toStrictEqual(topFrustumHeight)
+      } else {
+        expect(wellDepth).toStrictEqual(topFrustumHeight)
+      }
     }
   })
 }

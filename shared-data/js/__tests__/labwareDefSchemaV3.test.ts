@@ -44,13 +44,10 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
 
       expect(wellGeometryId in labwareDef.innerLabwareGeometry).toBe(true)
 
-      // FIXME(mm, 2025-02-04):
-      // `wellDepth` != `topFrustumHeight` for ~23/60 definitions.
-      //
-      // const wellDepth = labwareDef.wells[wellName].depth
-      // const topFrustumHeight =
-      //   labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
-      // expect(wellDepth).toEqual(topFrustumHeight)
+      const wellDepth = labwareDef.wells[wellName].depth
+      const topFrustumHeight =
+        labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
+      expect(wellDepth).toStrictEqual(topFrustumHeight)
     }
   })
 }
