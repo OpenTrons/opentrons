@@ -1,6 +1,6 @@
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Literal
+from typing import Any, Dict, List, Literal, cast
 
 import requests
 import structlog
@@ -27,20 +27,26 @@ class AnthropicPredict:
         self.system_prompt: str = SYSTEM_PROMPT
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
         self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "v2_structure.xml"
-        self.cached_docs: List[MessageParam] = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": DOCUMENTS.format(doc_content=self.get_docs()), "cache_control": {"type": "ephemeral"}}  # type: ignore
-                ],
-            }
-        ]
-        self.cached_api_docs: List[MessageParam] = [
-            {
-                "role": "user",
-                "content": [{"type": "text", "text": self.get_api_docs(), "cache_control": {"type": "ephemeral"}}],  # type: ignore
-            }
-        ]
+        self.cached_docs: List[MessageParam] = cast(
+            List[MessageParam],
+            [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": DOCUMENTS.format(doc_content=self.get_docs()), "cache_control": {"type": "ephemeral"}}
+                    ],
+                }
+            ],
+        )
+        self.cached_api_docs: List[MessageParam] = cast(
+            List[MessageParam],
+            [
+                {
+                    "role": "user",
+                    "content": [{"type": "text", "text": self.get_api_docs(), "cache_control": {"type": "ephemeral"}}],
+                }
+            ],
+        )
         self.tools: List[Dict[str, Any]] = [
             {
                 "name": "simulate_protocol",
