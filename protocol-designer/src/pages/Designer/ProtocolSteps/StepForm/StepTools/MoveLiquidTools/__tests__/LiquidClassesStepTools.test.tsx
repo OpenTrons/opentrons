@@ -1,9 +1,6 @@
 import { describe, it, vi, beforeEach, expect } from 'vitest'
-import {
-  fixtureP1000SingleV2Specs,
-  fixtureTiprack1000ul,
-} from '@opentrons/shared-data'
 import { fireEvent, screen } from '@testing-library/react'
+import { COLORS } from '@opentrons/components'
 import { i18n } from '../../../../../../../assets/localization'
 import { renderWithProviders } from '../../../../../../../__testing-utils__'
 import {
@@ -14,7 +11,6 @@ import formDataForSingleStep from '../../../../../../../__fixtures__/formDataFor
 import { LiquidClassesStepTools } from '../LiquidClassesStepTools'
 
 import type { ComponentProps } from 'react'
-import { COLORS } from '@opentrons/components'
 
 vi.mock('../../../../../../../step-forms/selectors')
 
@@ -99,5 +95,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
 
     expect(noLiquidClass).toHaveStyle(`background-color: ${COLORS.blue50}`)
     expect(water).toHaveStyle(`background-color: ${COLORS.grey35}`)
+    fireEvent.click(water)
+    expect(props.propsForFields.liquidClass.updateValue).not.toHaveBeenCalled()
   })
 })

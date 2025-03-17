@@ -8,6 +8,7 @@ import type {
   LabwareDefinition2,
   LabwareDefinition3,
   LiquidClass,
+  LiquidClassesOption,
   ModuleModel,
   RobotType,
   ThermalAdapterName,
@@ -422,4 +423,48 @@ export const getIncompatibleLiquidClasses = (
   return Object.values(liquidClassDefs)
     .filter(liquidClass => !Boolean(liquidClass.byPipette?.some(predicate)))
     .map(liquidClass => liquidClass.displayName)
+}
+
+export interface ValuesForLiquidClasses {
+  path?: string | null
+  volume?: number | null
+  tipRack?: string | null
+  pipette?: string | null
+}
+export const getDisableLiquidClasses = (
+  values: ValuesForLiquidClasses,
+  pipetteModel: string
+): Set<LiquidClassesOption> | null => {
+  const { volume, tipRack, pipette, path } = values
+  if (pipette == null) return null
+  const disabledLiquidClasses = new Set<LiquidClassesOption>()
+
+  if (volume != null && volume < 10) {
+    ;['Aqueous', 'Viscous', 'Volatile'].forEach(cls =>
+      disabledLiquidClasses.add(cls as LiquidClassesOption)
+    )
+  }
+
+  getIncompatibleLiquidClasses(
+    p => p.pipetteModel === pipetteModel
+  ).forEach(cls => disabledLiquidClasses.add(cls as LiquidClassesOption))
+
+  getIncompatibleLiquidClasses(
+    p =>
+      p.pipetteModel === pipetteModel &&
+      p.byTipType.some((t: { tiprack: string }) => t.tiprack === tipRack)
+  ).forEach(cls => disabledLiquidClasses.add(cls as LiquidClassesOption))
+
+  if (path === 'multiDispense') {
+    getIncompatibleLiquidClasses(
+      p =>
+        p.pipetteModel === pipetteModel &&
+        p.byTipType.some(
+          (t: { tiprack: string; multiDispense: any }) =>
+            t.tiprack === tipRack && t.multiDispense !== undefined
+        )
+    ).forEach(cls => disabledLiquidClasses.add(cls as LiquidClassesOption))
+  }
+
+  return disabledLiquidClasses.size > 0 ? disabledLiquidClasses : null
 }

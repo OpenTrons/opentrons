@@ -4,7 +4,7 @@ import {
   getWellTotalVolume,
 } from '@opentrons/shared-data'
 import type { FormError } from './errors'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 
 /*******************
  ** Warning Messages **
@@ -191,8 +191,9 @@ export const incompatiblePipettePath = (
   fields: HydratedFormData
 ): FormWarning | null => {
   const { pipette, tipRack, path } = fields
+  const pipetteName = pipette.name as PipetteName
 
-  const pipetteModel = PIPETTE_NAMES_MAP[pipette.name]
+  const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
   if (path === 'multiDispense') {
     const incompatiblePath = getIncompatibleLiquidClasses(
       p =>
@@ -213,7 +214,9 @@ export const incompatiblePipetteTiprack = (
 ): FormWarning | null => {
   const { pipette, tipRack } = fields
 
-  const pipetteModel = PIPETTE_NAMES_MAP[pipette.name]
+  const pipetteName = pipette.name as PipetteName
+
+  const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
 
   const incompatiblePipette = getIncompatibleLiquidClasses(
     p => p.pipetteModel === pipetteModel

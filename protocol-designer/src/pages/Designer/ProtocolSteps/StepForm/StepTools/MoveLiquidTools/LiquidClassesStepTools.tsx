@@ -8,12 +8,16 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  PIPETTE_NAMES_MAP,
+  getDisableLiquidClasses,
+  getSortedLiquidClassDefs,
+} from '@opentrons/shared-data'
 import { getLiquidEntities } from '../../../../../../step-forms/selectors'
 import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
 import { selectors as stepFormSelectors } from '../../../../../../step-forms'
-import { getDisableLiquidClasses } from '../../utils'
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { LiquidClassesOption } from '@opentrons/shared-data'
 import type { FormData } from '../../../../../../form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -32,6 +36,8 @@ export const LiquidClassesStepTools = ({
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
+  const pipetteName = pipetteEntities[formData.pipette].name
+  const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
   const disabledLiquidClasses = getDisableLiquidClasses(
     {
       volume: formData.volume,
@@ -39,7 +45,7 @@ export const LiquidClassesStepTools = ({
       pipette: formData.pipette,
       path: formData.path,
     },
-    pipetteEntities
+    pipetteModel
   )
   const liquidClassToLiquidsMap: Record<string, string[]> = {}
   Object.values(liquids).forEach(({ displayName, liquidClass }) => {
@@ -96,8 +102,6 @@ export const LiquidClassesStepTools = ({
     }
   }
 
-  console.log(disabledLiquidClasses)
-
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -136,7 +140,7 @@ export const LiquidClassesStepTools = ({
               largeDesktopBorderRadius
               disabled={
                 disabledLiquidClasses !== null &&
-                disabledLiquidClasses.has(name)
+                disabledLiquidClasses.has(name as LiquidClassesOption)
               }
             />
           )
