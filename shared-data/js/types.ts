@@ -1004,4 +1004,3 @@ export type NozzleLayoutConfig =
   | 'row'
   | 'full'
   | 'subrect'
-  
