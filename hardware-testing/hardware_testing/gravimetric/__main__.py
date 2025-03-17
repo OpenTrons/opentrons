@@ -203,7 +203,7 @@ class RunArgs:
             _ctx,
             args.channels,
             args.pipette,
-            "left",
+            args.mount,
             args.increment,
             args.photometric,
             args.gantry_speed if not args.photometric else None,
