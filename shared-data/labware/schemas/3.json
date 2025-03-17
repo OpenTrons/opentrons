@@ -42,7 +42,8 @@
         "aluminumBlock",
         "adapter",
         "other",
-        "lid"
+        "lid",
+        "system"
       ]
     },
     "safeString": {
@@ -672,17 +673,6 @@
         "$ref": "#/definitions/vector"
       }
     },
-    "stackLimit": {
-      "type": "number",
-      "description": "The limit representing the maximum stack size for a given labware. Defaults to 1 when unspecified indicating a single labware with no labware below it."
-    },
-    "compatibleParentLabware": {
-      "type": "array",
-      "description": "Array of parent Labware on which a labware may be loaded, primarily the labware which owns a lid.",
-      "items": {
-        "type": "string"
-      }
-    },
     "gripperOffsets": {
       "type": "object",
       "description": "Offsets to add when picking up or dropping another labware stacked atop this one. Do not use this to adjust the position of the gripper paddles relative to this labware or the child labware; use `gripHeightFromLabwareBottom` on this definition or the child's definition for that.",
@@ -712,6 +702,17 @@
     "gripHeightFromLabwareBottom": {
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+    },
+    "stackLimit": {
+      "type": "number",
+      "description": "The limit representing the maximum stack size for a given labware. Defaults to 1 when unspecified indicating a single labware with no labware below it."
+    },
+    "compatibleParentLabware": {
+      "type": "array",
+      "description": "Array of parent Labware on which a labware may be loaded, primarily the labware which owns a lid.",
+      "items": {
+        "type": "string"
+      }
     },
     "innerLabwareGeometry": {
       "type": ["object", "null"],
