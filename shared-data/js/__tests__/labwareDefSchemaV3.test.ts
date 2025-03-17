@@ -4,9 +4,8 @@ import { describe, expect, it, test } from 'vitest'
 
 import Ajv from 'ajv'
 
-import type { InnerWellGeometry, LabwareDefinition3 } from '../types'
+import type { LabwareDefinition3 } from '../types'
 import schema from '../../labware/schemas/3.json'
-import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
 
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/3')
 const definitionsDir = path.join(__dirname, '../../labware/definitions/3')
