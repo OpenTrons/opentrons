@@ -56,7 +56,8 @@ function isValidLocCombo(
   } else {
     return !(
       lwDef.allowedRoles.includes('lid') ||
-      lwDef.allowedRoles.includes('adapter')
+      lwDef.allowedRoles.includes('adapter') ||
+      lwDef.allowedRoles.includes('system')
     )
   }
 }
