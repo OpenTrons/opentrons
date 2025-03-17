@@ -196,7 +196,7 @@ def run(ctx: ProtocolContext) -> None:
     # DILUENT
     total_diluent_needed = 200 * TRIALS  # total diluent needed
     number_of_wells_needed = math.ceil(
-        total_diluent_needed / 9000
+        total_diluent_needed / (diluent_reservoir["A1"].max_volume - (diluent_pipette.channels * 200) - DEAD_VOL_DILUENT)
     )  # total number of wells needed
     total_diluent_per_well = (
         total_diluent_needed / number_of_wells_needed
@@ -311,7 +311,6 @@ def run(ctx: ProtocolContext) -> None:
         if not test_gripper_only:
             ctx.comment("FILLING DESTINATION PLATE WITH DILUENT")
             columns_list = plate.columns()[:columns]
-            diluent_pipette.pick_up_tip()
             for i in columns_list:
                 i_index = columns_list.index(i)
                 if i_index % 2 == 0:
@@ -342,7 +341,6 @@ def run(ctx: ProtocolContext) -> None:
                     diluent_src_index +=1
                     total_diluent_ul = 0
                     print(f"total diluent ul {total_diluent_ul} diluent src index {diluent_src_index}")
-            diluent_pipette.return_tip()
         ctx.move_labware(
             diluent_lid,
             diluent_reservoir,
@@ -383,7 +381,7 @@ def run(ctx: ProtocolContext) -> None:
         if "M" in asp_behavior:
             # NOTE: if liquid height is <2.5mm, protocol may error out
             #       this can be avoided by adding extra starting liquid in the SRC labware
-            SUBMERGE_MM = -2
+            SUBMERGE_MM = -1.5
             pipette.aspirate(target_ul, src_well.meniscus(SUBMERGE_MM))
             pipette.touch_tip(speed = 30)
         else:
@@ -406,6 +404,7 @@ def run(ctx: ProtocolContext) -> None:
     diluent_src_index = 0
     total_diluent_ul = 0
     n = 0
+    diluent_pipette.pick_up_tip()
     if not skip_diluent:
         for (vol, plate) in zip(volume_list, dst_labwares):
             lid_for_plate = plate.parent
@@ -473,3 +472,4 @@ def run(ctx: ProtocolContext) -> None:
                 # assign lid on plate to next lid to stack to
                 previous_lid = lid_for_plate
                 n += 1
+    diluent_pipette.drop_tip()
