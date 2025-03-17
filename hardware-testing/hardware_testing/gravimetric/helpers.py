@@ -201,7 +201,8 @@ def _sense_liquid_height(
     lps = config._get_liquid_probe_settings(cfg, well)
     # NOTE: very important that probing is done only 1x time,
     #       with a DRY tip, for reliability
-    probed_z = hwapi.liquid_probe(OT3Mount.LEFT, well.depth, lps)
+    hw_mount = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+    probed_z = hwapi.liquid_probe(hw_mount, well.depth, lps)
     if ctx.is_simulating():
         probed_z = well.top().point.z - 1
     liq_height = probed_z - well.bottom().point.z
