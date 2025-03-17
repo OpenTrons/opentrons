@@ -54,10 +54,8 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   )
 
   const newLocationSlot =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'slotName' in newLocation
-      ? newLocation.slotName
+    newLocation !== 'offDeck' && newLocation !== 'systemLocation'
+      ? Object.values(newLocation)[0]
       : null
 
   const multipleObjectsInSameSlotLabware =
