@@ -31,7 +31,7 @@ class CommandPublisher:
         """Set the publisher's Broker."""
         self._broker = broker
 
-
+c
 CommandPayloadCreator = Callable[..., CommandPayload]
 """A function that creates a Command dictionary message."""
 

@@ -30,6 +30,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
   CommandCreatorWarning,
+  TrashBinEntity,
 } from '../../types'
 
 /** Move labware from one location to another, manually or via a gripper. */
@@ -270,18 +271,17 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     const matchingTrashCutoutId = trashCutoutIds.find(
       cutoutId => cutoutId === cutoutIdFromAddressableAreaName
     )
-    const matchingTrashId =
-      matchingTrashCutoutId != null
-        ? Object.values(additionalEquipmentEntities).find(
-            ae =>
-              ae.name === 'trashBin' && ae.location === matchingTrashCutoutId
-          )?.id
-        : null
+    const matchingTrashBinEntity: TrashBinEntity | undefined = Object.values(
+      additionalEquipmentEntities
+    ).find(
+      ae => ae.name === 'trashBin' && ae.location === matchingTrashCutoutId
+    )
+    const matchingTrashId = matchingTrashBinEntity?.id
 
     if (is4thColumnSlot) {
       location = formatPyStr(newLocation.addressableAreaName)
     } else if (matchingTrashId != null && !isWasteChuteLocation) {
-      location = additionalEquipmentEntities[matchingTrashId]?.pythonName ?? ''
+      location = matchingTrashBinEntity?.pythonName ?? ''
     } else if (matchingTrashId == null && isWasteChuteLocation) {
       location =
         Object.values(additionalEquipmentEntities).find(
