@@ -62,5 +62,5 @@ export function useInitLPCStore({
 
       dispatch(startLPC(runId, initialState))
     }
-  }, [isReadyToInit])
+  }, [isReadyToInit, deckConfig])
 }
