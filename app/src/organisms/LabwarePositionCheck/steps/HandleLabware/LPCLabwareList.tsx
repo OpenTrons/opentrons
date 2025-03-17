@@ -25,7 +25,7 @@ import {
   setSelectedLabwareUri,
   selectCountNonHardcodedLocationSpecificOffsetsForLw,
   proceedEditOffsetSubstep,
-  selectIsDefaultOffsetMissing,
+  selectIsNecessaryDefaultOffsetMissing,
 } from '/app/redux/protocol-runs'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
@@ -158,8 +158,8 @@ function LabwareItem({
   selectedUri,
 }: LabwareItemProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
-  const isMissingDefaultOffset = useSelector(
-    selectIsDefaultOffsetMissing(runId, uri)
+  const isNecessaryDefaultOffsetMissing = useSelector(
+    selectIsNecessaryDefaultOffsetMissing(runId, uri)
   )
   const countLocationSpecificOffsets = useSelector(
     selectCountNonHardcodedLocationSpecificOffsetsForLw(runId, uri)
@@ -168,17 +168,19 @@ function LabwareItem({
 
   const getOffsetCopy = (): string => {
     if (countLocationSpecificOffsets > 1) {
-      return isMissingDefaultOffset
+      return isNecessaryDefaultOffsetMissing
         ? t('num_missing_offsets', { num: countLocationSpecificOffsets })
         : t('num_offsets', { num: countLocationSpecificOffsets })
     } else {
-      return isMissingDefaultOffset ? t('one_missing_offset') : t('one_offset')
+      return isNecessaryDefaultOffsetMissing
+        ? t('one_missing_offset')
+        : t('one_offset')
     }
   }
 
   return isOnDevice ? (
     <ListButton
-      type={isMissingDefaultOffset ? 'notConnected' : 'noActive'}
+      type={isNecessaryDefaultOffsetMissing ? 'notConnected' : 'noActive'}
       onClick={handlePrimaryOnClickOdd}
       width="100%"
     >

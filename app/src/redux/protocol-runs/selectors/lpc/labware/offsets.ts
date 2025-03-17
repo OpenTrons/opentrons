@@ -2,6 +2,7 @@ import type { Selector } from 'reselect'
 import { createSelector } from 'reselect'
 
 import {
+  getAreAnyLocationSpecificOffsetsMissing,
   getAreAllOffsetsHardCoded,
   getCountHardCodedOffsets,
   getDefaultOffsetDetailsForAllLabware,
@@ -221,8 +222,9 @@ export const selectIsDefaultOffsetAbsent = (
 // Whether the default offset is "missing" for the given labware geometry.
 // The default offset must be persisted on the robot-server to be considered "not missing".
 // Note that the default offset is not considered missing if all locations that would
-// utilize the default offset in the run are "hardcoded".
-export const selectIsDefaultOffsetMissing = (
+// utilize the default offset in the run are "hardcoded" or have existing location-specific
+// offsets.
+export const selectIsNecessaryDefaultOffsetMissing = (
   runId: string,
   uri: string
 ): Selector<State, boolean> =>
@@ -235,7 +237,8 @@ export const selectIsDefaultOffsetMissing = (
         .locationSpecificOffsetDetails,
     (defaultDetails, lsDetails) =>
       defaultDetails?.existingOffset == null &&
-      !getAreAllOffsetsHardCoded(lsDetails)
+      !getAreAllOffsetsHardCoded(lsDetails) &&
+      !getAreAnyLocationSpecificOffsetsMissing(lsDetails)
   )
 
 export const selectWorkingOffsetsByUri = (

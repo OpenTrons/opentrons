@@ -54,7 +54,7 @@ export function LabwareLocationItem({
       locationSpecificOffsetDetails
     )
   )
-  const isMissingDefaultOffset = useSelector(
+  const isDefaultOffsetAbsent = useSelector(
     selectIsDefaultOffsetAbsent(runId, definitionUri)
   )
 
@@ -148,7 +148,7 @@ export function LabwareLocationItem({
           buttonText: lpcTextT('adjust'),
           onClick: handleLaunchEditOffset,
           buttonType: 'secondary',
-          disabled: isMissingDefaultOffset || isHardcodedOffset,
+          disabled: isDefaultOffsetAbsent || isHardcodedOffset,
         }}
         colThreeSecondaryBtn={{
           buttonText: lpcTextT('reset_to_default'),

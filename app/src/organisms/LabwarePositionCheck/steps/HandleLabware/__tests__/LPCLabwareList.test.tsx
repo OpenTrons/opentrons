@@ -17,7 +17,7 @@ import {
   selectCountNonHardcodedLocationSpecificOffsetsForLw,
   selectStepInfo,
   setSelectedLabwareUri,
-  selectIsDefaultOffsetMissing,
+  selectIsNecessaryDefaultOffsetMissing,
   proceedEditOffsetSubstep,
 } from '/app/redux/protocol-runs'
 
@@ -41,7 +41,7 @@ vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs', () => ({
   selectAllLabwareInfo: vi.fn(),
   selectIsDefaultOffsetAbsent: vi.fn(),
-  selectIsDefaultOffsetMissing: vi.fn(),
+  selectIsNecessaryDefaultOffsetMissing: vi.fn(),
   selectCountLocationSpecificOffsetsForLw: vi.fn(),
   selectStepInfo: vi.fn(),
   setSelectedLabwareUri: vi.fn(),
@@ -116,7 +116,7 @@ describe('LPCLabwareList', () => {
     )
 
     vi.mocked(
-      selectIsDefaultOffsetMissing
+      selectIsNecessaryDefaultOffsetMissing
     ).mockImplementation((runId: string, uri: string) => (state: any) =>
       uri === 'labware-uri-1'
     )
@@ -164,7 +164,7 @@ describe('LPCLabwareList', () => {
       selectIsDefaultOffsetAbsent
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
     vi.mocked(
-      selectIsDefaultOffsetMissing
+      selectIsNecessaryDefaultOffsetMissing
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
     vi.mocked(
       selectCountNonHardcodedLocationSpecificOffsetsForLw
@@ -187,7 +187,7 @@ describe('LPCLabwareList', () => {
       selectIsDefaultOffsetAbsent
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
     vi.mocked(
-      selectIsDefaultOffsetMissing
+      selectIsNecessaryDefaultOffsetMissing
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
 
     render(props)
@@ -201,7 +201,7 @@ describe('LPCLabwareList', () => {
       selectIsDefaultOffsetAbsent
     ).mockImplementation((runId: any, uri: any) => (state: any) => true)
     vi.mocked(
-      selectIsDefaultOffsetMissing
+      selectIsNecessaryDefaultOffsetMissing
     ).mockImplementation((runId: any, uri: any) => (state: any) => true)
     vi.mocked(
       selectCountNonHardcodedLocationSpecificOffsetsForLw
