@@ -13,6 +13,7 @@ export type PipettingRunTimeCommand =
   | DropTipInPlaceRunTimeCommand
   | DropTipRunTimeCommand
   | GetTipPresenceRunTimeCommand
+  | GetNextTipRunTimeCommand
   | MoveToAddressableAreaForDropTipRunTimeCommand
   | PickUpTipRunTimeCommand
   | PrepareToAspirateRunTimeCommand
@@ -36,6 +37,7 @@ export type PipettingCreateCommand =
   | DropTipCreateCommand
   | DropTipInPlaceCreateCommand
   | GetTipPresenceCreateCommand
+  | GetNextTipCreateCommand
   | MoveToAddressableAreaForDropTipCreateCommand
   | PickUpTipCreateCommand
   | PrepareToAspirateCreateCommand
@@ -212,6 +214,16 @@ export interface GetTipPresenceRunTimeCommand
   result?: TipPresenceResult
 }
 
+export interface GetNextTipCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'getNextTip'
+  params: GetNextTipParams
+}
+export interface GetNextTipRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    GetNextTipCreateCommand {
+  result?: GetNextTipResult
+}
+
 export interface VerifyTipPresenceCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'verifyTipPresence'
@@ -286,7 +298,18 @@ export type TouchTipParams = PipetteAccessParams &
     speed?: number
   }
 export type DropTipParams = PipetteAccessParams & DropTipWellLocationParam
-export type PickUpTipParams = TouchTipParams
+export interface GetNextTipParams {
+  pipetteId: string
+  labwareIds: string[]
+}
+
+export interface GetNextTipResult {
+  nextTipInfo: {
+    labwareId: string
+    tipStartingWell: string
+  }
+}
+export type PickUpTipParams = PipetteAccessParams & WellLocationParam
 export type PrepareToAspirateParams = PipetteIdentityParams
 
 interface AddressableOffsetVector {

@@ -181,6 +181,17 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         return bool(int(match.group(1)))
 
     @classmethod
+    def parse_installation_detected(cls, response: str) -> bool:
+        """Parse install detection."""
+        _RE = re.compile(rf"^{GCODE.GET_INSTALL_DETECTED} I:(\d)$")
+        match = _RE.match(response)
+        if not match:
+            raise ValueError(
+                f"Incorrect Response for installation detected: {response}"
+            )
+        return bool(int(match.group(1)))
+
+    @classmethod
     def parse_move_params(cls, response: str) -> MoveParams:
         """Parse move params."""
         field_names = MoveParams.get_fields()
@@ -633,6 +644,16 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             GCODE.GET_DOOR_SWITCH.build_command()
         )
         return self.parse_door_closed(response)
+
+    async def get_installation_detected(self) -> bool:
+        """Get whether or not installation is detected.
+
+        :return: True if installation is detected, False otherwise
+        """
+        response = await self._connection.send_command(
+            GCODE.GET_INSTALL_DETECTED.build_command()
+        )
+        return self.parse_installation_detected(response)
 
     async def move_in_mm(
         self, axis: StackerAxis, distance: float, params: MoveParams | None = None

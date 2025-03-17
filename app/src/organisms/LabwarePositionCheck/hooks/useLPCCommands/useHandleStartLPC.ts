@@ -10,8 +10,11 @@ import type {
   RunTimeCommand,
   SetupRunTimeCommand,
   LoadedPipette,
+  LoadLabwareCreateCommand,
+  SetupCreateCommand,
 } from '@opentrons/shared-data'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
+import { mapFlexStackerLabware } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/utils'
 
 export interface UseHandleStartLPCResult {
   handleStartLPC: (
@@ -22,15 +25,15 @@ export interface UseHandleStartLPCResult {
 
 export function useHandleStartLPC({
   chainLPCCommands,
-  mostRecentAnalysis,
+  analysis,
 }: UseLPCCommandWithChainRunChildProps): UseHandleStartLPCResult {
   const handleStartLPC = (
     pipette: LoadedPipette | null,
     onSuccess: () => void
   ): Promise<void> => {
     const startCommands: CreateCommand[] = [
-      ...buildInstrumentLabwarePrepCommands(mostRecentAnalysis),
-      ...moduleInitBeforeAnyLPCCommands(mostRecentAnalysis),
+      ...buildInstrumentLabwarePrepCommands(analysis),
+      ...moduleInitBeforeAnyLPCCommands(analysis),
       ...fullHomeCommands(),
       ...moveToMaintenancePosition(pipette),
     ]
@@ -45,8 +48,19 @@ export function useHandleStartLPC({
 
 // Load all pipettes and labware into the maintenance run by utilizing the protocol resource.
 // Labware is loaded off-deck so that LPC can move them on individually later.
-// Next, emit module-specific setup commands to prepare for LPC.
+// Also, emit module-specific setup commands to prepare for LPC.
 function buildInstrumentLabwarePrepCommands(
+  protocolData: CompletedProtocolAnalysis
+): SetupCreateCommand[] {
+  const setupCommandsFromLoadCommands = processLoadCommands(protocolData)
+  const setupCommandsFromStackerCommands = processFlexStackerCommands(
+    protocolData
+  )
+
+  return [...setupCommandsFromLoadCommands, ...setupCommandsFromStackerCommands]
+}
+
+function processLoadCommands(
   protocolData: CompletedProtocolAnalysis
 ): SetupRunTimeCommand[] {
   return (
@@ -114,4 +128,21 @@ function isLoadCommand(
     'loadPipette',
   ]
   return loadCommands.includes(command.commandType)
+}
+
+// Stacker generated labware needs to be loaded as labware into the maintenance run.
+function processFlexStackerCommands(
+  protocolData: CompletedProtocolAnalysis
+): LoadLabwareCreateCommand[] {
+  const stackerLwDetails = mapFlexStackerLabware(protocolData.commands)
+
+  return stackerLwDetails.map(stackerLwDetail => {
+    return {
+      commandType: 'loadLabware',
+      params: {
+        ...stackerLwDetail,
+        location: 'offDeck',
+      },
+    }
+  })
 }

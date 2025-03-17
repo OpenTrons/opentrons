@@ -1,102 +1,41 @@
 import { useState } from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
-  ALIGN_CENTER,
   BORDERS,
-  Btn,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  Icon,
-  JUSTIFY_SPACE_BETWEEN,
-  Link as LinkComponent,
-  ListItem,
+  JUSTIFY_CENTER,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
-import { AnnouncementModal, DOC_URL } from '../../components/organisms'
-import {
-  actions as analyticsActions,
-  selectors as analyticsSelectors,
-} from '../../analytics'
-import {
-  actions as tutorialActions,
-  selectors as tutorialSelectors,
-} from '../../tutorial'
-import { LINK_BUTTON_STYLE, ToggleButton } from '../../components/atoms'
-import { actions as featureFlagActions } from '../../feature-flags'
-import { getFeatureFlagData } from '../../feature-flags/selectors'
-import type { FlagTypes } from '../../feature-flags'
 
-const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
-const EULA_URL = 'https://opentrons.com/eula'
+import { AnnouncementModal } from '../../components/organisms'
+import { selectors as analyticsSelectors } from '../../analytics'
+import { selectors as tutorialSelectors } from '../../tutorial'
+import { getFeatureFlagData } from '../../feature-flags/selectors'
+
+import {
+  AppInfo,
+  FeatureFlag,
+  Privacy,
+  UserSettings,
+} from '../../components/organisms/Settings'
+
+const SETTINGS_MAX_WIDTH = '56rem'
 
 export function Settings(): JSX.Element {
-  const dispatch = useDispatch()
-  const { t } = useTranslation(['feature_flags', 'shared'])
+  const { t } = useTranslation('shared')
   const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
     false
   )
-  const { hasOptedIn } = useSelector(analyticsSelectors.getHasOptedIn)
   const flags = useSelector(getFeatureFlagData)
   const canClearHintDismissals = useSelector(
     tutorialSelectors.getCanClearHintDismissals
   )
-
-  const pdVersion = process.env.OT_PD_VERSION
-
+  const { hasOptedIn } = useSelector(analyticsSelectors.getHasOptedIn)
   const prereleaseModeEnabled = flags.PRERELEASE_MODE === true
-
-  const allFlags = Object.keys(flags) as FlagTypes[]
-
-  const getDescription = (flag: FlagTypes): string => {
-    return flag === 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
-      ? t(`feature_flags:${flag}.description_1`)
-      : t(`feature_flags:${flag}.description`)
-  }
-
-  const setFeatureFlags = (
-    flags: Partial<Record<FlagTypes, boolean | null | undefined>>
-  ): void => {
-    dispatch(featureFlagActions.setFeatureFlags(flags))
-  }
-
-  const toFlagRow = (flagName: FlagTypes): JSX.Element => {
-    return (
-      <Flex key={flagName} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t(`feature_flags:${flagName}.title`)}
-          </StyledText>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {getDescription(flagName)}
-          </StyledText>
-        </Flex>
-        <ToggleButton
-          label={`Settings_${flagName}`}
-          toggledOn={Boolean(flags[flagName])}
-          onClick={() => {
-            setFeatureFlags({
-              [flagName as string]: !flags[flagName],
-            })
-          }}
-        />
-      </Flex>
-    )
-  }
-
-  const userFacingFlags: FlagTypes[] = [
-    'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
-    'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2',
-    'OT_PD_DISABLE_MODULE_RESTRICTIONS',
-  ]
-
-  const prereleaseFlagRows = allFlags
-    .filter(flag => !userFacingFlags.includes(flag))
-    .map(toFlagRow)
 
   return (
     <>
@@ -109,251 +48,43 @@ export function Settings(): JSX.Element {
         />
       ) : null}
       <Flex
-        backgroundColor={COLORS.grey10}
         width="100%"
-        minHeight="calc(100vh - 56px)"
-        height="100%"
-        padding={`${SPACING.spacing80} 17rem`}
+        justifyContent={JUSTIFY_CENTER}
+        backgroundColor={COLORS.grey10}
+        padding={`${SPACING.spacing60} ${SPACING.spacing80} ${SPACING.spacing80}`}
       >
-        <Flex
-          backgroundColor={COLORS.white}
-          padding={SPACING.spacing40}
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing40}
-          borderRadius={BORDERS.borderRadius8}
-          width="100%"
-        >
-          <StyledText desktopStyle="headingLargeBold">
-            {t('shared:settings')}
-          </StyledText>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('shared:app_info')}
+        <Flex width="100%" maxWidth={SETTINGS_MAX_WIDTH} height="100%">
+          <Flex
+            backgroundColor={COLORS.white}
+            padding={SPACING.spacing40}
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing40}
+            borderRadius={BORDERS.borderRadius8}
+            width="100%"
+            height="100%"
+          >
+            <Flex width="100%" height="100%">
+              <StyledText desktopStyle="headingLargeBold">
+                {t('settings')}
               </StyledText>
-              <ListItem
-                padding={SPACING.spacing16}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                type="default"
-              >
-                <Flex flexDirection={DIRECTION_COLUMN}>
-                  <StyledText desktopStyle="bodyDefaultSemiBold">
-                    {t('shared:pd_version')}
-                  </StyledText>
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {pdVersion}
-                  </StyledText>
-                </Flex>
-                <Flex gridGap={SPACING.spacing16} alignItems={ALIGN_CENTER}>
-                  <LinkComponent
-                    css={LINK_BUTTON_STYLE}
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                    href={DOC_URL}
-                    external
-                    padding={SPACING.spacing4}
-                  >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('shared:software_manual')}
-                    </StyledText>
-                  </LinkComponent>
+            </Flex>
 
-                  <Btn
-                    css={LINK_BUTTON_STYLE}
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                    onClick={() => {
-                      setShowAnnouncementModal(true)
-                    }}
-                    data-testid="AnnouncementModal_viewReleaseNotesButton"
-                    padding={SPACING.spacing4}
-                  >
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('shared:release_notes')}
-                    </StyledText>
-                  </Btn>
-                </Flex>
-              </ListItem>
-            </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('shared:user_settings')}
-              </StyledText>
-              <ListItem
-                padding={SPACING.spacing16}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                type="default"
-              >
-                <Flex flexDirection={DIRECTION_COLUMN}>
-                  <StyledText desktopStyle="bodyDefaultSemiBold">
-                    {t('shared:hints')}
-                  </StyledText>
-                  <Flex color={COLORS.grey60}>
-                    <StyledText desktopStyle="bodyDefaultRegular">
-                      {t('shared:show_hints_and_tips')}
-                    </StyledText>
-                  </Flex>
-                </Flex>
-                <Btn
-                  disabled={!canClearHintDismissals}
-                  textDecoration={
-                    canClearHintDismissals
-                      ? TYPOGRAPHY.textDecorationUnderline
-                      : 'none'
-                  }
-                  onClick={() =>
-                    dispatch(tutorialActions.clearAllHintDismissals())
-                  }
-                >
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    {canClearHintDismissals
-                      ? t('shared:reset')
-                      : t('shared:no_hints_to_restore')}
-                  </StyledText>
-                </Btn>
-              </ListItem>
-              {userFacingFlags.map(flag => (
-                <ListItem
-                  key={flag}
-                  padding={SPACING.spacing16}
-                  justifyContent={JUSTIFY_SPACE_BETWEEN}
-                  type="default"
-                  alignItems={ALIGN_CENTER}
-                >
-                  <Flex flexDirection={DIRECTION_COLUMN}>
-                    <StyledText desktopStyle="bodyDefaultSemiBold">
-                      {t(`${flag}.title`)}
-                    </StyledText>
-                    <Flex color={COLORS.grey60}>
-                      <StyledText desktopStyle="bodyDefaultRegular">
-                        {t(`${flag}.description`)}
-                      </StyledText>
-                    </Flex>
-                  </Flex>
-                  <ToggleButton
-                    label={`Settings_${flag}`}
-                    toggledOn={Boolean(flags[flag])}
-                    onClick={() => {
-                      setFeatureFlags({
-                        [flag]: !flags[flag],
-                      })
-                    }}
-                  />
-                </ListItem>
-              ))}
-            </Flex>
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('shared:privacy')}
-              </StyledText>
-              <ListItem
-                padding={SPACING.spacing16}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                type="default"
-                gridGap={SPACING.spacing40}
-              >
-                <Flex flexDirection={DIRECTION_COLUMN}>
-                  <StyledText desktopStyle="bodyDefaultSemiBold">
-                    {t('shared:shared_analytics')}
-                  </StyledText>
-                  <StyledText desktopStyle="bodyDefaultRegular">
-                    <Trans
-                      t={t}
-                      i18nKey="shared:we_are_improving"
-                      components={{
-                        link1: (
-                          <LinkComponent
-                            external
-                            href={PRIVACY_POLICY_URL}
-                            color={COLORS.blue50}
-                          />
-                        ),
-                        link2: (
-                          <LinkComponent
-                            external
-                            href={EULA_URL}
-                            color={COLORS.blue50}
-                          />
-                        ),
-                      }}
-                    />
-                  </StyledText>
-                </Flex>
-                <Btn
-                  role="switch"
-                  data-testid="analyticsToggle"
-                  size="2rem"
-                  css={
-                    Boolean(hasOptedIn)
-                      ? TOGGLE_ENABLED_STYLES
-                      : TOGGLE_DISABLED_STYLES
-                  }
-                  onClick={() =>
-                    dispatch(
-                      hasOptedIn
-                        ? analyticsActions.optOut()
-                        : analyticsActions.optIn()
-                    )
-                  }
-                >
-                  <Icon
-                    name={
-                      hasOptedIn ? 'ot-toggle-input-on' : 'ot-toggle-input-off'
-                    }
-                    height="1rem"
-                  />
-                </Btn>
-              </ListItem>
+            <Flex
+              height="100%"
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing24}
+            >
+              <AppInfo setShowAnnouncementModal={setShowAnnouncementModal} />
+              <UserSettings
+                canClearHintDismissals={canClearHintDismissals}
+                flags={flags}
+              />
+              <Privacy hasOptedIn={hasOptedIn} />
+              {prereleaseModeEnabled ? <FeatureFlag flags={flags} /> : null}
             </Flex>
           </Flex>
-          {prereleaseModeEnabled ? (
-            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-              <StyledText desktopStyle="bodyLargeSemiBold">
-                {t('shared:developer_ff')}
-              </StyledText>
-              <ListItem
-                type="default"
-                padding={SPACING.spacing16}
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing16}
-              >
-                {prereleaseFlagRows}
-              </ListItem>
-            </Flex>
-          ) : null}
         </Flex>
       </Flex>
     </>
   )
 }
-
-const TOGGLE_DISABLED_STYLES = css`
-  color: ${COLORS.grey50};
-
-  &:hover {
-    color: ${COLORS.grey55};
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.yellow50};
-  }
-
-  &:disabled {
-    color: ${COLORS.grey30};
-  }
-`
-
-const TOGGLE_ENABLED_STYLES = css`
-  color: ${COLORS.blue50};
-
-  &:hover {
-    color: ${COLORS.blue55};
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 3px ${COLORS.yellow50};
-  }
-
-  &:disabled {
-    color: ${COLORS.grey30};
-  }
-`

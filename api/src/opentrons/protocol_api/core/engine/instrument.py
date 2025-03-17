@@ -16,12 +16,16 @@ from opentrons.types import (
     Mount,
     NozzleConfigurationType,
     NozzleMapInterface,
+    MeniscusTrackingTarget,
 )
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
+from opentrons.protocols.advanced_control.transfers.common import (
+    TransferTipPolicyV2,
+    NoLiquidClassPropertyError,
+)
 from opentrons.protocols.advanced_control.transfers import common as tx_commons
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine import (
@@ -169,7 +173,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         rate: float,
         flow_rate: float,
         in_place: bool,
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
@@ -180,7 +184,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to aspirate at.
             in_place: whether this is a in-place command.
+            meniscus_tracking: Optional data about where to aspirate from.
         """
+        if meniscus_tracking == MeniscusTrackingTarget.START:
+            raise ValueError("Cannot aspirate at the starting liquid height.")
         if well_core is None:
             if not in_place:
                 self._engine_client.execute_command(
@@ -208,14 +215,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
-            well_location = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+            (
+                well_location,
+                dynamic_liquid_tracking,
+            ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                is_meniscus=is_meniscus,
+                meniscus_tracking=meniscus_tracking,
             )
-            if well_location.origin == WellOrigin.MENISCUS:
-                well_location.volumeOffset = "operationVolume"
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
@@ -223,17 +231,31 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            self._engine_client.execute_command(
-                cmd.AspirateParams(
-                    pipetteId=self._pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    wellLocation=well_location,
-                    volume=volume,
-                    flowRate=flow_rate,
-                    correctionVolume=correction_volume,
+            if dynamic_liquid_tracking:
+
+                self._engine_client.execute_command(
+                    cmd.AspirateWhileTrackingParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        wellLocation=well_location,
+                        volume=volume,
+                        flowRate=flow_rate,
+                        correctionVolume=correction_volume,
+                    )
                 )
-            )
+            else:
+                self._engine_client.execute_command(
+                    cmd.AspirateParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        wellLocation=well_location,
+                        volume=volume,
+                        flowRate=flow_rate,
+                        correctionVolume=correction_volume,
+                    )
+                )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
@@ -246,7 +268,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
@@ -258,6 +280,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             flow_rate: The flow rate in µL/s to dispense at.
             in_place: whether this is a in-place command.
             push_out: The amount to push the plunger below bottom position.
+            meniscus_tracking: Optional data about where to dispense from.
         """
         if self._protocol_core.api_version < _DISPENSE_VOLUME_VALIDATION_ADDED_IN:
             # In older API versions, when you try to dispense more than you can,
@@ -304,11 +327,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
-            well_location = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+            (
+                well_location,
+                dynamic_liquid_tracking,
+            ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                is_meniscus=is_meniscus,
+                meniscus_tracking=meniscus_tracking,
             )
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
@@ -317,18 +343,32 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            self._engine_client.execute_command(
-                cmd.DispenseParams(
-                    pipetteId=self._pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    wellLocation=well_location,
-                    volume=volume,
-                    flowRate=flow_rate,
-                    pushOut=push_out,
-                    correctionVolume=correction_volume,
+            if dynamic_liquid_tracking:
+                self._engine_client.execute_command(
+                    cmd.DispenseWhileTrackingParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        wellLocation=well_location,
+                        volume=volume,
+                        flowRate=flow_rate,
+                        pushOut=push_out,
+                        correctionVolume=correction_volume,
+                    )
                 )
-            )
+            else:
+                self._engine_client.execute_command(
+                    cmd.DispenseParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        wellLocation=well_location,
+                        volume=volume,
+                        flowRate=flow_rate,
+                        pushOut=push_out,
+                        correctionVolume=correction_volume,
+                    )
+                )
 
         if isinstance(location, (TrashBin, WasteChute)):
             self._protocol_core.set_last_location(location=None, mount=self.get_mount())
@@ -813,11 +853,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if flow_rate is None:
             flow_rate = _RESIN_TIP_DEFAULT_FLOW_RATE
 
-        well_location = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        (
+            well_location,
+            dynamic_tracking,
+        ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
             labware_id=labware_id,
             well_name=well_name,
             absolute_point=location.point,
-            is_meniscus=None,
         )
         pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
@@ -1117,9 +1159,17 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 "No tipracks found for pipette in order to perform transfer"
             )
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-        )
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
+
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
             name=liquid_class.name,
@@ -1302,10 +1352,17 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=None,
             ).volume,
         )
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(),
-            tip_rack=tiprack_uri_for_transfer_props,
-        )
+
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
 
         # If there are no multi-dispense properties or if the volume to distribute
         # per destination well is so large that the tip cannot hold enough liquid
@@ -1549,10 +1606,19 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             raise RuntimeError(
                 "No tipracks found for pipette in order to perform transfer"
             )
+
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-        )
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
+
         blow_out_properties = transfer_props.dispense.retract.blowout
         if (
             blow_out_properties.enabled

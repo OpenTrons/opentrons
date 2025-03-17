@@ -5,10 +5,12 @@ import { i18n } from '../../../assets/localization'
 import { configureStore } from '../../../configureStore'
 import { MaterialsListModal as MaterialsListModalComponent } from '.'
 
-import type { LiquidEntities } from '@opentrons/step-generation'
+import type {
+  AdditionalEquipmentEntity,
+  LiquidEntities,
+} from '@opentrons/step-generation'
 import type { Meta, StoryObj } from '@storybook/react'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
-import type { FixtureInList } from '.'
 
 const mockStore = configureStore()
 const mockHardware = [
@@ -27,7 +29,7 @@ const mockHardware = [
 
 const mockFixture = [
   { location: 'cutoutB3', name: 'trashBin', id: 'mockId:trashBin' },
-] as FixtureInList[]
+] as AdditionalEquipmentEntity[]
 
 const mockLabware = [
   {
