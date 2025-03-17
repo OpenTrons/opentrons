@@ -1,44 +1,37 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import styled from 'styled-components'
+
 import {
   ALIGN_CENTER,
-  ALIGN_START,
   BORDERS,
-  Box,
   COLORS,
   DIRECTION_COLUMN,
-  EmptySelectorButton,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
-  LabwareRender,
   OVERFLOW_AUTO,
-  RobotWorkSpace,
   SPACING,
   StyledText,
 } from '@opentrons/components'
+
 import * as wellContentsSelectors from '../../../top-selectors/well-contents'
 import { selectors } from '../../../labware-ingred/selectors'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-import { OffDeckControls } from './OffDeckControls'
 import { SlotDetailsContainer } from '../../../components/organisms'
-import { wellFillFromWellContents } from '../../../components/organisms/LabwareOnDeck/utils'
 import { getRobotType } from '../../../file-data/selectors'
 import {
   getHoveredDropdownItem,
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
-import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
-import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
-import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
+import { OffDeckLabwareList } from './OffDeckLabwareList'
+
+import type { DeckSlotId } from '@opentrons/shared-data'
 import type { DeckSetupTabType } from '../types'
 
 const OFF_DECK_MAP_WIDTH = '41.625rem'
 const OFF_DECK_MAP_HEIGHT = '44rem'
 const OFF_DECK_MAP_HEIGHT_FOR_STEP = '30.3rem'
-const ZERO_SLOT_POSITION: CoordinateTuple = [0, 0, 0]
 interface OffDeckDetailsProps extends DeckSetupTabType {
   addLabware: () => void
 }
@@ -108,110 +101,20 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
             {i18n.format(t('off_deck_labware'), 'upperCase')}
           </StyledText>
         </Flex>
-        <LabwareWrapper>
-          {tab === 'startingDeck' ? (
-            <Flex width="9.5625rem" height="6.375rem">
-              <EmptySelectorButton
-                onClick={addLabware}
-                text={t('add_labware')}
-                textAlignment="middle"
-                iconName="plus"
-              />
-            </Flex>
-          ) : null}
-          {offDeckLabware.map(lw => {
-            const wellContents = allWellContentsForActiveItem
-              ? allWellContentsForActiveItem[lw.id]
-              : null
-            const definition = lw.def
-            const { dimensions } = definition
-            const xyzDimensions = {
-              xDimension: dimensions.xDimension ?? 0,
-              yDimension: dimensions.yDimension ?? 0,
-              zDimension: dimensions.zDimension ?? 0,
-            }
-            const isLabwareSelectionSelected = selectedDropdownSelection.some(
-              selected => selected.id === lw.id
-            )
-            const highlighted = hoveredDropdownItem.id === lw.id
-            return (
-              <Flex
-                id={lw.id}
-                flexDirection={DIRECTION_COLUMN}
-                key={lw.id}
-                paddingBottom={
-                  isLabwareSelectionSelected || highlighted ? '0px' : '0px'
-                }
-              >
-                <RobotWorkSpace
-                  key={lw.id}
-                  viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
-                  width="9.5625rem"
-                  height="6.375rem"
-                >
-                  {() => (
-                    <>
-                      <LabwareRender
-                        definition={definition}
-                        wellFill={wellFillFromWellContents(
-                          wellContents,
-                          liquidDisplayColors
-                        )}
-                      />
-
-                      <OffDeckControls
-                        hover={hoverSlot}
-                        setShowMenuListForId={setShowMenuListForId}
-                        menuListId={menuListId}
-                        setHover={setHoverSlot}
-                        slotBoundingBox={xyzDimensions}
-                        slotPosition={ZERO_SLOT_POSITION}
-                        labwareId={lw.id}
-                        tab={tab}
-                      />
-                    </>
-                  )}
-                </RobotWorkSpace>
-                <HighlightOffdeckSlot
-                  labwareOnDeck={lw}
-                  position={ZERO_SLOT_POSITION}
-                />
-                {menuListId === lw.id ? (
-                  <Flex
-                    marginTop={`-${SPACING.spacing32}`}
-                    marginLeft="4rem"
-                    zIndex={3}
-                  >
-                    <SlotOverflowMenu
-                      location={menuListId}
-                      addEquipment={addLabware}
-                      setShowMenuList={() => {
-                        setShowMenuListForId(null)
-                      }}
-                      menuListSlotPosition={ZERO_SLOT_POSITION}
-                      invertY
-                    />
-                  </Flex>
-                ) : null}
-              </Flex>
-            )
-          })}
-          <HighlightOffdeckSlot position={ZERO_SLOT_POSITION} />
-        </LabwareWrapper>
+        <OffDeckLabwareList
+          tab={tab}
+          addLabware={addLabware}
+          offDeckLabware={offDeckLabware}
+          allWellContentsForActiveItem={allWellContentsForActiveItem}
+          selectedDropdownSelection={selectedDropdownSelection}
+          hoveredDropdownItem={hoveredDropdownItem}
+          liquidDisplayColors={liquidDisplayColors}
+          hoverSlot={hoverSlot}
+          menuListId={menuListId}
+          setHoverSlot={setHoverSlot}
+          setShowMenuListForId={setShowMenuListForId}
+        />
       </Flex>
     </Flex>
   )
 }
-
-const LabwareWrapper = styled(Box)`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9.5625rem, 1fr));
-  row-gap: ${SPACING.spacing40};
-  column-gap: ${SPACING.spacing32};
-  justify-content: ${JUSTIFY_CENTER}; /* Center the grid within the container */
-  align-items: ${ALIGN_START};
-  width: 100%;
-  // Note(kk: 1/30/2025) this padding is to add space to the right edge and the left edge of the grid
-  // this is not a perfect solution, but it works for now
-  padding: 0 ${SPACING.spacing24};
-`
