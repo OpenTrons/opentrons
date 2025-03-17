@@ -80,6 +80,364 @@
           "description": "Offset added to calculate drop coordinates."
         }
       }
+    },
+    "well": {
+      "anyOf": [
+        { "$ref": "#/definitions/rectangularWell" },
+        { "$ref": "#/definitions/circularWell" }
+      ]
+    },
+    "rectangularWell": {
+      "type": "object",
+      "required": [
+        "shape",
+        "depth",
+        "totalLiquidVolume",
+        "x",
+        "y",
+        "z",
+        "xDimension",
+        "yDimension"
+      ],
+      "$comment": "The properties with a subschema of `true` ('always pass') are defined in wellCommon. They need to be mentioned here for additionalProperties to work right, until we have JSON Schema 2019-09 and we can switch to unevaluatedProperties.",
+      "properties": {
+        "shape": {
+          "const": "rectangular"
+        },
+        "depth": true,
+        "totalLiquidVolume": true,
+        "x": true,
+        "y": true,
+        "z": true,
+        "geometryDefinitionId": true,
+        "xDimension": {
+          "description": "x dimension of rectangular wells",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "yDimension": {
+          "description": "y dimension of rectangular wells",
+          "$ref": "#/definitions/positiveNumber"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/definitions/wellCommon" }]
+    },
+    "circularWell": {
+      "type": "object",
+      "required": [
+        "shape",
+        "depth",
+        "totalLiquidVolume",
+        "x",
+        "y",
+        "z",
+        "diameter"
+      ],
+      "$comment": "The properties with a subschema of `true` ('always pass') are defined in wellCommon. They need to be mentioned here for additionalProperties to work right, until we have JSON Schema 2019-09 and we can switch to unevaluatedProperties.",
+      "properties": {
+        "shape": {
+          "const": "circular"
+        },
+        "depth": true,
+        "totalLiquidVolume": true,
+        "x": true,
+        "y": true,
+        "z": true,
+        "geometryDefinitionId": true,
+        "diameter": {
+          "description": "diameter of circular wells",
+          "$ref": "#/definitions/positiveNumber"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [{ "$ref": "#/definitions/wellCommon" }]
+    },
+    "wellCommon": {
+      "$comment": "These properties need to stay in sync with rectangularWell and circularWell. See comments there.",
+      "properties": {
+        "depth": {
+          "description": "The distance between the top and bottom of this well. If the labware is a tip rack, this will be ignored in favor of tipLength, but the values should match.",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "totalLiquidVolume": {
+          "description": "Total well, tube, or tip volume in microliters",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "x": {
+          "description": "x location of center-bottom of well in reference to left-front-bottom of labware",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "y": {
+          "description": "y location of center-bottom of well in reference to left-front-bottom of labware",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "z": {
+          "description": "z location of center-bottom of well in reference to left-front-bottom of labware",
+          "$ref": "#/definitions/positiveNumber"
+        },
+        "geometryDefinitionId": {
+          "description": "string id of the well's corresponding innerWellGeometry",
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "SphericalSegment": {
+      "type": "object",
+      "description": "A partial sphere shaped section at the bottom of the well.",
+      "additionalProperties": false,
+      "required": ["shape", "radiusOfCurvature", "topHeight", "bottomHeight"],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["spherical"]
+        },
+        "radiusOfCurvature": {
+          "type": "number",
+          "description": "radius of curvature of bottom subsection of wells"
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "The depth of a spherical bottom of a well"
+        },
+        "bottomHeight": {
+          "type": "number",
+          "description": "Height of the bottom of the segment, must be 0.0"
+        },
+        "xCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        },
+        "yCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        }
+      }
+    },
+    "ConicalFrustum": {
+      "type": "object",
+      "description": "A cone or conical segment, bounded by two circles on the top and bottom.",
+      "required": [
+        "shape",
+        "bottomDiameter",
+        "topDiameter",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["conical"]
+        },
+        "bottomDiameter": {
+          "type": "number",
+          "description": "The diameter at the bottom cross-section of a circular frustum"
+        },
+        "topDiameter": {
+          "type": "number",
+          "description": "The diameter at the top cross-section of a circular frustum"
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well"
+        },
+        "bottomHeight": {
+          "type": "number",
+          "description": "The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
+        },
+        "xCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        },
+        "yCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        }
+      }
+    },
+    "CuboidalFrustum": {
+      "type": "object",
+      "description": "A cuboidal shape bounded by two rectangles on the top and bottom",
+      "required": [
+        "shape",
+        "bottomXDimension",
+        "bottomYDimension",
+        "topXDimension",
+        "topYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["cuboidal"]
+        },
+        "bottomXDimension": {
+          "type": "number",
+          "description": "x dimension of the bottom cross-section of a rectangular frustum"
+        },
+        "bottomYDimension": {
+          "type": "number",
+          "description": "y dimension of the bottom cross-section of a rectangular frustum"
+        },
+        "topXDimension": {
+          "type": "number",
+          "description": "x dimension of the top cross-section of a rectangular frustum"
+        },
+        "topYDimension": {
+          "type": "number",
+          "description": "y dimension of the top cross-section of a rectangular frustum"
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well"
+        },
+        "bottomHeight": {
+          "type": "number",
+          "description": "The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
+        },
+        "xCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        },
+        "yCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        }
+      }
+    },
+    "SquaredConeSegment": {
+      "type": "object",
+      "description": "The intersection of a pyramid and a cone that both share a central axis where one face is a circle and one face is a rectangle",
+      "required": [
+        "shape",
+        "bottomCrossSection",
+        "circleDiameter",
+        "rectangleXDimension",
+        "rectangleYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["squaredcone"]
+        },
+        "bottomCrossSection": {
+          "type": "string",
+          "enum": ["circular", "rectangular"],
+          "description": "Denote if the shape is going from circular to rectangular or vise versa"
+        },
+        "circleDiameter": {
+          "type": "number",
+          "description": "diameter of the circular face of a truncated circular segment"
+        },
+        "rectangleXDimension": {
+          "type": "number",
+          "description": "x dimension of the rectangular face of a truncated circular segment"
+        },
+        "rectangleYDimension": {
+          "type": "number",
+          "description": "y dimension of the rectangular face of a truncated circular segment"
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well"
+        },
+        "bottomHeight": {
+          "type": "number",
+          "description": "The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
+        },
+        "xCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        },
+        "yCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        }
+      }
+    },
+    "RoundedCuboidSegment": {
+      "type": "object",
+      "description": "A cuboidal frustum where each corner is filleted out by circles with centers on the diagonals between opposite corners",
+      "required": [
+        "shape",
+        "bottomCrossSection",
+        "circleDiameter",
+        "rectangleXDimension",
+        "rectangleYDimension",
+        "topHeight",
+        "bottomHeight"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string",
+          "enum": ["roundedcuboid"]
+        },
+        "bottomCrossSection": {
+          "type": "string",
+          "enum": ["circular", "rectangular"],
+          "description": "Denote if the shape is going from circular to rectangular or vise versa"
+        },
+        "circleDiameter": {
+          "type": "number",
+          "description": "diameter of the circular face of a rounded rectangular segment"
+        },
+        "rectangleXDimension": {
+          "type": "number",
+          "description": "x dimension of the rectangular face of a rounded rectangular segment"
+        },
+        "rectangleYDimension": {
+          "type": "number",
+          "description": "y dimension of the rectangular face of a rounded rectangular segment"
+        },
+        "topHeight": {
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom"
+        },
+        "bottomHeight": {
+          "type": "number",
+          "description": "The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
+        },
+        "xCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        },
+        "yCount": {
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
+        }
+      }
+    },
+    "InnerWellGeometry": {
+      "type": "object",
+      "required": ["sections"],
+      "properties": {
+        "sections": {
+          "description": "A list of all of the sections of the well that have a contiguous shape. Must be ordered from top (highest z) to bottom (lowest z).",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/ConicalFrustum"
+              },
+              {
+                "$ref": "#/definitions/CuboidalFrustum"
+              },
+              {
+                "$ref": "#/definitions/SquaredConeSegment"
+              },
+              {
+                "$ref": "#/definitions/RoundedCuboidSegment"
+              },
+              {
+                "$ref": "#/definitions/SphericalSegment"
+              }
+            ]
+          }
+        }
+      }
     }
   },
   "type": "object",
@@ -186,6 +544,11 @@
           "description": "Flag marking whether a labware is compatible by default with the Magnetic Module",
           "type": "boolean"
         },
+        "isDeckSlotCompatible": {
+          "description": "Flag marking whether a labware is compatible by with being placed or loaded in a base deck slot, defaults to true.",
+          "type": "boolean",
+          "default": true
+        },
         "magneticModuleEngageHeight": {
           "description": "Distance to move magnetic module magnets to engage",
           "$ref": "#/definitions/positiveNumber"
@@ -229,58 +592,7 @@
       "additionalProperties": false,
       "patternProperties": {
         "[A-Z]+[0-9]+": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["depth", "shape", "totalLiquidVolume", "x", "y", "z"],
-          "oneOf": [
-            { "required": ["xDimension", "yDimension"] },
-            { "required": ["diameter"] }
-          ],
-          "not": {
-            "anyOf": [
-              { "required": ["diameter", "xDimension"] },
-              { "required": ["diameter", "yDimension"] }
-            ]
-          },
-          "properties": {
-            "depth": {
-              "description": "The distance between the top and bottom of this well. If the labware is a tip rack, this will be ignored in favor of tipLength, but the values should match.",
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "x": {
-              "description": "x location of center-bottom of well in reference to left-front-bottom of labware",
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "y": {
-              "description": "y location of center-bottom of well in reference to left-front-bottom of labware",
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "z": {
-              "description": "z location of center-bottom of well in reference to left-front-bottom of labware",
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "totalLiquidVolume": {
-              "description": "Total well, tube, or tip volume in microliters",
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "xDimension": {
-              "description": "x dimension of rectangular wells",
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "yDimension": {
-              "description": "y dimension of rectangular wells",
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "diameter": {
-              "description": "diameter of circular wells",
-              "$ref": "#/definitions/positiveNumber"
-            },
-            "shape": {
-              "description": "If 'rectangular', use xDimension and yDimension; if 'circular' use diameter",
-              "type": "string",
-              "enum": ["rectangular", "circular"]
-            }
-          }
+          "$ref": "#/definitions/well"
         }
       }
     },
@@ -389,6 +701,20 @@
     "stackLimit": {
       "type": "number",
       "description": "The limit representing the maximum stack size for a given labware. Defaults to 1 when unspecified indicating a single labware with no labware below it."
+    },
+    "compatibleParentLabware": {
+      "type": "array",
+      "description": "Array of parent Labware on which a labware may be loaded, primarily the labware which owns a lid.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "innerLabwareGeometry": {
+      "type": ["object", "null"],
+      "description": "A dictionary holding all unique inner well geometries in a labware.",
+      "additionalProperties": {
+        "$ref": "#/definitions/InnerWellGeometry"
+      }
     }
   }
 }
