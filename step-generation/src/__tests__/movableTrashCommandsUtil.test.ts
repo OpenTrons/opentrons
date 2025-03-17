@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest'
-import { makeContext } from '../fixtures'
 import { curryCommandCreator } from '../utils'
 import {
   airGapInMovableTrash,
@@ -13,43 +12,25 @@ import {
   moveToAddressableArea,
   prepareToAspirate,
 } from '../commandCreators/atomic'
-import type { PipetteEntities } from '../types'
+import type { CutoutId } from '@opentrons/shared-data'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 vi.mock('../utils/curryCommandCreator')
 
-const mockTrashBinId = 'mockTrashBinId'
 const mockId = 'mockId'
 
-const mockPipEntities: PipetteEntities = {
-  [mockId]: {
-    name: 'p50_single_flex',
-    id: mockId,
-  },
-} as any
-const mockCutout = 'cutoutA3'
+const mockCutout: CutoutId = 'cutoutA3'
 const mockMoveToAddressableAreaParams = {
   pipetteId: mockId,
   addressableAreaName: 'movableTrashA3',
   offset: { x: 0, y: 0, z: 0 },
 }
-const invariantContext = makeContext()
 
 const args = {
   pipetteId: mockId,
   volume: 10,
   flowRate: 10,
-  invariantContext: {
-    ...invariantContext,
-    pipetteEntities: mockPipEntities,
-    additionalEquipmentEntities: {
-      [mockTrashBinId]: {
-        name: 'trashBin' as const,
-        location: mockCutout,
-        id: mockTrashBinId,
-      },
-    },
-  },
+  trashLocation: mockCutout,
 }
 
 describe('movableTrashCommandsUtil', () => {
