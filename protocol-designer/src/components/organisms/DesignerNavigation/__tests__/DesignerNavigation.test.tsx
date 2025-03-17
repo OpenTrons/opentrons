@@ -10,7 +10,6 @@ import { DesignerNavigation } from '..'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type { TabProps } from '@opentrons/components'
 
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../molecules/LiquidButton')
