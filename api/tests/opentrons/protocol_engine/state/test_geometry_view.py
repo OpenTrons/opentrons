@@ -3596,7 +3596,7 @@ def test_get_well_height_at_volume(
     """Test getting the well height at a given volume."""
 
     def _get_labware_def() -> LabwareDefinition:
-        def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
+        def_dir = str(get_shared_data_root()) + f"/labware/definitions/2/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
         _labware_def = labware_definition_type_adapter.validate_python(
@@ -3605,9 +3605,7 @@ def test_get_well_height_at_volume(
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert (
-        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
-    )
+    assert labware_def.innerLabwareGeometry is not None
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -3664,7 +3662,7 @@ def test_get_well_volume_at_height(
     """Test getting the volume at a given height."""
 
     def _get_labware_def() -> LabwareDefinition:
-        def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
+        def_dir = str(get_shared_data_root()) + f"/labware/definitions/2/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
         _labware_def = labware_definition_type_adapter.validate_python(
@@ -3673,9 +3671,7 @@ def test_get_well_volume_at_height(
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert (
-        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
-    )
+    assert labware_def.innerLabwareGeometry is not None
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -4051,7 +4047,7 @@ def test_get_predicted_location_sequence_with_pending_labware(
             [
                 labware_definition_type_adapter.validate_python(
                     load_labware_definition(
-                        "opentrons_flex_tiprack_lid", version=1, schema=3
+                        "opentrons_flex_tiprack_lid", version=1, schema=2
                     )
                 ),
                 labware_definition_type_adapter.validate_python(
