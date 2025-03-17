@@ -385,7 +385,9 @@ class VirtualPipettingHandler(PipettingHandler):
 
     def get_is_ready_to_aspirate(self, pipette_id: str) -> bool:
         """Get whether a pipette is ready to aspirate."""
-        return self._state_view.pipettes.get_aspirated_volume(pipette_id) is not None
+        return self._state_view.pipettes.get_aspirated_volume(
+            pipette_id
+        ) is not None and self._state_view.pipettes.get_ready_to_aspirate(pipette_id)
 
     async def prepare_for_aspirate(self, pipette_id: str) -> None:
         """Virtually prepare to aspirate (no-op)."""
