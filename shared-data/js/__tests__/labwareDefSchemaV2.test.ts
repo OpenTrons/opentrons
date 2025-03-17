@@ -351,13 +351,7 @@ describe('check groups of labware that should have the same geometry', () => {
   })
 })
 
-/**
- * Return the latest version of the given labware that's defined in schema 2.
- *
- * todo(mm, 2025-02-27): We already have a "production" getLatestLabwareDef() function
- * elsewhere, and it would be nice to reuse that, but it looks like that one currently
- * relies on a hard-coded list of labware.
- */
+/** Return the latest version of the given labware that's defined in schema 2. */
 function findLatestDefinition(loadName: string): LabwareDefinition2 {
   const candidates: LabwareDefinition2[] = glob
     .sync('*.json', {
