@@ -1431,9 +1431,15 @@ class ModuleView:
             )
 
     def stacker_max_pool_count_by_height(
-        self, module_id: str, pool_height: float
+        self,
+        module_id: str,
+        pool_height: float,
+        pool_overlap: float,
     ) -> int:
         """Get the maximum stack count for the Flex Stacker by stack height."""
         max_fill_height = self.get_stacker_max_fill_height(module_id)
         assert max_fill_height > 0
-        return math.floor(max_fill_height / pool_height)
+        i = 0
+        while (pool_height * i + 1) - (pool_overlap * i) < max_fill_height:
+            i += 1
+        return i

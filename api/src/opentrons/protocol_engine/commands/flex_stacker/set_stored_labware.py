@@ -142,10 +142,19 @@ class SetStoredLabwareImpl(
         pool_height = self._state_view.geometry.get_height_of_labware_stack(
             [x for x in [lid_def, labware_def, adapter_def] if x is not None]
         )
-        max_pool_count = self._state_view.modules.stacker_max_pool_count_by_height(
-            params.moduleId, pool_height
+        pool_definitions = [
+            x for x in [lid_def, labware_def, adapter_def] if x is not None
+        ]
+
+        overlap = self._state_view._labware.get_labware_overlap_offsets(
+            pool_definitions[-1], pool_definitions[0].parameters.loadName
         )
 
+        max_pool_count = self._state_view.modules.stacker_max_pool_count_by_height(
+            params.moduleId,
+            pool_height,
+            overlap.z,
+        )
         initial_count = (
             params.initialCount if params.initialCount is not None else max_pool_count
         )
