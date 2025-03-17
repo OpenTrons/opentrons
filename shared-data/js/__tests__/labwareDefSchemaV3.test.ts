@@ -14,6 +14,8 @@ const globPattern = '**/*.json'
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(schema)
 
+// todo(mm, 2025-03-17): Unify these tests with labwareDefSchemaV2.test.ts.
+
 const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
   test('innerLabwareGeometry sections should be sorted top to bottom', () => {
     const geometries = Object.values(labwareDef.innerLabwareGeometry ?? [])

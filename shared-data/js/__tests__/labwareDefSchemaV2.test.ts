@@ -206,6 +206,45 @@ const expectGroupsFollowConvention = (
   })
 }
 
+const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
+  test('innerLabwareGeometry sections should be sorted top to bottom', () => {
+    const geometries = Object.values(labwareDef.innerLabwareGeometry ?? [])
+    for (const geometry of geometries) {
+      const sectionList = geometry.sections
+      const sortedSectionList = sectionList.toSorted(
+        (a, b) => b.topHeight - a.topHeight
+      )
+      expect(sortedSectionList).toStrictEqual(sectionList)
+    }
+  })
+
+  test('all geometryDefinitionIds should have an accompanying valid entry in innerLabwareGeometry', () => {
+    for (const wellName in labwareDef.wells) {
+      const wellGeometryId = labwareDef.wells[wellName].geometryDefinitionId
+
+      if (wellGeometryId === undefined) {
+        return
+      }
+      if (
+        labwareDef.innerLabwareGeometry === null ||
+        labwareDef.innerLabwareGeometry === undefined
+      ) {
+        return
+      }
+
+      expect(wellGeometryId in labwareDef.innerLabwareGeometry).toBe(true)
+
+      // FIXME(mm, 2025-02-04):
+      // `wellDepth` != `topFrustumHeight` for ~23/60 definitions.
+      //
+      // const wellDepth = labwareDef.wells[wellName].depth
+      // const topFrustumHeight =
+      //   labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
+      // expect(wellDepth).toEqual(topFrustumHeight)
+    }
+  })
+}
+
 test('fail on bad labware', () => {
   const badDef = {
     metadata: { name: 'bad' },
@@ -289,6 +328,8 @@ describe('test that the dimensions in all opentrons definitions make sense', () 
       const wellsHigher = getWellsHigherThanZDimension(labwareDef)
       expect(wellsHigher).toEqual(expectedWellsHigher)
     })
+
+    checkGeometryDefinitions(labwareDef)
   })
 })
 
