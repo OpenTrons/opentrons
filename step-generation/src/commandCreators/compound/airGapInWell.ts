@@ -7,7 +7,6 @@ import { airGapInPlace, moveToWell, prepareToAspirate } from '../atomic'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface AirGapInWellArgs {
-  //  destinationId is either labware or addressableAreaName for waste chute
   destinationId: string
   destWell: string
   flowRate: number

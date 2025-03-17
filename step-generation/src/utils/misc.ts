@@ -14,6 +14,7 @@ import {
   OT2_ROBOT_TYPE,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { ZERO_OFFSET } from '../constants'
 import {
   airGapInWasteChute,
   blowoutInWasteChute,
@@ -25,7 +26,12 @@ import {
   moveToAddressableArea,
   moveToWell,
 } from '../commandCreators/atomic'
-import { airGapInWell } from '../commandCreators/compound'
+import {
+  airGapInTrash,
+  blowOutInTrash,
+  dispenseInTrash,
+  airGapInWell,
+} from '../commandCreators/compound'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
 import type {
@@ -51,12 +57,6 @@ import type {
   RobotState,
   SourceAndDest,
 } from '../types'
-import {
-  airGapInTrash,
-  blowOutInTrash,
-  dispenseInTrash,
-} from '../commandCreators/compound'
-import { ZERO_OFFSET } from '../constants'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -466,7 +466,6 @@ export const getDispenseAirGapLocation = (args: {
     sourceWell,
     destWell,
   } = args
-
   return blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION
     ? {
         dispenseAirGapLabware: sourceLabware,
