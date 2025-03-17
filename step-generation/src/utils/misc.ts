@@ -26,6 +26,9 @@ import {
   airGapInWasteChute,
   blowOutInWasteChute,
   dispenseInWasteChute,
+  airGapInTrash,
+  blowOutInTrash,
+  dispenseInTrash,
 } from '../commandCreators/compound'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
@@ -52,11 +55,6 @@ import type {
   RobotState,
   SourceAndDest,
 } from '../types'
-import {
-  airGapInTrash,
-  blowOutInTrash,
-  dispenseInTrash,
-} from '../commandCreators/compound'
 import { ZERO_OFFSET } from '../constants'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
