@@ -12,7 +12,7 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
-import type { RecoveryContentProps } from '../types'
+import type { RecoveryContentProps, RouteStep } from '../types'
 
 export function ManualReplaceLwAndRetry(
   props: RecoveryContentProps
@@ -29,17 +29,28 @@ export function ManualReplaceLwAndRetry(
   const { routeUpdateActions } = props
   const { proceedToRouteAndStep } = routeUpdateActions
   const primaryBtnOnClick = (): Promise<void> =>
-    proceedToRouteAndStep(
-      route,
-      doorStatusUtils.isDoorOpen
-        ? route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
-          ? RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
-              .CLOSE_DOOR_AND_HOME
-          : MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLOSE_DOOR_AND_HOME
-        : route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
-        ? RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
-        : MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
-    )
+    proceedToRouteAndStep(route, buildNextStep())
+
+  const buildNextStep = (): RouteStep => {
+    if (doorStatusUtils.isDoorOpen) {
+      switch (route) {
+        case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+          return RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
+            .CLOSE_DOOR_AND_HOME
+        default:
+          return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CLOSE_DOOR_AND_HOME
+      }
+    } else {
+      switch (route) {
+        case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+          return RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS
+            .CONFIRM_RETRY
+        default:
+          return MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+      }
+    }
+  }
+
   const buildBodyText = (): JSX.Element => (
     <Trans
       t={t}

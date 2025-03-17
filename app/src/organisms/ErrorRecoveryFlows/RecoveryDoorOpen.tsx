@@ -19,9 +19,9 @@ import {
   RecoverySingleColumnContentWrapper,
   RecoveryFooterButtons,
 } from './shared'
+import { RECOVERY_MAP } from './constants'
 
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from './types'
-import { RECOVERY_MAP } from './constants'
 
 // There are two code paths that render this component:
 // 1) The door is open on a route & step in which it is not permitted to have the door open.
@@ -29,6 +29,7 @@ import { RECOVERY_MAP } from './constants'
 // to this component. This is commonly done when the route & step itself allows the user to keep the door open, but some
 // action on that route & step is about to occur that requires the door to be closed. In this case, once the door event
 // has been satisfied, manually route back to the previous route & step.
+// in case you need a custom "close the robot door" use RecoveryDoorOpenSpecial compnent with allowDoorOpen metadata set to true
 export function RecoveryDoorOpen({
   recoveryActionMutationUtils,
   runStatus,
@@ -81,7 +82,9 @@ export function RecoveryDoorOpen({
       recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
     ) {
       return t('stacker_door_open_robot_home')
-    } else return t('close_the_robot_door')
+    } else {
+      return t('close_the_robot_door')
+    }
   }
 
   const buildTitletext = (): string => {
@@ -89,7 +92,9 @@ export function RecoveryDoorOpen({
       recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
     ) {
       return t('close_robot_and_stacker_door')
-    } else return t('robot_door_is_open')
+    } else {
+      return t('robot_door_is_open')
+    }
   }
 
   const buildPrimaryButtonText = (): string => {
@@ -97,7 +102,9 @@ export function RecoveryDoorOpen({
       recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
     ) {
       return t('continue')
-    } else return t('resume')
+    } else {
+      return t('resume')
+    }
   }
 
   return (
