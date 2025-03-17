@@ -29,12 +29,6 @@ import {
 } from '../commandCreators/atomic'
 import { blowout } from '../commandCreators/atomic/blowout'
 import { curryCommandCreator } from './curryCommandCreator'
-import {
-  airGapInMovableTrash,
-  blowOutInMovableTrash,
-  dispenseInMovableTrash,
-  moveToMovableTrash,
-} from './movableTrashCommandsUtil'
 import type {
   AddressableAreaName,
   LabwareDefinition2,
@@ -58,6 +52,12 @@ import type {
   RobotState,
   SourceAndDest,
 } from '../types'
+import {
+  airGapInTrash,
+  blowOutInTrash,
+  dispenseInTrash,
+} from '../commandCreators/compound'
+import { ZERO_OFFSET } from '../constants'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -391,12 +391,13 @@ export const blowoutUtil = (args: {
     const trashBin = Object.values(additionalEquipmentEntities).find(
       ae => ae.name === 'trashBin'
     )
-    console.log('trashBin entity', trashBin)
-    return blowOutInMovableTrash({
-      pipetteId: pipette,
-      trashLocation: trashBin?.location as CutoutId,
-      flowRate,
-    })
+    return [
+      curryCommandCreator(blowOutInTrash, {
+        pipetteId: pipette,
+        trashLocation: trashBin?.location as CutoutId,
+        flowRate,
+      }),
+    ]
   }
 }
 export function createEmptyLiquidState(
@@ -617,13 +618,15 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
       invariantContext,
     })
   } else {
-    commands = dispenseInMovableTrash({
-      pipetteId,
-      volume,
-      flowRate,
-      trashLocation: additionalEquipmentEntities[destinationId]
-        .location as CutoutId,
-    })
+    commands = [
+      curryCommandCreator(dispenseInTrash, {
+        pipetteId,
+        volume,
+        flowRate,
+        trashLocation: additionalEquipmentEntities[destinationId]
+          .location as CutoutId,
+      }),
+    ]
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
@@ -675,11 +678,16 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
       }),
     ]
   } else {
-    commands = moveToMovableTrash({
-      pipetteId,
-      trashLocation: additionalEquipmentEntities[destinationId]
-        .location as CutoutId,
-    })
+    const addressableAreaName = getTrashBinAddressableAreaName(
+      additionalEquipmentEntities[destinationId].location as CutoutId
+    )
+    commands = [
+      curryCommandCreator(moveToAddressableArea, {
+        pipetteId,
+        addressableAreaName,
+        offset: ZERO_OFFSET,
+      }),
+    ]
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
@@ -792,13 +800,15 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
       invariantContext,
     })
   } else {
-    commands = airGapInMovableTrash({
-      pipetteId,
-      volume,
-      flowRate,
-      trashLocation: additionalEquipmentEntities[destinationId]
-        .location as CutoutId,
-    })
+    commands = [
+      curryCommandCreator(airGapInTrash, {
+        pipetteId,
+        volume,
+        flowRate,
+        trashLocation: additionalEquipmentEntities[destinationId]
+          .location as CutoutId,
+      }),
+    ]
   }
 
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
