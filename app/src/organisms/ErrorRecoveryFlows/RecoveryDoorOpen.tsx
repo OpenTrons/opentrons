@@ -52,7 +52,7 @@ export function RecoveryDoorOpen({
     route: RecoveryRoute,
     step?: RouteStep
   ): void => {
-    void handleMotionRouting(true, RECOVERY_MAP.ROBOT_IN_MOTION.ROUTE)
+    void handleMotionRouting(true)
       .then(() => recoveryCommands.homeAll())
       .finally(() => handleMotionRouting(false))
       .then(() => proceedToRouteAndStep(route, step))
