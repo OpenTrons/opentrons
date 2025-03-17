@@ -69,7 +69,6 @@ export function ErrorDetailsModal(props: ErrorDetailsModalProps): JSX.Element {
       case ERROR_KINDS.TIP_NOT_DETECTED:
       case ERROR_KINDS.GRIPPER_ERROR:
       case ERROR_KINDS.STALL_OR_COLLISION:
-      case ERROR_KINDS.STALL_WHILE_STACKING:
         return true
       default:
         return false
