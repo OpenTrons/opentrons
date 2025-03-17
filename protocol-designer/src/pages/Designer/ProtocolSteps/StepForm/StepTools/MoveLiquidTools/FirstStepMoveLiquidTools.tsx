@@ -98,9 +98,17 @@ export function FirstStepMoveLiquidTools({
         />
         <WellSelectionField
           {...propsForFields.aspirate_wells}
-          labwareId={String(propsForFields.aspirate_labware.value)}
+          labwareId={
+            typeof propsForFields.aspirate_labware.value === 'string'
+              ? propsForFields.aspirate_labware.value
+              : null
+          }
           pipetteId={formData.pipette}
-          nozzles={String(propsForFields.nozzles.value) ?? null}
+          nozzles={
+            typeof propsForFields.nozzles.value === 'string'
+              ? propsForFields.nozzles.value
+              : null
+          }
           hasFormError={
             visibleFormErrors?.some(error =>
               error.dependentFields.includes('aspirate_wells')
