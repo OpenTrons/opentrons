@@ -10,7 +10,6 @@ from robot_server.robot.calibration.check.models import (
 from robot_server.robot.calibration.check import util
 
 from robot_server.service.session.command_execution import (
-    CommandQueue,
     CallableExecutor,
     Command,
     CompletedCommand,
@@ -27,7 +26,6 @@ from robot_server.service.session.session_types.base_session import (
 from robot_server.service.session.errors import (
     SessionCreationException,
     CommandExecutionException,
-    UnsupportedFeature,
 )
 
 
@@ -136,10 +134,6 @@ class CheckSession(BaseSession):
     @property
     def command_executor(self) -> CallableExecutor:
         return self._command_executor
-
-    @property
-    def command_queue(self) -> CommandQueue:
-        raise UnsupportedFeature()
 
     @property
     def session_type(self) -> SessionType:

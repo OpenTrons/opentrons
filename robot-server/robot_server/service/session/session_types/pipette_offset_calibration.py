@@ -17,14 +17,12 @@ from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
     CompletedCommand,
-    CommandQueue,
     CommandExecutor,
 )
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
 from ..models.session import SessionType, PipetteOffsetCalibrationResponseAttributes
-from ..errors import UnsupportedFeature
 
 
 log = logging.getLogger(__name__)
@@ -109,10 +107,6 @@ class PipetteOffsetCalibrationSession(BaseSession):
     @property
     def command_executor(self) -> CommandExecutor:
         return self._command_executor
-
-    @property
-    def command_queue(self) -> CommandQueue:
-        raise UnsupportedFeature()
 
     @property
     def session_type(self) -> SessionType:

@@ -5,7 +5,6 @@ from typing import Optional
 
 from robot_server.service.session.models.common import IdentifierType, create_identifier
 from robot_server.service.session.command_execution import (
-    CommandQueue,
     CommandExecutor,
     create_command,
 )
@@ -82,11 +81,6 @@ class BaseSession(ABC):
     @abstractmethod
     def command_executor(self) -> CommandExecutor:
         """Accessor for the command executor"""
-        pass
-
-    @property
-    @abstractmethod
-    def command_queue(self) -> CommandQueue:
         pass
 
     @property
