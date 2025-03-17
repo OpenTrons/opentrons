@@ -8,7 +8,10 @@ import type {
 } from '@opentrons/shared-data'
 import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
 import type { AnalysisLwURIsByLwId } from './getAllPossibleLwURIsInRun'
-import type { LabwareModuleOnlyStackupDetails } from '/app/redux/protocol-runs'
+import type {
+  LabwareModuleStackupDetail,
+  LabwareModuleStackupDetails,
+} from '/app/redux/protocol-runs'
 
 // Given a location sequence, find the nearest module that is the beneath the topmost
 // location sequence component and return its moduleId, if any.
@@ -64,17 +67,31 @@ export function getLabwareDefURIFrom(
   }
 }
 
+type WorkingLwModStackupDetails = Omit<LabwareModuleStackupDetail, 'id'>
+
 // LPC cares about real modules/labware for commands and often only cares about
 // modules and labware for UI purposes. Return that data to simplify LPC access.
 // Note that while these data are derived from the (offset) location sequence, they are not
-// synonymous with a (offset) location sequence.
-export function getLwModOnlyLocSeqWithIds(
+// synonymous with a (offset) location sequence. They are REVERSE SORTED, so the
+// lowest most item in the stackup is returned first.
+export function getLwModStackupDetails(
   offsetLocSeq: LabwareOffsetLocationSequence,
-  locSeq: LabwareLocationSequence
-): LabwareModuleOnlyStackupDetails {
-  const modLwOffsetLocSeq = offsetLocSeq.filter(
-    component => component.kind === 'onModule' || component.kind === 'onLabware'
-  ) as Omit<LabwareModuleOnlyStackupDetails, 'id'>
+  locSeq: LabwareLocationSequence,
+  topLwId: string,
+  topLwUri: string
+): LabwareModuleStackupDetails {
+  const modLwOffsetLocSeq = offsetLocSeq.reduce<WorkingLwModStackupDetails[]>(
+    (acc, seq) => {
+      if (seq.kind === 'onModule') {
+        return [...acc, { kind: 'module', moduleModel: seq.moduleModel }]
+      } else if (seq.kind === 'onLabware') {
+        return [...acc, { kind: 'labware', labwareUri: seq.labwareUri }]
+      } else {
+        return acc
+      }
+    },
+    []
+  )
   const modLwLocSeq = locSeq.filter(
     component => component.kind === 'onModule' || component.kind === 'onLabware'
   ) as Array<
@@ -87,7 +104,7 @@ export function getLwModOnlyLocSeqWithIds(
     )
     return []
   } else {
-    return modLwOffsetLocSeq.map((offsetComponent, index) => {
+    const topBottomOffsets = modLwOffsetLocSeq.map((offsetComponent, index) => {
       const locSeqComponent = modLwLocSeq[index]
 
       return {
@@ -97,6 +114,12 @@ export function getLwModOnlyLocSeqWithIds(
             ? locSeqComponent.labwareId
             : locSeqComponent.moduleId,
       }
-    })
+    }) as LabwareModuleStackupDetails
+
+    return [
+      ...topBottomOffsets.reverse(),
+      // Add the top-most labware.
+      { kind: 'labware', labwareUri: topLwUri, id: topLwId },
+    ]
   }
 }

@@ -45,15 +45,6 @@ export function getLocationSpecificOffsetDetailsForLabware({
                 definitionUri,
                 lwOffsetLocSeq,
                 hardCodedOffsetId,
-                // Add the top-most labware itself.
-                lwModOnlyStackupDetails: [
-                  ...restInfo.lwModOnlyStackupDetails,
-                  {
-                    kind: 'onLabware',
-                    labwareUri: uri,
-                    id: restInfo.labwareId,
-                  },
-                ],
                 kind: OFFSET_KIND_LOCATION_SPECIFIC,
               },
             },

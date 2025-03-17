@@ -79,19 +79,19 @@ function buildMoveLabwareCommand(
   return offsetLocationDetails.lwModOnlyStackupDetails.reduce<
     MoveLabwareCreateCommand[]
   >((acc, component, idx, lwModOnlyLocSeqsWithIds) => {
-    if (component.kind === 'onModule') {
+    if (component.kind === 'module') {
       return acc
     } else {
       // If the previous item in the lw stackup is a module, we need to move the
       // labware on top of the module.
       const closestBeneathModuleId =
-        idx > 0 && lwModOnlyLocSeqsWithIds[idx - 1].kind === 'onModule'
+        idx > 0 && lwModOnlyLocSeqsWithIds[idx - 1].kind === 'module'
           ? lwModOnlyLocSeqsWithIds[idx - 1].id
           : null
       // If the previous item in the lw stackup is a lw, we need to move the
       // labware on top of the lw.
       const closestBeneathLwId =
-        idx > 0 && lwModOnlyLocSeqsWithIds[idx - 1].kind === 'onLabware'
+        idx > 0 && lwModOnlyLocSeqsWithIds[idx - 1].kind === 'labware'
           ? lwModOnlyLocSeqsWithIds[idx - 1].id
           : null
 

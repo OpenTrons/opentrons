@@ -3,7 +3,7 @@ import {
   getClosestBeneathModuleId,
   getClosestBeneathModuleModel,
   getLabwareDefURIFrom,
-  getLwModOnlyLocSeqWithIds,
+  getLwModStackupDetails,
   getAddressableAreaNameFrom,
 } from './helpers'
 import { getLwOffsetLocSeqFrom } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useLPCLabwareInfo/utils'
@@ -36,6 +36,7 @@ export function getMoveLabwareLocationCombo(
     } else {
       const moduleId = getClosestBeneathModuleId(loqSeq)
       const lwOffsetLocSeq = getLwOffsetLocSeqFrom(loqSeq, lw, modules)
+      const definitionUri = getLabwareDefURIFrom(labwareId, lwURIsByLwId)
 
       return {
         labwareId,
@@ -44,13 +45,15 @@ export function getMoveLabwareLocationCombo(
           moduleId,
           modules
         ),
-        definitionUri: getLabwareDefURIFrom(labwareId, lwURIsByLwId),
+        definitionUri,
         locationSequence: loqSeq,
         lwOffsetLocSeq,
         addressableAreaName,
-        lwModOnlyStackupDetails: getLwModOnlyLocSeqWithIds(
+        lwModOnlyStackupDetails: getLwModStackupDetails(
           lwOffsetLocSeq,
-          loqSeq
+          loqSeq,
+          labwareId,
+          definitionUri
         ),
         closestBeneathAdapterId: getClosestBeneathAdapterId(loqSeq),
       }

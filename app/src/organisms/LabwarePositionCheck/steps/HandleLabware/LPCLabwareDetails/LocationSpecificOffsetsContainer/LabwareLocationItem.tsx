@@ -106,7 +106,7 @@ export function LabwareLocationItem({
     const isLabwareInLwStackup = (): boolean => {
       const { lwModOnlyStackupDetails } = locationDetails
       const lwOnlyStackup = lwModOnlyStackupDetails.filter(
-        component => component.kind === 'onLabware'
+        component => component.kind === 'labware'
       )
 
       return lwOnlyStackup.length > 1

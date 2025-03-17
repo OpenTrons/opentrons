@@ -18,11 +18,11 @@ import { UnorderedList } from '/app/molecules/UnorderedList'
 import { DescriptionContent } from '/app/molecules/InterventionModal'
 
 import type { DisplayLocationParams } from '@opentrons/components'
-import type { OnLabwareOffsetLocationSequenceComponent } from '@opentrons/api-client'
 import type {
   LPCWizardState,
   SelectedLwOverview,
   OffsetLocationDetails,
+  LabwareStackupDetail,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
@@ -67,8 +67,8 @@ export function PlaceItemInstruction(
 
   // The "clear deck" copy handles the module case.
   const lwOnlyLocSeq = offsetLocationDetails.lwModOnlyStackupDetails.filter(
-    c => c.kind === 'onLabware'
-  ) as OnLabwareOffsetLocationSequenceComponent[]
+    c => c.kind === 'labware'
+  ) as LabwareStackupDetail[]
 
   return (
     <DescriptionContent
@@ -104,7 +104,7 @@ interface PlaceItemInstructionContentProps extends LPCWizardContentProps {
   isLwTiprack: boolean
   slotOnlyDisplayLocation: string
   labwareInfo: SelectedLwOverview
-  lwComponent: OnLabwareOffsetLocationSequenceComponent
+  lwComponent: LabwareStackupDetail
   isFirstItemInStackup: boolean
 }
 

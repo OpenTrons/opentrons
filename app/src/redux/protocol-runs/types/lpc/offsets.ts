@@ -14,18 +14,21 @@ export type LabwareOffsetLocSeqOrAnyLoc =
   | LabwareOffsetLocationSequence
   | typeof ANY_LOCATION
 
-export type OnModuleOffsetLocationSequenceComponentWithId = OnModuleOffsetLocationSequenceComponent & {
-  id: string
-}
-export type OnLabwareOffsetLocationSequenceComponentWithId = OnLabwareOffsetLocationSequenceComponent & {
+export interface ModStackupDetail {
+  kind: 'module'
+  moduleModel: ModuleModel
   id: string
 }
 
-export type LabwareModuleOnlyLocWithId =
-  | OnModuleOffsetLocationSequenceComponentWithId
-  | OnLabwareOffsetLocationSequenceComponentWithId
+export interface LabwareStackupDetail {
+  kind: 'labware'
+  labwareUri: string
+  id: string
+}
 
-export type LabwareModuleOnlyStackupDetails = LabwareModuleOnlyLocWithId[]
+export type LabwareModuleStackupDetail = ModStackupDetail | LabwareStackupDetail
+
+export type LabwareModuleStackupDetails = LabwareModuleStackupDetail[]
 
 /** The location and labware info for a top-most labware in a stackup. This data is associated
  * with a labware that is LPC-able.
@@ -47,7 +50,8 @@ export interface LabwareLocationInfo {
   // The module + labware stackup including the top-most labware (the labware being LPC'd).
   // LPC cares about real instances of these geometries for running commands, so the
   // id is included, too.
-  lwModOnlyStackupDetails: LabwareModuleOnlyStackupDetails
+  // NOTE: Elements are sorted from the lowest item in the stack to the top-most.
+  lwModOnlyStackupDetails: LabwareModuleStackupDetails
   // The id of the closest module that resides beneath the top-most labware, if any.
   closestBeneathModuleId?: string
   // The model of the closest module that resides beneath the top-most labware, if any.

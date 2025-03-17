@@ -8,7 +8,7 @@ import type { LoadedLabware } from '@opentrons/shared-data'
 import type { LegacyLabwareLocationCombo } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/getLegacyLabwareLocationCombos'
 import type {
   LabwareLocationInfo,
-  LabwareModuleOnlyStackupDetails,
+  LabwareModuleStackupDetails,
 } from '/app/redux/protocol-runs'
 
 export function getLabwareLocationInfoFrom(
@@ -98,10 +98,10 @@ function buildAdapterOffsetLocSeq(
 function buildLwModOnlyStackupDetails(
   legacyCombo: LegacyLabwareLocationCombo,
   offsetLocSeq: LabwareOffsetLocationSequence
-): LabwareModuleOnlyStackupDetails {
+): LabwareModuleStackupDetails {
   const lwModOnly = offsetLocSeq.filter(
     component => component.kind === 'onLabware' || component.kind === 'onModule'
-  ) as Omit<LabwareModuleOnlyStackupDetails, 'id'>
+  ) as Omit<LabwareModuleStackupDetails, 'id'>
 
   return lwModOnly.map((component, idx) => {
     // This is safe, since we know that the top-most labware MUST be the labware

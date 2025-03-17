@@ -31,7 +31,7 @@ export function getDefaultOffsetDetailsForLabware({
       lwOffsetLocSeq: ANY_LOCATION,
       // The only labware present on deck when configuring the default offset is the top-most labware itself.
       lwModOnlyStackupDetails: [
-        { kind: 'onLabware', labwareUri: uri, id: aLabwareId },
+        { kind: 'labware', labwareUri: uri, id: aLabwareId },
       ],
     },
   }

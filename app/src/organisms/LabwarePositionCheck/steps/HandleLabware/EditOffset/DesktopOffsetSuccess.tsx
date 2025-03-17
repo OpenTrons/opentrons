@@ -9,6 +9,7 @@ import {
   getLabwareDisplayLocation,
   SPACING,
   StyledText,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, getModuleDisplayName } from '@opentrons/shared-data'
 
@@ -124,6 +125,7 @@ const CONTENT_CONTAINER = css`
   align-items: ${ALIGN_CENTER};
   padding: ${SPACING.spacing40};
   gap: ${SPACING.spacing24};
+  text-align: ${TEXT_ALIGN_CENTER};
 `
 
 const IMAGE_STYLE = css`

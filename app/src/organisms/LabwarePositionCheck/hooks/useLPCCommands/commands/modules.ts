@@ -20,12 +20,9 @@ export function modulePrepCommands(
   } = offsetLocationDetails
 
   const moduleType =
-    (closestBeneathModuleId != null &&
-      closestBeneathModuleModel != null &&
-      'moduleModel' in location &&
-      location.moduleModel != null &&
-      getModuleType(closestBeneathModuleModel)) ??
-    null
+    closestBeneathModuleModel != null
+      ? getModuleType(closestBeneathModuleModel)
+      : null
 
   if (closestBeneathModuleId == null || moduleType == null) {
     return []
@@ -132,12 +129,9 @@ const heaterShakerCleanupCommands = (
   } = offsetLocationDetails
 
   const moduleType =
-    (closestBeneathModuleId != null &&
-      closestBeneathModuleModel != null &&
-      'moduleModel' in location &&
-      location.moduleModel != null &&
-      getModuleType(closestBeneathModuleModel)) ??
-    null
+    closestBeneathModuleModel != null
+      ? getModuleType(closestBeneathModuleModel)
+      : null
 
   return closestBeneathModuleId != null &&
     moduleType != null &&
