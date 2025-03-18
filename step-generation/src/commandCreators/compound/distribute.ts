@@ -285,12 +285,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   pipetteId: pipette,
                   labwareId: args.destLabware,
                   wellName: destWell,
-                  wellLocation: {
-                    origin: 'top',
-                    offset: {
-                      z: args.touchTipAfterDispenseOffsetMmFromTop,
-                    },
-                  },
+                  origin: 'top',
+                  zOffset: args.touchTipAfterDispenseOffsetMmFromTop,
                 }),
               ]
             : []
@@ -447,12 +443,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
               pipetteId: args.pipette,
               labwareId: args.sourceLabware,
               wellName: args.sourceWell,
-              wellLocation: {
-                origin: 'top',
-                offset: {
-                  z: args.touchTipAfterAspirateOffsetMmFromTop,
-                },
-              },
+              origin: 'top',
+              zOffset: args.touchTipAfterAspirateOffsetMmFromTop,
             }),
           ]
         : []

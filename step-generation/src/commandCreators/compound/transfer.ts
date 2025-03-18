@@ -334,12 +334,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipetteId: args.pipette,
                   labwareId: args.sourceLabware,
                   wellName: sourceWell,
-                  wellLocation: {
-                    origin: 'top',
-                    offset: {
-                      z: args.touchTipAfterAspirateOffsetMmFromTop,
-                    },
-                  },
+                  origin: 'top',
+                  zOffset: args.touchTipAfterAspirateOffsetMmFromTop,
                   ...(args.touchTipAfterAspirateSpeed != null
                     ? { speed: args.touchTipAfterAspirateSpeed }
                     : {}),
@@ -354,12 +350,8 @@ export const transfer: CommandCreator<TransferArgs> = (
                     pipetteId: args.pipette,
                     labwareId: args.destLabware,
                     wellName: destinationWell,
-                    wellLocation: {
-                      origin: 'top',
-                      offset: {
-                        z: args.touchTipAfterDispenseOffsetMmFromTop,
-                      },
-                    },
+                    origin: 'top',
+                    zOffset: args.touchTipAfterDispenseOffsetMmFromTop,
                     ...(args.touchTipAfterDispenseSpeed != null
                       ? { speed: args.touchTipAfterDispenseSpeed }
                       : {}),
