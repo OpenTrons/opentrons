@@ -1344,7 +1344,7 @@ class ModuleView:
                 col = (i % 12) + 1  # Convert index to column (1-12)
                 well_key = f"{row}{col}"
                 # Truncate the value to the third decimal place
-                well_map[well_key] = math.floor(value * 1000) / 1000
+                well_map[well_key] = max(0, math.floor(value * 1000) / 1000)
             return well_map
         else:
             raise ValueError(
