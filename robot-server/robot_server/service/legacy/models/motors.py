@@ -51,5 +51,7 @@ class Axes(BaseModel):
 
     @field_validator("axes", mode="before")
     @classmethod
-    def lower_case_motor_name(cls, v):
-        return [m.lower() for m in v]
+    def lower_case_motor_name(cls, v: object) -> object:
+        # type ignore to preserve prior behavior, but I think this is actually
+        # type-unsafe -- I think we need to account for v not being a list[str].
+        return [m.lower() for m in v]  # type: ignore[attr-defined]
