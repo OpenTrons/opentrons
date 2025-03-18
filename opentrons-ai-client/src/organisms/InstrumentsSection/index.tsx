@@ -93,6 +93,8 @@ export function InstrumentsSection(): JSX.Element | null {
         name: getPipetteSpecsV2(name)?.displayName ?? '',
       }))
       .filter(o => o.value !== 'p1000_96')
+      .filter(o => o.value !== 'p1000_multi_em_flex')
+      .filter(o => o.value !== 'p200_96')
     return [{ name: t('none'), value: NO_PIPETTES }, ...allPipetteOptions]
   }, [robotType])
 
