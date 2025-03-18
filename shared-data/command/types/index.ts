@@ -30,7 +30,7 @@ export * from './pipetting'
 export * from './setup'
 export * from './timing'
 export * from './unsafe'
-export * from './support'
+
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime

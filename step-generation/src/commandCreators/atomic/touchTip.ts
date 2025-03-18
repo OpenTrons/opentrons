@@ -1,15 +1,10 @@
 import { formatPyStr, indentPyLines, uuid } from '../../utils'
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
-import type {
-  CreateCommand,
-  TouchTipParams,
-  WellOrigin,
-} from '@opentrons/shared-data'
+import type { CreateCommand, TouchTipParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 interface TouchTipAtomicParams extends Omit<TouchTipParams, 'wellLocation'> {
-  zOffset: number
-  origin: WellOrigin
+  zOffsetFromTop: number
 }
 
 export const touchTip: CommandCreator<TouchTipAtomicParams> = (
@@ -19,7 +14,7 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
 ) => {
   /** touchTip with given args. Requires tip. */
   const actionName = 'touchTip'
-  const { pipetteId, labwareId, wellName, zOffset, origin, speed } = args
+  const { pipetteId, labwareId, wellName, zOffsetFromTop, speed } = args
   const pipetteData = prevRobotState.pipettes[pipetteId]
   const errors: CommandCreatorError[] = []
 
@@ -55,7 +50,7 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
 
   const pythonArgs = [
     `${labwarePythonName}[${formatPyStr(wellName)}],`,
-    `v_offset=${zOffset}`,
+    `v_offset=${zOffsetFromTop},`,
     ...(speed != null ? [`speed=${speed},`] : []),
   ]
 
@@ -73,9 +68,9 @@ export const touchTip: CommandCreator<TouchTipAtomicParams> = (
         labwareId,
         wellName,
         wellLocation: {
-          origin,
+          origin: 'top',
           offset: {
-            z: zOffset,
+            z: zOffsetFromTop,
           },
         },
         speed,
