@@ -318,7 +318,7 @@ interface LoadLidStackParams {
 interface LoadLidStackResult {
   stackLabwareId: string
   labwareIds: string[]
-  definition: LabwareDefinition2
+  definition?: LabwareDefinition2
   lidStackDefinition: LabwareDefinition2
   location: LabwareLocation
   stackLocationSequence?: LabwareLocationSequence
