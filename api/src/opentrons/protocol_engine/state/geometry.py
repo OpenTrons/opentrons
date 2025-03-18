@@ -1042,6 +1042,14 @@ class GeometryView:
             maybe_fixture = self._addressable_areas.get_fixture_by_deck_slot_name(
                 slot_name
             )
+            if maybe_fixture is None:
+                for area in self._addressable_areas.get_all():
+                    if "WasteChute" in area or "moveableTrash" in area:
+                        if slot_name == self._addressable_areas.get_addressable_area_base_slot(area):
+                            # Given we only have one Waste Chute fixture and one type of Trash bin fixture, it's fine to use the first of the set
+                            potential_fixture = deck_configuration_provider.get_potential_cutout_fixtures(area, self._addressable_areas.deck_definition)[1].pop()
+                            maybe_fixture = deck_configuration_provider.get_cutout_fixture(potential_fixture.cutout_fixture_id, self._addressable_areas.deck_definition)
+
             # Ignore generic single slot fixtures
             if maybe_fixture and maybe_fixture["id"] in {
                 "singleLeftSlot",
