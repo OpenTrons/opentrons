@@ -76,7 +76,7 @@ class LogLevels(str, Enum):
 
     """Valid log levels"""
 
-    def __new__(cls, value, level):
+    def __new__(cls, value: str, level: int) -> "LogLevels":
         # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
         obj = str.__new__(cls, value)
         obj._value_ = value
@@ -101,8 +101,17 @@ class LogLevel(BaseModel):
 
     @field_validator("log_level", mode="before")
     @classmethod
-    def lower_case_log_keys(cls, value):
-        return value if value is None else LogLevels(value.lower(), None)
+    def lower_case_log_keys(cls, value: object) -> object:
+        if value is None:
+            return value
+        else:
+            # This `type: ignore[call-arg]` is because mypy thinks there needs to be
+            # a second arg here for the int level, but there does not.
+            return LogLevels(  # type: ignore[call-arg]
+                # todo(mm, 2025-03-18): We probably do actually need to check that
+                # the value is a str before calling .lower() on it.
+                value.lower(),  # type: ignore[attr-defined]
+            )
 
 
 class FactoryResetOption(BaseModel):
