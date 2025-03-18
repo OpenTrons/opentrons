@@ -108,6 +108,8 @@ export const migrateFile = (
           dispense_submerge_speed: null,
           aspirate_touchTip_speed: null,
           dispense_touchTip_speed: null,
+          aspirate_touchTip_mmFromEdge: 0, // this field and the following were previously not configurable and defaulted to 0mm
+          dispense_touchTip_mmFromEdge: 0,
           aspirate_position_reference: null,
           aspirate_retract_position_reference: null,
           aspirate_submerge_mmFromBottom: null,
