@@ -142,14 +142,6 @@ def build_report(test_name: str) -> CSVReport:
                 lines=test_uv_lockout_switch.build_csv_lines(),
             ),
             CSVSection(
-                title=TestSection.Z_AXIS_CURRENT_SPEED.value,
-                lines=test_z_axis_current_speed.build_csv_lines(),
-            ),
-            CSVSection(
-                title=TestSection.X_AXIS_CURRENT_SPEED.value,
-                lines=test_x_axis_current_speed.build_csv_lines(),
-            ),
-            CSVSection(
                 title=TestSection.INSTALL_DETECTION.value,
                 lines=test_install_detection.build_csv_lines(),
             ),
@@ -160,6 +152,14 @@ def build_report(test_name: str) -> CSVReport:
             CSVSection(
                 title=TestSection.TOF_FUNCTIONAL.value,
                 lines=test_tof_functional.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.Z_AXIS_CURRENT_SPEED.value,
+                lines=test_z_axis_current_speed.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.X_AXIS_CURRENT_SPEED.value,
+                lines=test_x_axis_current_speed.build_csv_lines(),
             ),
         ],
     )
