@@ -54,14 +54,14 @@ class google_sheet:
         """Open individual worksheet within a googlesheet."""
         return self.spread_sheet.get_worksheet(tab_number)
 
-    def create_worksheet(self, title: str) -> Optional[str]:
+    def create_worksheet(self, title: str) -> str:
         """Create a worksheet with tab name. Existing spreadsheet needed."""
         try:
             new_sheet = self.spread_sheet.add_worksheet(title, rows="2500", cols="100")
             return new_sheet.id
         except gspread.exceptions.APIError:
             print("Sheet already exists.")
-            return new_sheet.id
+            return self.get_sheet_by_name(title)
 
     def write_header(self, header: List) -> None:
         """Write Header to first row if not present."""
@@ -222,11 +222,11 @@ class google_sheet:
         worksheets = self.spread_sheet.worksheets()
         return worksheets
 
-    def get_sheet_by_name(self, title: str) -> None:
-        """Reference sheet by name."""
+    def get_sheet_by_name(self, title: str) -> str:
+        """Reference sheet by name and return id."""
         try:
             worksheet = self.spread_sheet.worksheet(title)
-            return worksheet
+            return worksheet.id
         except gspread.exceptions.WorksheetNotFound:
             raise gspread.exceptions.WorksheetNotFound(
                 "Worksheet does not exist!!, Use create_worksheet() function first."
