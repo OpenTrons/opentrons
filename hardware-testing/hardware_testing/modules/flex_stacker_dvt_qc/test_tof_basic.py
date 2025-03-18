@@ -26,16 +26,15 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
         CSVLine(f"tof-X-disabled", [CSVResult]),
         CSVLine(f"tof-Z-enabled", [CSVResult]),
         CSVLine(f"tof-Z-disabled", [CSVResult]),
+        CSVLine(
+            f"tof-{TOFSensor.X}-histogram",
+            [str, CSVResult, str],
+        ),
+        CSVLine(
+            f"tof-{TOFSensor.Z}-histogram",
+            [str, CSVResult, str],
+        ),
     ]
-    # Add histogram data bins
-    for sensor in TOFSensor:
-        for zone in range(10):
-            lines.append(
-                CSVLine(
-                    f"tof-{sensor.name}-empty-histogram-zone-{zone}",
-                    [CSVResult, str],
-                )
-            )
     return lines
 
 
@@ -69,7 +68,7 @@ async def test_tof_sensors_for_comms(
 
 
 async def test_get_tof_sensor_histogram(
-    stacker: FlexStacker, report: CSVReport, section: str, sensor: TOFSensor
+        stacker: FlexStacker, report: CSVReport, section: str, sensor: TOFSensor, labware: str
 ) -> None:
     """Test that we can request and store histogram measurements from this TOF sensor."""
     if not stacker._simulating:
@@ -78,7 +77,7 @@ async def test_get_tof_sensor_histogram(
         if not status.ok or status.state != TOFSensorState.MEASURING:
             report(
                 section,
-                f"tof-{sensor.name}-empty-histogram",
+                f"tof-{sensor.name}-histogram-{labware}",
                 [
                     CSVResult.FAIL,
                     [],
@@ -88,15 +87,14 @@ async def test_get_tof_sensor_histogram(
 
     print(f"Getting histogram for {sensor}.")
     histogram = await stacker._driver.get_tof_histogram(sensor)
-    for zone, bins in histogram.bins.items():
-        report(
-            section,
-            f"tof-{sensor.name}-empty-histogram-zone-{zone}",
-            [
-                CSVResult.PASS,
-                bins,
-            ],
-        )
+    report(
+        section,
+        f"tof-{sensor.name}-histogram-{labware}",
+        [
+            CSVResult.PASS,
+            histogram.bins,
+        ],
+    )
 
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
@@ -122,5 +120,5 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     await test_tof_sensors_for_comms(stacker, TOFSensor.Z, True, report, section)
 
     print("Test TOF sensor get histogram")
-    await test_get_tof_sensor_histogram(stacker, report, section, TOFSensor.X)
-    await test_get_tof_sensor_histogram(stacker, report, section, TOFSensor.Z)
+    await test_get_tof_sensor_histogram(stacker, report, section, TOFSensor.X, "empty")
+    await test_get_tof_sensor_histogram(stacker, report, section, TOFSensor.Z, "empty")

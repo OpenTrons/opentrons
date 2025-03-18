@@ -61,7 +61,7 @@ async def test_tof_sensors_labware_detection(
         if not status.ok or status.state != TOFSensorState.MEASURING:
             report(
                 section,
-                f"tof-{sensor.name}-empty-histogram",
+                f"tof-{sensor.name}-histogram-{labware}",
                 [   
                     False,
                     "INVALID_CONFIG",
@@ -75,7 +75,7 @@ async def test_tof_sensors_labware_detection(
     if open:
         report(
             section,
-            f"tof-{sensor.name}-{labware}-histogram",
+            f"tof-{sensor.name}-histogram-{labware}",
             [   
                 False,
                 "HOPPER_OPEN",
@@ -93,7 +93,7 @@ async def test_tof_sensors_labware_detection(
     measurement = {k: v for k, v in histogram.bins.items() if k not in zones}
     report(
         section,
-        f"tof-{sensor.name}-empty-histogram-empty",
+        f"tof-{sensor.name}-histogram-{labware}",
         [
             detected,
             CSVResult.from_bool(detected),
