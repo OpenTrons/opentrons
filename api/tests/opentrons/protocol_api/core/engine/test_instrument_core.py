@@ -1882,6 +1882,7 @@ def test_aspirate_liquid_class_for_transfer(
     decoy.verify(
         mock_transfer_components_executor.submerge(
             submerge_properties=test_transfer_properties.aspirate.submerge,
+            post_submerge_action="aspirate",
             volume_for_pipette_mode_configuration=123,
         ),
         mock_transfer_components_executor.mix(
@@ -1942,6 +1943,7 @@ def test_aspirate_liquid_class_for_consolidate(
     decoy.verify(
         mock_transfer_components_executor.submerge(
             submerge_properties=test_transfer_properties.aspirate.submerge,
+            post_submerge_action="aspirate",
             volume_for_pipette_mode_configuration=543,
         ),
         mock_transfer_components_executor.aspirate_and_wait(volume=123),
@@ -2050,6 +2052,7 @@ def test_dispense_liquid_class(
     decoy.verify(
         mock_transfer_components_executor.submerge(
             submerge_properties=test_transfer_properties.dispense.submerge,
+            post_submerge_action="dispense",
             volume_for_pipette_mode_configuration=None,
         ),
         mock_transfer_components_executor.dispense_and_wait(
@@ -2133,6 +2136,7 @@ def test_dispense_liquid_class_during_multi_dispense(
     decoy.verify(
         mock_transfer_components_executor.submerge(
             submerge_properties=test_transfer_properties.multi_dispense.submerge,
+            post_submerge_action="dispense",
             volume_for_pipette_mode_configuration=None,
         ),
         mock_transfer_components_executor.dispense_and_wait(
@@ -2215,6 +2219,7 @@ def test_last_dispense_liquid_class_during_multi_dispense(
     decoy.verify(
         mock_transfer_components_executor.submerge(
             submerge_properties=test_transfer_properties.multi_dispense.submerge,
+            post_submerge_action="dispense",
             volume_for_pipette_mode_configuration=None,
         ),
         mock_transfer_components_executor.dispense_and_wait(

@@ -111,6 +111,7 @@ def test_submerge_without_lpd(
     # decoy.when(source_well.current_liquid_height()).then_return(1)
     subject.submerge(
         submerge_properties=sample_transfer_props.aspirate.submerge,
+        post_submerge_action="aspirate",
         volume_for_pipette_mode_configuration=123,
     )
 
@@ -187,6 +188,7 @@ def test_submerge_with_lpd(
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(True)
     subject.submerge(
         submerge_properties=sample_transfer_props.aspirate.submerge,
+        post_submerge_action="aspirate",
         volume_for_pipette_mode_configuration=123,
     )
 
@@ -264,6 +266,7 @@ def test_submerge_raises_when_submerge_point_is_invalid(
     with pytest.raises(RuntimeError, match="Oh no!"):
         subject.submerge(
             submerge_properties=sample_transfer_props.aspirate.submerge,
+            post_submerge_action="aspirate",
             volume_for_pipette_mode_configuration=123,
         )
 

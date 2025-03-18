@@ -1862,6 +1862,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
         components_executor.submerge(
             submerge_properties=aspirate_props.submerge,
+            post_submerge_action="aspirate",
             volume_for_pipette_mode_configuration=volume_for_pipette_mode_configuration,
         )
         # Do not do a pre-aspirate mix or pre-wet if consolidating
@@ -1972,6 +1973,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
         components_executor.submerge(
             submerge_properties=dispense_props.submerge,
+            post_submerge_action="dispense",
             volume_for_pipette_mode_configuration=None,
         )
         push_out_vol = (
@@ -2053,6 +2055,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         )
         components_executor.submerge(
             submerge_properties=dispense_props.submerge,
+            post_submerge_action="dispense",
             volume_for_pipette_mode_configuration=None,
         )
         tip_starting_volume = self.get_current_volume()

@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union, Literal
 from dataclasses import dataclass, field
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
@@ -130,6 +130,7 @@ class TransferComponentsExecutor:
     def submerge(
         self,
         submerge_properties: Submerge,
+        post_submerge_action: Literal["aspirate", "dispense"],
         volume_for_pipette_mode_configuration: Optional[float],
     ) -> None:
         """Execute submerge steps.
@@ -141,10 +142,6 @@ class TransferComponentsExecutor:
         2. move to aspirate position at desired speed
         3. delay
         """
-        if submerge_properties == self._transfer_properties.aspirate.submerge:
-            post_submerge_action = "aspirate"
-        else:
-            post_submerge_action = "dispense"
         submerge_start_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
             position_reference=submerge_properties.position_reference,
@@ -153,7 +150,17 @@ class TransferComponentsExecutor:
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
         )
-
+        self._instrument.move_to(
+            location=Location(
+                point=self._target_well.get_top(2),
+                labware=self._target_location.labware,
+            ),
+            well_core=self._target_well,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        )
+        self._remove_air_gap(location=submerge_start_location)
         if (
             self._transfer_type != TransferType.MANY_TO_ONE
             and post_submerge_action == "aspirate"
@@ -171,7 +178,7 @@ class TransferComponentsExecutor:
             well_core=self._target_well,
             location_check_descriptors=_LocationCheckDescriptors(
                 location_type="submerge start",
-                pipetting_action=post_submerge_action,  # type: ignore[arg-type]
+                pipetting_action=post_submerge_action,
             ),
             logger=log,
         )
@@ -182,7 +189,6 @@ class TransferComponentsExecutor:
             minimum_z_height=None,
             speed=None,
         )
-        self._remove_air_gap(location=submerge_start_location)
         if (
             post_submerge_action == "aspirate"
             and volume_for_pipette_mode_configuration is not None
