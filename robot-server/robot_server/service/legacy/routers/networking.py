@@ -6,7 +6,7 @@ from typing import Annotated, Optional
 
 from starlette import status
 from starlette.responses import JSONResponse
-from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query
+from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query, Response
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.system import nmcli, wifi
@@ -151,7 +151,7 @@ async def post_wifi_configure(
     response_model=WifiKeyFiles,
     response_model_by_alias=True,
 )
-async def get_wifi_keys():
+async def get_wifi_keys() -> WifiKeyFiles:
     keys = [
         WifiKeyFile(
             uri=f"/wifi/keys/{key.directory}",
@@ -160,12 +160,7 @@ async def get_wifi_keys():
         )
         for key in wifi.list_keys()
     ]
-    # Why not create a WifiKeyFiles? Because validation fails when there's a
-    # pydantic model with attribute named keys. Deep in the guts of pydantic
-    # there's a call to `dict(model)` which raises an exception because `keys`
-    # is not callable, like the `keys` member of dict.
-    # A problem for another time.
-    return {"keys": keys}
+    return WifiKeyFiles(keys=keys)
 
 
 @router.post(
@@ -180,7 +175,10 @@ async def get_wifi_keys():
     status_code=status.HTTP_201_CREATED,
     response_model_exclude_unset=True,
 )
-async def post_wifi_key(key: UploadFile = File(...)):
+async def post_wifi_key(
+    response: Response,
+    key: UploadFile = File(...),
+) -> AddWifiKeyFileResponse:
     key_name = key.filename
     if not key_name:
         raise LegacyErrorResponse(
@@ -189,17 +187,18 @@ async def post_wifi_key(key: UploadFile = File(...)):
 
     add_key_result = wifi.add_key(key_name, key.file.read())
 
-    response = AddWifiKeyFileResponse(
+    response_body = AddWifiKeyFileResponse(
         uri=f"/wifi/keys/{add_key_result.key.directory}",
         id=add_key_result.key.directory,
         name=os.path.basename(add_key_result.key.file),
     )
     if add_key_result.created:
-        return response
+        response.status_code = status.HTTP_201_CREATED
+        return response_body
     else:
-        # We return a JSONResponse because we want the 200 status code.
-        response.message = "Key file already present"
-        return JSONResponse(content=response.model_dump())
+        response.status_code = status.HTTP_200_OK
+        response_body.message = "Key file already present"
+        return response_body
 
 
 @router.delete(
