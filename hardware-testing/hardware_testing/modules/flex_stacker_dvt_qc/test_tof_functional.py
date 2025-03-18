@@ -54,23 +54,6 @@ async def test_tof_sensors_labware_detection(
         stacker: FlexStacker, report: CSVReport, section: str, sensor: TOFSensor, labware: str
 ) -> None:
     """Test that we can detect labware with the TOF sensor."""
-    if not stacker._simulating:
-        # Cancel any on-going measurements and make sure sensor is enabled
-        await stacker._driver.manage_tof_measurement(sensor, start=False)
-        status = await stacker._driver.get_tof_sensor_status(sensor)
-        if not status.ok or status.state != TOFSensorState.MEASURING:
-            report(
-                section,
-                f"tof-{sensor.name}-histogram-{labware}",
-                [   
-                    False,
-                    "INVALID_CONFIG",
-                    CSVResult.FAIL,
-                    [],
-                ],
-            )
-            return
-
     open = not await stacker._driver.get_hopper_door_closed()
     if open:
         report(
