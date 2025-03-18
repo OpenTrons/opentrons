@@ -274,6 +274,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   aspirate_retract_y_position?: number | null
   aspirate_submerge_delay_seconds?: number | null
   aspirate_submerge_speed?: number | null
+  aspirate_touchTip_mmFromEdge?: number | null
   aspirate_touchTip_mmFromTop?: number | null
   aspirate_touchTip_speed?: number | null
   aspirate_wells_grouped?: boolean | null
@@ -296,6 +297,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dispense_retract_y_position?: number | null
   dispense_submerge_delay_seconds?: number | null
   dispense_submerge_speed?: number | null
+  dispense_touchTip_mmFromEdge?: number | null
   dispense_touchTip_mmFromTop?: number | null
   dispense_touchTip_speed?: number | null
   dispense_x_position?: number | null

@@ -318,6 +318,10 @@
       "touchTip_speed": {
         "label": "Touch tip speed"
       },
+      "touchTip_mmFromEdge": {
+        "caption": "Valid range between {{min}} - {{max}}mm",
+        "label": "Distance from edge"
+      },
       "useGripper": {
         "label": "use gripper",
         "toggleOff": "Move labware manually (protocol will pause and prompt)",

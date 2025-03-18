@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { round } from 'lodash'
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -8,6 +9,7 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+import { getMinXYDimension } from '@opentrons/shared-data'
 import { getTrashOrLabware } from '@opentrons/step-generation'
 
 import {
@@ -144,6 +146,13 @@ export const SecondStepsMoveLiquidTools = ({
       },
     ]
   }
+
+  const minXYDimension = getMinXYDimension(
+    labwares[formData[`${tab}_labware`]].def,
+    ['A1']
+  )
+  const minRadiusForTouchTip =
+    minXYDimension != null ? round(minXYDimension / 2, 1) : null
 
   return (
     <Flex
@@ -417,7 +426,24 @@ export const SecondStepsMoveLiquidTools = ({
                 )}
                 units={t('application:units.millimeterPerSec')}
               />
-
+              <InputStepFormField
+                showTooltip={false}
+                padding="0"
+                title={t('form:step_edit_form.field.touchTip_mmFromEdge.label')}
+                {...propsForFields[`${tab}_touchTip_mmFromEdge`]}
+                errorToShow={getFormLevelError(
+                  `${tab}_touchTip_mmFromEdge`,
+                  mappedErrorsToField
+                )}
+                caption={t(
+                  `form:step_edit_form.field.touchTip_mmFromEdge.caption`,
+                  {
+                    min: 0,
+                    max: minRadiusForTouchTip,
+                  }
+                )}
+                units={t('application:units.millimeter')}
+              />
               <PositionField
                 prefix={tab}
                 propsForFields={propsForFields}

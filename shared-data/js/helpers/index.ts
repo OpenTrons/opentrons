@@ -1,4 +1,4 @@
-import uniq from 'lodash/uniq'
+import { min, uniq } from 'lodash'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
@@ -218,10 +218,12 @@ export const getWellsDepth = (
   return offsets[0]
 }
 
+type XYPlaneDimension = 'x' | 'y'
+
 export const getWellDimension = (
   labwareDef: LabwareDefinition2,
   wells: string[],
-  position: 'x' | 'y'
+  position: XYPlaneDimension
 ): number => {
   const offsets = wells.map(well => {
     const labwareWell = labwareDef.wells[well]
@@ -233,6 +235,19 @@ export const getWellDimension = (
     }
   })
   return offsets[0]
+}
+
+export const getMinXYDimension = (
+  labwareDef: LabwareDefinition2,
+  wells: string[]
+): number | null => {
+  return (
+    min(
+      ['x', 'y'].map(dim =>
+        getWellDimension(labwareDef, wells, dim as XYPlaneDimension)
+      )
+    ) ?? null
+  )
 }
 
 export const getSlotHasMatingSurfaceUnitVector = (
