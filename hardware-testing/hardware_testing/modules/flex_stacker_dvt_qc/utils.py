@@ -1,7 +1,7 @@
 """Utility functions for the Flex Stacker EVT QC module."""
 from collections import defaultdict
 import statistics
-from typing import DefaultDict, Dict, List
+from typing import Dict, List
 from opentrons.drivers.flex_stacker.driver import TOFSensor
 from opentrons.drivers.flex_stacker.utils import NUMBER_OF_BINS, NUMBER_OF_ZONES
 from hardware_testing.data import ui
