@@ -82,14 +82,6 @@ TESTS = [
         test_uv_lockout_switch.run,
     ),
     (
-        TestSection.Z_AXIS_CURRENT_SPEED,
-        test_z_axis_current_speed.run,
-    ),
-    (
-        TestSection.X_AXIS_CURRENT_SPEED,
-        test_x_axis_current_speed.run,
-    ),
-    (
         TestSection.INSTALL_DETECTION,
         test_install_detection.run,
     ),
@@ -100,6 +92,14 @@ TESTS = [
     (
         TestSection.TOF_FUNCTIONAL,
         test_tof_functional.run,
+    ),
+    (
+        TestSection.Z_AXIS_CURRENT_SPEED,
+        test_z_axis_current_speed.run,
+    ),
+    (
+        TestSection.X_AXIS_CURRENT_SPEED,
+        test_x_axis_current_speed.run,
     ),
 ]
 

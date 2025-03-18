@@ -71,6 +71,7 @@ async def test_tof_sensors_labware_detection(
     print(f"Getting histogram for {sensor}.")
     bins = [40, 80]
     zones = [0,1,2,3]
+    await stacker._driver.enable_tof_sensor(sensor, True)
     histogram = await stacker._driver.get_tof_histogram(sensor)
     detected = not labware_detected(histogram, sensor, bins, zones)
     measurement = {k: v for k, v in histogram.bins.items() if k not in zones}
