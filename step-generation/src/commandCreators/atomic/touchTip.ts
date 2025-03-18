@@ -1,4 +1,4 @@
-import { formatPyStr, uuid } from '../../utils'
+import { formatPyStr, indentPyLines, uuid } from '../../utils'
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type { CreateCommand, TouchTipParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
@@ -10,7 +10,7 @@ export const touchTip: CommandCreator<TouchTipParams> = (
 ) => {
   /** touchTip with given args. Requires tip. */
   const actionName = 'touchTip'
-  const { pipetteId, labwareId, wellName, wellLocation } = args
+  const { pipetteId, labwareId, wellName, wellLocation, speed } = args
   const pipetteData = prevRobotState.pipettes[pipetteId]
   const errors: CommandCreatorError[] = []
 
@@ -45,11 +45,19 @@ export const touchTip: CommandCreator<TouchTipParams> = (
     invariantContext.labwareEntities[labwareId].pythonName
   const pythonOffset =
     wellLocation?.offset?.z != null
-      ? `, v_offset=${wellLocation?.offset?.z}`
-      : ''
-  const python = `${pipettePythonName}.touch_tip(${labwarePythonName}[${formatPyStr(
-    wellName
-  )}]${pythonOffset})`
+      ? `v_offset=${wellLocation?.offset?.z},`
+      : null
+  const pythonSpeed = speed != null ? `speed=${speed},` : null
+  const pythonArgs = [
+    `${labwarePythonName}[${formatPyStr(wellName)}],`,
+    pythonOffset,
+    pythonSpeed,
+  ].filter(arg => arg != null)
+
+  //  TODO: add mmFromEdge to python and commandCreator
+  const python = `${pipettePythonName}.touch_tip(\n${indentPyLines(
+    pythonArgs.join('\n')
+  )}\n)`
 
   const commands: CreateCommand[] = [
     {
@@ -60,6 +68,7 @@ export const touchTip: CommandCreator<TouchTipParams> = (
         labwareId,
         wellName,
         wellLocation,
+        speed,
       },
     },
   ]
