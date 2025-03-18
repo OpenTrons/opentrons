@@ -1,4 +1,5 @@
 import 'cypress-file-upload'
+import { SetupContent } from './SetupSteps'
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -34,6 +35,7 @@ declare global {
       mixaspirate: () => Cypress.Chainable<void>
       clickConfirm: () => Cypress.Chainable<void>
       verifyOverflowBtn: () => Cypress.Chainable<void>
+      verifyOnboardingPage: () => Cypress.Chainable<void>
     }
   }
 }
@@ -107,6 +109,14 @@ Cypress.Commands.add('verifyFullHeader', () => {
 
 Cypress.Commands.add('verifyCreateNewHeader', () => {
   verifyUniversal()
+})
+
+// Onboarding page
+Cypress.Commands.add('verifyOnboardingPage', () => {
+  verifyUniversal()
+  cy.get(locators.privacyPolicy).should('exist').and('be.visible')
+  cy.get(locators.eula).should('exist').and('be.visible')
+  cy.contains(SetupContent.LetsGetStarted)
 })
 
 // Home Page
