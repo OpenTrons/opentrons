@@ -15,17 +15,16 @@ from opentrons.drivers.flex_stacker.types import (
     StackerAxis,
     LEDPattern,
     TOFSensor,
-    TOFSensorState,
 )
 
 
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = [
-        CSVLine(f"tof-X-enabled", [CSVResult]),
-        CSVLine(f"tof-X-disabled", [CSVResult]),
-        CSVLine(f"tof-Z-enabled", [CSVResult]),
-        CSVLine(f"tof-Z-disabled", [CSVResult]),
+        CSVLine("tof-X-enabled", [CSVResult]),
+        CSVLine("tof-X-disabled", [CSVResult]),
+        CSVLine("tof-Z-enabled", [CSVResult]),
+        CSVLine("tof-Z-disabled", [CSVResult]),
         CSVLine(
             f"tof-{TOFSensor.X}-histogram",
             [CSVResult, str],
@@ -68,7 +67,7 @@ async def test_tof_sensors_for_comms(
 
 
 async def test_get_tof_sensor_histogram(
-        stacker: FlexStacker, report: CSVReport, section: str, sensor: TOFSensor
+    stacker: FlexStacker, report: CSVReport, section: str, sensor: TOFSensor
 ) -> None:
     """Test that we can request and store histogram measurements from this TOF sensor."""
     print(f"Getting histogram for {sensor}.")

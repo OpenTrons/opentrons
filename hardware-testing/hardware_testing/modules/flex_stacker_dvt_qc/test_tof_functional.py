@@ -16,7 +16,6 @@ from opentrons.drivers.flex_stacker.types import (
     StackerAxis,
     LEDPattern,
     TOFSensor,
-    TOFSensorState,
 )
 
 
@@ -51,7 +50,11 @@ async def tof_sensors_installed(stacker: FlexStacker) -> bool:
 
 
 async def test_tof_sensors_labware_detection(
-        stacker: FlexStacker, report: CSVReport, section: str, sensor: TOFSensor, labware: str
+    stacker: FlexStacker,
+    report: CSVReport,
+    section: str,
+    sensor: TOFSensor,
+    labware: str,
 ) -> None:
     """Test that we can detect labware with the TOF sensor."""
     open = not await stacker._driver.get_hopper_door_closed()
@@ -59,7 +62,7 @@ async def test_tof_sensors_labware_detection(
         report(
             section,
             f"tof-{sensor.name}-histogram-{labware}",
-            [   
+            [
                 False,
                 "HOPPER_OPEN",
                 CSVResult.FAIL,
@@ -70,7 +73,7 @@ async def test_tof_sensors_labware_detection(
 
     print(f"Getting histogram for {sensor}.")
     bins = [40, 80]
-    zones = [0,1,2,3]
+    zones = [0, 1, 2, 3]
     status = await stacker._driver.get_tof_sensor_status(sensor)
     print(status)
     histogram = await stacker._driver.get_tof_histogram(sensor)
@@ -100,18 +103,27 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
 
     print("Test that we have no labware on the X")
     ui.get_user_ready("Make sure there is no labware on the stacker gripper position.")
-    await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.X, "empty")
+    await test_tof_sensors_labware_detection(
+        stacker, report, section, TOFSensor.X, "empty"
+    )
 
     print("Test that we detect tiprack on the X")
     ui.get_user_ready("Add 1 tiprack to the stacker X.")
-    await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.X, "tiprack")
+    await test_tof_sensors_labware_detection(
+        stacker, report, section, TOFSensor.X, "tiprack"
+    )
 
     print("Test that we have no labware on the Z")
-    ui.get_user_ready("Make sure there is no labware in the stacker and close the hopper door.")
+    ui.get_user_ready(
+        "Make sure there is no labware in the stacker and close the hopper door."
+    )
     await stacker.close_latch()
-    await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.Z, "empty")
+    await test_tof_sensors_labware_detection(
+        stacker, report, section, TOFSensor.Z, "empty"
+    )
 
     print("Test that we detect tiprack on the Z")
     ui.get_user_ready("Add 1 tiprack to the stacker Z and close the hopper door.")
-    await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.Z, "tiprack")
-
+    await test_tof_sensors_labware_detection(
+        stacker, report, section, TOFSensor.Z, "tiprack"
+    )
