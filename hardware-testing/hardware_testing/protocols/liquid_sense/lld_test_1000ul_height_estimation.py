@@ -1,5 +1,6 @@
 """Testing LLD Height Estimation during 1000uL Dynamic Aspirations."""
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 from os import listdir
 from os.path import isdir
@@ -18,6 +19,9 @@ from opentrons_shared_data.load import get_shared_data_root
 metadata = {"protocolName": "LLD 1000uL Tube-to-Tube"}
 requirements = {"robotType": "Flex", "apiLevel": "2.22"}
 
+SHAKER_RPM = 1100  # TODO: (sigler) double-check this again production script
+SHAKER_SECONDS = 30
+
 SLOTS = {
     "trash": "A3",
     "tips_1": "A1",
@@ -26,9 +30,11 @@ SLOTS = {
     "tips_4": "B2",
     "src_reservoir": "C2",
     "test_labware_1": "D1",
-    "dst_plate_1": "D2",
+    "dst_plate": "D2",
     "dst_plate_stack_start": "C1",  # FIXME: stack plates + lids
     "dst_plate_stack_end": "B3",  # FIXME: stack plates + lids
+    "reader": "D3",
+    "shaker": "C3",
 }
 
 P1000_MAX_PUSH_OUT_UL = 79.0
@@ -293,10 +299,9 @@ def _helper_load_all_labware(
         _load_labware(
             ctx,
             LOAD_NAME_DST_PLATE,
-            SLOTS[f"dst_plate_{i + 1}"],
+            SLOTS["dst_plate_stack_start"],
             liquid=(air, 0.01),
         )
-        for i in range(num_plates)
     ]
     return src_reservoir, test_labwares, dst_plates
 
@@ -378,6 +383,17 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=-100.0,
         maximum=0.0,
     )
+    parameters.add_int(
+        display_name="wavelength",
+        variable_name="wavelength",
+        default=450,
+        choices=[
+            {"display_name": "450", "value": 450},
+            {"display_name": "562", "value": 562},
+            {"display_name": "600", "value": 600},
+            {"display_name": "650", "value": 650},
+        ],
+    )
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -394,6 +410,7 @@ def run(ctx: ProtocolContext) -> None:
     }
     mm_offset_min_vol = ctx.params.mm_offset_min_vol  # type: ignore[attr-defined]
     mm_offset_well_top = ctx.params.mm_offset_well_top  # type: ignore[attr-defined]
+    wavelength = ctx.params.wavelength  # type: ignore[attr-defined]
 
     # LOAD PIPETTES
     num_tip_slots = len([s for s in SLOTS.keys() if "tip" in s])
@@ -407,11 +424,22 @@ def run(ctx: ProtocolContext) -> None:
             for i in range(num_tip_slots)
         ],
     )
-    # NOTE: Keep it simple. Just pick up a tip right-away.
-    #       `InstrumentContext.get_minimum_liquid_sense_height()` requires a tip
-    #       to be currently attached, else it raises an error.
+    # NOTE: `InstrumentContext.get_minimum_liquid_sense_height()`
+    #       requires a tip to be currently attached, else it raises an error.
     #       We call that function when pre-calculating stuff.
     pipette.pick_up_tip()
+
+    # LOAD PLATE-READER
+    reader_module = ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
+    reader_module.close_lid()
+    reader_module.initialize(mode="single", wavelengths=[wavelength])
+
+    # LOAD HEATER-SHAKER
+    shaker_module = ctx.load_module("heaterShakerModuleV1", SLOTS["shaker"])
+    shaker_module.close_labware_latch()
+    shaker_module.deactivate_heater()
+    shaker_module.deactivate_shaker()
+    shaker_adapter = shaker_module.load_adapter("opentrons_universal_flat_adapter")
 
     # LOAD LABWARE
     ctx.load_trash_bin(SLOTS["trash"])
@@ -469,7 +497,7 @@ def run(ctx: ProtocolContext) -> None:
 
     # LOAD LIQUID
     dye_src_well = src_reservoir["A1"]
-    range_hv = ctx.define_liquid(name="range-hv", display_color="#FF0000")
+    range_hv = ctx.define_liquid(name="red-dye", display_color="#FF0000")
     dead_vol_for_reservoir = LOAD_NAME_SRC_RESERVOIRS[reservoir_load_name]
     total_dye_transferred = sum(
         [t.ul_to_add for tl in test_trials_by_labware.values() for t in tl]
@@ -489,11 +517,10 @@ def run(ctx: ProtocolContext) -> None:
     # RUN
     _detected_src = False
     for test_labware, test_trials in test_trials_by_labware.items():
-        # TODO: use gripper to arrange things between test-labwares
+        ctx.move_labware(
+            test_labware, new_location=SLOTS["dst_plate"], use_gripper=True
+        )
         for trial in test_trials:
-
-            # FIXME: use dynamic tracking for ALL aspirates/dispenses (entire test, why not)
-
             # ADD DYE TO TEST-LABWARE
             # NOTE: 1st trial has tip already attached
             if not pipette.has_tip:
@@ -518,7 +545,8 @@ def run(ctx: ProtocolContext) -> None:
             if trial.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
                 pipette.require_liquid_presence(trial.test_well)
             pipette.aspirate(
-                trial.ul_to_remove, trial.test_well.meniscus(target="dynamic", z=trial.submerge_mm)
+                trial.ul_to_remove,
+                trial.test_well.meniscus(target="dynamic", z=trial.submerge_mm),
             )
 
             # MULTI-DISPENSE TO PLATE
@@ -527,4 +555,27 @@ def run(ctx: ProtocolContext) -> None:
                 pipette.dispense(v, w.top(), push_out=push_out)
             pipette.drop_tip()
 
-        # TODO: move dst_plate to plate-reader and take reading
+        # MOVE PLATE TO SHAKER
+        shaker_module.open_labware_latch()
+        ctx.move_labware(test_labware, new_location=shaker_adapter, use_gripper=True)
+        shaker_module.close_labware_latch()
+        shaker_module.set_and_wait_for_shake_speed(SHAKER_RPM)
+        ctx.delay(seconds=SHAKER_SECONDS)
+        shaker_module.deactivate_shaker()
+        shaker_module.open_labware_latch()
+
+        # MOVE PLATE TO READER
+        reader_module.open_lid()
+        ctx.move_labware(test_labware, new_location=reader_module, use_gripper=True)
+        reader_module.close_lid()
+        reader_module.read(
+            export_filename=f"{test_labware.load_name}_"
+            f"{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
+        )
+
+        # MOVE PLATE TO FINAL SLOT
+        reader_module.open_lid()
+        ctx.move_labware(
+            test_labware, new_location=SLOTS["dst_plate_stack_end"], use_gripper=True
+        )
+        reader_module.close_lid()
