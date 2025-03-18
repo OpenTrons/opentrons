@@ -175,8 +175,6 @@ export function LPCReducer(
         }
       }
 
-      // TODO(jh, 03-12-25): Revisit whether we need to set the store back to undefined, and
-      // if we can avoid having an `undefined` store at any point in the store's lifecycle.
       case FINISH_LPC:
         return {
           ...state,

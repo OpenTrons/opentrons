@@ -17,7 +17,6 @@ import type {
   LocationSpecificOffsetDetails,
   LPCLabwareInfo,
   LocationSpecificOffsetLocationDetails,
-  DefaultOffsetLocationDetails,
   WorkingOffset,
   LPCOffsetKind,
   DefaultOffsetDetails,
@@ -110,6 +109,13 @@ export const getDefaultOffsetDetailsForAllLabware = (
 
   return Object.values(labware).map(
     (details: LwGeometryDetails) => details.defaultOffsetDetails
+  )
+}
+
+export const getIsDefaultOffsetAbsent = (info: LwGeometryDetails): boolean => {
+  return (
+    info?.defaultOffsetDetails?.existingOffset == null &&
+    info?.defaultOffsetDetails?.workingOffset?.confirmedVector == null
   )
 }
 
@@ -239,4 +245,59 @@ export function getCountHardCodedOffsets(
         detail => detail.locationDetails.hardCodedOffsetId != null
       ).length
     : 0
+}
+
+export function getTotalCountLocationSpecificOffsets(
+  labware: LPCLabwareInfo['labware'] | undefined
+): number {
+  if (labware == null) {
+    return 0
+  }
+
+  let count = 0
+
+  Object.values(labware).forEach(lw => {
+    count += lw.locationSpecificOffsetDetails.length
+  })
+
+  return count
+}
+
+export function getTotalCountNonHardCodedLocationSpecificOffsets(
+  labware: LPCLabwareInfo['labware'] | undefined
+): number {
+  if (labware == null) {
+    return 0
+  }
+
+  let count = 0
+
+  Object.values(labware).forEach(lw => {
+    lw.locationSpecificOffsetDetails.forEach(lsDetail => {
+      if (lsDetail.locationDetails.hardCodedOffsetId == null) {
+        count += 1
+      }
+    })
+  })
+
+  return count
+}
+
+export function getCountNonHardcodedLocationSpecificOffsets(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): number {
+  return lsDetails != null
+    ? lsDetails.length - getCountHardCodedOffsets(lsDetails)
+    : 0
+}
+
+export function getIsNecessaryDefaultOffsetMissing(
+  defaultDetails: DefaultOffsetDetails | undefined,
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): boolean {
+  return (
+    defaultDetails?.existingOffset == null &&
+    !getAreAllOffsetsHardCoded(lsDetails) &&
+    !getAreAnyLocationSpecificOffsetsMissing(lsDetails)
+  )
 }
