@@ -271,6 +271,7 @@ class InstrumentContext(publisher.CommandPublisher):
             and self.liquid_presence_detection
             and self._core.nozzle_configuration_valid_for_lld()
             and self._core.get_current_volume() == 0
+            and self._core.get_has_clean_tip()
         ):
             self._raise_if_pressure_not_supported_by_pipette()
             self.require_liquid_presence(well=well)
