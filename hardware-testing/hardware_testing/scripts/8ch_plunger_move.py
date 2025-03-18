@@ -48,8 +48,8 @@ async def move_plunger(api: OT3API, mount: types.OT3Mount, trials: int) -> None:
             try:
                 # 每次移动前重新设置运动参数
                 pipette_ax = types.Axis.of_main_tool_actuator(mount)
-                print(f"Moving to bottom plunger position: {bottom_pos}\n")
-                await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos-10)
+                print(f"Moving to bottom plunger position: {bottom_pos-20}\n")
+                await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos-20)
                 csvwriter.writerow([i+1, current_time, 'Down', 'Success', '', ''])
             except StallOrCollisionDetectedError as e:
                 error_msg = f"Collision detected during downward movement: {str(e)}"
