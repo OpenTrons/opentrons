@@ -29,7 +29,7 @@ SLOTS = {
     "tips_3": "B1",
     "tips_4": "B2",
     "src_reservoir": "C2",
-    "test_labware_1": "D1",
+    "test_labware": "D1",
     "dst_plate": "D2",
     "dst_plate_stack_start": "C1",  # FIXME: stack plates + lids
     "dst_plate_stack_end": "B3",  # FIXME: stack plates + lids
@@ -272,7 +272,7 @@ def _helper_load_all_labware(
     test_labware_load_name: str,
     num_plates: int,
     pipette_channels: int,
-) -> Tuple[Labware, List[Labware], List[Labware]]:
+) -> Tuple[Labware, Labware, List[Labware]]:
     assert test_labware_load_name in list(
         LOAD_NAME_SRC_LABWARE_BY_CHANNELS[pipette_channels].values()
     ), f"{test_labware_load_name} cannot be tested with {pipette_channels}ch pipette"
@@ -285,16 +285,15 @@ def _helper_load_all_labware(
         SLOTS["src_reservoir"],
         liquid=(air, 0.01),
     )
-    test_labwares = [
-        _load_labware(
-            ctx,
-            test_labware_load_name,
-            SLOTS[f"test_labware_{i + 1}"],
-            liquid=(air, 0.01),
-        )
-        for i in range(num_plates)
-    ]
-    # FIXME: make this a stack of plates and lids
+    test_labware = _load_labware(
+        ctx,
+        test_labware_load_name,
+        SLOTS["test_labware"],
+        liquid=(air, 0.01),
+    )
+    # TODO: stack plate w/ lids
+    if num_plates > 1:
+        raise NotImplementedError("multiple plates not yet implemented")
     dst_plates = [
         _load_labware(
             ctx,
@@ -303,7 +302,7 @@ def _helper_load_all_labware(
             liquid=(air, 0.01),
         )
     ]
-    return src_reservoir, test_labwares, dst_plates
+    return src_reservoir, test_labware, dst_plates
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -446,7 +445,7 @@ def run(ctx: ProtocolContext) -> None:
     assert test_labware_load_name in list(
         LOAD_NAME_SRC_LABWARE_BY_CHANNELS[channels].values()
     ), f"{test_labware_load_name} cannot be tested with {channels}ch pipette"
-    src_reservoir, test_labwares, dst_plates = _helper_load_all_labware(
+    src_reservoir, test_labware, dst_plates = _helper_load_all_labware(
         ctx,
         reservoir_load_name=reservoir_load_name,
         test_labware_load_name=test_labware_load_name,
@@ -458,10 +457,10 @@ def run(ctx: ProtocolContext) -> None:
     # NOTE: storing trials by test-labware instance, so that during
     #       the test-run loop we can easily know when to use the
     #       gripper to re-arrange things
-    test_trials_by_labware: Dict[Labware, List[TestTrial]] = {
-        test_labware: [] for test_labware in test_labwares
+    test_trials_by_dst_plate: Dict[Labware, List[TestTrial]] = {
+        dst_plate: [] for dst_plate in dst_plates
     }
-    for test_labware, dst_plate in zip(test_labwares, dst_plates):
+    for dst_plate in dst_plates:
         remaining_dst_wells = dst_plate.wells()
         for test_well in test_labware.wells():
             # stop testing once the destination plate is full
@@ -483,7 +482,7 @@ def run(ctx: ProtocolContext) -> None:
             destination_wells = [
                 remaining_dst_wells.pop(0) for _ in range(len(destination_volumes))
             ]
-            test_trials_by_labware[test_labware].append(
+            test_trials_by_dst_plate[dst_plate].append(
                 TestTrial(
                     mode=mode,
                     test_well=test_well,
@@ -500,7 +499,7 @@ def run(ctx: ProtocolContext) -> None:
     range_hv = ctx.define_liquid(name="red-dye", display_color="#FF0000")
     dead_vol_for_reservoir = LOAD_NAME_SRC_RESERVOIRS[reservoir_load_name]
     total_dye_transferred = sum(
-        [t.ul_to_add for tl in test_trials_by_labware.values() for t in tl]
+        [t.ul_to_add for tl in test_trials_by_dst_plate.values() for t in tl]
     )
     min_dye_required_in_reservoir = dead_vol_for_reservoir + total_dye_transferred
     src_reservoir.load_liquid([dye_src_well], min_dye_required_in_reservoir, range_hv)
@@ -516,10 +515,14 @@ def run(ctx: ProtocolContext) -> None:
 
     # RUN
     _detected_src = False
-    for test_labware, test_trials in test_trials_by_labware.items():
+    for dst_plate, test_trials in test_trials_by_dst_plate.items():
+
+        # MOVE PLATE TO DECK SLOT
+        # TODO: stack plate w/ lids
         ctx.move_labware(
-            test_labware, new_location=SLOTS["dst_plate"], use_gripper=True
+            dst_plate, new_location=SLOTS["dst_plate"], use_gripper=True
         )
+
         for trial in test_trials:
             # ADD DYE TO TEST-LABWARE
             # NOTE: 1st trial has tip already attached
@@ -555,27 +558,28 @@ def run(ctx: ProtocolContext) -> None:
                 pipette.dispense(v, w.top(), push_out=push_out)
             pipette.drop_tip()
 
-        # MOVE PLATE TO SHAKER
+        # MOVE PLATE TO SHAKER & SHAKE
         shaker_module.open_labware_latch()
-        ctx.move_labware(test_labware, new_location=shaker_adapter, use_gripper=True)
+        ctx.move_labware(dst_plate, new_location=shaker_adapter, use_gripper=True)
         shaker_module.close_labware_latch()
         shaker_module.set_and_wait_for_shake_speed(SHAKER_RPM)
         ctx.delay(seconds=SHAKER_SECONDS)
         shaker_module.deactivate_shaker()
         shaker_module.open_labware_latch()
 
-        # MOVE PLATE TO READER
+        # MOVE PLATE TO READER & READ
         reader_module.open_lid()
-        ctx.move_labware(test_labware, new_location=reader_module, use_gripper=True)
+        ctx.move_labware(dst_plate, new_location=reader_module, use_gripper=True)
         reader_module.close_lid()
         reader_module.read(
-            export_filename=f"{test_labware.load_name}_"
+            export_filename=f"{dst_plate.load_name}_"
             f"{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
         )
 
         # MOVE PLATE TO FINAL SLOT
+        # TODO: stack plate w/ lids
         reader_module.open_lid()
         ctx.move_labware(
-            test_labware, new_location=SLOTS["dst_plate_stack_end"], use_gripper=True
+            dst_plate, new_location=SLOTS["dst_plate_stack_end"], use_gripper=True
         )
         reader_module.close_lid()
