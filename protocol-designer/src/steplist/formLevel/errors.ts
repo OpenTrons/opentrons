@@ -301,7 +301,7 @@ const ASPIRATE_MIX_TIMES_REQUIRED: FormError = {
   dependentFields: ['aspirate_mix_times'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_MIX_VOLUME_REQUIRED: FormError = {
@@ -309,7 +309,7 @@ const ASPIRATE_MIX_VOLUME_REQUIRED: FormError = {
   dependentFields: ['aspirate_mix_checkbox', 'aspirate_mix_volume'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_DELAY_DURATION_REQUIRED: FormError = {
@@ -317,7 +317,7 @@ const ASPIRATE_DELAY_DURATION_REQUIRED: FormError = {
   dependentFields: ['aspirate_delay_checkbox', 'aspirate_delay_seconds'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_AIRGAP_VOLUME_REQUIRED: FormError = {
@@ -325,7 +325,7 @@ const ASPIRATE_AIRGAP_VOLUME_REQUIRED: FormError = {
   dependentFields: ['aspirate_airGap_checkbox', 'aspirate_airGap_volume'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'aspirate',
 }
 const DISPENSE_MIX_TIMES_REQUIRED: FormError = {
@@ -333,7 +333,7 @@ const DISPENSE_MIX_TIMES_REQUIRED: FormError = {
   dependentFields: ['dispense_mix_checkbox', 'dispense_mix_times'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const DISPENSE_MIX_VOLUME_REQUIRED: FormError = {
@@ -341,7 +341,7 @@ const DISPENSE_MIX_VOLUME_REQUIRED: FormError = {
   dependentFields: ['dispense_mix_checkbox', 'dispense_mix_volume'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const DISPENSE_DELAY_DURATION_REQUIRED: FormError = {
@@ -349,7 +349,7 @@ const DISPENSE_DELAY_DURATION_REQUIRED: FormError = {
   dependentFields: ['dispense_delay_checkbox', 'dispense_delay_seconds'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
@@ -357,7 +357,7 @@ const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
   dependentFields: ['dispense_airGap_checkbox', 'dispense_airGap_volume'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const BLOWOUT_LOCATION_REQUIRED: FormError = {
@@ -365,7 +365,7 @@ const BLOWOUT_LOCATION_REQUIRED: FormError = {
   dependentFields: ['blowout_checkbox', 'blowout_location'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const WAVELENGTH_REQUIRED: FormError = {
@@ -422,14 +422,14 @@ const ASPIRATE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   dependentFields: ['aspirate_touchTip_speed'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
 }
 const DISPENSE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   title: 'Touch tip speed required',
   dependentFields: ['dispense_touchTip_speed'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
 }
 const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   title: 'Value falls outside of accepted range',
