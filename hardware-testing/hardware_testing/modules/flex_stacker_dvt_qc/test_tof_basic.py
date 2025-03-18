@@ -55,11 +55,6 @@ async def test_tof_sensors_for_comms(
 ) -> None:
     """Test the communication of the tof sensor."""
     ui.print_header(f"TOF Sensor - {sensor} sensor.")
-
-    # disable the opposite sensor so we can test one at a time
-    other = TOFSensor.X if sensor == TOFSensor.Z else TOFSensor.Z
-    await stacker._driver.enable_tof_sensor(other, False)
-
     # Set the state of the target sensor
     await stacker._driver.enable_tof_sensor(sensor, enable)
     status = await stacker._driver.get_tof_sensor_status(sensor)
@@ -79,7 +74,6 @@ async def test_get_tof_sensor_histogram(
     """Test that we can request and store histogram measurements from this TOF sensor."""
     if not stacker._simulating:
         # Cancel any on-going measurements and make sure sensor is enabled
-        await stacker._driver.manage_tof_measurement(sensor, start=False)
         status = await stacker._driver.get_tof_sensor_status(sensor)
         if not status.ok or status.state != TOFSensorState.MEASURING:
             report(
@@ -113,22 +107,18 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         ui.get_user_ready("Make sure there is no labware in the stacker.")
         await stacker._driver.set_led(0, pattern=LEDPattern.STATIC)
 
-    if not stacker._simulating and not await tof_sensors_installed(stacker):
-        print("FAILURE - Cannot start tests without tof sensors installed.")
-        return
-
     print("Homing stacker X and Z axis.")
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
     await stacker.home_axis(StackerAxis.Z, Direction.RETRACT)
 
-    print("Disabling both TOF sensors.")
-    await stacker._driver.enable_tof_sensor(TOFSensor.X, False)
-    await stacker._driver.enable_tof_sensor(TOFSensor.Z, False)
-
     print("Test TOF sensor I2C communication")
+    # disable the opposite sensor so we can test one at a time
+    await stacker._driver.enable_tof_sensor(TOFSensor.X, True)
     await test_tof_sensors_for_comms(stacker, TOFSensor.X, False, report, section)
-    await test_tof_sensors_for_comms(stacker, TOFSensor.Z, False, report, section)
     await test_tof_sensors_for_comms(stacker, TOFSensor.X, True, report, section)
+
+    await stacker._driver.enable_tof_sensor(TOFSensor.Z, True)
+    await test_tof_sensors_for_comms(stacker, TOFSensor.Z, False, report, section)
     await test_tof_sensors_for_comms(stacker, TOFSensor.Z, True, report, section)
 
     print("Test TOF sensor get histogram")
