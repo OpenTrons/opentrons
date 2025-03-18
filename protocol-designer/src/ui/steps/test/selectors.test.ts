@@ -705,6 +705,54 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        aspirate_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -1019,6 +1067,54 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         liquidClassesSupported: { isIndeterminate: false },
         liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        aspirate_submerge_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_x_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_y_position: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_submerge_mmFromBottom: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        dispense_retract_position_reference: {
           isIndeterminate: false,
           value: undefined,
         },

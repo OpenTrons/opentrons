@@ -133,7 +133,7 @@ async def test_success(
             ),
             pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
                 pipette_id="pipette-id",
-                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=400),
+                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=1000),
             ),
         ),
     )
@@ -221,7 +221,7 @@ async def test_no_tip_physically_missing_error(
             ),
             pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
                 pipette_id="pipette-id",
-                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=400),
+                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=1000),
             ),
         ),
     )

@@ -60,6 +60,16 @@ describe('form casting', () => {
       nozzles: null,
       tipRack: 'some tiprack',
       liquidClassesSupported: true,
+      aspirate_retract_position_reference: 'well-bottom',
+      aspirate_submerge_mmFromBottom: 1,
+      aspirate_submerge_x_position: 0,
+      aspirate_submerge_y_position: 0,
+      aspirate_position_reference: 'well-top',
+      dispense_retract_position_reference: 'well-bottom',
+      dispense_submerge_mmFromBottom: 4,
+      dispense_submerge_x_position: 1,
+      dispense_submerge_y_position: -1,
+      dispense_position_reference: 'well-bottom',
     }
     expect(_castForm(input)).toEqual({
       ...input,
