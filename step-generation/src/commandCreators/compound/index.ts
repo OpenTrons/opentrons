@@ -2,6 +2,7 @@ export { absorbanceReaderCloseInitialize } from './absorbanceReaderCloseInitiali
 export { absorbanceReaderCloseRead } from './absorbanceReaderCloseRead'
 export { airGapInTrash } from './airGapInTrash'
 export { airGapInWasteChute } from './airGapInWasteChute'
+export { airGapInWell } from './airGapInWell'
 export { blowOutInTrash } from './blowOutInTrash'
 export { blowOutInWasteChute } from './blowOutInWasteChute'
 export { consolidate } from './consolidate'
