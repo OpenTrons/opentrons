@@ -11,6 +11,7 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  formatPyStr,
 } from '../../utils'
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
@@ -24,10 +25,11 @@ export const blowout: CommandCreator<BlowoutParams> = (
 ) => {
   /** Blowout with given args. Requires tip. */
   const { pipetteId, labwareId, wellName, wellLocation, flowRate } = args
-
+  const { pipetteEntities, labwareEntities } = invariantContext
+  const pipette = pipetteEntities[pipetteId]
   const actionName = 'blowout'
   const errors: CommandCreatorError[] = []
-  const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
+  const pipetteSpec = pipette?.spec
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
@@ -184,6 +186,9 @@ export const blowout: CommandCreator<BlowoutParams> = (
     }
   }
 
+  const pipettePythonName = pipette.pythonName
+  const labwarePythonName = labwareEntities[labwareId].pythonName
+
   const commands: CreateCommand[] = [
     {
       commandType: 'blowout',
@@ -199,5 +204,8 @@ export const blowout: CommandCreator<BlowoutParams> = (
   ]
   return {
     commands,
+    python: `${pipettePythonName}.blow_out(${labwarePythonName}[${formatPyStr(
+      wellName
+    )}])`,
   }
 }
