@@ -13,6 +13,7 @@ import {
   RESET_OFFSET_TO_DEFAULT,
   CLEAR_WORKING_OFFSETS,
   APPLIED_OFFSETS_TO_RUN,
+  UPDATE_LPC_WITH_OFFSETS,
 } from '../constants'
 
 import type {
@@ -35,8 +36,9 @@ import type {
   ResetLocationSpecificOffsetToDefaultAction,
   ClearSelectedLabwareWorkingOffsetsAction,
   AppliedOffsetsToRunAction,
+  UpdateLPCWithOffsetsAction,
 } from '../types'
-import type { StoredLabwareOffset } from '@opentrons/api-client'
+import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
 
 export const proceedStep = (
   runId: string,
@@ -149,4 +151,12 @@ export const appliedOffsetsToRun = (
 ): AppliedOffsetsToRunAction => ({
   type: APPLIED_OFFSETS_TO_RUN,
   payload: { runId },
+})
+
+export const updateLPCWithOffsets = (
+  runId: string,
+  offsets: LabwareOffset[]
+): UpdateLPCWithOffsetsAction => ({
+  type: UPDATE_LPC_WITH_OFFSETS,
+  payload: { runId, offsets },
 })

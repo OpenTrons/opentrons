@@ -14,6 +14,7 @@ import {
   RESET_OFFSET_TO_DEFAULT,
   CLEAR_WORKING_OFFSETS,
   APPLIED_OFFSETS_TO_RUN,
+  UPDATE_LPC_WITH_OFFSETS,
 } from '../constants'
 import {
   updateOffsetsForURI,
@@ -21,6 +22,7 @@ import {
   goBackToPreviousHandleLwSubstep,
   handleApplyWorkingOffsets,
   clearAllWorkingOffsets,
+  updateLPCLabwareInfoFrom,
 } from './transforms'
 
 import type {
@@ -199,6 +201,21 @@ export function LPCReducer(
           labwareInfo: {
             ...state.labwareInfo,
             areOffsetsApplied: true,
+          },
+        }
+      }
+
+      case UPDATE_LPC_WITH_OFFSETS: {
+        const { offsets } = action.payload
+
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            labware: updateLPCLabwareInfoFrom(
+              offsets,
+              state.labwareInfo.labware
+            ),
           },
         }
       }
