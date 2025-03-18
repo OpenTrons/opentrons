@@ -239,6 +239,13 @@ export const moveLiquidFormToArgs = (
     aspirateYOffset: aspirate_y_position ?? 0,
     dispenseXOffset: dispense_x_position ?? 0,
     dispenseYOffset: dispense_y_position ?? 0,
+    aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed,
+    aspirateRetractSpeed: hydratedFormData.aspirate_submerge_speed,
+    dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed,
+    dispenseRetractSpeed: hydratedFormData.dispense_submerge_speed,
+    aspirateRetractXOffset: hydratedFormData.aspirate_retract_x_position,
+    aspirateRetractYOffset: hydratedFormData.aspirate_retract_y_position,
+    aspirateRetractZOffset: hydratedFormData.aspirate_retract_mmFromBottom,
   }
   console.assert(
     sourceWellsUnordered.length > 0,
