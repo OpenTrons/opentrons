@@ -24,6 +24,12 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import {
+  darkFill,
+  lightFill,
+  OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST,
+} from '../../../components/atoms'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
@@ -36,18 +42,6 @@ import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
-const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-  'fixedTrash',
-]
-export const lightFill = COLORS.grey35
-export const darkFill = COLORS.grey60
 
 export function ProtocolStepsDeck(): JSX.Element {
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)

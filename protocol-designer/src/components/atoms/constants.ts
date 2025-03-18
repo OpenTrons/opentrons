@@ -66,3 +66,14 @@ export const NAV_BAR_HEIGHT_REM = 3.75
 // Colors for svg
 export const lightFill = COLORS.grey35
 export const darkFill = COLORS.grey60
+
+export const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
+  'calibrationMarkings',
+  'fixedBase',
+  'doorStops',
+  'metalFrame',
+  'removalHandle',
+  'removableDeckOutline',
+  'screwHoles',
+  'fixedTrash',
+]

@@ -37,14 +37,7 @@ export function ProtocolStartingDeck({
 
   const deckViewItems =
     deckView === DeckView.ON_DECK ? (
-      <Flex
-        height="100%"
-        width="100%"
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-      >
-        <StartingDeckContainer />
-      </Flex>
+      <StartingDeckContainer />
     ) : (
       <OffDeck tab="startingDeck" />
     )

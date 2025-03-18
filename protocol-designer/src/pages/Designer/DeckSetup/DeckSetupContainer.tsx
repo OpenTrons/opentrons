@@ -27,7 +27,11 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { lightFill, darkFill } from '../../../components/atoms'
+import {
+  lightFill,
+  darkFill,
+  OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST,
+} from '../../../components/atoms'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
@@ -63,17 +67,6 @@ const DETAILS_HOVER_SPACE = 60
 // Note (02/02/25:kk) the size is different from the design but the product team requested keep the current size
 const STARTING_DECK_VIEW_MIN_WIDTH = '75%'
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem' // for Protocol Steps
-
-const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-  'fixedTrash',
-]
 
 export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
   const { tab } = props

@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from 'react'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -26,6 +27,12 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import {
+  darkFill,
+  lightFill,
+  OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST,
+} from '../../components/atoms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 
@@ -36,19 +43,6 @@ import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 const RIGHT_COLUMN_FIXTURE_PADDING = 50 // mm
 const WASTE_CHUTE_SPACE = 30
-const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-  'fixedTrash',
-]
-
-const lightFill = COLORS.grey35
-const darkFill = COLORS.grey60
 
 interface DeckThumbnailProps {
   hoverSlot: DeckSlotId | null
@@ -135,6 +129,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
                 layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
               />
             ) : (
+              // Note (kk, 03/18/25): this part will be exported as a component in the future since ProtocolStepsDesck uses the same code
               <>
                 {filteredAddressableAreas.map(addressableArea => {
                   const cutoutId = getCutoutIdForAddressableArea(
