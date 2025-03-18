@@ -1012,7 +1012,9 @@ export const aspirateTouchTipMmFromEdgeOutOfRange = (
   if (labwareDef == null) {
     return null
   }
-  const minDimension = getMinXYDimension(labwareDef, ['A1'])
+  const minDimension = getMinXYDimension(labwareDef as LabwareDefinition2, [
+    'A1',
+  ])
   if (minDimension == null) {
     return null
   }
@@ -1040,7 +1042,9 @@ export const dispenseTouchTipMmFromEdgeOutOfRange = (
   if (labwareDef == null) {
     return null
   }
-  const minDimension = getMinXYDimension(labwareDef, ['A1'])
+  const minDimension = getMinXYDimension(labwareDef as LabwareDefinition2, [
+    'A1',
+  ])
   if (minDimension == null) {
     return null
   }
