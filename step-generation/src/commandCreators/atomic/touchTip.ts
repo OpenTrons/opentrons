@@ -10,7 +10,14 @@ export const touchTip: CommandCreator<TouchTipParams> = (
 ) => {
   /** touchTip with given args. Requires tip. */
   const actionName = 'touchTip'
-  const { pipetteId, labwareId, wellName, wellLocation } = args
+  const {
+    pipetteId,
+    labwareId,
+    wellName,
+    wellLocation,
+    speed,
+    mmFromEdge,
+  } = args
   const pipetteData = prevRobotState.pipettes[pipetteId]
   const errors: CommandCreatorError[] = []
 
@@ -48,6 +55,8 @@ export const touchTip: CommandCreator<TouchTipParams> = (
         labwareId,
         wellName,
         wellLocation,
+        speed,
+        mmFromEdge,
       },
     },
   ]
