@@ -61,6 +61,7 @@ async def test_tof_sensors_labware_detection(
     """Test that we can detect labware with the TOF sensor."""
     open = not await stacker._driver.get_hopper_door_closed()
     if open:
+        print("Failed: Make sure to close the stacker door.")
         report(
             section,
             f"tof-{sensor.name}-histogram-{labware}",

@@ -117,15 +117,33 @@ def labware_detected(
     """Detect labware by subtracting baseline from histogram."""
     print(f"Detect labware: {sensor}")
     baseline: Dict[int, List[float]] = STACKER_TOF_BASELINE[sensor]
-    print(baseline)
-    print(histogram)
     diff = defaultdict(list)
-    for zone in zones:
-        raw_data = histogram[zone]
-        baseline_data = baseline[zone]
-        for bin in bins:
-            delta = raw_data[bin] - baseline_data[bin]
-            if delta > 0:
-                print(f"detected: zn: {zone} bn: {bin} dt: {delta}")
-                diff[zone].append(delta)
+    if sensor == TOFSensor.Z:
+        for zone in zones:
+            raw_data = histogram[zone]
+            baseline_data = baseline[zone]
+            for bin in bins:
+                delta = raw_data[bin] - baseline_data[bin]
+                if delta > 0:
+                    print(f"detected: zn: {zone} bn: {bin} count: {raw_data[bin]} dt: {delta}")
+                    diff[zone].append(delta)
+    elif sensor == TOFSensor.X:
+        for zone in zones:
+            # We only care about these zones because the X sensor is angled and 
+            # most of the zones are always detecting obsticles.
+            if zone not in [5,6,7]:
+                continue
+            raw_data = histogram[zone]
+            baseline_data = baseline[zone]
+            for bin in bins:
+                if bin not in range(10, 20):
+                    continue
+                # We need to ignore raw photon count below 10000 on the X as
+                # it becomes inconsistent to detect labware on the home position.
+                if raw_data[bin] < 10000:
+                    continue
+                delta = raw_data[bin] - baseline_data[bin]
+                if delta > 0:
+                    print(f"detected: zn: {zone} bn: {bin} count: {raw_data[bin]} dt: {delta}")
+                    diff[zone].append(delta)
     return dict(diff)  # type: ignore
