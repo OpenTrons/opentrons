@@ -10,11 +10,9 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
-  Tag,
   ToggleGroup,
 } from '@opentrons/components'
 import {
@@ -30,7 +28,8 @@ import {
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
 } from '../../../ui/steps/selectors'
-import { OffDeck } from '../../../components/organisms/OffDeck'
+import { HotKeyDisplay } from '../../../components/molecules'
+import { OffDeck, TimelineAlerts } from '../../../components/organisms'
 import { SubStepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
 import { StepSummary } from './StepSummary'
@@ -39,7 +38,7 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
-import { TimelineAlerts } from '../../../components/organisms'
+
 import { DraggableSidebar } from './DraggableSidebar'
 import { ProtocolStepsDeck } from '../DeckSetup/ProtocolStepsDeck'
 
@@ -167,29 +166,7 @@ export function ProtocolSteps(): JSX.Element {
           </Flex>
         </Flex>
         {enableHotKeyDisplay ? (
-          <Flex
-            position={POSITION_FIXED}
-            left={`calc(1.5rem + ${targetWidth}px)`}
-            bottom="0.75rem"
-            gridGap={SPACING.spacing4}
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Tag
-              text={t('double_click_to_edit')}
-              type="default"
-              shrinkToContent
-            />
-            <Tag
-              text={t('shift_click_to_select_range')}
-              type="default"
-              shrinkToContent
-            />
-            <Tag
-              text={t('command_click_to_multi_select')}
-              type="default"
-              shrinkToContent
-            />
-          </Flex>
+          <HotKeyDisplay targetWidth={targetWidth} />
         ) : null}
       </Flex>
       {formData == null && selectedSubstep ? (
