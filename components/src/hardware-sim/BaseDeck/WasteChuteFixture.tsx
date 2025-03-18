@@ -89,13 +89,24 @@ interface WasteChuteProps {
   backgroundColor: string
   showHighlight?: boolean
   tagInfo?: DeckLabelProps[]
+  //  optional opacity and overlay to change the overlay container over the WasteChute container
+  //  currently used in PD's BlockedSlot for drag/drop
+  overlay?: JSX.Element
+  opacity?: string
 }
 
 /**
  * a deck map foreign object representing the physical location of the waste chute connected to the deck
  */
 export function WasteChute(props: WasteChuteProps): JSX.Element {
-  const { wasteIconColor, backgroundColor, showHighlight, tagInfo } = props
+  const {
+    wasteIconColor,
+    backgroundColor,
+    showHighlight,
+    tagInfo,
+    overlay,
+    opacity,
+  } = props
 
   return (
     <>
@@ -105,29 +116,33 @@ export function WasteChute(props: WasteChuteProps): JSX.Element {
         x={WASTE_CHUTE_X}
         y={-51}
         flexProps={{ flex: '1' }}
-        foreignObjectProps={{ flex: '1' }}
+        foreignObjectProps={{ opacity: opacity ?? '1.0', flex: '1' }}
       >
-        <Flex
-          alignItems={ALIGN_CENTER}
-          backgroundColor={backgroundColor}
-          borderRadius="6px"
-          color={wasteIconColor}
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing4}
-          justifyContent={JUSTIFY_CENTER}
-          padding={SPACING.spacing8}
-          width="100%"
-          border={showHighlight ? `3px solid ${COLORS.blue50}` : 'none'}
-        >
-          <Icon name="trash" color={wasteIconColor} height="2rem" />
-          <Text
-            color={COLORS.white}
-            textAlign={TEXT_ALIGN_CENTER}
-            css={TYPOGRAPHY.bodyTextSemiBold}
+        {overlay != null ? (
+          overlay
+        ) : (
+          <Flex
+            alignItems={ALIGN_CENTER}
+            backgroundColor={backgroundColor}
+            borderRadius="6px"
+            color={wasteIconColor}
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing4}
+            justifyContent={JUSTIFY_CENTER}
+            padding={SPACING.spacing8}
+            width="100%"
+            border={showHighlight ? `3px solid ${COLORS.blue50}` : 'none'}
           >
-            Waste chute
-          </Text>
-        </Flex>
+            <Icon name="trash" color={wasteIconColor} height="2rem" />
+            <Text
+              color={COLORS.white}
+              textAlign={TEXT_ALIGN_CENTER}
+              css={TYPOGRAPHY.bodyTextSemiBold}
+            >
+              Waste chute
+            </Text>
+          </Flex>
+        )}
       </RobotCoordsForeignObject>
       {tagInfo != null && tagInfo.length > 0 ? (
         <DeckLabelSet
