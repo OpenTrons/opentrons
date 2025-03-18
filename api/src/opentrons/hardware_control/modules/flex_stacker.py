@@ -387,7 +387,9 @@ class FlexStacker(mod_abc.AbstractModule):
 
         # Transfer
         await self.open_latch()
-        z_speed = (STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed or 0) / 2
+        z_speed = (
+            STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed or 0
+        ) / 2
         await self.move_axis(
             StackerAxis.Z, Direction.EXTEND, (labware_height / 2), z_speed
         )

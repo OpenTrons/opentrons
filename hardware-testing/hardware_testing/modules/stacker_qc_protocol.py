@@ -45,7 +45,7 @@ def run(protocol: ProtocolContext) -> None:
     stacker.empty("Emptying all labware from the Flex Stacker")
     stacker.set_stored_labware(
         load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
-        count=5,
+        count=6,
     )
     stacker.fill("Fill stacker with pcr plates")
 
