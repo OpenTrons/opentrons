@@ -17,6 +17,8 @@ from . import (
     test_ui_leds,
     test_uv_lockout_switch,
     test_install_detection,
+    test_tof_basic,
+    test_tof_functional,
 )
 
 
@@ -32,6 +34,8 @@ class TestSection(enum.Enum):
     UI_LEDS = "UI_LEDS"
     UV_LOCKOUT_SWITCH = "UV_LOCKOUT_SWITCH"
     INSTALL_DETECTION = "INSTALL_DETECTION"
+    TOF_BASIC = "TOF_BASIC"
+    TOF_FUNCTIONAL = "TOF_FUNCTIONAL"
     Z_AXIS_CURRENT_SPEED = "Z_AXIS_CURRENT_SPEED"
     X_AXIS_CURRENT_SPEED = "X_AXIS_CURRENT_SPEED"
 
@@ -80,6 +84,14 @@ TESTS = [
     (
         TestSection.INSTALL_DETECTION,
         test_install_detection.run,
+    ),
+    (
+        TestSection.TOF_BASIC,
+        test_tof_basic.run,
+    ),
+    (
+        TestSection.TOF_FUNCTIONAL,
+        test_tof_functional.run,
     ),
     (
         TestSection.Z_AXIS_CURRENT_SPEED,
@@ -132,6 +144,14 @@ def build_report(test_name: str) -> CSVReport:
             CSVSection(
                 title=TestSection.INSTALL_DETECTION.value,
                 lines=test_install_detection.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.TOF_BASIC.value,
+                lines=test_tof_basic.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.TOF_FUNCTIONAL.value,
+                lines=test_tof_functional.build_csv_lines(),
             ),
             CSVSection(
                 title=TestSection.Z_AXIS_CURRENT_SPEED.value,
