@@ -62,3 +62,7 @@ export const COLUMN_STYLE = css`
 `
 
 export const NAV_BAR_HEIGHT_REM = 3.75
+
+// Colors for svg
+export const lightFill = COLORS.grey35
+export const darkFill = COLORS.grey60

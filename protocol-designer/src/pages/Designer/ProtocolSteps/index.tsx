@@ -149,7 +149,6 @@ export function ProtocolSteps(): JSX.Element {
             height="100%"
           >
             {deckView === leftString ? (
-              // <DeckSetupContainer tab="protocolSteps" />
               <ProtocolStepsDeck />
             ) : (
               <OffDeck tab="protocolSteps" />
