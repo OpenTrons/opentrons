@@ -2,6 +2,8 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getCutoutDisplayName,
+  getSlotFromAddressableAreaName,
+  getModuleModelFromAddressableArea,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
@@ -72,7 +74,7 @@ export function getLabwareLocationFromSequence(
   } = params
 
   return locationSequence.reduce<LocationResult>(
-    (acc, sequenceItem) => {
+    (acc, sequenceItem, index) => {
       if (sequenceItem.kind === 'notOnDeck') {
         return {
           slotName: sequenceItem.logicalLocationName,
@@ -93,6 +95,27 @@ export function getLabwareLocationFromSequence(
       ) {
         return {
           slotName: sequenceItem.addressableAreaName,
+        }
+      } else if (
+        sequenceItem.kind === 'onAddressableArea' &&
+        index === locationSequence.length - 1
+      ) {
+        const slotName = getSlotFromAddressableAreaName(
+          sequenceItem.addressableAreaName as AddressableAreaName
+        )
+        if (detailLevel === 'slot-only') {
+          return {
+            slotName,
+          }
+        } else {
+          const moduleModel = getModuleModelFromAddressableArea(
+            sequenceItem.addressableAreaName as AddressableAreaName
+          )
+          return {
+            ...acc,
+            slotName,
+            moduleModel: moduleModel ?? undefined,
+          }
         }
       } else if (detailLevel === 'full') {
         const { allRunDefs } = params as SequenceFullParams
