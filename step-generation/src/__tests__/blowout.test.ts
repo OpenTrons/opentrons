@@ -59,7 +59,9 @@ describe('blowout', () => {
         },
       },
     ])
-    expect(res.python).toBe('mockPythonName.blow_out(mockPythonName["A1"])')
+    expect(res.python).toBe(
+      'mockPythonName.blow_out(mockPythonName["A1"].top(-1.3))'
+    )
   })
   it('blowout with invalid pipette ID should throw error', () => {
     const result = blowout(

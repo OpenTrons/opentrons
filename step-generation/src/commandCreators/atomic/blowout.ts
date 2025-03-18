@@ -202,10 +202,13 @@ export const blowout: CommandCreator<BlowoutParams> = (
       },
     },
   ]
+  const originPython = wellLocation?.origin ?? ''
+  const offsetPython = wellLocation?.offset?.z ?? ''
+
   return {
     commands,
     python: `${pipettePythonName}.blow_out(${labwarePythonName}[${formatPyStr(
       wellName
-    )}])`,
+    )}].${originPython}(${offsetPython}))`,
   }
 }
