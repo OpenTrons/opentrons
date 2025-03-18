@@ -47,7 +47,7 @@ export function getLabwareDisplayLocation(
   params: DisplayLocationParams
 ): string {
   const { t, isOnDevice = false, location } = params
-  let locationResult = Array.isArray(location)
+  const locationResult = Array.isArray(location)
     ? getLabwareLocationFromSequence({
         ...params,
         locationSequence: location,
@@ -56,18 +56,6 @@ export function getLabwareDisplayLocation(
         ...params,
         location: location ?? null,
       })
-
-  if (Array.isArray(location)) {
-    locationResult = getLabwareLocationFromSequence({
-      ...params,
-      locationSequence: location as LabwareLocationSequence,
-    })
-  } else if (location != null) {
-    locationResult = getLabwareLocation({
-      ...params,
-      location: location as LabwareLocation,
-    })
-  }
   if (locationResult == null) {
     return ''
   }
