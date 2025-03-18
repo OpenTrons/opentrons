@@ -1,6 +1,7 @@
 import typing
 from functools import partial
 from enum import Enum
+from typing_extensions import Self
 
 from opentrons import types
 from pydantic import model_validator, ConfigDict, BaseModel, Field
@@ -95,19 +96,20 @@ class RobotMoveTarget(BaseModel):
         "if target is pipette",
     )
 
-    @model_validator(mode="before")
-    @classmethod
-    def root_validator(cls, values):
-        points = values.get("point", [])
-        target = values.get("target")
-        if target == MotionTarget.mount and len(points) == 3 and points[2] < 30:
+    @model_validator(mode="after")
+    def root_validator(self) -> Self:
+        if (
+            self.target == MotionTarget.mount
+            and len(self.point) == 3
+            and self.point[2] < 30
+        ):
             raise ValueError(
                 "Sending a mount to a z position lower than 30 "
                 "can cause a collision with the deck or reach the"
                 " end of the Z axis  movement screw. Z values for"
                 " mount movement must be >= 30"
             )
-        return values
+        return self
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -143,13 +145,12 @@ class RobotHomeTarget(BaseModel):
         " in that case)",
     )
 
-    @model_validator(mode="before")
-    @classmethod
-    def root_validate(cls, values):
+    @model_validator(mode="after")
+    def root_validate(self) -> Self:
         # Make sure that mount is present if target is pipette
-        if values.get("target") == HomeTarget.pipette.value and not values.get("mount"):
+        if self.target == HomeTarget.pipette.value and not self.mount:
             raise ValueError("mount must be specified if target is pipette")
-        return values
+        return self
 
     model_config = ConfigDict(
         json_schema_extra={
