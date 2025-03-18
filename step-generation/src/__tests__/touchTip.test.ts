@@ -58,6 +58,24 @@ describe('touchTip', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      `mockPythonName.touch_tip(mockPythonName["A1"], v_offset=10)`
+    )
+  })
+
+  it('touchTip for python with tip, with no offset set', () => {
+    const result = touchTip(
+      {
+        pipetteId: DEFAULT_PIPETTE,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    const res = getSuccessResult(result)
+
+    expect(res.python).toBe(`mockPythonName.touch_tip(mockPythonName["A1"])`)
   })
 
   it('touchTip with invalid pipette ID should throw error', () => {
