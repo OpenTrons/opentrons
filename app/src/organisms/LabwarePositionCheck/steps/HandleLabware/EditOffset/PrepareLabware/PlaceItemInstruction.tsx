@@ -9,11 +9,10 @@ import {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
-  selectSelectedLwRelatedAdapterDisplayName,
   selectIsSelectedLwTipRack,
   selectSelectedLwOverview,
-  selectSelectedLwDisplayName,
   OFFSET_KIND_DEFAULT,
+  selectLwDisplayName,
 } from '/app/redux/protocol-runs'
 import { UnorderedList } from '/app/molecules/UnorderedList'
 import { DescriptionContent } from '/app/molecules/InterventionModal'
@@ -23,6 +22,7 @@ import type {
   LPCWizardState,
   SelectedLwOverview,
   OffsetLocationDetails,
+  LabwareStackupDetail,
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
@@ -34,7 +34,7 @@ export function PlaceItemInstruction(
   const { runId } = props
   const { t: commandTextT } = useTranslation('protocol_command_text')
   const { t } = useTranslation('labware_position_check')
-  const { protocolData, labwareDefs } = useSelector(
+  const { protocolData } = useSelector(
     (state: State) => state.protocolRuns[runId]?.lpc as LPCWizardState
   )
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
@@ -64,11 +64,11 @@ export function PlaceItemInstruction(
     detailLevel: 'slot-only',
     ...buildDisplayParams(),
   })
-  const fullDisplayLocation = getLabwareDisplayLocation({
-    detailLevel: 'full',
-    allRunDefs: labwareDefs,
-    ...buildDisplayParams(),
-  })
+
+  // The "clear deck" copy handles the module case.
+  const lwOnlyLocSeq = offsetLocationDetails.lwModOnlyStackupDetails.filter(
+    c => c.kind === 'labware'
+  ) as LabwareStackupDetail[]
 
   return (
     <DescriptionContent
@@ -79,19 +79,20 @@ export function PlaceItemInstruction(
             <ClearDeckCopy
               {...props}
               key="clear_deck"
-              isLwTiprack={isLwTiprack}
               slotOnlyDisplayLocation={slotOnlyDisplayLocation}
-              fullDisplayLocation={fullDisplayLocation}
               labwareInfo={selectedLwInfo}
             />,
-            <PlaceItemInstructionContents
-              key={slotOnlyDisplayLocation}
-              isLwTiprack={isLwTiprack}
-              slotOnlyDisplayLocation={slotOnlyDisplayLocation}
-              fullDisplayLocation={fullDisplayLocation}
-              labwareInfo={selectedLwInfo}
-              {...props}
-            />,
+            ...lwOnlyLocSeq.map((component, index) => (
+              <PlaceItemInstructionContent
+                key={`${slotOnlyDisplayLocation}-${index}`}
+                isLwTiprack={isLwTiprack}
+                slotOnlyDisplayLocation={slotOnlyDisplayLocation}
+                labwareInfo={selectedLwInfo}
+                lwComponent={component}
+                isFirstItemInStackup={index === 0}
+                {...props}
+              />
+            )),
           ]}
         />
       }
@@ -102,23 +103,28 @@ export function PlaceItemInstruction(
 interface PlaceItemInstructionContentProps extends LPCWizardContentProps {
   isLwTiprack: boolean
   slotOnlyDisplayLocation: string
-  fullDisplayLocation: string
   labwareInfo: SelectedLwOverview
+  lwComponent: LabwareStackupDetail
+  isFirstItemInStackup: boolean
 }
 
 // See LPCDeck for clarification of deck behavior.
 function ClearDeckCopy({
   slotOnlyDisplayLocation,
   labwareInfo,
-}: PlaceItemInstructionContentProps): JSX.Element {
+}: Pick<
+  PlaceItemInstructionContentProps,
+  'labwareInfo' | 'slotOnlyDisplayLocation'
+>): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 
   const {
     kind: offsetKind,
-    moduleModel,
+    closestBeneathModuleModel,
   } = labwareInfo.offsetLocationDetails as OffsetLocationDetails
 
-  return offsetKind === OFFSET_KIND_DEFAULT || moduleModel == null ? (
+  return offsetKind === OFFSET_KIND_DEFAULT ||
+    closestBeneathModuleModel == null ? (
     <Trans
       t={t}
       i18nKey="clear_deck_all_lw_all_modules_from"
@@ -130,48 +136,30 @@ function ClearDeckCopy({
   )
 }
 
-function PlaceItemInstructionContents({
+function PlaceItemInstructionContent({
   runId,
   isLwTiprack,
   slotOnlyDisplayLocation,
-  fullDisplayLocation,
-  labwareInfo,
+  lwComponent,
+  isFirstItemInStackup,
 }: PlaceItemInstructionContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 
-  const { adapterId } = labwareInfo.offsetLocationDetails ?? { adapterId: null }
-  const labwareDisplayName = useSelector(selectSelectedLwDisplayName(runId))
-  const adapterDisplayName = useSelector(
-    selectSelectedLwRelatedAdapterDisplayName(runId)
+  const displayName = useSelector(
+    selectLwDisplayName(runId, lwComponent.labwareUri)
   )
 
   if (isLwTiprack) {
     return (
       <Trans
         t={t}
-        i18nKey="place_a_full_tip_rack_in_location"
+        i18nKey={
+          isFirstItemInStackup
+            ? 'place_a_full_tip_rack_in_location'
+            : 'next_place_a_full_tip_rack_in_location'
+        }
         tOptions={{
-          tip_rack: labwareDisplayName,
-          location: fullDisplayLocation,
-        }}
-        components={{
-          bold: (
-            <LegacyStyledText
-              as="span"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            />
-          ),
-        }}
-      />
-    )
-  } else if (adapterId != null) {
-    return (
-      <Trans
-        t={t}
-        i18nKey="place_labware_in_adapter_in_location"
-        tOptions={{
-          adapter: adapterDisplayName,
-          labware: labwareDisplayName,
+          tip_rack: displayName,
           location: slotOnlyDisplayLocation,
         }}
         components={{
@@ -188,10 +176,14 @@ function PlaceItemInstructionContents({
     return (
       <Trans
         t={t}
-        i18nKey="place_labware_in_location"
+        i18nKey={
+          isFirstItemInStackup
+            ? 'place_labware_in_location'
+            : 'next_place_labware_in_location'
+        }
         tOptions={{
-          labware: labwareDisplayName,
-          location: fullDisplayLocation,
+          labware: displayName,
+          location: slotOnlyDisplayLocation,
         }}
         components={{
           bold: (

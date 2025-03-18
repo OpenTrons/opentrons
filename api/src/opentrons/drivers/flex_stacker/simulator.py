@@ -45,6 +45,10 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         self._tof_registers: Dict[TOFSensor, Dict[int, int]] = {
             a: {} for a in TOFSensor
         }
+        self._tof_sensor_status: Dict[TOFSensor, TOFSensorStatus] = {
+            s: TOFSensorStatus(s, TOFSensorState.IDLE, TOFSensorMode.MEASURE, True)
+            for s in TOFSensor
+        }
 
     def set_limit_switch(self, status: LimitSwitchStatus) -> bool:
         self._limit_switch_status = status
@@ -116,6 +120,9 @@ class SimulatingDriver(AbstractFlexStackerDriver):
     @ensure_yield
     async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> bool:
         """Enable or disable the TOF sensor."""
+        state = TOFSensorState.IDLE if enable else TOFSensorState.DISABLED
+        self._tof_sensor_status[sensor].state = state
+        self._tof_sensor_status[sensor].ok = enable
         return True
 
     @ensure_yield
@@ -174,17 +181,12 @@ class SimulatingDriver(AbstractFlexStackerDriver):
     @ensure_yield
     async def get_tof_sensor_status(self, sensor: TOFSensor) -> TOFSensorStatus:
         """Get the status of the tof sensor."""
-        return TOFSensorStatus(
-            sensor=sensor,
-            mode=TOFSensorMode.MEASURE,
-            state=TOFSensorState.IDLE,
-            ok=True,
-        )
+        return self._tof_sensor_status[sensor]
 
     @ensure_yield
     async def get_motion_params(self, axis: StackerAxis) -> MoveParams:
         """Get the motion parameters used by the given axis motor."""
-        return MoveParams(axis, 1, 1, 1)
+        return MoveParams(1, 1, 1)
 
     @ensure_yield
     async def get_stallguard_threshold(self, axis: StackerAxis) -> StallGuardParams:

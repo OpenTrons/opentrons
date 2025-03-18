@@ -79,7 +79,7 @@ async def test_dispense_implementation(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=50.0,
         )
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -201,7 +201,7 @@ async def test_overpressure_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=50.0,
         ),
     ).then_return(position)
 
@@ -302,7 +302,7 @@ async def test_stall_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=50.0,
         ),
     ).then_raise(StallOrCollisionDetectedError())
 

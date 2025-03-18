@@ -57,3 +57,7 @@ export const getEnablePythonExport: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_PYTHON_EXPORT ?? false
 )
+export const getEnablePartialTipSupport: Selector<boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT ?? false
+)

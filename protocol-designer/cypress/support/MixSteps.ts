@@ -33,7 +33,7 @@ enum MixContent {
   WasteChute = 'Waste chute',
   AspFlowRate = 'Aspirate flow rate',
   AspWellOrder = 'Aspirate well order',
-  MixTipPosition = 'Mix tip position',
+  MixTipPosition = 'Mix position',
   AdvancedPipSettings = 'Advanced pipetting settings',
   Delay = 'Delay',
   DelayDuration = 'Delay duration',

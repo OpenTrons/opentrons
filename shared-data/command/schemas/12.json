@@ -4935,9 +4935,9 @@
       "description": "A request to execute a Flex Stacker SetStoredLabware command.",
       "properties": {
         "commandType": {
-          "const": "flexStacker/setStoredlabware",
-          "default": "flexStacker/setStoredlabware",
-          "enum": ["flexStacker/setStoredlabware"],
+          "const": "flexStacker/setStoredLabware",
+          "default": "flexStacker/setStoredLabware",
+          "enum": ["flexStacker/setStoredLabware"],
           "title": "Commandtype",
           "type": "string"
         },
@@ -6585,7 +6585,7 @@
       "flexStacker/empty": "#/$defs/EmptyCreate",
       "flexStacker/fill": "#/$defs/FillCreate",
       "flexStacker/retrieve": "#/$defs/RetrieveCreate",
-      "flexStacker/setStoredlabware": "#/$defs/SetStoredLabwareCreate",
+      "flexStacker/setStoredLabware": "#/$defs/SetStoredLabwareCreate",
       "flexStacker/store": "#/$defs/StoreCreate",
       "getNextTip": "#/$defs/GetNextTipCreate",
       "getTipPresence": "#/$defs/GetTipPresenceCreate",

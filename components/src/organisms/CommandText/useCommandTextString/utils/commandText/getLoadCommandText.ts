@@ -1,4 +1,6 @@
+import find from 'lodash/find'
 import {
+  getAllLiquidClassDefs,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
@@ -109,6 +111,16 @@ export const getLoadCommandText = ({
                 allRunDefs,
               })
             : null,
+      })
+    }
+    case 'loadLiquidClass': {
+      const { liquidClassName } = command.params.liquidClassRecord
+      const liquidClassDisplayName = find(
+        getAllLiquidClassDefs(),
+        liquidClassDef => liquidClassDef.liquidClassName === liquidClassName
+      )?.displayName
+      return t('load_liquid_class', {
+        liquidClassDisplayName,
       })
     }
     default: {

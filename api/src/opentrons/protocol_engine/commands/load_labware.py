@@ -5,13 +5,9 @@ from typing import TYPE_CHECKING, Optional, Type, Any
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
-from typing_extensions import Literal, TypeGuard, assert_type
+from typing_extensions import Literal, TypeGuard
 
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    LabwareDefinition2,
-    LabwareDefinition3,
-)
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..errors import LabwareIsNotAllowedInLocationError
 from ..resources import labware_validation, fixture_validation
@@ -107,7 +103,7 @@ class LoadLabwareImplementation(
         module: LoadedModule = self._state_view.modules.get(location.moduleId)
         return module.model == module_model
 
-    async def execute(  # noqa: C901
+    async def execute(
         self, params: LoadLabwareParams
     ) -> SuccessData[LoadLabwareResult]:
         """Load definition and calibration data necessary for a labware."""
@@ -175,18 +171,13 @@ class LoadLabwareImplementation(
             ):
                 # This parent is assumed to be compatible, unless the lid enumerates
                 # all its compatible parents and this parent is missing from the list.
-                if isinstance(loaded_labware.definition, LabwareDefinition2):
-                    # Labware schema 2 has no compatibleParentLabware list.
-                    parent_is_incompatible = False
-                else:
-                    assert_type(loaded_labware.definition, LabwareDefinition3)
-                    parent_is_incompatible = (
-                        loaded_labware.definition.compatibleParentLabware is not None
-                        and self._state_view.labware.get_load_name(
-                            verified_location.labwareId
-                        )
-                        not in loaded_labware.definition.compatibleParentLabware
+                parent_is_incompatible = (
+                    loaded_labware.definition.compatibleParentLabware is not None
+                    and self._state_view.labware.get_load_name(
+                        verified_location.labwareId
                     )
+                    not in loaded_labware.definition.compatibleParentLabware
+                )
 
                 if parent_is_incompatible:
                     raise ValueError(
