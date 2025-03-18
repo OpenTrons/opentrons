@@ -16,7 +16,9 @@
   "brand": {
     "brand": "Opentrons",
     "brandId": ["999-00260"],
-    "links": []
+    "links": [
+      "https://opentrons.com/products/opentrons-tough-22-ml-12-well-reservoir-25-count/"
+    ]
   },
   "metadata": {
     "displayName": "Opentrons Tough 22mL 12 Well Reservoir",

@@ -3,7 +3,9 @@
   "brand": {
     "brand": "Opentrons",
     "brandId": ["999-00259"],
-    "links": []
+    "links": [
+      "https://opentrons.com/products/opentrons-tough-72-ml-4-well-reservoir-25-count/"
+    ]
   },
   "metadata": {
     "displayName": "Opentrons Tough 72 mL 4 Well Reservoir",

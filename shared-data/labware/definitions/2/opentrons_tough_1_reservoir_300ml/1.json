@@ -3,7 +3,9 @@
   "brand": {
     "brand": "Opentrons",
     "brandId": ["999-00258"],
-    "links": []
+    "links": [
+      "https://opentrons.com/products/opentrons-tough-300-ml-1-well-reservoir-25-count/"
+    ]
   },
   "metadata": {
     "displayName": "Opentrons Tough 300 mL 1 Well Reservoir",

@@ -3,7 +3,10 @@
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
-    "brandId": []
+    "brandId": ["999-00261"],
+    "links": [
+      "https://opentrons.com/products/opentrons-tough-universal-lid-50-count/"
+    ]
   },
   "metadata": {
     "displayName": "Opentrons Tough Universal Lid",
