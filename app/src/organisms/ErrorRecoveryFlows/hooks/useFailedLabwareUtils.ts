@@ -108,9 +108,9 @@ export function useFailedLabwareUtils({
 
   console.log('failedLabwareDetails: ', failedLabwareDetails)
   const failedLabware = useMemo(
-    () => getFailedLabware(recentRelevantFailedLabwareCmd, runRecord),
-    [recentRelevantFailedLabwareCmd?.key]
-  )
+        () => getFailedLabware(recentRelevantFailedLabwareCmd, runRecord, errorKind),
+        [recentRelevantFailedLabwareCmd?.key]
+      )
 
   const relevantWellName = getRelevantWellName(
     failedPipetteInfo,
@@ -335,15 +335,27 @@ export function getFailedCmdRelevantLabware(
 // Get the relevant labware related to the failed command, if any.
 function getFailedLabware(
   recentRelevantPickUpTipCmd: FailedCommandRelevantLabware,
-  runRecord?: Run
+  runRecord?: Run,
+  errorKind: ErrorKind
 ): LoadedLabware | null {
   console.log("recentRelevantPickUpTipCmd: ", recentRelevantPickUpTipCmd)
   //get module id from recentRelevantPickUpTipCmd.params and get module if stacker
-  return (
-    runRecord?.data.labware.find(
-      lw => lw.id === recentRelevantPickUpTipCmd?.params.labwareId
-    ) ?? null
-  )
+  switch (errorKind){
+    case ERROR_KINDS.STALL_WHILE_STACKING:
+      const loadedModule = (
+        runRecord?.data.modules.find(
+          md => md.id === recentRelevantPickUpTipCmd?.params.moduleId
+        ) ?? null)
+      return {
+        loadedModule
+      }
+    default:
+      return (
+        runRecord?.data.labware.find(
+          lw => lw.id === recentRelevantPickUpTipCmd?.params.labwareId
+        ) ?? null
+      )
+}
 }
 
 // Return the name of the well(s) related to the failed command, if any.
