@@ -1,4 +1,4 @@
-"""Tests for delay properties in the Opentrons protocol API."""
+"""Tests for mix properties in the Opentrons protocol API."""
 
 from pydantic import ValidationError
 import pytest
