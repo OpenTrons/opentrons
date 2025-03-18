@@ -209,21 +209,24 @@ class PipetteSettingsUpdate(BaseModel):
 
     @field_validator("setting_fields")
     @classmethod
-    def validate_fields(cls, v):
+    def validate_fields(
+        cls, v: Optional[Dict[str, Optional[PipetteUpdateField]]]
+    ) -> Optional[Dict[str, Optional[PipetteUpdateField]]]:
         """A validator to ensure that values for mutable configs are
         floats and booleans for quirks."""
-        for key, value in v.items():
-            if value is None:
-                pass
-            elif key in model_constants.MUTABLE_CONFIGS_V1:
-                if value.value is not None:
-                    # Must be a float for overriding a config field
-                    value.value = float(value.value)
-            elif key in model_constants.VALID_QUIRKS:
-                if not isinstance(value.value, bool):
-                    raise ValueError(
-                        f"{key} quirk value must " f"be a boolean. Got {value.value}"
-                    )
-            else:
-                raise ValueError(f"{key} is not a valid field or quirk name")
+        if v is not None:
+            for key, value in v.items():
+                if value is None:
+                    pass
+                elif key in model_constants.MUTABLE_CONFIGS_V1:
+                    if value.value is not None:
+                        # Must be a float for overriding a config field
+                        value.value = float(value.value)
+                elif key in model_constants.VALID_QUIRKS:
+                    if not isinstance(value.value, bool):
+                        raise ValueError(
+                            f"{key} quirk value must be a boolean. Got {value.value}"
+                        )
+                else:
+                    raise ValueError(f"{key} is not a valid field or quirk name")
         return v

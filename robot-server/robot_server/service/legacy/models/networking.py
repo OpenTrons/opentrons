@@ -172,7 +172,9 @@ class WifiConfiguration(BaseModel):
 
     @field_validator("eapConfig")
     @classmethod
-    def eap_config_validate(cls, v):
+    def eap_config_validate(
+        cls, v: typing.Optional[typing.Dict[str, str]]
+    ) -> typing.Optional[typing.Dict[str, str]]:
         """Custom validator for the eapConfig field"""
         if v is not None:
             if not v.get("eapType"):
