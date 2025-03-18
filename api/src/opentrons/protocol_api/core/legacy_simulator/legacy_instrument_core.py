@@ -377,6 +377,9 @@ class LegacyInstrumentCoreSimulator(
     def get_current_volume(self) -> float:
         return self._pipette_dict["current_volume"]
 
+    def get_has_clean_tip(self) -> bool:
+        return False
+
     def get_available_volume(self) -> float:
         return self._pipette_dict["available_volume"]
 

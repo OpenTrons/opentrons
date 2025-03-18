@@ -11,6 +11,7 @@ from typing import (
     Optional,
     Tuple,
     cast,
+    Union,
 )
 
 from typing_extensions import assert_never
@@ -126,6 +127,7 @@ class PipetteState:
     nozzle_configuration_by_id: Dict[str, NozzleMap]
     liquid_presence_detection_by_id: Dict[str, bool]
     ready_to_aspirate_by_id: Dict[str, bool]
+    has_clean_tips_by_id: Dict[str, bool]
 
 
 class PipetteStore(HasState[PipetteState], HandlesActions):
@@ -147,6 +149,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             nozzle_configuration_by_id={},
             liquid_presence_detection_by_id={},
             ready_to_aspirate_by_id={},
+            has_clean_tips_by_id={},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -213,6 +216,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             else:
                 pipette_id = state_update.pipette_tip_state.pipette_id
                 self._state.attached_tip_by_id[pipette_id] = None
+                self._state.has_clean_tips_by_id[pipette_id] = False
 
                 static_config = self._state.static_config_by_id.get(pipette_id)
                 if static_config:
@@ -329,11 +333,19 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _update_volumes(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_aspirated_fluid == update_types.NO_CHANGE:
             return
+        # if this is updating to anything but clean mark the tip as unclean
+        if state_update.pipette_aspirated_fluid.type != "clean":
+            self._state.has_clean_tips_by_id[
+                state_update.pipette_aspirated_fluid.pipette_id
+            ] = False
+
         if state_update.pipette_aspirated_fluid.type == "aspirated":
             self._update_aspirated(state_update.pipette_aspirated_fluid)
         elif state_update.pipette_aspirated_fluid.type == "ejected":
             self._update_ejected(state_update.pipette_aspirated_fluid)
         elif state_update.pipette_aspirated_fluid.type == "empty":
+            self._update_empty(state_update.pipette_aspirated_fluid)
+        elif state_update.pipette_aspirated_fluid.type == "clean":
             self._update_empty(state_update.pipette_aspirated_fluid)
         elif state_update.pipette_aspirated_fluid.type == "unknown":
             self._update_unknown(state_update.pipette_aspirated_fluid)
@@ -353,7 +365,12 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _update_ejected(self, update: update_types.PipetteEjectedFluidUpdate) -> None:
         self._fluid_stack_log_if_empty(update.pipette_id).remove_fluid(update.volume)
 
-    def _update_empty(self, update: update_types.PipetteEmptyFluidUpdate) -> None:
+    def _update_empty(
+        self,
+        update: Union[
+            update_types.PipetteEmptyFluidUpdate, update_types.PipetteCleanFluidUpdate
+        ],
+    ) -> None:
         self._state.pipette_contents_by_id[update.pipette_id] = fluid_stack.FluidStack()
 
     def _update_unknown(self, update: update_types.PipetteUnknownFluidUpdate) -> None:
@@ -489,6 +506,29 @@ class PipetteView:
                 return None
             return stack.aspirated_volume()
 
+        except KeyError as e:
+            raise errors.PipetteNotLoadedError(
+                f"Pipette {pipette_id} not found; unable to get current volume."
+            ) from e
+
+    def get_has_clean_tip(self, pipette_id: str) -> bool:
+        """Get if the tip of a pipette by ID is clean.
+
+        This is only true directly after a pick up tip, once any kind of aspirate happens
+        it is no longer clean
+
+        Returns:
+            True if the tip is clean
+            False if it is unclean
+
+        Raises:
+            PipetteNotLoadedError: pipette ID does not exist.
+            TipNotAttachedError: if no tip is attached to the pipette.
+        """
+        self.validate_tip_state(pipette_id, True)
+
+        try:
+            return self._state.has_clean_tips_by_id[pipette_id]
         except KeyError as e:
             raise errors.PipetteNotLoadedError(
                 f"Pipette {pipette_id} not found; unable to get current volume."

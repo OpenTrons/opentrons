@@ -939,6 +939,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         return current_volume or 0
 
+    def get_has_clean_tip(self) -> bool:
+        try:
+            clean_tip = self._engine_client.state.pipettes.get_has_clean_tip(
+                self._pipette_id
+            )
+        except TipNotAttachedError:
+            clean_tip = False
+
+        return clean_tip
+
     def get_available_volume(self) -> float:
         try:
             available_volume = self._engine_client.state.pipettes.get_available_volume(
