@@ -10,6 +10,7 @@ import type {
   LabwareWell,
 } from '../types'
 import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
+import range from 'lodash/range'
 
 const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/2')
@@ -207,7 +208,33 @@ const expectGroupsFollowConvention = (
 }
 
 const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
-  test('innerLabwareGeometry sections should be sorted top to bottom', () => {
+  test('geometries referenced by wells must actually exist', () => {
+    for (const geometryId of Object.values(labwareDef.wells).map(
+      well => well.geometryDefinitionId
+    )) {
+      if (geometryId !== undefined) {
+        expect(labwareDef.innerLabwareGeometry).toHaveProperty(geometryId)
+      }
+    }
+  })
+
+  test("geometries should only exist if they're referenced by at least one well", () => {
+    function isDefined<T>(x: T | undefined): x is T {
+      return x !== undefined
+    }
+
+    const referencedGeometryIds = new Set(
+      Object.values(labwareDef.wells)
+        .map(well => well.geometryDefinitionId)
+        .filter(isDefined)
+    )
+
+    for (const geometryId in labwareDef.innerLabwareGeometry) {
+      expect(referencedGeometryIds).toContain(geometryId)
+    }
+  })
+
+  test('sections of a well geometry should be sorted top to bottom', () => {
     const geometries = Object.values(labwareDef.innerLabwareGeometry ?? [])
     for (const geometry of geometries) {
       const sectionList = geometry.sections
@@ -218,25 +245,48 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
     }
   })
 
-  test('all geometryDefinitionIds should have an accompanying valid entry in innerLabwareGeometry', () => {
-    for (const wellName in labwareDef.wells) {
-      const wellGeometryId = labwareDef.wells[wellName].geometryDefinitionId
+  test('the bottom of a well geometry should be at height 0', () => {
+    for (const geometry of Object.values(
+      labwareDef.innerLabwareGeometry ?? {}
+    )) {
+      const bottomFrustum = geometry.sections[geometry.sections.length - 1]
+      expect(bottomFrustum.bottomHeight).toStrictEqual(0)
+    }
+  })
 
-      if (wellGeometryId === undefined) {
-        return
+  test('each section of a well geometry should have topHeight > bottomHeight', () => {
+    for (const geometry of Object.values(
+      labwareDef.innerLabwareGeometry ?? {}
+    )) {
+      for (const section of geometry.sections) {
+        expect(section.topHeight).toBeGreaterThan(section.bottomHeight)
       }
-      if (
-        labwareDef.innerLabwareGeometry === null ||
-        labwareDef.innerLabwareGeometry === undefined
-      ) {
-        return
+    }
+  })
+
+  test('sections of a well geometry should exactly connect to each other', () => {
+    for (const geometry of Object.values(
+      labwareDef.innerLabwareGeometry ?? {}
+    )) {
+      for (const [above, below] of pairs(geometry.sections)) {
+        expect(above.bottomHeight).toStrictEqual(below.topHeight)
       }
+    }
+  })
 
-      expect(wellGeometryId in labwareDef.innerLabwareGeometry).toBe(true)
+  test("a well's depth should equal the height of its geometry", () => {
+    for (const well of Object.values(labwareDef.wells)) {
+      const wellGeometryId = well.geometryDefinitionId
 
-      const wellDepth = labwareDef.wells[wellName].depth
-      const topFrustumHeight =
-        labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
+      if (wellGeometryId === undefined) return
+      if (labwareDef.innerLabwareGeometry == null) return
+
+      const wellGeometry = labwareDef.innerLabwareGeometry[wellGeometryId]
+      if (wellGeometry === undefined) return
+
+      const wellDepth = well.depth
+      const topFrustumHeight = wellGeometry.sections[0].topHeight
+
       const labwareWithWellDepthMismatches = [
         // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
         'agilent_1_reservoir_290ml/2',
@@ -251,6 +301,7 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
         'opentrons_6_tuberack_falcon_50ml_conical/2',
         'opentrons_6_tuberack_nest_50ml_conical/2',
       ]
+
       if (
         labwareDef.parameters.loadName ===
           'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical' &&
@@ -465,4 +516,16 @@ function getGeometry(
     }
     return result
   }
+}
+
+/**
+ * [1, 2, 3, 4] -> [[1, 2], [2, 3], [3, 4]]
+ *
+ * [1] -> []
+ */
+function pairs<T>(array: T[]): Array<[T, T]> {
+  return range(array.length - 1).map(firstIndex => [
+    array[firstIndex],
+    array[firstIndex + 1],
+  ])
 }
