@@ -814,6 +814,8 @@ def _get_liquid_height(
 def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noqa: C901
     """Run."""
     new_liquid_class = None
+    if not resources.ctx.is_simulating():
+        input("Press ENTER to continue...")
     if not cfg.use_old_method:
         lc_name = SupportedLiquid.from_string(cfg.liquid).name_with_dilution(
             cfg.dilution
