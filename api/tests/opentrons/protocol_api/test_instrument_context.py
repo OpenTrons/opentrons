@@ -1673,6 +1673,65 @@ def test_mix_with_lpd(
     )
 
 
+@pytest.mark.ot3_only
+@pytest.mark.parametrize("clean,expected", [(True, 1), (False, 0)])
+def test_aspirate_with_lpd(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+    clean: bool,
+    expected: int,
+) -> None:
+    """It should aspirate/dispense to a well several times and do 1 lpd."""
+    mock_well = decoy.mock(cls=Well)
+    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    top_location = Location(point=Point(3, 2, 1), labware=None)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=last_location)
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
+    decoy.when(mock_well.top()).then_return(top_location)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_has_clean_tip()).then_return(clean)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+    decoy.when(mock_instrument_core.nozzle_configuration_valid_for_lld()).then_return(
+        True
+    )
+
+    subject.liquid_presence_detection = True
+    subject.aspirate(volume=10.0, location=input_location, rate=1.23)
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            bottom_location,
+            mock_well._core,
+            10.0,
+            1.23,
+            5.67,
+            False,
+            None,
+        ),
+        times=1,
+    )
+    decoy.verify(
+        mock_instrument_core.liquid_probe_with_recovery(mock_well._core, top_location),
+        times=expected,
+    )
+
+
 @pytest.mark.parametrize(
     "api_version",
     versions_between(
