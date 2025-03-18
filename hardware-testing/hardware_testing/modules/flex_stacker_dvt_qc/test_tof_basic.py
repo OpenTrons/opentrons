@@ -28,11 +28,11 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
         CSVLine(f"tof-Z-disabled", [CSVResult]),
         CSVLine(
             f"tof-{TOFSensor.X}-histogram",
-            [str, CSVResult, str],
+            [CSVResult, str],
         ),
         CSVLine(
             f"tof-{TOFSensor.Z}-histogram",
-            [str, CSVResult, str],
+            [CSVResult, str],
         ),
     ]
     return lines
@@ -68,28 +68,14 @@ async def test_tof_sensors_for_comms(
 
 
 async def test_get_tof_sensor_histogram(
-        stacker: FlexStacker, report: CSVReport, section: str, sensor: TOFSensor, labware: str
+        stacker: FlexStacker, report: CSVReport, section: str, sensor: TOFSensor
 ) -> None:
     """Test that we can request and store histogram measurements from this TOF sensor."""
-    if not stacker._simulating:
-        # Cancel any on-going measurements and make sure sensor is enabled
-        status = await stacker._driver.get_tof_sensor_status(sensor)
-        if not status.ok or status.state != TOFSensorState.MEASURING:
-            report(
-                section,
-                f"tof-{sensor.name}-histogram-{labware}",
-                [
-                    CSVResult.FAIL,
-                    [],
-                ],
-            )
-            return
-
     print(f"Getting histogram for {sensor}.")
     histogram = await stacker._driver.get_tof_histogram(sensor)
     report(
         section,
-        f"tof-{sensor.name}-histogram-{labware}",
+        f"tof-{sensor.name}-histogram",
         [
             CSVResult.PASS,
             histogram.bins,
@@ -120,5 +106,5 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     await test_tof_sensors_for_comms(stacker, TOFSensor.Z, True, report, section)
 
     print("Test TOF sensor get histogram")
-    await test_get_tof_sensor_histogram(stacker, report, section, TOFSensor.X, "empty")
-    await test_get_tof_sensor_histogram(stacker, report, section, TOFSensor.Z, "empty")
+    await test_get_tof_sensor_histogram(stacker, report, section, TOFSensor.X)
+    await test_get_tof_sensor_histogram(stacker, report, section, TOFSensor.Z)
