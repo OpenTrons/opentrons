@@ -117,10 +117,6 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
     await stacker.home_axis(StackerAxis.Z, Direction.RETRACT)
 
-    print("Disabling both TOF sensors.")
-    await stacker._driver.enable_tof_sensor(TOFSensor.X, False)
-    await stacker._driver.enable_tof_sensor(TOFSensor.Z, False)
-
     print("Test that we have no labware on the Z")
     ui.get_user_ready("Make sure there is no labware in the stacker and close the hopper door.")
     await stacker.close_latch()
