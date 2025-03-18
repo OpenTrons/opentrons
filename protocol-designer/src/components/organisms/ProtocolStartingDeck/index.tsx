@@ -12,7 +12,7 @@ import {
   ToggleGroup,
 } from '@opentrons/components'
 
-import { OffDeck } from '../../../pages/Designer/OffDeck'
+import { OffDeck } from '../OffDeck'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'

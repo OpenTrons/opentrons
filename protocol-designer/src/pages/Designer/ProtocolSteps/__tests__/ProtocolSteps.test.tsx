@@ -18,14 +18,13 @@ import {
 } from '../../../../file-data/selectors'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
 import { ProtocolStepsDeck } from '../../DeckSetup/ProtocolStepsDeck'
-import { OffDeck } from '../../OffDeck'
+import { OffDeck } from '../../../../components/organisms/OffDeck'
 import { SubStepsToolbox } from '../Timeline'
 import { DraggableSidebar } from '../DraggableSidebar'
 import { ProtocolSteps } from '..'
 
 import type { SavedStepFormState } from '../../../../step-forms'
 
-vi.mock('../../OffDeck')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../ui/steps/selectors')
 vi.mock('../../../../ui/labware/selectors')
@@ -36,6 +35,7 @@ vi.mock('../DraggableSidebar')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
+vi.mock('../../../../components/organisms/OffDeck')
 vi.mock('../../DeckSetup/ProtocolStepsDeck')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {

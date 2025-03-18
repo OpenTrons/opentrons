@@ -14,8 +14,8 @@ import {
 } from '@opentrons/components'
 import { OffDeckControls } from './OffDeckControls'
 import { HighlightOffdeckSlot } from './HighlightOffdeckSlot'
-import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
-import { wellFillFromWellContents } from '../../../components/organisms/LabwareOnDeck/utils'
+import { SlotOverflowMenu } from '../../../pages/Designer/DeckSetup/SlotOverflowMenu'
+import { wellFillFromWellContents } from '../LabwareOnDeck/utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'

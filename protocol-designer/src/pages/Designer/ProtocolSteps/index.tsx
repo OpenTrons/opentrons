@@ -30,7 +30,7 @@ import {
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
 } from '../../../ui/steps/selectors'
-import { OffDeck } from '../OffDeck'
+import { OffDeck } from '../../../components/organisms/OffDeck'
 import { SubStepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
 import { StepSummary } from './StepSummary'
