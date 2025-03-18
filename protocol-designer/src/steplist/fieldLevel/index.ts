@@ -260,6 +260,22 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   aspirate_delay_mmFromBottom: {
     castValue: numberOrNull,
   },
+  aspirate_touchTip_speed: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  dispense_touchTip_speed: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  aspirate_touchTip_mmFromEdge: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  dispense_touchTip_mmFromEdge: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: Number,
+  },
   dispense_delay_seconds: {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
     castValue: Number,
