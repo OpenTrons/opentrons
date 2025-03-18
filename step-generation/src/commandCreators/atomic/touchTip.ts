@@ -1,4 +1,4 @@
-import { uuid } from '../../utils'
+import { formatPyStr, indentPyLines, uuid } from '../../utils'
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type { CreateCommand, TouchTipParams } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
@@ -46,6 +46,24 @@ export const touchTip: CommandCreator<TouchTipParams> = (
     }
   }
 
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
+  const labwarePythonName =
+    invariantContext.labwareEntities[labwareId].pythonName
+
+  const pythonArgs = [
+    `${labwarePythonName}[${formatPyStr(wellName)}],`,
+    ...(wellLocation?.offset?.z != null
+      ? [`v_offset=${wellLocation?.offset?.z},`]
+      : []),
+    ...(speed != null ? [`speed=${speed},`] : []),
+  ]
+
+  //  TODO: add mmFromEdge to python and commandCreator
+  const python = `${pipettePythonName}.touch_tip(\n${indentPyLines(
+    pythonArgs.join('\n')
+  )}\n)`
+
   const commands: CreateCommand[] = [
     {
       commandType: 'touchTip',
@@ -62,5 +80,6 @@ export const touchTip: CommandCreator<TouchTipParams> = (
   ]
   return {
     commands,
+    python,
   }
 }
