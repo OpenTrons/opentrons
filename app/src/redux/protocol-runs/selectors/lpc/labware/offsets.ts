@@ -10,6 +10,7 @@ import {
   getMissingOffsets,
   getSelectedLabwareWithOffsetDetails,
   getWorkingOffsetsByUri,
+  getTotalCountNonHardCodedLocationSpecificOffsets,
 } from '../transforms'
 
 import {
@@ -24,6 +25,7 @@ import {
 } from '/app/redux/protocol-runs/constants'
 
 import type {
+  LabwareOffsetCreateData,
   StoredLabwareOffsetCreate,
   VectorOffset,
 } from '@opentrons/api-client'
@@ -208,25 +210,14 @@ export const selectCountNonHardcodedLocationSpecificOffsetsForLw = (
   )
 
 // The total count of all location specific offsets utilized in a run.
-export const selectCountTotalLocationSpecificOffsets = (
+export const selectTotalCountNonHardCodedLocationSpecificOffsets = (
   runId: string
 ): Selector<State, number> =>
   createSelector(
     (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
-    labware => {
-      if (labware == null) {
-        return 0
-      }
-
-      let count = 0
-
-      Object.values(labware).forEach(lw => {
-        count += lw.locationSpecificOffsetDetails.length
-      })
-
-      return count
-    }
+    labware => getTotalCountNonHardCodedLocationSpecificOffsets(labware)
   )
+
 // Whether the default offset is "absent" for the given labware geometry.
 // The default offset only needs to be added client-side to be considered "not absent".
 // Note that the default offset is not considered absent if all locations that would
@@ -268,6 +259,32 @@ export const selectIsNecessaryDefaultOffsetMissing = (
       defaultDetails?.existingOffset == null &&
       !getAreAllOffsetsHardCoded(lsDetails) &&
       !getAreAnyLocationSpecificOffsetsMissing(lsDetails)
+  )
+
+// Is any default offset missing for the run. See selectIsNecessaryDefaultOffsetMissing.
+export const selectIsAnyNecessaryDefaultOffsetMissing = (
+  runId: string
+): Selector<State, boolean> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => {
+      if (labware == null) {
+        return false
+      }
+
+      return Object.values(labware).some(details => {
+        const {
+          defaultOffsetDetails: defaultDetails,
+          locationSpecificOffsetDetails: lsDetails,
+        } = details
+
+        return (
+          defaultDetails.existingOffset == null &&
+          !getAreAllOffsetsHardCoded(lsDetails) &&
+          !getAreAnyLocationSpecificOffsetsMissing(lsDetails)
+        )
+      })
+    }
   )
 
 export const selectWorkingOffsetsByUri = (
@@ -367,5 +384,67 @@ export const selectPendingOffsetOperations = (
       })
 
       return result
+    }
+  )
+
+// Returns offsets for injection into the run. Prefer the location-specific
+// offset if it exists, otherwise use the default offset. Locations with hardcoded
+// offsets are ignored.
+export const selectLabwareOffsetsToAddToRun = (
+  runId: string
+): Selector<State, LabwareOffsetCreateData[] | null> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => {
+      if (labware == null) {
+        return []
+      }
+
+      try {
+        const result: LabwareOffsetCreateData[] = []
+
+        Object.entries(labware).forEach(([uri, details]) => {
+          const {
+            defaultOffsetDetails,
+            locationSpecificOffsetDetails: lsDetails,
+          } = details
+          const defaultVector = defaultOffsetDetails.existingOffset?.vector
+
+          lsDetails.forEach(detail => {
+            const { vector: lsVector } = detail.existingOffset ?? {
+              vector: null,
+            }
+            const locationSequence = detail.locationDetails.lwOffsetLocSeq
+
+            if (detail.locationDetails.hardCodedOffsetId == null) {
+              if (lsVector != null) {
+                result.push({
+                  definitionUri: uri,
+                  vector: lsVector,
+                  locationSequence,
+                })
+              } else if (defaultVector != null) {
+                result.push({
+                  definitionUri: uri,
+                  vector: defaultVector,
+                  locationSequence,
+                })
+              } else {
+                console.error(
+                  `CRITICAL ERROR: Expected to apply a default offset to the run, but did not for lw: ${uri}, details: ${JSON.stringify(
+                    details
+                  )}`
+                )
+
+                throw new Error('Missing required offset.')
+              }
+            }
+          })
+        })
+
+        return result
+      } catch (error) {
+        return null
+      }
     }
   )

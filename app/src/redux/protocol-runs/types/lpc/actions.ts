@@ -88,6 +88,11 @@ export interface GoBackHandleLwSubstepAction {
   payload: { runId: string }
 }
 
+export interface AppliedOffsetsToRunAction {
+  type: 'APPLIED_OFFSETS_TO_RUN'
+  payload: { runId: string }
+}
+
 export type LPCWizardAction =
   | StartLPCAction
   | FinishLPCAction
@@ -102,3 +107,4 @@ export type LPCWizardAction =
   | GoBackStepAction
   | ProceedHandleLwSubstepAction
   | GoBackHandleLwSubstepAction
+  | AppliedOffsetsToRunAction

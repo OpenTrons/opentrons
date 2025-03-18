@@ -13,6 +13,7 @@ import {
   GO_BACK_HANDLE_LW_SUBSTEP,
   RESET_OFFSET_TO_DEFAULT,
   CLEAR_WORKING_OFFSETS,
+  APPLIED_OFFSETS_TO_RUN,
 } from '../constants'
 import {
   updateOffsetsForURI,
@@ -193,6 +194,16 @@ export function LPCReducer(
             currentSubstep: null,
           },
         }
+
+      case APPLIED_OFFSETS_TO_RUN: {
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            areOffsetsApplied: true,
+          },
+        }
+      }
 
       default:
         return state
