@@ -150,28 +150,35 @@ class TransferComponentsExecutor:
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
         )
-        self._instrument.move_to(
-            location=Location(
-                point=self._target_well.get_top(2),
-                labware=self._target_location.labware,
-            ),
-            well_core=self._target_well,
-            force_direct=False,
-            minimum_z_height=None,
-            speed=None,
+        prep_before_moving_to_submerge = (
+            post_submerge_action == "aspirate"
+            and volume_for_pipette_mode_configuration is not None
         )
-        self._remove_air_gap(location=submerge_start_location)
-        if (
-            self._transfer_type != TransferType.MANY_TO_ONE
-            and post_submerge_action == "aspirate"
-            and self._instrument.get_liquid_presence_detection()
-        ):
-            # Currently this moves the pipette to 2mm above the well
-            # `liquid_probe_with_recovery` is being updated to start probing
-            # from the current location or a non-well-top start location.
-            self._instrument.liquid_probe_with_recovery(
-                self._target_well, submerge_start_location
+        if prep_before_moving_to_submerge:
+            # TODO: make this a shared position between liquid probing and this movement
+            #  so that they don't go out of sync
+            self._instrument.move_to(
+                location=Location(
+                    point=self._target_well.get_top(2),
+                    labware=self._target_location.labware,
+                ),
+                well_core=self._target_well,
+                force_direct=False,
+                minimum_z_height=None,
+                speed=None,
             )
+            self._remove_air_gap(location=submerge_start_location)
+            if (
+                self._transfer_type != TransferType.MANY_TO_ONE
+                and self._instrument.get_liquid_presence_detection()
+            ):
+                # TODO: probe only if this well hasn't been probed before
+                self._instrument.liquid_probe_with_recovery(
+                    self._target_well, submerge_start_location
+                )
+            # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
+            self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)
+            self._instrument.prepare_to_aspirate()
         tx_utils.raise_if_location_inside_liquid(
             location=submerge_start_location,
             well_location=self._target_location,
@@ -189,13 +196,8 @@ class TransferComponentsExecutor:
             minimum_z_height=None,
             speed=None,
         )
-        if (
-            post_submerge_action == "aspirate"
-            and volume_for_pipette_mode_configuration is not None
-        ):
-            # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
-            self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)
-            self._instrument.prepare_to_aspirate()
+        if not prep_before_moving_to_submerge:
+            self._remove_air_gap(location=submerge_start_location)
         self._instrument.move_to(
             location=self._target_location,
             well_core=self._target_well,
