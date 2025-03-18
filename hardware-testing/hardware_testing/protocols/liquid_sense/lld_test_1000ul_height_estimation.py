@@ -470,16 +470,16 @@ def run(ctx: ProtocolContext) -> None:
     # LOAD LIQUID
     dye_src_well = src_reservoir["A1"]
     range_hv = ctx.define_liquid(name="range-hv", display_color="#FF0000")
-    src_reservoir.load_liquid([dye_src_well], dye_src_well.max_volume, range_hv)
-
-    # DETECT LIQUID
-    # NOTE: pipette should already have tip attached
-    pipette.require_liquid_presence(dye_src_well)
     dead_vol_for_reservoir = LOAD_NAME_SRC_RESERVOIRS[reservoir_load_name]
     total_dye_transferred = sum(
         [t.ul_to_add for tl in test_trials_by_labware.values() for t in tl]
     )
     min_dye_required_in_reservoir = dead_vol_for_reservoir + total_dye_transferred
+    src_reservoir.load_liquid([dye_src_well], min_dye_required_in_reservoir, range_hv)
+
+    # DETECT LIQUID
+    # NOTE: pipette should already have tip attached
+    pipette.require_liquid_presence(dye_src_well)
     if not ctx.is_simulating():
         assert dye_src_well.current_liquid_volume() >= min_dye_required_in_reservoir, (
             f"must have >= {int(min_dye_required_in_reservoir)} uL "
