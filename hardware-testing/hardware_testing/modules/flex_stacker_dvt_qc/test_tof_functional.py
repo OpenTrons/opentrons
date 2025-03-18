@@ -92,10 +92,6 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         ui.get_user_ready("Make sure both TOF sensors are installed.")
         await stacker._driver.set_led(0, pattern=LEDPattern.STATIC)
 
-    if not stacker._simulating and not await tof_sensors_installed(stacker):
-        print("FAILURE - Cannot start tests without tof sensors installed.")
-        return
-
     print("Homing stacker X and Z axis.")
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
     await stacker.home_axis(StackerAxis.Z, Direction.RETRACT)
