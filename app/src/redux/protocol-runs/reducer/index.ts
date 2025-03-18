@@ -31,6 +31,7 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
 
     case Constants.START_LPC:
     case Constants.FINISH_LPC:
+    case Constants.APPLIED_OFFSETS_TO_RUN:
     case Constants.PROCEED_STEP:
     case Constants.GO_BACK_LAST_STEP:
     case Constants.PROCEED_HANDLE_LW_SUBSTEP:

@@ -12,6 +12,7 @@ import {
   GO_BACK_HANDLE_LW_SUBSTEP,
   RESET_OFFSET_TO_DEFAULT,
   CLEAR_WORKING_OFFSETS,
+  APPLIED_OFFSETS_TO_RUN,
 } from '../constants'
 
 import type {
@@ -33,6 +34,7 @@ import type {
   LocationSpecificOffsetLocationDetails,
   ResetLocationSpecificOffsetToDefaultAction,
   ClearSelectedLabwareWorkingOffsetsAction,
+  AppliedOffsetsToRunAction,
 } from '../types'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
 
@@ -139,5 +141,12 @@ export const goBackEditOffsetSubstep = (
   runId: string
 ): GoBackHandleLwSubstepAction => ({
   type: GO_BACK_HANDLE_LW_SUBSTEP,
+  payload: { runId },
+})
+
+export const appliedOffsetsToRun = (
+  runId: string
+): AppliedOffsetsToRunAction => ({
+  type: APPLIED_OFFSETS_TO_RUN,
   payload: { runId },
 })
