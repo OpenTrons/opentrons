@@ -770,7 +770,7 @@ class Labware:
               - Offsets only apply to the exact :py:class:`.Labware` instance.
 
                 If your protocol has multiple instances of the same type of labware,
-                you must either use ``set_offset`` on all of them or none of them.
+                you must either use ``set_offset()`` on all of them or none of them.
             * - 2.14–2.17
               - ``set_offset()`` is not available, and the API raises an error.
             * - 2.18 and newer
