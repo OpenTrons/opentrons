@@ -1621,6 +1621,7 @@ def test_mix_with_lpd(
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_has_clean_tip()).then_return(True)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
     decoy.when(mock_instrument_core.nozzle_configuration_valid_for_lld()).then_return(
         True
