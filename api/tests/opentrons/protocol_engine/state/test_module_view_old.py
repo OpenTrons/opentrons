@@ -2025,7 +2025,7 @@ def test_is_flex_deck_with_thermocycler(
         (
             lazy_fixture("auto_sealing_lid_def"),
             None,
-            97,
+            96,
         ),
     ],
 )
