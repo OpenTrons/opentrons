@@ -2,7 +2,11 @@ import { createSelector } from 'reselect'
 
 import { getIsTiprack, getLabwareDefURI } from '@opentrons/shared-data'
 
-import { getItemLabwareDef, getSelectedLabwareDefFrom } from '../transforms'
+import {
+  getItemLabwareDef,
+  getSelectedLabwareDefFrom,
+  getIsDefaultOffsetAbsent,
+} from '../transforms'
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
@@ -13,17 +17,44 @@ import type { State } from '/app/redux/types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LPCFlowType,
-  LPCLabwareInfo,
+  LwGeometryDetails,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
-// Returns all the LPC labware info for the labware used in the current run.
-export const selectAllLabwareInfo = (
+export interface LPCLabwareInfoAndDefaultStatus {
+  uri: string
+  info: LwGeometryDetails
+  isMissingDefaultOffset: boolean
+}
+
+// Returns all the LPC labware info for the labware used in the current run,
+// sorted by URI display name.
+export const selectAllLabwareInfoAndDefaultStatusSorted = (
   runId: string
-): Selector<State, LPCLabwareInfo['labware']> =>
+): Selector<State, LPCLabwareInfoAndDefaultStatus[]> =>
   createSelector(
     (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
-    labware => labware ?? {}
+    labwareInfo => {
+      if (labwareInfo == null) {
+        return []
+      }
+
+      return Object.entries(labwareInfo)
+        .map(([uri, info]) => ({
+          uri,
+          info,
+          isMissingDefaultOffset: getIsDefaultOffsetAbsent(info),
+        }))
+        .sort((a, b) => {
+          // Primary sort: isMissingDefaultOffset (true values first).
+          if (a.isMissingDefaultOffset !== b.isMissingDefaultOffset) {
+            return a.isMissingDefaultOffset ? -1 : 1
+          }
+
+          // Secondary sort: alphabetical by displayName.
+          return a.info.displayName.localeCompare(b.info.displayName)
+        })
+    }
   )
 
 // Returns the labware overview for the currently user-selected labware, if any.
