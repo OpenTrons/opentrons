@@ -17,7 +17,7 @@ import styled from 'styled-components'
 export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
   const {
     handleAttachProbeCheck,
-    handleNavToDetachProbe,
+    handleCloseWithoutHome,
   } = props.commandUtils.headerCommands
   const { t } = useTranslation('labware_position_check')
   const channelCount = useSelector(selectActivePipetteChannelCount(props.runId))
@@ -62,7 +62,7 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
         buttonText: t('exit'),
         buttonCategory: 'rounded',
         buttonType: 'tertiaryLowLight',
-        onClick: handleNavToDetachProbe,
+        onClick: handleCloseWithoutHome,
       }}
     >
       <TwoColumn>

@@ -1,12 +1,11 @@
 import {
   createUpdatedWorkingDefaultOffset,
   createUpdatedWorkingLocationSpecificOffset,
-  findMatchingLocationOffset,
   findLocationSpecificOffsetWithFallbacks,
+  findMatchingLocationOffset,
   vectorEqualsDefault,
 } from '../../../utils'
 import {
-  APPLY_WORKING_OFFSETS,
   CLEAR_WORKING_OFFSETS,
   OFFSET_KIND_DEFAULT,
   RESET_OFFSET_TO_DEFAULT,
@@ -15,16 +14,15 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type {
-  ApplyWorkingOffsetsAction,
   ClearSelectedLabwareWorkingOffsetsAction,
   DefaultOffsetDetails,
   FinalPositionAction,
   InitialPositionAction,
-  LwGeometryDetails,
   LocationSpecificOffsetDetails,
-  LPCWizardState,
-  ResetLocationSpecificOffsetToDefaultAction,
   LocationSpecificOffsetLocationDetails,
+  LPCWizardState,
+  LwGeometryDetails,
+  ResetLocationSpecificOffsetToDefaultAction,
 } from '../../../types'
 
 type PositionAction = InitialPositionAction | FinalPositionAction
@@ -34,18 +32,13 @@ type UpdateOffsetsAction =
   | PositionAction
   | ResetPositionAction
   | ClearSelectedLabwareWorkingOffsetsAction
-  | ApplyWorkingOffsetsAction
 
 // Handle vector position updates, only updating the appropriate working/existing offsets.
 export function updateOffsetsForURI(
   state: LPCWizardState,
   action: UpdateOffsetsAction
 ): LwGeometryDetails {
-  if (action.type === APPLY_WORKING_OFFSETS) {
-    return handleApplyWorkingOffsets(
-      state.labwareInfo.labware[action.payload.labwareUri]
-    )
-  } else if (action.type === CLEAR_WORKING_OFFSETS) {
+  if (action.type === CLEAR_WORKING_OFFSETS) {
     return handleClearWorkingOffsets(
       state.labwareInfo.labware[action.payload.labwareUri]
     )
@@ -86,57 +79,6 @@ export function updateOffsetsForURI(
         ),
       }
     }
-  }
-}
-
-// Apply any working offsets to make them the new existing offsets.
-function handleApplyWorkingOffsets(
-  lwDetails: LwGeometryDetails
-): LwGeometryDetails {
-  // Process location-specific offsets
-  const updatedLSOffsetDetails = lwDetails.locationSpecificOffsetDetails.map(
-    offset => {
-      if (offset.workingOffset?.confirmedVector != null) {
-        if (offset.workingOffset.confirmedVector === RESET_TO_DEFAULT) {
-          // Delete the location-specific offset.
-          return { ...offset, workingOffset: null, existingOffset: null }
-        }
-        // Apply confirmed vector as new existing offset
-        else {
-          return {
-            ...offset,
-            workingOffset: null,
-            existingOffset: {
-              vector: offset.workingOffset.confirmedVector,
-              // TODO(jh, 03-07-25): Use the server response preferably.
-              createdAt: new Date().getTime().toString(),
-            },
-          }
-        }
-      } else {
-        return offset
-      }
-    }
-  )
-
-  // Process default offset
-  const updatedDefaultOffsetDetails: DefaultOffsetDetails =
-    lwDetails.defaultOffsetDetails.workingOffset?.confirmedVector != null
-      ? {
-          ...lwDetails.defaultOffsetDetails,
-          workingOffset: null,
-          existingOffset: {
-            vector:
-              lwDetails.defaultOffsetDetails.workingOffset.confirmedVector,
-            createdAt: new Date().getTime().toString(),
-          },
-        }
-      : { ...lwDetails.defaultOffsetDetails }
-
-  return {
-    ...lwDetails,
-    defaultOffsetDetails: updatedDefaultOffsetDetails,
-    locationSpecificOffsetDetails: updatedLSOffsetDetails,
   }
 }
 
