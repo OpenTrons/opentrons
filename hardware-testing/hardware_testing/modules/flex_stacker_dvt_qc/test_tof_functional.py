@@ -71,17 +71,18 @@ async def test_tof_sensors_labware_detection(
     print(f"Getting histogram for {sensor}.")
     bins = [40, 80]
     zones = [0,1,2,3]
-    await stacker._driver.enable_tof_sensor(sensor, True)
+    status = await stacker._driver.get_tof_sensor_status(sensor)
+    print(status)
     histogram = await stacker._driver.get_tof_histogram(sensor)
-    detected = not labware_detected(histogram, sensor, bins, zones)
-    measurement = {k: v for k, v in histogram.bins.items() if k not in zones}
+    detected = not labware_detected(histogram.bins, sensor, bins, zones)
     report(
         section,
         f"tof-{sensor.name}-histogram-{labware}",
         [
             detected,
+            "HISTOGRAM",
             CSVResult.from_bool(detected),
-            measurement,
+            histogram.bins,
         ],
     )
 
@@ -100,7 +101,6 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     print("Test that we have no labware on the Z")
     ui.get_user_ready("Make sure there is no labware in the stacker and close the hopper door.")
     await stacker.close_latch()
-    await stacker._driver.enable_tof_sensor(TOFSensor.Z, True)
     await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.Z, "empty")
 
     print("Test that we detect tiprack on the Z")
@@ -109,7 +109,6 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
 
     print("Test that we have no labware on the X")
     ui.get_user_ready("Make sure there is no labware on the stacker gripper position.")
-    await stacker._driver.enable_tof_sensor(TOFSensor.X, True)
     await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.X, "empty")
 
     print("Test that we detect tiprack on the X")
