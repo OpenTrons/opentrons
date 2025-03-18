@@ -226,7 +226,7 @@ class MixProperties:
 
     @volume.setter
     def volume(self, new_volume: float) -> None:
-        validated_volume = validation.ensure_positive_float(new_volume)
+        validated_volume = validation.ensure_greater_than_zero_float(new_volume)
         self._volume = validated_volume
 
     def _get_shared_data_params(self) -> Optional[SharedDataMixParams]:

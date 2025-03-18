@@ -139,15 +139,15 @@ class MixParams(BaseModel):
     """Parameters for mix."""
 
     repetitions: _StrictNonNegativeInt = Field(
-        ..., description="Number of mixing repetitions."
+        ..., description="Number of mixing repetitions. 0 is valid, but no mixing will occur."
     )
-    volume: _Number = Field(..., description="Volume used for mixing, in microliters.")
+    volume: _GreaterThanZeroNumber = Field(..., description="Volume used for mixing, in microliters.")
 
 
 class MixProperties(BaseModel):
     """Mixing properties."""
 
-    enable: bool = Field(..., description="Whether mix is enabled.")
+    enable: StrictBool = Field(..., description="Whether mix is enabled.")
     params: MixParams | SkipJsonSchema[None] = Field(
         None,
         description="Parameters for the mix function.",
