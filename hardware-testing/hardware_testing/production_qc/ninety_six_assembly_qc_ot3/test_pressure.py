@@ -43,6 +43,7 @@ THRESHOLDS = {
     ),
 }
 
+PROBE_POSITIONS = [InstrumentProbeType.PRIMARY, InstrumentProbeType.SECONDARY]
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
     assert reading in PRESSURE_READINGS, f"{reading} not in PRESSURE_READINGS"
@@ -52,7 +53,7 @@ def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
-    for p in InstrumentProbeType:
+    for p in PROBE_POSITIONS:
         for r in PRESSURE_READINGS:
             tag = _get_test_tag(p, r)
             lines.append(CSVLine(tag, [float, CSVResult]))
@@ -103,7 +104,7 @@ async def run(
     home_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
 
-    for probe in InstrumentProbeType:
+    for probe in PROBE_POSITIONS:
         sensor_id = sensor_id_for_instrument(probe)
         ui.print_header(f"Sensor: {probe}")
 

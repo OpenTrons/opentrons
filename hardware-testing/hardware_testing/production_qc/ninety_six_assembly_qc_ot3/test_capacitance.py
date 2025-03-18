@@ -45,6 +45,8 @@ THRESHOLDS = {
     ),
 }
 
+PROBE_POSITIONS = [InstrumentProbeType.PRIMARY, InstrumentProbeType.SECONDARY]
+
 
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
     return f"{probe.name.lower()}-{reading}"
@@ -53,7 +55,7 @@ def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
 def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
-    for p in InstrumentProbeType:
+    for p in PROBE_POSITIONS:
         for r in PROBE_READINGS:
             lines.append(CSVLine(_get_test_tag(p, r), [float, CSVResult]))
             if "mm" in r:
@@ -118,7 +120,7 @@ async def run(
     if not api.is_simulator:
         ui.get_user_ready("REMOVE everything from the deck")
 
-    for probe in InstrumentProbeType:
+    for probe in PROBE_POSITIONS:
         # store the thresolds (for reference)
         for k in THRESHOLDS.keys():
             report(section, _get_test_tag(probe, f"{k}-min"), [THRESHOLDS[k][0]])
