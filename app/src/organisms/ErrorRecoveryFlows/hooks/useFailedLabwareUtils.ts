@@ -117,6 +117,7 @@ export function useFailedLabwareUtils({
     recentRelevantFailedLabwareCmd
   )
 
+  console.log("above: ", failedLabware)
   const failedLabwareLocations = useRelevantFailedLwLocations({
     failedLabware,
     failedCommandByRunRecord,
@@ -336,6 +337,8 @@ function getFailedLabware(
   recentRelevantPickUpTipCmd: FailedCommandRelevantLabware,
   runRecord?: Run
 ): LoadedLabware | null {
+  console.log("recentRelevantPickUpTipCmd: ", recentRelevantPickUpTipCmd)
+  //get module id from recentRelevantPickUpTipCmd.params and get module if stacker
   return (
     runRecord?.data.labware.find(
       lw => lw.id === recentRelevantPickUpTipCmd?.params.labwareId
@@ -392,6 +395,9 @@ export function useRelevantFailedLwLocations({
     detailLevel: 'slot-only',
     isOnDevice: false, // Always return the "slot XYZ" copy, which is the desktop copy.
   }
+
+  console.log("failedLabware: ", failedLabware)
+  const currLoc = failedLabware?.location // ? failedLabware["location"] : failedLabware.
 
   const displayNameCurrentLoc = getLabwareDisplayLocation({
     ...BASE_DISPLAY_PARAMS,
