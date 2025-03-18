@@ -14,54 +14,60 @@ import {
 } from './getLabwareLocation'
 
 import type { TFunction } from 'i18next'
-
-import type { AddressableAreaName, RobotType } from '@opentrons/shared-data'
 import type {
   LocationFullParams,
   LocationSlotOnlyParams,
-  SequenceSlotOnlyParams,
-  SequenceFullParams,
 } from './getLabwareLocation'
+import type {
+  AddressableAreaName,
+  LabwareLocation,
+  LabwareLocationSequence,
+} from '@opentrons/shared-data'
 
-export interface DisplayLocationSlotOnlyParams extends LocationSlotOnlyParams {
+export interface DisplayLocationSlotOnlyParams
+  extends Omit<LocationSlotOnlyParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  location?: LabwareLocation | LabwareLocationSequence | null
 }
-
-export interface DisplayLocationFullParams extends LocationFullParams {
+export interface DisplayLocationFullParams
+  extends Omit<LocationFullParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  location?: LabwareLocation | LabwareLocationSequence | null
 }
-export interface DisplaySequenceSlotOnlyParams extends SequenceSlotOnlyParams {
-  t: TFunction
-  isOnDevice?: boolean
-  robotType: RobotType
-}
-export interface DisplaySequenceFullParams extends SequenceFullParams {
-  t: TFunction
-  isOnDevice?: boolean
-  robotType: RobotType
-}
-
 export type DisplayLocationParams =
   | DisplayLocationSlotOnlyParams
   | DisplayLocationFullParams
-
-export type DisplayLocationFromSequenceParams =
-  | DisplaySequenceSlotOnlyParams
-  | DisplaySequenceFullParams
 
 // detailLevel applies to nested labware. If 'full', return copy that includes the actual peripheral that nests the
 // labware, ex, "in module XYZ in slot C1".
 // If 'slot-only', return only the slot name, ex "in slot C1".
 export function getLabwareDisplayLocation(
-  params: DisplayLocationParams | DisplayLocationFromSequenceParams
+  params: DisplayLocationParams
 ): string {
-  const { t, isOnDevice = false } = params
-  const locationResult =
-    'locationSequence' in params
-      ? getLabwareLocationFromSequence(params)
-      : getLabwareLocation(params)
+  const { t, isOnDevice = false, location } = params
+  let locationResult = Array.isArray(location)
+    ? getLabwareLocationFromSequence({
+        ...params,
+        locationSequence: location,
+      })
+    : getLabwareLocation({
+        ...params,
+        location: location ?? null,
+      })
+
+  if (Array.isArray(location)) {
+    locationResult = getLabwareLocationFromSequence({
+      ...params,
+      locationSequence: location as LabwareLocationSequence,
+    })
+  } else if (location != null) {
+    locationResult = getLabwareLocation({
+      ...params,
+      location: location as LabwareLocation,
+    })
+  }
   if (locationResult == null) {
     return ''
   }
@@ -75,6 +81,10 @@ export function getLabwareDisplayLocation(
 
   if (slotName === 'offDeck' || slotName === 'systemLocation') {
     return t('off_deck')
+  } else if (slotName === 'systemLocation') {
+    // returning system location for slot name which we'll use to swap out
+    // run log copy, this should never reach the user
+    return slotName
   }
   // Simple slot location
   else if (moduleModel == null && adapterName == null) {

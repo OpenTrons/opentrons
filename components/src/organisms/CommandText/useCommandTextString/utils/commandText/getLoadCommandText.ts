@@ -5,6 +5,8 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
   getPipetteSpecsV2,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
 import { getPipetteNameOnMount } from '../getPipetteNameOnMount'
@@ -43,32 +45,29 @@ export const getLoadCommandText = ({
         getModuleType(command.params.model),
         robotType
       )
+      let slotName = command.params.location.slotName
+      if (
+        THERMOCYCLER_MODULE_V2 === command.params.model ||
+        THERMOCYCLER_MODULE_V1 === command.params.model
+      ) {
+        slotName = 'A1 + B1'
+      }
       return t('load_module_protocol_setup', {
         count: occludedSlotCount,
         module: getModuleDisplayName(command.params.model),
-        slot_name: command.params.location.slotName,
+        slot_name: slotName,
       })
     }
     case 'loadLid':
     case 'loadLabware': {
-      const location =
-        command.result?.locationSequence != null
-          ? getLabwareDisplayLocation({
-              locationSequence: command.result.locationSequence,
-              robotType,
-              allRunDefs,
-              loadedLabwares: commandTextData?.labware ?? [],
-              loadedModules: commandTextData?.modules ?? [],
-              t,
-            })
-          : getLabwareDisplayLocation({
-              location: command.params.location,
-              robotType,
-              allRunDefs,
-              loadedLabwares: commandTextData?.labware ?? [],
-              loadedModules: commandTextData?.modules ?? [],
-              t,
-            })
+      const location = getLabwareDisplayLocation({
+        location: command.result?.locationSequence ?? command.params.location,
+        robotType,
+        allRunDefs,
+        loadedLabwares: commandTextData?.labware ?? [],
+        loadedModules: commandTextData?.modules ?? [],
+        t,
+      })
       const labwareName =
         'displayName' in command.params && command.params.displayName != null
           ? command.params.displayName
@@ -98,7 +97,7 @@ export const getLoadCommandText = ({
       const location =
         command.result?.stackLocationSequence != null
           ? getLabwareDisplayLocation({
-              locationSequence: command.result.stackLocationSequence,
+              location: command.result.stackLocationSequence,
               robotType,
               allRunDefs,
               loadedLabwares: commandTextData?.labware ?? [],

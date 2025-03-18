@@ -22,7 +22,7 @@ export function getMoveLabwareCommandText({
     command.result?.immediateDestinationLocationSequence != null
   ) {
     oldDisplayLocation = getLabwareDisplayLocation({
-      locationSequence: command.result.originLocationSequence,
+      location: command.result.originLocationSequence,
       robotType,
       allRunDefs,
       loadedLabwares: commandTextData?.labware ?? [],
@@ -30,7 +30,7 @@ export function getMoveLabwareCommandText({
       t,
     })
     newDisplayLocation = getLabwareDisplayLocation({
-      locationSequence: command.result.immediateDestinationLocationSequence,
+      location: command.result.immediateDestinationLocationSequence,
       robotType,
       allRunDefs,
       loadedLabwares: commandTextData?.labware ?? [],
@@ -48,7 +48,7 @@ export function getMoveLabwareCommandText({
         : null
 
     oldDisplayLocation = getLabwareDisplayLocation({
-      location: oldLocation?.location ?? null,
+      location: oldLocation?.location,
       robotType,
       allRunDefs,
       loadedLabwares: commandTextData?.labware ?? [],
@@ -71,6 +71,14 @@ export function getMoveLabwareCommandText({
   )
     ? 'Waste Chute'
     : newDisplayLocation
+
+  // system location is an off deck location we create lid stacks in and
+  // move them to and should not be exposed to the user
+  if (oldDisplayLocation === 'systemLocation') {
+    return t('move_lid_stack_to_deck', { slot_name: newDisplayLocation })
+  } else if (newDisplayLocation === 'systemLocation') {
+    return t('move_lid_stack_from_deck', { slot_name: oldDisplayLocation })
+  }
 
   return strategy === 'usingGripper'
     ? t('move_labware_using_gripper', {

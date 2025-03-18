@@ -22,26 +22,14 @@ export function getMoveToWellCommandText({
       ? getFinalLabwareLocation(labwareId, allPreviousCommands)
       : null
 
-  let displayLocation = ''
-  if (labwareLocation?.locationSequence != null) {
-    displayLocation = getLabwareDisplayLocation({
-      loadedLabwares: commandTextData?.labware ?? [],
-      locationSequence: labwareLocation.locationSequence,
-      robotType,
-      allRunDefs,
-      loadedModules: commandTextData?.modules ?? [],
-      t,
-    })
-  } else {
-    displayLocation = getLabwareDisplayLocation({
-      loadedLabwares: commandTextData?.labware ?? [],
-      location: labwareLocation?.location ?? null,
-      robotType,
-      allRunDefs,
-      loadedModules: commandTextData?.modules ?? [],
-      t,
-    })
-  }
+  const displayLocation = getLabwareDisplayLocation({
+    loadedLabwares: commandTextData?.labware ?? [],
+    location: labwareLocation?.locationSequence ?? labwareLocation?.location,
+    robotType,
+    allRunDefs,
+    loadedModules: commandTextData?.modules ?? [],
+    t,
+  })
 
   return t('move_to_well', {
     well_name: wellName,
