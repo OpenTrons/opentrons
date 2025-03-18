@@ -139,9 +139,12 @@ class MixParams(BaseModel):
     """Parameters for mix."""
 
     repetitions: _StrictNonNegativeInt = Field(
-        ..., description="Number of mixing repetitions. 0 is valid, but no mixing will occur."
+        ...,
+        description="Number of mixing repetitions. 0 is valid, but no mixing will occur.",
     )
-    volume: _GreaterThanZeroNumber = Field(..., description="Volume used for mixing, in microliters.")
+    volume: _GreaterThanZeroNumber = Field(
+        ..., description="Volume used for mixing, in microliters."
+    )
 
 
 class MixProperties(BaseModel):
