@@ -44,7 +44,7 @@ EvotipSealPipetteCommandType = Literal["evotipSealPipette"]
 _PREP_DISTANCE_DEFAULT = 8.25
 _PRESS_DISTANCE_DEFAULT = 3.5
 _EJECTOR_PUSH_MM_DEFAULT = 7.0
-_SAFE_TOP_VOLUME = 400
+_SAFE_TOP_VOLUME = 1000
 
 
 class TipPickUpParams(BaseModel):
