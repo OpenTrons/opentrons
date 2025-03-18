@@ -98,6 +98,14 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
     await stacker.home_axis(StackerAxis.Z, Direction.RETRACT)
 
+    print("Test that we have no labware on the X")
+    ui.get_user_ready("Make sure there is no labware on the stacker gripper position.")
+    await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.X, "empty")
+
+    print("Test that we detect tiprack on the X")
+    ui.get_user_ready("Add 1 tiprack to the stacker X.")
+    await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.X, "tiprack")
+
     print("Test that we have no labware on the Z")
     ui.get_user_ready("Make sure there is no labware in the stacker and close the hopper door.")
     await stacker.close_latch()
@@ -107,10 +115,3 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     ui.get_user_ready("Add 1 tiprack to the stacker Z and close the hopper door.")
     await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.Z, "tiprack")
 
-    print("Test that we have no labware on the X")
-    ui.get_user_ready("Make sure there is no labware on the stacker gripper position.")
-    await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.X, "empty")
-
-    print("Test that we detect tiprack on the X")
-    ui.get_user_ready("Add 1 tiprack to the stacker X.")
-    await test_tof_sensors_labware_detection(stacker, report, section, TOFSensor.X, "tiprack")
