@@ -49,7 +49,7 @@ export interface LoadLidStackRunTimeCommand
 }
 export interface StackerRetriveCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/retrieve'
-  params: LoadLidStackParams
+  params: StackerRetriveParams
 }
 export interface StackerRetriveRunTimeCommand
   extends CommonCommandRunTimeInfo,
@@ -292,6 +292,14 @@ interface LoadLidStackParams {
   namespace: string
   version: number
   quantity: number
+}
+
+interface StackerRetriveParams {
+  moduleId: string
+  labwareId?: string
+  displayName?: string
+  adapterId?: string
+  lidId?: string
 }
 
 interface LoadLidStackResult {
