@@ -9,12 +9,16 @@ from hardware_testing.data.csv_report import (
 )
 
 from .driver import FlexStackerInterface as FlexStacker, FlexStackerStallError
-from opentrons.drivers.flex_stacker.driver import STACKER_MOTION_CONFIG
+from opentrons.drivers.flex_stacker.driver import (
+    STACKER_MOTION_CONFIG,
+    STALLGUARD_CONFIG,
+)
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
 TEST_AXIS = StackerAxis.Z
 HOME_SPEED = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].move_params.max_speed
 HOME_CURRENT = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].run_current
+STALLTHRESHOLD = STALLGUARD_CONFIG[TEST_AXIS].threshold
 
 TEST_SPEEDS = [150, 165]  # mm/s
 TEST_CURRENTS = [1.5, 1.0, 0.7, 0.6, 0.5]  # A rms
@@ -171,6 +175,7 @@ async def test_retract_cycle(
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
+    await stacker._driver.set_stallguard_threshold(TEST_AXIS, False, STALLTHRESHOLD)
     for speed in TEST_SPEEDS:
         for current in TEST_CURRENTS:
             tag = f"speed-{speed}-current-{current}"
@@ -225,4 +230,5 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
                 )
                 return
     # End test in home position
+    await stacker._driver.set_stallguard_threshold(TEST_AXIS, True, STALLTHRESHOLD)
     await stacker.home_axis(TEST_AXIS, Direction.RETRACT)

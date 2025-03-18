@@ -9,12 +9,16 @@ from hardware_testing.data.csv_report import (
 )
 
 from .driver import FlexStackerInterface as FlexStacker, FlexStackerStallError
-from opentrons.drivers.flex_stacker.driver import STACKER_MOTION_CONFIG
+from opentrons.drivers.flex_stacker.driver import (
+    STACKER_MOTION_CONFIG,
+    STALLGUARD_CONFIG,
+)
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
 TEST_AXIS = StackerAxis.X
 HOME_SPEED = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].move_params.max_speed
 HOME_CURRENT = STACKER_MOTION_CONFIG[TEST_AXIS]["home"].run_current
+STALLTHRESHOLD = STALLGUARD_CONFIG[TEST_AXIS].threshold
 
 TEST_SPEEDS = [200, 220]  # mm/s
 TEST_CURRENTS = [1.5, 0.7, 0.5, 0.4, 0.3]  # A rms
@@ -103,6 +107,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     # Home to retract position if we are not already on the switch
     if not await stacker._driver.get_limit_switch(TEST_AXIS, Direction.RETRACT):
         await stacker.home_axis(TEST_AXIS, Direction.RETRACT)
+    await stacker._driver.set_stallguard_threshold(TEST_AXIS, False, STALLTHRESHOLD)
     for speed in TEST_SPEEDS:
         for current in TEST_CURRENTS:
             tag = f"speed-{speed}-current-{current}"
@@ -161,5 +166,6 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
                 )
                 return
 
+    await stacker._driver.set_stallguard_threshold(TEST_AXIS, True, STALLTHRESHOLD)
     # End test in gripper position
     await stacker.home_axis(TEST_AXIS, Direction.EXTEND)
