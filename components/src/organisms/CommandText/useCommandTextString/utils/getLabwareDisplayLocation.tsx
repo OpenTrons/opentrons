@@ -66,7 +66,12 @@ export function getLabwareDisplayLocation(
     return ''
   }
 
-  const { slotName, moduleModel, adapterName } = locationResult
+  const { slotName: initialSlotName, moduleModel, adapterName } = locationResult
+  const slotName =
+    moduleModel === THERMOCYCLER_MODULE_V1 ||
+    moduleModel === THERMOCYCLER_MODULE_V2
+      ? 'A1+B1'
+      : initialSlotName
 
   if (slotName === 'offDeck' || slotName === 'systemLocation') {
     return t('off_deck')
@@ -79,10 +84,7 @@ export function getLabwareDisplayLocation(
   // Module location without adapter
   else if (moduleModel != null && adapterName == null) {
     if (params.detailLevel === 'slot-only') {
-      return moduleModel === THERMOCYCLER_MODULE_V1 ||
-        moduleModel === THERMOCYCLER_MODULE_V2
-        ? t('slot', { slot_name: 'A1+B1' })
-        : t('slot', { slot_name: slotName })
+      return t('slot', { slot_name: slotName })
     } else {
       return isOnDevice
         ? `${getModuleDisplayName(moduleModel)}, ${slotName}`

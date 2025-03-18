@@ -77,6 +77,7 @@ export function getLabwareLocationFromSequence(
     (acc, sequenceItem, index) => {
       if (sequenceItem.kind === 'notOnDeck') {
         return {
+          ...acc,
           slotName: sequenceItem.logicalLocationName,
         }
       } else if (sequenceItem.kind === 'onCutoutFixture') {
@@ -94,6 +95,7 @@ export function getLabwareLocationFromSequence(
           ))
       ) {
         return {
+          ...acc,
           slotName: sequenceItem.addressableAreaName,
         }
       } else if (
@@ -103,18 +105,22 @@ export function getLabwareLocationFromSequence(
         const slotName = getSlotFromAddressableAreaName(
           sequenceItem.addressableAreaName as AddressableAreaName
         )
-        if (detailLevel === 'slot-only') {
-          return {
-            slotName,
-          }
+        const moduleModel = getModuleModelFromAddressableArea(
+          sequenceItem.addressableAreaName as AddressableAreaName
+        )
+        return {
+          ...acc,
+          slotName,
+          moduleModel: moduleModel ?? undefined,
+        }
+      } else if (sequenceItem.kind === 'onModule') {
+        const moduleModel = getModuleModel(loadedModules, sequenceItem.moduleId)
+        if (moduleModel == null) {
+          console.error('labware is located on an unknown module model')
         } else {
-          const moduleModel = getModuleModelFromAddressableArea(
-            sequenceItem.addressableAreaName as AddressableAreaName
-          )
           return {
             ...acc,
-            slotName,
-            moduleModel: moduleModel ?? undefined,
+            moduleModel,
           }
         }
       } else if (detailLevel === 'full') {
@@ -136,19 +142,6 @@ export function getLabwareLocationFromSequence(
             return {
               ...acc,
               adapterName: nestedLabwareName,
-            }
-          }
-        } else if (sequenceItem.kind === 'onModule') {
-          const moduleModel = getModuleModel(
-            loadedModules,
-            sequenceItem.moduleId
-          )
-          if (moduleModel == null) {
-            console.error('labware is located on an unknown module model')
-          } else {
-            return {
-              ...acc,
-              moduleModel,
             }
           }
         }
