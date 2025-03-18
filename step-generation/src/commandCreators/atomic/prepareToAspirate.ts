@@ -2,8 +2,14 @@ import { uuid } from '../../utils'
 import type { CommandCreator } from '../../types'
 import type { PrepareToAspirateParams } from '@opentrons/shared-data'
 
-export const prepareToAspirate: CommandCreator<PrepareToAspirateParams> = args => {
+export const prepareToAspirate: CommandCreator<PrepareToAspirateParams> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
   const { pipetteId } = args
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
 
   const commands = [
     {
@@ -16,5 +22,6 @@ export const prepareToAspirate: CommandCreator<PrepareToAspirateParams> = args =
   ]
   return {
     commands,
+    python: `${pipettePythonName}.prepare_to_aspirate()`,
   }
 }
