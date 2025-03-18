@@ -43,16 +43,14 @@ export const touchTip: CommandCreator<TouchTipParams> = (
     invariantContext.pipetteEntities[pipetteId].pythonName
   const labwarePythonName =
     invariantContext.labwareEntities[labwareId].pythonName
-  const pythonOffset =
-    wellLocation?.offset?.z != null
-      ? `v_offset=${wellLocation?.offset?.z},`
-      : null
-  const pythonSpeed = speed != null ? `speed=${speed},` : null
+
   const pythonArgs = [
     `${labwarePythonName}[${formatPyStr(wellName)}],`,
-    pythonOffset,
-    pythonSpeed,
-  ].filter(arg => arg != null)
+    ...(wellLocation?.offset?.z != null
+      ? [`v_offset=${wellLocation?.offset?.z},`]
+      : []),
+    ...(speed != null ? [`speed=${speed},`] : []),
+  ]
 
   //  TODO: add mmFromEdge to python and commandCreator
   const python = `${pipettePythonName}.touch_tip(\n${indentPyLines(
