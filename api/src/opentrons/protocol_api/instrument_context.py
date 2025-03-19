@@ -1867,38 +1867,33 @@ class InstrumentContext(publisher.CommandPublisher):
 
         The ``location`` provided is where the liquid will be dispensed into.
 
-        Resin tips use pressure-based dispensing rather than isobaric volume-displacement
-        pipetting. The volume and rate parameters to this function control the motion of
-        the plunger to create a desired pressure profile inside the pipette chamber. The
-        volume and rate parameters to this function do not directly relate to the volume
-        of liquid dispensed from the resin tips or the flow rate of liquid from the resin
-        tips. Values for the volume and rate of this function should be selected based on
-        experimentation with the resin tips to provide a pressure profile.
+        The volume and rate parameters for this function control the motion of the plunger
+        to create a desired pressure profile inside the pipette chamber. Unlike a regular
+        dispense action, the volume and rate do not correspond to liquid volume or flow rate
+        dispensed from the resin tips. Select your values for volume and flow rate based on
+        experimentation with the resin tips to create a pressure profile.
 
         The common way to use this function is as follows:
-        1. Seal resin tips to the pipette using :py:meth:`resin_tip_seal`.
-        2. Use :py:meth:`resin_dip_dispense` to displace an experimentally derived volume
-           at an experimentally derived rate to create an experimentally derived target
-           pressure inside the pipette.
-        3. Use :py:meth:`delay()` to wait an experimentally derived amount of time for
-           the pressure inside the pipette to push liquid into and through the resin tip
+        #. Seal resin tips to the pipette using :py:meth:`InstrumentContext.resin_tip_seal`.
+
+        #. Use :py:meth:`InstrumentContext.resin_tip_dispense` to displace an experimentally
+           derived volume at an experimentally derived rate to create an experimentally derived
+           target pressure inside the pipette.
+
+        #. Use :py:meth:`ProtocolContext.delay` to wait an experimentally derived amount of
+           time for the pressure inside the pipette to push liquid into and through the resin tip
            and out the other side.
-        4. As liquid passes through the resin tip, the pressure inside the pipette will
+
+        #. As liquid passes through the resin tip, the pressure inside the pipette will
            fall. If not all liquid has been dispensed from the resin tip, repeat steps 2
            and 3.
-        5. Unseal resin tips from the pipette using :py:meth:`resin_tip_unseal`.
 
-        On the Opentrons Flex, the pipette pressure sensors will raise an overpressure
-        error if they sense a differential pressure inside the pipette chamber above the
-        sensor limits. This sensor limit may be lower than the pressure required to
-        dispense liquid from the resin tip, requiring the pressure sensor to be disabled.
+        #. Unseal resin tips from the pipette using :py:meth:`InstrumentContext.resin_tip_unseal`.
 
-        If the pressure sensor is disabled, this function can easily create a pressure
-        condition inside the pipette chamber that will damage the pressure sensor's
-        diaphragm, making it fail to return valid pressure sensor readings. It is also
-        possible to create a pressure condition inside the pipette chamber that will
-        burst the pressure sensor's diaphragm, which will cause the pipette to be unable
-        to hold liquid or to reach a non-ambient pressure condition internally.
+        Flex pipette pressure sensors will raise an overpressure when a differential pressure
+        inside the pipette chamber above sensor limits is detected. You may need to disable the
+        pressure sensor to create the required pressure profile, which can cause damage or
+        failure to your pipette's pressure sensors.
 
         :param location: The location into which to dispense.
         :type location: :py:class:`~.types.Location`
@@ -1913,7 +1908,6 @@ class InstrumentContext(publisher.CommandPublisher):
                      :py:attr:`flow_rate.dispense<flow_rate>`. Does not directly relate to
                      the flow rate of liquid out of the resin tip.
         :type rate: float
-
         """
         well: Optional[labware.Well] = None
         last_location = self._get_last_location_by_api_version()
