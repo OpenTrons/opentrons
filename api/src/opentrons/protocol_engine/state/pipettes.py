@@ -11,7 +11,6 @@ from typing import (
     Optional,
     Tuple,
     cast,
-    Union,
 )
 
 from typing_extensions import assert_never
@@ -333,19 +332,17 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _update_volumes(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_aspirated_fluid == update_types.NO_CHANGE:
             return
-        # if this is updating to anything but clean mark the tip as unclean
-        if state_update.pipette_aspirated_fluid.type != "clean":
-            self._state.has_clean_tips_by_id[
-                state_update.pipette_aspirated_fluid.pipette_id
-            ] = False
+        # set the tip state to unclean, if an "empty" update has a clean_tip flag
+        # it will set it to true
+        self._state.has_clean_tips_by_id[
+            state_update.pipette_aspirated_fluid.pipette_id
+        ] = False
 
         if state_update.pipette_aspirated_fluid.type == "aspirated":
             self._update_aspirated(state_update.pipette_aspirated_fluid)
         elif state_update.pipette_aspirated_fluid.type == "ejected":
             self._update_ejected(state_update.pipette_aspirated_fluid)
         elif state_update.pipette_aspirated_fluid.type == "empty":
-            self._update_empty(state_update.pipette_aspirated_fluid)
-        elif state_update.pipette_aspirated_fluid.type == "clean":
             self._update_empty(state_update.pipette_aspirated_fluid)
         elif state_update.pipette_aspirated_fluid.type == "unknown":
             self._update_unknown(state_update.pipette_aspirated_fluid)
@@ -365,13 +362,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _update_ejected(self, update: update_types.PipetteEjectedFluidUpdate) -> None:
         self._fluid_stack_log_if_empty(update.pipette_id).remove_fluid(update.volume)
 
-    def _update_empty(
-        self,
-        update: Union[
-            update_types.PipetteEmptyFluidUpdate, update_types.PipetteCleanFluidUpdate
-        ],
-    ) -> None:
+    def _update_empty(self, update: update_types.PipetteEmptyFluidUpdate) -> None:
         self._state.pipette_contents_by_id[update.pipette_id] = fluid_stack.FluidStack()
+        self._state.has_clean_tips_by_id[update.pipette_id] = update.clean_tip
 
     def _update_unknown(self, update: update_types.PipetteUnknownFluidUpdate) -> None:
         self._state.pipette_contents_by_id[update.pipette_id] = None

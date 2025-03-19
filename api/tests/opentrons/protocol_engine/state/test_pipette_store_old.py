@@ -282,7 +282,7 @@ def test_handles_pick_up_and_drop_tip(subject: PipetteStore) -> None:
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                    pipette_id="abc"
+                    pipette_id="abc", clean_tip=True
                 ),
             ),
         )
@@ -338,7 +338,7 @@ def test_handles_drop_tip_in_place(subject: PipetteStore) -> None:
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                    pipette_id="xyz"
+                    pipette_id="xyz", clean_tip=False
                 ),
             ),
         )
@@ -393,7 +393,7 @@ def test_handles_unsafe_drop_tip_in_place(subject: PipetteStore) -> None:
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                    pipette_id="xyz"
+                    pipette_id="xyz", clean_tip=False
                 ),
             ),
         )
@@ -455,7 +455,7 @@ def test_aspirate_adds_volume(subject: PipetteStore) -> None:
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                    pipette_id="pipette-id"
+                    pipette_id="pipette-id", clean_tip=True
                 ),
             ),
         )
@@ -512,7 +512,7 @@ def test_dispense_subtracts_volume(subject: PipetteStore) -> None:
                     tip_geometry=TipGeometry(volume=47, length=101, diameter=8.0),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                    pipette_id="pipette-id"
+                    pipette_id="pipette-id", clean_tip=True
                 ),
             ),
         )
@@ -569,7 +569,7 @@ def test_blow_out_clears_volume(subject: PipetteStore) -> None:
                     tip_geometry=TipGeometry(volume=47, length=101, diameter=8.0),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                    pipette_id="pipette-id"
+                    pipette_id="pipette-id", clean_tip=True
                 ),
             ),
         )
@@ -739,7 +739,7 @@ def test_prepare_to_aspirate_marks_pipette_ready(
                     tip_geometry=TipGeometry(volume=42, length=101, diameter=8.0),
                 ),
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                    pipette_id="xyz"
+                    pipette_id="xyz", clean_tip=True
                 ),
             ),
         )
@@ -754,7 +754,7 @@ def test_prepare_to_aspirate_marks_pipette_ready(
             command=dummy_command,
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                    pipette_id="pipette-id"
+                    pipette_id="pipette-id", clean_tip=False
                 )
             ),
         )
