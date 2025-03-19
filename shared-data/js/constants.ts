@@ -659,6 +659,11 @@ export const DEPRECATED_WHALE_GREY = '#9395a0'
 // react code because the web worker context does not play nicely with react
 export const INTERACTIVE_WELL_DATA_ATTRIBUTE = 'data-wellname'
 
+export const WELL_TOP: 'well-top' = 'well-top'
+export const WELL_CENTER: 'well-center' = 'well-center'
+export const WELL_BOTTOM: 'well-bottom' = 'well-bottom'
+export const LIQUID_MENISCUS: 'liquid-meniscus' = 'liquid-meniscus'
+
 export const PIPETTE_NAMES_MAP: Record<PipetteName, string> = {
   p10_single: 'p10_single',
   p10_multi: 'p10_multi',

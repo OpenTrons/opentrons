@@ -33,7 +33,7 @@ import {
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
-
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   ConsolidateArgs,
   CommandCreator,
@@ -183,16 +183,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
 
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'wasteChute'
-  const isTrashBin =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'trashBin'
+  const dropTipEntity =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  const isWasteChute = dropTipEntity?.name === 'wasteChute'
+  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -481,7 +475,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       }
       if (isTrashBin) {
         dropTipCommand = [
-          curryCommandCreator(dropTipInTrash, { pipetteId: args.pipette }),
+          curryCommandCreator(dropTipInTrash, {
+            pipetteId: args.pipette,
+            trashLocation: dropTipEntity.location as CutoutId,
+          }),
         ]
       }
 

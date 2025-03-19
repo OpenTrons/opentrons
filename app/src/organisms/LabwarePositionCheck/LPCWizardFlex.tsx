@@ -12,10 +12,7 @@ import {
 import { LPCRobotInMotion } from './LPCRobotInMotion'
 import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
-import {
-  useLPCCommands,
-  useLPCInitialState,
-} from '/app/organisms/LabwarePositionCheck/hooks'
+import { useLPCCommands } from '/app/organisms/LabwarePositionCheck/hooks'
 import {
   closeLPC,
   proceedStep as proceedStepDispatch,
@@ -32,8 +29,6 @@ import type { LPCStep } from '/app/redux/protocol-runs'
 export interface LPCWizardFlexProps extends Omit<LPCFlowsProps, 'robotType'> {}
 
 export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
-  const { onCloseClick, ...rest } = props
-
   const proceedStep = (toStep?: LPCStep): void => {
     dispatch(proceedStepDispatch(props.runId, toStep))
   }
@@ -44,10 +39,7 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   const dispatch = useDispatch()
   const LPCHandlerUtils = useLPCCommands({
     ...props,
-    onCloseClick,
   })
-
-  useLPCInitialState({ ...rest })
 
   // Clean up state on LPC close.
   useEffect(() => {

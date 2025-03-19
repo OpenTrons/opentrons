@@ -77,15 +77,8 @@ describe(`test labware definitions with schema v3`, () => {
       const valid = validate(labwareDef)
       const validationErrors = validate.errors
 
-      // FIXME(mm, 2025-02-04): These new definitions have a displayCategory that
-      // the schema does not recognize. Either they need to change or the schema does.
-      const expectFailure = ['protocol_engine_lid_stack_object'].includes(
-        labwareDef.parameters.loadName
-      )
-
-      if (expectFailure) expect(validationErrors).not.toBe(null)
-      else expect(validationErrors).toBe(null)
-      expect(valid).toBe(!expectFailure)
+      expect(validationErrors).toBe(null)
+      expect(valid).toBe(true)
     })
 
     checkGeometryDefinitions(labwareDef)

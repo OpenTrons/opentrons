@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 
-import { getIsTiprack } from '@opentrons/shared-data'
+import { getIsTiprack, getLabwareDefURI } from '@opentrons/shared-data'
 
 import { getItemLabwareDef, getSelectedLabwareDefFrom } from '../transforms'
 import {
@@ -76,6 +76,31 @@ export const selectSelectedLwDisplayName = (
     }
   )
 
+// Returns the display name for a labware, if any.
+export const selectLwDisplayName = (
+  runId: string,
+  uri: string
+): Selector<State, string> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareDefs,
+    lwDefs => {
+      if (lwDefs == null) {
+        console.warn('Cannot access invalid labware')
+        return ''
+      } else {
+        const matchingLw = lwDefs.find(def => getLabwareDefURI(def) === uri)
+        if (matchingLw == null) {
+          console.error(
+            `Expected to find a matching lw def but did not for ${uri}`
+          )
+          return ''
+        } else {
+          return matchingLw.metadata.displayName
+        }
+      }
+    }
+  )
+
 // Returns whether the user-selected labware is a tiprack.
 // Returns false if there is no user-selected labware.
 export const selectIsSelectedLwTipRack = (
@@ -84,33 +109,6 @@ export const selectIsSelectedLwTipRack = (
   createSelector(
     (state: State) => getSelectedLabwareDefFrom(runId, state),
     def => (def != null ? getIsTiprack(def) : false)
-  )
-
-// Returns the associated adapter display name for the user-selected labware, if any.
-export const selectSelectedLwRelatedAdapterDisplayName = (
-  runId: string
-): Selector<State, string> =>
-  createSelector(
-    (state: State) =>
-      state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware,
-    (state: State) => state?.protocolRuns[runId]?.lpc?.labwareDefs,
-    (state: State) => state?.protocolRuns[runId]?.lpc?.protocolData,
-    (selectedLabware, labwareDefs, analysis) => {
-      const adapterId = selectedLabware?.offsetLocationDetails?.adapterId
-
-      if (selectedLabware == null || labwareDefs == null || analysis == null) {
-        console.warn('No selected labware or store not properly initialized.')
-        return ''
-      }
-
-      return adapterId != null
-        ? getItemLabwareDef({
-            labwareId: adapterId,
-            loadedLabware: analysis.labware,
-            labwareDefs,
-          })?.metadata.displayName ?? ''
-        : ''
-    }
   )
 
 // Returns the labware definition for the user-selected labware, if any.

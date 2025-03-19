@@ -23,7 +23,7 @@ import {
 import {
   selectAllLabwareInfo,
   setSelectedLabwareUri,
-  selectCountLocationSpecificOffsetsForLw,
+  selectCountNonHardcodedLocationSpecificOffsetsForLw,
   proceedEditOffsetSubstep,
   selectIsDefaultOffsetMissing,
 } from '/app/redux/protocol-runs'
@@ -162,7 +162,7 @@ function LabwareItem({
     selectIsDefaultOffsetMissing(runId, uri)
   )
   const countLocationSpecificOffsets = useSelector(
-    selectCountLocationSpecificOffsetsForLw(runId, uri)
+    selectCountNonHardcodedLocationSpecificOffsetsForLw(runId, uri)
   )
   const isOnDevice = useSelector(getIsOnDevice)
 
