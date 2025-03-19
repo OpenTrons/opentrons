@@ -6,7 +6,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_CENTER,
   JUSTIFY_FLEX_END,
   SPACING,
   ToggleGroup,
