@@ -25,7 +25,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.21",
+    "apiLevel": "2.22",
 }
 
 # SCRIPT SETTINGS
@@ -74,7 +74,7 @@ def run(protocol: ProtocolContext) -> None:
     deck_riser = protocol.params.deck_riser  # type: ignore[attr-defined]
     trash_lid = protocol.params.trash_lid  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "01")
+    helpers.comment_protocol_version(protocol, "02")
 
     unused_lids: List[Labware] = []
     used_lids: List[Labware] = []
@@ -151,21 +151,22 @@ def run(protocol: ProtocolContext) -> None:
     ) -> None:
         """Determine which wells to use as liquid waste."""
         remaining_volume = vol_to_trash
-        max_capacity = 1500.0
-        # Determine liquid waste location depending on current total volume
-        # Distribute the liquid volume sequentially
+        max_capacity = 1500.0  # Maximum capacity of a well in µL
         for well, current_volume in liquid_trash_list.items():
-            if remaining_volume <= 0.0:
+            if remaining_volume <= 0 or pipette.current_volume == 0.0:
                 break
             available_capacity = max_capacity - current_volume
-            if available_capacity < remaining_volume:
-                continue
-            pipette.dispense(remaining_volume, well.top())
-            protocol.delay(minutes=0.1)
-            pipette.blow_out(well.top())
-            liquid_trash_list[well] += remaining_volume
-            if pipette.current_volume <= 0.0:
-                break
+            if available_capacity >= 0:
+                dispense_volume = min(
+                    remaining_volume, available_capacity
+                )  # Take the minimum of what's left and available space
+                pipette.dispense(dispense_volume, well.top())
+                protocol.delay(minutes=0.1)
+                pipette.blow_out(well.top())
+
+                # Update the tracking dictionary
+                liquid_trash_list[well] += dispense_volume
+                remaining_volume -= dispense_volume  # Reduce the remaining volume
 
     # Will Be distributed during the protocol
     EEW_1 = sample_plate_2.wells_by_name()["A9"]
@@ -301,9 +302,8 @@ def run(protocol: ProtocolContext) -> None:
             for loop, X in enumerate(column_1_list):
                 p50.pick_up_tip()
                 p50.aspirate(PanelVol, Panel.bottom(z=dot_bottom))  # original = ()
-                p50.dispense(
-                    PanelVol, sample_plate_1[X].bottom(z=dot_bottom)
-                )  # original = ()
+                p50.dispense(PanelVol, sample_plate_1[X].bottom(z=dot_bottom))
+                # original = ()
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -541,7 +541,9 @@ def run(protocol: ProtocolContext) -> None:
                     protocol.delay(minutes=0.1)
                     p1000.move_to(sample_plate_2[X].bottom(z=0.5))
                     p1000.aspirate(100, rate=0.25)
-                    trash_liquid(protocol, p1000, RemoveSup, liquid_trash_list)
+                    trash_liquid(
+                        protocol, p1000, float(p1000.current_volume), liquid_trash_list
+                    )
                     p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
@@ -607,7 +609,9 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2[X].bottom(z=0.5))
                 p1000.aspirate(100, rate=0.25)
                 p1000.move_to(sample_plate_2[X].top(z=0.5))
-                trash_liquid(protocol, p1000, 100, liquid_trash_list)
+                trash_liquid(
+                    protocol, p1000, float(p1000.current_volume), liquid_trash_list
+                )
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
@@ -618,7 +622,9 @@ def run(protocol: ProtocolContext) -> None:
                 p50.move_to(sample_plate_2[X].bottom(z=dot_bottom))  # original = z=0
                 p50.aspirate(50, rate=0.25)
                 p50.default_speed = 200
-                trash_liquid(protocol, p50, 50, liquid_trash_list)
+                trash_liquid(
+                    protocol, p50, float(p50.current_volume), liquid_trash_list
+                )
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -853,7 +859,9 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.default_speed = 5
                 p1000.move_to(sample_plate_2[X].top(z=2))
                 p1000.default_speed = 200
-                trash_liquid(protocol, p1000, 200, liquid_trash_list)
+                trash_liquid(
+                    protocol, p1000, float(p1000.current_volume), liquid_trash_list
+                )
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
@@ -867,8 +875,7 @@ def run(protocol: ProtocolContext) -> None:
                     p1000.move_to(EtOH.top(z=0))
                     p1000.move_to(EtOH.top(z=-5))
                     p1000.move_to(EtOH.top(z=0))
-                    p1000.move_to(sample_plate_2[X].top(z=-2))
-                    p1000.dispense(ETOHMaxVol, rate=1)
+                    p1000.dispense(ETOHMaxVol, sample_plate_2[X].top(z=-2), rate=1)
                     protocol.delay(minutes=0.1)
                     p1000.blow_out()
                     p1000.move_to(sample_plate_2[X].top(z=5))
@@ -892,7 +899,9 @@ def run(protocol: ProtocolContext) -> None:
                     p1000.default_speed = 5
                     p1000.move_to(sample_plate_2[X].top(z=2))
                     p1000.default_speed = 200
-                    trash_liquid(protocol, p1000, RemoveSup, liquid_trash_list)
+                    trash_liquid(
+                        protocol, p1000, float(p1000.current_volume), liquid_trash_list
+                    )
                     p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
@@ -908,7 +917,9 @@ def run(protocol: ProtocolContext) -> None:
                 )  # original = (z=0)
                 p1000.aspirate(50, rate=0.25)
                 p1000.default_speed = 200
-                trash_liquid(protocol, p1000, 50, liquid_trash_list)
+                trash_liquid(
+                    protocol, p1000, float(p1000.current_volume), liquid_trash_list
+                )
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
@@ -945,9 +956,12 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.dispense(
                     RSBVol, sample_plate_2.wells_by_name()[X].center(), rate=1
                 )
-                p1000.move_to(sample_plate_2.wells_by_name()[X].bottom(z=1))
-                p1000.aspirate(RSBVol, rate=1)
-                p1000.dispense(RSBVol, rate=1)
+                p1000.aspirate(
+                    RSBVol, sample_plate_2.wells_by_name()[X].bottom(z=1), rate=1
+                )
+                p1000.dispense(
+                    RSBVol, sample_plate_2.wells_by_name()[X].bottom(z=1), rate=1
+                )
 
                 p1000.blow_out(sample_plate_2.wells_by_name()[X].center())
                 p1000.move_to(sample_plate_2.wells_by_name()[X].top(z=5))
