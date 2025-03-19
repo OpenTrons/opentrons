@@ -1,4 +1,5 @@
 """HTTP routes and handlers for /health endpoints."""
+
 from dataclasses import dataclass
 from fastapi import APIRouter, Depends, status
 from typing import Annotated, Dict, cast
@@ -168,8 +169,8 @@ async def get_health(
         board_revision=hardware.board_revision,
         logs=logs,
         system_version=versions.system_version,
-        maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION),
-        minimum_protocol_api_version=list(minimum_protocol_api_version),
+        maximum_protocol_api_version=list(protocol_api.MAX_SUPPORTED_VERSION[:2]),
+        minimum_protocol_api_version=list(minimum_protocol_api_version[:2]),
         robot_model=robot_type,
         links=health_links,
         robot_serial=(await hardware.get_serial_number()),

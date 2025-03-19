@@ -8,7 +8,6 @@ import functools
 import itertools
 import json
 import logging
-import re
 import traceback
 from io import BytesIO
 from zipfile import ZipFile
@@ -26,7 +25,7 @@ from opentrons_shared_data.robot.types import RobotType
 from opentrons.ordered_set import OrderedSet
 
 from .api_support.definitions import MIN_SUPPORTED_VERSION_FOR_FLEX
-from .api_support.types import APIVersion
+from .api_support.types import APIVersion, BadAPIVersionError
 from .types import (
     RUN_FUNCTION_MESSAGE,
     Protocol,
@@ -46,8 +45,6 @@ if TYPE_CHECKING:
 
 MODULE_LOG = logging.getLogger(__name__)
 
-# match e.g. "2.0" but not "hi", "2", "2.0.1"
-API_VERSION_RE = re.compile(r"^(\d+)\.(\d+)$")
 MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
 API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
 
@@ -181,15 +178,15 @@ def version_from_string(vstr: str) -> APIVersion:
     :returns APIVersion: The parsed version
     :raises ValueError: if the version string is the wrong format
     """
-    matches = API_VERSION_RE.match(vstr)
-    if not matches:
+    try:
+        return APIVersion.from_string(vstr)
+    except BadAPIVersionError:
         raise MalformedPythonProtocolError(
             short_message=(
                 f"apiLevel {vstr} is incorrectly formatted. It should be "
                 "major.minor, where both major and minor are numbers."
             )
         )
-    return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 
 
 def _parse_json(
@@ -514,12 +511,7 @@ def _version_from_static_python_info(
     requested_level = from_requirements or from_metadata
     if requested_level is None:
         return None
-    elif requested_level == "1":
-        # TODO(mm, 2022-10-21): Can we safely move this special case to
-        # version_from_string()?
-        return APIVersion(1, 0)
-    else:
-        return version_from_string(requested_level)
+    return version_from_string(requested_level)
 
 
 def robot_type_from_python_identifier(python_robot_type: str) -> RobotType:

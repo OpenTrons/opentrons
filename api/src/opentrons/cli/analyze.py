@@ -1,4 +1,5 @@
 """Opentrons analyze CLI."""
+
 import click
 
 from anyio import run
@@ -7,8 +8,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer, BeforeValidator
 from typing import (
+    Annotated,
     Any,
     Dict,
     List,
@@ -445,11 +447,28 @@ class JsonConfig(BaseModel):
     schemaVersion: int
 
 
+def _api_version_deser(obj: Any) -> APIVersion:
+    if obj == "experimental":
+        return APIVersion.from_string("experimental")
+    try:
+        return APIVersion(obj[0], obj[1])
+    except (IndexError, TypeError, KeyError):
+        raise ValueError(obj)
+
+
 class PythonConfig(BaseModel):
     """Configuration of a Python protocol."""
 
     protocolType: Literal[ProtocolType.PYTHON] = ProtocolType.PYTHON
-    apiVersion: APIVersion
+    apiVersion: Annotated[APIVersion, BeforeValidator(_api_version_deser)]
+
+    @field_serializer("apiVersion")
+    def _serialize_experimental(
+        self, apiVersion: APIVersion, _info: Any
+    ) -> str | tuple[int, int]:
+        if apiVersion == APIVersion.from_string("experimental"):
+            return "experimental"
+        return (apiVersion.major, apiVersion.minor)
 
 
 class AnalysisResult(str, Enum):

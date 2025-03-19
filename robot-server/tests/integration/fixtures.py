@@ -1,6 +1,5 @@
 """Fixtures to be used by Tavern tests."""
 
-
 from box import Box
 from requests import Response
 from opentrons.protocol_api import (
@@ -26,8 +25,8 @@ def check_health_response(response: Response) -> None:
         ],
         "system_version": config.OT_SYSTEM_VERSION,
         "robot_model": "OT-2 Standard",
-        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION),
-        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION),
+        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION[:2]),
+        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION[:2]),
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",
@@ -58,8 +57,8 @@ def check_ot3_health_response(response: Response) -> None:
         ],
         "system_version": config.OT_SYSTEM_VERSION,
         "robot_model": "OT-3 Standard",
-        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION_FOR_FLEX),
-        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION),
+        "minimum_protocol_api_version": list(MIN_SUPPORTED_VERSION_FOR_FLEX[:2]),
+        "maximum_protocol_api_version": list(MAX_SUPPORTED_VERSION[:2]),
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",

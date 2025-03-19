@@ -265,7 +265,7 @@ def _analyze_python_protocol(
         parsed, PythonProtocol
     ), "Parsing a Python file returned something other than a Python protocol."
 
-    if parsed.api_level > MAX_SUPPORTED_VERSION:
+    if parsed.api_level > MAX_SUPPORTED_VERSION and not parsed.api_level.experimental:
         raise FileIdentificationError(
             message=(
                 f"API version {parsed.api_level} is not supported by this "
