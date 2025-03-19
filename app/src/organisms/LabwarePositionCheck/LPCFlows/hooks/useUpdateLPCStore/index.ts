@@ -25,7 +25,7 @@ import type {
 import type { State } from '/app/redux/types'
 
 export interface UseLPCInitialStateProps {
-  runId: string
+  runId: string | null
   analysis: CompletedProtocolAnalysis | null
   protocolName: string | undefined
   maintenanceRunId: string | null
@@ -49,7 +49,7 @@ export function useUpdateLPCStore({
 }: UseLPCInitialStateProps): void {
   const dispatch = useDispatch()
   const lpcState = useSelector(
-    (state: State) => state?.protocolRuns[runId]?.lpc
+    (state: State) => state?.protocolRuns[runId ?? '']?.lpc
   )
 
   const isReadyToInit =
@@ -95,7 +95,7 @@ export function useUpdateLPCStore({
 
   // Update the store.
   useEffect(() => {
-    if (lpcState != null) {
+    if (lpcState != null && runId != null) {
       const updatedState: LPCWizardState = {
         ...lpcState,
         deckConfig: deckConfig != null ? deckConfig : lpcState.deckConfig,

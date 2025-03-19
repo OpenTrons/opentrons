@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
@@ -24,10 +23,10 @@ import {
   Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   useCreateRunMutation,
   useHost,
-  useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
@@ -40,17 +39,12 @@ import {
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
-import {
-  getApplyHistoricOffsets,
-  getPinnedQuickTransferIds,
-  updateConfigValue,
-} from '/app/redux/config'
+import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
 import {
   ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
   ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
 } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
@@ -58,6 +52,8 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { selectLabwareOffsetsToAddToRun } from '/app/redux/protocol-runs'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
@@ -313,6 +309,7 @@ export function QuickTransferDetails(): JSX.Element | null {
   const [currentOption, setCurrentOption] = useState<TabOption>(
     transferSectionTabOptions[0]
   )
+  const [createdRunId, setCreatedRunId] = useState<string | null>(null)
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
   const {
@@ -328,32 +325,21 @@ export function QuickTransferDetails(): JSX.Element | null {
   let pinnedTransferIds = useSelector(getPinnedQuickTransferIds) ?? []
   const pinned = pinnedTransferIds.includes(transferId)
 
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
-    transferId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolRecord != null }
+  useLPCFlows({
+    runId: createdRunId,
+    robotType: FLEX_ROBOT_TYPE,
+    protocolName: protocolRecord?.data.metadata.protocolName,
+  })
+  const lwOffsetsForRun = useSelector(
+    selectLabwareOffsetsToAddToRun(createdRunId ?? '')
   )
-
-  const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
-  // I'd love to skip scraping altogether if we aren't applying
-  // conditional offsets, but React won't let us use hooks conditionally.
-  // So, we'll scrape regardless and just toss them if we don't need them.
-  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
-    mostRecentAnalysis ?? null
-  ).map(({ vector, location, definitionUri }) => ({
-    vector,
-    location,
-    definitionUri,
-  }))
-  const labwareOffsets = shouldApplyOffsets ? scrapedLabwareOffsets : []
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
         console.error(`could not invalidate runs cache: ${e.message}`)
       })
+      setCreatedRunId(data.data.id)
     },
   })
 
@@ -374,7 +360,7 @@ export function QuickTransferDetails(): JSX.Element | null {
     )
   }
   const handleRunTransfer = (): void => {
-    createRun({ protocolId: transferId, labwareOffsets })
+    createRun({ protocolId: transferId, labwareOffsets: lwOffsetsForRun ?? [] })
   }
   const [
     showConfirmDeleteTransfer,

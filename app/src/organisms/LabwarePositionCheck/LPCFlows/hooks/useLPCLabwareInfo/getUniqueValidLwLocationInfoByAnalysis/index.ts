@@ -20,7 +20,6 @@ export function getUniqueValidLwLocationInfoByAnalysis({
   robotType,
 }: GetUniqueValidLwLocationInfoByAnalysisParams & {
   robotType: RobotType
-  runId: string
 }): LabwareLocationInfo[] {
   if (protocolData == null || labwareDefs == null) {
     return []
