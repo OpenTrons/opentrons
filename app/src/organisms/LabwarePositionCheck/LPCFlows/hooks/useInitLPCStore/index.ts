@@ -1,18 +1,27 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
-import { startLPC, LPC_STEPS } from '/app/redux/protocol-runs'
-import { getActivePipetteId } from './utils'
-
-import type { LPCWizardState, LPCLabwareInfo } from '/app/redux/protocol-runs'
 import type {
   CompletedProtocolAnalysis,
   DeckConfiguration,
   LabwareDefinition2,
   RobotType,
 } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+
+import {
+  startLPC,
+  LPC_STEPS,
+  OFFSET_SOURCE_CONFLICT,
+  OFFSET_SOURCE_DATABASE,
+} from '/app/redux/protocol-runs'
+import { getActivePipetteId } from './utils'
+
+import type {
+  LPCLabwareInfo,
+  LPCWizardState,
+  OffsetSources,
+} from '/app/redux/protocol-runs'
 
 export interface UseLPCInitialStateProps {
   runId: string
@@ -45,6 +54,10 @@ export function useInitLPCStore({
   useEffect(() => {
     if (isReadyToInit && robotType === FLEX_ROBOT_TYPE) {
       const activePipetteId = getActivePipetteId(analysis.pipettes)
+      const sourcedOffsets: OffsetSources =
+        lastFreshOffsetRunTs != null
+          ? OFFSET_SOURCE_CONFLICT
+          : OFFSET_SOURCE_DATABASE
 
       const initialState: LPCWizardState = {
         ...rest,
@@ -56,6 +69,7 @@ export function useInitLPCStore({
         labwareInfo: {
           ...rest.labwareInfo,
           lastFreshOffsetRunTimestamp: lastFreshOffsetRunTs,
+          sourcedOffsets,
         },
         steps: {
           currentStepIndex: 0,

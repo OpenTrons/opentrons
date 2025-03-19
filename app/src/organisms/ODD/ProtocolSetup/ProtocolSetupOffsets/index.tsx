@@ -1,143 +1,66 @@
 import { useTranslation } from 'react-i18next'
-import {
-  Chip,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  InfoScreen,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  getLabwareDefinitionsFromCommands,
-  StyledText,
-} from '@opentrons/components'
+import { useSelector } from 'react-redux'
 
-import type { LabwareOffset } from '@opentrons/api-client'
+import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
+
 import { useToaster } from '/app/organisms/ToasterOven'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
-import type { SetupScreens } from '../types'
-import { TerseOffsetTable } from '/app/organisms/TerseOffsetTable'
+import { FloatingActionButton } from '/app/atoms/buttons'
+import { SetupOffsetsTable } from './SetupOffsetsTable'
+import { SetupOffsetsHeader } from './SetupOffsetsHeader'
+import { LPCFlows } from '/app/organisms/LabwarePositionCheck'
 import {
-  useNotifyRunQuery,
-  useMostRecentCompletedAnalysis,
-} from '/app/resources/runs'
-import { getLatestCurrentOffsets } from '/app/transformations/runs'
+  OFFSET_SOURCE_CONFLICT,
+  selectOffsetSource,
+} from '/app/redux/protocol-runs'
+import { handleOffsetsConflictModalODD } from './OffsetsConflictModalODD'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { Run } from '@opentrons/api-client'
+import type { SetupScreens } from '../types'
+import type { UseLPCFlowsResult } from '/app/organisms/LabwarePositionCheck'
 
 export interface ProtocolSetupOffsetsProps {
+  lpcLaunchProps: UseLPCFlowsResult
   runId: string
+  runRecord: Run | undefined
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
   lpcDisabledReason: string | null
-  launchLPC: () => void
-  LPCWizard: JSX.Element | null
   isConfirmed: boolean
-  setIsConfirmed: (confirmed: boolean) => void
 }
 
-export function ProtocolSetupOffsets({
-  runId,
-  setSetupScreen,
-  isConfirmed,
-  setIsConfirmed,
-  launchLPC,
-  lpcDisabledReason,
-  LPCWizard,
-}: ProtocolSetupOffsetsProps): JSX.Element {
+export function ProtocolSetupOffsets(
+  props: ProtocolSetupOffsetsProps
+): JSX.Element {
+  const { lpcDisabledReason, lpcLaunchProps, runId } = props
+  const { showLPC, lpcProps, launchLPC } = lpcLaunchProps
   const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const makeDisabledReasonSnackbar = (): void => {
+  const offsetSource = useSelector(selectOffsetSource(runId))
+
+  if (offsetSource === OFFSET_SOURCE_CONFLICT) {
+    void handleOffsetsConflictModalODD({ ...props })
+  }
+
+  const onLPCLaunchClick = (): void => {
     if (lpcDisabledReason != null) {
       makeSnackbar(lpcDisabledReason)
+    } else {
+      void launchLPC()
     }
   }
 
-  const labwareDefinitions = getLabwareDefinitionsFromCommands(
-    mostRecentAnalysis?.commands ?? []
-  )
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
-  const currentOffsets = runRecord?.data?.labwareOffsets ?? []
-  const sortedOffsets: LabwareOffset[] =
-    currentOffsets.length > 0
-      ? currentOffsets
-          .map(offset => ({
-            ...offset,
-            //  convert into date to sort
-            createdAt: new Date(offset.createdAt),
-          }))
-          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-          .map(offset => ({
-            ...offset,
-            //   convert back into string
-            createdAt: offset.createdAt.toISOString(),
-          }))
-      : []
-  const nonIdentityOffsets = getLatestCurrentOffsets(sortedOffsets)
   return (
     <>
-      {LPCWizard ?? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
-        >
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-          >
-            <ODDBackButton
-              label={t('labware_position_check')}
-              onClick={() => {
-                setSetupScreen('prepare to run')
-              }}
-            />
-            {isConfirmed ? (
-              <Chip
-                background
-                iconName="ot-check"
-                text={t('offsets_confirmed')}
-                type="success"
-              />
-            ) : (
-              <SmallButton
-                buttonText={t('confirm_offsets')}
-                disabled={nonIdentityOffsets.length === 0}
-                onClick={() => {
-                  setIsConfirmed(true)
-                  setSetupScreen('prepare to run')
-                }}
-                buttonCategory="rounded"
-              />
-            )}
-          </Flex>
-          <Flex marginTop={SPACING.spacing32} flexDirection={DIRECTION_COLUMN}>
-            {nonIdentityOffsets.length > 0 ? (
-              <>
-                <StyledText
-                  oddStyle="level4HeaderSemiBold"
-                  marginBottom={SPACING.spacing8}
-                >
-                  {t('applied_labware_offset_data')}
-                </StyledText>
-                <TerseOffsetTable
-                  offsets={nonIdentityOffsets}
-                  labwareDefinitions={labwareDefinitions}
-                />
-              </>
-            ) : (
-              <InfoScreen content={t('no_labware_offset_data')} />
-            )}
-          </Flex>
+      {showLPC ? (
+        <LPCFlows {...lpcProps} />
+      ) : (
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <SetupOffsetsHeader {...props} />
+          <SetupOffsetsTable {...props} />
           <FloatingActionButton
-            buttonText={t('update_offsets')}
+            buttonText={t('labware_position_check')}
             iconName="reticle"
-            onClick={() => {
-              if (lpcDisabledReason != null) {
-                makeDisabledReasonSnackbar()
-              } else {
-                launchLPC()
-              }
-            }}
+            onClick={onLPCLaunchClick}
           />
         </Flex>
       )}

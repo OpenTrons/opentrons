@@ -39,6 +39,7 @@
   "confirm_position_and_return_tip": "Confirm position, return tip to Slot {{next_slot}} and home",
   "confirm_removal": "Confirm removal",
   "continue": "Continue",
+  "custom": "Custom",
   "default": "Default",
   "default_labware_offset": "Default Labware Offset",
   "detach_probe": "Remove calibration probe",
