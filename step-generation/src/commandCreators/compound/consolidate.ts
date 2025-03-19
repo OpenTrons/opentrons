@@ -5,7 +5,6 @@ import {
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
 } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import { dropTipInTrash } from './dropTipInTrash'
@@ -20,7 +19,6 @@ import {
   getHasWasteChute,
 } from '../../utils'
 import {
-  airGapInPlace,
   aspirate,
   configureForVolume,
   delay,
@@ -37,6 +35,7 @@ import type {
   CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
+import { airGapInWell } from './airGapInWell'
 
 export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
@@ -181,23 +180,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         (sourceWell: string, wellIndex: number): CurriedCommandCreator[] => {
           const airGapAfterAspirateCommands = aspirateAirGapVolume
             ? [
-                curryCommandCreator(moveToWell, {
+                curryCommandCreator(airGapInWell, {
                   pipetteId: args.pipette,
                   labwareId: args.sourceLabware,
                   wellName: sourceWell,
-                  wellLocation: {
-                    origin: 'top',
-                    offset: {
-                      z: AIR_GAP_OFFSET_FROM_TOP,
-                      x: 0,
-                      y: 0,
-                    },
-                  },
-                }),
-                curryCommandCreator(airGapInPlace, {
-                  pipetteId: args.pipette,
                   volume: aspirateAirGapVolume,
                   flowRate: aspirateFlowRateUlSec,
+                  type: 'aspirate',
                 }),
                 ...(aspirateDelay != null
                   ? [
@@ -426,7 +415,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 destinationId: args.destLabware,
                 destWell: destinationWell,
                 flowRate: aspirateFlowRateUlSec,
-                offsetFromTopMm: AIR_GAP_OFFSET_FROM_TOP,
               }),
               ...(aspirateDelay != null
                 ? [

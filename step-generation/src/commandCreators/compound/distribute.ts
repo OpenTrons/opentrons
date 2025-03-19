@@ -17,16 +17,15 @@ import {
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
   getHasWasteChute,
+  airGapHelper,
 } from '../../utils'
 import {
-  airGapInPlace,
   aspirate,
   configureForVolume,
   delay,
   dispense,
   dropTip,
   moveToWell,
-  prepareToAspirate,
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
@@ -39,6 +38,7 @@ import type {
   CurriedCommandCreator,
   CommandCreatorError,
 } from '../../types'
+import { airGapInWell } from './airGapInWell'
 export const distribute: CommandCreator<DistributeArgs> = (
   args,
   invariantContext,
@@ -193,23 +193,13 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const firstDestWell = destWellChunk[0]
       const airGapAfterAspirateCommands = aspirateAirGapVolume
         ? [
-            curryCommandCreator(moveToWell, {
+            curryCommandCreator(airGapInWell, {
               pipetteId: args.pipette,
               labwareId: args.sourceLabware,
               wellName: args.sourceWell,
-              wellLocation: {
-                origin: 'top',
-                offset: {
-                  z: AIR_GAP_OFFSET_FROM_TOP,
-                  x: 0,
-                  y: 0,
-                },
-              },
-            }),
-            curryCommandCreator(airGapInPlace, {
-              pipetteId: args.pipette,
               volume: aspirateAirGapVolume,
               flowRate: aspirateFlowRateUlSec,
+              type: 'aspirate',
             }),
             ...(aspirateDelay != null
               ? [
@@ -340,24 +330,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
           ? [
-              curryCommandCreator(moveToWell, {
+              curryCommandCreator(airGapHelper, {
                 pipetteId: args.pipette,
-                labwareId: dispenseAirGapLabware,
-                wellName: dispenseAirGapWell,
-                wellLocation: {
-                  origin: 'top',
-                  offset: {
-                    z: AIR_GAP_OFFSET_FROM_TOP,
-                    x: 0,
-                    y: 0,
-                  },
-                },
-              }),
-              curryCommandCreator(prepareToAspirate, {
-                pipetteId: args.pipette,
-              }),
-              curryCommandCreator(airGapInPlace, {
-                pipetteId: args.pipette,
+                destinationId: dispenseAirGapLabware,
+                destWell: dispenseAirGapWell,
                 volume: dispenseAirGapVolume,
                 flowRate: aspirateFlowRateUlSec,
               }),

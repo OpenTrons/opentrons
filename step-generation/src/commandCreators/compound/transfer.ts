@@ -4,7 +4,6 @@ import {
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import { dropTipInTrash } from './dropTipInTrash'
@@ -19,7 +18,6 @@ import {
   getHasWasteChute,
 } from '../../utils'
 import {
-  airGapInPlace,
   aspirate,
   configureForVolume,
   delay,
@@ -28,6 +26,7 @@ import {
   moveToWell,
   touchTip,
 } from '../atomic'
+import { airGapInWell } from './airGapInWell'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
@@ -38,6 +37,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,
@@ -376,23 +376,13 @@ export const transfer: CommandCreator<TransferArgs> = (
           const airGapAfterAspirateCommands =
             aspirateAirGapVolume && destinationWell != null
               ? [
-                  curryCommandCreator(moveToWell, {
+                  curryCommandCreator(airGapInWell, {
                     pipetteId: args.pipette,
                     labwareId: args.sourceLabware,
                     wellName: sourceWell,
-                    wellLocation: {
-                      origin: 'top',
-                      offset: {
-                        z: AIR_GAP_OFFSET_FROM_TOP,
-                        x: 0,
-                        y: 0,
-                      },
-                    },
-                  }),
-                  curryCommandCreator(airGapInPlace, {
-                    pipetteId: args.pipette,
                     volume: aspirateAirGapVolume,
                     flowRate: aspirateFlowRateUlSec,
+                    type: 'aspirate',
                   }),
                   ...(aspirateDelay != null
                     ? [
