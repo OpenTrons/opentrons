@@ -7,11 +7,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getRobotSettings } from '/app/redux/robot-settings'
 import { getLocalRobot } from '/app/redux/discovery'
-import {
-  getAppLanguage,
-  toggleDevtools,
-  toggleHistoricOffsets,
-} from '/app/redux/config'
+import { getAppLanguage, toggleDevtools } from '/app/redux/config'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
@@ -118,7 +114,6 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Choose what data to share with Opentrons.')
     screen.getByText('Device Reset')
     screen.getByText('Update Channel')
-    screen.getByText('Apply Labware Offsets')
     screen.getByText('Use stored data when setting up a protocol.')
     screen.getByText('Developer Tools')
     screen.getByText('Access additional logging and feature flags.')
@@ -237,13 +232,6 @@ describe('RobotSettingsDashboard', () => {
     expect(
       screen.getByTestId('RobotSettingButton_home_gantry_on_restart')
     ).toHaveTextContent('On')
-  })
-
-  it('should call a mock function when tapping enable historic offset', () => {
-    render()
-    const button = screen.getByText('Apply Labware Offsets')
-    fireEvent.click(button)
-    expect(vi.mocked(toggleHistoricOffsets)).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping enable dev tools', () => {

@@ -107,7 +107,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
     when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, false, null)
       .thenReturn([])
     when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
@@ -118,6 +118,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     when(vi.mocked(useOffsetCandidatesForAnalysis))
       .calledWith(
         storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
+        false,
         null
       )
       .thenReturn([])
@@ -313,7 +314,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
     }
     when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, false, null)
       .thenReturn([mockOffsetCandidate])
     vi.mocked(getConnectableRobots).mockReturnValue([
       mockConnectableRobot,
@@ -362,7 +363,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
       runCreatedAt: '2022-05-11T13:33:51.012179+00:00',
     }
     when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, null)
+      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, false, null)
       .thenReturn([mockOffsetCandidate])
     vi.mocked(getConnectableRobots).mockReturnValue([
       mockConnectableRobot,

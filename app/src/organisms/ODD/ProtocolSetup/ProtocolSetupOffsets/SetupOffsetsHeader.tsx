@@ -40,9 +40,9 @@ export function SetupOffsetsHeader({
   const onApplyOffsets = (): void => {
     if (!isApplyOffsets) {
       if (isNecessaryDefaultOffsetMissing) {
-        makeSnackbar(t('add_missing_labware_offsets'))
+        makeSnackbar(t('add_missing_labware_offsets') as string)
       } else if (lwOffsetsForRun == null) {
-        makeSnackbar(t('no_offsets_found'))
+        makeSnackbar(t('no_offsets_found') as string)
       } else {
         setIsApplyingOffsets(true)
         Promise.all(
@@ -53,7 +53,7 @@ export function SetupOffsetsHeader({
             setSetupScreen('prepare to run')
           })
           .catch(() => {
-            makeSnackbar(t('failed_to_apply_offsets'))
+            makeSnackbar(t('failed_to_apply_offsets') as string)
           })
           .finally(() => {
             setIsApplyingOffsets(false)

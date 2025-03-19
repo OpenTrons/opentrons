@@ -58,7 +58,7 @@ const OffsetsConflictModalODD = NiceModal.create(
           <StyledText oddStyle="bodyTextRegular">
             <Trans
               t={t}
-              i18nKey="labware_offsets_conflict_description"
+              i18nKey="branded:labware_offsets_conflict_description"
               values={{
                 timestamp: lastFreshRunTs,
               }}

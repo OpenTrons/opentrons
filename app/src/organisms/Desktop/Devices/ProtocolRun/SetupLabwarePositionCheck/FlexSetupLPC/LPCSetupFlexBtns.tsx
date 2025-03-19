@@ -84,7 +84,7 @@ export function LPCSetupFlexBtns({
           setOffsetsConfirmed(true)
         })
         .catch(() => {
-          makeSnackbar(t('failed_to_apply_offsets'))
+          makeSnackbar(t('failed_to_apply_offsets') as string)
         })
         .finally(() => {
           setIsApplyingOffsets(false)
