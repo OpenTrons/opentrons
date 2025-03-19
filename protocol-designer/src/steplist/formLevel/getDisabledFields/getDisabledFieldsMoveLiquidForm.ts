@@ -15,7 +15,6 @@ export function getDisabledFieldsMoveLiquidForm(
     'name' in hydratedForm.dispense_labware &&
     (hydratedForm.dispense_labware.name === 'wasteChute' ||
       hydratedForm.dispense_labware.name === 'trashBin')
-  console.log('isDispenseingintotrash', isDispensingIntoTrash)
   if (
     (hydratedForm.dispense_wells.length === 0 && !isDispensingIntoTrash) ||
     hydratedForm.aspirate_wells.length === 0 ||
