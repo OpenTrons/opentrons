@@ -95,6 +95,7 @@ class _WellCommon2(TypedDict):
     x: float
     y: float
     z: float
+    geometryDefinitionId: NotRequired[str | None]
 
 
 class CircularWellDefinition2(_WellCommon2, TypedDict):
@@ -111,24 +112,14 @@ class RectangularWellDefinition2(_WellCommon2, TypedDict):
 WellDefinition2 = CircularWellDefinition2 | RectangularWellDefinition2
 
 
-class _WellCommon3(TypedDict):
-    depth: float
-    totalLiquidVolume: float
-    x: float
-    y: float
-    z: float
-    geometryDefinitionId: NotRequired[str | None]
+class CircularWellDefinition3(CircularWellDefinition2, TypedDict):
+    # Currently equivalent to CircularWellDefinition2.
+    pass
 
 
-class CircularWellDefinition3(_WellCommon3, TypedDict):
-    shape: CircularType
-    diameter: float
-
-
-class RectangularWellDefinition3(_WellCommon3, TypedDict):
-    shape: RectangularType
-    xDimension: float
-    yDimension: float
+class RectangularWellDefinition3(RectangularWellDefinition2, TypedDict):
+    # Currently equivalent to RectangularWellDefinition2.
+    pass
 
 
 WellDefinition3 = CircularWellDefinition3 | RectangularWellDefinition3

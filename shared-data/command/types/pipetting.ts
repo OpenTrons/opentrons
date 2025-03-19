@@ -296,6 +296,7 @@ export type BlowoutParams = FlowRateParams &
 export type TouchTipParams = PipetteAccessParams &
   WellLocationParam & {
     speed?: number
+    mmFromEdge?: number
   }
 export type DropTipParams = PipetteAccessParams & DropTipWellLocationParam
 export interface GetNextTipParams {
