@@ -12,10 +12,10 @@ import {
 } from '@opentrons/components'
 
 import { OffDeck } from '../OffDeck'
+import { StartingDeckContainer } from './StartingDeckContainer'
 
 import type { CutoutId } from '@opentrons/shared-data'
 import type { DeckSlot } from '@opentrons/step-generation'
-import { StartingDeckContainer } from './StartingDeckContainer'
 
 enum DeckView {
   ON_DECK = 'On deck',
