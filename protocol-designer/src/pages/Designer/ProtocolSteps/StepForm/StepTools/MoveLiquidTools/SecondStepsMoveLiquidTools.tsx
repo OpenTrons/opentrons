@@ -410,7 +410,7 @@ export const SecondStepsMoveLiquidTools = ({
           tooltipText={
             propsForFields[`${tab}_touchTip_checkbox`].tooltipContent
           }
-          disabled={tab === 'dispense' && isDestinationTrash}
+          disabled={propsForFields[`${tab}_touchTip_checkbox`].disabled}
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
