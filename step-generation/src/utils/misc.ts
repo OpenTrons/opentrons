@@ -30,7 +30,7 @@ import {
   blowOutInWasteChute,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
-import { blowout } from '../commandCreators/atomic/blowout'
+import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import { curryCommandCreator } from './curryCommandCreator'
 import type {
   AddressableAreaName,
@@ -365,7 +365,7 @@ export const blowoutUtil = (args: {
 
   if (well != null && trashOrLabware === 'labware' && labware != null) {
     return [
-      curryCommandCreator(blowout, {
+      curryCommandCreator(blowOutInWell, {
         pipetteId: pipette,
         labwareId: labware.id,
         wellName: well,

@@ -4,7 +4,13 @@ import Ajv from 'ajv'
 import { describe, expect, it, beforeAll, test } from 'vitest'
 
 import schema from '../../labware/schemas/2.json'
-import type { LabwareDefinition2, LabwareWell } from '../types'
+import type {
+  InnerWellGeometry,
+  LabwareDefinition2,
+  LabwareWell,
+} from '../types'
+import { SHARED_GEOMETRY_GROUPS } from './sharedGeometryGroups'
+import range from 'lodash/range'
 
 const definitionsDir = path.join(__dirname, '../../labware/definitions/2')
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/2')
@@ -41,6 +47,7 @@ const expectedWellsHigherThanZDimension: Record<string, Set<string>> = {
   'geb_96_tiprack_10ul/1.json': standard96WellNames,
   'opentrons_24_aluminumblock_generic_2ml_screwcap/1.json': standard24WellNames,
   'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/1.json': standard24WellNames,
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/2.json': standard24WellNames,
   'opentrons_96_aluminumblock_generic_pcr_strip_200ul/1.json': standard96WellNames,
   'opentrons_96_filtertiprack_200ul/1.json': standard96WellNames,
   'opentrons_96_tiprack_300ul/1.json': standard96WellNames,
@@ -63,6 +70,12 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
     'A4',
     'B4',
   ]),
+  'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical/2.json': new Set([
+    'A3',
+    'B3',
+    'A4',
+    'B4',
+  ]),
   'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic/1.json': new Set([
     'A3',
     'B3',
@@ -75,10 +88,19 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
     'A4',
     'B4',
   ]),
+  'opentrons_10_tuberack_nest_4x50ml_6x15ml_conical/2.json': new Set([
+    'A3',
+    'B3',
+    'A4',
+    'B4',
+  ]),
 
   // These height mismatches are legitimate. The zDimension should match the taller side.
   'opentrons_calibrationblock_short_side_left/1.json': new Set(['A1']),
   'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
+
+  // this labware has a lip
+  'evotips_opentrons_96_labware/2.json': standard96WellNames,
 
   // These height mismatches need to be investigated. See Jira RSS-202.
   // Each one should either be explained here or marked as a known bug.
@@ -115,8 +137,15 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json': standard96WellNames,
   'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json': standard96WellNames,
   'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json': standard384WellNames,
-  // this labware has a lip
-  'evotips_opentrons_96_labware/2.json': standard96WellNames,
+  // This batch may have incompletely-updated geometry from recent work related to
+  // liquid level detection and meniscus-relative pipetting. Probably, the wells were
+  // updated but not the overall labware dimensions. This needs to be investigated and fixed.
+  'nest_96_wellplate_100ul_pcr_full_skirt/3.json': standard96WellNames,
+  'opentrons_24_tuberack_nest_1.5ml_screwcap/2.json': standard24WellNames,
+  'opentrons_24_tuberack_nest_2ml_screwcap/2.json': standard24WellNames,
+  'usascientific_12_reservoir_22ml/2.json': generateStandardWellNames(1, 12),
+  'corning_12_wellplate_6.9ml_flat/3.json': generateStandardWellNames(3, 4),
+  'biorad_96_wellplate_200ul_pcr/3.json': standard96WellNames,
 }
 
 const filterWells = (
@@ -174,6 +203,122 @@ const expectGroupsFollowConvention = (
         expect(group.metadata.displayName).toBe(undefined)
         expect(group.metadata.displayCategory).toBe(undefined)
       })
+    }
+  })
+}
+
+const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
+  test('geometries referenced by wells must actually exist', () => {
+    for (const geometryId of Object.values(labwareDef.wells).map(
+      well => well.geometryDefinitionId
+    )) {
+      if (geometryId !== undefined) {
+        expect(labwareDef.innerLabwareGeometry).toHaveProperty(geometryId)
+      }
+    }
+  })
+
+  test("geometries should only exist if they're referenced by at least one well", () => {
+    function isDefined<T>(x: T | undefined): x is T {
+      return x !== undefined
+    }
+
+    const referencedGeometryIds = new Set(
+      Object.values(labwareDef.wells)
+        .map(well => well.geometryDefinitionId)
+        .filter(isDefined)
+    )
+
+    for (const geometryId in labwareDef.innerLabwareGeometry) {
+      expect(referencedGeometryIds).toContain(geometryId)
+    }
+  })
+
+  test('sections of a well geometry should be sorted top to bottom', () => {
+    const geometries = Object.values(labwareDef.innerLabwareGeometry ?? [])
+    for (const geometry of geometries) {
+      const sectionList = geometry.sections
+      const sortedSectionList = sectionList.toSorted(
+        (a, b) => b.topHeight - a.topHeight
+      )
+      expect(sortedSectionList).toStrictEqual(sectionList)
+    }
+  })
+
+  test('the bottom of a well geometry should be at height 0', () => {
+    for (const geometry of Object.values(
+      labwareDef.innerLabwareGeometry ?? {}
+    )) {
+      const bottomFrustum = geometry.sections[geometry.sections.length - 1]
+      expect(bottomFrustum.bottomHeight).toStrictEqual(0)
+    }
+  })
+
+  test('each section of a well geometry should have topHeight > bottomHeight', () => {
+    for (const geometry of Object.values(
+      labwareDef.innerLabwareGeometry ?? {}
+    )) {
+      for (const section of geometry.sections) {
+        expect(section.topHeight).toBeGreaterThan(section.bottomHeight)
+      }
+    }
+  })
+
+  test('sections of a well geometry should exactly connect to each other', () => {
+    for (const geometry of Object.values(
+      labwareDef.innerLabwareGeometry ?? {}
+    )) {
+      for (const [above, below] of pairs(geometry.sections)) {
+        expect(above.bottomHeight).toStrictEqual(below.topHeight)
+      }
+    }
+  })
+
+  test("a well's depth should equal the height of its geometry", () => {
+    for (const well of Object.values(labwareDef.wells)) {
+      const wellGeometryId = well.geometryDefinitionId
+
+      if (wellGeometryId === undefined) return
+      if (labwareDef.innerLabwareGeometry == null) return
+
+      const wellGeometry = labwareDef.innerLabwareGeometry[wellGeometryId]
+      if (wellGeometry === undefined) return
+
+      const wellDepth = well.depth
+      const topFrustumHeight = wellGeometry.sections[0].topHeight
+
+      const labwareWithWellDepthMismatches = [
+        // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
+        'agilent_1_reservoir_290ml/2',
+        'corning_24_wellplate_3.4ml_flat/3',
+        'corning_6_wellplate_16.8ml_flat/3',
+        'corning_96_wellplate_360ul_flat/3',
+        'nest_96_wellplate_2ml_deep/3',
+        'opentrons_15_tuberack_falcon_15ml_conical/2',
+        'opentrons_24_aluminumblock_nest_1.5ml_screwcap/2',
+        'opentrons_24_aluminumblock_nest_2ml_screwcap/2',
+        'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap/2',
+        'opentrons_6_tuberack_falcon_50ml_conical/2',
+        'opentrons_6_tuberack_nest_50ml_conical/2',
+      ]
+
+      if (
+        labwareDef.parameters.loadName ===
+          'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical' &&
+        labwareDef.version === 2
+      ) {
+        // todo(mm, 2025-03-17): Some of the well heights in this definition do match
+        // and some of them don't, so we can't assert either way. Investigate and
+        // resolve the mismatches.
+      } else if (
+        labwareWithWellDepthMismatches.includes(
+          labwareDef.parameters.loadName + '/' + labwareDef.version
+        )
+      ) {
+        expect(wellDepth).not.toStrictEqual(topFrustumHeight)
+      } else {
+        expect(wellDepth).toStrictEqual(topFrustumHeight)
+      }
     }
   })
 }
@@ -261,6 +406,8 @@ describe('test that the dimensions in all opentrons definitions make sense', () 
       const wellsHigher = getWellsHigherThanZDimension(labwareDef)
       expect(wellsHigher).toEqual(expectedWellsHigher)
     })
+
+    checkGeometryDefinitions(labwareDef)
   })
 })
 
@@ -296,3 +443,89 @@ describe('test schemas of all v2 labware fixtures', () => {
     expectGroupsFollowConvention(labwareDef, filename)
   })
 })
+
+describe('check groups of labware that should have the same geometry', () => {
+  describe.each(
+    Object.entries(SHARED_GEOMETRY_GROUPS).map(([groupName, groupEntries]) => ({
+      groupName,
+      groupEntries,
+    }))
+  )('$groupName', ({ groupEntries }) => {
+    const normalizedGroupEntries = groupEntries.map(entry => ({
+      loadName: typeof entry === 'string' ? entry : entry.loadName,
+      geometryKey: typeof entry === 'string' ? undefined : entry.geometryKey,
+    }))
+    test.each(normalizedGroupEntries)(
+      '$loadName',
+      ({ loadName, geometryKey }) => {
+        // We arbitrarily pick the first labware in the group to compare the rest against.
+        const otherLabwareGeometry = getGeometry(
+          normalizedGroupEntries[0].loadName,
+          normalizedGroupEntries[0].geometryKey
+        )
+        const thisLabwareGeometry = getGeometry(loadName, geometryKey)
+        expect(thisLabwareGeometry).toEqual(otherLabwareGeometry)
+      }
+    )
+  })
+})
+
+/** Return the latest version of the given labware that's defined in schema 2. */
+function findLatestDefinition(loadName: string): LabwareDefinition2 {
+  const candidates: LabwareDefinition2[] = glob
+    .sync('*.json', {
+      cwd: path.join(definitionsDir, loadName),
+      absolute: true,
+    })
+    .map(require)
+  if (candidates.length === 0) {
+    throw new Error(`No definitions found for ${loadName}.`)
+  }
+  candidates.sort((a, b) => a.version - b.version)
+  const latest = candidates[candidates.length - 1]
+  return latest
+}
+
+/**
+ * Extract the given geometry from the given definition.
+ *
+ * If geometryKey is unspecified, the definition is expected to have exactly one
+ * geometry key, and that one is extracted and returned.
+ */
+function getGeometry(
+  loadName: string,
+  geometryKey: string | undefined
+): InnerWellGeometry {
+  const definition = findLatestDefinition(loadName)
+  const availableGeometries = definition.innerLabwareGeometry ?? {}
+
+  if (geometryKey === undefined) {
+    const availableGeometryEntries = Object.entries(availableGeometries)
+    if (availableGeometryEntries.length !== 1) {
+      throw new Error(
+        `Expected exactly 1 geometry in ${definition.parameters.loadName} but found ${availableGeometryEntries.length}.`
+      )
+    }
+    return availableGeometryEntries[0][1]
+  } else {
+    const result = availableGeometries[geometryKey]
+    if (result === undefined) {
+      throw new Error(
+        `No geometry found in ${definition.parameters.loadName} with key ${geometryKey}.`
+      )
+    }
+    return result
+  }
+}
+
+/**
+ * [1, 2, 3, 4] -> [[1, 2], [2, 3], [3, 4]]
+ *
+ * [1] -> []
+ */
+function pairs<T>(array: T[]): Array<[T, T]> {
+  return range(array.length - 1).map(firstIndex => [
+    array[firstIndex],
+    array[firstIndex + 1],
+  ])
+}
