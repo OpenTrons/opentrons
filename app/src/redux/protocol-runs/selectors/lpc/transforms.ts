@@ -128,10 +128,11 @@ export interface MissingOffsets {
   totalCount: number
 }
 
-// Derive missing offsets for every labware by checking to see if an "existing offset" value
-// does not exist. Note: only offsets persisted on the robot-server are "not missing."
+// Derive missing location-specific offsets for every labware by checking to see if an
+// "existing offset" value  does not exist.
+// Note: only offsets persisted on the robot-server are "not missing."
 // Hardcoded offsets are not missing.
-export const getMissingOffsets = (
+export const getMissingLSOffsets = (
   labware: LPCLabwareInfo['labware'] | undefined
 ): MissingOffsets => {
   const missingOffsets: MissingOffsets = {

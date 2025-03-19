@@ -58,7 +58,7 @@ export function useLPCFlows({
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
   // TOME TODO: Check that offset requests don't happen if we are looking at a historical
-  // run. Also, what is the general behavior? Is manipulating offsets disabled.
+  // run. Make sure run setup is disabled, too.
 
   const deckConfig = useNotifyDeckConfigurationQuery().data
   const { data: runRecord } = useNotifyRunQuery(runId)

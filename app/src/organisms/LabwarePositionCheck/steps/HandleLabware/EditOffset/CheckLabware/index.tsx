@@ -38,7 +38,7 @@ import {
 import { getIsOnDevice } from '/app/redux/config'
 import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
 import { LPCLabwareJogRender } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCLabwareJogRender'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
 import type { LoadedPipette, Coordinates } from '@opentrons/shared-data'

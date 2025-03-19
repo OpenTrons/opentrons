@@ -8,7 +8,7 @@ import {
   mockLocationSpecificOffsetDetails,
 } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { LocationSpecificOffsetsContainer } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/LocationSpecificOffsetsContainer'
-import { selectSelectedLwLocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
+import { selectSortedLSOffsetDetailsWithCopy } from '/app/redux/protocol-runs'
 
 import type { ComponentProps } from 'react'
 
@@ -63,7 +63,7 @@ describe('LocationSpecificOffsetsContainer', () => {
     }
 
     vi.mocked(
-      selectSelectedLwLocationSpecificOffsetDetails
+      selectSortedLSOffsetDetailsWithCopy
     ).mockImplementation((runId: string) => () =>
       mockLocationSpecificOffsetDetails
     )

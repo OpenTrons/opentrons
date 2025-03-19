@@ -57,7 +57,6 @@ import {
   getIncompleteInstrumentCount,
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
-import { useLaunchLegacyLPC } from '/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -68,10 +67,9 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { getIsHeaterShakerAttached, useFeatureFlag } from '/app/redux/config'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
-import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
@@ -89,7 +87,13 @@ import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
 } from '/app/transformations/commands'
-import { useLPCFlows, LPCFlows } from '/app/organisms/LabwarePositionCheck'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import {
+  selectAreOffsetsApplied,
+  selectCountMissingLocationSpecificOffsets,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectTotalCountLocationSpecificOffsets,
+} from '/app/redux/protocol-runs'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -97,7 +101,10 @@ import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
-import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
+import type {
+  SetupScreens,
+  ProtocolSetupStepProps,
+} from '/app/organisms/ODD/ProtocolSetup'
 import type {
   ProtocolHardware,
   ProtocolFixture,
@@ -340,7 +347,10 @@ function PrepareToRun({
   const areLiquidsInProtocol = liquidsInProtocol.length > 0
 
   const isReadyToRun =
-    incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
+    incompleteInstrumentCount === 0 &&
+    areModulesReady &&
+    areFixturesReady &&
+    offsetsConfirmed
   const onPlay = (): void => {
     if (isDoorOpen) {
       makeSnackbar(t('shared:close_robot_door') as string)
@@ -348,11 +358,7 @@ function PrepareToRun({
       if (isReadyToRun) {
         if (
           runStatus === RUN_STATUS_IDLE &&
-          !(
-            labwareConfirmed &&
-            offsetsConfirmed &&
-            (liquidsConfirmed || !areLiquidsInProtocol)
-          )
+          !(labwareConfirmed && (liquidsConfirmed || !areLiquidsInProtocol))
         ) {
           confirmStepsComplete()
         } else if (runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol) {
@@ -479,9 +485,40 @@ function PrepareToRun({
       ? t('additional_labware', { count: additionalLabwareCount })
       : null
 
-  const latestCurrentOffsets = getLatestCurrentOffsets(
-    runRecord?.data?.labwareOffsets ?? []
+  const totalOffsets = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
   )
+  const numMissingLSOffsets = useSelector(
+    selectCountMissingLocationSpecificOffsets(runId)
+  )
+  const isAnyNecessaryDefaultOffsetMissing = useSelector(
+    selectIsAnyNecessaryDefaultOffsetMissing(runId)
+  )
+  const areOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+
+  const lpcSetupStepProps = (): Pick<
+    ProtocolSetupStepProps,
+    'detail' | 'status'
+  > => {
+    if (totalOffsets === 0) {
+      return { detail: t('offsets_not_required'), status: 'ready' }
+    } else if (areOffsetsApplied) {
+      return {
+        detail: t('num_offsets_applied', { num: totalOffsets }),
+        status: 'ready',
+      }
+    } else if (isAnyNecessaryDefaultOffsetMissing) {
+      return {
+        detail: t('num_missing_offsets', { num: numMissingLSOffsets }),
+        status: 'not ready',
+      }
+    } else {
+      return {
+        detail: t('offsets_not_applied'),
+        status: 'not ready',
+      }
+    }
+  }
 
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: FETCH_DURATION_MS,
@@ -602,13 +639,7 @@ function PrepareToRun({
                 setSetupScreen('offsets')
               }}
               title={t('labware_position_check')}
-              detail={t('recommended')}
-              subDetail={
-                latestCurrentOffsets.length > 0
-                  ? t('offsets_applied', { count: latestCurrentOffsets.length })
-                  : null
-              }
-              status={offsetsConfirmed ? 'ready' : 'general'}
+              {...lpcSetupStepProps()}
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
@@ -661,7 +692,6 @@ export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
-  const isNewLPC = useFeatureFlag('lpcRedesign')
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { t } = useTranslation(['protocol_setup'])
@@ -738,18 +768,6 @@ export function ProtocolSetup(): JSX.Element {
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name ??
     ''
-
-  const { launchLegacyLPC, LegacyLPCWizard } = useLaunchLegacyLPC(
-    runId,
-    robotType,
-    protocolName
-  )
-  const { launchLPC, showLPC, lpcProps } = useLPCFlows({
-    runId,
-    robotType,
-    protocolName,
-  })
-
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
@@ -782,9 +800,8 @@ export function ProtocolSetup(): JSX.Element {
   // TODO(jh 10-31-24): Refactor the below to utilize useMissingStepsModal.
   const [labwareConfirmed, setLabwareConfirmed] = useState<boolean>(false)
   const [liquidsConfirmed, setLiquidsConfirmed] = useState<boolean>(false)
-  const [offsetsConfirmed, setOffsetsConfirmed] = useState<boolean>(false)
+  const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
   const missingSteps = [
-    !offsetsConfirmed ? t('applied_labware_offsets') : null,
     !labwareConfirmed ? t('labware_placement') : null,
     !liquidsConfirmed && areLiquidsInProtocol ? t('liquids') : null,
   ].filter(s => s != null)
@@ -794,10 +811,15 @@ export function ProtocolSetup(): JSX.Element {
     cancel: cancelExitMissingStepsConfirmation,
   } = useConditionalConfirm(
     handleProceedToRunClick,
-    !(labwareConfirmed && liquidsConfirmed && offsetsConfirmed)
+    !(labwareConfirmed && liquidsConfirmed)
   )
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
+  const lpcLaunchProps = useLPCFlows({
+    runId,
+    robotType,
+    protocolName,
+  })
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = useState<SetupScreens>('prepare to run')
@@ -830,20 +852,11 @@ export function ProtocolSetup(): JSX.Element {
     offsets: (
       <ProtocolSetupOffsets
         runId={runId}
+        runRecord={runRecord}
+        lpcLaunchProps={lpcLaunchProps}
         setSetupScreen={setSetupScreen}
         lpcDisabledReason={lpcDisabledReason}
-        launchLPC={isNewLPC ? launchLPC : launchLegacyLPC}
-        LPCWizard={
-          isNewLPC ? (
-            showLPC ? (
-              <LPCFlows {...lpcProps} />
-            ) : null
-          ) : (
-            LegacyLPCWizard
-          )
-        }
         isConfirmed={offsetsConfirmed}
-        setIsConfirmed={setOffsetsConfirmed}
       />
     ),
     labware: (

@@ -8,7 +8,7 @@ import {
   getAreAllOffsetsHardCoded,
   getDefaultOffsetDetailsForAllLabware,
   getLocationSpecificOffsetDetailsForAllLabware,
-  getMissingOffsets,
+  getMissingLSOffsets,
   getSelectedLabwareWithOffsetDetails,
   getWorkingOffsetsByUri,
   getTotalCountLocationSpecificOffsets,
@@ -39,7 +39,7 @@ import type {
   LPCOffsetKind,
   WorkingOffset,
 } from '/app/redux/protocol-runs'
-import type { MissingOffsets, WorkingOffsetsByUri } from '../transforms'
+import type { WorkingOffsetsByUri } from '../transforms'
 import type { TFunction } from 'i18next'
 import type { Selector } from 'reselect'
 
@@ -273,6 +273,14 @@ export const selectTotalCountLocationSpecificOffsets = (
     labware => getTotalCountLocationSpecificOffsets(labware)
   )
 
+export const selectCountMissingLocationSpecificOffsets = (
+  runId: string
+): Selector<State, number> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => getMissingLSOffsets(labware).totalCount
+  )
+
 // Whether the default offset is "absent" for the given labware geometry.
 // The default offset only needs to be added client-side to be considered "not absent".
 // Note that the default offset is not considered absent if all locations that would
@@ -361,16 +369,6 @@ export const selectIsAnyOffsetHardCoded = (
       details?.some(
         detail => detail.locationDetails.hardCodedOffsetId != null
       ) ?? false
-  )
-
-// Returns the offset details for missing offsets, keyed by the labware URI.
-// Note: only offsets persisted on the robot-server are "not missing".
-export const selectMissingOffsets = (
-  runId: string
-): Selector<State, MissingOffsets> =>
-  createSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
-    labware => getMissingOffsets(labware)
   )
 
 export interface SelectOffsetsToApplyResult {

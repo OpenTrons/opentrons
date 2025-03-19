@@ -1,15 +1,18 @@
-import { getLabwareDisplayName, getLabwareDefURI } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
+import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
 import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
-
 import type {
-  LabwareDefinition2,
-  CompletedProtocolAnalysis,
-} from '@opentrons/shared-data'
-import type {
-  LPCLabwareInfo,
   LabwareLocationInfo,
+  LPCLabwareInfo,
+} from '/app/redux/protocol-runs'
+import {
+  getTotalCountNonHardCodedLocationSpecificOffsets,
+  OFFSET_SOURCE_DATABASE,
 } from '/app/redux/protocol-runs'
 import type { UseLPCLabwareInfoProps } from '..'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
@@ -25,11 +28,17 @@ interface GetLPCLabwareInfoParams {
 export function getLPCLabwareInfoFrom(
   params: GetLPCLabwareInfoParams
 ): LPCLabwareInfo {
+  const labware = getLabwareInfoRecords(params)
+  // If the run contains no LPC-able labware, mark offsets as applied.
+  const areOffsetsApplied =
+    getTotalCountNonHardCodedLocationSpecificOffsets(labware) === 0
+
   return {
-    areOffsetsApplied: false,
+    areOffsetsApplied,
     selectedLabware: null,
-    labware: getLabwareInfoRecords(params),
-    lastFreshOffsetRunTimestamp: null, // Accurate data injected downstream.
+    labware,
+    lastFreshOffsetRunTimestamp: null,
+    sourcedOffsets: OFFSET_SOURCE_DATABASE,
   }
 }
 

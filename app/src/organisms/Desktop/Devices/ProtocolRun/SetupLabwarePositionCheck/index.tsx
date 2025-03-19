@@ -151,7 +151,7 @@ export function SetupLabwarePositionCheck(
             nonIdentityOffsets.length === 0
           }
         >
-          {t('confirm_offsets')}
+          {t('apply_offsets')}
         </SecondaryButton>
         {lpcDisabledReason != null || nonIdentityOffsets.length === 0 ? (
           <Tooltip tooltipProps={confirmOffsetsTooltipProps}>
