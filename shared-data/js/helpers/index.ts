@@ -1,4 +1,4 @@
-import { min, uniq } from 'lodash'
+import uniq from 'lodash/uniq'
 
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
@@ -242,8 +242,8 @@ export const getMinXYDimension = (
   wells: string[]
 ): number | null => {
   return (
-    min(
-      ['x', 'y'].map(dim =>
+    Math.min(
+      ...['x', 'y'].map(dim =>
         getWellDimension(labwareDef, wells, dim as XYPlaneDimension)
       )
     ) ?? null
