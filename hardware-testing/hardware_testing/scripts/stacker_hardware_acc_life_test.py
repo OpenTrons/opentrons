@@ -4,6 +4,8 @@ import asyncio
 import csv
 import os
 import sys
+import subprocess
+import re
 import time
 import threading
 from datetime import datetime
@@ -35,7 +37,7 @@ class Stacker_Axis_Acc_Lifetime_Test:
         self.home = None
         self.stackers = []
         self.test_files = []
-        self.serial_port_name = "/dev/ttyACM"
+        self.serial_port_name = "/dev/"
         self.labware_height = flex_stacker_driver.LABWARE_Z_HEIGHT.OPENTRONS_TIPRACKS
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
         self.test_data = {
@@ -49,6 +51,10 @@ class Stacker_Axis_Acc_Lifetime_Test:
             "ZR":"None",
             "LR":"None",
         }
+        self.stackerA_active = False
+        self.stackerB_active = False
+        self.stackerC_active = False
+        self.stackerD_active = False
 
     async def test_setup(self):
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
@@ -60,9 +66,14 @@ class Stacker_Axis_Acc_Lifetime_Test:
         self.start_time = time.time()
 
     async def stacker_setup(self):
-        for i in range(self.num_stacker):
-            self.stackers.append(flex_stacker_driver.FlexStacker(None).create(self.serial_port_name+str(i+1)))
-            self.stackers[i].setup_stall_detection()
+        res = subprocess.check_output(["ls", "-la", "/dev"])
+        port_list = re.findall(r'ot_module_flexstacker[0-9]', res.decode())
+        print(port_list)
+        for port in port_list:
+            stacker = flex_stacker_driver.FlexStacker(None).create(f"{self.serial_port_name}{port}")
+            stacker.set_led(power=1, color=flex_stacker_driver.LEDColor.GREEN, pattern=flex_stacker_driver.LEDPattern.STATIC)
+            stacker.setup_stall_detection()
+            self.stackers.append(stacker)
 
     async def gripper_setup(self):
         await self.api.cache_instruments()
@@ -94,14 +105,14 @@ class Stacker_Axis_Acc_Lifetime_Test:
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
 
-    def run_threading(self, cycle):
+    def run_threading(self):
         # # Define threads
-        stackerA_thread = threading.Thread(target = self.move_stackerA, args = (cycle, self.stackers[0], self.test_files[0],))
-        stackerB_thread = threading.Thread(target = self.move_stackerB, args = (cycle, self.stackers[1], self.test_files[1],))
+        stackerA_thread = threading.Thread(target = self.move_stackerA, args = (self.stackers[0], self.test_files[0],))
+        stackerB_thread = threading.Thread(target = self.move_stackerB, args = (self.stackers[1], self.test_files[1],))
         if self.num_stacker >= 3:
-            stackerC_thread = threading.Thread(target = self.move_stackerC, args = (cycle, self.stackers[2], self.test_files[2],))
+            stackerC_thread = threading.Thread(target = self.move_stackerC, args = (self.stackers[2], self.test_files[2],))
         if self.num_stacker == 4:
-            stackerD_thread = threading.Thread(target = self.move_stackerD, args = (cycle, self.stackers[3], self.test_files[3],))
+            stackerD_thread = threading.Thread(target = self.move_stackerD, args = (self.stackers[3], self.test_files[3],))
         # # Start threads
         stackerA_thread.start()
         stackerB_thread.start()
@@ -117,141 +128,181 @@ class Stacker_Axis_Acc_Lifetime_Test:
         if self.num_stacker == 4:
             stackerD_thread.join()
 
-    def move_stackerA(self, cycle, stacker, test_file):
+    def move_stackerA(self, stacker, test_file):
         # stacker.unload_labware(self.labware_height)
         # stacker.load_labware(self.labware_height)
-
-        serial_number = stacker.get_device_serial_number()
-        test_dataA = self.test_data.copy()
-        test_dataA["Cycle"] = str(cycle)
-        test_dataA["Stacker"] = serial_number
-
-        stacker.unload_labware(self.labware_height)
-        sensor_states = stacker.get_sensor_states()
-        stacker_state = "Unloaded"
-        test_dataA["State"] = stacker_state
-        test_dataA.update(sensor_states)
-        test_data = self.dict_values_to_line(test_dataA)
-        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-
-        stacker.load_labware(self.labware_height)
-        sensor_states = stacker.get_sensor_states()
-        stacker_state = "Loaded"
-        test_dataA["State"] = stacker_state
-        test_dataA.update(sensor_states)
-        test_data = self.dict_values_to_line(test_dataA)
-        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-
-    def move_stackerB(self, cycle, stacker, test_file):
-        # stacker.unload_labware(self.labware_height)
-        # stacker.load_labware(self.labware_height)
-
-        serial_number = stacker.get_device_serial_number()
-        test_dataB = self.test_data.copy()
-        test_dataB["Cycle"] = str(cycle)
-        test_dataB["Stacker"] = serial_number
-
-        stacker.unload_labware(self.labware_height)
-        sensor_states = stacker.get_sensor_states()
-        stacker_state = "Unloaded"
-        test_dataB["State"] = stacker_state
-        test_dataB.update(sensor_states)
-        test_data = self.dict_values_to_line(test_dataB)
-        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-
-        stacker.load_labware(self.labware_height)
-        sensor_states = stacker.get_sensor_states()
-        stacker_state = "Loaded"
-        test_dataB["State"] = stacker_state
-        test_dataB.update(sensor_states)
-        test_data = self.dict_values_to_line(test_dataB)
-        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-
-    def move_stackerC(self, cycle, stacker, test_file):
-        # stacker.unload_labware(self.labware_height)
-        # stacker.load_labware(self.labware_height)
-
-        serial_number = stacker.get_device_serial_number()
-        test_dataC = self.test_data.copy()
-        test_dataC["Cycle"] = str(cycle)
-        test_dataC["Stacker"] = serial_number
-
-        stacker.unload_labware(self.labware_height)
-        sensor_states = stacker.get_sensor_states()
-        stacker_state = "Unloaded"
-        test_dataC["State"] = stacker_state
-        test_dataC.update(sensor_states)
-        test_data = self.dict_values_to_line(test_dataC)
-        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-
-        stacker.load_labware(self.labware_height)
-        sensor_states = stacker.get_sensor_states()
-        stacker_state = "Loaded"
-        test_dataC["State"] = stacker_state
-        test_dataC.update(sensor_states)
-        test_data = self.dict_values_to_line(test_dataC)
-        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-
-    def move_stackerD(self, cycle, stacker, test_file):
-        # stacker.unload_labware(self.labware_height)
-        # stacker.load_labware(self.labware_height)
-
-        serial_number = stacker.get_device_serial_number()
-        test_dataD = self.test_data.copy()
-        test_dataD["Cycle"] = str(cycle)
-        test_dataD["Stacker"] = serial_number
-
-        stacker.unload_labware(self.labware_height)
-        sensor_states = stacker.get_sensor_states()
-        stacker_state = "Unloaded"
-        test_dataD["State"] = stacker_state
-        test_dataD.update(sensor_states)
-        test_data = self.dict_values_to_line(test_dataD)
-        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-
-        stacker.load_labware(self.labware_height)
-        sensor_states = stacker.get_sensor_states()
-        stacker_state = "Loaded"
-        test_dataD["State"] = stacker_state
-        test_dataD.update(sensor_states)
-        test_data = self.dict_values_to_line(test_dataD)
-        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
-
-    async def _stacker_mode(self, cycle):
-        # Sequential Mode
-        if self.mode == "sequential":
-            for stacker in self.stackers:
-                print(f"-> Unloading Labware...")
-                stacker.unload_labware(self.labware_height)
+        self.stackerA_active = True
+        cycle = 0
+        try:
+            while self.stackerA_active and cycle <= self.cycles:
                 serial_number = stacker.get_device_serial_number()
+                test_dataA = self.test_data.copy()
+                test_dataA["Cycle"] = str(cycle)
+                test_dataA["Stacker"] = serial_number
+
+                stacker.unload_labware(self.labware_height)
                 sensor_states = stacker.get_sensor_states()
                 stacker_state = "Unloaded"
-                self.test_data["Cycle"] = str(cycle)
-                self.test_data["Stacker"] = serial_number
-                self.test_data["State"] = stacker_state
-                self.test_data.update(sensor_states)
-                test_data = self.dict_values_to_line(self.test_data)
-                for file in self.test_files:
-                    if serial_number in file:
-                        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=file, data=test_data)
+                test_dataA["State"] = stacker_state
+                test_dataA.update(sensor_states)
+                test_data = self.dict_values_to_line(test_dataA)
+                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
 
-            for stacker in self.stackers:
-                print(f"-> Loading Labware...")
                 stacker.load_labware(self.labware_height)
-                serial_number = stacker.get_device_serial_number()
                 sensor_states = stacker.get_sensor_states()
                 stacker_state = "Loaded"
-                self.test_data["Cycle"] = str(cycle)
-                self.test_data["Stacker"] = serial_number
-                self.test_data["State"] = stacker_state
-                self.test_data.update(sensor_states)
-                test_data = self.dict_values_to_line(self.test_data)
-                for file in self.test_files:
-                    if serial_number in file:
-                        data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=file, data=test_data)
+                test_dataA["State"] = stacker_state
+                test_dataA.update(sensor_states)
+                test_data = self.dict_values_to_line(test_dataA)
+                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
+                cycle += 1
+        except flex_stacker_driver.MotorStallError:
+            print("\nStackerA: Stall Error Detected!")
+            self.exit_stacker()
+        except KeyboardInterrupt:
+            self.exit_stacker()
+
+    def move_stackerB(self, stacker, test_file):
+        # stacker.unload_labware(self.labware_height)
+        # stacker.load_labware(self.labware_height)
+        self.stackerB_active = True
+        cycle = 0
+        try:
+            while self.stackerB_active and cycle <= self.cycles:
+                serial_number = stacker.get_device_serial_number()
+                test_dataB = self.test_data.copy()
+                test_dataB["Cycle"] = str(cycle)
+                test_dataB["Stacker"] = serial_number
+
+                stacker.unload_labware(self.labware_height)
+                sensor_states = stacker.get_sensor_states()
+                stacker_state = "Unloaded"
+                test_dataB["State"] = stacker_state
+                test_dataB.update(sensor_states)
+                test_data = self.dict_values_to_line(test_dataB)
+                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
+
+                stacker.load_labware(self.labware_height)
+                sensor_states = stacker.get_sensor_states()
+                stacker_state = "Loaded"
+                test_dataB["State"] = stacker_state
+                test_dataB.update(sensor_states)
+                test_data = self.dict_values_to_line(test_dataB)
+                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
+                cycle += 1
+        except flex_stacker_driver.MotorStallError:
+            print("\nStackerB: Stall Error Detected!")
+            self.exit_stacker()
+        except KeyboardInterrupt:
+            self.exit_stacker()
+
+    def move_stackerC(self, stacker, test_file):
+        # stacker.unload_labware(self.labware_height)
+        # stacker.load_labware(self.labware_height)
+        self.stackerC_active = True
+        cycle = 0
+        try:
+            while self.stackerC_active and cycle <= self.cycles:
+                serial_number = stacker.get_device_serial_number()
+                test_dataC = self.test_data.copy()
+                test_dataC["Cycle"] = str(cycle)
+                test_dataC["Stacker"] = serial_number
+
+                stacker.unload_labware(self.labware_height)
+                sensor_states = stacker.get_sensor_states()
+                stacker_state = "Unloaded"
+                test_dataC["State"] = stacker_state
+                test_dataC.update(sensor_states)
+                test_data = self.dict_values_to_line(test_dataC)
+                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
+
+                stacker.load_labware(self.labware_height)
+                sensor_states = stacker.get_sensor_states()
+                stacker_state = "Loaded"
+                test_dataC["State"] = stacker_state
+                test_dataC.update(sensor_states)
+                test_data = self.dict_values_to_line(test_dataC)
+                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
+                cycle += 1
+        except flex_stacker_driver.MotorStallError:
+            print("\nStackerC: Stall Error Detected!")
+            self.exit_stacker()
+        except KeyboardInterrupt:
+            self.exit_stacker()
+
+    def move_stackerD(self, stacker, test_file):
+        # stacker.unload_labware(self.labware_height)
+        # stacker.load_labware(self.labware_height)
+        self.stackerD_active = True
+        cycle = 0
+        try:
+            while self.stackerD_active and cycle <= self.cycles:
+                print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
+                serial_number = stacker.get_device_serial_number()
+                test_dataD = self.test_data.copy()
+                test_dataD["Cycle"] = str(cycle)
+                test_dataD["Stacker"] = serial_number
+
+                stacker.unload_labware(self.labware_height)
+                sensor_states = stacker.get_sensor_states()
+                stacker_state = "Unloaded"
+                test_dataD["State"] = stacker_state
+                test_dataD.update(sensor_states)
+                test_data = self.dict_values_to_line(test_dataD)
+                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
+
+                stacker.load_labware(self.labware_height)
+                sensor_states = stacker.get_sensor_states()
+                stacker_state = "Loaded"
+                test_dataD["State"] = stacker_state
+                test_dataD.update(sensor_states)
+                test_data = self.dict_values_to_line(test_dataD)
+                data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
+                cycle += 1
+        except flex_stacker_driver.MotorStallError:
+            print("\nStackerD: Stall Error Detected!")
+            self.exit_stacker()
+        except KeyboardInterrupt:
+            self.exit_stacker()
+
+    async def _stacker_mode(self):
+        # Sequential Mode
+        if self.mode == "sequential":
+            for i in range(self.cycles):
+                cycle = i + 1
+                print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
+                for stacker in self.stackers:
+                    print(f"-> Unloading Labware...")
+                    stacker.unload_labware(self.labware_height)
+                    serial_number = stacker.get_device_serial_number()
+                    sensor_states = stacker.get_sensor_states()
+                    stacker_state = "Unloaded"
+                    self.test_data["Cycle"] = str(cycle)
+                    self.test_data["Stacker"] = serial_number
+                    self.test_data["State"] = stacker_state
+                    self.test_data.update(sensor_states)
+                    test_data = self.dict_values_to_line(self.test_data)
+                    for file in self.test_files:
+                        if serial_number in file:
+                            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=file, data=test_data)
+
+                for stacker in self.stackers:
+                    print(f"-> Loading Labware...")
+                    stacker.load_labware(self.labware_height)
+                    serial_number = stacker.get_device_serial_number()
+                    sensor_states = stacker.get_sensor_states()
+                    stacker_state = "Loaded"
+                    self.test_data["Cycle"] = str(cycle)
+                    self.test_data["Stacker"] = serial_number
+                    self.test_data["State"] = stacker_state
+                    self.test_data.update(sensor_states)
+                    test_data = self.dict_values_to_line(self.test_data)
+                    for file in self.test_files:
+                        if serial_number in file:
+                            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=file, data=test_data)
         # Parallel Mode
         else:
-            self.run_threading(cycle)
+            self.run_threading()
 
     async def _home(
         self, api: OT3API, mount: OT3Mount
@@ -263,15 +314,18 @@ class Stacker_Axis_Acc_Lifetime_Test:
         if self.api:
             await self.api.disengage_axes(self.axes)
 
+    def exit_stacker(self):
+        self.stackerA_active = False
+        self.stackerB_active = False
+        self.stackerC_active = False
+        self.stackerD_active = False
+
     async def run(self) -> None:
         try:
             await self.test_setup()
             if self.api and self.mount:
                 await self._home(self.api, self.mount)
-                for i in range(self.cycles):
-                    cycle = i + 1
-                    print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
-                    await self._stacker_mode(cycle)
+                await self._stacker_mode()
         except Exception as e:
             await self.exit()
             raise e
