@@ -9,6 +9,8 @@ export const SharedScrollRefContext = createContext<SharedScrollRefContextType |
   null
 )
 
+// This provider exists to capture the ref of the main scrollable Box element in the ODD
+// This is so that we can do things like auto scroll (using the ref) across components
 export const SharedScrollRefProvider: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
@@ -18,7 +20,6 @@ export const SharedScrollRefProvider: React.FC<{
   // This is necessary because we need a ref to be attached to the DOM
   // But also refs don't trigger rerenders, which we need in order to detect scrolling
   const refCallback = useCallback((node: HTMLElement | null) => {
-    console.log('calling refCallback')
     setCurrentElement(node)
   }, [])
 
