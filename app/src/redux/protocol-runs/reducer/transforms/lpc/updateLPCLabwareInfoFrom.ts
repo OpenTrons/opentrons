@@ -14,6 +14,11 @@ export function updateLPCLabwareInfoFrom(
   clonedRunOffsets: LabwareOffset[],
   currentLwInfoLw: LPCLabwareInfo['labware']
 ): LPCLabwareInfo['labware'] {
+  if (clonedRunOffsets.length === 0) {
+    console.error('Attempted to update LPC with no run offsets.')
+    return currentLwInfoLw
+  }
+
   return clonedRunOffsets.reduce(
     (acc, clonedRunOffset) => {
       const definitionUri = clonedRunOffset.definitionUri

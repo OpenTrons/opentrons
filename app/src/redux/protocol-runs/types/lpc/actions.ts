@@ -97,9 +97,14 @@ export interface AppliedOffsetsToRunAction {
   payload: { runId: string }
 }
 
-export interface UpdateLPCWithOffsetsAction {
-  type: 'UPDATE_LPC_WITH_OFFSETS'
+export interface SourceOffsetsFromRunAction {
+  type: 'SOURCE_OFFSETS_FROM_RUN'
   payload: { runId: string; offsets: LabwareOffset[] }
+}
+
+export interface SourceOffsetsFromDatabaseAction {
+  type: 'SOURCE_OFFSETS_FROM_DATABASE'
+  payload: { runId: string }
 }
 
 export type LPCWizardAction =
@@ -117,4 +122,5 @@ export type LPCWizardAction =
   | ProceedHandleLwSubstepAction
   | GoBackHandleLwSubstepAction
   | AppliedOffsetsToRunAction
-  | UpdateLPCWithOffsetsAction
+  | SourceOffsetsFromRunAction
+  | SourceOffsetsFromDatabaseAction

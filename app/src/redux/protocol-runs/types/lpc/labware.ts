@@ -3,16 +3,28 @@ import type {
   LocationSpecificOffsetDetails,
   OffsetLocationDetails,
 } from './offsets'
+import type {
+  OFFSET_SOURCE_RUN_RECORD,
+  OFFSET_SOURCE_DATABASE,
+  OFFSET_SOURCE_CONFLICT,
+} from '/app/redux/protocol-runs'
 
 export interface LPCLabwareInfo {
   // Whether the user has confirmed offsets should be applied to the run.
   // Initializes as true if the run has no LPC-able labware.
   areOffsetsApplied: boolean
+  // From which source the offsets that populate LPCLabwareInfo are sourced.
+  sourcedOffsets: OffsetSources
   // If current run offsets are stale, the run timestamp when they were not stale.
   lastFreshOffsetRunTimestamp: string | null
   selectedLabware: SelectedLwOverview | null
   labware: { [uri: string]: LwGeometryDetails }
 }
+
+export type OffsetSources =
+  | typeof OFFSET_SOURCE_RUN_RECORD
+  | typeof OFFSET_SOURCE_DATABASE
+  | typeof OFFSET_SOURCE_CONFLICT
 
 export interface LwGeometryDetails {
   id: string
