@@ -11,7 +11,6 @@ export interface SetupLabwarePositionCheckProps {
   robotName: string
   robotType: RobotType
   runId: string
-  isNewLPC: boolean
 }
 
 export function SetupLabwarePositionCheck(

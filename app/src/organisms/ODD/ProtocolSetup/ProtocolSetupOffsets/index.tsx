@@ -28,6 +28,8 @@ export interface ProtocolSetupOffsetsProps {
   isConfirmed: boolean
 }
 
+// TOME TODO: Do not forget the desktop offset conflict resolution.
+
 export function ProtocolSetupOffsets(
   props: ProtocolSetupOffsetsProps
 ): JSX.Element {

@@ -2,7 +2,6 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 
-import { useLaunchLegacyLPC } from '/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC'
 import { useNotifyRunQuery } from '/app/resources/runs'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useLPCFlows, LPCFlows } from '/app/organisms/LabwarePositionCheck'
@@ -18,7 +17,7 @@ import type { SetupLabwarePositionCheckProps } from '..'
 export function FlexSetupLPC(
   props: SetupLabwarePositionCheckProps
 ): JSX.Element {
-  const { robotName, runId, isNewLPC } = props
+  const { robotName, runId } = props
   const robotType = useRobotType(robotName)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { data: protocolRecord } = useProtocolQuery(
@@ -32,11 +31,6 @@ export function FlexSetupLPC(
     protocolRecord?.data.files[0].name ??
     ''
 
-  const { launchLegacyLPC, LegacyLPCWizard } = useLaunchLegacyLPC(
-    runId,
-    robotType,
-    protocolName
-  )
   const { launchLPC, lpcProps, showLPC } = useLPCFlows({
     runId,
     robotType,
@@ -46,12 +40,7 @@ export function FlexSetupLPC(
   return (
     <Flex css={CONTAINER_STYLE}>
       <LPCSetupOffsetsTable {...props} />
-      <LPCSetupFlexBtns
-        {...props}
-        launchLPC={launchLPC}
-        launchLegacyLPC={launchLegacyLPC}
-      />
-      {isNewLPC ? null : LegacyLPCWizard}
+      <LPCSetupFlexBtns {...props} launchLPC={launchLPC} />
       {showLPC && <LPCFlows {...lpcProps} />}
     </Flex>
   )
