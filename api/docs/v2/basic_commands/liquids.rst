@@ -129,33 +129,22 @@ The optional ``push_out`` parameter of ``dispense()`` helps ensure all liquid le
 
 Flex pipettes include a push out of air by default for any dispense that completely empties the attached pipette tip. The default and maximum push out volumes depend on your Flex pipette and tip combination. 
 
-.. list-table::
-    :header-rows: 1
++----------------------------------+------+---------------------------+---------------------------+
+|              Pipette             |  Tip |          Default          |          Maximum          |
+|                                  |      |          push_out         |          push_out         |
+|                                  |      |         Volume (µL)       |         Volume (µL)       |
++==================================+======+=========+=================+=========+=================+ 
+|                                  |      | Default | Low-volume mode | Default | Low-volume mode | 
++----------------------------------+------+---------+-----------------+---------+-----------------+ 
+|     1- and 8-channel (50 µL)     |  50  |    2    |        7        |   3.9   |       11.7      | 
++----------------------------------+------+---------+-----------------+---------+-----------------+ 
+| 1-, 8-, and 96-channel (1000 µL) | 50   | 7       |        -        |   79.5  |        -        | 
+|                                  +------+---------+                 |         |                 |
+|                                  | 200  | 5       |                 |         |                 |
+|                                  +------+---------+                 |         |                 |
+|                                  | 1000 | 20      |                 |         |                 |
++----------------------------------+------+---------+-----------------+---------+-----------------+
 
-    * - Pipette
-      - Tip
-      - Default ``push_out`` Volume (µL)
-      - Maximum ``push_out`` Volume (µL)
-    * - 1- and 8-channel (50 µL)
-      - 
-          - 50
-      - 
-          - Default: 2
-          - Low-volume mode: 7
-      - 
-          - Default: 3.9
-          - Low-volume mode: 11.7
-    * - 1-, 8-, and 96-channel (1000 µL)
-      - 
-          - 50
-          - 200
-          - 1000
-      - 
-          - 7
-          - 5
-          - 20
-      - 
-          - All volumes: 79.5
 
 OT-2 pipettes do not include a push out by default. 
 

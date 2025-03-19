@@ -364,6 +364,8 @@ class InstrumentContext(publisher.CommandPublisher):
         :param push_out: Continue past the plunger bottom to help ensure all liquid
                          leaves the tip. Measured in µL. The default value is ``None``.
 
+                         When not specified or set to ``None``, the plunger moves by a non-zero default amount.
+
                          See :ref:`push-out-dispense` for details.
         :type push_out: float
 
