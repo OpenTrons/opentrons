@@ -8,7 +8,7 @@ import {
   getRelevantFailedLabwareCmdFrom,
   useRelevantFailedLwLocations,
 } from '../useFailedLabwareUtils'
-import { DEFINED_ERROR_TYPES } from '../../constants'
+import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
 
 import type { ComponentProps } from 'react'
 import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
@@ -203,6 +203,7 @@ describe('useRelevantFailedLwLocations', () => {
       failedLabware: mockFailedLabware,
       failedCommandByRunRecord: mockFailedCommand,
       runRecord: mockRunRecord,
+      errorKind: ERROR_KINDS.GENERAL_ERROR,
     })
 
     screen.getByText('Current Loc: Slot D1')
@@ -213,6 +214,7 @@ describe('useRelevantFailedLwLocations', () => {
         failedLabware: mockFailedLabware,
         failedCommandByRunRecord: mockFailedCommand,
         runRecord: mockRunRecord,
+        errorKind: ERROR_KINDS.GENERAL_ERROR,
       })
     )
 
@@ -232,6 +234,7 @@ describe('useRelevantFailedLwLocations', () => {
       failedLabware: mockFailedLabware,
       failedCommandByRunRecord: mockFailedCommand,
       runRecord: mockRunRecord,
+      errorKind: ERROR_KINDS.GENERAL_ERROR,
     })
 
     screen.getByText('Current Loc: Slot D1')
@@ -242,6 +245,7 @@ describe('useRelevantFailedLwLocations', () => {
         failedLabware: mockFailedLabware,
         failedCommandByRunRecord: mockFailedCommand,
         runRecord: mockRunRecord,
+        errorKind: ERROR_KINDS.GENERAL_ERROR,
       })
     )
 
