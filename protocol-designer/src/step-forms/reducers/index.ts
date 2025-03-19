@@ -5,6 +5,7 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import {
+  FLEX_ROBOT_TYPE,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -12,7 +13,10 @@ import {
   MAGNETIC_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { GRIPPER_LOCATION } from '@opentrons/step-generation'
+import {
+  GRIPPER_LOCATION,
+  PROTOCOL_CONTEXT_FIXED_TRASH,
+} from '@opentrons/step-generation'
 import { rootReducer as labwareDefsRootReducer } from '../../labware-defs'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
@@ -1260,7 +1264,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               location,
               pythonName: getAdditionalEquipmentPythonName(
                 'trashBin',
-                index + 1
+                index + 1,
+                location
               ),
             },
           }),
@@ -1345,7 +1350,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           pythonName:
             name === 'stagingArea'
               ? undefined
-              : getAdditionalEquipmentPythonName(name, typeCount + 1),
+              : getAdditionalEquipmentPythonName(name, typeCount + 1, location),
         },
       }
     },
