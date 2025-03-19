@@ -2467,7 +2467,7 @@ def run(protocol: ProtocolContext) -> None:
         p1000.pick_up_tip()
         p1000.move_to(sample_plate_3["A1"].bottom(z=0.5))
         p1000.aspirate(TransferSup + 1, rate=0.25)
-        p1000.dispense(TransferSup + 1, CleanupPlate_2["A2"].bottom(z=1))
+        p1000.dispense(TransferSup + 1, CleanupPlate_2["A1"].bottom(z=1))
         p1000.drop_tip()
         # ===============================================
         protocol.comment("--> ADDING AMPure (0.8x)")
