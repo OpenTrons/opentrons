@@ -10,7 +10,6 @@ import {
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
-  OFFSET_SOURCE_DATABASE,
 } from '/app/redux/protocol-runs/constants'
 
 import type { Selector } from 'reselect'

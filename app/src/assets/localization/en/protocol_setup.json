@@ -118,7 +118,6 @@
   "labware_name": "Labware name",
   "labware_offsets": "Labware Offsets",
   "labware_offsets_conflict": "Labware offsets conflict",
-  "labware_offsets_conflict_description": "Your Flex's stored labware offsets were updated after the last protocol run on <strong>{{timestamp}}</strong>. Which offsets do you want to use to run this protocol again?",
   "labware_placement": "labware placement",
   "labware_position_check": "Labware Position Check",
   "labware_position_check_not_available": "Labware Position Check is not available after run has started",

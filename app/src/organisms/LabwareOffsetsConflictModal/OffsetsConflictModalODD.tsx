@@ -34,7 +34,7 @@ export const handleOffsetsConflictModalODD = (
 
 const OffsetsConflictModalODD = NiceModal.create(
   ({ runId, runRecord }: OffsetsConflictModalODDProps): JSX.Element => {
-    const { t } = useTranslation('protocol_setup')
+    const { t } = useTranslation(['protocol_setup', 'branded'])
     const dispatch = useDispatch()
     const clonedRunOffsets = runRecord?.data.labwareOffsets ?? []
     const lastFreshRunTs = useSelector(selectLastFreshOffsetRunTimestamp(runId))
@@ -63,7 +63,7 @@ const OffsetsConflictModalODD = NiceModal.create(
           <StyledText oddStyle="bodyTextRegular">
             <Trans
               t={t}
-              i18nKey="labware_offsets_conflict_description"
+              i18nKey="branded:labware_offsets_conflict_description"
               values={{
                 timestamp: lastFreshRunTs,
               }}

@@ -45,6 +45,14 @@ vi.mock('../Hardware')
 vi.mock('../Labware')
 vi.mock('/app/redux/config')
 vi.mock('/app/local-resources/dom-utils')
+vi.mock('/app/organisms/LabwarePositionCheck')
+vi.mock('react-redux', async () => {
+  const actual = await vi.importActual('react-redux')
+  return {
+    ...actual,
+    useSelector: vi.fn(),
+  }
+})
 
 const MOCK_HOST_CONFIG = {} as HostConfig
 const mockCreateRun = vi.fn((id: string) => {})
