@@ -41,7 +41,6 @@ import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
-// const WASTE_CHUTE_SPACE = 30
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
 export function ProtocolStepsDeckContainer(): JSX.Element {
