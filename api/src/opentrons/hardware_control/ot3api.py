@@ -1465,7 +1465,7 @@ class OT3API(
     ) -> None:
         """Worker function to apply robot motion."""
         start = time.time()
-        PROFILE_LOG.info(f"API level move {start}")
+        PROFILE_LOG.info(f"OT3API._move\tstart\t{start}")
         machine_pos = machine_from_deck(
             deck_pos=target_position,
             attitude=self._robot_calibration.deck_calibration.attitude,
@@ -1498,13 +1498,17 @@ class OT3API(
             except Exception:
                 self._log.exception("Move failed")
                 self._current_position.clear()
-                PROFILE_LOG.info(f"API level move Failed {time.time() - start}")
+                end = time.time()
+                PROFILE_LOG.info(f"OT3API._move\tfailed\t{end}")
+                PROFILE_LOG.info(f"OT3API._move\tduration\t{end - start}")
                 raise
             else:
                 await self._cache_current_position()
                 await self._cache_encoder_position()
 
-        PROFILE_LOG.info(f"API level move done {time.time() - start}")
+        end = time.time()
+        PROFILE_LOG.info(f"OT3API._move\tend\t{end}")
+        PROFILE_LOG.info(f"OT3API._move\tduration\t{end - start}")
 
     async def _set_plunger_current_and_home(
         self,
