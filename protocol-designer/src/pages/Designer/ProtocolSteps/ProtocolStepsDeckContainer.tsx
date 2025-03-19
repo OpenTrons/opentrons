@@ -34,8 +34,8 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
-import { DeckSetupDetails } from './DeckSetupDetails'
-import { getCutoutIdForAddressableArea } from './utils'
+import { DeckSetupDetails } from '../DeckSetup/DeckSetupDetails'
+import { getCutoutIdForAddressableArea } from '../DeckSetup/utils'
 
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'

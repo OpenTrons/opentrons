@@ -40,7 +40,7 @@ import {
 } from '../../../file-data/selectors'
 
 import { DraggableSidebar } from './DraggableSidebar'
-import { ProtocolStepsDeckContainer } from '../DeckSetup/ProtocolStepsDeckContainer'
+import { ProtocolStepsDeckContainer } from './ProtocolStepsDeckContainer'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 

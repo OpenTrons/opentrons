@@ -17,7 +17,7 @@ import {
   getRobotStateTimeline,
 } from '../../../../file-data/selectors'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
-import { ProtocolStepsDeckContainer } from '../../DeckSetup/ProtocolStepsDeckContainer'
+import { ProtocolStepsDeckContainer } from '../ProtocolStepsDeckContainer'
 import { OffDeck } from '../../../../components/organisms/OffDeck'
 import { SubStepsToolbox } from '../Timeline'
 import { DraggableSidebar } from '../DraggableSidebar'
@@ -36,7 +36,7 @@ vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
 vi.mock('../../../../components/organisms/OffDeck')
-vi.mock('../../DeckSetup/ProtocolStepsDeckContainer')
+vi.mock('../ProtocolStepsDeckContainer')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {
     i18nInstance: i18n,
