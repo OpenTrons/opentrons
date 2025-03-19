@@ -4,7 +4,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils'
-import { blowout } from '../commandCreators/atomic'
+import { blowOutInWell } from '../commandCreators/atomic'
 import { blowOutInWasteChute } from '../commandCreators/compound'
 import { curryCommandCreator } from '../utils/curryCommandCreator'
 import {
@@ -59,7 +59,7 @@ describe('blowoutUtil', () => {
       ...blowoutArgs,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: blowoutArgs.sourceLabwareId,
       wellName: blowoutArgs.sourceWell,
@@ -101,7 +101,7 @@ describe('blowoutUtil', () => {
       ...blowoutArgs,
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: blowoutArgs.destLabwareId,
       wellName: blowoutArgs.destWell,
@@ -119,7 +119,7 @@ describe('blowoutUtil', () => {
       ...blowoutArgs,
       blowoutLocation: TROUGH_LABWARE,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: TROUGH_LABWARE,
       wellName: 'A1',

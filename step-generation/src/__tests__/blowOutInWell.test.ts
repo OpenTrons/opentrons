@@ -1,6 +1,6 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { expectTimelineError } from '../__utils__/testMatchers'
-import { blowout } from '../commandCreators/atomic/blowout'
+import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import {
   makeContext,
   getInitialRobotStateStandard,
@@ -16,7 +16,7 @@ import type { RobotState, InvariantContext } from '../types'
 
 vi.mock('../utils/heaterShakerCollision')
 
-describe('blowout', () => {
+describe('blowOutInWell', () => {
   let invariantContext: InvariantContext
   let initialRobotState: RobotState
   let robotStateWithTip: RobotState
@@ -39,7 +39,7 @@ describe('blowout', () => {
     }
   })
   it('blowout with tip', () => {
-    const result = blowout(params, invariantContext, robotStateWithTip)
+    const result = blowOutInWell(params, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
@@ -60,11 +60,11 @@ describe('blowout', () => {
       },
     ])
     expect(res.python).toBe(
-      'mockPythonName.blow_out(mockPythonName["A1"].top(-1.3))'
+      'mockPythonName.blow_out(mockPythonName["A1"].top(z=-1.3))'
     )
   })
   it('blowout with invalid pipette ID should throw error', () => {
-    const result = blowout(
+    const result = blowOutInWell(
       { ...params, pipetteId: 'badPipette' },
       invariantContext,
       robotStateWithTip
@@ -72,7 +72,7 @@ describe('blowout', () => {
     expectTimelineError(getErrorResult(result).errors, 'PIPETTE_DOES_NOT_EXIST')
   })
   it('blowout with invalid labware ID should throw error', () => {
-    const result = blowout(
+    const result = blowOutInWell(
       { ...params, labwareId: 'badLabware' },
       invariantContext,
       robotStateWithTip
@@ -84,7 +84,7 @@ describe('blowout', () => {
     })
   })
   it('blowout with no tip should throw error', () => {
-    const result = blowout(params, invariantContext, initialRobotState)
+    const result = blowOutInWell(params, invariantContext, initialRobotState)
     const res = getErrorResult(result)
     expect(res.errors).toHaveLength(1)
     expect(res.errors[0]).toMatchObject({
@@ -95,7 +95,7 @@ describe('blowout', () => {
     initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
       invariantContext
     )
-    const result = blowout(
+    const result = blowOutInWell(
       {
         flowRate: 10,
         wellLocation: {

@@ -12,13 +12,14 @@ import {
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   formatPyStr,
+  formatPyWellLocation,
 } from '../../utils'
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CreateCommand, BlowoutParams } from '@opentrons/shared-data'
 import type { CommandCreatorError, CommandCreator } from '../../types'
 
-export const blowout: CommandCreator<BlowoutParams> = (
+export const blowOutInWell: CommandCreator<BlowoutParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -202,13 +203,13 @@ export const blowout: CommandCreator<BlowoutParams> = (
       },
     },
   ]
-  const originPython = wellLocation?.origin ?? ''
-  const offsetPython = wellLocation?.offset?.z ?? ''
+  const pythonWellLocation =
+    wellLocation != null ? formatPyWellLocation(wellLocation) : ''
 
   return {
     commands,
     python: `${pipettePythonName}.blow_out(${labwarePythonName}[${formatPyStr(
       wellName
-    )}].${originPython}(${offsetPython}))`,
+    )}]${pythonWellLocation})`,
   }
 }
