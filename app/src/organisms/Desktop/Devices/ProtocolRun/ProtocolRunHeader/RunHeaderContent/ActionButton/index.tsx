@@ -1,3 +1,5 @@
+import { useSelector } from 'react-redux'
+
 import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -25,10 +27,10 @@ import {
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 import { getFallbackRobotSerialNumber, isRunAgainStatus } from '../../utils'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
+import { selectAreOffsetsApplied } from '/app/redux/protocol-runs'
 
 import type { MutableRefObject } from 'react'
 import type { RunHeaderContentProps } from '..'
-
 export type BaseActionButtonProps = RunHeaderContentProps
 
 interface ActionButtonProps extends BaseActionButtonProps {
@@ -63,10 +65,13 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     robotName
   )
   const currentRunId = useCurrentRunId()
+  const areOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  console.log('=>(index.tsx:69) areOffsetsApplied', areOffsetsApplied)
 
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
+    areOffsetsApplied &&
     missingModuleIds.length === 0
   const isCurrentRun = currentRunId === runId
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId

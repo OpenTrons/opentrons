@@ -14,7 +14,7 @@ import {
   SET_INITIAL_POSITION,
   SET_SELECTED_LABWARE,
   SET_SELECTED_LABWARE_URI,
-  START_LPC,
+  UPDATE_LPC,
   SOURCE_OFFSETS_FROM_RUN,
   SOURCE_OFFSETS_FROM_DATABASE,
   OFFSET_SOURCE_DATABASE,
@@ -41,7 +41,7 @@ export function LPCReducer(
   state: LPCWizardState | undefined,
   action: LPCWizardAction
 ): LPCWizardState | undefined {
-  if (action.type === START_LPC) {
+  if (action.type === UPDATE_LPC) {
     return action.payload.state
   } else if (state == null) {
     return undefined

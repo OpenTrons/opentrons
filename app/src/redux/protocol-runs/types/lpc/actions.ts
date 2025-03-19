@@ -16,8 +16,8 @@ export interface PositionParams {
   position: VectorOffset
 }
 
-export interface StartLPCAction {
-  type: 'START_LPC'
+export interface UpdateLPCAction {
+  type: 'UPDATE_LPC'
   payload: { runId: string; state: LPCWizardState }
 }
 
@@ -108,7 +108,7 @@ export interface SourceOffsetsFromDatabaseAction {
 }
 
 export type LPCWizardAction =
-  | StartLPCAction
+  | UpdateLPCAction
   | FinishLPCAction
   | SelectedLabwareNameAction
   | SelectedLabwareAction

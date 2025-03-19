@@ -99,12 +99,7 @@ function useFlexLPCLabwareInfo({
         labwareDefs,
         protocolData,
       }),
-    [
-      storedOffsets?.length,
-      labwareDefs?.length,
-      lwLocationCombos.length,
-      protocolData?.commands.length,
-    ]
+    [storedOffsets, labwareDefs, lwLocationCombos, protocolData]
   )
 
   return { labwareInfo, storedOffsets, searchLwOffsetsParams }

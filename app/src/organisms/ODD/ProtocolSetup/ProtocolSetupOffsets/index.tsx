@@ -12,7 +12,7 @@ import {
   OFFSET_SOURCE_CONFLICT,
   selectOffsetSource,
 } from '/app/redux/protocol-runs'
-import { handleOffsetsConflictModalODD } from './OffsetsConflictModalODD'
+import { handleOffsetsConflictModalODD } from '/app/organisms/LabwareOffsetsConflictModal'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run } from '@opentrons/api-client'

@@ -89,11 +89,14 @@ import {
 } from '/app/transformations/commands'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import {
+  OFFSET_SOURCE_CONFLICT,
   selectAreOffsetsApplied,
   selectCountMissingLocationSpecificOffsets,
   selectIsAnyNecessaryDefaultOffsetMissing,
+  selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
 } from '/app/redux/protocol-runs'
+import { OffsetsConflictModalDesktop } from '/app/organisms/LabwareOffsetsConflictModal'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -494,7 +497,6 @@ function PrepareToRun({
   const isAnyNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
-  const areOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
 
   const lpcSetupStepProps = (): Pick<
     ProtocolSetupStepProps,
@@ -502,7 +504,7 @@ function PrepareToRun({
   > => {
     if (totalOffsets === 0) {
       return { detail: t('offsets_not_required'), status: 'ready' }
-    } else if (areOffsetsApplied) {
+    } else if (offsetsConfirmed) {
       return {
         detail: t('num_offsets_applied', { num: totalOffsets }),
         status: 'ready',
@@ -820,6 +822,7 @@ export function ProtocolSetup(): JSX.Element {
     robotType,
     protocolName,
   })
+  const offsetSource = useSelector(selectOffsetSource(runId))
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = useState<SetupScreens>('prepare to run')
@@ -916,6 +919,9 @@ export function ProtocolSetup(): JSX.Element {
           isProceedToRunModal={true}
           onConfirmClick={handleProceedToRunClick}
         />
+      ) : null}
+      {offsetSource === OFFSET_SOURCE_CONFLICT ? (
+        <OffsetsConflictModalDesktop runId={runId} runRecord={runRecord} />
       ) : null}
       <Flex css={buildSetupScreenStyle(setupScreen)}>
         {setupComponentByScreen[setupScreen]}

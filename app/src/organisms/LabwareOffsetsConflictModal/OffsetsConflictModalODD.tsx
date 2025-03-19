@@ -19,22 +19,17 @@ import {
 } from '/app/redux/protocol-runs'
 
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
-import type { Run } from '@opentrons/api-client'
-
-export interface OffsetsConflictModalODDProps {
-  runId: string
-  runRecord: Run | undefined
-}
+import type { OffsetsConflictModalProps } from './types'
 
 export const handleOffsetsConflictModalODD = (
-  props: OffsetsConflictModalODDProps
+  props: OffsetsConflictModalProps
 ): Promise<unknown> => {
   return NiceModal.show(OffsetsConflictModalODD, { ...props })
 }
 
 const OffsetsConflictModalODD = NiceModal.create(
-  ({ runId, runRecord }: OffsetsConflictModalODDProps): JSX.Element => {
-    const { t } = useTranslation('protocol_setup')
+  ({ runId, runRecord }: OffsetsConflictModalProps): JSX.Element => {
+    const { t } = useTranslation(['protocol_setup', 'branded'])
     const dispatch = useDispatch()
     const clonedRunOffsets = runRecord?.data.labwareOffsets ?? []
     const lastFreshRunTs = useSelector(selectLastFreshOffsetRunTimestamp(runId))
