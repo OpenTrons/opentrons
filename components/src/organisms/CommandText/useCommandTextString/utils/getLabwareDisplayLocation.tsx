@@ -4,6 +4,7 @@ import {
   getOccludedSlotCountForModule,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  FLEX_STACKER_MODULE_V1,
   TRASH_BIN_FIXTURE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
@@ -57,10 +58,22 @@ export function getLabwareDisplayLocation(
   // Module location without adapter
   else if (moduleModel != null && adapterName == null) {
     if (params.detailLevel === 'slot-only') {
-      return moduleModel === THERMOCYCLER_MODULE_V1 ||
-        moduleModel === THERMOCYCLER_MODULE_V2
-        ? t('slot', { slot_name: 'A1+B1' })
-        : t('slot', { slot_name: slotName })
+      switch (moduleModel) {
+        case THERMOCYCLER_MODULE_V1:
+        case THERMOCYCLER_MODULE_V2:
+          return t('slot', { slot_name: 'A1+B1' })
+        case FLEX_STACKER_MODULE_V1:
+          if (slotName === 'D3') {
+            return t('stacker_display_name', { stacker_slot: 'A' })
+          } else if (slotName === 'C3') {
+            return t('stacker_display_name', { stacker_slot: 'B' })
+          } else if (slotName === 'B3') {
+            return t('stacker_display_name', { stacker_slot: 'C' })
+          } else return t('stacker_display_name', { stacker_slot: 'D' })
+
+        default:
+          return t('slot', { slot_name: slotName })
+      }
     } else {
       return isOnDevice
         ? `${getModuleDisplayName(moduleModel)}, ${slotName}`

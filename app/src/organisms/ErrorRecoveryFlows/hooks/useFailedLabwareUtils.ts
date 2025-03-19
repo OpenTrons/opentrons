@@ -50,6 +50,8 @@ interface RelevantFailedLabwareLocations {
   newLoc: LabwareLocation | null
 }
 
+export type interventionLayout = 'default' | 'stacked'
+
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   /* The name of the labware relevant to the failed command, if any.  */
   failedLabwareName: string | null
@@ -61,6 +63,8 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   failedLabwareNickname: string | null
   /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
+  layout: interventionLayout
+  labwareQuantity: string | null
 }
 
 /** Utils for labware relating to the failedCommand.
@@ -68,6 +72,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
  * NOTE: What constitutes "relevant labware" varies depending on the errorKind.
  * For overpressure errors, the relevant labware is the tip rack from which the pipette picked up the tip.
  * For no liquid detected errors, the relevant labware is the well in which no liquid was detected.
+ * For stacker errors the labware is the labware set by flexStacker/setStoredLabwre.
  */
 export function useFailedLabwareUtils({
   failedCommand,
@@ -123,6 +128,18 @@ export function useFailedLabwareUtils({
     errorKind,
   })
 
+  console.log('WTFFFF: ', recentRelevantFailedLabwareCmd)
+  const labwareQuantity = getFailedLabwareQuantity(
+    runCommands,
+    recentRelevantFailedLabwareCmd,
+    errorKind
+  )
+
+  let layout
+  if (errorKind !== ERROR_KINDS.STALL_WHILE_STACKING) {
+    layout = 'default'
+  } else layout = 'stacked'
+
   return {
     ...tipSelectionUtils,
     failedLabwareName: failedLabwareDetails?.name ?? null,
@@ -130,6 +147,8 @@ export function useFailedLabwareUtils({
     relevantWellName,
     failedLabwareNickname: failedLabwareDetails?.nickname ?? null,
     failedLabwareLocations,
+    layout,
+    labwareQuantity,
   }
 }
 
@@ -291,6 +310,37 @@ function useTipSelectionUtils(
   }
 }
 
+export function getFailedLabwareQuantity(
+  runCommands: CommandsData | undefined,
+  recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
+  errorKind: ErrorKind
+): string | null {
+  if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
+    const itemsBeforefailedCmd = runCommands?.data.slice(
+      0,
+      runCommands?.data.findIndex(
+        x => x.id === recentRelevantFailedLabwareCmd?.id
+      )
+    )
+    const setStoredLabware = itemsBeforefailedCmd?.findLast(
+      cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+    )
+    console.log('setStoredLabware: ', setStoredLabware)
+    let total = 0
+    if (setStoredLabware?.params['initialCount']) {
+      total = setStoredLabware?.params.initialCount
+      const retreiveCmds = itemsBeforefailedCmd?.filter(
+        cmd => cmd.commandType === 'flexStacker/retrieve'
+      ).length
+      const storeCmds = itemsBeforefailedCmd?.filter(
+        cmd => cmd.commandType === 'flexStacker/store'
+      ).length
+      return 'Quantity: ' + total - retreiveCmds + storeCmds
+    } else return 'Quantity: 0'
+  }
+  return null
+}
+
 // Get the name of the relevant labware relevant to the failed command, if any.
 export function getFailedCmdRelevantLabware(
   protocolAnalysis: ErrorRecoveryFlowsProps['protocolAnalysis'],
@@ -408,10 +458,9 @@ export function useRelevantFailedLwLocations({
   let location
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
-      location =
-        runRecord?.data.modules.find(
-          md => md.id === failedCommandByRunRecord?.params.moduleId
-        )?.location ?? null
+      location = {
+        moduleId: failedCommandByRunRecord?.params.moduleId,
+      }
       break
     default:
       location = failedLabware?.location ?? null

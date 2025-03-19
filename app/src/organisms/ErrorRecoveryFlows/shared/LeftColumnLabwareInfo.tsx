@@ -21,6 +21,8 @@ export function LeftColumnLabwareInfo({
     failedLabwareName,
     failedLabwareNickname,
     failedLabwareLocations,
+    layout,
+    labwareQuantity,
   } = failedLabwareUtils
   const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
 
@@ -35,7 +37,8 @@ export function LeftColumnLabwareInfo({
     <InterventionContent
       headline={title}
       infoProps={{
-        layout: 'default',
+        layout: layout,
+        tagText: labwareQuantity,
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',
