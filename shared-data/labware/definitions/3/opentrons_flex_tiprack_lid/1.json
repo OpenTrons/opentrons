@@ -45,6 +45,11 @@
       "y": 0,
       "z": 14
     },
+    "opentrons_flex_96_filtertiprack_50ul": {
+      "x": 0,
+      "y": 0,
+      "z": 14
+    },
     "opentrons_flex_96_filtertiprack_200ul": {
       "x": 0,
       "y": 0,
@@ -82,8 +87,9 @@
     "opentrons_flex_96_tiprack_50ul",
     "opentrons_flex_96_tiprack_200ul",
     "opentrons_flex_96_tiprack_1000ul",
-    "opentrons_flex_96_filertiprack_200ul",
-    "opentrons_flex_96_filertiprack_1000ul"
+    "opentrons_flex_96_filtertiprack_50ul",
+    "opentrons_flex_96_filtertiprack_200ul",
+    "opentrons_flex_96_filtertiprack_1000ul"
   ],
   "gripForce": 10,
   "gripHeightFromLabwareBottom": 10,

@@ -200,6 +200,14 @@ def tiprack_lid_def() -> LabwareDefinition:
 
 
 @pytest.fixture(scope="session")
+def auto_sealing_lid_def() -> LabwareDefinition:
+    """Get the definition of the opentrons tough auto sealing lid."""
+    return labware_definition_type_adapter.validate_python(
+        load_definition("opentrons_tough_pcr_auto_sealing_lid", 2, schema=3)
+    )
+
+
+@pytest.fixture(scope="session")
 def tempdeck_v1_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
     definition = load_shared_data("module/definitions/3/temperatureModuleV1.json")
