@@ -90,8 +90,7 @@ if __name__ == "__main__":
         sheet_name_list.append(name)
     if sheet_name in sheet_name_list:
         sheet_id = google_sheet.get_sheet_by_name(sheet_name)
-        if isinstance(sheet_id, str):
-            new_sheet_id = sheet_id
+        new_sheet_id = sheet_id
         print(f"Adding data to existing sheet {sheet_name}")
     else:
         new_sheet_id = google_sheet.create_worksheet(str(sheet_name))
