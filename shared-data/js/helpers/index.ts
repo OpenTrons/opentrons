@@ -433,11 +433,20 @@ export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
 }
 
 export const getIncompatibleLiquidClasses = (
-  predicate: (p: any) => boolean
+  pipetteModel: string,
+  additionalFilter?: (p: any) => boolean
 ): string[] => {
   const liquidClassDefs = getAllLiquidClassDefs()
+
   return Object.values(liquidClassDefs)
-    .filter(liquidClass => !Boolean(liquidClass.byPipette?.some(predicate)))
+    .filter(
+      liquidClass =>
+        !liquidClass.byPipette?.some(
+          p =>
+            p.pipetteModel === pipetteModel &&
+            (additionalFilter ? additionalFilter(p) : true)
+        )
+    )
     .map(liquidClass => liquidClass.displayName)
 }
 
@@ -461,24 +470,20 @@ export const getDisableLiquidClasses = (
     )
   }
 
-  getIncompatibleLiquidClasses(
-    p => p.pipetteModel === pipetteModel
-  ).forEach(cls => disabledLiquidClasses.add(cls as LiquidClassesOption))
+  getIncompatibleLiquidClasses(pipetteModel).forEach(cls =>
+    disabledLiquidClasses.add(cls as LiquidClassesOption)
+  )
 
-  getIncompatibleLiquidClasses(
-    p =>
-      p.pipetteModel === pipetteModel &&
-      p.byTipType.some((t: { tiprack: string }) => t.tiprack === tipRack)
+  getIncompatibleLiquidClasses(pipetteModel, p =>
+    p.byTipType.some((t: { tiprack: string }) => t.tiprack === tipRack)
   ).forEach(cls => disabledLiquidClasses.add(cls as LiquidClassesOption))
 
   if (path === 'multiDispense') {
-    getIncompatibleLiquidClasses(
-      p =>
-        p.pipetteModel === pipetteModel &&
-        p.byTipType.some(
-          (t: { tiprack: string; multiDispense: any }) =>
-            t.tiprack === tipRack && t.multiDispense !== undefined
-        )
+    getIncompatibleLiquidClasses(pipetteModel, p =>
+      p.byTipType.some(
+        (t: { tiprack: string; multiDispense: any }) =>
+          t.tiprack === tipRack && t.multiDispense !== undefined
+      )
     ).forEach(cls => disabledLiquidClasses.add(cls as LiquidClassesOption))
   }
 
