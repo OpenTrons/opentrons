@@ -5,10 +5,10 @@ import {
   getSuccessResult,
   makeContext,
 } from '../fixtures'
+import { PROTOCOL_CONTEXT_NAME } from '../utils'
 import { blowOutInTrash } from '../commandCreators/compound'
 import type { CutoutId } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
-import { PROTOCOL_CONTEXT_FIXED_TRASH } from '../constants'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
@@ -73,7 +73,7 @@ mockPythonName.blow_out(mock_trash_bin_1)`.trim()
         [mockFixedTrashId]: {
           id: mockFixedTrashId,
           name: 'trashBin',
-          pythonName: PROTOCOL_CONTEXT_FIXED_TRASH,
+          pythonName: `${PROTOCOL_CONTEXT_NAME}.fixed_trash`,
           location: 'cutout12',
         },
       },
@@ -109,7 +109,7 @@ mockPythonName.blow_out(mock_trash_bin_1)`.trim()
     expect(getSuccessResult(result).python).toBe(
       `
 mockPythonName.flow_rate.blow_out = 10
-mockPythonName.blow_out(protocol_context.fixed_trash)`.trim()
+mockPythonName.blow_out(protocol.fixed_trash)`.trim()
     )
   })
 })
