@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -30,6 +30,7 @@ import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { ProtocolSetupStep } from '../ProtocolSetupStep'
+import { useScrollRef } from '/app/App/hooks'
 import type {
   CompletedProtocolAnalysis,
   ChoiceParameter,
@@ -56,7 +57,6 @@ export function ProtocolSetupParameters({
   protocolId,
   labwareOffsets,
   runTimeParameters,
-  mostRecentAnalysis,
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
@@ -74,6 +74,10 @@ export function ProtocolSetupParameters({
     chooseCsvFileScreen,
     setChooseCsvFileScreen,
   ] = useState<CsvFileParameter | null>(null)
+  const [prevScrollPosition, setPrevScrollPosition] = useState<number | null>(
+    null
+  )
+  const { element } = useScrollRef()
   const [resetValuesModal, showResetValuesModal] = useState<boolean>(false)
   const [startSetup, setStartSetup] = useState<boolean>(false)
   const [runTimeParametersOverrides, setRunTimeParametersOverrides] = useState<
@@ -87,6 +91,25 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+  useEffect(() => {
+    const isShowingParametersList =
+      chooseValueScreen == null &&
+      chooseCsvFileScreen == null &&
+      showNumericalInputScreen == null
+    const canRestoreScrollPosition =
+      prevScrollPosition != null && element != null
+
+    if (isShowingParametersList && canRestoreScrollPosition) {
+      element.scrollTop = prevScrollPosition
+      setPrevScrollPosition(null) // Reset scroll position
+    }
+  }, [
+    chooseCsvFileScreen,
+    chooseValueScreen,
+    element,
+    prevScrollPosition,
+    showNumericalInputScreen,
+  ])
 
   const hasMissingFileParam =
     runTimeParametersOverrides?.some((parameter): boolean => {
@@ -307,6 +330,7 @@ export function ProtocolSetupParameters({
                       : parameter.displayName
                   }
                   onClickSetupStep={() => {
+                    setPrevScrollPosition(element?.scrollTop ?? null)
                     handleSetParameter(parameter)
                   }}
                   detail={detail}

@@ -1,17 +1,21 @@
-import { useCallback, useRef, useEffect } from 'react'
+import { useCallback, useRef, useEffect, useContext } from 'react'
 import difference from 'lodash/difference'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
 
-import { useInterval, truncateString } from '@opentrons/components'
+import {
+  useInterval,
+  truncateString,
+  useScrolling,
+} from '@opentrons/components'
 import {
   useAllProtocolIdsQuery,
   useHost,
   useCreateLiveCommandMutation,
 } from '@opentrons/react-api-client'
 import { getProtocol } from '@opentrons/api-client'
-
+import { SharedScrollRefContext } from './ODDProviders/ScrollRefProvider'
 import { checkShellUpdate } from '/app/redux/shell'
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -112,4 +116,28 @@ export function useProtocolReceiptToast(): void {
     // dont want this hook to rerun when other deps change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [protocolIds])
+}
+
+export function useScrollRef(): {
+  isScrolling: boolean
+  refCallback: (node: HTMLElement | null) => void
+  element: HTMLElement | null
+} {
+  const refData = useContext(SharedScrollRefContext)
+
+  if (!refData) {
+    throw new Error(
+      'useScrollRef must be used within a SharedScrollRefProvider'
+    )
+  }
+
+  const { refCallback, element } = refData
+
+  const isScrolling = useScrolling(element) // Assuming useScrolling is properly handling scroll state
+
+  return {
+    refCallback,
+    isScrolling,
+    element,
+  }
 }
