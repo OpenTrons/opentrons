@@ -40,7 +40,8 @@
       "totalLiquidVolume": 22000,
       "x": 14.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A2": {
       "depth": 42.3,
