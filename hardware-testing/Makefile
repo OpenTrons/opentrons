@@ -315,6 +315,7 @@ push-ot3-gravimetric:
 	$(MAKE) push-ot3
 	$(MAKE) apply-patches-gravimetric
 	cd ../ && $(MAKE) -C shared-data push-ot3
+	cd ../ && $(MAKE) -C api push-ot3
 	$(MAKE) remove-patches-gravimetric
 
 .PHONY: apply-patches-gravimetric
