@@ -1,7 +1,6 @@
 import assert from 'assert'
 import zip from 'lodash/zip'
 import {
-  getWellDepth,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
@@ -29,6 +28,7 @@ import {
   moveToWell,
   touchTip,
 } from '../atomic'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
 import type { CutoutId } from '@opentrons/shared-data'
@@ -38,7 +38,6 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,
@@ -213,19 +212,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       pairIdx: number
     ): CurriedCommandCreator[] => {
       const [sourceWell, destinationWell] = wellPair
-      const sourceLabwareDef =
-        invariantContext.labwareEntities[args.sourceLabware].def
-      const destLabwareDef =
-        trashOrLabware === 'labware'
-          ? invariantContext.labwareEntities[args.destLabware].def
-          : null
-      const wellDepth =
-        destinationWell != null && destLabwareDef != null
-          ? getWellDepth(destLabwareDef, destinationWell)
-          : 0
-      const airGapOffsetSourceWell =
-        getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
-      const airGapOffsetDestWell = wellDepth + AIR_GAP_OFFSET_FROM_TOP
       const commands = subTransferVolumes.reduce(
         (
           innerAcc: CurriedCommandCreator[],
@@ -395,9 +381,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                     labwareId: args.sourceLabware,
                     wellName: sourceWell,
                     wellLocation: {
-                      origin: 'bottom',
+                      origin: 'top',
                       offset: {
-                        z: airGapOffsetSourceWell,
+                        z: AIR_GAP_OFFSET_FROM_TOP,
                         x: 0,
                         y: 0,
                       },
@@ -422,9 +408,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                     wellName: destinationWell,
                     flowRate: dispenseFlowRateUlSec,
                     wellLocation: {
-                      origin: 'bottom',
+                      origin: 'top',
                       offset: {
-                        z: airGapOffsetDestWell,
+                        z: AIR_GAP_OFFSET_FROM_TOP,
                         x: 0,
                         y: 0,
                       },
@@ -533,7 +519,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destinationId: args.destLabware,
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
-                    offsetFromBottomMm: airGapOffsetDestWell,
+                    offsetFromTopMm: AIR_GAP_OFFSET_FROM_TOP,
                   }),
                   ...(aspirateDelay != null
                     ? [

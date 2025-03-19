@@ -173,7 +173,7 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A1', 50),
       aspirateHelper('A2', 50),
       dispenseHelper('B1', 100),
-      makeMoveToWellHelper('B1', DEST_LABWARE),
+      makeMoveToWellHelper('B1', DEST_LABWARE, 'top', 1),
       ...makeAirGapHelper(5),
       //   drop tip at end
       {
@@ -897,13 +897,13 @@ describe('consolidate single-channel', () => {
 
       aspirateHelper('A1', 100),
       ...delayWithOffset('A1', SOURCE_LABWARE),
-      makeMoveToWellHelper('A1'),
+      makeMoveToWellHelper('A1', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       aspirateHelper('A2', 100),
       ...delayWithOffset('A2', SOURCE_LABWARE),
-      makeMoveToWellHelper('A2'),
+      makeMoveToWellHelper('A2', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
@@ -911,13 +911,13 @@ describe('consolidate single-channel', () => {
 
       aspirateHelper('A3', 100),
       ...delayWithOffset('A3', SOURCE_LABWARE),
-      makeMoveToWellHelper('A3'),
+      makeMoveToWellHelper('A3', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
       aspirateHelper('A4', 100),
       ...delayWithOffset('A4', SOURCE_LABWARE),
-      makeMoveToWellHelper('A4'),
+      makeMoveToWellHelper('A4', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
@@ -1059,21 +1059,21 @@ describe('consolidate single-channel', () => {
       pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 100),
-      makeMoveToWellHelper('A1'),
+      makeMoveToWellHelper('A1', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
 
       aspirateHelper('A2', 100),
-      makeMoveToWellHelper('A2'),
+      makeMoveToWellHelper('A2', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 210),
 
       aspirateHelper('A3', 100),
-      makeMoveToWellHelper('A3'),
+      makeMoveToWellHelper('A3', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
 
       aspirateHelper('A4', 100),
-      makeMoveToWellHelper('A4'),
+      makeMoveToWellHelper('A4', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 210),
@@ -1097,25 +1097,25 @@ describe('consolidate single-channel', () => {
       pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 150),
-      makeMoveToWellHelper('A1'),
+      makeMoveToWellHelper('A1', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A2', 150),
-      makeMoveToWellHelper('A2'),
+      makeMoveToWellHelper('A2', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A3', 150),
-      makeMoveToWellHelper('A3'),
+      makeMoveToWellHelper('A3', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
 
       aspirateHelper('A4', 150),
-      makeMoveToWellHelper('A4'),
+      makeMoveToWellHelper('A4', undefined, 'top', 1),
       makeAirGapAfterAspirateHelper(5),
 
       dispenseHelper('B1', 155),
@@ -1288,11 +1288,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1382,11 +1382,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1648,11 +1648,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1797,11 +1797,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -1995,11 +1995,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2088,11 +2088,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2369,11 +2369,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2533,11 +2533,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2752,11 +2752,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -2845,11 +2845,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A2',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -3010,11 +3010,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -3177,11 +3177,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A3',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },
@@ -3342,11 +3342,11 @@ describe('consolidate single-channel', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
                 x: 0,
                 y: 0,
-                z: 11.54,
+                z: 1,
               },
             },
           },

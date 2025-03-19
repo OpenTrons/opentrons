@@ -2,7 +2,6 @@ import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 import last from 'lodash/last'
 import {
-  getWellDepth,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   ALL,
@@ -192,15 +191,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     destWellChunks,
     (destWellChunk: string[], chunkIndex: number): CurriedCommandCreator[] => {
       const firstDestWell = destWellChunk[0]
-      const sourceLabwareDef =
-        invariantContext.labwareEntities[args.sourceLabware].def
-      const destLabwareDef =
-        invariantContext.labwareEntities[args.destLabware].def
-      const airGapOffsetSourceWell =
-        getWellDepth(sourceLabwareDef, args.sourceWell) +
-        AIR_GAP_OFFSET_FROM_TOP
-      const airGapOffsetDestWell =
-        getWellDepth(destLabwareDef, firstDestWell) + AIR_GAP_OFFSET_FROM_TOP
       const airGapAfterAspirateCommands = aspirateAirGapVolume
         ? [
             curryCommandCreator(moveToWell, {
@@ -208,9 +198,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
               labwareId: args.sourceLabware,
               wellName: args.sourceWell,
               wellLocation: {
-                origin: 'bottom',
+                origin: 'top',
                 offset: {
-                  z: airGapOffsetSourceWell,
+                  z: AIR_GAP_OFFSET_FROM_TOP,
                   x: 0,
                   y: 0,
                 },
@@ -235,9 +225,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
               wellName: firstDestWell,
               flowRate: dispenseFlowRateUlSec,
               wellLocation: {
-                origin: 'bottom',
+                origin: 'top',
                 offset: {
-                  z: airGapOffsetDestWell,
+                  z: AIR_GAP_OFFSET_FROM_TOP,
                   x: 0,
                   y: 0,
                 },
@@ -355,9 +345,9 @@ export const distribute: CommandCreator<DistributeArgs> = (
                 labwareId: dispenseAirGapLabware,
                 wellName: dispenseAirGapWell,
                 wellLocation: {
-                  origin: 'bottom',
+                  origin: 'top',
                   offset: {
-                    z: airGapOffsetDestWell,
+                    z: AIR_GAP_OFFSET_FROM_TOP,
                     x: 0,
                     y: 0,
                   },

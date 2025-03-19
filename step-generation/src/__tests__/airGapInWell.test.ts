@@ -20,7 +20,7 @@ describe('airGapInWell', () => {
   it('air gap in 1 well for transfer', () => {
     const args = {
       flowRate: 10,
-      offsetFromBottomMm: 1,
+      offsetFromTopMm: 1,
       pipetteId: 'p10SingleId',
       volume: 10,
       labwareId: SOURCE_LABWARE,
@@ -42,7 +42,7 @@ describe('airGapInWell', () => {
               y: 0,
               z: 1,
             },
-            origin: 'bottom',
+            origin: 'top',
           },
           wellName: 'B1',
         },
@@ -70,7 +70,7 @@ describe('airGapInWell', () => {
       labwareId: DEST_LABWARE,
       wellName: 'A1',
       flowRate: 10,
-      offsetFromBottomMm: 1,
+      offsetFromTopMm: 1,
       pipetteId: 'p10SingleId',
       volume: 10,
     }
@@ -90,7 +90,7 @@ describe('airGapInWell', () => {
               y: 0,
               z: 1,
             },
-            origin: 'bottom',
+            origin: 'top',
           },
           wellName: 'A1',
         },

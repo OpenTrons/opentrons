@@ -4,7 +4,7 @@ import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface AirGapInWellArgs {
   flowRate: number
-  offsetFromBottomMm: number
+  offsetFromTopMm: number
   pipetteId: string
   volume: number
   labwareId: string
@@ -20,7 +20,7 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
     labwareId,
     wellName,
     flowRate,
-    offsetFromBottomMm,
+    offsetFromTopMm,
     pipetteId,
     volume,
   } = args
@@ -31,9 +31,9 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
       labwareId,
       wellName,
       wellLocation: {
-        origin: 'bottom',
+        origin: 'top',
         offset: {
-          z: offsetFromBottomMm,
+          z: offsetFromTopMm,
           x: 0,
           y: 0,
         },

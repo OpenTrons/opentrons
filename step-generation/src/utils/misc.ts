@@ -703,7 +703,7 @@ interface AirGapArgs {
   destinationId: string
   destWell: string | null
   flowRate: number
-  offsetFromBottomMm: number
+  offsetFromTopMm: number
   pipetteId: string
   volume: number
   blowOutLocation?: string | null
@@ -720,7 +720,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     destinationId,
     destWell,
     flowRate,
-    offsetFromBottomMm,
+    offsetFromTopMm,
     pipetteId,
     sourceId,
     sourceWell,
@@ -748,7 +748,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     commands = [
       curryCommandCreator(airGapInWell, {
         flowRate,
-        offsetFromBottomMm,
+        offsetFromTopMm,
         pipetteId,
         labwareId: dispenseAirGapLabware,
         wellName: dispenseAirGapWell,
