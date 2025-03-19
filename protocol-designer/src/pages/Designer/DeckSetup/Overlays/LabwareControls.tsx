@@ -12,6 +12,7 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
   TYPOGRAPHY,
+  WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
 import { DND_TYPES } from '../../../../constants'
 import { moveDeckItem } from '../../../../labware-ingred/actions'
@@ -149,7 +150,15 @@ export const LabwareControls = (
       textAlign={TYPOGRAPHY.textAlignCenter}
     >
       <Link role="button">
-        <StyledText desktopStyle="bodyLargeSemiBold">
+        <StyledText
+          desktopStyle="bodyLargeSemiBold"
+          whiteSpace={WHITE_SPACE_PRE_WRAP}
+          width={
+            getDisplayText() === t('deck:overlay.slot.drag_to_new_slot')
+              ? '5.125rem'
+              : '100%'
+          }
+        >
           {getDisplayText()}
         </StyledText>
       </Link>
