@@ -59,7 +59,9 @@ describe('blowOutInTrash', () => {
       },
     ])
     expect(getSuccessResult(result).python).toBe(
-      'mockPythonName.blow_out(mock_trash_bin_1)'
+      `
+mockPythonName.flow_rate.blow_out = 10
+mockPythonName.blow_out(mock_trash_bin_1)`.trim()
     )
   })
 })

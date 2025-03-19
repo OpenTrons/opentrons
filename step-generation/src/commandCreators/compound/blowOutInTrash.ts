@@ -29,7 +29,9 @@ export const blowOutInTrash: CommandCreator<BlowOutInTrashParams> = (
 
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
-    python: `${pipettePythonName}.blow_out(${trashPythonName})`,
+    python:
+      `${pipettePythonName}.flow_rate.blow_out = ${flowRate}\n` +
+      `${pipettePythonName}.blow_out(${trashPythonName})`,
   })
   const commandCreators = [
     curryWithoutPython(moveToAddressableArea, {
