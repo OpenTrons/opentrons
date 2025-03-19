@@ -1,5 +1,5 @@
-NUMBER_OF_BINS = 10
-NUMBER_OF_ZONES = 128
+NUMBER_OF_ZONES = 10
+NUMBER_OF_BINS = 128
 
 
 def validate_histogram_frame(data: bytes, next_frame_id: int) -> bool:

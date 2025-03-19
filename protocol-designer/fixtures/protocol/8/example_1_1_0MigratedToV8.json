@@ -44,7 +44,7 @@
         }
       },
       "ingredLocations": {
-        "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1": {
+        "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2": {
           "A1": {
             "0": {
               "volume": 121
@@ -92,7 +92,7 @@
           "labwareLocationUpdate": {
             "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul:opentrons/opentrons_96_tiprack_10ul/1": "1",
             "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul:opentrons/tipone_96_tiprack_200ul/1": "2",
-            "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1": "10"
+            "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2": "10"
           },
           "moduleLocationUpdate": {},
           "pipetteLocationUpdate": {
@@ -115,7 +115,7 @@
           "aspirate_delay_mmFromBottom": "1",
           "aspirate_delay_seconds": "1",
           "aspirate_flowRate": 0.6,
-          "aspirate_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+          "aspirate_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
           "aspirate_mix_checkbox": true,
           "aspirate_mix_times": 3,
           "aspirate_mix_volume": "2",
@@ -135,6 +135,7 @@
           "aspirate_submerge_position_reference": null,
           "aspirate_touchTip_checkbox": true,
           "aspirate_touchTip_mmFromTop": -12.8,
+          "aspirate_touchTip_mmFromEdge": 0,
           "aspirate_touchTip_speed": null,
           "aspirate_wellOrder_first": "t2b",
           "aspirate_wellOrder_second": "l2r",
@@ -153,7 +154,7 @@
           "dispense_delay_mmFromBottom": "0.5",
           "dispense_delay_seconds": "1",
           "dispense_flowRate": null,
-          "dispense_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+          "dispense_labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
           "dispense_mix_checkbox": true,
           "dispense_mix_times": 2,
           "dispense_mix_volume": "3",
@@ -172,6 +173,7 @@
           "dispense_submerge_y_position": null,
           "dispense_submerge_position_reference": null,
           "dispense_touchTip_checkbox": true,
+          "dispense_touchTip_mmFromEdge": 0,
           "dispense_touchTip_mmFromTop": null,
           "dispense_touchTip_speed": null,
           "dispense_wellOrder_first": "b2t",
@@ -219,7 +221,7 @@
           "dispense_delay_seconds": "1",
           "dispense_flowRate": 7,
           "dropTip_location": "b7445d51-0002-47a7-adee-2746539ccf9f:trashBin",
-          "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+          "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
           "liquidClassesSupported": false,
           "mix_mmFromBottom": 0.5,
           "mix_touchTip_checkbox": true,
@@ -274,9 +276,9 @@
           "displayName": "tiprack 200ul (1)",
           "labwareDefURI": "opentrons/tipone_96_tiprack_200ul/1"
         },
-        "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1": {
+        "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2": {
           "displayName": "96 deep well (1)",
-          "labwareDefURI": "opentrons/usascientific_96_wellplate_2.4ml_deep/1"
+          "labwareDefURI": "opentrons/usascientific_96_wellplate_2.4ml_deep/2"
         }
       }
     }
@@ -2323,7 +2325,7 @@
         "z": 0
       }
     },
-    "opentrons/usascientific_96_wellplate_2.4ml_deep/1": {
+    "opentrons/usascientific_96_wellplate_2.4ml_deep/2": {
       "ordering": [
         ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
         ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
@@ -2365,7 +2367,8 @@
           "totalLiquidVolume": 2400,
           "x": 14.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G1": {
           "depth": 41.3,
@@ -2375,7 +2378,8 @@
           "totalLiquidVolume": 2400,
           "x": 14.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F1": {
           "depth": 41.3,
@@ -2385,7 +2389,8 @@
           "totalLiquidVolume": 2400,
           "x": 14.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E1": {
           "depth": 41.3,
@@ -2395,7 +2400,8 @@
           "totalLiquidVolume": 2400,
           "x": 14.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D1": {
           "depth": 41.3,
@@ -2405,7 +2411,8 @@
           "totalLiquidVolume": 2400,
           "x": 14.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C1": {
           "depth": 41.3,
@@ -2415,7 +2422,8 @@
           "totalLiquidVolume": 2400,
           "x": 14.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B1": {
           "depth": 41.3,
@@ -2425,7 +2433,8 @@
           "totalLiquidVolume": 2400,
           "x": 14.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A1": {
           "depth": 41.3,
@@ -2435,7 +2444,8 @@
           "totalLiquidVolume": 2400,
           "x": 14.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H2": {
           "depth": 41.3,
@@ -2445,7 +2455,8 @@
           "totalLiquidVolume": 2400,
           "x": 23.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G2": {
           "depth": 41.3,
@@ -2455,7 +2466,8 @@
           "totalLiquidVolume": 2400,
           "x": 23.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F2": {
           "depth": 41.3,
@@ -2465,7 +2477,8 @@
           "totalLiquidVolume": 2400,
           "x": 23.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E2": {
           "depth": 41.3,
@@ -2475,7 +2488,8 @@
           "totalLiquidVolume": 2400,
           "x": 23.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D2": {
           "depth": 41.3,
@@ -2485,7 +2499,8 @@
           "totalLiquidVolume": 2400,
           "x": 23.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C2": {
           "depth": 41.3,
@@ -2495,7 +2510,8 @@
           "totalLiquidVolume": 2400,
           "x": 23.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B2": {
           "depth": 41.3,
@@ -2505,7 +2521,8 @@
           "totalLiquidVolume": 2400,
           "x": 23.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A2": {
           "depth": 41.3,
@@ -2515,7 +2532,8 @@
           "totalLiquidVolume": 2400,
           "x": 23.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H3": {
           "depth": 41.3,
@@ -2525,7 +2543,8 @@
           "totalLiquidVolume": 2400,
           "x": 32.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G3": {
           "depth": 41.3,
@@ -2535,7 +2554,8 @@
           "totalLiquidVolume": 2400,
           "x": 32.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F3": {
           "depth": 41.3,
@@ -2545,7 +2565,8 @@
           "totalLiquidVolume": 2400,
           "x": 32.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E3": {
           "depth": 41.3,
@@ -2555,7 +2576,8 @@
           "totalLiquidVolume": 2400,
           "x": 32.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D3": {
           "depth": 41.3,
@@ -2565,7 +2587,8 @@
           "totalLiquidVolume": 2400,
           "x": 32.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C3": {
           "depth": 41.3,
@@ -2575,7 +2598,8 @@
           "totalLiquidVolume": 2400,
           "x": 32.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B3": {
           "depth": 41.3,
@@ -2585,7 +2609,8 @@
           "totalLiquidVolume": 2400,
           "x": 32.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A3": {
           "depth": 41.3,
@@ -2595,7 +2620,8 @@
           "totalLiquidVolume": 2400,
           "x": 32.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H4": {
           "depth": 41.3,
@@ -2605,7 +2631,8 @@
           "totalLiquidVolume": 2400,
           "x": 41.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G4": {
           "depth": 41.3,
@@ -2615,7 +2642,8 @@
           "totalLiquidVolume": 2400,
           "x": 41.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F4": {
           "depth": 41.3,
@@ -2625,7 +2653,8 @@
           "totalLiquidVolume": 2400,
           "x": 41.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E4": {
           "depth": 41.3,
@@ -2635,7 +2664,8 @@
           "totalLiquidVolume": 2400,
           "x": 41.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D4": {
           "depth": 41.3,
@@ -2645,7 +2675,8 @@
           "totalLiquidVolume": 2400,
           "x": 41.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C4": {
           "depth": 41.3,
@@ -2655,7 +2686,8 @@
           "totalLiquidVolume": 2400,
           "x": 41.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B4": {
           "depth": 41.3,
@@ -2665,7 +2697,8 @@
           "totalLiquidVolume": 2400,
           "x": 41.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A4": {
           "depth": 41.3,
@@ -2675,7 +2708,8 @@
           "totalLiquidVolume": 2400,
           "x": 41.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H5": {
           "depth": 41.3,
@@ -2685,7 +2719,8 @@
           "totalLiquidVolume": 2400,
           "x": 50.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G5": {
           "depth": 41.3,
@@ -2695,7 +2730,8 @@
           "totalLiquidVolume": 2400,
           "x": 50.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F5": {
           "depth": 41.3,
@@ -2705,7 +2741,8 @@
           "totalLiquidVolume": 2400,
           "x": 50.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E5": {
           "depth": 41.3,
@@ -2715,7 +2752,8 @@
           "totalLiquidVolume": 2400,
           "x": 50.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D5": {
           "depth": 41.3,
@@ -2725,7 +2763,8 @@
           "totalLiquidVolume": 2400,
           "x": 50.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C5": {
           "depth": 41.3,
@@ -2735,7 +2774,8 @@
           "totalLiquidVolume": 2400,
           "x": 50.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B5": {
           "depth": 41.3,
@@ -2745,7 +2785,8 @@
           "totalLiquidVolume": 2400,
           "x": 50.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A5": {
           "depth": 41.3,
@@ -2755,7 +2796,8 @@
           "totalLiquidVolume": 2400,
           "x": 50.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H6": {
           "depth": 41.3,
@@ -2765,7 +2807,8 @@
           "totalLiquidVolume": 2400,
           "x": 59.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G6": {
           "depth": 41.3,
@@ -2775,7 +2818,8 @@
           "totalLiquidVolume": 2400,
           "x": 59.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F6": {
           "depth": 41.3,
@@ -2785,7 +2829,8 @@
           "totalLiquidVolume": 2400,
           "x": 59.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E6": {
           "depth": 41.3,
@@ -2795,7 +2840,8 @@
           "totalLiquidVolume": 2400,
           "x": 59.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D6": {
           "depth": 41.3,
@@ -2805,7 +2851,8 @@
           "totalLiquidVolume": 2400,
           "x": 59.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C6": {
           "depth": 41.3,
@@ -2815,7 +2862,8 @@
           "totalLiquidVolume": 2400,
           "x": 59.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B6": {
           "depth": 41.3,
@@ -2825,7 +2873,8 @@
           "totalLiquidVolume": 2400,
           "x": 59.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A6": {
           "depth": 41.3,
@@ -2835,7 +2884,8 @@
           "totalLiquidVolume": 2400,
           "x": 59.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H7": {
           "depth": 41.3,
@@ -2845,7 +2895,8 @@
           "totalLiquidVolume": 2400,
           "x": 68.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G7": {
           "depth": 41.3,
@@ -2855,7 +2906,8 @@
           "totalLiquidVolume": 2400,
           "x": 68.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F7": {
           "depth": 41.3,
@@ -2865,7 +2917,8 @@
           "totalLiquidVolume": 2400,
           "x": 68.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E7": {
           "depth": 41.3,
@@ -2875,7 +2928,8 @@
           "totalLiquidVolume": 2400,
           "x": 68.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D7": {
           "depth": 41.3,
@@ -2885,7 +2939,8 @@
           "totalLiquidVolume": 2400,
           "x": 68.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C7": {
           "depth": 41.3,
@@ -2895,7 +2950,8 @@
           "totalLiquidVolume": 2400,
           "x": 68.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B7": {
           "depth": 41.3,
@@ -2905,7 +2961,8 @@
           "totalLiquidVolume": 2400,
           "x": 68.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A7": {
           "depth": 41.3,
@@ -2915,7 +2972,8 @@
           "totalLiquidVolume": 2400,
           "x": 68.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H8": {
           "depth": 41.3,
@@ -2925,7 +2983,8 @@
           "totalLiquidVolume": 2400,
           "x": 77.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G8": {
           "depth": 41.3,
@@ -2935,7 +2994,8 @@
           "totalLiquidVolume": 2400,
           "x": 77.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F8": {
           "depth": 41.3,
@@ -2945,7 +3005,8 @@
           "totalLiquidVolume": 2400,
           "x": 77.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E8": {
           "depth": 41.3,
@@ -2955,7 +3016,8 @@
           "totalLiquidVolume": 2400,
           "x": 77.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D8": {
           "depth": 41.3,
@@ -2965,7 +3027,8 @@
           "totalLiquidVolume": 2400,
           "x": 77.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C8": {
           "depth": 41.3,
@@ -2975,7 +3038,8 @@
           "totalLiquidVolume": 2400,
           "x": 77.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B8": {
           "depth": 41.3,
@@ -2985,7 +3049,8 @@
           "totalLiquidVolume": 2400,
           "x": 77.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A8": {
           "depth": 41.3,
@@ -2995,7 +3060,8 @@
           "totalLiquidVolume": 2400,
           "x": 77.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H9": {
           "depth": 41.3,
@@ -3005,7 +3071,8 @@
           "totalLiquidVolume": 2400,
           "x": 86.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G9": {
           "depth": 41.3,
@@ -3015,7 +3082,8 @@
           "totalLiquidVolume": 2400,
           "x": 86.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F9": {
           "depth": 41.3,
@@ -3025,7 +3093,8 @@
           "totalLiquidVolume": 2400,
           "x": 86.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E9": {
           "depth": 41.3,
@@ -3035,7 +3104,8 @@
           "totalLiquidVolume": 2400,
           "x": 86.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D9": {
           "depth": 41.3,
@@ -3045,7 +3115,8 @@
           "totalLiquidVolume": 2400,
           "x": 86.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C9": {
           "depth": 41.3,
@@ -3055,7 +3126,8 @@
           "totalLiquidVolume": 2400,
           "x": 86.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B9": {
           "depth": 41.3,
@@ -3065,7 +3137,8 @@
           "totalLiquidVolume": 2400,
           "x": 86.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A9": {
           "depth": 41.3,
@@ -3075,7 +3148,8 @@
           "totalLiquidVolume": 2400,
           "x": 86.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H10": {
           "depth": 41.3,
@@ -3085,7 +3159,8 @@
           "totalLiquidVolume": 2400,
           "x": 95.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G10": {
           "depth": 41.3,
@@ -3095,7 +3170,8 @@
           "totalLiquidVolume": 2400,
           "x": 95.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F10": {
           "depth": 41.3,
@@ -3105,7 +3181,8 @@
           "totalLiquidVolume": 2400,
           "x": 95.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E10": {
           "depth": 41.3,
@@ -3115,7 +3192,8 @@
           "totalLiquidVolume": 2400,
           "x": 95.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D10": {
           "depth": 41.3,
@@ -3125,7 +3203,8 @@
           "totalLiquidVolume": 2400,
           "x": 95.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C10": {
           "depth": 41.3,
@@ -3135,7 +3214,8 @@
           "totalLiquidVolume": 2400,
           "x": 95.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B10": {
           "depth": 41.3,
@@ -3145,7 +3225,8 @@
           "totalLiquidVolume": 2400,
           "x": 95.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A10": {
           "depth": 41.3,
@@ -3155,7 +3236,8 @@
           "totalLiquidVolume": 2400,
           "x": 95.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H11": {
           "depth": 41.3,
@@ -3165,7 +3247,8 @@
           "totalLiquidVolume": 2400,
           "x": 104.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G11": {
           "depth": 41.3,
@@ -3175,7 +3258,8 @@
           "totalLiquidVolume": 2400,
           "x": 104.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F11": {
           "depth": 41.3,
@@ -3185,7 +3269,8 @@
           "totalLiquidVolume": 2400,
           "x": 104.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E11": {
           "depth": 41.3,
@@ -3195,7 +3280,8 @@
           "totalLiquidVolume": 2400,
           "x": 104.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D11": {
           "depth": 41.3,
@@ -3205,7 +3291,8 @@
           "totalLiquidVolume": 2400,
           "x": 104.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C11": {
           "depth": 41.3,
@@ -3215,7 +3302,8 @@
           "totalLiquidVolume": 2400,
           "x": 104.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B11": {
           "depth": 41.3,
@@ -3225,7 +3313,8 @@
           "totalLiquidVolume": 2400,
           "x": 104.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A11": {
           "depth": 41.3,
@@ -3235,7 +3324,8 @@
           "totalLiquidVolume": 2400,
           "x": 104.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "H12": {
           "depth": 41.3,
@@ -3245,7 +3335,8 @@
           "totalLiquidVolume": 2400,
           "x": 113.4,
           "y": 11.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "G12": {
           "depth": 41.3,
@@ -3255,7 +3346,8 @@
           "totalLiquidVolume": 2400,
           "x": 113.4,
           "y": 20.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "F12": {
           "depth": 41.3,
@@ -3265,7 +3357,8 @@
           "totalLiquidVolume": 2400,
           "x": 113.4,
           "y": 29.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "E12": {
           "depth": 41.3,
@@ -3275,7 +3368,8 @@
           "totalLiquidVolume": 2400,
           "x": 113.4,
           "y": 38.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "D12": {
           "depth": 41.3,
@@ -3285,7 +3379,8 @@
           "totalLiquidVolume": 2400,
           "x": 113.4,
           "y": 47.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "C12": {
           "depth": 41.3,
@@ -3295,7 +3390,8 @@
           "totalLiquidVolume": 2400,
           "x": 113.4,
           "y": 56.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "B12": {
           "depth": 41.3,
@@ -3305,7 +3401,8 @@
           "totalLiquidVolume": 2400,
           "x": 113.4,
           "y": 65.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         },
         "A12": {
           "depth": 41.3,
@@ -3315,7 +3412,8 @@
           "totalLiquidVolume": 2400,
           "x": 113.4,
           "y": 74.2,
-          "z": 2.8
+          "z": 2.8,
+          "geometryDefinitionId": "cuboidalWell"
         }
       },
       "groups": [
@@ -3431,12 +3529,36 @@
         "loadName": "usascientific_96_wellplate_2.4ml_deep"
       },
       "namespace": "opentrons",
-      "version": 1,
+      "version": 2,
       "schemaVersion": 2,
       "cornerOffsetFromSlot": {
         "x": 0,
         "y": 0,
         "z": 0
+      },
+      "innerLabwareGeometry": {
+        "cuboidalWell": {
+          "sections": [
+            {
+              "shape": "cuboidal",
+              "topXDimension": 8.2,
+              "topYDimension": 8.2,
+              "bottomXDimension": 7.52,
+              "bottomYDimension": 7.52,
+              "topHeight": 41.3,
+              "bottomHeight": 2.63
+            },
+            {
+              "shape": "cuboidal",
+              "topXDimension": 7.52,
+              "topYDimension": 7.52,
+              "bottomXDimension": 0.25,
+              "bottomYDimension": 0.25,
+              "topHeight": 2.63,
+              "bottomHeight": 0
+            }
+          ]
+        }
       }
     }
   },
@@ -3506,10 +3628,10 @@
       "commandType": "loadLabware",
       "params": {
         "displayName": "96 deep well (1)",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "loadName": "usascientific_96_wellplate_2.4ml_deep",
         "namespace": "opentrons",
-        "version": 1,
+        "version": 2,
         "location": {
           "slotName": "10"
         }
@@ -3520,7 +3642,7 @@
       "key": "41da95b5-da85-42e1-acd1-ee72627a325b",
       "params": {
         "liquidId": "1",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "volumeByWell": {
           "F1": 44,
           "G1": 44,
@@ -3533,7 +3655,7 @@
       "key": "477dfe52-6e4a-42fb-b934-c6800aeb9846",
       "params": {
         "liquidId": "0",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "volumeByWell": {
           "A1": 121,
           "B1": 121,
@@ -3558,7 +3680,7 @@
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
@@ -3577,7 +3699,7 @@
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
@@ -3596,7 +3718,7 @@
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
@@ -3615,7 +3737,7 @@
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
@@ -3634,7 +3756,7 @@
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
@@ -3653,7 +3775,7 @@
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
         "volume": 5.5,
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "wellName": "F1",
         "wellLocation": {
           "origin": "bottom",
@@ -3692,7 +3814,7 @@
       "key": "c692ebeb-d5bd-4ae3-9222-de8ef7f04acd",
       "params": {
         "pipetteId": "c6f45030-92a5-11e9-ac62-1b173f839d9e",
-        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/1",
+        "labwareId": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
         "wellName": "F1",
         "wellLocation": {
           "origin": "top",

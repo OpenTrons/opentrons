@@ -762,11 +762,15 @@ class Labware:
 
         .. list-table::
             :header-rows: 1
+            :widths: 1 5
 
             * - API level
               - Offset behavior
             * - 2.12–2.13
               - Offsets only apply to the exact :py:class:`.Labware` instance.
+
+                If your protocol has multiple instances of the same type of labware,
+                you must either use ``set_offset()`` on all of them or none of them.
             * - 2.14–2.17
               - ``set_offset()`` is not available, and the API raises an error.
             * - 2.18 and newer
