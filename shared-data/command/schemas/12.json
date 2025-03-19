@@ -2265,54 +2265,6 @@
       "title": "GetTipPresenceParams",
       "type": "object"
     },
-    "HomeCreate": {
-      "description": "Data to create a Home command.",
-      "properties": {
-        "commandType": {
-          "const": "home",
-          "default": "home",
-          "enum": ["home"],
-          "title": "Commandtype",
-          "type": "string"
-        },
-        "intent": {
-          "$ref": "#/$defs/CommandIntent",
-          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
-          "title": "Intent"
-        },
-        "key": {
-          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
-          "title": "Key",
-          "type": "string"
-        },
-        "params": {
-          "$ref": "#/$defs/HomeParams"
-        }
-      },
-      "required": ["params"],
-      "title": "HomeCreate",
-      "type": "object"
-    },
-    "HomeParams": {
-      "description": "Payload required for a Home command.",
-      "properties": {
-        "axes": {
-          "description": "Axes to return to their home positions. If omitted, will home all motors. Extra axes may be implicitly homed to ensure accurate homing of the explicitly specified axes.",
-          "items": {
-            "$ref": "#/$defs/MotorAxis"
-          },
-          "title": "Axes",
-          "type": "array"
-        },
-        "skipIfMountPositionOk": {
-          "$ref": "#/$defs/MountType",
-          "description": "If this parameter is provided, the gantry will only be homed if the specified mount has an invalid position. If omitted, the homing action will be executed unconditionally.",
-          "title": "Skipifmountpositionok"
-        }
-      },
-      "title": "HomeParams",
-      "type": "object"
-    },
     "InitializeCreate": {
       "description": "A request to execute an Absorbance Reader measurement.",
       "properties": {
@@ -6285,6 +6237,47 @@
       "title": "OpenLidParams",
       "type": "object"
     },
+    "opentrons__protocol_engine__commands__flex_stacker__home__HomeCreate": {
+      "description": "A request to execute a Flex Stacker home command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/home",
+          "default": "flexStacker/home",
+          "enum": ["flexStacker/home"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/opentrons__protocol_engine__commands__flex_stacker__home__HomeParams"
+        }
+      },
+      "required": ["params"],
+      "title": "HomeCreate",
+      "type": "object"
+    },
+    "opentrons__protocol_engine__commands__flex_stacker__home__HomeParams": {
+      "description": "The parameters defining how a stacker should be emptied.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "HomeParams",
+      "type": "object"
+    },
     "opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate": {
       "description": "A request to create a Heater-Shaker's set temperature command.",
       "properties": {
@@ -6375,6 +6368,54 @@
       },
       "required": ["moduleId"],
       "title": "WaitForTemperatureParams",
+      "type": "object"
+    },
+    "opentrons__protocol_engine__commands__home__HomeCreate": {
+      "description": "Data to create a Home command.",
+      "properties": {
+        "commandType": {
+          "const": "home",
+          "default": "home",
+          "enum": ["home"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/opentrons__protocol_engine__commands__home__HomeParams"
+        }
+      },
+      "required": ["params"],
+      "title": "HomeCreate",
+      "type": "object"
+    },
+    "opentrons__protocol_engine__commands__home__HomeParams": {
+      "description": "Payload required for a Home command.",
+      "properties": {
+        "axes": {
+          "description": "Axes to return to their home positions. If omitted, will home all motors. Extra axes may be implicitly homed to ensure accurate homing of the explicitly specified axes.",
+          "items": {
+            "$ref": "#/$defs/MotorAxis"
+          },
+          "title": "Axes",
+          "type": "array"
+        },
+        "skipIfMountPositionOk": {
+          "$ref": "#/$defs/MountType",
+          "description": "If this parameter is provided, the gantry will only be homed if the specified mount has an invalid position. If omitted, the homing action will be executed unconditionally.",
+          "title": "Skipifmountpositionok"
+        }
+      },
+      "title": "HomeParams",
       "type": "object"
     },
     "opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureCreate": {
@@ -6584,6 +6625,7 @@
       "evotipUnsealPipette": "#/$defs/EvotipUnsealPipetteCreate",
       "flexStacker/empty": "#/$defs/EmptyCreate",
       "flexStacker/fill": "#/$defs/FillCreate",
+      "flexStacker/home": "#/$defs/opentrons__protocol_engine__commands__flex_stacker__home__HomeCreate",
       "flexStacker/retrieve": "#/$defs/RetrieveCreate",
       "flexStacker/setStoredLabware": "#/$defs/SetStoredLabwareCreate",
       "flexStacker/store": "#/$defs/StoreCreate",
@@ -6596,7 +6638,7 @@
       "heaterShaker/setAndWaitForShakeSpeed": "#/$defs/SetAndWaitForShakeSpeedCreate",
       "heaterShaker/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
-      "home": "#/$defs/HomeCreate",
+      "home": "#/$defs/opentrons__protocol_engine__commands__home__HomeCreate",
       "liquidProbe": "#/$defs/LiquidProbeCreate",
       "loadLabware": "#/$defs/LoadLabwareCreate",
       "loadLid": "#/$defs/LoadLidCreate",
@@ -6700,7 +6742,7 @@
       "$ref": "#/$defs/DropTipInPlaceCreate"
     },
     {
-      "$ref": "#/$defs/HomeCreate"
+      "$ref": "#/$defs/opentrons__protocol_engine__commands__home__HomeCreate"
     },
     {
       "$ref": "#/$defs/RetractAxisCreate"
@@ -6887,6 +6929,9 @@
     },
     {
       "$ref": "#/$defs/EmptyCreate"
+    },
+    {
+      "$ref": "#/$defs/opentrons__protocol_engine__commands__flex_stacker__home__HomeCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"
