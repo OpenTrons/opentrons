@@ -1,7 +1,7 @@
 import {
   getTrashBinAddressableAreaName,
   reduceCommandCreators,
-  curryCommandCreator,
+  curryWithoutPython,
 } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
 import { blowOutInPlace, moveToAddressableArea } from '../atomic'
@@ -11,25 +11,37 @@ import type { CutoutId } from '@opentrons/shared-data'
 interface BlowOutInTrashParams {
   pipetteId: string
   flowRate: number
-  trashLocation: CutoutId
+  trashId: string
 }
 export const blowOutInTrash: CommandCreator<BlowOutInTrashParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, trashLocation, flowRate } = args
-  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
-  const commandCreators: CurriedCommandCreator[] = [
-    curryCommandCreator(moveToAddressableArea, {
+  const { pipetteId, trashId, flowRate } = args
+  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
+  const trashEntity = additionalEquipmentEntities[trashId]
+  const addressableAreaName = getTrashBinAddressableAreaName(
+    trashEntity.location as CutoutId
+  )
+  const pipettePythonName = pipetteEntities[pipetteId].pythonName
+  const trashPythonName = trashEntity.pythonName
+
+  const pythonCommandCreator: CurriedCommandCreator = () => ({
+    commands: [],
+    python: `${pipettePythonName}.blow_out(${trashPythonName})`,
+  })
+  const commandCreators = [
+    curryWithoutPython(moveToAddressableArea, {
       pipetteId,
       addressableAreaName,
       offset: ZERO_OFFSET,
     }),
-    curryCommandCreator(blowOutInPlace, {
+    curryWithoutPython(blowOutInPlace, {
       pipetteId,
       flowRate,
     }),
+    pythonCommandCreator,
   ]
 
   return reduceCommandCreators(
