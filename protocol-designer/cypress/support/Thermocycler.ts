@@ -36,7 +36,7 @@ enum ThermoContent {
 enum ThermoLocators {
   Button = 'button',
   Div = 'div',
-  ThermocyclerEditor = '[data-testid="StepContainer_dcec0c89-338b-453b-a79b-c081830ff138"]',
+  ThermocyclerEditor = '[data-testid^="StepContainer"]',
   StateBlockTempInput = '[name="blockTargetTemp"]',
   StateLidTempInput = '[name="lidTargetTemp"]',
   ListButton = '[data-testid="ListButton_noActive"]',
@@ -51,9 +51,12 @@ enum ThermoLocators {
   SelectorButton = '[data-testid="EmptySelectorButton_container"]',
   AddCycleStep = 'button:contains("Add a cycle step")',
   ButtonSwitch = 'button[role="switch"]',
-  CyclesContainer = '.Flex-sc-1qhp8l7-0.IRIsG .Flex-sc-1qhp8l7-0.ijfQYO',
-  AddStepContainer = '.Flex-sc-1qhp8l7-0.IRIsG .bJjWDY',
-  AddStepInput = '.InputField__StyledInput-sc-1gyyvht-0.cLVzBl',
+  CycleContainer = '[data-testid^="thermocyclerCycle"]',
+  ThermocyclerStepContainer = '[data-testid^="thermocyclerStep"]',
+  CycleStep = '[data-testid^="cycleStep"]',
+  DeleteCycleStepX = 'path[aria-roledescription="close"]',
+  AddStepInput = '[class^="InputField"]',
+  ModalContainer = '[aria-label="ModalShell_ModalArea"]',
 }
 
 /**
@@ -61,7 +64,7 @@ enum ThermoLocators {
  * Add a comment to all records
  */
 
-export const ThermocylerEditor = {
+export const ThermocyclerEditor = {
   SelectThermocyclerStep: (): StepThunk => ({
     call: () => {
       cy.contains(ThermoContent.Thermocycler)
@@ -75,7 +78,7 @@ export const ThermocylerEditor = {
    * "Select Thermocycler Duplicate Step"
    */
 
-  DuplicateThermocylerStep: (): StepThunk => ({
+  DuplicateThermocyclerStep: (): StepThunk => ({
     call: () => {
       cy.contains(ThermoContent.DuplicateStep).click()
     },
@@ -101,6 +104,19 @@ export const ThermocylerEditor = {
     },
   }),
 
+  /**
+   *
+   * Click profile steps save button
+   */
+  SaveProfileSteps: (): StepThunk => ({
+    call: () => {
+      cy.get(ThermoLocators.ModalContainer)
+        .find(ThermoLocators.Save)
+        .first()
+        .should('be.visible')
+        .click()
+    },
+  }),
   /**
    *
    * "Select Thermocycler Save Button"
@@ -137,11 +153,11 @@ export const ThermocylerEditor = {
         .find('button[data-testid^="StepContainer"]')
         .click()
       if (editOption === ThermoContent.EditStep) {
-        ThermocylerEditor.EditThermocyclerStep().call()
+        ThermocyclerEditor.EditThermocyclerStep().call()
       } else if (editOption === ThermoContent.DeleteStep) {
-        ThermocylerEditor.DeleteThermocyclerStep().call()
+        ThermocyclerEditor.DeleteThermocyclerStep().call()
       } else if (editOption === ThermoContent.DuplicateStep) {
-        ThermocylerEditor.DuplicateThermocylerStep().call()
+        ThermocyclerEditor.DuplicateThermocyclerStep().call()
       }
     },
   }),
@@ -165,52 +181,57 @@ export const ThermocylerEditor = {
   }),
 
   /**
+   * Activates or deactivates Block Temperature.
    *
-   * "Activating or Deactivating Block Temp"
+   * @param input - 'active' to activate, 'deactivate' to deactivate the Block Temperature
+   * @returns Cypress StepThunk
    */
-  BlockTempOnOff: (input: string): StepThunk => ({
+  BlockTempOnOff: (input: 'active' | 'deactivate'): StepThunk => ({
     call: () => {
-      if (input === 'active') {
-        cy.contains(`${ThermoContent.Block} ${ThermoContent.Temperature}`)
-          .parent()
-          .find(ThermoLocators.ButtonSwitch)
-          .should('have.attr', 'aria-checked', 'false')
-          .click()
-          .should('have.attr', 'aria-checked', 'true')
-      } else if (input === 'deactivate') {
-        cy.contains(`${ThermoContent.Block} ${ThermoContent.Temperature}`)
-          .parent()
-          .find(ThermoLocators.ButtonSwitch)
-          .should('have.attr', 'aria-checked', 'true')
-          .click()
-          .should('have.attr', 'aria-checked', 'false')
-      }
+      const shouldBeActive = input === 'active'
+
+      cy.contains(`${ThermoContent.Block} ${ThermoContent.Temperature}`)
+        .parents(ThermoLocators.ListButton)
+        .find(ThermoLocators.ButtonSwitch)
+        .as('blockTempSwitch')
+
+      cy.get('@blockTempSwitch')
+        .should('have.attr', 'aria-checked', shouldBeActive ? 'false' : 'true')
+        .click()
+
+      cy.get('@blockTempSwitch').should(
+        'have.attr',
+        'aria-checked',
+        shouldBeActive ? 'true' : 'false'
+      )
     },
   }),
 
   /**
+   * Activates or deactivates Lid Temperature.
    *
-   * "Activating or Deactivating Lid Temp"
+   * @param input - 'active' to activate, 'deactivate' to deactivate the Lid Temperature
+   * @returns Cypress StepThunk
    */
-  LidTempOnOff: (input: string): StepThunk => ({
+  LidTempOnOff: (input: 'active' | 'deactivate'): StepThunk => ({
     call: () => {
-      if (input === 'active') {
-        cy.get(ThermoLocators.ListButton)
-          .contains(`${ThermoContent.Lid} ${ThermoContent.Temperature}`)
-          .parent()
-          .find(ThermoLocators.ButtonSwitch)
-          .should('have.attr', 'aria-checked', 'false')
-          .click()
-          .should('have.attr', 'aria-checked', 'true')
-      } else if (input === 'deactivate') {
-        cy.get(ThermoLocators.ListButton)
-          .contains(`${ThermoContent.Lid} ${ThermoContent.Temperature}`)
-          .parent()
-          .find(ThermoLocators.ButtonSwitch)
-          .should('have.attr', 'aria-checked', 'true')
-          .click()
-          .should('have.attr', 'aria-checked', 'false')
-      }
+      const shouldBeActive = input === 'active'
+
+      cy.get(ThermoLocators.ListButton)
+        .contains(`${ThermoContent.Lid} ${ThermoContent.Temperature}`)
+        .parents(ThermoLocators.ListButton)
+        .find(ThermoLocators.ButtonSwitch)
+        .as('lidTempSwitch')
+
+      cy.get('@lidTempSwitch')
+        .should('have.attr', 'aria-checked', shouldBeActive ? 'false' : 'true')
+        .click()
+
+      cy.get('@lidTempSwitch').should(
+        'have.attr',
+        'aria-checked',
+        shouldBeActive ? 'true' : 'false'
+      )
     },
   }),
 
@@ -225,17 +246,25 @@ export const ThermocylerEditor = {
           .contains('Lid position')
           .parents(ThermoLocators.ListButton)
           .find(ThermoLocators.ButtonSwitch)
+          .as('lidPositionSwitch') // alias the element for safe reuse
+        cy.get('@lidPositionSwitch')
           .should('have.attr', 'aria-checked', 'false')
           .click()
-          .should('have.attr', 'aria-checked', 'true')
+        cy.get('@lidPositionSwitch').should('have.attr', 'aria-checked', 'true')
       } else if (input === 'closed') {
         cy.get(ThermoLocators.ListButton)
           .contains('Lid position')
           .parents(ThermoLocators.ListButton)
           .find(ThermoLocators.ButtonSwitch)
+          .as('lidPositionSwitch')
+        cy.get('@lidPositionSwitch')
           .should('have.attr', 'aria-checked', 'true')
           .click()
-          .should('have.attr', 'aria-checked', 'false')
+        cy.get('@lidPositionSwitch').should(
+          'have.attr',
+          'aria-checked',
+          'false'
+        )
       }
     },
   }),
@@ -305,6 +334,18 @@ export const ThermoProfile = {
   }),
 }
 
+const getCycle = (cycle: number): Cypress.Chainable => {
+  return cy.get(ThermoLocators.CycleContainer).eq(cycle)
+}
+
+const getCycleStep = (cycle: number, step: number): Cypress.Chainable => {
+  return getCycle(cycle).find(ThermoLocators.CycleStep).eq(step)
+}
+
+const getThermocyclerStep = (step: number): Cypress.Chainable => {
+  return cy.get(ThermoLocators.ThermocyclerStepContainer).eq(step)
+}
+
 export const ThermoProfileSteps = {
   /**
    *
@@ -334,53 +375,147 @@ export const ThermoProfileSteps = {
 
   /**
    *
-   * "Input information for either cycle step or add step"
+   * "Set cycle count"
    */
-  CreateStep: (
-    stepType: 'cycleStep' | 'addStep',
-    cycleStep: number,
-    name: string,
-    temp: string,
-    time: string,
-    cycles?: string
-  ): StepThunk => ({
+  SetCycleCount: (cycle: number, cycleCount: string): StepThunk => ({
     call: () => {
-      if (cycles) {
-        cy.log('IF CYCLES****')
-        cy.contains('p', 'Number of cycles')
-          .closest('.Flex-sc-1qhp8l7-0.ivRgZg')
-          .find('input')
-          .type(cycles)
-      }
-      if (stepType === 'cycleStep') {
-        cy.get(ThermoLocators.CyclesContainer)
-          .eq(cycleStep)
-          .within(() => {
-            const values = [name, temp, time]
+      cy.log(`*****setting cycle count ${cycleCount}******`)
+      getCycle(cycle).within(() => {
+        cy.get(ThermoLocators.AddStepInput).then($inputs => {
+          const inputCount = $inputs.length
 
-            cy.get(ThermoLocators.AddStepInput).each(($el, index) => {
-              cy.wrap($el).clear().type(values[index])
-            })
-          })
-      } else if (stepType === 'addStep') {
-        cy.get(ThermoLocators.AddStepContainer).within(() => {
-          const values = [name, temp, time]
-
-          cy.get(ThermoLocators.AddStepInput).each(($el, index) => {
-            cy.wrap($el).clear().type(values[index])
-          })
+          if (inputCount === 4) {
+            // Set cycle count in the input at index 3
+            cy.wrap($inputs).eq(3).type(cycleCount)
+          } else if (inputCount === 1) {
+            // Set cycle count in the input at index 0
+            cy.wrap($inputs).eq(0).type(cycleCount)
+          } else {
+            cy.log(`Unexpected input count: ${inputCount}`)
+          }
         })
-      }
+      })
+    },
+  }),
+
+  /**
+   *
+   * Fill a Cycle step
+   * or add a step to a cycle
+   */
+  FillCycleStep: ({
+    cycle,
+    step,
+    stepName,
+    temp,
+    time,
+  }: {
+    cycle: number
+    step: number
+    stepName: string
+    temp: string
+    time: string
+  }): StepThunk => ({
+    call: () => {
+      const values = [stepName, temp, time]
+      getCycleStep(cycle, step)
+        .find(ThermoLocators.AddStepInput)
+        .each(($input, index) => {
+          if (index < values.length) {
+            // Split the chain and start from cy. to avoid chaining issues
+            cy.wrap($input).should('exist').should('be.visible')
+            // Start a new command chain for typing
+            cy.wrap($input).type(values[index])
+          }
+        })
+    },
+  }),
+
+  /**
+   *
+   * Fill a Step
+   * or add a step to a cycle
+   */
+
+  FillThermocyclerStep: ({
+    step,
+    stepName,
+    temp,
+    time,
+  }: {
+    step: number
+    stepName: string
+    temp: string
+    time: string
+  }): StepThunk => ({
+    call: () => {
+      const values = [stepName, temp, time]
+      getThermocyclerStep(step)
+        .find(ThermoLocators.AddStepInput)
+        .each(($input, index) => {
+          cy.wrap($input)
+            .should('exist')
+            .should('be.visible')
+            .type(values[index])
+        })
+    },
+  }),
+
+  /**
+   *
+   * "Delete Thermocycler step"
+   * specifying the step number
+   * to delete
+   */
+  DeleteThermocyclerStep: (step: number): StepThunk => ({
+    call: () => {
+      cy.log(`*****clicking X on thermocycler step ${step}******`)
+      getThermocyclerStep(step).find(ThermoLocators.Delete).click()
+    },
+  }),
+
+  /**
+   *
+   * "Save step"
+   */
+  SaveThermocyclerStep: (step: number): StepThunk => ({
+    call: () => {
+      cy.log(`*****clicking Save on  thermocycler step ${step}******`)
+      getThermocyclerStep(step).find('button').contains('Save').click()
+    },
+  }),
+
+  /**
+   *
+   * "Delete cycle"
+   */
+  DeleteCycle: (cycle: number): StepThunk => ({
+    call: () => {
+      cy.log(`*****clicking delete cycle on cycle: ${cycle}******`)
+      getCycle(cycle).find('path[aria-roledescription="close"]').click()
+    },
+  }),
+
+  /**
+   *
+   * "Save cycle"
+   */
+  SaveCycle: (step: number): StepThunk => ({
+    call: () => {
+      cy.log(`*****clicking Save on cycle: ${step}******`)
+      getCycle(step).find('button').contains('Save').click()
     },
   }),
 
   /**
    *
    * "Add cycle step to cycle"
+   * specifying the cycle number
+   * to add the step to
    */
-  AddCycleStep: (): StepThunk => ({
+  AddCycleStep: (cycle: number): StepThunk => ({
     call: () => {
-      cy.get(ThermoLocators.AddCycleStep).click()
+      getCycle(cycle).find(ThermoLocators.AddCycleStep).click()
     },
   }),
 
@@ -388,36 +523,10 @@ export const ThermoProfileSteps = {
    *
    * "delete cycle step from cycle"
    */
-  DeleteCycleStep: (step: number): StepThunk => ({
+  DeleteCycleStep: (cycle: number, step: number): StepThunk => ({
     call: () => {
-      cy.get('.Flex-sc-1qhp8l7-0.ijfQYO')
-        .eq(step)
-        .find('path[aria-roledescription="close"]')
-        .click()
-    },
-  }),
-
-  /**
-   *
-   * "Delete cycle or step"
-   */
-  DeleteCycleOrStep: (): StepThunk => ({
-    call: () => {
-      cy.get(ThermoLocators.Delete).click()
-    },
-  }),
-
-  /**
-   *
-   * "Save cycle or step"
-   */
-  SaveCycleOrStep: (): StepThunk => ({
-    call: () => {
-      cy.get(
-        'button.Btn-sc-o3dtr1-0.Btn__PrimaryBtn-sc-o3dtr1-1.Btn__NewPrimaryBtn-sc-o3dtr1-3.PrimaryButton-sc-1bbed59-0'
-      )
-        .contains('Save')
-        .click()
+      cy.log(`*****clicking delete cycle step ${step}******`)
+      getCycleStep(cycle, step).find(ThermoLocators.DeleteCycleStepX).click()
     },
   }),
 }
@@ -481,7 +590,7 @@ export const ThermoVerifications = {
   VerifyPartOne: (): StepThunk => ({
     call: () => {
       cy.log(`*****checking part 1 of TC setup******`)
-      thermoVerifications.VerifyThermoSetupHeader('1').call()
+      ThermoVerifications.VerifyThermoSetupHeader('1').call()
       cy.contains(ThermoContent.ChangeThermoState)
         .should('exist')
         .should('be.visible')
@@ -498,7 +607,7 @@ export const ThermoVerifications = {
    */
   VerifyThermoState: (): StepThunk => ({
     call: () => {
-      thermoVerifications.VerifyThermoSetupHeader('2').call()
+      ThermoVerifications.VerifyThermoSetupHeader('2').call()
       cy.contains(`${ThermoContent.Thermocycler} ${ThermoContent.State}`)
         .should('exist')
         .should('be.visible')
@@ -545,7 +654,7 @@ export const ThermoVerifications = {
    */
   VerifyThermoProfile: (): StepThunk => ({
     call: () => {
-      thermoVerifications.VerifyThermoSetupHeader('2').call()
+      ThermoVerifications.VerifyThermoSetupHeader('2').call()
       cy.contains(ThermoContent.ProfileSettings)
         .should('exist')
         .should('be.visible')
