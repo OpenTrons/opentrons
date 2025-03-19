@@ -1,28 +1,31 @@
 import {
-  PROCEED_STEP,
-  SET_SELECTED_LABWARE,
-  SET_INITIAL_POSITION,
-  SET_FINAL_POSITION,
-  FINISH_LPC,
-  START_LPC,
-  GO_BACK_LAST_STEP,
-  SET_SELECTED_LABWARE_URI,
-  APPLY_WORKING_OFFSETS,
-  LPC_STEPS,
-  PROCEED_HANDLE_LW_SUBSTEP,
-  GO_BACK_HANDLE_LW_SUBSTEP,
-  RESET_OFFSET_TO_DEFAULT,
-  CLEAR_WORKING_OFFSETS,
   APPLIED_OFFSETS_TO_RUN,
-  UPDATE_LPC_WITH_OFFSETS,
+  APPLY_WORKING_OFFSETS,
+  CLEAR_WORKING_OFFSETS,
+  FINISH_LPC,
+  GO_BACK_HANDLE_LW_SUBSTEP,
+  GO_BACK_LAST_STEP,
+  LPC_STEPS,
+  OFFSET_SOURCE_RUN_RECORD,
+  PROCEED_HANDLE_LW_SUBSTEP,
+  PROCEED_STEP,
+  RESET_OFFSET_TO_DEFAULT,
+  SET_FINAL_POSITION,
+  SET_INITIAL_POSITION,
+  SET_SELECTED_LABWARE,
+  SET_SELECTED_LABWARE_URI,
+  START_LPC,
+  SOURCE_OFFSETS_FROM_RUN,
+  SOURCE_OFFSETS_FROM_DATABASE,
+  OFFSET_SOURCE_DATABASE,
 } from '../constants'
 import {
-  updateOffsetsForURI,
-  proceedToNextHandleLwSubstep,
+  clearAllWorkingOffsets,
   goBackToPreviousHandleLwSubstep,
   handleApplyWorkingOffsets,
-  clearAllWorkingOffsets,
+  proceedToNextHandleLwSubstep,
   updateLPCLabwareInfoFrom,
+  updateOffsetsForURI,
 } from './transforms'
 
 import type {
@@ -205,7 +208,7 @@ export function LPCReducer(
         }
       }
 
-      case UPDATE_LPC_WITH_OFFSETS: {
+      case SOURCE_OFFSETS_FROM_RUN: {
         const { offsets } = action.payload
 
         return {
@@ -216,6 +219,17 @@ export function LPCReducer(
               offsets,
               state.labwareInfo.labware
             ),
+            sourcedOffsets: OFFSET_SOURCE_RUN_RECORD,
+          },
+        }
+      }
+
+      case SOURCE_OFFSETS_FROM_DATABASE: {
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            sourcedOffsets: OFFSET_SOURCE_DATABASE,
           },
         }
       }

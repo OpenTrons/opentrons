@@ -10,6 +10,7 @@ import {
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
+  OFFSET_SOURCE_DATABASE,
 } from '/app/redux/protocol-runs/constants'
 
 import type { Selector } from 'reselect'
@@ -18,6 +19,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LPCFlowType,
   LwGeometryDetails,
+  OffsetSources,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
@@ -167,4 +169,22 @@ export const selectSelectedLwDef = (
         })
       }
     }
+  )
+
+export const selectLastFreshOffsetRunTimestamp = (
+  runId: string
+): Selector<State, string | null> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.lastFreshOffsetRunTimestamp,
+    ts => ts ?? null
+  )
+
+export const selectOffsetSource = (
+  runId: string
+): Selector<State, OffsetSources> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.sourcedOffsets,
+    source => source ?? ('UNHANDLED' as OffsetSources)
   )

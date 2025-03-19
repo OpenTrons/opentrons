@@ -6,13 +6,11 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   getAreAnyLocationSpecificOffsetsMissing,
   getAreAllOffsetsHardCoded,
-  getCountHardCodedOffsets,
   getDefaultOffsetDetailsForAllLabware,
   getLocationSpecificOffsetDetailsForAllLabware,
   getMissingOffsets,
   getSelectedLabwareWithOffsetDetails,
   getWorkingOffsetsByUri,
-  getTotalCountNonHardCodedLocationSpecificOffsets,
   getTotalCountLocationSpecificOffsets,
   getCountNonHardcodedLocationSpecificOffsets,
   getIsNecessaryDefaultOffsetMissing,
@@ -102,7 +100,9 @@ export const selectSortedLSOffsetDetailsWithCopy = (
     }
   )
 
-export const selectTotalOrMissingOffsetCountForLwCopy = (
+// If no offsets are missing, returns copy for the total number of location-specific offsets.
+// If offsets are missing, returns copy for the total number of location-specific offsets missing.
+export const selectTotalOrMissingOffsetRequiredCountForLwCopy = (
   runId: string,
   uri: string,
   t: TFunction
@@ -118,15 +118,16 @@ export const selectTotalOrMissingOffsetCountForLwCopy = (
       const countLSOffsetsNoHC = getCountNonHardcodedLocationSpecificOffsets(
         lsDetails
       )
+      const countLSOffsetsTotal = lsDetails?.length ?? 0
       const isNecessaryDefaultOffsetMising = getIsNecessaryDefaultOffsetMissing(
         defaultDetails,
         lsDetails
       )
 
-      if (countLSOffsetsNoHC > 1) {
+      if (countLSOffsetsTotal > 1) {
         return isNecessaryDefaultOffsetMising
           ? t('num_missing_offsets', { num: countLSOffsetsNoHC })
-          : t('num_offsets', { num: countLSOffsetsNoHC })
+          : t('num_offsets', { num: countLSOffsetsTotal })
       } else {
         return isNecessaryDefaultOffsetMising
           ? t('one_missing_offset')
