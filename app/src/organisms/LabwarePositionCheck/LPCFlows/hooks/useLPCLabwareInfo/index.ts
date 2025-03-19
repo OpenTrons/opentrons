@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 
-import { useSearchLabwareOffsets } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 
 import { getUniqueValidLwLocationInfoByAnalysis } from './getUniqueValidLwLocationInfoByAnalysis'
 import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
 import { getLPCSearchParams } from './getLPCSearchParams'
+import { useNotifySearchLabwareOffsets } from '/app/resources/labware_offsets'
 import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 
 import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
@@ -66,11 +66,7 @@ function useFlexLPCLabwareInfo({
     [lwLocationCombos.length]
   )
 
-  // TODO(jh, 03-14-25): Add this search route to notifications.
-
-  // We have to poll, because it's possible for a user to update the
-  // offsets on a different app while a view utilizing this data is active.
-  const { data } = useSearchLabwareOffsets(searchLwOffsetsParams, {
+  const { data } = useNotifySearchLabwareOffsets(searchLwOffsetsParams, {
     enabled:
       searchLwOffsetsParams.filters.length > 0 &&
       robotType === FLEX_ROBOT_TYPE &&
