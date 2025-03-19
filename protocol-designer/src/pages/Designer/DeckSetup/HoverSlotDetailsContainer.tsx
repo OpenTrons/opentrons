@@ -31,15 +31,13 @@ export function HoverSlotDetailsContainer({
   hoverSlot,
   robotType,
 }: HoverSlotDetailsContainerProps): JSX.Element {
-  // ToDo update
-  const leftRightPosition = robotType === OT2_ROBOT_TYPE ? '0%' : '0%'
   return (
     <Box
       position="absolute"
       top="50%"
       transform="translateY(-50%)"
-      left={LEFT_SLOTS.includes(hoverSlot) ? leftRightPosition : 'auto'}
-      right={LEFT_SLOTS.includes(hoverSlot) ? 'auto' : leftRightPosition}
+      left={LEFT_SLOTS.includes(hoverSlot) ? '0%' : 'auto'}
+      right={LEFT_SLOTS.includes(hoverSlot) ? 'auto' : '0%'}
       zIndex={3}
       // width and max-width is from the design
       width="253px"
