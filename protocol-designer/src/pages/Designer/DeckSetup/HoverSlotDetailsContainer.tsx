@@ -36,11 +36,11 @@ export function HoverSlotDetailsContainer({
       position="absolute"
       top="50%"
       transform="translateY(-50%)"
-      left={LEFT_SLOTS.includes(hoverSlot) ? '2%' : 'auto'}
-      right={LEFT_SLOTS.includes(hoverSlot) ? 'auto' : '2%'}
+      left={LEFT_SLOTS.includes(hoverSlot) ? '0%' : 'auto'}
+      right={LEFT_SLOTS.includes(hoverSlot) ? 'auto' : '0%'}
       zIndex={3}
       width="100%"
-      maxWidth={robotType === OT2_ROBOT_TYPE ? '358' : '317px'}
+      maxWidth={robotType === OT2_ROBOT_TYPE ? '358px' : '300px'}
       data-testid="hover-slot-details-container"
     >
       <SlotDetailsContainer robotType={robotType} slot={hoverSlot} />

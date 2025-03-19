@@ -30,7 +30,7 @@ describe('HoverSlotDetailsContainer', () => {
   it('should render the slot details container for slot A1', () => {
     render(props)
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
-      'left: 2%'
+      'left: 0%'
     )
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
       'right: auto'
@@ -48,7 +48,7 @@ describe('HoverSlotDetailsContainer', () => {
       'left: auto'
     )
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
-      'right: 2%'
+      'right: 0%'
     )
   })
 
@@ -59,7 +59,7 @@ describe('HoverSlotDetailsContainer', () => {
     }
     render(props)
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
-      'left: 2%'
+      'left: 0%'
     )
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
       'right: auto'
@@ -77,7 +77,7 @@ describe('HoverSlotDetailsContainer', () => {
       'left: auto'
     )
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
-      'right: 2%'
+      'right: 0%'
     )
   })
 })

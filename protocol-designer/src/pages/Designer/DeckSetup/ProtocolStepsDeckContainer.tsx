@@ -133,7 +133,7 @@ export function ProtocolStepsDeckContainer(): JSX.Element {
           outline="auto"
           borderRadius={BORDERS.borderRadius12}
         >
-          {({ getRobotCoordsFromDOMCoords }) => (
+          {() => (
             <>
               {robotType === OT2_ROBOT_TYPE ? (
                 <DeckFromLayers
@@ -208,7 +208,6 @@ export function ProtocolStepsDeckContainer(): JSX.Element {
                 </>
               )}
               <DeckSetupDetails
-                getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
                 tab="protocolSteps"
                 addEquipment={addEquipment}
                 activeDeckSetup={activeDeckSetup}

@@ -204,7 +204,7 @@ export function StartingDeckContainer(): JSX.Element {
               zoomed={zoomIn.slot != null}
               borderRadius={BORDERS.borderRadius12}
             >
-              {({ getRobotCoordsFromDOMCoords }) => (
+              {() => (
                 <>
                   {robotType === OT2_ROBOT_TYPE ? (
                     <DeckFromLayers
@@ -306,7 +306,6 @@ export function StartingDeckContainer(): JSX.Element {
                   )}
                   <DeckSetupDetails
                     selectedZoomInSlot={zoomIn.slot ?? undefined}
-                    getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
                     hoveredLabware={hoveredLabware}
                     hoveredModule={hoveredModule}
                     hoveredFixture={hoveredFixture}
