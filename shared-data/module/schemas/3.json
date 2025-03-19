@@ -110,7 +110,9 @@
         "footprintXDimension": { "type": "number" },
         "footprintYDimension": { "type": "number" },
         "labwareInterfaceXDimension": { "type": "number" },
-        "labwareInterfaceYDimension": { "type": "number" }
+        "labwareInterfaceYDimension": { "type": "number" },
+        "maxStackerFillHeight": { "type": "number" },
+        "maxStackerRetrievableHeight": { "type": "number" }
       }
     },
     "cornerOffsetFromSlot": {

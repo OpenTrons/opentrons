@@ -97,8 +97,11 @@ export function SelectAuthenticationType({
                 buttonLabel={radio.label}
                 buttonValue={radio.value}
                 onChange={handleChange}
-                subButtonLabel={radio.subLabel ?? undefined}
                 isSelected={radio.value === selectedAuthType}
+                buttonSubLabel={{
+                  label: radio.subLabel ?? undefined,
+                  align: 'vertical',
+                }}
               />
             ))}
           </Flex>

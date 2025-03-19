@@ -66,7 +66,7 @@ class UnsafeEngageAxes(
 
     commandType: UnsafeEngageAxesCommandType = "unsafe/engageAxes"
     params: UnsafeEngageAxesParams
-    result: Optional[UnsafeEngageAxesResult]
+    result: Optional[UnsafeEngageAxesResult] = None
 
     _ImplementationCls: Type[
         UnsafeEngageAxesImplementation

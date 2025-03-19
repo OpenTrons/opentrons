@@ -2,6 +2,7 @@ from typing import Dict, Tuple, List, Optional
 
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
+from opentrons.protocols.api_support.types import APIVersion
 
 
 # Default versions of Opentrons standard labware definitions in Python Protocol API
@@ -34,6 +35,11 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     "corning_24_wellplate_3.4ml_flat": 2,
 }
 
+_APILEVEL_2_23_OT_DEFAULT_VERSIONS: Dict[str, int] = {
+    "evotips_opentrons_96_labware": 2,
+    "evotips_flex_96_tiprack_adapter": 2,
+}
+
 
 class AmbiguousLoadLabwareParamsError(RuntimeError):
     """Error raised when specific labware parameters cannot be found due to multiple matching labware definitions."""
@@ -44,6 +50,7 @@ def resolve(
     namespace: Optional[str],
     version: Optional[int],
     custom_load_labware_params: List[LabwareLoadParams],
+    api_version: APIVersion,
 ) -> Tuple[str, int]:
     """Resolve the load labware parameters that best matches any custom labware, or default to opentrons standards
 
@@ -82,7 +89,9 @@ def resolve(
         resolved_version = (
             version
             if version is not None
-            else _get_default_version_for_standard_labware(load_name=load_name)
+            else _get_default_version_for_standard_labware(
+                load_name=load_name, api_version=api_version
+            )
         )
 
     elif len(filtered_custom_params) > 1:
@@ -99,7 +108,15 @@ def resolve(
     return resolved_namespace, resolved_version
 
 
-def _get_default_version_for_standard_labware(load_name: str) -> int:
+def _get_default_version_for_standard_labware(
+    load_name: str, api_version: APIVersion
+) -> int:
     # We know the protocol is running at least apiLevel 2.14 by this point because
     # apiLevel 2.13 and below has its own separate code path for resolving labware.
-    return _APILEVEL_2_14_OT_DEFAULT_VERSIONS.get(load_name, 1)
+    if (
+        api_version >= APIVersion(2, 23)
+        and load_name in _APILEVEL_2_23_OT_DEFAULT_VERSIONS
+    ):
+        return _APILEVEL_2_23_OT_DEFAULT_VERSIONS[load_name]
+    else:
+        return _APILEVEL_2_14_OT_DEFAULT_VERSIONS.get(load_name, 1)

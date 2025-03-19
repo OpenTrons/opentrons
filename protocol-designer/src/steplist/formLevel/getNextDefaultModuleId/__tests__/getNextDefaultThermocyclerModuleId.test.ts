@@ -22,6 +22,7 @@ const getThermocycler = () => ({
     lidTargetTemp: null,
     lidOpen: null,
   },
+  pythonName: 'mockPythonName',
 })
 
 const getMag = () => ({
@@ -33,6 +34,7 @@ const getMag = () => ({
     type: MAGNETIC_MODULE_TYPE,
     engaged: false,
   },
+  pythonName: 'mockPythonName',
 })
 
 const getTemp = () => ({
@@ -45,6 +47,7 @@ const getTemp = () => ({
     status: TEMPERATURE_DEACTIVATED,
     targetTemperature: null,
   },
+  pythonName: 'mockPythonName',
 })
 
 describe('getNextDefaultThermocyclerModuleId', () => {
@@ -110,6 +113,7 @@ describe('getNextDefaultThermocyclerModuleId', () => {
               type: MAGNETIC_MODULE_TYPE,
               engaged: false,
             },
+            pythonName: 'mockPythonName',
           },
           tempId: {
             id: 'tempId',
@@ -121,6 +125,7 @@ describe('getNextDefaultThermocyclerModuleId', () => {
               status: TEMPERATURE_DEACTIVATED,
               targetTemperature: null,
             },
+            pythonName: 'mockPythonName',
           },
         },
         expected: null,

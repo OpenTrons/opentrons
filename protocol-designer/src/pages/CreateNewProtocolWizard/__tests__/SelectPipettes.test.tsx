@@ -6,7 +6,7 @@ import { i18n } from '../../../assets/localization'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
-import { IncompatibleTipsModal } from '../../../organisms'
+import { IncompatibleTipsModal } from '../../../components/organisms'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { SelectPipettes } from '../SelectPipettes'
 import { getTiprackOptions } from '../utils'
@@ -17,7 +17,7 @@ import type { WizardFormState, WizardTileProps } from '../types'
 
 vi.mock('../../../labware-defs/selectors')
 vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../organisms')
+vi.mock('../../../components/organisms')
 vi.mock('../../../labware-defs/actions')
 vi.mock('../utils')
 const mockLocation = vi.fn()

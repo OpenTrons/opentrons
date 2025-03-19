@@ -213,6 +213,6 @@ term:
 plot-session:
 	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf
 
-PHONY: command-schema
+.PHONY: command-schema
 command-schema: 
-	$(python) src/opentrons/protocol_engine/commands/generate_command_schema.py $(COMMAND_SCHEMA_VERSION) > ../shared-data/command/schemas/$(COMMAND_SCHEMA_VERSION).json
+	$(python) src/opentrons/protocol_engine/commands/generate_command_schema.py --overwrite-shared-data

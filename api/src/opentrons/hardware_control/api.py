@@ -58,6 +58,7 @@ from .types import (
     SubSystem,
     SubSystemState,
     HardwareFeatureFlags,
+    TipScrapeType,
 )
 from . import modules
 from .robot_calibration import (
@@ -778,6 +779,7 @@ class API(
         position: Mapping[Axis, float],
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
+        expect_stalls: bool = False,
     ) -> None:
         """Moves the effectors of the specified axis to the specified position.
         The effector of the x,y axis is the center of the carriage.
@@ -1075,6 +1077,7 @@ class API(
         rate: float = 1.0,
         push_out: Optional[float] = None,
         correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.
@@ -1250,7 +1253,11 @@ class API(
             await self.prepare_for_aspirate(mount)
 
     async def tip_drop_moves(
-        self, mount: top_types.Mount, home_after: bool = True
+        self,
+        mount: top_types.Mount,
+        home_after: bool = True,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
         spec, _ = self.plan_check_drop_tip(mount, home_after)
 

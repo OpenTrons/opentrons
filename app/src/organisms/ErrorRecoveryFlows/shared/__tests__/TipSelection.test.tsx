@@ -42,6 +42,7 @@ describe('TipSelection', () => {
         channels:
           props.failedPipetteUtils.failedPipetteInfo?.data.channels ?? 1,
         allowSelect: props.allowTipSelection,
+        allowMultiDrag: false,
         pipetteNozzleDetails: undefined,
       }),
       {}

@@ -99,6 +99,7 @@ from .types import (
     HardwareFeatureFlags,
     FailedTipStateCheck,
     PipetteSensorResponseQueue,
+    TipScrapeType,
 )
 from .errors import (
     UpdateOngoingError,
@@ -126,6 +127,7 @@ from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
     target_position_from_plunger,
+    target_positions_from_plunger_tracking,
     offset_for_mount,
     deck_from_machine,
     machine_from_deck,
@@ -1189,7 +1191,7 @@ class OT3API(
         speed: Optional[float] = None,
         critical_point: Optional[CriticalPoint] = None,
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
-        _expect_stalls: bool = False,
+        expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed."""
@@ -1233,7 +1235,7 @@ class OT3API(
             target_position,
             speed=speed,
             max_speeds=checked_max,
-            expect_stalls=_expect_stalls,
+            expect_stalls=expect_stalls,
         )
 
     async def move_axes(  # noqa: C901
@@ -1241,6 +1243,7 @@ class OT3API(
         position: Mapping[Axis, float],
         speed: Optional[float] = None,
         max_speeds: Optional[Dict[Axis, float]] = None,
+        expect_stalls: bool = False,
     ) -> None:
         """Moves the effectors of the specified axis to the specified position.
         The effector of the x,y axis is the center of the carriage.
@@ -1296,7 +1299,11 @@ class OT3API(
             if axis not in absolute_positions:
                 absolute_positions[axis] = position_value
 
-        await self._move(target_position=absolute_positions, speed=speed)
+        await self._move(
+            target_position=absolute_positions,
+            speed=speed,
+            expect_stalls=expect_stalls,
+        )
 
     async def move_rel(
         self,
@@ -1306,7 +1313,7 @@ class OT3API(
         max_speeds: Union[None, Dict[Axis, float], OT3AxisMap[float]] = None,
         check_bounds: MotionChecks = MotionChecks.NONE,
         fail_on_not_homed: bool = False,
-        _expect_stalls: bool = False,
+        expect_stalls: bool = False,
     ) -> None:
         """Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed."""
@@ -1348,7 +1355,7 @@ class OT3API(
             speed=speed,
             max_speeds=checked_max,
             check_bounds=check_bounds,
-            expect_stalls=_expect_stalls,
+            expect_stalls=expect_stalls,
         )
 
     async def _cache_and_maybe_retract_mount(self, mount: OT3Mount) -> None:
@@ -2093,6 +2100,7 @@ class OT3API(
         rate: float = 1.0,
         push_out: Optional[float] = None,
         correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette."""
@@ -2102,6 +2110,7 @@ class OT3API(
             volume=volume,
             rate=rate,
             push_out=push_out,
+            is_full_dispense=is_full_dispense,
             correction_volume=correction_volume,
         )
         if not dispense_spec:
@@ -2329,28 +2338,43 @@ class OT3API(
         instrument.working_volume = tip_volume
 
     async def tip_drop_moves(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        home_after: bool = False,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
         realmount = OT3Mount.from_mount(mount)
-
-        await self._move_to_plunger_bottom(realmount, rate=1.0, check_current_vol=False)
+        if ignore_plunger is False:
+            await self._move_to_plunger_bottom(
+                realmount, rate=1.0, check_current_vol=False
+            )
 
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             spec = self._pipette_handler.plan_ht_drop_tip()
             await self._tip_motor_action(realmount, spec.tip_action_moves)
         else:
-            spec = self._pipette_handler.plan_lt_drop_tip(realmount)
+            spec = self._pipette_handler.plan_lt_drop_tip(realmount, scrape_type)
             for move in spec.tip_action_moves:
                 async with self._backend.motor_current(move.currents):
-                    target_pos = target_position_from_plunger(
-                        realmount, move.distance, self._current_position
-                    )
-                    await self._move(
-                        target_pos,
-                        speed=move.speed,
-                        home_flagged_axes=False,
-                    )
-
+                    if not move.scrape_axis:
+                        target_pos = target_position_from_plunger(
+                            realmount, move.distance, self._current_position
+                        )
+                        await self._move(
+                            target_pos,
+                            speed=move.speed,
+                            home_flagged_axes=False,
+                        )
+                    else:
+                        target_pos = OrderedDict(self._current_position)
+                        target_pos[move.scrape_axis] += move.distance
+                        self._log.info(f"Moving to target Pos: {target_pos}")
+                        await self._move(
+                            target_pos,
+                            speed=move.speed,
+                            home_flagged_axes=False,
+                        )
         for shake in spec.shake_off_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
@@ -2972,6 +2996,103 @@ class OT3API(
         return values
 
     AMKey = TypeVar("AMKey")
+
+    async def aspirate_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        z_distance: float,
+        volume: float,
+        flow_rate: float = 1.0,
+    ) -> None:
+        """
+        Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during apsiration.
+        :param volume: The volume of liquid to be aspirated.
+        :param flow_rate: The flow rate to aspirate with.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        aspirate_spec = self._pipette_handler.plan_check_aspirate(
+            realmount, volume, flow_rate
+        )
+        if not aspirate_spec:
+            return
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            aspirate_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
+        try:
+            await self._backend.set_active_current(
+                {aspirate_spec.axis: aspirate_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, aspirate_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
+        except Exception:
+            self._log.exception("Aspirate failed")
+            aspirate_spec.instr.set_current_volume(0)
+            raise
+        else:
+            aspirate_spec.instr.add_current_volume(aspirate_spec.volume)
+
+    async def dispense_while_tracking(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        z_distance: float,
+        volume: float,
+        push_out: Optional[float],
+        flow_rate: float = 1.0,
+        is_full_dispense: bool = False,
+    ) -> None:
+        """
+        Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
+
+        :param mount: A robot mount that the instrument is on.
+        :param z_distance: The distance the z axis will move during dispensing.
+        :param volume: The volume of liquid to be dispensed.
+        :param flow_rate: The flow rate to dispense with.
+        """
+        realmount = OT3Mount.from_mount(mount)
+        dispense_spec = self._pipette_handler.plan_check_dispense(
+            realmount, volume, flow_rate, push_out, is_full_dispense
+        )
+        if not dispense_spec:
+            return
+        target_pos = target_positions_from_plunger_tracking(
+            realmount,
+            dispense_spec.plunger_distance,
+            z_distance,
+            self._current_position,
+        )
+
+        try:
+            await self._backend.set_active_current(
+                {dispense_spec.axis: dispense_spec.current}
+            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, dispense_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
+        except Exception:
+            self._log.exception("dispense failed")
+            dispense_spec.instr.set_current_volume(0)
+            raise
+        else:
+            dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
     @property
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:

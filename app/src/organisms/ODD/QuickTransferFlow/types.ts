@@ -51,6 +51,7 @@ export interface QuickTransferSummaryState {
     positionFromBottom: number
   }
   touchTipAspirate?: number
+  touchTipAspirateSpeed?: number
   airGapAspirate?: number
   tipPositionDispense: number
   mixOnDispense?: {
@@ -62,6 +63,7 @@ export interface QuickTransferSummaryState {
     positionFromBottom: number
   }
   touchTipDispense?: number
+  touchTipDispenseSpeed?: number
   disposalVolume?: number
   blowOut?: BlowOutLocation
   airGapDispense?: number

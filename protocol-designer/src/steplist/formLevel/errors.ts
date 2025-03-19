@@ -1,4 +1,8 @@
-import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
+import {
+  getMinXYDimension,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+} from '@opentrons/shared-data'
 
 import {
   ABSORBANCE_READER_INITIALIZE,
@@ -24,6 +28,7 @@ import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
 import type { PipetteEntity } from '@opentrons/step-generation'
 import type { StepFieldName } from '../../form-types'
 import type { ModuleEntities } from '../../step-forms'
+import type { LiquidHandlingTab } from '../../pages/Designer/ProtocolSteps/StepForm/types'
 /*******************
  ** Error Messages **
  ********************/
@@ -60,7 +65,7 @@ export interface FormError {
   showAtField?: boolean
   showAtForm?: boolean
   page?: number
-  tab?: 'aspirate' | 'dispense'
+  tab?: LiquidHandlingTab
 }
 const INCOMPATIBLE_ASPIRATE_LABWARE: FormError = {
   title: 'Selected aspirate labware is incompatible with pipette',
@@ -296,7 +301,7 @@ const ASPIRATE_MIX_TIMES_REQUIRED: FormError = {
   dependentFields: ['aspirate_mix_times'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_MIX_VOLUME_REQUIRED: FormError = {
@@ -304,7 +309,7 @@ const ASPIRATE_MIX_VOLUME_REQUIRED: FormError = {
   dependentFields: ['aspirate_mix_checkbox', 'aspirate_mix_volume'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_DELAY_DURATION_REQUIRED: FormError = {
@@ -312,7 +317,7 @@ const ASPIRATE_DELAY_DURATION_REQUIRED: FormError = {
   dependentFields: ['aspirate_delay_checkbox', 'aspirate_delay_seconds'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'aspirate',
 }
 const ASPIRATE_AIRGAP_VOLUME_REQUIRED: FormError = {
@@ -320,7 +325,7 @@ const ASPIRATE_AIRGAP_VOLUME_REQUIRED: FormError = {
   dependentFields: ['aspirate_airGap_checkbox', 'aspirate_airGap_volume'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'aspirate',
 }
 const DISPENSE_MIX_TIMES_REQUIRED: FormError = {
@@ -328,7 +333,7 @@ const DISPENSE_MIX_TIMES_REQUIRED: FormError = {
   dependentFields: ['dispense_mix_checkbox', 'dispense_mix_times'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const DISPENSE_MIX_VOLUME_REQUIRED: FormError = {
@@ -336,7 +341,7 @@ const DISPENSE_MIX_VOLUME_REQUIRED: FormError = {
   dependentFields: ['dispense_mix_checkbox', 'dispense_mix_volume'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const DISPENSE_DELAY_DURATION_REQUIRED: FormError = {
@@ -344,7 +349,7 @@ const DISPENSE_DELAY_DURATION_REQUIRED: FormError = {
   dependentFields: ['dispense_delay_checkbox', 'dispense_delay_seconds'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
@@ -352,7 +357,7 @@ const DISPENSE_AIRGAP_VOLUME_REQUIRED: FormError = {
   dependentFields: ['dispense_airGap_checkbox', 'dispense_airGap_volume'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const BLOWOUT_LOCATION_REQUIRED: FormError = {
@@ -360,7 +365,7 @@ const BLOWOUT_LOCATION_REQUIRED: FormError = {
   dependentFields: ['blowout_checkbox', 'blowout_location'],
   showAtForm: false,
   showAtField: true,
-  page: 1,
+  page: 2,
   tab: 'dispense',
 }
 const WAVELENGTH_REQUIRED: FormError = {
@@ -411,6 +416,48 @@ const MAGNETIC_MODULE_ID_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 0,
+}
+const ASPIRATE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
+  title: 'Touch tip speed required',
+  dependentFields: ['aspirate_touchTip_speed'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+}
+const DISPENSE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
+  title: 'Touch tip speed required',
+  dependentFields: ['dispense_touchTip_speed'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+}
+const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
+  title: 'Value falls outside of accepted range',
+  dependentFields: ['aspirate_touchTip_mmFromEdge'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+}
+const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
+  title: 'Value falls outside of accepted range',
+  dependentFields: ['dispense_touchTip_mmFromEdge'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+}
+const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
+  title: 'Value required',
+  dependentFields: ['aspirate_touchTip_mmFromEdge'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+}
+const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
+  title: 'Value required',
+  dependentFields: ['dispense_touchTip_mmFromEdge'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
 }
 
 export interface HydratedFormData {
@@ -932,6 +979,98 @@ export const fileNameRequired = (
   const { absorbanceReaderFormType, fileName } = fields
   return !fileName && absorbanceReaderFormType === ABSORBANCE_READER_READ
     ? FILENAME_REQUIRED
+    : null
+}
+export const aspirateTouchTipSpeedRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { aspirate_touchTip_speed, aspirate_touchTip_checkbox } = fields
+  return aspirate_touchTip_checkbox && !aspirate_touchTip_speed
+    ? ASPIRATE_TOUCH_TIP_SPEED_REQUIRED
+    : null
+}
+export const dispenseTouchTipSpeedRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { dispense_touchTip_speed, dispense_touchTip_checkbox } = fields
+  return dispense_touchTip_checkbox && !dispense_touchTip_speed
+    ? DISPENSE_TOUCH_TIP_SPEED_REQUIRED
+    : null
+}
+export const aspirateTouchTipMmFromEdgeOutOfRange = (
+  fields: HydratedFormData
+): FormError | null => {
+  const {
+    aspirate_touchTip_checkbox,
+    aspirate_touchTip_mmFromEdge,
+    aspirate_labware,
+  } = fields
+  if (aspirate_touchTip_checkbox == null) {
+    return null
+  }
+  const labwareDef = aspirate_labware?.def
+  if (labwareDef == null) {
+    return null
+  }
+  const minDimension = getMinXYDimension(labwareDef as LabwareDefinition2, [
+    'A1',
+  ])
+  if (minDimension == null) {
+    return null
+  }
+  const maxRadius = minDimension / 2
+  if (
+    Number(aspirate_touchTip_mmFromEdge) > maxRadius ||
+    Number(aspirate_touchTip_mmFromEdge) < 0
+  ) {
+    return ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE
+  }
+  return null
+}
+export const dispenseTouchTipMmFromEdgeOutOfRange = (
+  fields: HydratedFormData
+): FormError | null => {
+  const {
+    dispense_touchTip_checkbox,
+    dispense_touchTip_mmFromEdge,
+    dispense_labware,
+  } = fields
+  if (dispense_touchTip_checkbox == null) {
+    return null
+  }
+  const labwareDef = dispense_labware?.def
+  if (labwareDef == null) {
+    return null
+  }
+  const minDimension = getMinXYDimension(labwareDef as LabwareDefinition2, [
+    'A1',
+  ])
+  if (minDimension == null) {
+    return null
+  }
+  const maxRadius = minDimension / 2
+  if (
+    Number(dispense_touchTip_mmFromEdge) > maxRadius ||
+    Number(dispense_touchTip_mmFromEdge) < 0
+  ) {
+    return DISPENSE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE
+  }
+  return null
+}
+export const aspirateTouchTipMmFromEdgeRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { aspirate_touchTip_checkbox, aspirate_touchTip_mmFromEdge } = fields
+  return aspirate_touchTip_checkbox && !aspirate_touchTip_mmFromEdge
+    ? ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED
+    : null
+}
+export const dispenseTouchTipMmFromEdgeRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { dispense_touchTip_checkbox, dispense_touchTip_mmFromEdge } = fields
+  return dispense_touchTip_checkbox && !dispense_touchTip_mmFromEdge
+    ? DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED
     : null
 }
 

@@ -1,4 +1,5 @@
 """Test deck configuration provider."""
+
 from typing import List, Set
 
 import pytest
@@ -213,6 +214,51 @@ def test_get_provided_addressable_area_names(
             },
             lazy_fixture("ot3_standard_deck_def"),
         ),
+        (
+            "flexStackerModuleV1D4",
+            "cutoutD3",
+            {
+                PotentialCutoutFixture(
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="flexStackerModuleV1",
+                    provided_addressable_areas=frozenset(
+                        {"D3", "flexStackerModuleV1D4"}
+                    ),
+                ),
+                PotentialCutoutFixture(
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="flexStackerModuleV1WithMagneticBlockV1",
+                    provided_addressable_areas=frozenset(
+                        {"flexStackerModuleV1D4", "magneticBlockV1D3"}
+                    ),
+                ),
+                PotentialCutoutFixture(
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="flexStackerModuleV1WithWasteChuteRightAdapterCovered",
+                    provided_addressable_areas=frozenset(
+                        {
+                            "1ChannelWasteChute",
+                            "8ChannelWasteChute",
+                            "flexStackerModuleV1D4",
+                        }
+                    ),
+                ),
+                PotentialCutoutFixture(
+                    cutout_id="cutoutD3",
+                    cutout_fixture_id="flexStackerModuleV1WithWasteChuteRightAdapterNoCover",
+                    provided_addressable_areas=frozenset(
+                        {
+                            "1ChannelWasteChute",
+                            "8ChannelWasteChute",
+                            "96ChannelWasteChute",
+                            "gripperWasteChute",
+                            "flexStackerModuleV1D4",
+                        }
+                    ),
+                ),
+            },
+            lazy_fixture("ot3_standard_deck_def"),
+        ),
     ],
 )
 def test_get_potential_cutout_fixtures(
@@ -246,7 +292,7 @@ def test_get_potential_cutout_fixtures_raises(
             AddressableArea(
                 area_name="1",
                 area_type=AreaType.SLOT,
-                base_slot=DeckSlotName.SLOT_A1,
+                base_slot=DeckSlotName.SLOT_1,
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -263,7 +309,7 @@ def test_get_potential_cutout_fixtures_raises(
             AddressableArea(
                 area_name="1",
                 area_type=AreaType.SLOT,
-                base_slot=DeckSlotName.SLOT_A1,
+                base_slot=DeckSlotName.SLOT_1,
                 display_name="Slot 1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -280,7 +326,7 @@ def test_get_potential_cutout_fixtures_raises(
             AddressableArea(
                 area_name="D1",
                 area_type=AreaType.SLOT,
-                base_slot=DeckSlotName.SLOT_A1,
+                base_slot=DeckSlotName.SLOT_D1,
                 display_name="Slot D1",
                 bounding_box=Dimensions(x=128.0, y=86.0, z=0),
                 position=AddressableOffsetVector(x=1, y=2, z=3),
@@ -293,7 +339,7 @@ def test_get_potential_cutout_fixtures_raises(
             AddressableArea(
                 area_name="movableTrashB3",
                 area_type=AreaType.MOVABLE_TRASH,
-                base_slot=DeckSlotName.SLOT_A1,
+                base_slot=DeckSlotName.SLOT_B3,
                 display_name="Trash Bin in B3",
                 bounding_box=Dimensions(x=225, y=78, z=40),
                 position=AddressableOffsetVector(x=-5.25, y=6, z=3),
@@ -306,7 +352,7 @@ def test_get_potential_cutout_fixtures_raises(
             AddressableArea(
                 area_name="gripperWasteChute",
                 area_type=AreaType.WASTE_CHUTE,
-                base_slot=DeckSlotName.SLOT_A1,
+                base_slot=DeckSlotName.SLOT_D3,
                 display_name="Waste Chute",
                 bounding_box=Dimensions(x=0, y=0, z=0),
                 position=AddressableOffsetVector(x=65, y=31, z=139.5),
@@ -323,7 +369,7 @@ def test_get_addressable_area_from_name(
 ) -> None:
     """It should get the deck position for the requested cutout id."""
     addressable_area = subject.get_addressable_area_from_name(
-        addressable_area_name, DeckPoint(x=1, y=2, z=3), DeckSlotName.SLOT_A1, deck_def
+        addressable_area_name, DeckPoint(x=1, y=2, z=3), deck_def
     )
     assert addressable_area == expected_addressable_area
 
@@ -336,6 +382,5 @@ def test_get_addressable_area_from_name_raises(
         subject.get_addressable_area_from_name(
             "theFunArea",
             DeckPoint(x=1, y=2, z=3),
-            DeckSlotName.SLOT_A1,
             ot3_standard_deck_def,
         )

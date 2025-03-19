@@ -14,7 +14,7 @@ interface NotificationProps {
 
 export interface DescriptionContentProps extends NotificationProps {
   headline: string
-  message: string
+  message: string | JSX.Element
 }
 
 export function DescriptionContent(
@@ -46,12 +46,16 @@ export function DescriptionContent(
         >
           {props.headline}
         </StyledText>
-        <StyledText
-          oddStyle="bodyTextRegular"
-          desktopStyle="bodyDefaultRegular"
-        >
-          {props.message}
-        </StyledText>
+        {typeof props.message === 'string' ? (
+          <StyledText
+            oddStyle="bodyTextRegular"
+            desktopStyle="bodyDefaultRegular"
+          >
+            {props.message}
+          </StyledText>
+        ) : (
+          props.message
+        )}
       </Flex>
       <NotificationIfSpecified {...props} />
     </Flex>

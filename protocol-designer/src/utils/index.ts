@@ -1,4 +1,5 @@
 import uuidv1 from 'uuid/v4'
+import snakeCase from 'lodash/snakeCase'
 import {
   makeWellSetHelpers,
   getDeckDefFromRobotType,
@@ -18,10 +19,10 @@ import type {
   WellSetHelpers,
   AddressableAreaName,
   CutoutId,
-  CutoutFixtureId,
-  RobotType,
   SupportedTip,
   LabwareDefinition2,
+  ModuleType,
+  LabwareDisplayCategory,
 } from '@opentrons/shared-data'
 import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
@@ -169,44 +170,6 @@ export const getStagingAreaAddressableAreas = (
   return addressableAreasRaw
 }
 
-export const getCutoutIdByAddressableArea = (
-  addressableAreaName: AddressableAreaName,
-  cutoutFixtureId: CutoutFixtureId,
-  robotType: RobotType
-): CutoutId => {
-  const deckDef = getDeckDefFromRobotType(robotType)
-  const cutoutFixtures = deckDef.cutoutFixtures
-  const providesAddressableAreasForAddressableArea = cutoutFixtures.find(
-    cutoutFixture => cutoutFixture.id.includes(cutoutFixtureId)
-  )?.providesAddressableAreas
-
-  const findCutoutIdByAddressableArea = (
-    addressableAreaName: AddressableAreaName
-  ): CutoutId | null => {
-    if (providesAddressableAreasForAddressableArea != null) {
-      for (const cutoutId in providesAddressableAreasForAddressableArea) {
-        if (
-          providesAddressableAreasForAddressableArea[
-            cutoutId as keyof typeof providesAddressableAreasForAddressableArea
-          ].includes(addressableAreaName)
-        ) {
-          return cutoutId as CutoutId
-        }
-      }
-    }
-    return null
-  }
-
-  const cutoutId = findCutoutIdByAddressableArea(addressableAreaName)
-
-  if (cutoutId == null) {
-    throw Error(
-      `expected to find cutoutId from addressableAreaName ${addressableAreaName} but could not`
-    )
-  }
-  return cutoutId
-}
-
 export function getMatchingTipLiquidSpecs(
   pipetteEntity: PipetteEntity,
   volume: number,
@@ -285,4 +248,32 @@ export const removeOpentronsPhrases = (input: string): string => {
     .replace(/\s+/g, ' ')
 
   return updatedText.trim()
+}
+
+const getModuleShortnameForPython = (type: ModuleType): string => {
+  const shortName = type.split('Type')[0]
+  return snakeCase(shortName)
+}
+
+export const getModulePythonName = (
+  type: ModuleType,
+  typeCount: number
+): string => {
+  return `${getModuleShortnameForPython(type)}_${typeCount}`
+}
+
+export const getLabwarePythonName = (
+  labwareDisplayCategory: LabwareDisplayCategory,
+  typeCount: number
+): string => {
+  return `${snakeCase(labwareDisplayCategory)}_${typeCount}`
+}
+
+export const getAdditionalEquipmentPythonName = (
+  fixtureName: 'wasteChute' | 'trashBin',
+  typeCount: number
+): string => {
+  return fixtureName === 'wasteChute'
+    ? snakeCase(fixtureName)
+    : `${snakeCase(fixtureName)}_${typeCount}`
 }

@@ -48,7 +48,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
     showConfirmTerminateModal ? (
       //    confirm terminate modal
       <OddModal header={terminateHeader}>
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
             {t('branded:confirm_terminate')}
           </LegacyStyledText>
@@ -79,6 +79,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
           gridGap={SPACING.spacing40}
           alignItems={ALIGN_CENTER}
           justifyContent={ALIGN_CENTER}
+          width="100%"
         >
           <Flex
             height="12.5rem"
@@ -88,6 +89,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             color={COLORS.grey60}
             padding={SPACING.spacing24}
             alignItems={ALIGN_CENTER}
+            width="100%"
           >
             <Icon
               name="ot-alert"

@@ -1,7 +1,9 @@
-from typing import List, Protocol
+from typing import List, Optional, Protocol
 
 from .types import (
+    LEDPattern,
     LimitSwitchStatus,
+    MeasurementKind,
     MoveResult,
     StackerAxis,
     PlatformStatus,
@@ -9,6 +11,11 @@ from .types import (
     MoveParams,
     StackerInfo,
     LEDColor,
+    StallGuardParams,
+    TOFMeasurement,
+    TOFMeasurementResult,
+    TOFSensor,
+    TOFSensorStatus,
 )
 
 
@@ -51,8 +58,59 @@ class AbstractFlexStackerDriver(Protocol):
         """Set axis hold current in amps."""
         ...
 
+    async def set_stallguard_threshold(
+        self, axis: StackerAxis, enable: bool, threshold: int
+    ) -> bool:
+        """Enables and sets the stallguard threshold for the given axis motor."""
+        ...
+
+    async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> bool:
+        """Enable or disable the TOF sensor."""
+        ...
+
+    async def manage_tof_measurement(
+        self,
+        sensor: TOFSensor,
+        kind: MeasurementKind = MeasurementKind.HISTOGRAM,
+        start: bool = True,
+    ) -> TOFMeasurement:
+        """Start or stop Measurements from the TOF sensor."""
+        ...
+
+    async def get_tof_histogram(self, sensor: TOFSensor) -> TOFMeasurementResult:
+        """Get the full histogram measurement from the TOF sensor."""
+        ...
+
+    async def set_motor_driver_register(
+        self, axis: StackerAxis, reg: int, value: int
+    ) -> bool:
+        """Set the register of the given motor axis driver to the given value."""
+        ...
+
+    async def get_motor_driver_register(self, axis: StackerAxis, reg: int) -> int:
+        """Gets the register value of the given motor axis driver."""
+        ...
+
+    async def set_tof_driver_register(
+        self, sensor: TOFSensor, reg: int, value: int
+    ) -> bool:
+        """Set the register of the given tof sensor driver to the given value."""
+        ...
+
+    async def get_tof_driver_register(self, sensor: TOFSensor, reg: int) -> int:
+        """Gets the register value of the given tof sensor driver."""
+        ...
+
+    async def get_tof_sensor_status(self, sensor: TOFSensor) -> TOFSensorStatus:
+        """Get the status of the tof sensor."""
+        ...
+
     async def get_motion_params(self, axis: StackerAxis) -> MoveParams:
         """Get the motion parameters used by the given axis motor."""
+        ...
+
+    async def get_stallguard_threshold(self, axis: StackerAxis) -> StallGuardParams:
+        """Get the stallguard parameters by the given axis motor."""
         ...
 
     async def get_limit_switch(self, axis: StackerAxis, direction: Direction) -> bool:
@@ -84,6 +142,13 @@ class AbstractFlexStackerDriver(Protocol):
         """
         ...
 
+    async def get_installation_detected(self) -> bool:
+        """Get whether or not installation is detected.
+
+        :return: True if installation is detected, False otherwise
+        """
+        ...
+
     async def move_in_mm(
         self, axis: StackerAxis, distance: float, params: MoveParams | None = None
     ) -> MoveResult:
@@ -96,16 +161,26 @@ class AbstractFlexStackerDriver(Protocol):
         """Move until limit switch is triggered."""
         ...
 
-    async def home_axis(self, axis: StackerAxis, direction: Direction) -> bool:
+    async def home_axis(self, axis: StackerAxis, direction: Direction) -> MoveResult:
         """Home axis."""
         ...
 
     async def set_led(
-        self, power: float, color: LEDColor | None = None, external: bool | None = None
+        self,
+        power: float,
+        color: Optional[LEDColor] = None,
+        external: Optional[bool] = None,
+        pattern: Optional[LEDPattern] = None,
+        duration: Optional[int] = None,
+        reps: Optional[int] = None,
     ) -> bool:
-        """Set LED color of status bar."""
+        """Set LED Status bar color and pattern."""
         ...
 
     async def enter_programming_mode(self) -> None:
         """Reboot into programming mode"""
+        ...
+
+    def reset_serial_buffers(self) -> None:
+        """Reset the input and output serial buffers."""
         ...

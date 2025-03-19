@@ -19,9 +19,9 @@
     "links": ["https://www.nest-biotech.com/pcr-plates/58773587.html"]
   },
   "metadata": {
-    "displayName": "NEST 96 Well Plate 100 \u00b5L PCR Full Skirt",
+    "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
@@ -1136,10 +1136,11 @@
     "conicalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 3.015,
-          "topHeight": 0.2,
-          "bottomHeight": 0.0
+          "shape": "conical",
+          "bottomDiameter": 5.26,
+          "topDiameter": 5.34,
+          "topHeight": 14.7,
+          "bottomHeight": 9.89
         },
         {
           "shape": "conical",
@@ -1149,13 +1150,13 @@
           "bottomHeight": 0.2
         },
         {
-          "shape": "conical",
-          "bottomDiameter": 5.26,
-          "topDiameter": 5.34,
-          "topHeight": 14.7,
-          "bottomHeight": 9.89
+          "shape": "spherical",
+          "radiusOfCurvature": 3.015,
+          "topHeight": 0.2,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

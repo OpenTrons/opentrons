@@ -119,14 +119,20 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
         labwareId,
         loadLabwareCommands
       )
-      const isLabwareInStack = protocolAnalysis?.commands.some(
-        command =>
-          command.commandType === 'loadLabware' &&
-          command.result?.labwareId === labwareId &&
-          typeof command.params.location === 'object' &&
-          ('moduleId' in command.params.location ||
-            'labwareId' in command.params.location)
-      )
+      const isLabwareInStack =
+        protocolAnalysis?.commands.some(
+          command =>
+            command.commandType === 'loadLabware' &&
+            command.result?.labwareId === labwareId &&
+            typeof command.params.location === 'object' &&
+            ('moduleId' in command.params.location ||
+              'labwareId' in command.params.location)
+        ) ||
+        protocolAnalysis?.commands.some(
+          command =>
+            command.commandType === 'loadLidStack' &&
+            command.result?.labwareIds.includes(labwareId)
+        )
 
       return {
         definition: labwareDef,

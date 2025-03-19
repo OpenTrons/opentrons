@@ -6,7 +6,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import {
-  AIR_GAP_META,
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DEFAULT_PIPETTE,
   delayCommand,
@@ -28,6 +27,7 @@ import {
   makeDispenseAirGapHelper,
   makeMoveToWellHelper,
   makeAirGapAfterAspirateHelper,
+  AIR_GAP_META,
 } from '../fixtures'
 import { FIXED_TRASH_ID } from '../constants'
 import {
@@ -129,6 +129,8 @@ describe('pick up tip if no tip on pipette', () => {
       },
     }
 
+    robotStateWithTip.tipState.pipettes.p300SingleId = true
+
     noTipArgs = {
       ...noTipArgs,
       changeTip: 'always',
@@ -140,11 +142,56 @@ describe('pick up tip if no tip on pipette', () => {
 
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
+      //   drop tip from return tip
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 30),
       dispenseHelper('B2', 30),
       makeMoveToWellHelper('B2', 'destPlateId'),
       ...makeAirGapHelper(5),
+      //   drop tip at end
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+        params: {
+          addressableAreaName: '1ChannelWasteChute',
+          offset: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+          pipetteId: 'p300SingleId',
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+
+        params: {
+          pipetteId: 'p300SingleId',
+        },
+      },
     ])
   })
 
@@ -862,6 +909,7 @@ describe('advanced options', () => {
         makeAirGapAfterAspirateHelper(5),
         dispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 150),
+
         aspirateHelper('A1', 150),
         makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
@@ -1094,7 +1142,7 @@ describe('advanced options', () => {
         },
         aspirateDelay: { seconds: 11, mmFromBottom: 15 },
         touchTipAfterAspirate: true,
-        touchTipAfterAspirateOffsetMmFromBottom: 14.5,
+        touchTipAfterAspirateOffsetMmFromTop: -14.5,
         aspirateAirGapVolume: 31,
         // dispense column
         dispenseDelay: { seconds: 12, mmFromBottom: 14 },
@@ -1277,9 +1325,9 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 14.5,
+                z: -14.5,
               },
             },
           },
@@ -1472,9 +1520,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -1587,9 +1635,9 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 14.5,
+                z: -14.5,
               },
             },
           },
@@ -1778,9 +1826,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -1870,7 +1918,6 @@ describe('advanced options', () => {
         },
         {
           commandType: 'dispense',
-
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1924,7 +1971,6 @@ describe('advanced options', () => {
         },
         {
           commandType: 'dispense',
-
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2002,9 +2048,9 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 14.5,
+                z: -14.5,
               },
             },
           },
@@ -2193,9 +2239,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -2310,9 +2356,9 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 14.5,
+                z: -14.5,
               },
             },
           },
@@ -2500,9 +2546,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -2525,6 +2571,7 @@ describe('advanced options', () => {
             },
           },
         },
+
         {
           commandType: 'prepareToAspirate',
           key: expect.any(String),
@@ -2751,9 +2798,9 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 14.5,
+                z: -14.5,
               },
             },
           },
@@ -2795,8 +2842,8 @@ describe('advanced options', () => {
         // dispense
         {
           commandType: 'dispense',
-          key: expect.any(String),
           meta: AIR_GAP_META,
+          key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
             volume: 31,
@@ -2942,9 +2989,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -3059,9 +3106,9 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 14.5,
+                z: -14.5,
               },
             },
           },
@@ -3250,9 +3297,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -3275,6 +3322,7 @@ describe('advanced options', () => {
             },
           },
         },
+
         {
           commandType: 'prepareToAspirate',
           key: expect.any(String),
@@ -3499,9 +3547,9 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 14.5,
+                z: -14.5,
               },
             },
           },
@@ -3690,9 +3738,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },
@@ -3871,9 +3919,9 @@ describe('advanced options', () => {
             labwareId: 'sourcePlateId',
             wellName: 'A1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 14.5,
+                z: -14.5,
               },
             },
           },
@@ -4062,9 +4110,9 @@ describe('advanced options', () => {
             labwareId: 'destPlateId',
             wellName: 'B1',
             wellLocation: {
-              origin: 'bottom',
+              origin: 'top',
               offset: {
-                z: 3.4,
+                z: -3.4,
               },
             },
           },

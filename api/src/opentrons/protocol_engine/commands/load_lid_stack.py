@@ -1,4 +1,5 @@
 """Load lid stack command request, result, and implementation models."""
+
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type, List, Any
@@ -10,11 +11,13 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from ..errors import LabwareIsNotAllowedInLocationError, ProtocolEngineError
 from ..resources import fixture_validation, labware_validation
 from ..types import (
-    LabwareLocation,
+    LoadableLabwareLocation,
     SYSTEM_LOCATION,
     OnLabwareLocation,
     DeckSlotLocation,
     AddressableAreaLocation,
+    LabwareLocationSequence,
+    OnLabwareLocationSequenceComponent,
 )
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
@@ -41,7 +44,7 @@ _LID_STACK_PE_VERSION = 1
 class LoadLidStackParams(BaseModel):
     """Payload required to load a lid stack onto a location."""
 
-    location: LabwareLocation = Field(
+    location: LoadableLabwareLocation = Field(
         ...,
         description="Location the lid stack should be loaded into.",
     )
@@ -80,7 +83,7 @@ class LoadLidStackResult(BaseModel):
 
     stackLabwareId: str = Field(
         ...,
-        description="An ID to reference the Protocol Engine Labware Lid Stack in subsequent commands.",
+        description="An ID to reference the lid stack labware object created.",
     )
     labwareIds: List[str] = Field(
         ...,
@@ -90,8 +93,20 @@ class LoadLidStackResult(BaseModel):
         ...,
         description="The full definition data for this lid labware.",
     )
-    location: LabwareLocation = Field(
+    location: LoadableLabwareLocation = Field(
         ..., description="The Location that the stack of lid labware has been loaded."
+    )
+    lidStackDefinition: LabwareDefinition | None = Field(
+        None,
+        description="The definition of the lid stack object. Optional for backwards-compatibility.",
+    )
+    stackLocationSequence: LabwareLocationSequence | None = Field(
+        None,
+        description="The location sequence for the lid stack labware object created.",
+    )
+    locationSequences: List[LabwareLocationSequence] | None = Field(
+        None,
+        description="The location sequences for the lids just loaded into the stack. These are in the same order as labwareIds.",
     )
 
 
@@ -106,10 +121,7 @@ class LoadLidStackImplementation(
         self._equipment = equipment
         self._state_view = state_view
 
-    async def execute(
-        self, params: LoadLidStackParams
-    ) -> SuccessData[LoadLidStackResult]:
-        """Load definition and calibration data necessary for a lid stack."""
+    def _validate_location(self, params: LoadLidStackParams) -> LoadableLabwareLocation:
         if isinstance(params.location, AddressableAreaLocation):
             area_name = params.location.addressableAreaName
             if not (
@@ -130,10 +142,72 @@ class LoadLidStackImplementation(
             raise ProtocolEngineError(
                 message="Lid Stack Labware Object with quantity 0 must be loaded onto System Location."
             )
+        return self._state_view.geometry.ensure_location_not_occupied(params.location)
 
-        verified_location = self._state_view.geometry.ensure_location_not_occupied(
-            params.location
+    def _format_results(
+        self,
+        verified_location: LoadableLabwareLocation,
+        lid_stack_object: LoadedLabwareData,
+        loaded_lid_labwares: list[LoadedLabwareData],
+        lid_labware_definition: LabwareDefinition | None,
+    ) -> SuccessData[LoadLidStackResult]:
+        stack_location_sequence = (
+            self._state_view.geometry.get_predicted_location_sequence(verified_location)
         )
+        loaded_lid_locations_by_id: dict[str, OnLabwareLocation] = {}
+        loaded_lid_ids_ordered: list[str] = []
+        loaded_lid_location_sequences_ordered: list[LabwareLocationSequence] = []
+        lid_location_sequence_accumulated: LabwareLocationSequence = [
+            OnLabwareLocationSequenceComponent(
+                labwareId=lid_stack_object.labware_id, lidId=None
+            )
+        ] + stack_location_sequence
+        load_location = OnLabwareLocation(labwareId=lid_stack_object.labware_id)
+        last_lid_id: str | None = None
+        for loaded_lid in loaded_lid_labwares:
+            loaded_lid_locations_by_id[loaded_lid.labware_id] = load_location
+            loaded_lid_ids_ordered.append(loaded_lid.labware_id)
+            if last_lid_id is None:
+                last_lid_id = loaded_lid.labware_id
+            else:
+                lid_location_sequence_accumulated = [
+                    OnLabwareLocationSequenceComponent(
+                        labwareId=last_lid_id, lidId=None
+                    )
+                ] + lid_location_sequence_accumulated
+                last_lid_id = loaded_lid.labware_id
+            loaded_lid_location_sequences_ordered.append(
+                [loc for loc in lid_location_sequence_accumulated]
+            )
+            load_location = OnLabwareLocation(labwareId=loaded_lid.labware_id)
+
+        state_update = StateUpdate()
+        state_update.set_loaded_lid_stack(
+            stack_id=lid_stack_object.labware_id,
+            stack_object_definition=lid_stack_object.definition,
+            stack_location=verified_location,
+            locations=loaded_lid_locations_by_id,
+            labware_definition=lid_labware_definition,
+        )
+
+        return SuccessData(
+            public=LoadLidStackResult(
+                stackLabwareId=lid_stack_object.labware_id,
+                lidStackDefinition=lid_stack_object.definition,
+                labwareIds=loaded_lid_ids_ordered,
+                definition=lid_labware_definition,
+                location=verified_location,
+                stackLocationSequence=stack_location_sequence,
+                locationSequences=loaded_lid_location_sequences_ordered,
+            ),
+            state_update=state_update,
+        )
+
+    async def execute(
+        self, params: LoadLidStackParams
+    ) -> SuccessData[LoadLidStackResult]:
+        """Load definition and calibration data necessary for a lid stack."""
+        verified_location = self._validate_location(params)
 
         lid_stack_object = await self._equipment.load_labware(
             load_name=_LID_STACK_PE_LABWARE,
@@ -150,8 +224,8 @@ class LoadLidStackImplementation(
                 message="Lid Stack Labware Object Labware Definition does not contain required allowed role 'system'."
             )
 
-        loaded_lid_labwares: List[LoadedLabwareData] = []
-        lid_labware_definition = None
+        loaded_lid_labwares: list[LoadedLabwareData] = []
+        lid_labware_definition: LabwareDefinition | None = None
 
         if params.quantity > 0:
             loaded_lid_labwares = await self._equipment.load_lids(
@@ -162,40 +236,18 @@ class LoadLidStackImplementation(
                 quantity=params.quantity,
                 labware_ids=params.labwareIds,
             )
-
-            lid_labware_definition = loaded_lid_labwares[0].definition
-
+            lid_labware_definition = loaded_lid_labwares[-1].definition
             if isinstance(verified_location, OnLabwareLocation):
                 self._state_view.labware.raise_if_labware_cannot_be_stacked(
-                    top_labware_definition=loaded_lid_labwares[
-                        params.quantity - 1
-                    ].definition,
+                    top_labware_definition=lid_labware_definition,
                     bottom_labware_id=verified_location.labwareId,
                 )
 
-        loaded_lid_locations_by_id = {}
-        load_location = OnLabwareLocation(labwareId=lid_stack_object.labware_id)
-        for loaded_lid in loaded_lid_labwares:
-            loaded_lid_locations_by_id[loaded_lid.labware_id] = load_location
-            load_location = OnLabwareLocation(labwareId=loaded_lid.labware_id)
-
-        state_update = StateUpdate()
-        state_update.set_loaded_lid_stack(
-            stack_id=lid_stack_object.labware_id,
-            stack_object_definition=lid_stack_object.definition,
-            stack_location=verified_location,
-            locations=loaded_lid_locations_by_id,
-            labware_definition=lid_labware_definition,
-        )
-
-        return SuccessData(
-            public=LoadLidStackResult(
-                stackLabwareId=lid_stack_object.labware_id,
-                labwareIds=list(loaded_lid_locations_by_id.keys()),
-                definition=lid_labware_definition,
-                location=params.location,
-            ),
-            state_update=state_update,
+        return self._format_results(
+            verified_location,
+            lid_stack_object,
+            loaded_lid_labwares,
+            lid_labware_definition,
         )
 
 
@@ -206,7 +258,7 @@ class LoadLidStack(
 
     commandType: LoadLidStackCommandType = "loadLidStack"
     params: LoadLidStackParams
-    result: Optional[LoadLidStackResult]
+    result: Optional[LoadLidStackResult] = None
 
     _ImplementationCls: Type[LoadLidStackImplementation] = LoadLidStackImplementation
 

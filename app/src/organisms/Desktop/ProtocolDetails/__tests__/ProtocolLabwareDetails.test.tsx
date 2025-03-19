@@ -77,7 +77,7 @@ describe('ProtocolLabwareDetails', () => {
   let props: ComponentProps<typeof ProtocolLabwareDetails>
   beforeEach(() => {
     props = {
-      requiredLabwareDetails: mockRequiredLabwareDetails,
+      loadLabwareCommands: mockRequiredLabwareDetails,
     }
   })
 
@@ -148,7 +148,7 @@ describe('ProtocolLabwareDetails', () => {
 
   it('should render mock infoscreen when no labware', () => {
     props = {
-      requiredLabwareDetails: [],
+      loadLabwareCommands: [],
     }
     render(props)
     screen.getByText('mock InfoScreen')

@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
 import { getTiprackOptions } from '../../../../../ui/labware/selectors'
-import { DropdownStepFormField } from '../../../../../molecules'
+import { DropdownStepFormField } from '../../../../../components/molecules'
 import type { FieldProps } from '../types'
 
 interface TiprackFieldProps extends FieldProps {
@@ -61,7 +61,7 @@ export function TiprackField(props: TiprackFieldProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {t('tiprack')}
           </StyledText>
-          <ListItem type="noActive">
+          <ListItem type="default">
             <Flex padding={SPACING.spacing12}>
               <StyledText desktopStyle="bodyDefaultRegular">
                 {tiprackOptions[0]?.name ?? t('no_tiprack')}

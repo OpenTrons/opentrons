@@ -5,6 +5,7 @@ from opentrons.protocol_engine.types import (
     ModuleLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
+    InStackerHopperLocation,
 )
 
 
@@ -17,6 +18,15 @@ def well(engine_client: SyncClient, well_name: str, labware_id: str) -> str:
     return f"{well_name} of {_labware_location_string(engine_client, labware_location)}"
 
 
+def _module_in_location_string(module_id: str, engine_client: SyncClient) -> str:
+    module_name = engine_client.state.modules.get_definition(
+        module_id=module_id
+    ).displayName
+    module_on = engine_client.state.modules.get_location(module_id=module_id)
+    module_on_string = _labware_location_string(engine_client, module_on)
+    return f"{module_name} on {module_on_string}"
+
+
 def _labware_location_string(
     engine_client: SyncClient, location: LabwareLocation
 ) -> str:
@@ -26,14 +36,7 @@ def _labware_location_string(
         return f"slot {location.slotName.id}"
 
     elif isinstance(location, ModuleLocation):
-        module_name = engine_client.state.modules.get_definition(
-            module_id=location.moduleId
-        ).displayName
-        module_on = engine_client.state.modules.get_location(
-            module_id=location.moduleId
-        )
-        module_on_string = _labware_location_string(engine_client, module_on)
-        return f"{module_name} on {module_on_string}"
+        return _module_in_location_string(location.moduleId, engine_client)
 
     elif isinstance(location, OnLabwareLocation):
         labware_name = _labware_name(engine_client, location.labwareId)
@@ -52,6 +55,11 @@ def _labware_location_string(
 
     elif location == "systemLocation":
         return "[systemLocation]"
+
+    elif isinstance(location, InStackerHopperLocation):
+        return (
+            f"stored in {_module_in_location_string(location.moduleId, engine_client)}"
+        )
 
 
 def _labware_name(engine_client: SyncClient, labware_id: str) -> str:

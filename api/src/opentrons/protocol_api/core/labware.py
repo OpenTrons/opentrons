@@ -7,7 +7,8 @@ from typing import Any, Generic, List, NamedTuple, Optional, TypeVar, Dict
 
 from opentrons_shared_data.labware.types import (
     LabwareUri,
-    LabwareParameters as LabwareParametersDict,
+    LabwareParameters2,
+    LabwareParameters3,
     LabwareDefinition as LabwareDefinitionDict,
 )
 
@@ -15,6 +16,9 @@ from opentrons.types import DeckSlotName, Point, NozzleMapInterface
 from .._liquid import Liquid
 
 from .well import WellCoreType
+
+
+_LabwareParametersDict = LabwareParameters2 | LabwareParameters3
 
 
 class LabwareLoadParams(NamedTuple):
@@ -75,7 +79,7 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
         """Get the labware's definition as a plain dictionary."""
 
     @abstractmethod
-    def get_parameters(self) -> LabwareParametersDict:
+    def get_parameters(self) -> _LabwareParametersDict:
         """Get the labware's definition's `parameters` field as a plain dictionary."""
 
     @abstractmethod

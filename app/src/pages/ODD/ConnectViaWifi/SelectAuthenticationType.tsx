@@ -21,12 +21,12 @@ export function SelectAuthenticationType({
   setCurrentOption,
   setSelectedAuthType,
 }: SelectAuthenticationTypeProps): JSX.Element {
-  const { i18n, t } = useTranslation('device_settings')
+  const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <RobotSetupHeader
-        buttonText={i18n.format(t('continue'), 'capitalize')}
+        buttonText={i18n.format(t('shared:continue'), 'capitalize')}
         header={t('select_a_security_type')}
         onClickBack={() => {
           setCurrentOption('WifiList')

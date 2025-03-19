@@ -15,8 +15,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { SlotDetailsContainer } from '../../organisms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
+import { SlotDetailsContainer } from '../../components/organisms'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnail } from './DeckThumbnail'
 import { OffDeckThumbnail } from './OffdeckThumbnail'

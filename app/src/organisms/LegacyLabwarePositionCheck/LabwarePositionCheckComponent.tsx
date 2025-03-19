@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useConditionalConfirm, ModalShell } from '@opentrons/components'
 import {
-  useCreateLabwareOffsetMutation,
+  useAddLabwareOffsetToRunMutation,
   useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
 import { FIXED_TRASH_ID, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -39,7 +39,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type {
-  LabwareOffsetCreateData,
+  LegacyLabwareOffsetCreateData,
   LabwareOffset,
   CommandData,
 } from '@opentrons/api-client'
@@ -193,7 +193,7 @@ export const LabwarePositionCheckComponent = (
     isCommandMutationLoading: isCommandChainLoading,
   } = useChainMaintenanceCommands()
 
-  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
+  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
@@ -310,7 +310,9 @@ export const LabwarePositionCheckComponent = (
     robotType,
   }
 
-  const handleApplyOffsets = (offsets: LabwareOffsetCreateData[]): void => {
+  const handleApplyOffsets = (
+    offsets: LegacyLabwareOffsetCreateData[]
+  ): void => {
     setIsApplyingOffsets(true)
     Promise.all(offsets.map(data => createLabwareOffset({ runId, data })))
       .then(() => {

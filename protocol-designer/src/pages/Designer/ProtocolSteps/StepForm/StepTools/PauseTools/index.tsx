@@ -1,9 +1,7 @@
-import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
-  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   Divider,
@@ -12,7 +10,6 @@ import {
   RadioButton,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -25,7 +22,10 @@ import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '../../../../../../constants'
-import { InputStepFormField } from '../../../../../../molecules'
+import {
+  InputStepFormField,
+  TextAreaField,
+} from '../../../../../../components/molecules'
 import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
 import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
@@ -238,7 +238,7 @@ export function PauseTools(props: StepFormProps): JSX.Element {
                 'capitalize'
               )}
             </StyledText>
-            <StyledTextArea
+            <TextAreaField
               value={propsForFields.pauseMessage.value as string}
               onChange={(e: ChangeEvent<any>) => {
                 propsForFields.pauseMessage.updateValue(e.currentTarget.value)
@@ -251,18 +251,3 @@ export function PauseTools(props: StepFormProps): JSX.Element {
     </Flex>
   )
 }
-
-const StyledTextArea = styled.textarea<{ height?: string; error?: boolean }>`
-  width: 100%;
-  height: ${props => (props.height != null ? props.height : '2rem')};
-  box-sizing: border-box;
-  border: 1px solid
-    ${props =>
-      props.error != null && props.error ? COLORS.red50 : COLORS.grey50};
-  border-radius: ${BORDERS.borderRadius4};
-  padding: ${SPACING.spacing8};
-  font-size: ${TYPOGRAPHY.fontSizeH4};
-  line-height: ${TYPOGRAPHY.lineHeight16};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  resize: none;
-`

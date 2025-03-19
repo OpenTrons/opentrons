@@ -6,6 +6,7 @@ from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     ("num_to_configure_as_maximum", "num_to_upload", "num_to_expect"),
     [

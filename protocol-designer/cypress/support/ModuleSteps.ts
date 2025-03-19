@@ -28,7 +28,6 @@ export enum ModContent {
  * Each function returns a StepThunk
  * Add a comment to all records
  */
-
 export const ModuleSteps = {
   /**
    * Select "Done" on a step form.

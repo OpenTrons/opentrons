@@ -1,4 +1,5 @@
 """ProtocolEngine shared test fixtures."""
+
 from __future__ import annotations
 
 import pytest
@@ -9,7 +10,10 @@ from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware import load_definition
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    labware_definition_type_adapter,
+)
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
@@ -78,7 +82,7 @@ def ot3_standard_deck_def() -> DeckDefinitionV5:
 @pytest.fixture(scope="session")
 def ot2_fixed_trash_def() -> LabwareDefinition:
     """Get the definition of the OT-2 standard fixed trash."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_1_trash_1100ml_fixed", 1)
     )
 
@@ -86,7 +90,7 @@ def ot2_fixed_trash_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def ot2_short_fixed_trash_def() -> LabwareDefinition:
     """Get the definition of the OT-2 short fixed trash."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_1_trash_850ml_fixed", 1)
     )
 
@@ -94,7 +98,7 @@ def ot2_short_fixed_trash_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def ot3_fixed_trash_def() -> LabwareDefinition:
     """Get the definition of the OT-3 fixed trash."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_1_trash_3200ml_fixed", 1)
     )
 
@@ -102,7 +106,7 @@ def ot3_fixed_trash_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def ot3_absorbance_reader_lid() -> LabwareDefinition:
     """Get the definition of the OT-3 plate reader lid."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_flex_lid_absorbance_plate_reader_module", 1)
     )
 
@@ -110,7 +114,7 @@ def ot3_absorbance_reader_lid() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def well_plate_def() -> LabwareDefinition:
     """Get the definition of a 96 well plate."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("corning_96_wellplate_360ul_flat", 2)
     )
 
@@ -118,7 +122,7 @@ def well_plate_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def flex_50uL_tiprack() -> LabwareDefinition:
     """Get the definition of a Flex 50uL tiprack."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_flex_96_filtertiprack_50ul", 1)
     )
 
@@ -126,7 +130,7 @@ def flex_50uL_tiprack() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def adapter_plate_def() -> LabwareDefinition:
     """Get the definition of a h/s adapter plate."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_universal_flat_adapter", 1)
     )
 
@@ -134,7 +138,7 @@ def adapter_plate_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def reservoir_def() -> LabwareDefinition:
     """Get the definition of single-row reservoir."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("nest_12_reservoir_15ml", 1)
     )
 
@@ -142,23 +146,39 @@ def reservoir_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def tip_rack_def() -> LabwareDefinition:
     """Get the definition of Opentrons 300 uL tip rack."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_96_tiprack_300ul", 1)
+    )
+
+
+@pytest.fixture(scope="session")
+def tiprack_adapter_def() -> LabwareDefinition:
+    """Get the definition of a flex 96 channel tiprack adapter."""
+    return labware_definition_type_adapter.validate_python(
+        load_definition("opentrons_flex_96_tiprack_adapter", 1)
     )
 
 
 @pytest.fixture(scope="session")
 def adapter_def() -> LabwareDefinition:
     """Get the definition of Opentrons 96 PCR adapter."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_96_pcr_adapter", 1)
+    )
+
+
+@pytest.fixture(scope="session")
+def lid_stack_def() -> LabwareDefinition:
+    """Get the definition of the opentrons tiprack lid."""
+    return labware_definition_type_adapter.validate_python(
+        load_definition("protocol_engine_lid_stack_object", 1, schema=3)
     )
 
 
 @pytest.fixture(scope="session")
 def falcon_tuberack_def() -> LabwareDefinition:
     """Get the definition of the 6-well Falcon tuberack."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("opentrons_6_tuberack_falcon_50ml_conical", 1)
     )
 
@@ -166,8 +186,16 @@ def falcon_tuberack_def() -> LabwareDefinition:
 @pytest.fixture(scope="session")
 def magdeck_well_plate_def() -> LabwareDefinition:
     """Get the definition of a well place compatible with magdeck."""
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("nest_96_wellplate_100ul_pcr_full_skirt", 1)
+    )
+
+
+@pytest.fixture(scope="session")
+def tiprack_lid_def() -> LabwareDefinition:
+    """Get the definition of the opentrons tiprack lid."""
+    return labware_definition_type_adapter.validate_python(
+        load_definition("opentrons_flex_tiprack_lid", 1, schema=3)
     )
 
 

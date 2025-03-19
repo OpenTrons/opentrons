@@ -11,7 +11,7 @@ import {
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../molecules'
+} from '../../../../components/molecules'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
@@ -24,7 +24,7 @@ import {
   WellsOrderField,
 } from '../StepForm/PipetteFields'
 import type { WellOrderOption } from '../../../../form-types'
-import type { FieldPropsByName } from '../StepForm/types'
+import type { FieldPropsByName, LiquidHandlingTab } from '../StepForm/types'
 
 interface BatchEditMoveLiquidProps {
   propsForFields: FieldPropsByName
@@ -35,7 +35,7 @@ export function BatchEditMoveLiquidTools(
 ): JSX.Element {
   const { t, i18n } = useTranslation(['button', 'tooltip', 'protocol_steps'])
   const { propsForFields } = props
-  const [tab, setTab] = useState<'aspirate' | 'dispense'>('aspirate')
+  const [tab, setTab] = useState<LiquidHandlingTab>('aspirate')
   const aspirateTab = {
     text: t('protocol_steps:aspirate'),
     isActive: tab === 'aspirate',

@@ -2,7 +2,6 @@
 from opentrons.protocol_api import (
     ParameterContext,
     ProtocolContext,
-    Labware,
     Well,
     InstrumentContext,
 )
@@ -14,7 +13,6 @@ from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
     MagneticBlockContext,
 )
-from datetime import datetime
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from typing import List, Dict
 from opentrons import types
@@ -28,7 +26,7 @@ metadata = {
 
 requirements = {"robotType": "Flex", "apiLevel": "2.21"}
 
-HELLMA_PLATE_SLOT = "D4"
+HELLMA_PLATE_SLOT = "D3"
 PLATE_READER_SLOT = "C3"
 
 # SCRIPT SETTINGS
@@ -72,40 +70,6 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-def plate_reader_actions(
-    protocol: ProtocolContext,
-    plate_reader: AbsorbanceReaderContext,
-    hellma_plate: Labware,
-    hellma_plate_name: str,
-) -> None:
-    """Plate reader single and multi wavelength readings."""
-    wavelengths = [450, 650]
-    # Single Wavelength Readings
-    plate_reader.close_lid()
-    for wavelength in wavelengths:
-        plate_reader.initialize("single", [wavelength], reference_wavelength=wavelength)
-        plate_reader.open_lid()
-        protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
-        plate_reader.close_lid()
-        result = plate_reader.read(str(datetime.now()))
-        msg = f"{hellma_plate_name} result: {result}"
-        protocol.comment(msg=msg)
-        plate_reader.open_lid()
-        protocol.move_labware(hellma_plate, HELLMA_PLATE_SLOT, use_gripper=True)
-        plate_reader.close_lid()
-    # Multi Wavelength
-    plate_reader.initialize("multi", [450, 650])
-    plate_reader.open_lid()
-    protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
-    plate_reader.close_lid()
-    result = plate_reader.read(str(datetime.now()))
-    msg = f"{hellma_plate_name} result: {result}"
-    protocol.comment(msg=msg)
-    plate_reader.open_lid()
-    protocol.move_labware(hellma_plate, HELLMA_PLATE_SLOT, use_gripper=True)
-    plate_reader.close_lid()
-
-
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     # LOAD PARAMETERS
@@ -119,8 +83,6 @@ def run(protocol: ProtocolContext) -> None:
     plate_name_str = "hellma_plate_" + str(plate_orientation)
     global p200_tips
     global p50_tips
-    # WASTE BIN
-    protocol.load_waste_chute()
     # TIP RACKS
     tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "B2")
     tiprack_200_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "C2")
@@ -249,7 +211,7 @@ def run(protocol: ProtocolContext) -> None:
     PPC = reagent_plate.wells_by_name()["A6"]
     EPM = reagent_plate.wells_by_name()["A7"]
     # Load Liquids
-    plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
+    helpers.plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
 
     # tip and sample tracking
     if COLUMNS == 1:
@@ -991,6 +953,8 @@ def run(protocol: ProtocolContext) -> None:
             Liquid_trash_well_4,
         ]
         helpers.find_liquid_height_of_all_wells(protocol, p50, liquids_to_probe_at_end)
-        plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
+        helpers.plate_reader_actions(
+            protocol, plate_reader, hellma_plate, plate_name_str
+        )
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)

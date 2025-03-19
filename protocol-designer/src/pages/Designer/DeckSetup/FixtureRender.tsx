@@ -17,7 +17,7 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareSlot } from '@opentrons/step-generation'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
-import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../organisms'
+import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
 import { lightFill, darkFill } from './DeckSetupContainer'
 import { getAdjacentSlots } from './utils'
 import type {

@@ -1,6 +1,7 @@
 """Protocol engine types to deal with locating things on the deck."""
 
-from typing import Literal, Union
+from __future__ import annotations
+from typing import Literal, Union, TypeGuard
 
 from pydantic import BaseModel, Field
 
@@ -13,7 +14,7 @@ class DeckSlotLocation(BaseModel):
     slotName: DeckSlotName = Field(
         ...,
         description=(
-            # This description should be kept in sync with LabwareOffsetLocation.slotName.
+            # This description should be kept in sync with LegacyLabwareOffsetLocation.slotName.
             "A slot on the robot's deck."
             "\n\n"
             'The plain numbers like `"5"` are for the OT-2,'
@@ -33,7 +34,7 @@ class StagingSlotLocation(BaseModel):
     slotName: StagingSlotName = Field(
         ...,
         description=(
-            # This description should be kept in sync with LabwareOffsetLocation.slotName.
+            # This description should be kept in sync with LegacyLabwareOffsetLocation.slotName.
             "A slot on the robot's staging area."
             "\n\n"
             "These apply only to the Flex. The OT-2 has no staging slots."
@@ -72,10 +73,81 @@ class OnLabwareLocation(BaseModel):
     )
 
 
+class InStackerHopperLocation(BaseModel):
+    """The location of a labware in a stacker hopper."""
+
+    kind: Literal["inStackerHopper"] = "inStackerHopper"
+    moduleId: str = Field(
+        ..., description="The ID of the stacker in which this labware is."
+    )
+
+
 _OffDeckLocationType = Literal["offDeck"]
 _SystemLocationType = Literal["systemLocation"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 SYSTEM_LOCATION: _SystemLocationType = "systemLocation"
+
+
+def labware_location_is_off_deck(
+    location: LabwareLocation,
+) -> TypeGuard[_OffDeckLocationType]:
+    """Check if a location is an off deck location."""
+    return isinstance(location, str) and location == OFF_DECK_LOCATION
+
+
+def labware_location_is_system(
+    location: LabwareLocation,
+) -> TypeGuard[_SystemLocationType]:
+    """Check if a location is the system location."""
+    return isinstance(location, str) and location == SYSTEM_LOCATION
+
+
+class OnLabwareLocationSequenceComponent(BaseModel):
+    """Labware on another labware."""
+
+    kind: Literal["onLabware"] = "onLabware"
+    labwareId: str
+    lidId: str | None
+
+
+class OnModuleLocationSequenceComponent(BaseModel):
+    """Labware on a module."""
+
+    kind: Literal["onModule"] = "onModule"
+    moduleId: str
+
+
+class OnAddressableAreaLocationSequenceComponent(BaseModel):
+    """Labware on an addressable area."""
+
+    kind: Literal["onAddressableArea"] = "onAddressableArea"
+    addressableAreaName: str
+
+
+class OnCutoutFixtureLocationSequenceComponent(BaseModel):
+    """Something on a deck cutout fixture."""
+
+    kind: Literal["onCutoutFixture"] = "onCutoutFixture"
+    possibleCutoutFixtureIds: list[str]
+    cutoutId: str
+
+
+class NotOnDeckLocationSequenceComponent(BaseModel):
+    """Labware on a system location."""
+
+    kind: Literal["notOnDeck"] = "notOnDeck"
+    logicalLocationName: _OffDeckLocationType | _SystemLocationType
+
+
+LabwareLocationSequence = list[
+    OnLabwareLocationSequenceComponent
+    | OnModuleLocationSequenceComponent
+    | OnAddressableAreaLocationSequenceComponent
+    | NotOnDeckLocationSequenceComponent
+    | OnCutoutFixtureLocationSequenceComponent
+    | InStackerHopperLocation
+]
+"""Labware location specifier."""
 
 LabwareLocation = Union[
     DeckSlotLocation,
@@ -84,8 +156,19 @@ LabwareLocation = Union[
     _OffDeckLocationType,
     _SystemLocationType,
     AddressableAreaLocation,
+    InStackerHopperLocation,
 ]
 """Union of all locations where it's legal to keep a labware."""
+
+LoadableLabwareLocation = Union[
+    DeckSlotLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+    _OffDeckLocationType,
+    _SystemLocationType,
+    AddressableAreaLocation,
+]
+"""Union of all locations where it's legal to load a labware."""
 
 OnDeckLabwareLocation = Union[
     DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation

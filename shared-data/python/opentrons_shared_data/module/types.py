@@ -69,6 +69,8 @@ ModuleDimensions = TypedDict(
         "footprintYDimension": float,
         "labwareInterfaceXDimension": float,
         "labwareInterfaceYDimension": float,
+        "maxStackerFillHeight": float,
+        "maxStackerRetrievableHeight": float,
     },
     total=False,
 )

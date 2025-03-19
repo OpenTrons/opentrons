@@ -52,7 +52,7 @@ env:
 jobs:
   js-unit-test:
     # unit tests for the app's view layer (not the node layer)
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     name: 'opentrons app frontend unit tests'
     timeout-minutes: 60
     steps:
@@ -386,7 +386,7 @@ jobs:
 
   deploy-release-app:
     name: 'Deploy built app artifacts to S3'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     needs:
       ['js-unit-test', 'backend-unit-test', 'build-app', 'determine-build-type']
     if: contains(fromJSON(needs.determine-build-type.outputs.variants), 'release') || contains(fromJSON(needs.determine-build-type.outputs.variants), 'internal-release')

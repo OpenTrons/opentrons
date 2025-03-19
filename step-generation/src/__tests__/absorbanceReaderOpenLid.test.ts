@@ -8,6 +8,7 @@ import {
   makeContext,
   getInitialRobotStateStandard,
 } from '../fixtures'
+import { GRIPPER_LOCATION } from '../constants'
 import { absorbanceReaderOpenLid } from '../commandCreators/atomic/absorbanceReaderOpenLid'
 import { absorbanceReaderStateGetter } from '../robotStateSelectors'
 import type {
@@ -28,11 +29,13 @@ describe('absorbanceReaderOpenLid', () => {
       id: moduleId,
       type: ABSORBANCE_READER_TYPE,
       model: ABSORBANCE_READER_V1,
+      pythonName: 'mock_absorbance_plate_reader_1',
     }
     invariantContext.additionalEquipmentEntities = {
       gripperId: {
         name: 'gripper',
         id: 'gripperId',
+        location: GRIPPER_LOCATION,
       },
     }
 
@@ -67,6 +70,7 @@ describe('absorbanceReaderOpenLid', () => {
           },
         },
       ],
+      python: 'mock_absorbance_plate_reader_1.open_lid()',
     })
   })
   it('creates returns error if bad module state', () => {

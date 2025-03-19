@@ -1096,7 +1096,7 @@ def test_tip_length_for_caldata(
     assert (
         instrument_support.tip_length_for(
             pipette=instr.hw_pipette,
-            tip_rack_definition=tip_rack._core.get_definition(),
+            tip_rack_definition=tip_rack._core.get_definition(),  # type: ignore[arg-type]
         )
         == 2
     )
@@ -1107,7 +1107,7 @@ def test_tip_length_for_caldata(
 
     assert instrument_support.tip_length_for(
         pipette=instr.hw_pipette,
-        tip_rack_definition=tip_rack._core.get_definition(),
+        tip_rack_definition=tip_rack._core.get_definition(),  # type: ignore[arg-type]
     ) == (
         tip_rack._core.get_definition()["parameters"]["tipLength"]
         - instr.hw_pipette["tip_overlap"]["opentrons/geb_96_tiprack_10ul/1"]

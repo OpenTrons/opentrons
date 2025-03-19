@@ -7,21 +7,16 @@
     "description": "A test for 5.0.0 -> 5.1.0 migration",
     "created": 1600714068238,
     "lastModified": 1714570500165,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "8.2.0",
+    "version": "8.5.0",
     "data": {
       "_internalAppBuildDate": "Wed, 01 May 2024 13:32:34 GMT",
-      "defaultValues": {
-        "aspirate_mmFromBottom": 1,
-        "dispense_mmFromBottom": 1,
-        "touchTip_mmFromTop": -1,
-        "blowout_mmFromTop": 0
-      },
       "pipetteTiprackAssignments": {
         "pipetteId": ["opentrons/opentrons_96_tiprack_10ul/1"]
       },
@@ -36,6 +31,9 @@
           },
           "pipetteLocationUpdate": { "pipetteId": "left" },
           "moduleLocationUpdate": {},
+          "wasteChuteLocationUpdate": {},
+          "stagingAreaLocationUpdate": {},
+          "gripperLocationUpdate": {},
           "stepType": "manualIntervention",
           "id": "__INITIAL_DECK_SETUP_STEP__"
         },
@@ -88,7 +86,23 @@
       "orderedStepIds": [
         "f59ea8e0-fc3a-11ea-8809-e959e7d61d96",
         "fc4dc7c0-fc3a-11ea-8809-e959e7d61d96"
-      ]
+      ],
+      "pipettes": {
+        "pipetteId": {
+          "pipetteName": "p20_single_gen2"
+        }
+      },
+      "modules": {},
+      "labware": {
+        "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1": {
+          "displayName": "Opentrons OT-2 96 Tip Rack 10 µL",
+          "labwareDefURI": "opentrons/opentrons_96_tiprack_10ul/1"
+        },
+        "fe572c50-fc3a-11ea-8809-e959e7d61d96:opentrons/biorad_96_wellplate_200ul_pcr/1": {
+          "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
+          "labwareDefURI": "opentrons/biorad_96_wellplate_200ul_pcr/1"
+        }
+      }
     }
   },
   "robot": { "model": "OT-2 Standard", "deckId": "ot2_standard" },

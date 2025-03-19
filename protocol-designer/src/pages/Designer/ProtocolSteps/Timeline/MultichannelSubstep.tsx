@@ -91,6 +91,7 @@ export function MultichannelSubstep(
                 'units.microliter'
               )}`}
               type="default"
+              shrinkToContent
             />
             {firstChannelDest != null ? (
               <DeckInfoLabel deckLabel={destWellRange} />

@@ -3,9 +3,10 @@ import pytest
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    LabwareDefinition2,
     LabwareRole,
-    OverlapOffset,
-    Parameters,
+    Vector,
+    Parameters2,
 )
 
 from opentrons.protocol_engine.resources import labware_validation as subject
@@ -15,15 +16,15 @@ from opentrons.protocol_engine.resources import labware_validation as subject
     ("definition", "expected_result"),
     [
         (
-            LabwareDefinition.model_construct(allowedRoles=[LabwareRole.labware]),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(allowedRoles=[LabwareRole.labware]),  # type: ignore[call-arg]
             True,
         ),
         (
-            LabwareDefinition.model_construct(allowedRoles=[]),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(allowedRoles=[]),  # type: ignore[call-arg]
             True,
         ),
         (
-            LabwareDefinition.model_construct(allowedRoles=[LabwareRole.adapter]),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(allowedRoles=[LabwareRole.adapter]),  # type: ignore[call-arg]
             False,
         ),
     ],
@@ -39,15 +40,15 @@ def test_validate_definition_is_labware(
     ("definition", "expected_result"),
     [
         (
-            LabwareDefinition.model_construct(allowedRoles=[LabwareRole.adapter]),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(allowedRoles=[LabwareRole.adapter]),  # type: ignore[call-arg]
             True,
         ),
         (
-            LabwareDefinition.model_construct(allowedRoles=[]),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(allowedRoles=[]),  # type: ignore[call-arg]
             False,
         ),
         (
-            LabwareDefinition.model_construct(allowedRoles=[LabwareRole.labware]),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(allowedRoles=[LabwareRole.labware]),  # type: ignore[call-arg]
             False,
         ),
     ],
@@ -63,19 +64,19 @@ def test_validate_definition_is_adapter(
     ("definition", "expected_result"),
     [
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
-                stackingOffsetWithLabware={"labware123": OverlapOffset(x=4, y=5, z=6)}
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={"labware123": Vector(x=4, y=5, z=6)}
             ),
             True,
         ),
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
-                stackingOffsetWithLabware={"labwareXYZ": OverlapOffset(x=4, y=5, z=6)}
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={"labwareXYZ": Vector(x=4, y=5, z=6)}
             ),
             False,
         ),
         (
-            LabwareDefinition.model_construct(stackingOffsetWithLabware={}),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(stackingOffsetWithLabware={}),  # type: ignore[call-arg]
             False,
         ),
     ],
@@ -94,20 +95,20 @@ def test_validate_labware_can_be_stacked(
     ("definition", "expected_result"),
     [
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
-                parameters=Parameters.model_construct(quirks=None)  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(quirks=None)  # type: ignore[call-arg]
             ),
             True,
         ),
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
-                parameters=Parameters.model_construct(quirks=["foo"])  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(quirks=["foo"])  # type: ignore[call-arg]
             ),
             True,
         ),
         (
-            LabwareDefinition.model_construct(  # type: ignore[call-arg]
-                parameters=Parameters.model_construct(quirks=["gripperIncompatible"])  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+                parameters=Parameters2.model_construct(quirks=["gripperIncompatible"])  # type: ignore[call-arg]
             ),
             False,
         ),

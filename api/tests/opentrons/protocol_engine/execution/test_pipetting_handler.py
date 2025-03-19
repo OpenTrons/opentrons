@@ -10,12 +10,15 @@ from opentrons.hardware_control.dev_types import PipetteDict
 
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.pipettes import HardwarePipette
+from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.wells import WellView
 from opentrons.protocol_engine.types import TipGeometry
 from opentrons.protocol_engine.execution.pipetting import (
     HardwarePipettingHandler,
     VirtualPipettingHandler,
     create_pipetting_handler,
 )
+
 from opentrons.protocol_engine.errors.exceptions import (
     TipNotAttachedError,
     InvalidAspirateVolumeError,
@@ -24,6 +27,43 @@ from opentrons.protocol_engine.errors.exceptions import (
 )
 from opentrons.protocol_engine.notes import CommandNoteAdder, CommandNote
 from ..note_utils import CommandNoteMatcher
+
+
+from opentrons_shared_data.labware.labware_definition import (
+    CuboidalFrustum,
+    InnerWellGeometry,
+    SphericalSegment,
+    RectangularWellDefinition3,
+)
+
+_TEST_INNER_WELL_GEOMETRY = InnerWellGeometry(
+    sections=[
+        CuboidalFrustum(
+            shape="cuboidal",
+            topXDimension=7.6,
+            topYDimension=8.5,
+            bottomXDimension=5.6,
+            bottomYDimension=6.5,
+            topHeight=45,
+            bottomHeight=20,
+        ),
+        CuboidalFrustum(
+            shape="cuboidal",
+            topXDimension=5.6,
+            topYDimension=6.5,
+            bottomXDimension=4.5,
+            bottomYDimension=4.0,
+            topHeight=20,
+            bottomHeight=10,
+        ),
+        SphericalSegment(
+            shape="spherical",
+            radiusOfCurvature=6,
+            topHeight=10,
+            bottomHeight=0.0,
+        ),
+    ],
+)
 
 
 @pytest.fixture
@@ -47,6 +87,18 @@ def hardware_subject(
     return HardwarePipettingHandler(
         state_view=mock_state_view, hardware_api=mock_hardware_api
     )
+
+
+@pytest.fixture
+def mock_labware_view(decoy: Decoy) -> LabwareView:
+    """Get a mock in the shape of a LabwareView."""
+    return decoy.mock(cls=LabwareView)
+
+
+@pytest.fixture
+def mock_well_view(decoy: Decoy) -> WellView:
+    """Get a mock in the shape of a WellView."""
+    return decoy.mock(cls=WellView)
 
 
 async def test_create_pipette_handler(
@@ -94,6 +146,9 @@ def test_hw_get_is_ready_to_aspirate(
     decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
         aspirated_volume
     )
+    decoy.when(
+        mock_state_view.pipettes.get_ready_to_aspirate("pipette-id")
+    ).then_return(ready_to_aspirate)
     decoy.when(
         mock_state_view.pipettes.get_hardware_pipette("pipette-id", {})
     ).then_return(
@@ -162,7 +217,11 @@ async def test_hw_dispense_in_place(
     )
 
     result = await hardware_subject.dispense_in_place(
-        pipette_id="pipette-id", volume=25, flow_rate=2.5, push_out=None
+        pipette_id="pipette-id",
+        volume=25,
+        flow_rate=2.5,
+        push_out=None,
+        is_full_dispense=True,
     )
 
     assert result == 25
@@ -172,7 +231,11 @@ async def test_hw_dispense_in_place(
             mount=Mount.RIGHT, aspirate=None, dispense=2.5, blow_out=None
         ),
         await mock_hardware_api.dispense(
-            mount=Mount.RIGHT, volume=25, push_out=None, correction_volume=0
+            mount=Mount.RIGHT,
+            volume=25,
+            push_out=None,
+            correction_volume=0,
+            is_full_dispense=True,
         ),
         mock_hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=1.23, dispense=4.56, blow_out=7.89
@@ -213,8 +276,74 @@ async def test_hw_dispense_in_place_raises_invalid_push_out(
 
     with pytest.raises(InvalidPushOutVolumeError):
         await hardware_subject.dispense_in_place(
-            pipette_id="pipette-id", volume=25, flow_rate=2.5, push_out=-7
+            pipette_id="pipette-id",
+            volume=25,
+            flow_rate=2.5,
+            push_out=-7,
+            is_full_dispense=True,
         )
+
+
+async def test_hw_aspirate_while_tracking(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+    hardware_subject: HardwarePipettingHandler,
+    mock_command_note_adder: CommandNoteAdder,
+) -> None:
+    """Should set flow_rate and call hardware_api aspirate."""
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
+        RectangularWellDefinition3.model_construct(totalLiquidVolume=1100000)  # type: ignore[call-arg]
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "A1")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+
+    decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(
+        25
+    )
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        0
+    )
+
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes={},
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.LEFT,
+            config=cast(
+                PipetteDict,
+                {
+                    "aspirate_flow_rate": 1.23,
+                    "dispense_flow_rate": 4.56,
+                    "blow_out_flow_rate": 7.89,
+                },
+            ),
+        )
+    )
+
+    decoy.when(
+        mock_state_view.geometry.get_liquid_handling_z_change(
+            labware_id="labware-id", well_name="A1", operation_volume=25.0
+        )
+    ).then_return(4.544)
+
+    result = await hardware_subject.aspirate_while_tracking(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_name="A1",
+        volume=25,
+        flow_rate=2.5,
+        command_note_adder=mock_command_note_adder,
+    )
+    # make sure hw aspirate_while_tracking runs without error
+    assert result == 25
 
 
 async def test_hw_aspirate_in_place(
@@ -376,7 +505,11 @@ async def test_virtual_dispense_in_place(
     )
 
     result = await subject.dispense_in_place(
-        pipette_id="pipette-id", volume=3, flow_rate=5, push_out=None
+        pipette_id="pipette-id",
+        volume=3,
+        flow_rate=5,
+        push_out=None,
+        is_full_dispense=True,
     )
     assert result == 3
 
@@ -391,17 +524,17 @@ async def test_virtual_dispense_in_place_raises_invalid_push_out(
         TipGeometry(length=1, diameter=2, volume=3)
     )
 
-    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
-        TipGeometry(length=1, diameter=2, volume=3)
-    )
-
     with pytest.raises(InvalidPushOutVolumeError):
         await subject.dispense_in_place(
-            pipette_id="pipette-id", volume=3, flow_rate=5, push_out=-7
+            pipette_id="pipette-id",
+            volume=3,
+            flow_rate=5,
+            push_out=-7,
+            is_full_dispense=False,
         )
 
 
-async def test_virtual_dispense_in_place_raises_no_tip(
+async def test_virtual_dispense_in_place_raises_invalid_volume(
     decoy: Decoy, mock_state_view: StateView
 ) -> None:
     """Should raise an InvalidDispenseVolumeError."""
@@ -417,7 +550,11 @@ async def test_virtual_dispense_in_place_raises_no_tip(
 
     with pytest.raises(InvalidDispenseVolumeError):
         await subject.dispense_in_place(
-            pipette_id="pipette-id", volume=3, flow_rate=5, push_out=7
+            pipette_id="pipette-id",
+            volume=3,
+            flow_rate=5,
+            push_out=7,
+            is_full_dispense=False,
         )
 
 
@@ -456,7 +593,7 @@ async def test_virtual_dispense_validate_tip_attached(
         TipNotAttachedError, match="Cannot perform dispense without a tip attached"
     ):
         await subject.dispense_in_place(
-            "pipette-id", volume=20, flow_rate=1, push_out=None
+            "pipette-id", volume=20, flow_rate=1, push_out=None, is_full_dispense=False
         )
 
 
@@ -585,11 +722,19 @@ async def test_dispense_volume_validation(
     for subject in [virtual_subject, hardware_subject]:
         assert (
             await subject.dispense_in_place(
-                pipette_id="pipette-id", volume=ok_volume, flow_rate=5, push_out=7
+                pipette_id="pipette-id",
+                volume=ok_volume,
+                flow_rate=5,
+                push_out=7,
+                is_full_dispense=True,
             )
             == expected_adjusted_volume
         )
         with pytest.raises(InvalidDispenseVolumeError):
             await subject.dispense_in_place(
-                pipette_id="pipette-id", volume=not_ok_volume, flow_rate=5, push_out=7
+                pipette_id="pipette-id",
+                volume=not_ok_volume,
+                flow_rate=5,
+                push_out=7,
+                is_full_dispense=True,
             )

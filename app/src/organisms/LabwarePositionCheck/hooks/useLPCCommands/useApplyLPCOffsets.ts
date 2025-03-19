@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
-import { useCreateLabwareOffsetMutation } from '@opentrons/react-api-client'
+import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
 
-import type { LabwareOffsetCreateData } from '@opentrons/api-client'
+import type { LegacyLabwareOffsetCreateData } from '@opentrons/api-client'
 import type { UseLPCCommandChildProps } from './types'
 
 export interface UseApplyLPCOffsetsProps extends UseLPCCommandChildProps {
@@ -11,7 +11,7 @@ export interface UseApplyLPCOffsetsProps extends UseLPCCommandChildProps {
 
 export interface UseApplyLPCOffsetsResult {
   handleApplyOffsetsAndClose: (
-    offsets: LabwareOffsetCreateData[]
+    offsets: LegacyLabwareOffsetCreateData[]
   ) => Promise<void>
   isApplyingOffsets: boolean
 }
@@ -23,10 +23,10 @@ export function useApplyLPCOffsets({
 }: UseApplyLPCOffsetsProps): UseApplyLPCOffsetsResult {
   const [isApplyingOffsets, setIsApplyingOffsets] = useState<boolean>(false)
 
-  const { createLabwareOffset } = useCreateLabwareOffsetMutation()
+  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
 
   const handleApplyOffsetsAndClose = (
-    offsets: LabwareOffsetCreateData[]
+    offsets: LegacyLabwareOffsetCreateData[]
   ): Promise<void> => {
     setIsApplyingOffsets(true)
     return Promise.all(

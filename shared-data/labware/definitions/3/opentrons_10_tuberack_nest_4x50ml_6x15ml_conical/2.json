@@ -171,17 +171,11 @@
     "conicalWell15mL": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 1.235,
-          "topHeight": 0.92,
-          "bottomHeight": 0.0
-        },
-        {
           "shape": "conical",
-          "topDiameter": 13.8,
-          "bottomDiameter": 2.38,
-          "topHeight": 22.55,
-          "bottomHeight": 0.92
+          "topDiameter": 15.5,
+          "bottomDiameter": 14.56,
+          "topHeight": 117.8,
+          "bottomHeight": 113.8
         },
         {
           "shape": "conical",
@@ -192,10 +186,16 @@
         },
         {
           "shape": "conical",
-          "topDiameter": 15.5,
-          "bottomDiameter": 14.56,
-          "topHeight": 117.8,
-          "bottomHeight": 113.8
+          "topDiameter": 13.8,
+          "bottomDiameter": 2.38,
+          "topHeight": 22.55,
+          "bottomHeight": 0.92
+        },
+        {
+          "shape": "spherical",
+          "radiusOfCurvature": 1.235,
+          "topHeight": 0.92,
+          "bottomHeight": 0.0
         }
       ]
     },
@@ -203,17 +203,10 @@
       "sections": [
         {
           "shape": "conical",
-          "topDiameter": 26.0,
-          "bottomDiameter": 4.5,
-          "topHeight": 14.35,
-          "bottomHeight": 0.0
-        },
-        {
-          "shape": "conical",
-          "topDiameter": 27.69,
-          "bottomDiameter": 26.0,
-          "topHeight": 108.8,
-          "bottomHeight": 14.35
+          "topDiameter": 28.18,
+          "bottomDiameter": 27.95,
+          "topHeight": 113.1,
+          "bottomHeight": 109.1
         },
         {
           "shape": "conical",
@@ -224,12 +217,20 @@
         },
         {
           "shape": "conical",
-          "topDiameter": 28.18,
-          "bottomDiameter": 27.95,
-          "topHeight": 113.1,
-          "bottomHeight": 109.1
+          "topDiameter": 27.69,
+          "bottomDiameter": 26.0,
+          "topHeight": 108.8,
+          "bottomHeight": 14.35
+        },
+        {
+          "shape": "conical",
+          "topDiameter": 26.0,
+          "bottomDiameter": 4.5,
+          "topHeight": 14.35,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

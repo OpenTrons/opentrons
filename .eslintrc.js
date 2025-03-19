@@ -29,6 +29,7 @@ module.exports = {
     'import/no-default-export': 'error',
     '@typescript-eslint/promise-function-async': 'off',
     '@typescript-eslint/default-param-last': 'off',
+    '@typescript-eslint/consistent-indexed-object-style': 'off',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
     'lines-between-class-members': 'warn',
@@ -103,7 +104,6 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
-        '@typescript-eslint/consistent-indexed-object-style': 'warn',
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
         '@typescript-eslint/await-thenable': 'warn',

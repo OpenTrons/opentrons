@@ -326,54 +326,62 @@
     "conicalWell": {
       "sections": [
         {
-          "shape": "spherical",
-          "radiusOfCurvature": 3.19,
-          "topHeight": 1.21,
-          "bottomHeight": 0.0
+          "shape": "conical",
+          "topDiameter": 9.28,
+          "bottomDiameter": 8.9,
+          "topHeight": 39.28,
+          "bottomHeight": 15.04
         },
         {
           "shape": "conical",
-          "bottomDiameter": 5,
-          "topDiameter": 6,
-          "topHeight": 1.83,
-          "bottomHeight": 1.21
+          "topDiameter": 8.9,
+          "bottomDiameter": 8.74,
+          "topHeight": 15.04,
+          "bottomHeight": 6.26
         },
         {
           "shape": "conical",
-          "bottomDiameter": 6,
-          "topDiameter": 7,
-          "topHeight": 2.59,
-          "bottomHeight": 1.83
+          "topDiameter": 8.74,
+          "bottomDiameter": 8.0,
+          "topHeight": 6.26,
+          "bottomHeight": 3.98
         },
         {
           "shape": "conical",
-          "bottomDiameter": 7,
+          "topDiameter": 8.0,
+          "bottomDiameter": 7.2,
+          "topHeight": 3.98,
+          "bottomHeight": 2.74
+        },
+        {
+          "shape": "conical",
           "topDiameter": 7.2,
+          "bottomDiameter": 7.0,
           "topHeight": 2.74,
           "bottomHeight": 2.59
         },
         {
           "shape": "conical",
-          "bottomDiameter": 7.2,
-          "topDiameter": 8,
-          "topHeight": 3.89,
-          "bottomHeight": 2.74
+          "topDiameter": 7.0,
+          "bottomDiameter": 6.0,
+          "topHeight": 2.59,
+          "bottomHeight": 1.83
         },
         {
           "shape": "conical",
-          "bottomDiameter": 8,
-          "topDiameter": 8.9,
-          "topHeight": 15.05,
-          "bottomHeight": 3.89
+          "topDiameter": 6.0,
+          "bottomDiameter": 5.0,
+          "topHeight": 1.83,
+          "bottomHeight": 1.21
         },
         {
-          "shape": "conical",
-          "bottomDiameter": 8.9,
-          "topDiameter": 9.28,
-          "topHeight": 39.28,
-          "bottomHeight": 15.04
+          "shape": "spherical",
+          "radiusOfCurvature": 3.19,
+          "topHeight": 1.21,
+          "bottomHeight": 0.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

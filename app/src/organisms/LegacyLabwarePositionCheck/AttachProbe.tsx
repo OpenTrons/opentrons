@@ -178,7 +178,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         <StyledBody>
           <Trans
             t={t}
-            i18nKey={'install_probe'}
+            i18nKey={'legacy_install_probe'}
             values={{ location: probeLocation }}
             components={{
               bold: <strong />,

@@ -14,6 +14,7 @@ from .pipetting_common import (
     TipPhysicallyAttachedError,
 )
 from .movement_common import StallOrCollisionError
+from .flex_stacker.common import FlexStackerStallOrCollisionError
 
 from . import absorbance_reader
 from . import flex_stacker
@@ -377,6 +378,30 @@ from .liquid_probe import (
     TryLiquidProbeCommandType,
 )
 
+from .evotip_seal_pipette import (
+    EvotipSealPipette,
+    EvotipSealPipetteParams,
+    EvotipSealPipetteCreate,
+    EvotipSealPipetteResult,
+    EvotipSealPipetteCommandType,
+)
+
+from .evotip_dispense import (
+    EvotipDispense,
+    EvotipDispenseParams,
+    EvotipDispenseCreate,
+    EvotipDispenseResult,
+    EvotipDispenseCommandType,
+)
+
+from .evotip_unseal_pipette import (
+    EvotipUnsealPipette,
+    EvotipUnsealPipetteParams,
+    EvotipUnsealPipetteCreate,
+    EvotipUnsealPipetteResult,
+    EvotipUnsealPipetteCommandType,
+)
+
 Command = Annotated[
     Union[
         AirGapInPlace,
@@ -423,6 +448,9 @@ Command = Annotated[
         GetNextTip,
         LiquidProbe,
         TryLiquidProbe,
+        EvotipSealPipette,
+        EvotipDispense,
+        EvotipUnsealPipette,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -449,9 +477,11 @@ Command = Annotated[
         absorbance_reader.OpenLid,
         absorbance_reader.Initialize,
         absorbance_reader.ReadAbsorbance,
-        flex_stacker.Configure,
         flex_stacker.Retrieve,
         flex_stacker.Store,
+        flex_stacker.SetStoredLabware,
+        flex_stacker.Fill,
+        flex_stacker.Empty,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -516,6 +546,9 @@ CommandParams = Union[
     GetNextTipParams,
     LiquidProbeParams,
     TryLiquidProbeParams,
+    EvotipSealPipetteParams,
+    EvotipDispenseParams,
+    EvotipUnsealPipetteParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -542,9 +575,11 @@ CommandParams = Union[
     absorbance_reader.OpenLidParams,
     absorbance_reader.InitializeParams,
     absorbance_reader.ReadAbsorbanceParams,
-    flex_stacker.ConfigureParams,
     flex_stacker.RetrieveParams,
     flex_stacker.StoreParams,
+    flex_stacker.SetStoredLabwareParams,
+    flex_stacker.FillParams,
+    flex_stacker.EmptyParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -607,6 +642,9 @@ CommandType = Union[
     GetNextTipCommandType,
     LiquidProbeCommandType,
     TryLiquidProbeCommandType,
+    EvotipSealPipetteCommandType,
+    EvotipDispenseCommandType,
+    EvotipUnsealPipetteCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -633,9 +671,11 @@ CommandType = Union[
     absorbance_reader.OpenLidCommandType,
     absorbance_reader.InitializeCommandType,
     absorbance_reader.ReadAbsorbanceCommandType,
-    flex_stacker.ConfigureCommandType,
     flex_stacker.RetrieveCommandType,
     flex_stacker.StoreCommandType,
+    flex_stacker.SetStoredLabwareCommandType,
+    flex_stacker.FillCommandType,
+    flex_stacker.EmptyCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -699,6 +739,9 @@ CommandCreate = Annotated[
         GetNextTipCreate,
         LiquidProbeCreate,
         TryLiquidProbeCreate,
+        EvotipSealPipetteCreate,
+        EvotipDispenseCreate,
+        EvotipUnsealPipetteCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -725,9 +768,11 @@ CommandCreate = Annotated[
         absorbance_reader.OpenLidCreate,
         absorbance_reader.InitializeCreate,
         absorbance_reader.ReadAbsorbanceCreate,
-        flex_stacker.ConfigureCreate,
         flex_stacker.RetrieveCreate,
         flex_stacker.StoreCreate,
+        flex_stacker.SetStoredLabwareCreate,
+        flex_stacker.FillCreate,
+        flex_stacker.EmptyCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -799,6 +844,9 @@ CommandResult = Union[
     GetNextTipResult,
     LiquidProbeResult,
     TryLiquidProbeResult,
+    EvotipSealPipetteResult,
+    EvotipDispenseResult,
+    EvotipUnsealPipetteResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -825,9 +873,11 @@ CommandResult = Union[
     absorbance_reader.OpenLidResult,
     absorbance_reader.InitializeResult,
     absorbance_reader.ReadAbsorbanceResult,
-    flex_stacker.ConfigureResult,
     flex_stacker.RetrieveResult,
     flex_stacker.StoreResult,
+    flex_stacker.SetStoredLabwareResult,
+    flex_stacker.FillResult,
+    flex_stacker.EmptyResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
@@ -854,6 +904,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[LiquidNotFoundError],
     DefinedErrorData[GripperMovementError],
     DefinedErrorData[StallOrCollisionError],
+    DefinedErrorData[FlexStackerStallOrCollisionError],
 ]
 
 

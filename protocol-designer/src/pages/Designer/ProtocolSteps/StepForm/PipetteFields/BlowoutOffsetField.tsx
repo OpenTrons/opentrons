@@ -12,7 +12,7 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { ZTipPositionModal } from '../../../../../organisms'
+import { ZTipPositionModal } from '../../../../../components/organisms'
 import { getLabwareEntities } from '../../../../../step-forms/selectors'
 import type { FieldProps } from '../types'
 
@@ -76,8 +76,9 @@ export function BlowoutOffsetField(
           onClick={
             disabled
               ? undefined
-              : () => {
+              : e => {
                   setModalOpen(true)
+                  e.stopPropagation()
                 }
           }
           value={String(value)}

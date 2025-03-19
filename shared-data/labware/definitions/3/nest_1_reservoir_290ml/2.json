@@ -57,6 +57,15 @@
       "sections": [
         {
           "shape": "cuboidal",
+          "topXDimension": 107.76,
+          "topYDimension": 71.0,
+          "bottomXDimension": 106.75,
+          "bottomYDimension": 70.75,
+          "topHeight": 39.55,
+          "bottomHeight": 2.0
+        },
+        {
+          "shape": "cuboidal",
           "topXDimension": 7.75,
           "topYDimension": 70.75,
           "bottomXDimension": 3.127,
@@ -64,17 +73,9 @@
           "topHeight": 2.0,
           "bottomHeight": 0.0,
           "xCount": 12
-        },
-        {
-          "shape": "cuboidal",
-          "topXDimension": 107.76,
-          "topYDimension": 71.0,
-          "bottomXDimension": 106.75,
-          "bottomYDimension": 70.75,
-          "topHeight": 39.55,
-          "bottomHeight": 2.0
         }
       ]
     }
-  }
+  },
+  "$otSharedSchema": "#/labware/schemas/3"
 }

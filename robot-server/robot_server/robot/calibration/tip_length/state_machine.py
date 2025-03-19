@@ -40,12 +40,12 @@ TIP_LENGTH_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
 
 
 class TipCalibrationStateMachine:
-    def __init__(self):
+    def __init__(self) -> None:
         self._state_machine = SimpleStateMachine(
             states=set(s for s in State), transitions=TIP_LENGTH_TRANSITIONS
         )
 
-    def get_next_state(self, from_state: State, command: CommandDefinition):
+    def get_next_state(self, from_state: State, command: CommandDefinition) -> State:
         next_state = self._state_machine.get_next_state(from_state, command)
         if next_state:
             return next_state

@@ -1,4 +1,5 @@
 """Test load labware commands."""
+
 import inspect
 
 import pytest
@@ -14,6 +15,7 @@ from opentrons.protocol_engine.errors import (
 
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
+    OnAddressableAreaLocationSequenceComponent,
 )
 from opentrons.protocol_engine.execution import ReloadedLabwareData, EquipmentHandler
 from opentrons.protocol_engine.resources import labware_validation
@@ -59,6 +61,11 @@ async def test_reload_labware_implementation(
             offsetId="labware-offset-id",
         )
     )
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+        )
+    ).then_return([OnAddressableAreaLocationSequenceComponent(addressableAreaName="4")])
 
     result = await subject.execute(data)
 
@@ -66,6 +73,9 @@ async def test_reload_labware_implementation(
         public=ReloadLabwareResult(
             labwareId="my-labware-id",
             offsetId="labware-offset-id",
+            locationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="4")
+            ],
         ),
         state_update=StateUpdate(
             labware_location=LabwareLocationUpdate(

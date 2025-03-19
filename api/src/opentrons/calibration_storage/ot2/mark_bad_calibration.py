@@ -10,7 +10,9 @@ from .models import v1
 CalibrationType = typing.TypeVar(
     "CalibrationType",
     v1.PipetteOffsetCalibration,
+    v1.InstrumentOffsetModel,
     v1.TipLengthCalibration,
+    v1.TipLengthModel,
     v1.DeckCalibrationModel,
 )
 

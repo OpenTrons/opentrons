@@ -1,4 +1,5 @@
 """Router for /maintenance_runs endpoints dealing with labware offsets and definitions."""
+
 from typing import Annotated
 import logging
 
@@ -7,7 +8,11 @@ from fastapi import Depends, status
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from server_utils.fastapi_utils.light_router import LightRouter
 
-from opentrons.protocol_engine import LabwareOffsetCreate, LabwareOffset
+from opentrons.protocol_engine import (
+    LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+    LabwareOffset,
+)
 
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
@@ -31,33 +36,57 @@ labware_router = LightRouter()
         "There is no matching `GET /maintenance_runs/{runId}/labware_offsets` endpoint."
         " To read the list of labware offsets currently on the run,"
         " see the run's `labwareOffsets` field."
+        "\n\n"
+        "The response body's `data` will either be a single offset or a list of offsets,"
+        " depending on whether you provided a single offset or a list in the request body's `data`."
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleBody[LabwareOffset]},
+        status.HTTP_201_CREATED: {
+            "model": SimpleBody[LabwareOffset | list[LabwareOffset]]
+        },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[RunNotIdle]},
     },
 )
 async def add_labware_offset(
-    request_body: RequestModel[LabwareOffsetCreate],
+    request_body: RequestModel[
+        LabwareOffsetCreate
+        | LegacyLabwareOffsetCreate
+        | list[LabwareOffsetCreate | LegacyLabwareOffsetCreate]
+    ],
     run_orchestrator_store: Annotated[
         MaintenanceRunOrchestratorStore, Depends(get_maintenance_run_orchestrator_store)
     ],
     run: Annotated[MaintenanceRun, Depends(get_run_data_from_url)],
-) -> PydanticResponse[SimpleBody[LabwareOffset]]:
-    """Add a labware offset to a maintenance run.
+) -> PydanticResponse[SimpleBody[LabwareOffset | list[LabwareOffset]]]:
+    """Add labware offsets to a maintenance run.
 
     Args:
         request_body: New labware offset request data from request body.
         run_orchestrator_store: Engine storage interface.
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
-    added_offset = run_orchestrator_store.add_labware_offset(request_body.data)
-    log.info(f'Added labware offset "{added_offset.id}"' f' to run "{run.id}".')
+    offsets_to_add = (
+        request_body.data
+        if isinstance(request_body.data, list)
+        else [request_body.data]
+    )
+
+    added_offsets: list[LabwareOffset] = []
+    for offset_to_add in offsets_to_add:
+        added_offset = run_orchestrator_store.add_labware_offset(offset_to_add)
+        added_offsets.append(added_offset)
+        log.info(f'Added labware offset "{added_offset.id}" to run "{run.id}".')
+
+    # Return a list if the client POSTed a list, or an object if the client POSTed an object.
+    # For some reason, mypy needs to be given the type annotation explicitly.
+    response_data: LabwareOffset | list[LabwareOffset] = (
+        added_offsets if isinstance(request_body.data, list) else added_offsets[0]
+    )
 
     return await PydanticResponse.create(
-        content=SimpleBody.model_construct(data=added_offset),
+        content=SimpleBody.model_construct(data=response_data),
         status_code=status.HTTP_201_CREATED,
     )
 

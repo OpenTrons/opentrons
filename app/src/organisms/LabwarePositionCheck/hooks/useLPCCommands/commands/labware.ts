@@ -1,42 +1,27 @@
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { CheckPositionsStep } from '/app/organisms/LabwarePositionCheck/types'
+import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
-export interface BuildMoveLabwareOffDeckParams {
-  step: CheckPositionsStep
-}
-
-export function moveLabwareOffDeckCommands({
-  step,
-}: BuildMoveLabwareOffDeckParams): CreateCommand[] {
-  const { adapterId, labwareId } = step
-
-  return adapterId != null
-    ? [
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
+export function moveLabwareOffDeckCommands(
+  offsetLocationDetails: OffsetLocationDetails
+): CreateCommand[] {
+  return offsetLocationDetails.lwModOnlyStackupDetails
+    .slice()
+    .reverse()
+    .reduce<CreateCommand[]>((acc, component) => {
+      if (component.kind === 'module') {
+        return acc
+      } else {
+        return [
+          ...acc,
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: component.id,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
           },
-        },
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: adapterId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
-      ]
-    : [
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
-      ]
+        ]
+      }
+    }, [])
 }

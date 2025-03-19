@@ -6,6 +6,7 @@ import {
   fixtureP300SingleV2Specs,
   labwareSchemaV2,
   protocolSchemaV8,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   fixture_12_trough,
@@ -14,7 +15,11 @@ import {
   fixture_tiprack_300_ul,
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
-import { createFile, getLabwareDefinitionsInUse } from '../selectors'
+import {
+  createFile,
+  createPythonFile,
+  getLabwareDefinitionsInUse,
+} from '../selectors'
 import {
   fileMetadata,
   dismissedWarnings,
@@ -24,7 +29,6 @@ import {
   labwareNicknamesById,
   labwareDefsByURI,
   pipetteEntities,
-  ot2Robot,
 } from '../__fixtures__/createFile/commonFields'
 import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -66,24 +70,27 @@ describe('createFile selector', () => {
   afterEach(() => {
     vi.restoreAllMocks()
   })
+  const entities = {
+    moduleEntities: v7Fixture.moduleEntities,
+    labwareEntities,
+    pipetteEntities,
+    liquidEntities: ingredients,
+  }
   it('should return a schema-valid JSON V8 protocol', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
       fileMetadata,
       v7Fixture.initialRobotState,
       v7Fixture.robotStateTimeline,
-      ot2Robot,
+      OT2_ROBOT_TYPE,
       dismissedWarnings,
-      ingredients,
       ingredLocations,
       v7Fixture.savedStepForms,
       v7Fixture.orderedStepIds,
-      labwareEntities,
-      v7Fixture.moduleEntities,
-      pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI,
-      {}
+      {},
+      entities
     )
     expectResultToMatchSchema(result)
 
@@ -92,7 +99,76 @@ describe('createFile selector', () => {
       ingredLocations
     )
   })
+
+  it('should return a valid Python protocol file', () => {
+    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
+    const result = createPythonFile.resultFunc(
+      fileMetadata,
+      OT2_ROBOT_TYPE,
+      entities,
+      v7Fixture.initialRobotState,
+      v7Fixture.robotStateTimeline,
+      ingredLocations,
+      labwareNicknamesById
+    )
+    // This is just a quick smoke test to make sure createPythonFile() produces
+    // something that looks like a Python file. The individual sections of the
+    // generated Python will be tested in separate unit tests.
+    expect(result).toBe(
+      `
+from contextlib import nullcontext as pd_step
+from opentrons import protocol_api, types
+
+metadata = {
+    "protocolName": "Test Protocol",
+    "author": "The Author",
+    "description": "Protocol description",
+    "created": "2020-02-25T21:48:32.515Z",
+    "protocolDesigner": "fake_PD_version",
+    "source": "Protocol Designer",
+}
+
+requirements = {
+    "robotType": "OT-2",
+    "apiLevel": "2.23",
+}
+
+def run(protocol: protocol_api.ProtocolContext):
+    # Load Labware:
+    mock_python_name_1 = protocol.load_labware(
+        "fixture_trash",
+        "12",
+        label="Trash",
+        namespace="fixture",
+        version=1,
+    )
+    mock_python_name_2 = protocol.load_labware(
+        "fixture_tiprack_10_ul",
+        "1",
+        label="Opentrons 96 Tip Rack 10 µL",
+        namespace="fixture",
+        version=1,
+    )
+    mock_python_name_3 = protocol.load_labware(
+        "fixture_96_plate",
+        "7",
+        label="NEST 96 Well Plate 100 µL PCR Full Skirt",
+        namespace="fixture",
+        version=1,
+    )
+
+    # Load Pipettes:
+    mock_python_name_1 = protocol.load_instrument("p10_single", "left", tip_racks=[mock_python_name_2])
+
+    # PROTOCOL STEPS
+
+    # Step 1:
+    pass
+`.trimStart()
+    )
+  })
 })
+
 describe('getLabwareDefinitionsInUse util', () => {
   it('should exclude definitions that are neither on the deck nor assigned to a pipette', () => {
     const assignedTiprackOnDeckDef = fixture_tiprack_10_ul
@@ -106,11 +182,13 @@ describe('getLabwareDefinitionsInUse util', () => {
         id: 'someLabwareId',
         def: assignedTiprackOnDeckDef as LabwareDefinition2,
         labwareDefURI: 'assignedTiprackOnDeckURI',
+        pythonName: 'mockPythonName',
       },
       otherLabwareId: {
         id: 'otherLabwareId',
         def: nonTiprackLabwareOnDeckDef as LabwareDefinition2,
         labwareDefURI: 'nonTiprackLabwareOnDeckURI',
+        pythonName: 'mockPythonName',
       },
     }
     const allLabwareDefsByURI: LabwareDefByDefURI = {

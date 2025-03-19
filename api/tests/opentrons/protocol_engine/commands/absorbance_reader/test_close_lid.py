@@ -30,18 +30,18 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    Parameters,
+    LabwareDefinition2,
+    Parameters2,
 )
 
 
 @pytest.fixture
-def absorbance_def() -> LabwareDefinition:
+def absorbance_def() -> LabwareDefinition2:
     """Get a tip rack Pydantic model definition value object."""
-    return LabwareDefinition.model_construct(  # type: ignore[call-arg]
+    return LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         namespace="test",
         version=1,
-        parameters=Parameters.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
             loadName="cool-labware",
             tipOverlap=None,  # add a None value to validate serialization to dictionary
         ),
@@ -70,7 +70,7 @@ async def test_absorbance_reader_close_lid_implementation(
     state_view: StateView,
     equipment: EquipmentHandler,
     hardware_lid_status: AbsorbanceReaderLidStatus,
-    absorbance_def: LabwareDefinition,
+    absorbance_def: LabwareDefinition2,
 ) -> None:
     """It should validate, find hardware module if not virtualized, and close lid."""
     params = CloseLidParams(
@@ -169,7 +169,7 @@ async def test_close_lid_raises_no_gripper_offset(
     state_view: StateView,
     equipment: EquipmentHandler,
     subject: CloseLidImpl,
-    absorbance_def: LabwareDefinition,
+    absorbance_def: LabwareDefinition2,
 ) -> None:
     """Should raise an error that gripper offset not found."""
     params = CloseLidParams(

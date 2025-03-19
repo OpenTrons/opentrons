@@ -12,6 +12,7 @@ from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
     MagneticBlockContext,
     TemperatureModuleContext,
+    AbsorbanceReaderContext,
 )
 
 import numpy as np
@@ -20,12 +21,12 @@ from typing import Dict
 
 metadata = {
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
-    "protocolName": "Thermo MagMax RNA Extraction: Cells Multi-Channel",
+    "protocolName": "Thermo MagMax RNA Extraction: Cells Multi-Channel + Plate Reader",
 }
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.21",
+    "apiLevel": "2.22",
 }
 """
 Slot A1: Tips 200
@@ -64,6 +65,13 @@ def add_parameters(parameters: ParameterContext) -> None:
     helpers.create_single_pipette_mount_parameter(parameters)
     helpers.create_hs_speed_parameter(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
+    helpers.create_plate_reader_compatible_labware_parameter(parameters)
+    parameters.add_bool(
+        variable_name="plate_orientation",
+        display_name="Hellma Plate Orientation",
+        default=True,
+        description="If hellma plate is rotated, set to True.",
+    )
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -81,7 +89,11 @@ def run(protocol: ProtocolContext) -> None:
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     pipette_mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
+    plate_type = protocol.params.labware_plate_reader_compatible  # type: ignore [attr-defined]
+    plate_orientation = protocol.params.plate_orientation  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "01")
+
+    plate_name_str = "hellma_plate_" + str(plate_orientation)
 
     # Protocol Parameters
     deepwell_type = "nest_96_wellplate_2ml_deep"
@@ -98,7 +110,7 @@ def run(protocol: ProtocolContext) -> None:
         drybeads = elute_time = 0.25
         bind_time = wash_time = dnase_time = stop_time = 0.25
     bead_vol = 20.0
-    protocol.load_trash_bin("A3")
+
     h_s: HeaterShakerContext = protocol.load_module(
         helpers.hs_str, "D1"
     )  # type: ignore[assignment]
@@ -117,8 +129,13 @@ def run(protocol: ProtocolContext) -> None:
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
     waste_reservoir = protocol.load_labware(
-        "nest_1_reservoir_195ml", "B3", "Liquid Waste"
+        "nest_1_reservoir_195ml", "C3", "Liquid Waste"
     )
+    # Plate Reader
+    plate_reader: AbsorbanceReaderContext = protocol.load_module(
+        helpers.abs_mod_str, "A3"
+    )  # type: ignore[assignment]
+    hellma_plate = protocol.load_labware(plate_type, "B3")
     waste = waste_reservoir.wells()[0].top()
     res1 = protocol.load_labware(res_type, "D2", "reagent reservoir 1")
     num_cols = math.ceil(num_samples / 8)
@@ -186,6 +203,8 @@ def run(protocol: ProtocolContext) -> None:
     }
 
     helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, m1000)
+    # run plate reader
+    helpers.plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
 
     m1000.flow_rate.aspirate = 50
     m1000.flow_rate.dispense = 150
@@ -222,6 +241,7 @@ def run(protocol: ProtocolContext) -> None:
                 m1000.move_to(m.center())
                 m1000.transfer(vol_per_trans, loc, waste, new_tip="never", air_gap=20)
                 m1000.blow_out(waste)
+                m1000.prepare_to_aspirate()
                 m1000.air_gap(20)
             m1000.drop_tip(tips_sn[8 * i]) if TIP_TRASH else m1000.return_tip()
         m1000.flow_rate.aspirate = 300
@@ -341,6 +361,7 @@ def run(protocol: ProtocolContext) -> None:
             if i != 0:
                 tiptrack(m1000)
             for x in range(8 if not dry_run else 1):
+                m1000.prepare_to_aspirate()
                 m1000.aspirate(tvol * 0.75, cells_m[i].bottom(dot_bottom))
                 m1000.dispense(tvol * 0.75, cells_m[i].bottom(8))
                 if x == 3:
@@ -370,11 +391,13 @@ def run(protocol: ProtocolContext) -> None:
         for i, well in enumerate(samples_m):
             # Transfer cells+lysis/bind to wells with beads
             tiptrack(m1000)
+            m1000.prepare_to_aspirate()
             m1000.aspirate(185, cells_m[i].bottom(dot_bottom))
             m1000.air_gap(10)
             m1000.dispense(m1000.current_volume, well.bottom(8))
             # Mix after transfer
             bead_mixing(well, m1000, 130, reps=5 if not dry_run else 1)
+            m1000.prepare_to_aspirate()
             m1000.air_gap(10)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
         helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, bind_time, True)
@@ -417,6 +440,7 @@ def run(protocol: ProtocolContext) -> None:
                     src = source[whichwash]
                     protocol.comment(f"new wash source {whichwash}")
                     wash_volume_tracker = 0.0
+            m1000.prepare_to_aspirate()
             m1000.air_gap(10)
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
@@ -458,6 +482,7 @@ def run(protocol: ProtocolContext) -> None:
                 m1000.aspirate(vol_per_trans, src.bottom(dot_bottom))
                 m1000.dispense(vol_per_trans, m.top(-3))
             m1000.blow_out(m.top(-3))
+            m1000.prepare_to_aspirate()
             m1000.air_gap(20)
 
         m1000.flow_rate.aspirate = 300
@@ -485,6 +510,7 @@ def run(protocol: ProtocolContext) -> None:
                     m1000.dispense(m1000.current_volume, src.top())
                 m1000.transfer(vol_per_trans, src, m.top(), air_gap=20, new_tip="never")
             m1000.blow_out(m.top(-3))
+            m1000.prepare_to_aspirate()
             m1000.air_gap(20)
 
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
@@ -516,6 +542,7 @@ def run(protocol: ProtocolContext) -> None:
             m1000.air_gap(10)
             m1000.dispense(m1000.current_volume, loc)
             m1000.blow_out(m.top(-3))
+            m1000.prepare_to_aspirate()
             m1000.air_gap(10)
 
         m1000.flow_rate.aspirate = 300
@@ -554,6 +581,7 @@ def run(protocol: ProtocolContext) -> None:
             loc = m.bottom(dot_bottom)
             m1000.transfer(vol, loc, e.bottom(5), air_gap=20, new_tip="never")
             m1000.blow_out(e.top(-2))
+            m1000.prepare_to_aspirate()
             m1000.air_gap(20)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
@@ -586,5 +614,8 @@ def run(protocol: ProtocolContext) -> None:
         m1000, [elutionplate, sample_plate], waste_reservoir["A1"], 200
     )
     helpers.find_liquid_height_of_all_wells(protocol, m1000, end_list_of_wells_to_probe)
+    # Run plate reader
+    helpers.plate_reader_actions(protocol, plate_reader, hellma_plate, plate_name_str)
+
     if deactivate_modules_bool:
         helpers.deactivate_modules(protocol)

@@ -20,6 +20,9 @@ class SessionCreateParams(BaseModel):
         "is performed, this is ignored, but it should always be "
         "specified.",
     )
+    # todo(mm, 2025-02-13): This should restrict input to labware schema 2 to protect
+    # robot_server.robot.calibration legacy internals.
+    # https://opentrons.atlassian.net/browse/EXEC-1230
     tipRackDefinition: Optional[Dict[str, Any]] = Field(
         None,
         description="The full labware definition of the tip rack to "

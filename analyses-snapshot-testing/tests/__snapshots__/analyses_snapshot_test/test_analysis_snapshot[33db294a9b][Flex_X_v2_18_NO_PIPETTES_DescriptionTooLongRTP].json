@@ -1,33 +1,6 @@
 {
   "commandAnnotations": [],
-  "commands": [
-    {
-      "commandType": "home",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "50c7ae73a4e3f7129874f39dfb514803",
-      "notes": [],
-      "params": {},
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "comment",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "c9cac9dba72ab541665f112752004fbc",
-      "notes": [],
-      "params": {
-        "message": "variable dilutions has value 1"
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    }
-  ],
+  "commands": [],
   "config": {
     "apiVersion": [
       2,
@@ -36,7 +9,33 @@
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
-  "errors": [],
+  "errors": [
+    {
+      "createdAt": "TIMESTAMP",
+      "detail": "ParameterNameError [line 16]: Description \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\" greater than 100 characters.",
+      "errorCode": "4000",
+      "errorInfo": {},
+      "errorType": "ExceptionInProtocolError",
+      "id": "UUID",
+      "isDefined": false,
+      "wrappedErrors": [
+        {
+          "createdAt": "TIMESTAMP",
+          "detail": "opentrons.protocols.parameters.exceptions.ParameterNameError: Description \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\" greater than 100 characters.",
+          "errorCode": "4000",
+          "errorInfo": {
+            "args": "('Description \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\" greater than 100 characters.',)",
+            "class": "ParameterNameError",
+            "traceback": "  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/execution/execute_python.py\", line N, in _parse_and_set_parameters\n    exec(\"add_parameters(__param_context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_18_NO_PIPETTES_DescriptionTooLongRTP.py\", line N, in add_parameters\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocol_api/_parameter_context.py\", line N, in add_int\n    parameter = parameter_definition.create_int_parameter(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in create_int_parameter\n    return ParameterDefinition(\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/parameter_definition.py\", line N, in __init__\n    self._description = validation.ensure_description(description)\n\n  File \"/usr/local/lib/python3.10/site-packages/opentrons/protocols/parameters/validation.py\", line N, in ensure_description\n    raise ParameterNameError(\n"
+          },
+          "errorType": "PythonException",
+          "id": "UUID",
+          "isDefined": false,
+          "wrappedErrors": []
+        }
+      ]
+    }
+  ],
   "files": [
     {
       "name": "Flex_X_v2_18_NO_PIPETTES_DescriptionTooLongRTP.py",
@@ -51,18 +50,7 @@
   },
   "modules": [],
   "pipettes": [],
-  "result": "ok",
+  "result": "not-ok",
   "robotType": "OT-3 Standard",
-  "runTimeParameters": [
-    {
-      "default": 1.0,
-      "description": "This is a description that is longer than 30 characters.",
-      "displayName": "display name",
-      "max": 3.0,
-      "min": 1.0,
-      "type": "int",
-      "value": 1.0,
-      "variableName": "dilutions"
-    }
-  ]
+  "runTimeParameters": []
 }

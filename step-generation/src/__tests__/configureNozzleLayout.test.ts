@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { ALL, COLUMN } from '@opentrons/shared-data'
+import { ALL, COLUMN, fixtureP100096V2Specs } from '@opentrons/shared-data'
 import { getSuccessResult } from '../fixtures'
 import { configureNozzleLayout } from '../commandCreators/atomic/configureNozzleLayout'
 
@@ -7,9 +7,18 @@ const getRobotInitialState = (): any => {
   return {}
 }
 
-const invariantContext: any = {}
-const robotInitialState = getRobotInitialState()
 const mockPipette = 'mockPipette'
+const invariantContext: any = {
+  pipetteEntities: {
+    [mockPipette]: {
+      name: 'p1000_96',
+      id: mockPipette,
+      pythonName: 'mock_pipette',
+      spec: fixtureP100096V2Specs,
+    },
+  },
+}
+const robotInitialState = getRobotInitialState()
 
 describe('configureNozzleLayout', () => {
   it('should call configureNozzleLayout with correct params for full tip', () => {
@@ -35,6 +44,9 @@ describe('configureNozzleLayout', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      'mock_pipette.configure_nozzle_layout(protocol_api.ALL)'
+    )
   })
   it('should call configureNozzleLayout with correct params for column tip', () => {
     const result = configureNozzleLayout(
@@ -59,5 +71,8 @@ describe('configureNozzleLayout', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      'mock_pipette.configure_nozzle_layout(protocol_api.COLUMN, start="A12")'
+    )
   })
 })

@@ -209,6 +209,10 @@ class LegacyProtocolCore(
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware,
         )
+        # For type checking. This should always pass because
+        # opentrons.protocol_api.core.legacy should only load labware with schema 2.
+        assert labware_def["schemaVersion"] == 2
+
         labware_core = LegacyLabwareCore(
             definition=labware_def,
             parent=parent,

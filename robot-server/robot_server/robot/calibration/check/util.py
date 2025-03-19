@@ -33,7 +33,7 @@ class ComparisonStatePerCalibration:
         self,
         name: str,
         value: Union[TipComparisonMap, PipetteOffsetComparisonMap, DeckComparisonMap],
-    ):
+    ) -> None:
         setattr(self, name, value)
 
 
@@ -42,7 +42,7 @@ class ComparisonStatePerPipette:
     first: ComparisonStatePerCalibration
     second: ComparisonStatePerCalibration
 
-    def set_value(self, name: str, value: ComparisonStatePerCalibration):
+    def set_value(self, name: str, value: ComparisonStatePerCalibration) -> None:
         setattr(self, name, value)
 
 

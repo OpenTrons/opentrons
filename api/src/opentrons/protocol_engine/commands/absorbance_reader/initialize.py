@@ -137,7 +137,7 @@ class Initialize(BaseCommand[InitializeParams, InitializeResult, ErrorOccurrence
 
     commandType: InitializeCommandType = "absorbanceReader/initialize"
     params: InitializeParams
-    result: Optional[InitializeResult]
+    result: Optional[InitializeResult] = None
 
     _ImplementationCls: Type[InitializeImpl] = InitializeImpl
 

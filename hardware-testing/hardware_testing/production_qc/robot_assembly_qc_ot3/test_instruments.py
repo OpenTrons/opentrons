@@ -201,10 +201,10 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     target_z = 100
     await api.home([z_ax, Axis.G])
     start_pos = await api.gantry_position(OT3Mount.GRIPPER)
-    await api.move_to(mount, start_pos._replace(z=target_z), _expect_stalls=True)
+    await api.move_to(mount, start_pos._replace(z=target_z), expect_stalls=True)
     enc_pos = await api.encoder_current_position_ot3(OT3Mount.GRIPPER)
     if abs(enc_pos[Axis.Z_G] - target_z) < 0.25:
-        await api.move_to(mount, start_pos, _expect_stalls=True)
+        await api.move_to(mount, start_pos, expect_stalls=True)
         if abs(enc_pos[Axis.Z_G] - target_z) < 0.25:
             result = CSVResult.PASS
     await api.home([z_ax])

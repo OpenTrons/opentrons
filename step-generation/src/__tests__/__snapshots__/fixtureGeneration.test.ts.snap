@@ -1983,6 +1983,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "destPlateId",
       "labwareDefURI": "fixture/fixture_96_plate/1",
+      "pythonName": "mockPythonName",
     },
     "sourcePlateId": {
       "def": {
@@ -3116,6 +3117,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "sourcePlateId",
       "labwareDefURI": "fixture/fixture_96_plate/1",
+      "pythonName": "mockPythonName",
     },
     "tiprack1Id": {
       "def": {
@@ -4242,6 +4244,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack1Id",
       "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
+      "pythonName": "mockPythonName",
     },
     "tiprack2Id": {
       "def": {
@@ -5368,6 +5371,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack2Id",
       "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
+      "pythonName": "mockPythonName",
     },
     "tiprack3Id": {
       "def": {
@@ -6494,6 +6498,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack3Id",
       "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
+      "pythonName": "mockPythonName",
     },
     "tiprack4AdapterId": {
       "def": {
@@ -6541,6 +6546,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack4AdapterId",
       "labwareDefURI": "fixture/fixture_flex_96_tiprack_adapter/1",
+      "pythonName": "mockPythonName",
     },
     "tiprack4Id": {
       "def": {
@@ -7679,6 +7685,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack4Id",
       "labwareDefURI": "fixture/fixture_flex_96_tiprack_1000ul/1",
+      "pythonName": "mockPythonName",
     },
     "tiprack5AdapterId": {
       "def": {
@@ -7726,6 +7733,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack5AdapterId",
       "labwareDefURI": "fixture/fixture_flex_96_tiprack_adapter/1",
+      "pythonName": "mockPythonName",
     },
     "tiprack5Id": {
       "def": {
@@ -8864,6 +8872,7 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "tiprack5Id",
       "labwareDefURI": "fixture/fixture_flex_96_tiprack_1000ul/1",
+      "pythonName": "mockPythonName",
     },
     "troughId": {
       "def": {
@@ -9085,13 +9094,16 @@ exports[`snapshot tests > makeContext 1`] = `
       },
       "id": "troughId",
       "labwareDefURI": "fixture/fixture_12_trough/1",
+      "pythonName": "mockPythonName",
     },
   },
+  "liquidEntities": {},
   "moduleEntities": {},
   "pipetteEntities": {
     "p100096Id": {
       "id": "p100096Id",
       "name": "p1000_96",
+      "pythonName": "mockPythonName",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -9251,7 +9263,7 @@ exports[`snapshot tests > makeContext 1`] = `
                 },
                 "defaultFlowAcceleration": 16000,
                 "defaultPushOutVolume": 20,
-                "defaultReturnTipHeight": 0.2,
+                "defaultReturnTipHeight": 0.71,
                 "defaultTipLength": 95.6,
                 "dispense": {
                   "default": {
@@ -9564,7 +9576,7 @@ exports[`snapshot tests > makeContext 1`] = `
                 },
                 "defaultFlowAcceleration": 16000,
                 "defaultPushOutVolume": 5,
-                "defaultReturnTipHeight": 0.2,
+                "defaultReturnTipHeight": 0.6,
                 "defaultTipLength": 58.35,
                 "dispense": {
                   "default": {
@@ -9715,7 +9727,7 @@ exports[`snapshot tests > makeContext 1`] = `
                 },
                 "defaultFlowAcceleration": 16000,
                 "defaultPushOutVolume": 7,
-                "defaultReturnTipHeight": 0.2,
+                "defaultReturnTipHeight": 0.6,
                 "defaultTipLength": 57.9,
                 "dispense": {
                   "default": {
@@ -12285,6 +12297,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p10MultiId": {
       "id": "p10MultiId",
       "name": "p10_multi",
+      "pythonName": "mockPythonName",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -13918,6 +13931,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p10SingleId": {
       "id": "p10SingleId",
       "name": "p10_single",
+      "pythonName": "mockPythonName",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -15283,6 +15297,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p300MultiId": {
       "id": "p300MultiId",
       "name": "p300_multi",
+      "pythonName": "mockPythonName",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {
@@ -16905,6 +16920,7 @@ exports[`snapshot tests > makeContext 1`] = `
     "p300SingleId": {
       "id": "p300SingleId",
       "name": "p300_single",
+      "pythonName": "mockPythonName",
       "spec": {
         "$otSharedSchema": "#/pipette/schemas/2/pipetteGeometrySchema.json",
         "availableSensors": {

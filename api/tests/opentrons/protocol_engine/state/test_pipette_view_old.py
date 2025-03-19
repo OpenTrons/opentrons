@@ -84,6 +84,7 @@ def get_pipette_view(
     flow_rates_by_id: Optional[Dict[str, FlowRates]] = None,
     nozzle_layout_by_id: Optional[Dict[str, NozzleMap]] = None,
     liquid_presence_detection_by_id: Optional[Dict[str, bool]] = None,
+    ready_to_aspirate_by_id: Optional[Dict[str, bool]] = None,
     pipette_contents_by_id: Optional[
         Dict[str, Optional[fluid_stack.FluidStack]]
     ] = None,
@@ -100,6 +101,7 @@ def get_pipette_view(
         flow_rates_by_id=flow_rates_by_id or {},
         nozzle_configuration_by_id=nozzle_layout_by_id or {},
         liquid_presence_detection_by_id=liquid_presence_detection_by_id or {},
+        ready_to_aspirate_by_id=ready_to_aspirate_by_id or {},
     )
 
     return PipetteView(state=state)

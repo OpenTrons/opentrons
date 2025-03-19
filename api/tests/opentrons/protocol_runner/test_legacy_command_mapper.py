@@ -1,4 +1,5 @@
 """Tests for the PythonAndLegacyRunner's LegacyCommandMapper."""
+
 import inspect
 from datetime import datetime
 from typing import cast
@@ -40,7 +41,7 @@ from opentrons.protocol_runner.legacy_command_mapper import (
     LegacyContextCommandError,
     LegacyCommandMapper,
 )
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons_shared_data.module.types import ModuleDefinitionV3
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons.types import DeckSlotName, Mount, MountType
@@ -266,7 +267,7 @@ def test_command_stack() -> None:
     ]
 
 
-def test_map_labware_load(minimal_labware_def: LabwareDefinition) -> None:
+def test_map_labware_load(minimal_labware_def: LabwareDefinition2) -> None:
     """It should correctly map a labware load."""
     input = LegacyLabwareLoadInfo(
         labware_definition=minimal_labware_def,
@@ -467,7 +468,7 @@ def test_map_module_load(
     assert result_succeed == expected_succeed
 
 
-def test_map_module_labware_load(minimal_labware_def: LabwareDefinition) -> None:
+def test_map_module_labware_load(minimal_labware_def: LabwareDefinition2) -> None:
     """It should correctly map a labware load on module."""
     load_input = LegacyLabwareLoadInfo(
         labware_definition=minimal_labware_def,

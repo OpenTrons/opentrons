@@ -39,6 +39,7 @@ import {
   useProtocolQuery,
   useDeleteRunMutation,
   useRunCommandErrors,
+  useErrorRecoverySettings,
 } from '@opentrons/react-api-client'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
@@ -68,8 +69,8 @@ import {
   useCurrentRunCommands,
 } from '/app/resources/runs'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
-import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
+import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '/app/App/types'
@@ -235,22 +236,19 @@ export function RunSummary(): JSX.Element {
     runId,
     runRecord: runRecord ?? null,
   })
-
-  // Determine tip status on initial render only. Error Recovery always handles tip status, so don't show it twice.
+  const { data } = useErrorRecoverySettings()
+  const isEREnabled = data?.data.enabled ?? true
   const runSummaryNoFixit = useCurrentRunCommands({
     includeFixitCommands: false,
     pageLength: 1,
   })
+
   useEffect(() => {
-    if (
-      isRunCurrent &&
-      runSummaryNoFixit != null &&
-      runSummaryNoFixit.length > 0 &&
-      !lastRunCommandPromptedErrorRecovery(runSummaryNoFixit)
-    ) {
+    // Only run tip checking if it wasn't *just* handled during Error Recovery.
+    if (!lastRunCommandPromptedErrorRecovery(runSummaryNoFixit, isEREnabled)) {
       void determineTipStatus()
     }
-  }, [runSummaryNoFixit, isRunCurrent])
+  }, [isRunCurrent, runSummaryNoFixit, isEREnabled])
 
   const returnToQuickTransfer = (): void => {
     closeCurrentRunIfValid(() => {

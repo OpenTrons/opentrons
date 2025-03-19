@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any, List
+from typing_extensions import TypedDict  # note: need this instead of typing for py<3.12
 
 from pydantic.json_schema import SkipJsonSchema
 from pydantic import BaseModel, Field
@@ -18,7 +19,7 @@ from opentrons.types import Point
 from ..types import (
     ModuleModel,
     CurrentWell,
-    LabwareLocation,
+    LoadableLabwareLocation,
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
@@ -26,6 +27,9 @@ from ..types import (
     LabwareMovementStrategy,
     LabwareOffsetVector,
     LabwareMovementOffsetData,
+    LabwareLocationSequence,
+    NotOnDeckLocationSequenceComponent,
+    OFF_DECK_LOCATION,
 )
 from ..errors import (
     LabwareMovementNotAllowedError,
@@ -64,7 +68,9 @@ class MoveLabwareParams(BaseModel):
     """Input parameters for a ``moveLabware`` command."""
 
     labwareId: str = Field(..., description="The ID of the labware to move.")
-    newLocation: LabwareLocation = Field(..., description="Where to move the labware.")
+    newLocation: LoadableLabwareLocation = Field(
+        ..., description="Where to move the labware."
+    )
     strategy: LabwareMovementStrategy = Field(
         ...,
         description="Whether to use the gripper to perform the labware movement"
@@ -100,6 +106,31 @@ class MoveLabwareResult(BaseModel):
             " so the default of (0, 0, 0) will be used."
         ),
     )
+    eventualDestinationLocationSequence: LabwareLocationSequence | None = Field(
+        None,
+        description=(
+            "The full location in which this labware will eventually reside. This will typically be the same as its "
+            "immediate destination, but if this labware is going to the trash then this field will be off deck."
+        ),
+    )
+    immediateDestinationLocationSequence: LabwareLocationSequence | None = Field(
+        None,
+        description=(
+            "The full location to which this labware is being moved, right now."
+        ),
+    )
+    originLocationSequence: LabwareLocationSequence | None = Field(
+        None,
+        description="The full location down to the deck of the labware before this command.",
+    )
+
+
+class ErrorDetails(TypedDict):
+    """Location details for a failed gripper move."""
+
+    originLocationSequence: LabwareLocationSequence
+    immediateDestinationLocationSequence: LabwareLocationSequence
+    eventualDestinationLocationSequence: LabwareLocationSequence
 
 
 class GripperMovementError(ErrorOccurrence):
@@ -111,6 +142,8 @@ class GripperMovementError(ErrorOccurrence):
     isDefined: bool = True
 
     errorType: Literal["gripperMovement"] = "gripperMovement"
+
+    errorInfo: ErrorDetails
 
 
 _ExecuteReturn = SuccessData[MoveLabwareResult] | DefinedErrorData[GripperMovementError]
@@ -152,6 +185,11 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 f"Cannot move fixed trash labware '{current_labware_definition.parameters.loadName}'."
             )
 
+        origin_location_sequence = self._state_view.geometry.get_location_sequence(
+            params.labwareId
+        )
+        eventual_destination_location_sequence: LabwareLocationSequence | None = None
+
         if isinstance(params.newLocation, AddressableAreaLocation):
             area_name = params.newLocation.addressableAreaName
             if (
@@ -181,9 +219,19 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     y=0,
                     z=0,
                 )
+                eventual_destination_location_sequence = [
+                    NotOnDeckLocationSequenceComponent(
+                        logicalLocationName=OFF_DECK_LOCATION
+                    )
+                ]
             elif fixture_validation.is_trash(area_name):
                 # When dropping labware in the trash bins we want to ensure they are lids
                 # and enforce a y-axis drop offset to ensure they fall within the trash bin
+                eventual_destination_location_sequence = [
+                    NotOnDeckLocationSequenceComponent(
+                        logicalLocationName=OFF_DECK_LOCATION
+                    )
+                ]
                 if labware_validation.validate_definition_is_lid(
                     self._state_view.labware.get_definition(params.labwareId)
                 ):
@@ -220,9 +268,18 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         )
 
         # Check that labware and destination do not have labware on top
-        self._state_view.labware.raise_if_labware_has_labware_on_top(
+        self._state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
             labware_id=params.labwareId
         )
+
+        if isinstance(available_new_location, DeckSlotLocation):
+            self._state_view.labware.raise_if_labware_cannot_be_ondeck(
+                location=available_new_location,
+                labware_definition=self._state_view.labware.get_definition(
+                    params.labwareId
+                ),
+            )
+
         if isinstance(available_new_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_has_labware_on_top(
                 available_new_location.labwareId
@@ -289,6 +346,16 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             if trash_lid_drop_offset:
                 user_offset_data.dropOffset += trash_lid_drop_offset
 
+            immediate_destination_location_sequence = (
+                self._state_view.geometry.get_predicted_location_sequence(
+                    validated_new_loc
+                )
+            )
+            if eventual_destination_location_sequence is None:
+                eventual_destination_location_sequence = (
+                    immediate_destination_location_sequence
+                )
+
             try:
                 # Skips gripper moves when using virtual gripper
                 await self._labware_movement.move_labware_with_gripper(
@@ -305,20 +372,23 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 # todo(mm, 2024-09-26): Catch LabwareNotPickedUpError when that exists and
                 # move_labware_with_gripper() raises it.
             ) as exception:
-                gripper_movement_error: GripperMovementError | None = (
-                    GripperMovementError(
-                        id=self._model_utils.generate_id(),
-                        createdAt=self._model_utils.get_timestamp(),
-                        errorCode=exception.code.value.code,
-                        detail=exception.code.value.detail,
-                        wrappedErrors=[
-                            ErrorOccurrence.from_failed(
-                                id=self._model_utils.generate_id(),
-                                createdAt=self._model_utils.get_timestamp(),
-                                error=exception,
-                            )
-                        ],
-                    )
+                gripper_movement_error: GripperMovementError | None = GripperMovementError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    errorCode=exception.code.value.code,
+                    detail=exception.code.value.detail,
+                    errorInfo={
+                        "originLocationSequence": origin_location_sequence,
+                        "immediateDestinationLocationSequence": immediate_destination_location_sequence,
+                        "eventualDestinationLocationSequence": eventual_destination_location_sequence,
+                    },
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=exception,
+                        )
+                    ],
                 )
             else:
                 gripper_movement_error = None
@@ -334,7 +404,27 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
 
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement
+            immediate_destination_location_sequence = (
+                self._state_view.geometry.get_predicted_location_sequence(
+                    params.newLocation
+                )
+            )
+            if eventual_destination_location_sequence is None:
+                eventual_destination_location_sequence = (
+                    immediate_destination_location_sequence
+                )
+
             await self._run_control.wait_for_resume()
+        else:
+            immediate_destination_location_sequence = (
+                self._state_view.geometry.get_predicted_location_sequence(
+                    params.newLocation
+                )
+            )
+            if eventual_destination_location_sequence is None:
+                eventual_destination_location_sequence = (
+                    immediate_destination_location_sequence
+                )
 
         # We may have just moved the labware that contains the current well out from
         # under the pipette. Clear the current location to reflect the fact that the
@@ -360,9 +450,9 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             parent_updates: List[str] = []
             lid_updates: List[str | None] = []
             # when moving a lid between locations we need to:
-            assert isinstance(current_labware.location, OnLabwareLocation)
             if (
-                self._state_view.labware.get_lid_by_labware_id(
+                isinstance(current_labware.location, OnLabwareLocation)
+                and self._state_view.labware.get_lid_by_labware_id(
                     current_labware.location.labwareId
                 )
                 is not None
@@ -389,7 +479,12 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 )
 
         return SuccessData(
-            public=MoveLabwareResult(offsetId=new_offset_id),
+            public=MoveLabwareResult(
+                offsetId=new_offset_id,
+                originLocationSequence=origin_location_sequence,
+                immediateDestinationLocationSequence=immediate_destination_location_sequence,
+                eventualDestinationLocationSequence=eventual_destination_location_sequence,
+            ),
             state_update=state_update,
         )
 

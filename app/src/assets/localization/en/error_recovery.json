@@ -110,7 +110,7 @@
   "stand_back_retrying": "Stand back, retrying failed step",
   "stand_back_skipping_to_next_step": "Stand back, skipping to next step",
   "take_any_necessary_precautions": "Take any necessary precautions before positioning yourself to stabilize or catch the labware. Once confirmed, a countdown will begin before the gripper releases.",
-  "take_necessary_actions": "<block>First, take any necessary actions to prepare the robot to retry the failed step.</block><block>Then, close the robot door before proceeding.</block>",
+  "take_necessary_actions": "<block>Take any necessary additional actions to prepare the robot to retry the failed step.</block><block>Close the robot door before proceeding.</block>",
   "take_necessary_actions_failed_pickup": "<block>First, take any necessary actions to prepare the robot to retry the failed tip pickup.</block><block>Then, close the robot door before proceeding.</block>",
   "take_necessary_actions_failed_tip_drop": "<block>First, take any necessary actions to prepare the robot to retry the failed tip drop.</block><block>Then, close the robot door before proceeding.</block>",
   "take_necessary_actions_home": "<block>Take any necessary actions to prepare the robot to move the gantry to its home position.</block><block>Close the robot door before proceeding.</block>",

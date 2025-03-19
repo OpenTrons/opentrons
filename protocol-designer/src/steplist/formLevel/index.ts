@@ -49,6 +49,12 @@ import {
   referenceWavelengthOutOfRange,
   absorbanceReaderModuleIdRequired,
   magneticModuleIdRequired,
+  aspirateTouchTipSpeedRequired,
+  dispenseTouchTipSpeedRequired,
+  aspirateTouchTipMmFromEdgeOutOfRange,
+  dispenseTouchTipMmFromEdgeOutOfRange,
+  aspirateTouchTipMmFromEdgeRequired,
+  dispenseTouchTipMmFromEdgeRequired,
 } from './errors'
 
 import {
@@ -150,7 +156,13 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       dispenseAirGapVolumeRequired,
       blowoutLocationRequired,
       aspirateWellsRequired,
-      dispenseWellsRequired
+      dispenseWellsRequired,
+      aspirateTouchTipSpeedRequired,
+      dispenseTouchTipSpeedRequired,
+      aspirateTouchTipMmFromEdgeOutOfRange,
+      dispenseTouchTipMmFromEdgeOutOfRange,
+      aspirateTouchTipMmFromEdgeRequired,
+      dispenseTouchTipMmFromEdgeRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,

@@ -40,9 +40,11 @@ describe('generateRobotStateTimeline', () => {
           dispenseAirGapVolume: null,
           mixInDestination: null,
           touchTipAfterAspirate: false,
-          touchTipAfterAspirateOffsetMmFromBottom: 13.81,
+          touchTipAfterAspirateOffsetMmFromTop: -13.81,
+          touchTipAfterAspirateSpeed: null,
           touchTipAfterDispense: false,
-          touchTipAfterDispenseOffsetMmFromBottom: 13.81,
+          touchTipAfterDispenseOffsetMmFromTop: -13.81,
+          touchTipAfterDispenseSpeed: null,
           name: 'transfer',
           commandCreatorFnName: 'transfer',
           blowoutLocation: null,
@@ -80,9 +82,11 @@ describe('generateRobotStateTimeline', () => {
           dispenseAirGapVolume: null,
           mixInDestination: null,
           touchTipAfterAspirate: false,
-          touchTipAfterAspirateOffsetMmFromBottom: 13.81,
+          touchTipAfterAspirateOffsetMmFromTop: -13.81,
+          touchTipAfterAspirateSpeed: null,
           touchTipAfterDispense: false,
-          touchTipAfterDispenseOffsetMmFromBottom: 13.81,
+          touchTipAfterDispenseOffsetMmFromTop: -13.81,
+          touchTipAfterDispenseSpeed: null,
           name: 'transfer',
           commandCreatorFnName: 'transfer',
           blowoutLocation: null,
@@ -110,7 +114,7 @@ describe('generateRobotStateTimeline', () => {
           volume: 5,
           times: 2,
           touchTip: false,
-          touchTipMmFromBottom: 13.81,
+          touchTipMmFromTop: -13.81,
           changeTip: 'always',
           blowoutLocation: null,
           pipette: DEFAULT_PIPETTE,
@@ -179,5 +183,43 @@ describe('generateRobotStateTimeline', () => {
         ],
       ]
     `)
+
+    // The regex elides all the indented arguments in the Python code
+    const pythonCommandsOverview = result.timeline.map(frame =>
+      frame.python?.replaceAll(/(\n\s+.*)+\n/g, '...')
+    )
+    expect(pythonCommandsOverview).toEqual([
+      // Step a:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+      // Step b:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+      // Step c:
+      `
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.aspirate(...)
+mockPythonName.dispense(...)
+mockPythonName.drop_tip()
+`.trim(),
+    ])
   })
 })

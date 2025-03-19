@@ -60,7 +60,7 @@ export function ControlledLabwareListItems(): JSX.Element | null {
 
               return (
                 <ListItem
-                  type="noActive"
+                  type="default"
                   key={`${index}_${labwareDef.parameters.loadName}`}
                 >
                   <ListItemCustomize
