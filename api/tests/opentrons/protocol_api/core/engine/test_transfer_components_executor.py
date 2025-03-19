@@ -107,8 +107,8 @@ def test_submerge_without_lpd(
     )
     decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(source_well.get_top(0)).then_return(well_top_point)
+    decoy.when(source_well.get_top(2)).then_return(Point(1, 2, 6))
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(False)
-    # decoy.when(source_well.current_liquid_height()).then_return(1)
     subject.submerge(
         submerge_properties=sample_transfer_props.aspirate.submerge,
         post_submerge_action="aspirate",
@@ -116,18 +116,8 @@ def test_submerge_without_lpd(
     )
 
     decoy.verify(
-        tx_utils.raise_if_location_inside_liquid(
-            location=Location(Point(x=2, y=4, z=7), labware=None),
-            well_location=Location(Point(x=1, y=2, z=3), labware=None),
-            well_core=source_well,
-            location_check_descriptors=_LocationCheckDescriptors(
-                location_type="submerge start",
-                pipetting_action="aspirate",
-            ),
-            logger=matchers.Anything(),
-        ),
         mock_instrument_core.move_to(
-            location=Location(Point(x=2, y=4, z=7), labware=None),
+            location=Location(point=Point(1, 2, 6), labware=None),
             well_core=source_well,
             force_direct=False,
             minimum_z_height=None,
@@ -146,6 +136,23 @@ def test_submerge_without_lpd(
         mock_instrument_core.delay(0.5),
         mock_instrument_core.configure_for_volume(123),
         mock_instrument_core.prepare_to_aspirate(),
+        tx_utils.raise_if_location_inside_liquid(
+            location=Location(Point(x=2, y=4, z=7), labware=None),
+            well_location=Location(Point(x=1, y=2, z=3), labware=None),
+            well_core=source_well,
+            location_check_descriptors=_LocationCheckDescriptors(
+                location_type="submerge start",
+                pipetting_action="aspirate",
+            ),
+            logger=matchers.Anything(),
+        ),
+        mock_instrument_core.move_to(
+            location=Location(Point(x=2, y=4, z=7), labware=None),
+            well_core=source_well,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        ),
         mock_instrument_core.move_to(
             location=Location(Point(1, 2, 3), labware=None),
             well_core=source_well,
@@ -185,6 +192,7 @@ def test_submerge_with_lpd(
     )
     decoy.when(source_well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(source_well.get_top(0)).then_return(well_top_point)
+    decoy.when(source_well.get_top(2)).then_return(Point(1, 2, 6))
     decoy.when(mock_instrument_core.get_liquid_presence_detection()).then_return(True)
     subject.submerge(
         submerge_properties=sample_transfer_props.aspirate.submerge,
@@ -193,11 +201,8 @@ def test_submerge_with_lpd(
     )
 
     decoy.verify(
-        mock_instrument_core.liquid_probe_with_recovery(
-            source_well, Location(Point(x=2, y=4, z=7), labware=None)
-        ),
         mock_instrument_core.move_to(
-            location=Location(Point(x=2, y=4, z=7), labware=None),
+            location=Location(point=Point(1, 2, 6), labware=None),
             well_core=source_well,
             force_direct=False,
             minimum_z_height=None,
@@ -210,13 +215,22 @@ def test_submerge_with_lpd(
             rate=1,
             flow_rate=air_gap_removal_flow_rate,
             in_place=True,
-            is_meniscus=False,
             push_out=0,
             correction_volume=air_gap_correction_vol,
         ),
         mock_instrument_core.delay(0.5),
+        mock_instrument_core.liquid_probe_with_recovery(
+            source_well, Location(Point(x=2, y=4, z=7), labware=None)
+        ),
         mock_instrument_core.configure_for_volume(123),
         mock_instrument_core.prepare_to_aspirate(),
+        mock_instrument_core.move_to(
+            location=Location(Point(x=2, y=4, z=7), labware=None),
+            well_core=source_well,
+            force_direct=False,
+            minimum_z_height=None,
+            speed=None,
+        ),
         mock_instrument_core.move_to(
             location=Location(Point(1, 2, 3), labware=None),
             well_core=source_well,

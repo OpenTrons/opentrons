@@ -12,6 +12,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
     BlowoutLocation,
 )
+from opentrons_shared_data.pipette.types import LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
 
 from opentrons.protocol_api._liquid_properties import (
     Submerge,
@@ -155,11 +156,12 @@ class TransferComponentsExecutor:
             and volume_for_pipette_mode_configuration is not None
         )
         if prep_before_moving_to_submerge:
-            # TODO: make this a shared position between liquid probing and this movement
-            #  so that they don't go out of sync
+            # Move to the tip probe start position
             self._instrument.move_to(
                 location=Location(
-                    point=self._target_well.get_top(2),
+                    point=self._target_well.get_top(
+                        LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z
+                    ),
                     labware=self._target_location.labware,
                 ),
                 well_core=self._target_well,
@@ -172,12 +174,11 @@ class TransferComponentsExecutor:
                 self._transfer_type != TransferType.MANY_TO_ONE
                 and self._instrument.get_liquid_presence_detection()
             ):
-                # TODO: probe only if this well hasn't been probed before
                 self._instrument.liquid_probe_with_recovery(
                     self._target_well, submerge_start_location
                 )
             # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
-            self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)
+            self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)  # type: ignore[arg-type]
             self._instrument.prepare_to_aspirate()
         tx_utils.raise_if_location_inside_liquid(
             location=submerge_start_location,

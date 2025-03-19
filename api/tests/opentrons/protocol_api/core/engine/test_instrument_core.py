@@ -2288,3 +2288,13 @@ def test_get_next_tip_when_no_tip_available(
         starting_well="F00",
     )
     assert result is None
+
+
+def test_lpd_for_transfer_context_manager(
+    subject: InstrumentCore,
+) -> None:
+    """It should update LPD state according to context."""
+    assert subject.get_liquid_presence_detection() is False
+    with subject.lpd_for_transfer(enable=True):
+        assert subject.get_liquid_presence_detection() is True
+    assert subject.get_liquid_presence_detection() is False
