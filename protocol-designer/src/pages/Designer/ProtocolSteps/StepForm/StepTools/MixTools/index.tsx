@@ -118,7 +118,11 @@ export function MixTools(props: StepFormProps): JSX.Element {
         {...propsForFields.wells}
         labwareId={formData.labware}
         pipetteId={formData.pipette}
-        nozzles={String(propsForFields.nozzles.value) ?? null}
+        nozzles={
+          typeof propsForFields.nozzles.value === 'string'
+            ? propsForFields.nozzles.value
+            : null
+        }
         hasFormError={
           visibleFormErrors?.some(error =>
             error.dependentFields.includes('wells')
@@ -156,7 +160,11 @@ export function MixTools(props: StepFormProps): JSX.Element {
               <Divider marginY="0" />
               <TipWellSelectionField
                 {...propsForFields.pickUpTip_wellNames}
-                nozzles={String(propsForFields.nozzles.value) ?? null}
+                nozzles={
+                  typeof propsForFields.nozzles.value === 'string'
+                    ? propsForFields.nozzles.value
+                    : null
+                }
                 labwareId={propsForFields.pickUpTip_location.value}
                 pipetteId={propsForFields.pipette.value}
               />
@@ -174,7 +182,11 @@ export function MixTools(props: StepFormProps): JSX.Element {
           <Divider marginY="0" />
           <TipWellSelectionField
             {...propsForFields.dropTip_wellNames}
-            nozzles={String(propsForFields.nozzles.value) ?? null}
+            nozzles={
+              typeof propsForFields.nozzles.value === 'string'
+                ? propsForFields.nozzles.value
+                : null
+            }
             labwareId={propsForFields.dropTip_location.value}
             pipetteId={propsForFields.pipette.value}
           />

@@ -6,7 +6,7 @@ export {
   absorbanceReaderOpenLid,
   absorbanceReaderRead,
   aspirate,
-  blowout,
+  blowOutInWell,
   comment,
   consolidate,
   deactivateTemperature,

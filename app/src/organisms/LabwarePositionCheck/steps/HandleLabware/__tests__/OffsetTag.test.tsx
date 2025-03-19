@@ -97,4 +97,24 @@ describe('OffsetTag', () => {
       expect.anything()
     )
   })
+
+  it('renders with "Hardcoded" text and reticle icon kind is hardcoded', () => {
+    renderWithProviders(<OffsetTag kind="hardcoded" />, { i18nInstance: i18n })
+
+    const tagElement = screen.getByTestId('mock-tag')
+
+    expect(tagElement).toHaveAttribute('data-icon-name', 'reticle')
+    expect(tagElement).toHaveAttribute('data-icon-position', 'left')
+    expect(tagElement).toHaveAttribute('data-type', 'default')
+
+    expect(Tag).toHaveBeenCalledWith(
+      expect.objectContaining({
+        iconName: 'reticle',
+        type: 'default',
+        iconPosition: 'left',
+        text: 'Hardcoded',
+      }),
+      expect.anything()
+    )
+  })
 })

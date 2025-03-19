@@ -6,7 +6,7 @@ describe('URL Navigation', () => {
   it('createNew', () => {
     cy.visit('#/createNew')
     // directly navigating sends you back to the home page
-    cy.verifyHomePage()
+    cy.verifyOnboardingPage()
   })
   it('overview', () => {
     cy.visit('#/overview')

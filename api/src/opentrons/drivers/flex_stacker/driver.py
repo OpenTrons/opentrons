@@ -20,6 +20,7 @@ from .types import (
     StackerInfo,
     HardwareRevision,
     MoveParams,
+    AxisParams,
     LimitSwitchStatus,
     LEDColor,
     StallGuardParams,
@@ -57,56 +58,67 @@ NUMBER_OF_BINS = 128
 STALLGUARD_CONFIG = {
     StackerAxis.X: StallGuardParams(StackerAxis.X, True, 2),
     StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 2),
-    StackerAxis.L: StallGuardParams(StackerAxis.L, True, 2),
 }
 
 STACKER_MOTION_CONFIG = {
     StackerAxis.X: {
-        "home": MoveParams(
-            StackerAxis.X,
-            max_speed=10.0,  # mm/s
-            acceleration=100.0,  # mm/s^2
-            max_speed_discont=40,  # mm/s
-            current=1.5,  # mAmps
+        "home": AxisParams(
+            run_current=1.5,  # mAmps
+            hold_current=0.75,
+            move_params=MoveParams(
+                max_speed=10.0,  # mm/s
+                acceleration=100.0,  # mm/s^2
+                max_speed_discont=40.0,  # mm/s
+            ),
         ),
-        "move": MoveParams(
-            StackerAxis.X,
-            max_speed=200.0,
-            acceleration=1500.0,
-            max_speed_discont=40,
-            current=1.0,
+        "move": AxisParams(
+            run_current=1.0,
+            hold_current=0.75,
+            move_params=MoveParams(
+                max_speed=200.0,
+                acceleration=1500.0,
+                max_speed_discont=40.0,
+            ),
         ),
     },
     StackerAxis.Z: {
-        "home": MoveParams(
-            StackerAxis.Z,
-            max_speed=10.0,
-            acceleration=100.0,
-            max_speed_discont=40,
-            current=1.5,
+        "home": AxisParams(
+            run_current=1.5,
+            hold_current=1.8,
+            move_params=MoveParams(
+                max_speed=10.0,
+                acceleration=100.0,
+                max_speed_discont=25.0,
+            ),
         ),
-        "move": MoveParams(
-            StackerAxis.Z,
-            max_speed=200.0,
-            acceleration=500.0,
-            max_speed_discont=40,
-            current=1.5,
+        "move": AxisParams(
+            run_current=1.5,
+            hold_current=0.5,
+            move_params=MoveParams(
+                max_speed=150.0,
+                acceleration=500.0,
+                max_speed_discont=25.0,
+            ),
         ),
     },
     StackerAxis.L: {
-        "home": MoveParams(
-            StackerAxis.L,
-            max_speed=100.0,
-            acceleration=800.0,
-            max_speed_discont=40,
-            current=0.8,
+        "home": AxisParams(
+            run_current=0.8,
+            hold_current=0.15,
+            move_params=MoveParams(
+                max_speed=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
+            ),
         ),
-        "move": MoveParams(
-            StackerAxis.L,
-            max_speed=100.0,
-            acceleration=800.0,
-            max_speed_discont=40,
-            current=0.6,
+        "move": AxisParams(
+            run_current=0.6,
+            hold_current=0.15,
+            move_params=MoveParams(
+                max_speed=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
+            ),
         ),
     },
 }
@@ -183,18 +195,12 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
     def parse_move_params(cls, response: str) -> MoveParams:
         """Parse move params."""
         field_names = MoveParams.get_fields()
-        pattern = r"\s".join(
-            [
-                rf"{f}:(?P<{f}>(\d*\.)?\d+)" if f != "M" else rf"{f}:(?P<{f}>[XZL])"
-                for f in field_names
-            ]
-        )
-        _RE = re.compile(f"^{GCODE.GET_MOVE_PARAMS} {pattern}$")
+        pattern = r"\s".join(rf"{f}:(?P<{f}>(\d*\.)?\d+)" for f in field_names)
+        _RE = re.compile(rf"^{GCODE.GET_MOVE_PARAMS} M:([XZL]) {pattern}$")
         m = _RE.match(response)
         if not m:
             raise ValueError(f"Incorrect Response for move params: {response}")
         return MoveParams(
-            axis=StackerAxis(m.group("M")),
             max_speed=float(m.group("V")),
             acceleration=float(m.group("A")),
             max_speed_discont=float(m.group("D")),
@@ -294,14 +300,9 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
     ) -> CommandBuilder:
         """Append move params."""
         if params is not None:
-            if params.max_speed is not None:
-                command.add_float("V", params.max_speed, GCODE_ROUNDING_PRECISION)
-            if params.acceleration is not None:
-                command.add_float("A", params.acceleration, GCODE_ROUNDING_PRECISION)
-            if params.max_speed_discont is not None:
-                command.add_float(
-                    "D", params.max_speed_discont, GCODE_ROUNDING_PRECISION
-                )
+            command.add_float("V", params.max_speed, GCODE_ROUNDING_PRECISION)
+            command.add_float("A", params.acceleration, GCODE_ROUNDING_PRECISION)
+            command.add_float("D", params.max_speed_discont, GCODE_ROUNDING_PRECISION)
         return command
 
     @classmethod
@@ -410,6 +411,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         self, axis: StackerAxis, enable: bool, threshold: int
     ) -> bool:
         """Enables and sets the stallguard threshold for the given axis motor."""
+        assert axis != StackerAxis.L, "Stallguard not supported for L axis"
         if not -64 < threshold < 63:
             raise ValueError(
                 f"Threshold value ({threshold}) should be between -64 and 63."

@@ -31,7 +31,7 @@ import {
 } from '../atomic'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
-
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   TransferArgs,
   CurriedCommandCreator,
@@ -167,16 +167,10 @@ export const transfer: CommandCreator<TransferArgs> = (
     }
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
 
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'wasteChute'
-  const isTrashBin =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation] !=
-      null &&
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation].name ===
-      'trashBin'
+  const dropTipEntity =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  const isWasteChute = dropTipEntity?.name === 'wasteChute'
+  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -340,12 +334,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipetteId: args.pipette,
                   labwareId: args.sourceLabware,
                   wellName: sourceWell,
-                  wellLocation: {
-                    origin: 'top',
-                    offset: {
-                      z: args.touchTipAfterAspirateOffsetMmFromTop,
-                    },
-                  },
+                  zOffsetFromTop: args.touchTipAfterAspirateOffsetMmFromTop,
                   ...(args.touchTipAfterAspirateSpeed != null
                     ? { speed: args.touchTipAfterAspirateSpeed }
                     : {}),
@@ -360,12 +349,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     pipetteId: args.pipette,
                     labwareId: args.destLabware,
                     wellName: destinationWell,
-                    wellLocation: {
-                      origin: 'top',
-                      offset: {
-                        z: args.touchTipAfterDispenseOffsetMmFromTop,
-                      },
-                    },
+                    zOffsetFromTop: args.touchTipAfterDispenseOffsetMmFromTop,
                     ...(args.touchTipAfterDispenseSpeed != null
                       ? { speed: args.touchTipAfterDispenseSpeed }
                       : {}),
@@ -566,7 +550,10 @@ export const transfer: CommandCreator<TransferArgs> = (
           }
           if (isTrashBin) {
             dropTipCommand = [
-              curryCommandCreator(dropTipInTrash, { pipetteId: args.pipette }),
+              curryCommandCreator(dropTipInTrash, {
+                pipetteId: args.pipette,
+                trashLocation: dropTipEntity.location as CutoutId,
+              }),
             ]
           }
 

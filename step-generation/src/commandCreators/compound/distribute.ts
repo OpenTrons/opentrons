@@ -33,7 +33,7 @@ import {
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
-
+import type { CutoutId } from '@opentrons/shared-data'
 import type {
   DistributeArgs,
   CommandCreator,
@@ -168,12 +168,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
   )
   const { pipette } = args
 
-  const isWasteChute =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
-    'wasteChute'
-  const isTrashBin =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]?.name ===
-    'trashBin'
+  const dropTipEntity =
+    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+  const isWasteChute = dropTipEntity?.name === 'wasteChute'
+  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol
@@ -287,12 +285,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
                   pipetteId: pipette,
                   labwareId: args.destLabware,
                   wellName: destWell,
-                  wellLocation: {
-                    origin: 'top',
-                    offset: {
-                      z: args.touchTipAfterDispenseOffsetMmFromTop,
-                    },
-                  },
+                  zOffsetFromTop: args.touchTipAfterDispenseOffsetMmFromTop,
                 }),
               ]
             : []
@@ -398,7 +391,10 @@ export const distribute: CommandCreator<DistributeArgs> = (
       }
       if (isTrashBin) {
         dropTipCommand = [
-          curryCommandCreator(dropTipInTrash, { pipetteId: args.pipette }),
+          curryCommandCreator(dropTipInTrash, {
+            pipetteId: args.pipette,
+            trashLocation: dropTipEntity.location as CutoutId,
+          }),
         ]
       }
 
@@ -446,12 +442,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               pipetteId: args.pipette,
               labwareId: args.sourceLabware,
               wellName: args.sourceWell,
-              wellLocation: {
-                origin: 'top',
-                offset: {
-                  z: args.touchTipAfterAspirateOffsetMmFromTop,
-                },
-              },
+              zOffsetFromTop: args.touchTipAfterAspirateOffsetMmFromTop,
             }),
           ]
         : []

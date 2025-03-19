@@ -17,6 +17,8 @@ from . import (
     test_ui_leds,
     test_uv_lockout_switch,
     test_install_detection,
+    test_tof_basic,
+    test_tof_functional,
 )
 
 
@@ -31,9 +33,11 @@ class TestSection(enum.Enum):
     X_AXIS_BASIC = "X_AXIS_BASIC"
     UI_LEDS = "UI_LEDS"
     UV_LOCKOUT_SWITCH = "UV_LOCKOUT_SWITCH"
+    INSTALL_DETECTION = "INSTALL_DETECTION"
+    TOF_BASIC = "TOF_BASIC"
+    TOF_FUNCTIONAL = "TOF_FUNCTIONAL"
     Z_AXIS_CURRENT_SPEED = "Z_AXIS_CURRENT_SPEED"
     X_AXIS_CURRENT_SPEED = "X_AXIS_CURRENT_SPEED"
-    INSTALL_DETECTION = "INSTALL_DETECTION"
 
 
 @dataclass
@@ -78,16 +82,24 @@ TESTS = [
         test_uv_lockout_switch.run,
     ),
     (
+        TestSection.INSTALL_DETECTION,
+        test_install_detection.run,
+    ),
+    (
+        TestSection.TOF_BASIC,
+        test_tof_basic.run,
+    ),
+    (
+        TestSection.TOF_FUNCTIONAL,
+        test_tof_functional.run,
+    ),
+    (
         TestSection.Z_AXIS_CURRENT_SPEED,
         test_z_axis_current_speed.run,
     ),
     (
         TestSection.X_AXIS_CURRENT_SPEED,
         test_x_axis_current_speed.run,
-    ),
-    (
-        TestSection.INSTALL_DETECTION,
-        test_install_detection.run,
     ),
 ]
 
@@ -130,16 +142,24 @@ def build_report(test_name: str) -> CSVReport:
                 lines=test_uv_lockout_switch.build_csv_lines(),
             ),
             CSVSection(
+                title=TestSection.INSTALL_DETECTION.value,
+                lines=test_install_detection.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.TOF_BASIC.value,
+                lines=test_tof_basic.build_csv_lines(),
+            ),
+            CSVSection(
+                title=TestSection.TOF_FUNCTIONAL.value,
+                lines=test_tof_functional.build_csv_lines(),
+            ),
+            CSVSection(
                 title=TestSection.Z_AXIS_CURRENT_SPEED.value,
                 lines=test_z_axis_current_speed.build_csv_lines(),
             ),
             CSVSection(
                 title=TestSection.X_AXIS_CURRENT_SPEED.value,
                 lines=test_x_axis_current_speed.build_csv_lines(),
-            ),
-            CSVSection(
-                title=TestSection.INSTALL_DETECTION.value,
-                lines=test_install_detection.build_csv_lines(),
             ),
         ],
     )
