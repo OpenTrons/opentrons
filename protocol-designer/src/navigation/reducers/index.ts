@@ -12,7 +12,6 @@ const newProtocolModal: Reducer<boolean, any> = handleActions(
       state,
       action: ToggleNewProtocolModalAction
     ): boolean => action.payload,
-    CREATE_NEW_PROTOCOL: () => false,
   },
   false
 )

@@ -23,12 +23,9 @@ from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     LabwareDefinition,
-    LabwareDefinition2,
     LabwareRole,
     WellDefinition2,
     WellDefinition3,
-    CircularWellDefinition2,
-    RectangularWellDefinition2,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
@@ -684,19 +681,11 @@ class LabwareView:
     ) -> InnerWellGeometry:
         """Get a well's inner geometry by labware and well name."""
         labware_def = self.get_definition(labware_id)
-        if (
-            isinstance(labware_def, LabwareDefinition2)
-            or labware_def.innerLabwareGeometry is None
-        ):
+        if labware_def.innerLabwareGeometry is None:
             raise errors.IncompleteLabwareDefinitionError(
                 message=f"No innerLabwareGeometry found in labware definition for labware_id: {labware_id}."
             )
         well_def = self.get_well_definition(labware_id, well_name)
-        # Assert for type-checking. We expect the well definitions from schema *3*, specifically.
-        # This should always pass because we exclude LabwareDefinition2 above.
-        assert not isinstance(
-            well_def, (RectangularWellDefinition2, CircularWellDefinition2)
-        )
         geometry_id = well_def.geometryDefinitionId
         if geometry_id is None:
             raise errors.IncompleteWellDefinitionError(

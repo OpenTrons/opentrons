@@ -44,6 +44,7 @@ export * from './formatRunTimeParameterValue'
 export * from './formatRunTimeParameterMinMax'
 export * from './orderRuntimeParameterRangeOptions'
 export * from './sortRunTimeParameters'
+export * from './parseAddressableArea'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -218,10 +219,12 @@ export const getWellsDepth = (
   return offsets[0]
 }
 
+type XYPlaneDimension = 'x' | 'y'
+
 export const getWellDimension = (
   labwareDef: LabwareDefinition2,
   wells: string[],
-  position: 'x' | 'y'
+  position: XYPlaneDimension
 ): number => {
   const offsets = wells.map(well => {
     const labwareWell = labwareDef.wells[well]
@@ -233,6 +236,19 @@ export const getWellDimension = (
     }
   })
   return offsets[0]
+}
+
+export const getMinXYDimension = (
+  labwareDef: LabwareDefinition2,
+  wells: string[]
+): number | null => {
+  return (
+    Math.min(
+      ...['x', 'y'].map(dim =>
+        getWellDimension(labwareDef, wells, dim as XYPlaneDimension)
+      )
+    ) ?? null
+  )
 }
 
 export const getSlotHasMatingSurfaceUnitVector = (
