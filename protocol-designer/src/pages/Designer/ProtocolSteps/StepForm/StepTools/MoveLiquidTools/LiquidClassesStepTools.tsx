@@ -33,17 +33,17 @@ export const LiquidClassesStepTools = ({
 }: LiquidClassesStepToolsProps): JSX.Element => {
   const { t } = useTranslation(['liquids'])
   const liquids = useSelector(getLiquidEntities)
-  const sortedLiquidClassDefs = getSortedLiquidClassDefs()
-
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
+  const sortedLiquidClassDefs = getSortedLiquidClassDefs()
   const pipetteName = pipetteEntities[formData.pipette].name
   const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
+  const { volume, tipRack, pipette, path } = formData
   const disabledLiquidClasses = getDisableLiquidClasses(
     {
-      volume: formData.volume,
-      tipRack: formData.tipRack,
-      pipette: formData.pipette,
-      path: formData.path,
+      volume,
+      tipRack,
+      pipette,
+      path,
     },
     pipetteModel
   )

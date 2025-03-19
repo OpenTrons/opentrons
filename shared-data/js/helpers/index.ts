@@ -435,7 +435,7 @@ export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
 export const getIncompatibleLiquidClasses = (
   pipetteModel: string,
   additionalFilter?: (p: any) => boolean
-): string[] => {
+): LiquidClassesOption[] => {
   const liquidClassDefs = getAllLiquidClassDefs()
 
   return Object.values(liquidClassDefs)

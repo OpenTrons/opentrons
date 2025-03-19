@@ -9,33 +9,33 @@
   },
   "form": {
     "warning": {
-      "OVER_MAX_WELL_VOLUME": {
-        "title": "Dispense volume will overflow a destination well"
-      },
-      "BELOW_PIPETTE_MINIMUM_VOLUME": {
-        "title": "Transfer volume is below pipette minimum ({{min}} µL)",
-        "body": "Pipettes cannot accurately handle volumes below their minimum. "
-      },
       "BELOW_MIN_AIR_GAP_VOLUME": {
         "title": "Air gap volume is below pipette minimum ({{min}} µL)",
-        "body": "Pipettes cannot accurately handle volumes below their minimum. "
+        "body": "Pipettes cannot accurately handle volumes below their minimum."
       },
       "BELOW_MIN_DISPOSAL_VOLUME": {
         "title": "Disposal volume is below recommended minimum ({{min}} µL)",
         "body": "For accuracy in multi-dispense Transfers we recommend you use a disposal volume of at least the pipette's minimum. Read more ",
         "link": "here"
       },
-      "LOW_VOLUME_TRANSFER": {
-        "title": "Transfer volumes of 10 µL or less are incompatible with liquid classes."
-      },
-      "INCOMPATIBLE_PIPETTE_PATH": {
-        "title": "The pipette path is incompatible with some liquid classes."
+      "BELOW_PIPETTE_MINIMUM_VOLUME": {
+        "title": "Transfer volume is below pipette minimum ({{min}} µL)",
+        "body": "Pipettes cannot accurately handle volumes below their minimum."
       },
       "INCOMPATIBLE_ALL_PIPETTE_LABWARE": {
         "title": "The selected {{type}} is incompatible with liquid classes."
       },
+      "INCOMPATIBLE_PIPETTE_PATH": {
+        "title": "The pipette path is incompatible with some liquid classes."
+      },
       "INCOMPATIBLE_SOME_PIPETTE_LABWARE": {
         "title": "The selected {{type}} is incompatible with some liquid classes."
+      },
+      "LOW_VOLUME_TRANSFER": {
+        "title": "Transfer volumes of 10 µL or less are incompatible with liquid classes."
+      },
+      "OVER_MAX_WELL_VOLUME": {
+        "title": "Dispense volume will overflow a destination well."
       }
     }
   },
