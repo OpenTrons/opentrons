@@ -13,6 +13,7 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { StepMeter } from '/app/atoms/StepMeter'
 
@@ -22,6 +23,7 @@ interface WizardHeaderProps {
   totalSteps?: number | null
   currentStep?: number | null
   exitDisabled?: boolean
+  hideStepText?: boolean
 }
 
 const EXIT_BUTTON_STYLE = css`
@@ -59,14 +61,7 @@ const HEADER_CONTAINER_STYLE = css`
     border-radius: ${BORDERS.borderRadius16};
   }
 `
-const HEADER_TEXT_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold}
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize22};
-    font-weight: ${TYPOGRAPHY.fontWeightBold};
-    line-height: ${TYPOGRAPHY.lineHeight28};
-  }
-`
+
 const STEP_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   color: ${COLORS.grey60};
@@ -77,21 +72,31 @@ const STEP_TEXT_STYLE = css`
 `
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
-  const { totalSteps, currentStep, title, onExit, exitDisabled } = props
+  const {
+    totalSteps,
+    currentStep,
+    hideStepText,
+    title,
+    onExit,
+    exitDisabled,
+  } = props
   const { t } = useTranslation('shared')
 
   return (
     <Box css={BOX_STYLE}>
       <Flex css={HEADER_CONTAINER_STYLE}>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <LegacyStyledText
-            css={HEADER_TEXT_STYLE}
-            marginRight={SPACING.spacing8}
+          <StyledText
+            desktopStyle="bodyLargeSemiBold"
+            oddStyle="bodyTextSemiBold"
           >
             {title}
-          </LegacyStyledText>
+          </StyledText>
 
-          {currentStep != null && totalSteps != null && currentStep > 0 ? (
+          {!hideStepText &&
+          currentStep != null &&
+          totalSteps != null &&
+          currentStep > 0 ? (
             <LegacyStyledText css={STEP_TEXT_STYLE}>
               {t('step', { current: currentStep, max: totalSteps })}
             </LegacyStyledText>

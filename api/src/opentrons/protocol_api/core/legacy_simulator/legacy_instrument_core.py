@@ -102,7 +102,7 @@ class LegacyInstrumentCoreSimulator(
         rate: float,
         flow_rate: float,
         in_place: bool,
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         if self.get_current_volume() == 0:
@@ -145,7 +145,7 @@ class LegacyInstrumentCoreSimulator(
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):

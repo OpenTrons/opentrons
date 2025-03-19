@@ -1,4 +1,5 @@
 """ProtocolEngine-based Protocol API core implementation."""
+
 from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
@@ -224,7 +225,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
 
         load_result = self._engine_client.execute_command_without_recovery(
@@ -295,7 +296,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
         load_result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLabwareParams(
@@ -343,7 +344,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
         load_result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLidParams(
@@ -960,7 +961,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
 
         load_result = self._engine_client.execute_command_without_recovery(
@@ -1162,7 +1163,7 @@ class ProtocolCore(
             OffDeckType,
             WasteChute,
             TrashBin,
-        ]
+        ],
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)

@@ -11,7 +11,7 @@ import {
   getSavedStepForms,
 } from '../../../step-forms/selectors'
 import { getDismissedHints } from '../../../tutorial/selectors'
-import { MaterialsListModal } from '../../../organisms/MaterialsListModal'
+import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import { ProtocolOverview } from '../index'
 import { ProtocolMetadata } from '../ProtocolMetadata'
@@ -25,11 +25,11 @@ import type { NavigateFunction } from 'react-router-dom'
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../tutorial/selectors')
 vi.mock('../../../file-data/selectors')
-vi.mock('../../../organisms/MaterialsListModal')
+vi.mock('../../../components/organisms/MaterialsListModal')
 vi.mock('../../../labware-ingred/selectors')
 vi.mock('../../../load-file/actions')
 vi.mock('../../../feature-flags/selectors')
-vi.mock('../../../organisms')
+vi.mock('../../../components/organisms')
 vi.mock('../ProtocolMetadata')
 vi.mock('../LiquidDefinitions')
 vi.mock('../InstrumentsInfo')

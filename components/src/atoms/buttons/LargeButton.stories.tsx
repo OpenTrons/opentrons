@@ -1,6 +1,6 @@
 import { ICON_DATA_BY_NAME } from '../../icons'
 import { SPACING } from '../../ui-style-constants'
-import { Box } from '../../primitives'
+import { Box, STYLE_PROPS } from '../../primitives'
 import { COLORS } from '../../helix-design-system'
 import { LargeButton } from './LargeButton'
 
@@ -10,6 +10,13 @@ const meta: Meta<typeof LargeButton> = {
   title: 'Helix/Atoms/Buttons/LargeButton',
   component: LargeButton,
   argTypes: {
+    // Disable all StyleProps
+    ...Object.fromEntries(
+      [...STYLE_PROPS, 'as', 'ref', 'theme', 'forwardedAs'].map(prop => [
+        prop,
+        { table: { disable: true } },
+      ])
+    ),
     onClick: { action: 'clicked' },
     iconName: {
       control: {

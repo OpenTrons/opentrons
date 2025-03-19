@@ -190,13 +190,16 @@ export const getSlotIdsBlockedBySpanningForThermocycler = (
   return []
 }
 
-//  TODO(jr, 3/13/24): refactor this util it is messy and confusing
+//  TODO(ja, 3/7/25): this util is very outdated, much of it is probably
+//  not even in use. we should refactor this!!!
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
   /* we don't always want to count the slot as full if there is a staging area present
      since labware/wasteChute can still go on top of staging areas  **/
-  includeStagingAreas?: boolean
+  includeStagingAreas?: boolean,
+  /* optional disallowing for additionalEquipmentAreas or not **/
+  discountAdditionalEquipmentAreas?: boolean
 ): boolean => {
   //   special-casing the TC's slot A1 for the Flex
   if (
@@ -236,6 +239,9 @@ export const getSlotIsEmpty = (
       return additionalEquipment.location?.includes(slot) && includeStaging
     }
   })
+  const additionalEquipment = discountAdditionalEquipmentAreas
+    ? []
+    : filteredAdditionalEquipmentOnDeck
   return (
     [
       ...values(initialDeckSetup.modules).filter(
@@ -249,7 +255,7 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
-      ...filteredAdditionalEquipmentOnDeck,
+      ...additionalEquipment,
     ].length === 0
   )
 }

@@ -34,6 +34,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         self._limit_switch_status = LimitSwitchStatus(False, False, False, False, False)
         self._platform_sensor_status = PlatformStatus(False, False)
         self._door_closed = True
+        self._install_detected = True
         self._connected = True
         self._stallgard_threshold = {
             a: StallGuardParams(a, False, 0) for a in StackerAxis
@@ -43,6 +44,10 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         }
         self._tof_registers: Dict[TOFSensor, Dict[int, int]] = {
             a: {} for a in TOFSensor
+        }
+        self._tof_sensor_status: Dict[TOFSensor, TOFSensorStatus] = {
+            s: TOFSensorStatus(s, TOFSensorState.IDLE, TOFSensorMode.MEASURE, True)
+            for s in TOFSensor
         }
 
     def set_limit_switch(self, status: LimitSwitchStatus) -> bool:
@@ -83,6 +88,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         self._sn = sn
         return True
 
+    @ensure_yield
     async def enable_motors(self, axis: List[StackerAxis]) -> bool:
         """Enables the axis motor if present, disables it otherwise."""
         return True
@@ -92,15 +98,18 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         """Stop all motor movement."""
         return True
 
+    @ensure_yield
     async def set_run_current(self, axis: StackerAxis, current: float) -> bool:
         """Set axis peak run current in amps."""
 
         return True
 
+    @ensure_yield
     async def set_ihold_current(self, axis: StackerAxis, current: float) -> bool:
         """Set axis hold current in amps."""
         return True
 
+    @ensure_yield
     async def set_stallguard_threshold(
         self, axis: StackerAxis, enable: bool, threshold: int
     ) -> bool:
@@ -108,10 +117,15 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         self._stallgard_threshold[axis] = StallGuardParams(axis, enable, threshold)
         return True
 
+    @ensure_yield
     async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> bool:
         """Enable or disable the TOF sensor."""
+        state = TOFSensorState.IDLE if enable else TOFSensorState.DISABLED
+        self._tof_sensor_status[sensor].state = state
+        self._tof_sensor_status[sensor].ok = enable
         return True
 
+    @ensure_yield
     async def manage_tof_measurement(
         self,
         sensor: TOFSensor,
@@ -129,6 +143,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
             total_bytes=3840 if start else 0,
         )
 
+    @ensure_yield
     async def get_tof_histogram(self, sensor: TOFSensor) -> TOFMeasurementResult:
         """Get the full histogram measurement from the TOF sensor."""
         return TOFMeasurementResult(
@@ -137,6 +152,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
             bins={c: [b for b in range(NUMBER_OF_BINS)] for c in range(10)},
         )
 
+    @ensure_yield
     async def set_motor_driver_register(
         self, axis: StackerAxis, reg: int, value: int
     ) -> bool:
@@ -144,10 +160,12 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         self._motor_registers[axis].update({reg: value})
         return True
 
+    @ensure_yield
     async def get_motor_driver_register(self, axis: StackerAxis, reg: int) -> int:
         """Gets the register value of the given motor axis driver."""
         return self._motor_registers[axis].get(reg, 0)
 
+    @ensure_yield
     async def set_tof_driver_register(
         self, sensor: TOFSensor, reg: int, value: int
     ) -> bool:
@@ -155,23 +173,22 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         self._tof_registers[sensor].update({reg: value})
         return True
 
+    @ensure_yield
     async def get_tof_driver_register(self, sensor: TOFSensor, reg: int) -> int:
         """Gets the register value of the given tof sensor driver."""
         return self._tof_registers[sensor].get(reg, 0)
 
+    @ensure_yield
     async def get_tof_sensor_status(self, sensor: TOFSensor) -> TOFSensorStatus:
         """Get the status of the tof sensor."""
-        return TOFSensorStatus(
-            sensor=sensor,
-            mode=TOFSensorMode.MEASURE,
-            state=TOFSensorState.IDLE,
-            ok=True,
-        )
+        return self._tof_sensor_status[sensor]
 
+    @ensure_yield
     async def get_motion_params(self, axis: StackerAxis) -> MoveParams:
         """Get the motion parameters used by the given axis motor."""
-        return MoveParams(axis, 1, 1, 1)
+        return MoveParams(1, 1, 1)
 
+    @ensure_yield
     async def get_stallguard_threshold(self, axis: StackerAxis) -> StallGuardParams:
         """Get the stallguard parameters by the given axis motor."""
         return self._stallgard_threshold[axis]
@@ -189,6 +206,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         """Get limit switch statuses for all axes."""
         return self._limit_switch_status
 
+    @ensure_yield
     async def get_platform_sensor(self, direction: Direction) -> bool:
         """Get platform sensor status.
 
@@ -196,6 +214,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         """
         return self._platform_sensor_status.get(direction)
 
+    @ensure_yield
     async def get_platform_status(self) -> PlatformStatus:
         """Get platform status."""
         return self._platform_sensor_status
@@ -207,6 +226,14 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         :return: True if door is closed, False otherwise
         """
         return self._door_closed
+
+    @ensure_yield
+    async def get_installation_detected(self) -> bool:
+        """Get whether or not installation is detected.
+
+        :return: True if installation is detected, False otherwise
+        """
+        return self._install_detected
 
     @ensure_yield
     async def move_in_mm(
@@ -222,10 +249,12 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         """Move until limit switch is triggered."""
         return MoveResult.NO_ERROR
 
+    @ensure_yield
     async def home_axis(self, axis: StackerAxis, direction: Direction) -> MoveResult:
         """Home axis."""
         return MoveResult.NO_ERROR
 
+    @ensure_yield
     async def set_led(
         self,
         power: float,
@@ -238,6 +267,7 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         """Set LED Status bar color and pattern."""
         return True
 
+    @ensure_yield
     async def enter_programming_mode(self) -> None:
         """Reboot into programming mode"""
         pass

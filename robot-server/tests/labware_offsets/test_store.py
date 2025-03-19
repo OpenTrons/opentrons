@@ -1,6 +1,7 @@
 # noqa: D100
 
 from datetime import datetime, timezone
+from typing import Sequence
 
 import pytest
 import sqlalchemy
@@ -11,7 +12,9 @@ from opentrons.protocol_engine import (
     OnModuleOffsetLocationSequenceComponent,
     OnAddressableAreaOffsetLocationSequenceComponent,
 )
-from opentrons.protocol_engine.types import ModuleModel
+from opentrons.protocol_engine.types import (
+    ModuleModel,
+)
 from robot_server.persistence.tables import (
     labware_offset_location_sequence_components_table,
 )
@@ -21,9 +24,12 @@ from robot_server.labware_offsets.store import (
     IncomingStoredLabwareOffset,
 )
 from robot_server.labware_offsets.models import (
+    ANY_LOCATION,
+    SearchFilter,
     StoredLabwareOffset,
     DoNotFilterType,
     DO_NOT_FILTER,
+    StoredLabwareOffsetLocationSequenceComponents,
     UnknownLabwareOffsetLocationSequenceComponent,
 )
 
@@ -34,17 +40,73 @@ def subject(sql_engine: sqlalchemy.engine.Engine) -> LabwareOffsetStore:
     return LabwareOffsetStore(sql_engine)
 
 
-def _get_all(store: LabwareOffsetStore) -> list[StoredLabwareOffset]:
-    return store.search()
+def test_empty_search(subject: LabwareOffsetStore) -> None:
+    """Searching with no filters should return no results."""
+    subject.add(
+        IncomingStoredLabwareOffset(
+            id="id",
+            createdAt=datetime.now(timezone.utc),
+            definitionUri="namespace/load_name/1",
+            locationSequence="anyLocation",
+            vector=LabwareOffsetVector(x=1, y=2, z=3),
+        )
+    )
+    assert subject.search([]) == []
+
+
+def test_search_most_recent_only(subject: LabwareOffsetStore) -> None:
+    """mostRecentOnly=True should restrict that specific filter to the most recent."""
+    uri_1 = "namespace/load_name_1/1"
+    uri_2 = "namespace/load_name_2/1"
+    ids_and_definition_uris = [
+        ("id-1", uri_1),
+        ("id-2", uri_1),
+        ("id-3", uri_2),
+        ("id-4", uri_2),
+    ]
+    for id, definition_uri in ids_and_definition_uris:
+        subject.add(
+            IncomingStoredLabwareOffset(
+                id=id,
+                definitionUri=definition_uri,
+                createdAt=datetime.now(timezone.utc),
+                locationSequence="anyLocation",
+                vector=LabwareOffsetVector(x=1, y=2, z=3),
+            )
+        )
+
+    results = subject.search([SearchFilter(mostRecentOnly=True)])
+    assert [result.id for result in results] == ["id-4"]
+
+    results = subject.search(
+        [
+            SearchFilter(definitionUri=uri_1, mostRecentOnly=True),
+        ]
+    )
+    assert [result.id for result in results] == ["id-2"]
+
+    results = subject.search(
+        [
+            SearchFilter(definitionUri=uri_1, mostRecentOnly=True),
+            SearchFilter(definitionUri=uri_2, mostRecentOnly=True),
+        ]
+    )
+    assert [result.id for result in results] == ["id-2", "id-4"]
+
+    results = subject.search(
+        [
+            SearchFilter(definitionUri=uri_1, mostRecentOnly=False),
+            SearchFilter(definitionUri=uri_1, mostRecentOnly=True),
+        ]
+    )
+    assert [result.id for result in results] == ["id-1", "id-2"]
 
 
 @pytest.mark.parametrize(
     argnames=[
         "id_filter",
         "definition_uri_filter",
-        "location_addressable_area_filter",
-        "location_module_model_filter",
-        "location_labware_uri_filter",
+        "location_sequence_filter",
         "returned_ids",
     ],
     argvalues=[
@@ -52,25 +114,30 @@ def _get_all(store: LabwareOffsetStore) -> list[StoredLabwareOffset]:
             "a",
             DO_NOT_FILTER,
             DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
             ["a"],
-            id="id-only",
+            id="id-filter-only",
         ),
         pytest.param(
             DO_NOT_FILTER,
             "definitionUri a",
             DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
             ["a", "c", "d", "e"],
-            id="labware-only",
+            id="labware-filter-only",
+        ),
+        pytest.param(
+            DO_NOT_FILTER,
+            DO_NOT_FILTER,
+            [
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    addressableAreaName="A1"
+                )
+            ],
+            ["c"],
+            id="location-filter-only",
         ),
         pytest.param(
             "a",
             "definitionUri a",
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
             DO_NOT_FILTER,
             ["a"],
             id="labware-and-id-matching",
@@ -79,82 +146,22 @@ def _get_all(store: LabwareOffsetStore) -> list[StoredLabwareOffset]:
             "a",
             "definitionUri b",
             DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
             [],
             id="labware-and-id-conflicting",
         ),
         pytest.param(
             DO_NOT_FILTER,
             DO_NOT_FILTER,
-            "A1",
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            ["a", "c", "d", "e"],
-            id="aa-only",
-        ),
-        pytest.param(
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            "A1",
-            None,
-            None,
-            ["c"],
+            [
+                OnAddressableAreaOffsetLocationSequenceComponent(
+                    kind="onAddressableArea",
+                    addressableAreaName="A1",
+                )
+            ],
+            [
+                "c",
+            ],
             id="aa-and-not-mod-or-lw",
-        ),
-        pytest.param(
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            "A1",
-            None,
-            DO_NOT_FILTER,
-            ["c", "d"],
-            id="aa-and-not-module",
-        ),
-        pytest.param(
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            "A1",
-            DO_NOT_FILTER,
-            None,
-            ["c", "e"],
-            id="aa-and-not-lw",
-        ),
-        pytest.param(
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            ModuleModel.MAGNETIC_BLOCK_V1,
-            DO_NOT_FILTER,
-            ["b", "e"],
-            id="module-only",
-        ),
-        pytest.param(
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            ModuleModel.MAGNETIC_BLOCK_V1,
-            None,
-            ["e"],
-            id="module-and-not-lw",
-        ),
-        pytest.param(
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            "location.definitionUri a",
-            ["a", "d"],
-            id="lw-only",
-        ),
-        pytest.param(
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            DO_NOT_FILTER,
-            None,
-            "location.definitionUri a",
-            ["d"],
-            id="lw-and-not-module",
         ),
     ],
 )
@@ -162,9 +169,8 @@ def test_filter_fields(
     subject: LabwareOffsetStore,
     id_filter: str | DoNotFilterType,
     definition_uri_filter: str | DoNotFilterType,
-    location_addressable_area_filter: str | DoNotFilterType,
-    location_module_model_filter: ModuleModel | None | DoNotFilterType,
-    location_labware_uri_filter: str | None | DoNotFilterType,
+    location_sequence_filter: Sequence[StoredLabwareOffsetLocationSequenceComponents]
+    | DoNotFilterType,
     returned_ids: list[str],
 ) -> None:
     """Test each filterable field to make sure it returns only matching entries."""
@@ -246,11 +252,13 @@ def test_filter_fields(
     for offset in offsets.values():
         subject.add(offset)
     results = subject.search(
-        id_filter=id_filter,
-        definition_uri_filter=definition_uri_filter,
-        location_addressable_area_filter=location_addressable_area_filter,
-        location_module_model_filter=location_module_model_filter,
-        location_definition_uri_filter=location_labware_uri_filter,
+        [
+            SearchFilter(
+                id=id_filter,
+                definitionUri=definition_uri_filter,
+                locationSequence=location_sequence_filter,
+            )
+        ]
     )
     assert sorted(results, key=lambda o: o.id,) == sorted(
         [
@@ -267,8 +275,8 @@ def test_filter_fields(
     )
 
 
-def test_filter_combinations(subject: LabwareOffsetStore) -> None:
-    """Test that multiple filters are combined correctly."""
+def test_filter_field_combinations(subject: LabwareOffsetStore) -> None:
+    """Test that multiple fields within a single filter are combined correctly."""
     ids_and_definition_uris = [
         ("id-1", "definition-uri-a"),
         ("id-2", "definition-uri-b"),
@@ -305,29 +313,75 @@ def test_filter_combinations(subject: LabwareOffsetStore) -> None:
     for labware_offset in labware_offsets:
         subject.add(labware_offset)
 
-    # No filters:
-    assert subject.search() == outgoing_offsets
+    # Filter accepting any value for each field (i.e. a return-everything filter):
+    result = subject.search([SearchFilter()])
+    assert result == outgoing_offsets
 
-    # Filter on one thing:
-    result = subject.search(definition_uri_filter="definition-uri-b")
+    # Filter on one field:
+    result = subject.search([SearchFilter(definitionUri="definition-uri-b")])
     assert len(result) == 3
     assert result == [
         entry for entry in outgoing_offsets if entry.definitionUri == "definition-uri-b"
     ]
 
-    # Filter on two things:
+    # Filter on two fields:
     result = subject.search(
-        id_filter="id-2",
-        definition_uri_filter="definition-uri-b",
+        [
+            SearchFilter(
+                id="id-2",
+                definitionUri="definition-uri-b",
+            )
+        ]
     )
     assert result == [outgoing_offsets[1]]
 
-    # Filters should be ANDed, not ORed, together:
+    # Filter fields should be ANDed, not ORed, together:
     result = subject.search(
-        id_filter="id-1",
-        definition_uri_filter="definition-uri-b",
+        [
+            SearchFilter(
+                id="id-1",
+                definitionUri="definition-uri-b",
+            )
+        ]
     )
     assert result == []
+
+
+def test_filter_combinations(subject: LabwareOffsetStore) -> None:
+    """Test that multiple filters are combined correctly."""
+    ids_and_definition_uris = [
+        ("id-1", "definition-uri-a"),
+        ("id-2", "definition-uri-b"),
+    ]
+    for id, definition_uri in ids_and_definition_uris:
+        subject.add(
+            IncomingStoredLabwareOffset(
+                id=id,
+                createdAt=datetime.now(timezone.utc),
+                definitionUri=definition_uri,
+                locationSequence=ANY_LOCATION,
+                vector=LabwareOffsetVector(x=1, y=2, z=3),
+            )
+        )
+
+    # Multiple filters should be OR'd together.
+    result = subject.search(
+        [
+            SearchFilter(definitionUri="definition-uri-a"),
+            SearchFilter(definitionUri="definition-uri-b"),
+        ]
+    )
+    assert [e.id for e in result] == ["id-1", "id-2"]
+
+    # It should be a true union, not just a concatenation--
+    # there should be no repeated offsets in the results.
+    result = subject.search(
+        [
+            SearchFilter(id="id-1"),
+            SearchFilter(definitionUri="definition-uri-a"),
+        ]
+    )
+    assert [e.id for e in result] == ["id-1"]
 
 
 def test_delete(subject: LabwareOffsetStore) -> None:
@@ -367,12 +421,17 @@ def test_delete(subject: LabwareOffsetStore) -> None:
     subject.add(c)
 
     assert subject.delete(b.id) == out_b
-    assert _get_all(subject) == [out_a, out_c]
+    assert subject.get_all() == [out_a, out_c]
+    assert subject.search([SearchFilter()]) == [
+        out_a,
+        out_c,
+    ]  # A return-everything search filter.
     with pytest.raises(LabwareOffsetNotFoundError):
         subject.delete(out_b.id)
 
     subject.delete_all()
-    assert _get_all(subject) == []
+    assert subject.get_all() == []
+    assert subject.search([SearchFilter()]) == []  # A return-everything search filter.
 
 
 def test_handle_unknown(
@@ -413,4 +472,4 @@ def test_handle_unknown(
                 component_value_json='{"asdasda": "dddddd", "kind": "asdasdad"}',
             )
         )
-    assert subject.search(id_filter="id-a") == [outgoing_offset]
+    assert subject.search([SearchFilter(id="id-a")]) == [outgoing_offset]

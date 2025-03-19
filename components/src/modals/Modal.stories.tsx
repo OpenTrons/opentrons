@@ -1,6 +1,6 @@
 import { PrimaryButton, StyledText } from '../atoms'
 import { SPACING } from '../ui-style-constants'
-import { Flex } from '../primitives'
+import { Flex, STYLE_PROPS } from '../primitives'
 import { JUSTIFY_END } from '../styles'
 import { Modal as ModalComponent } from './Modal'
 
@@ -9,6 +9,15 @@ import type { Meta, StoryObj } from '@storybook/react'
 const meta: Meta<typeof ModalComponent> = {
   title: 'Helix/Molecules/Modal',
   component: ModalComponent,
+  argTypes: {
+    // Disable all StyleProps
+    ...Object.fromEntries(
+      [...STYLE_PROPS, 'as', 'ref', 'theme', 'forwardedAs'].map(prop => [
+        prop,
+        { table: { disable: true } },
+      ])
+    ),
+  },
 }
 export default meta
 type Story = StoryObj<typeof ModalComponent>

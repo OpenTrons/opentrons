@@ -20,6 +20,7 @@ import type {
   AddressableAreaName,
   CutoutId,
   SupportedTip,
+  LabwareDefinition2,
   ModuleType,
   LabwareDisplayCategory,
 } from '@opentrons/shared-data'
@@ -130,10 +131,11 @@ export const getIsAdapter = (
   labwareEntities: LabwareEntities
 ): boolean => {
   if (labwareEntities[labwareId] == null) return false
-  return (
-    labwareEntities[labwareId].def.allowedRoles?.includes('adapter') ?? false
-  )
+  return getIsAdapterFromDef(labwareEntities[labwareId].def)
 }
+
+export const getIsAdapterFromDef = (labwareDef: LabwareDefinition2): boolean =>
+  labwareDef.allowedRoles?.includes('adapter') ?? false
 
 export const getStagingAreaSlots = (
   stagingAreas?: AdditionalEquipmentEntity[]

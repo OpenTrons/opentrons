@@ -16,7 +16,7 @@ import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getStepGroups } from '../../step-forms/selectors'
 import { getFileMetadata, getRobotType } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -42,7 +42,7 @@ import type {
 } from '@opentrons/step-generation'
 import type {
   CommandAnnotationV1Mixin,
-  CommandV8Mixin,
+  CommandV10Mixin,
   CreateCommand,
   LabwareV2Mixin,
   LiquidV1Mixin,
@@ -120,7 +120,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     stepGroups,
     invariantContext
   ) => {
-    const { author, description, created } = fileMetadata
+    const { author, description, created, source } = fileMetadata
     const {
       pipetteEntities,
       labwareEntities,
@@ -243,8 +243,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       liquids,
     }
 
-    const commandv8Mixin: CommandV8Mixin = {
-      commandSchemaId: 'opentronsCommandSchemaV8',
+    const commandv10Mixin: CommandV10Mixin = {
+      commandSchemaId: 'opentronsCommandSchemaV10',
       commands,
     }
 
@@ -286,6 +286,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         description,
         created,
         lastModified,
+        source,
         // TODO LATER
         category: null,
         subcategory: null,
@@ -299,7 +300,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ...deckStructure,
       ...labwareV2Mixin,
       ...liquidV1Mixin,
-      ...commandv8Mixin,
+      ...commandv10Mixin,
       ...commandAnnotionaV1Mixin,
     }
   }

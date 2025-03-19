@@ -47,6 +47,7 @@ describe('pythonMetadata', () => {
         category: 'PCR',
         subcategory: 'PCR Prep',
         tags: ['wombat', 'kangaroo', 'wallaby'],
+        source: 'Protocol Designer',
       })
     ).toBe(
       `
@@ -60,6 +61,7 @@ metadata = {
     "subcategory": "PCR Prep",
     "tags": "wombat, kangaroo, wallaby",
     "protocolDesigner": "fake_PD_version",
+    "source": "Protocol Designer",
 }`.trimStart()
     )
   })

@@ -12,11 +12,14 @@ import {
   JUSTIFY_END,
   JUSTIFY_FLEX_START,
   RESPONSIVENESS,
+  SecondaryButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
-import { QuaternaryButton, SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/atoms/buttons'
+
+import type { SmallButtonTypes } from '/app/atoms/buttons/SmallButton'
 
 const MAX_SUPPORTED_LABELS = 3
 
@@ -24,6 +27,7 @@ export interface MultiDeckLabelTagBtn {
   buttonText: string
   onClick: () => void
   disabled?: boolean
+  buttonType?: SmallButtonTypes
 }
 
 export interface MultiDeckLabelTagBtnsProps {
@@ -72,11 +76,11 @@ export function MultiDeckLabelTagBtns({
         )}
         <>
           <SmallButton {...colThreePrimaryBtn} css={ODD_ONLY_BUTTON} />
-          <QuaternaryButton {...colThreePrimaryBtn} css={DESKTOP_ONLY_BUTTON}>
+          <SecondaryButton {...colThreePrimaryBtn} css={DESKTOP_ONLY_BUTTON}>
             <StyledText desktopStyle="captionSemiBold">
               {colThreePrimaryBtn.buttonText}
             </StyledText>
-          </QuaternaryButton>
+          </SecondaryButton>
         </>
       </Flex>
     </Flex>
@@ -91,6 +95,10 @@ const CONTAINER_STYLE = css`
   grid-template-columns: 160px 1fr ${FLEX_MAX_CONTENT};
   gap: ${SPACING.spacing24};
   align-items: ${ALIGN_CENTER};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-radius: ${BORDERS.borderRadius8};
+  }
 
   /* Collapse the Tag vertically beneath the DeckInfo labels */
   @media (max-width: 423px) {

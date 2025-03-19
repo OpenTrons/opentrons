@@ -26,13 +26,12 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getRobotType } from '../../file-data/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
-import type { CutoutId, DeckSlotId } from '@opentrons/shared-data'
+import type { CutoutId, DeckSlotId, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 const RIGHT_COLUMN_FIXTURE_PADDING = 50 // mm
@@ -54,12 +53,12 @@ const darkFill = COLORS.grey60
 interface DeckThumbnailProps {
   hoverSlot: DeckSlotId | null
   setHoverSlot: Dispatch<SetStateAction<string | null>>
+  robotType: RobotType
 }
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
-  const { hoverSlot, setHoverSlot } = props
+  const { hoverSlot, setHoverSlot, robotType } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const robotType = useSelector(getRobotType)
-  const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [])
+  const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const trash = Object.values(initialDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )

@@ -8,7 +8,10 @@ import {
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
+import {
+  getEnablePartialTipSupport,
+  getEnableReturnTip,
+} from '../../../../../../feature-flags/selectors'
 
 import {
   ChangeTipField,
@@ -42,6 +45,7 @@ export function FirstStepMoveLiquidTools({
   const { t } = useTranslation('protocol_steps')
   const labwares = useSelector(getLabwareEntities)
   const pipettes = useSelector(getPipetteEntities)
+  const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -50,6 +54,9 @@ export function FirstStepMoveLiquidTools({
   const { pipette, tipRack } = propsForFields
   const is96Channel =
     pipette.value != null && pipettes[String(pipette.value)].name === 'p1000_96'
+  const is8Channel =
+    propsForFields.pipette.value != null &&
+    pipettes[String(propsForFields.pipette.value)].spec.channels === 8
   const userSelectedDropTipLocation =
     labwares[String(propsForFields.dropTip_location.value)] != null
   const userSelectedPickUpTipLocation =
@@ -68,10 +75,14 @@ export function FirstStepMoveLiquidTools({
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
-      {is96Channel ? (
+      {propsForFields.pipette.value != null &&
+      (is96Channel || (is8Channel && enablePartialTip)) ? (
         <>
           <Divider marginY="0" />
-          <PartialTipField {...propsForFields.nozzles} />
+          <PartialTipField
+            {...propsForFields.nozzles}
+            pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+          />
         </>
       ) : null}
       <Divider marginY="0" />

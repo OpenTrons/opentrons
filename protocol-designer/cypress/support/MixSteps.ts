@@ -33,7 +33,7 @@ enum MixContent {
   WasteChute = 'Waste chute',
   AspFlowRate = 'Aspirate flow rate',
   AspWellOrder = 'Aspirate well order',
-  MixTipPosition = 'Mix tip position',
+  MixTipPosition = 'Mix position',
   AdvancedPipSettings = 'Advanced pipetting settings',
   Delay = 'Delay',
   DelayDuration = 'Delay duration',
@@ -106,8 +106,8 @@ enum MixLocators {
   PosFromBottom = '[id="TipPositionField_mix_touchTip_mmFromBottom"]',
   RenameBtn = 'button:contains("Rename")',
   StepNameInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]',
-  StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-ug50vm-0 fSXuLe"]',
-  // StepNotesInput = '[data-testid="TextAreaField_step_notes"]',
+  // StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-1mhuse7-0 hpcyEZ"]',
+  StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
 }
 

@@ -16,6 +16,7 @@ export {
   distribute,
   dropTip,
   dropTipInPlace,
+  dropTipInTrash,
   engageMagnet,
   heaterShaker,
   mix,

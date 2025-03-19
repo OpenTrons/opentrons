@@ -15,7 +15,7 @@ import {
   Kitchen,
   LabwareUploadModal,
   Navigation,
-} from './organisms'
+} from './components/organisms'
 import { ProtocolDesignerAppFallback } from './resources/ProtocolDesignerAppFallback'
 
 import type { RouteProps } from './types'

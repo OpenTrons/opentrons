@@ -3,6 +3,8 @@ export {
   absorbanceReaderCloseRead,
   consolidate,
   distribute,
+  dropTipInTrash,
+  dropTipInWasteChute,
   heaterShaker,
   mix,
   replaceTip,

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from dataclasses import dataclass
-from typing import Iterator, Sequence
+from typing import Iterator, Sequence, TypedDict
 from typing_extensions import assert_never
 
 from opentrons.protocol_engine.types import (
@@ -18,22 +18,19 @@ from robot_server.persistence.tables import (
     labware_offset_location_sequence_components_table,
 )
 from .models import (
-    StoredLabwareOffset,
-    DoNotFilterType,
-    DO_NOT_FILTER,
-    StoredLabwareOffsetLocationSequenceComponents,
+    ANY_LOCATION,
+    AnyLocation,
     ReturnedLabwareOffsetLocationSequenceComponents,
+    SearchFilter,
+    StoredLabwareOffset,
+    StoredLabwareOffsetLocationSequenceComponents,
     UnknownLabwareOffsetLocationSequenceComponent,
 )
 
 import sqlalchemy
 import sqlalchemy.exc
 
-from ._search_query_builder import SearchQueryBuilder
-
-ReturnedLabwareOffsetLocationSequence = Sequence[
-    ReturnedLabwareOffsetLocationSequenceComponents
-]
+from ._search_query_builder import build_query
 
 
 @dataclass
@@ -43,7 +40,9 @@ class IncomingStoredLabwareOffset:
     id: str
     createdAt: datetime
     definitionUri: str
-    locationSequence: Sequence[StoredLabwareOffsetLocationSequenceComponents]
+    locationSequence: Sequence[
+        StoredLabwareOffsetLocationSequenceComponents
+    ] | AnyLocation
     vector: LabwareOffsetVector
 
 
@@ -70,46 +69,36 @@ class LabwareOffsetStore:
                     _pydantic_to_sql_offset(offset)
                 )
             ).inserted_primary_key.row_id
-            transaction.execute(
-                sqlalchemy.insert(
-                    labware_offset_location_sequence_components_table
-                ).values(
-                    list(
-                        _pydantic_to_sql_location_sequence_iterator(
-                            offset, offset_row_id
-                        )
-                    )
-                )
+            location_components_to_insert = list(
+                _pydantic_to_sql_location_sequence_iterator(offset, offset_row_id)
             )
+            if location_components_to_insert:
+                transaction.execute(
+                    sqlalchemy.insert(
+                        labware_offset_location_sequence_components_table
+                    ),
+                    location_components_to_insert,
+                )
 
-    def search(
-        self,
-        id_filter: str | DoNotFilterType = DO_NOT_FILTER,
-        definition_uri_filter: str | DoNotFilterType = DO_NOT_FILTER,
-        location_addressable_area_filter: str | DoNotFilterType = DO_NOT_FILTER,
-        location_module_model_filter: (
-            ModuleModel | None | DoNotFilterType
-        ) = DO_NOT_FILTER,
-        location_definition_uri_filter: str | None | DoNotFilterType = DO_NOT_FILTER,
-        # todo(mm, 2024-12-06): Support pagination (cursor & pageLength query params).
-        # The logic for that is currently duplicated across several places in
-        # robot-server and api. We should try to clean that up, or at least avoid
-        # making it worse.
-    ) -> list[StoredLabwareOffset]:
-        """Return all matching labware offsets in order from oldest-added to newest."""
-        builder = (
-            SearchQueryBuilder()
-            .do_active_filter(True)
-            .do_id_filter(id_filter)
-            .do_definition_uri_filter(definition_uri_filter)
-            .do_on_addressable_area_filter(location_addressable_area_filter)
-            .do_on_module_filter(location_module_model_filter)
-            .do_on_labware_filter(location_definition_uri_filter)
-        )
-        query = builder.build_query()
+    def get_all(self) -> list[StoredLabwareOffset]:
+        """Return all offsets from oldest to newest.
+
+        Inactive (deleted) offsets are excluded.
+        """
+        return_everything_filter = SearchFilter()
+        return self.search([return_everything_filter])
+
+    def search(self, filters: Sequence[SearchFilter]) -> list[StoredLabwareOffset]:
+        """Return all matching labware offsets in order from oldest-added to newest.
+
+        If the list of filters is empty, no offsets are returned.
+
+        Inactive (deleted) offsets are always excluded.
+        """
+        sql_query = build_query(filters)
 
         with self._sql_engine.begin() as transaction:
-            result = transaction.execute(query).all()
+            result = transaction.execute(sql_query).all()
 
         if len(result) == 0:
             return []
@@ -117,11 +106,10 @@ class LabwareOffsetStore:
 
     def delete(self, offset_id: str) -> StoredLabwareOffset:
         """Delete a labware offset by its ID. Return what was just deleted."""
-        builder = SearchQueryBuilder().do_id_filter(offset_id)
-        query = builder.build_query()
+        select_rows_to_delete = build_query([SearchFilter(id=offset_id)])
         with self._sql_engine.begin() as transaction:
             try:
-                offset_rows = transaction.execute(query).all()
+                offset_rows = transaction.execute(select_rows_to_delete).all()
             except sqlalchemy.exc.NoResultFound:
                 raise LabwareOffsetNotFoundError(bad_offset_id=offset_id) from None
             if len(offset_rows) == 0:
@@ -176,25 +164,74 @@ def _sql_sequence_component_to_pydantic_sequence_component(
         )
 
 
+class _LocationComponentAsSQLRow(TypedDict):
+    offset_id: int
+    sequence_ordinal: int
+    component_kind: str
+    primary_component_value: str
+    component_value_json: str
+
+
+def _pydantic_sequence_component_to_sql_sequence_component(
+    component: StoredLabwareOffsetLocationSequenceComponents,
+    offset_row_id: int,
+    sequence_ordinal: int,
+) -> _LocationComponentAsSQLRow:
+    if isinstance(component, OnLabwareOffsetLocationSequenceComponent):
+        return {
+            "offset_id": offset_row_id,
+            "sequence_ordinal": sequence_ordinal,
+            "component_kind": component.kind,
+            "primary_component_value": component.labwareUri,
+            "component_value_json": component.model_dump_json(),
+        }
+    elif isinstance(component, OnModuleOffsetLocationSequenceComponent):
+        return {
+            "offset_id": offset_row_id,
+            "sequence_ordinal": sequence_ordinal,
+            "component_kind": component.kind,
+            "primary_component_value": component.moduleModel.value,
+            "component_value_json": component.model_dump_json(),
+        }
+    elif isinstance(component, OnAddressableAreaOffsetLocationSequenceComponent):
+        return {
+            "offset_id": offset_row_id,
+            "sequence_ordinal": sequence_ordinal,
+            "component_kind": component.kind,
+            "primary_component_value": component.addressableAreaName,
+            "component_value_json": component.model_dump_json(),
+        }
+    else:
+        assert_never(component)
+
+
 def _collate_sql_locations(
     first_row: sqlalchemy.engine.Row, rest_rows: Iterator[sqlalchemy.engine.Row]
 ) -> tuple[
-    list[ReturnedLabwareOffsetLocationSequenceComponents], sqlalchemy.engine.Row | None
+    list[ReturnedLabwareOffsetLocationSequenceComponents] | AnyLocation,
+    sqlalchemy.engine.Row | None,
 ]:
-    offset_id = first_row.offset_id
-    location_sequence: list[ReturnedLabwareOffsetLocationSequenceComponents] = [
-        _sql_sequence_component_to_pydantic_sequence_component(first_row)
-    ]
-    while True:
-        try:
-            row = next(rest_rows)
-        except StopIteration:
-            return location_sequence, None
-        if row.offset_id != offset_id:
-            return location_sequence, row
-        location_sequence.append(
-            _sql_sequence_component_to_pydantic_sequence_component(row)
-        )
+    if first_row.component_kind is None:
+        # If this is NULL in SQL, it means this offset had no components to its
+        # location sequence, which is how we encode ANY_LOCATION.
+        return ANY_LOCATION, next(rest_rows, None)
+
+    else:
+        offset_id = first_row.offset_id
+
+        location_sequence: list[ReturnedLabwareOffsetLocationSequenceComponents] = [
+            _sql_sequence_component_to_pydantic_sequence_component(first_row)
+        ]
+        while True:
+            try:
+                row = next(rest_rows)
+            except StopIteration:
+                return location_sequence, None
+            if row.offset_id != offset_id:
+                return location_sequence, row
+            location_sequence.append(
+                _sql_sequence_component_to_pydantic_sequence_component(row)
+            )
 
 
 def _sql_to_pydantic(
@@ -243,31 +280,14 @@ def _pydantic_to_sql_offset(
 
 def _pydantic_to_sql_location_sequence_iterator(
     labware_offset: IncomingStoredLabwareOffset, offset_row_id: int
-) -> Iterator[dict[str, object]]:
+) -> Iterator[_LocationComponentAsSQLRow]:
+    """Given a location from HTTP, return the equivalent rows to store in SQL."""
+    if labware_offset.locationSequence == ANY_LOCATION:
+        # ANY_LOCATION is represented in SQL as the absence of any rows,
+        # so return an empty iterator.
+        return
+
     for index, component in enumerate(labware_offset.locationSequence):
-        if isinstance(component, OnLabwareOffsetLocationSequenceComponent):
-            yield dict(
-                offset_id=offset_row_id,
-                sequence_ordinal=index,
-                component_kind=component.kind,
-                primary_component_value=component.labwareUri,
-                component_value_json=component.model_dump_json(),
-            )
-        elif isinstance(component, OnModuleOffsetLocationSequenceComponent):
-            yield dict(
-                offset_id=offset_row_id,
-                sequence_ordinal=index,
-                component_kind=component.kind,
-                primary_component_value=component.moduleModel.value,
-                component_value_json=component.model_dump_json(),
-            )
-        elif isinstance(component, OnAddressableAreaOffsetLocationSequenceComponent):
-            yield dict(
-                offset_id=offset_row_id,
-                sequence_ordinal=index,
-                component_kind=component.kind,
-                primary_component_value=component.addressableAreaName,
-                component_value_json=component.model_dump_json(),
-            )
-        else:
-            assert_never(component)
+        yield _pydantic_sequence_component_to_sql_sequence_component(
+            component, offset_row_id=offset_row_id, sequence_ordinal=index
+        )

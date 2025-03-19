@@ -39,7 +39,7 @@ export interface DropdownOption {
   /** subtext below the name */
   subtext?: string
   disabled?: boolean
-  tooltipText?: string
+  tooltipText?: string | null
 }
 
 export type DropdownBorder = 'rounded' | 'neutral'

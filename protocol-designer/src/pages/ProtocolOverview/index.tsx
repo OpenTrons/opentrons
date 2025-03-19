@@ -9,7 +9,6 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  EndUserAgreementFooter,
   Flex,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
@@ -34,13 +33,14 @@ import {
   getEnableTimelineScrubber,
 } from '../../feature-flags/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { MaterialsListModal } from '../../organisms/MaterialsListModal'
-import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../atoms'
-import { useBlockingHint } from '../../organisms/BlockingHintModal/useBlockingHint'
+import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
+import { LINE_CLAMP_TEXT_STYLE, COLUMN_STYLE } from '../../components/atoms'
+import { EndUserAgreementFooter } from '../../components/molecules'
+import { useBlockingHint } from '../../components/organisms/BlockingHintModal/useBlockingHint'
 import {
   EditProtocolMetadataModal,
   EditInstrumentsModal,
-} from '../../organisms'
+} from '../../components/organisms'
 import { getWarningContent } from './UnusedModalContent'
 import { ProtocolMetadata } from './ProtocolMetadata'
 import { InstrumentsInfo } from './InstrumentsInfo'

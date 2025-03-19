@@ -48,8 +48,13 @@ import {
   wavelengthOutOfRange,
   referenceWavelengthOutOfRange,
   absorbanceReaderModuleIdRequired,
+  magneticModuleIdRequired,
   aspirateTouchTipSpeedRequired,
   dispenseTouchTipSpeedRequired,
+  aspirateTouchTipMmFromEdgeOutOfRange,
+  dispenseTouchTipMmFromEdgeOutOfRange,
+  aspirateTouchTipMmFromEdgeRequired,
+  dispenseTouchTipMmFromEdgeRequired,
 } from './errors'
 
 import {
@@ -153,7 +158,11 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       aspirateWellsRequired,
       dispenseWellsRequired,
       aspirateTouchTipSpeedRequired,
-      dispenseTouchTipSpeedRequired
+      dispenseTouchTipSpeedRequired,
+      aspirateTouchTipMmFromEdgeOutOfRange,
+      dispenseTouchTipMmFromEdgeOutOfRange,
+      aspirateTouchTipMmFromEdgeRequired,
+      dispenseTouchTipMmFromEdgeRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,
@@ -169,7 +178,8 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       magnetActionRequired,
       engageHeightRequired,
       moduleIdRequired,
-      engageHeightRangeExceeded
+      engageHeightRangeExceeded,
+      magneticModuleIdRequired
     ),
   },
   temperature: {

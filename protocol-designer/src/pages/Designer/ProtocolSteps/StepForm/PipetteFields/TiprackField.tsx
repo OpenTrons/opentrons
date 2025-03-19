@@ -11,7 +11,7 @@ import {
 } from '@opentrons/components'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
 import { getTiprackOptions } from '../../../../../ui/labware/selectors'
-import { DropdownStepFormField } from '../../../../../molecules'
+import { DropdownStepFormField } from '../../../../../components/molecules'
 import type { FieldProps } from '../types'
 
 interface TiprackFieldProps extends FieldProps {

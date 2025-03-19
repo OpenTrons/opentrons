@@ -32,6 +32,9 @@ export type ModuleRunTimeCommand =
   | AbsorbanceReaderReadRunTimeCommand
   | FlexStackerSetStoredLabwareRunTimeCommand
   | FlexStackerRetrieveRunTimeCommand
+  | FlexStackerStoreRunTimeCommand
+  | FlexStackerFillRunTimeCommand
+  | FlexStackerEmptyRunTimeCommand
 
 export type ModuleCreateCommand =
   | MagneticModuleEngageMagnetCreateCommand
@@ -63,6 +66,9 @@ export type ModuleCreateCommand =
   | AbsorbanceReaderReadCreateCommand
   | FlexStackerSetStoredLabwareCreateCommand
   | FlexStackerRetrieveCreateCommand
+  | FlexStackerStoreCreateCommand
+  | FlexStackerFillCreateCommand
+  | FlexStackerEmptyCreateCommand
 
 export interface MagneticModuleEngageMagnetCreateCommand
   extends CommonCommandCreateInfo {
@@ -424,6 +430,30 @@ export interface FlexStackerRetrieveCreateCommand
   }
 }
 
+export interface FlexStackerStoreCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/store'
+  params: { moduleId: string }
+}
+
+export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/fill'
+  params: {
+    moduleId: string
+    strategy: 'manualWithPause' | 'logical'
+    message?: string
+    count?: number
+  }
+}
+
+export interface FlexStackerEmptyCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/empty'
+  params: {
+    moduleId: string
+    strategy: 'manualWithPause' | 'logical'
+    message?: string
+    count?: number
+  }
+}
 interface RetrieveResultPrimary {
   labwareId: string
   primaryLocationSequence: LabwareLocationSequence
@@ -462,4 +492,34 @@ export interface FlexStackerRetrieveRunTimeCommand
     | (RetrieveResultPrimary & RetrieveResultLid & RetrieveResultNoAdapter)
     | (RetrieveResultPrimary & RetrieveResultNoLid & RetrieveResultAdapter)
     | (RetrieveResultPrimary & RetrieveResultAdapter & RetrieveResultLid)
+}
+
+export interface FlexStackerStoreRunTimeCommand
+  extends FlexStackerStoreCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: {
+    eventualDestinationLocationSequence?: LabwareLocationSequence
+    primaryOriginLocationSequence?: LabwareLocationSequence
+    primaryLabwareId?: string
+    adapterOriginLocationSequence?: LabwareLocationSequence
+    adapterLabwareId?: string
+    lidOriginLocationSequence?: LabwareLocationSequence
+    lidLabwareId?: LabwareLocationSequence
+  }
+}
+
+export interface FlexStackerFillRunTimeCommand
+  extends FlexStackerFillCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: {
+    count: number
+  }
+}
+
+export interface FlexStackerEmptyRunTimeCommand
+  extends FlexStackerEmptyCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: {
+    count: number
+  }
 }

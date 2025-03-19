@@ -6,7 +6,6 @@ import { reduceCommandCreators } from './reduceCommandCreators'
 import { modulePipetteCollision } from './modulePipetteCollision'
 import { thermocyclerPipetteCollision } from './thermocyclerPipetteCollision'
 import { getLabwareSlot } from './getLabwareSlot'
-import { movableTrashCommandsUtil } from './movableTrashCommandsUtil'
 import { findThermocyclerProfileRepetitions } from './findThermocyclerProfileRepetitions'
 
 export {
@@ -18,16 +17,13 @@ export {
   modulePipetteCollision,
   thermocyclerPipetteCollision,
   getLabwareSlot,
-  movableTrashCommandsUtil,
   findThermocyclerProfileRepetitions,
 }
 export * from './commandCreatorArgsGetters'
 export * from './heaterShakerCollision'
 export * from './createTimelineFromRunCommands'
 export * from './misc'
-export * from './movableTrashCommandsUtil'
 export * from './safePipetteMovements'
-export * from './wasteChuteCommandsUtil'
 export * from './createTimelineFromRunCommands'
 export * from './constructInvariantContextFromRunCommands'
 export * from './pythonFormat'

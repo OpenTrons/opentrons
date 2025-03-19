@@ -1,4 +1,5 @@
 """IDT xGEn 96x with Flex Stacker."""
+
 from opentrons.protocol_api import ProtocolContext, ParameterContext
 from abr_testing.protocols import helpers
 from typing import List
@@ -106,18 +107,18 @@ def run(protocol: ProtocolContext) -> None:
     stacker_200_ul_tips: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", "B4"
     )  # type: ignore[assignment]
-    stacker_200_ul_tips.load_labware_to_hopper(
+    stacker_200_ul_tips.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_200ul",
-        quantity=6,
         lid="opentrons_flex_tiprack_lid",
+        count=6,
     )
     stacker_50_ul_tips: FlexStackerContext = protocol.load_module(
         "flexStackerModuleV1", "C4"
     )  # type: ignore[assignment]
-    stacker_50_ul_tips.load_labware_to_hopper(
+    stacker_50_ul_tips.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_50ul",
-        quantity=6,
         lid="opentrons_flex_tiprack_lid",
+        count=6,
     )
 
     # ========== FIRST ROW ===========
