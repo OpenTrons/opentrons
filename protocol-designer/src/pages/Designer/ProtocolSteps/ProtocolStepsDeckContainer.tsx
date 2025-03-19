@@ -141,7 +141,6 @@ export function ProtocolStepsDeckContainer(): JSX.Element {
                   layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
                 />
               ) : (
-                // ToDo export this as a component
                 <>
                   {filteredAddressableAreas.map(addressableArea => {
                     const cutoutId = getCutoutIdForAddressableArea(
