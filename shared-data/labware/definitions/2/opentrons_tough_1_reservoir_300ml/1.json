@@ -27,7 +27,8 @@
       "totalLiquidVolume": 300000,
       "x": 63.88,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     }
   },
   "groups": [
@@ -52,5 +53,31 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "innerLabwareGeometry": {
+    "MainWellGeometry": {
+      "sections": [
+        {
+          "shape": "cuboidal",
+          "bottomHeight": 2.29,
+          "topHeight": 42.3,
+          "bottomXDimension": 108,
+          "bottomYDimension": 70.01,
+          "topXDimension": 108.7,
+          "topYDimension": 70.7
+        },
+        {
+          "shape": "cuboidal",
+          "xCount": 12,
+          "yCount": 8,
+          "bottomHeight": 0,
+          "topHeight": 2.29,
+          "bottomXDimension": 1.8,
+          "bottomYDimension": 1.8,
+          "topXDimension": 9,
+          "topYDimension": 9
+        }
+      ]
+    }
   }
 }

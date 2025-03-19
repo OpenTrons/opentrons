@@ -35,7 +35,7 @@
     "A1": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 14.38,
@@ -45,112 +45,123 @@
     "A2": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 23.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A3": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 32.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A4": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 41.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A5": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 50.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A6": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 59.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A7": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 68.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A8": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 77.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A9": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 86.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A10": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 95.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A11": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 104.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     },
     "A12": {
       "depth": 42.3,
       "shape": "rectangular",
-      "xDimension": 8.31,
+      "xDimension": 8.2,
       "yDimension": 70.7,
       "totalLiquidVolume": 22000,
       "x": 113.38,
       "y": 42.74,
-      "z": 3
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
     }
   },
   "groups": [
@@ -188,5 +199,29 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "innerLabwareGeometry": {
+    "MainWellGeometry": {
+      "sections": [
+        {
+          "shape": "cuboidal",
+          "bottomHeight": 2,
+          "topHeight": 42.3,
+          "bottomXDimension": 7.5,
+          "bottomYDimension": 70,
+          "topXDimension": 8.2,
+          "topYDimension": 70.7
+        },
+        {
+          "shape": "cuboidal",
+          "bottomHeight": 0,
+          "topHeight": 2,
+          "bottomXDimension": 2.15,
+          "bottomYDimension": 67.46,
+          "topXDimension": 7.5,
+          "topYDimension": 70
+        }
+      ]
+    }
   }
 }
