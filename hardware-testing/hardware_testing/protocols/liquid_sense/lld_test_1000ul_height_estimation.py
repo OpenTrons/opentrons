@@ -427,6 +427,8 @@ def run(ctx: ProtocolContext) -> None:
     #       requires a tip to be currently attached, else it raises an error.
     #       We call that function when pre-calculating stuff.
     pipette.pick_up_tip()
+    # FIXME: remove once horizontal crash bug is fixed
+    pipette._retract()
 
     # LOAD PLATE-READER
     reader_module = ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
@@ -528,6 +530,8 @@ def run(ctx: ProtocolContext) -> None:
             # NOTE: 1st trial has tip already attached
             if not pipette.has_tip:
                 pipette.pick_up_tip()
+                # FIXME: remove once horizontal crash bug is fixed
+                pipette._retract()
             print(f"adding {trial.ul_to_add} uL")
 
             while trial.test_well.current_liquid_volume() < trial.ul_to_add:
@@ -545,6 +549,8 @@ def run(ctx: ProtocolContext) -> None:
             # REMOVE DYE FROM TEST-LABWARE
             print(f"removing {trial.ul_to_remove} uL")
             pipette.pick_up_tip()
+            # FIXME: remove once horizontal crash bug is fixed
+            pipette._retract()
             if trial.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
                 pipette.require_liquid_presence(trial.test_well)
             pipette.aspirate(
