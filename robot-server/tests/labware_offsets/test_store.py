@@ -273,10 +273,7 @@ def test_filter_fields(
             )
         ]
     )
-    assert sorted(
-        results,
-        key=lambda o: o.id,
-    ) == sorted(
+    assert sorted(results, key=lambda o: o.id) == sorted(
         [
             StoredLabwareOffset(
                 id=offsets[id_].id,

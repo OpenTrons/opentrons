@@ -55,7 +55,7 @@ class LabwareOffsetStore:
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
-        labware_offsets_publisher: LabwareOffsetsPublisher,
+        labware_offsets_publisher: LabwareOffsetsPublisher | None,
     ) -> None:
         """Initialize the store.
 
@@ -87,7 +87,7 @@ class LabwareOffsetStore:
                     ),
                     location_components_to_insert,
                 )
-        self._labware_offsets_publisher.publish_labware_offsets()
+        self._publish_change_notification()
 
     def get_all(self) -> list[StoredLabwareOffset]:
         """Return all offsets from oldest to newest.
@@ -132,7 +132,7 @@ class LabwareOffsetStore:
                 .where(labware_offset_table.c.offset_id == offset_id)
                 .values(active=False)
             )
-        self._labware_offsets_publisher.publish_labware_offsets()
+        self._publish_change_notification()
         return next(_collate_sql_to_pydantic(offset_rows))
 
     def delete_all(self) -> None:
@@ -141,7 +141,11 @@ class LabwareOffsetStore:
             transaction.execute(
                 sqlalchemy.update(labware_offset_table).values(active=False)
             )
-        self._labware_offsets_publisher.publish_labware_offsets()
+        self._publish_change_notification()
+
+    def _publish_change_notification(self) -> None:
+        if self._labware_offsets_publisher:
+            self._labware_offsets_publisher.publish_labware_offsets()
 
 
 class LabwareOffsetNotFoundError(KeyError):
