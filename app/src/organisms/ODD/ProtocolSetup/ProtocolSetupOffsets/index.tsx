@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
@@ -8,11 +7,6 @@ import { FloatingActionButton } from '/app/atoms/buttons'
 import { SetupOffsetsTable } from './SetupOffsetsTable'
 import { SetupOffsetsHeader } from './SetupOffsetsHeader'
 import { LPCFlows } from '/app/organisms/LabwarePositionCheck'
-import {
-  OFFSET_SOURCE_CONFLICT,
-  selectOffsetSource,
-} from '/app/redux/protocol-runs'
-import { handleOffsetsConflictModalODD } from '/app/organisms/LabwareOffsetsConflictModal'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { Run } from '@opentrons/api-client'
@@ -28,20 +22,13 @@ export interface ProtocolSetupOffsetsProps {
   isConfirmed: boolean
 }
 
-// TOME TODO: Do not forget the desktop offset conflict resolution.
-
 export function ProtocolSetupOffsets(
   props: ProtocolSetupOffsetsProps
 ): JSX.Element {
-  const { lpcDisabledReason, lpcLaunchProps, runId } = props
+  const { lpcDisabledReason, lpcLaunchProps } = props
   const { showLPC, lpcProps, launchLPC } = lpcLaunchProps
   const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
-  const offsetSource = useSelector(selectOffsetSource(runId))
-
-  if (offsetSource === OFFSET_SOURCE_CONFLICT) {
-    void handleOffsetsConflictModalODD({ ...props })
-  }
 
   const onLPCLaunchClick = (): void => {
     if (lpcDisabledReason != null) {

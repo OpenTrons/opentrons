@@ -10,6 +10,7 @@ import {
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
+  OFFSETS_FROM_DATABASE,
 } from '/app/redux/protocol-runs/constants'
 
 import type { Selector } from 'reselect'
@@ -185,5 +186,5 @@ export const selectOffsetSource = (
   createSelector(
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.sourcedOffsets,
-    source => source ?? ('UNHANDLED' as OffsetSources)
+    source => source ?? OFFSETS_FROM_DATABASE
   )

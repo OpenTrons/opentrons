@@ -12,8 +12,8 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   updateLPC,
   LPC_STEPS,
-  OFFSET_SOURCE_CONFLICT,
-  OFFSET_SOURCE_DATABASE,
+  OFFSETS_CONFLICT,
+  OFFSETS_FROM_DATABASE,
 } from '/app/redux/protocol-runs'
 import { getActivePipetteId } from './utils'
 
@@ -64,9 +64,7 @@ export function useUpdateLPCStore({
     if (isReadyToInit && robotType === FLEX_ROBOT_TYPE) {
       const activePipetteId = getActivePipetteId(analysis.pipettes)
       const sourcedOffsets: OffsetSources =
-        lastFreshOffsetRunTs != null
-          ? OFFSET_SOURCE_CONFLICT
-          : OFFSET_SOURCE_DATABASE
+        lastFreshOffsetRunTs != null ? OFFSETS_CONFLICT : OFFSETS_FROM_DATABASE
 
       const initialState: LPCWizardState = {
         ...rest,

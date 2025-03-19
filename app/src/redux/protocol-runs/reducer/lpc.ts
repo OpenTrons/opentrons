@@ -6,7 +6,7 @@ import {
   GO_BACK_HANDLE_LW_SUBSTEP,
   GO_BACK_LAST_STEP,
   LPC_STEPS,
-  OFFSET_SOURCE_RUN_RECORD,
+  OFFSETS_FROM_RUN_RECORD,
   PROCEED_HANDLE_LW_SUBSTEP,
   PROCEED_STEP,
   RESET_OFFSET_TO_DEFAULT,
@@ -17,7 +17,7 @@ import {
   UPDATE_LPC,
   SOURCE_OFFSETS_FROM_RUN,
   SOURCE_OFFSETS_FROM_DATABASE,
-  OFFSET_SOURCE_DATABASE,
+  OFFSETS_FROM_DATABASE,
 } from '../constants'
 import {
   clearAllWorkingOffsets,
@@ -219,7 +219,7 @@ export function LPCReducer(
               offsets,
               state.labwareInfo.labware
             ),
-            sourcedOffsets: OFFSET_SOURCE_RUN_RECORD,
+            sourcedOffsets: OFFSETS_FROM_RUN_RECORD,
           },
         }
       }
@@ -229,7 +229,7 @@ export function LPCReducer(
           ...state,
           labwareInfo: {
             ...state.labwareInfo,
-            sourcedOffsets: OFFSET_SOURCE_DATABASE,
+            sourcedOffsets: OFFSETS_FROM_DATABASE,
           },
         }
       }

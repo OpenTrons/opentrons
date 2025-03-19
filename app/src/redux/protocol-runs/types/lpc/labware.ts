@@ -4,9 +4,9 @@ import type {
   OffsetLocationDetails,
 } from './offsets'
 import type {
-  OFFSET_SOURCE_RUN_RECORD,
-  OFFSET_SOURCE_DATABASE,
-  OFFSET_SOURCE_CONFLICT,
+  OFFSETS_FROM_RUN_RECORD,
+  OFFSETS_FROM_DATABASE,
+  OFFSETS_CONFLICT,
 } from '/app/redux/protocol-runs'
 
 export interface LPCLabwareInfo {
@@ -22,9 +22,9 @@ export interface LPCLabwareInfo {
 }
 
 export type OffsetSources =
-  | typeof OFFSET_SOURCE_RUN_RECORD
-  | typeof OFFSET_SOURCE_DATABASE
-  | typeof OFFSET_SOURCE_CONFLICT
+  | typeof OFFSETS_FROM_RUN_RECORD
+  | typeof OFFSETS_FROM_DATABASE
+  | typeof OFFSETS_CONFLICT
 
 export interface LwGeometryDetails {
   id: string

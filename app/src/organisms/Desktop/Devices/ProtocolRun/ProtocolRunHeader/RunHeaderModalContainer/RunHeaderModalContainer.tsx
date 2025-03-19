@@ -10,8 +10,9 @@ import {
   ConfirmMissingStepsModal,
 } from './modals'
 import { ConfirmAttachmentModal } from '/app/organisms/ModuleCard/ConfirmAttachmentModal'
+import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
 
-import type { RunStatus } from '@opentrons/api-client'
+import type { RunStatus, Run } from '@opentrons/api-client'
 import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { UseRunErrorsResult } from '../hooks'
 import type { UseRunHeaderModalContainerResult } from '.'
@@ -19,6 +20,7 @@ import type { UseRunHeaderModalContainerResult } from '.'
 export interface RunHeaderModalContainerProps {
   runId: string
   runStatus: RunStatus | null
+  runRecord: Run | undefined
   robotName: string
   protocolRunControls: RunControls
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
@@ -41,6 +43,7 @@ export function RunHeaderModalContainer(
     recoveryModalUtils,
     missingStepsModalUtils,
     dropTipUtils,
+    offsetConflictModalUtils,
   } = runHeaderModalContainerUtils
   const { dropTipModalUtils, dropTipWizardUtils } = dropTipUtils
 
@@ -89,6 +92,9 @@ export function RunHeaderModalContainer(
       )}
       {missingStepsModalUtils.showModal && (
         <ConfirmMissingStepsModal {...missingStepsModalUtils.modalProps} />
+      )}
+      {offsetConflictModalUtils.showModal && (
+        <LabwareOffsetsConflictModal {...props} isOnDevice={false} />
       )}
     </>
   )

@@ -66,7 +66,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   )
   const currentRunId = useCurrentRunId()
   const areOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
-  console.log('=>(index.tsx:69) areOffsetsApplied', areOffsetsApplied)
 
   const isSetupComplete =
     isCalibrationComplete &&

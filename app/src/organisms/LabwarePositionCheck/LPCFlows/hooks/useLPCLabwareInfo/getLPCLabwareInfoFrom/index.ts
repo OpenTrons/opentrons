@@ -12,7 +12,7 @@ import type {
 } from '/app/redux/protocol-runs'
 import {
   getTotalCountNonHardCodedLocationSpecificOffsets,
-  OFFSET_SOURCE_DATABASE,
+  OFFSETS_FROM_DATABASE,
 } from '/app/redux/protocol-runs'
 import type { UseLPCLabwareInfoProps } from '..'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
@@ -38,7 +38,7 @@ export function getLPCLabwareInfoFrom(
     selectedLabware: null,
     labware,
     lastFreshOffsetRunTimestamp: null,
-    sourcedOffsets: OFFSET_SOURCE_DATABASE,
+    sourcedOffsets: OFFSETS_FROM_DATABASE,
   }
 }
 

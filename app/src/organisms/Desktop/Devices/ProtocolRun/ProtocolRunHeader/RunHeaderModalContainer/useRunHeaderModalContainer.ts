@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import {
   useConfirmCancelModal,
@@ -24,6 +25,7 @@ import {
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
 import { useRobot, useRobotType } from '/app/redux-resources/robots'
+import { OFFSETS_CONFLICT, selectOffsetSource } from '/app/redux/protocol-runs'
 
 import type { AttachedModule, RunStatus, Run } from '@opentrons/api-client'
 import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
@@ -42,6 +44,10 @@ import type { ProtocolRunHeaderProps } from '..'
 import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { UseRunErrorsResult } from '../hooks'
 
+interface OffsetCOnflictModalUtils {
+  showModal: boolean
+}
+
 interface UseRunHeaderModalContainerProps extends ProtocolRunHeaderProps {
   attachedModules: AttachedModule[]
   protocolRunControls: RunControls
@@ -59,6 +65,7 @@ export interface UseRunHeaderModalContainerResult {
   missingStepsModalUtils: UseMissingStepsModalResult
   dropTipUtils: UseRunHeaderDropTipResult
   recoveryModalUtils: UseErrorRecoveryResult
+  offsetConflictModalUtils: OffsetCOnflictModalUtils
 }
 
 // Provides all the utilities used by the various modals that render in ProtocolRunHeader.
@@ -80,6 +87,8 @@ export function useRunHeaderModalContainer({
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
+  const isLabwareOffsetConflict =
+    useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
 
   function handleProceedToRunClick(): void {
     navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
@@ -135,5 +144,8 @@ export function useRunHeaderModalContainer({
     recoveryModalUtils,
     missingStepsModalUtils,
     dropTipUtils,
+    offsetConflictModalUtils: {
+      showModal: isLabwareOffsetConflict,
+    },
   }
 }
