@@ -20,7 +20,6 @@ import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { CurrentOffsetsTable } from './CurrentOffsetsTable'
-import { useLaunchLegacyLPC } from '/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC'
 import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import {
   useNotifyRunQuery,
@@ -36,13 +35,7 @@ import type { LabwareOffset } from '@opentrons/api-client'
 export function OT2SetupLPC(
   props: SetupLabwarePositionCheckProps
 ): JSX.Element {
-  const {
-    robotName,
-    runId,
-    setOffsetsConfirmed,
-    offsetsConfirmed,
-    isNewLPC,
-  } = props
+  const { robotName, runId, setOffsetsConfirmed, offsetsConfirmed } = props
   const { t, i18n } = useTranslation('protocol_setup')
 
   const robotType = useRobotType(robotName)
@@ -87,11 +80,6 @@ export function OT2SetupLPC(
     placement: TOOLTIP_LEFT,
   })
 
-  const { launchLegacyLPC, LegacyLPCWizard } = useLaunchLegacyLPC(
-    runId,
-    robotType,
-    protocolName
-  )
   const { launchLPC, lpcProps, showLPC } = useLPCFlows({
     runId,
     robotType,
@@ -151,9 +139,7 @@ export function OT2SetupLPC(
         ) : null}
         <PrimaryButton
           textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={() => {
-            isNewLPC ? launchLPC() : launchLegacyLPC()
-          }}
+          onClick={launchLPC}
           id="LabwareSetup_checkLabwarePositionsButton"
           {...runLPCTargetProps}
           disabled={lpcDisabledReason !== null}
@@ -166,7 +152,6 @@ export function OT2SetupLPC(
           </Tooltip>
         ) : null}
       </Flex>
-      {isNewLPC ? null : LegacyLPCWizard}
       {showLPC && <LPCFlows {...lpcProps} />}
     </Flex>
   )

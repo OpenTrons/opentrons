@@ -25,14 +25,11 @@ import {
 import type { SetupLabwarePositionCheckProps } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck'
 
 export interface LPCSetupFlexBtnsProps extends SetupLabwarePositionCheckProps {
-  launchLegacyLPC: () => void
   launchLPC: () => void
 }
 
 export function LPCSetupFlexBtns({
   setOffsetsConfirmed,
-  isNewLPC,
-  launchLegacyLPC,
   launchLPC,
   runId,
   robotName,
@@ -98,9 +95,7 @@ export function LPCSetupFlexBtns({
   return (
     <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing8}>
       <SecondaryButton
-        onClick={() => {
-          isNewLPC ? launchLPC() : launchLegacyLPC()
-        }}
+        onClick={launchLPC}
         id="LabwareSetup_checkLabwarePositionsButton"
         {...runLPCTargetProps}
         disabled={lpcDisabledReason !== null}

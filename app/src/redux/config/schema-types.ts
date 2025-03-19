@@ -12,7 +12,6 @@ export type DevInternalFlag =
   | 'forceHttpPolling'
   | 'protocolStats'
   | 'enableRunNotes'
-  | 'lpcRedesign'
   | 'protocolTimeline'
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'

@@ -27,13 +27,10 @@ import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import {
   DEV_INTERNAL_FLAGS,
   getAppLanguage,
-  getApplyHistoricOffsets,
   getDevtoolsEnabled,
   getFeatureFlags,
   toggleDevInternalFlag,
   toggleDevtools,
-  toggleHistoricOffsets,
-  useFeatureFlag,
 } from '/app/redux/config'
 import { InlineNotification } from '/app/atoms/InlineNotification'
 import { getRobotSettings, updateSetting } from '/app/redux/robot-settings'
@@ -61,7 +58,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
     'app_settings',
     'branded',
   ])
-  const isNewLPC = useFeatureFlag('lpcRedesign')
   const dispatch = useDispatch<Dispatch>()
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -85,7 +81,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
-  const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
 
@@ -188,16 +183,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           }}
           iconName="privacy"
         />
-        {!isNewLPC && (
-          <RobotSettingButton
-            settingName={t('apply_historic_offsets')}
-            dataTestId="RobotSettingButton_apply_historic_offsets"
-            settingInfo={t('historic_offsets_description')}
-            iconName="reticle"
-            rightElement={<OnOffToggle isOn={historicOffsetsOn} />}
-            onClick={() => dispatch(toggleHistoricOffsets())}
-          />
-        )}
         <RobotSettingButton
           settingName={t('app_settings:error_recovery_mode')}
           dataTestId="RobotSettingButton_error_recovery_mode"
