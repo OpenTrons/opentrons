@@ -33,8 +33,17 @@ export function AccordionHeader({
 
   return (
     <Flex css={ACCORDION_HEADER_CONTAINER_STYLE}>
-      <StyledText oddStyle="bodyTextSemiBold">{lwDisplayName}</StyledText>
-      <StyledText css={OFFSET_COPY_STYLE} oddStyle="bodyTextRegular">
+      <StyledText
+        oddStyle="bodyTextSemiBold"
+        desktopStyle="bodyDefaultSemiBold"
+      >
+        {lwDisplayName}
+      </StyledText>
+      <StyledText
+        css={OFFSET_COPY_STYLE}
+        oddStyle="bodyTextRegular"
+        desktopStyle="bodyDefaultRegular"
+      >
         {offsetCopy}
       </StyledText>
     </Flex>

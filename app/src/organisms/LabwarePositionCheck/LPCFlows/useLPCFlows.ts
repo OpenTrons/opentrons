@@ -6,6 +6,7 @@ import {
   useDeleteMaintenanceRunMutation,
   useRunLoadedLabwareDefinitions,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   useCreateTargetedMaintenanceRunMutation,
@@ -15,15 +16,18 @@ import {
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
-import { useLPCLabwareInfo, useInitLPCStore } from './hooks'
+import {
+  useLPCLabwareInfo,
+  useUpdateLPCStore,
+  useCompatibleAnalysis,
+} from './hooks'
+import { useClonedRunOffsetStaleTimestamp } from './useClonedRunOffsetStaleTimestamp'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   LegacySupportLPCFlowsProps,
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
-import { useCompatibleAnalysis } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useCompatibleAnalysis'
-import { useClonedRunOffsetStaleTimestamp } from '/app/organisms/LabwarePositionCheck/LPCFlows/useClonedRunOffsetStaleTimestamp'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -59,22 +63,26 @@ export function useLPCFlows({
 
   // TOME TODO: Check that offset requests don't happen if we are looking at a historical
   // run. Make sure run setup is disabled, too.
-
+  const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
   const { data: runRecord } = useNotifyRunQuery(runId)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const compatibleAnalysis = useCompatibleAnalysis(
+  const compatibleFlexAnalysis = useCompatibleAnalysis(
     runId,
     runRecord,
-    mostRecentAnalysis
+    mostRecentAnalysis,
+    isFlex
   )
+  const compatibleRobotAnalysis = isFlex
+    ? compatibleFlexAnalysis
+    : mostRecentAnalysis
 
   const labwareDefs = useMemo(() => {
     const labwareDefsFromCommands = getLabwareDefinitionsFromCommands(
-      compatibleAnalysis?.commands ?? []
+      compatibleRobotAnalysis?.commands ?? []
     )
     return labwareDefsFromCommands
-  }, [compatibleAnalysis?.commands.length])
+  }, [compatibleRobotAnalysis?.commands.length])
 
   const {
     labwareInfo,
@@ -83,19 +91,20 @@ export function useLPCFlows({
     searchLwOffsetsParams: flexOffsetSearchParams,
   } = useLPCLabwareInfo({
     labwareDefs,
-    protocolData: compatibleAnalysis,
+    protocolData: compatibleRobotAnalysis,
     robotType,
     runId,
   })
 
   const lastFreshOffsetRunTs = useClonedRunOffsetStaleTimestamp(
     runRecord,
-    flexOffsetSearchParams
+    flexOffsetSearchParams,
+    isFlex
   )
 
-  useInitLPCStore({
+  useUpdateLPCStore({
     runId,
-    analysis: compatibleAnalysis,
+    analysis: compatibleRobotAnalysis,
     protocolName,
     maintenanceRunId,
     labwareDefs,
@@ -137,18 +146,24 @@ export function useLPCFlows({
     enabled: maintenanceRunId != null,
   })
 
-  // TOME TODO: Disable this button while waiting on flex offsets.
-
   const launchLPC = (): Promise<void> => {
-    setIsLaunching(true)
+    // Avoid accidentally creating several maintenance runs if a request is ongoing.
+    if (!isLaunching) {
+      setIsLaunching(true)
+      const labwareOffsets = getRelevantOffsets(
+        robotType,
+        ot2Offsets,
+        flexOffsets ?? []
+      )
+      const createRunData = labwareOffsets != null ? { labwareOffsets } : {}
 
-    if (flexOffsets != null) {
-      return createTargetedMaintenanceRun({
-        labwareOffsets: getRelevantOffsets(robotType, ot2Offsets, flexOffsets),
-      }).then(maintenanceRun => {
-        setMaintenanceRunId(maintenanceRun.data.id)
-      })
+      return createTargetedMaintenanceRun(createRunData).then(
+        maintenanceRun => {
+          setMaintenanceRunId(maintenanceRun.data.id)
+        }
+      )
     } else {
+      console.warn('Attempted to launch LPC while already launching.')
       return Promise.resolve()
     }
   }
@@ -168,7 +183,7 @@ export function useLPCFlows({
     hasCreatedLPCRun &&
     maintenanceRunId != null &&
     protocolName != null &&
-    compatibleAnalysis != null &&
+    compatibleRobotAnalysis != null &&
     deckConfig != null
 
   return showLPC
@@ -183,7 +198,7 @@ export function useLPCFlows({
           deckConfig,
           labwareDefs,
           labwareInfo,
-          analysis: compatibleAnalysis,
+          analysis: compatibleRobotAnalysis,
           protocolName,
           maintenanceRunId,
           runRecordExistingOffsets: ot2Offsets,

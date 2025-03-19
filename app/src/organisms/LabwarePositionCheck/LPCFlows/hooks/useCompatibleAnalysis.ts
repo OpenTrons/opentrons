@@ -27,7 +27,8 @@ import type {
 export function useCompatibleAnalysis(
   runId: string,
   runRecord: Run | undefined,
-  mostRecentAnalysis: CompletedProtocolAnalysis | null
+  mostRecentAnalysis: CompletedProtocolAnalysis | null,
+  isFlex: boolean
 ): CompletedProtocolAnalysis | null {
   const [
     compatibleAnalysis,
@@ -47,7 +48,7 @@ export function useCompatibleAnalysis(
     protocolId,
     compatibleAnalysisId,
     {
-      enabled: compatibleAnalysisId != null,
+      enabled: isFlex && compatibleAnalysisId != null,
       staleTime: Infinity,
     }
   )
@@ -61,7 +62,7 @@ export function useCompatibleAnalysis(
   )
 
   useEffect(() => {
-    if (mostRecentAnalysis != null && !hasProcessedAnalysis.current) {
+    if (isFlex && mostRecentAnalysis != null && !hasProcessedAnalysis.current) {
       hasProcessedAnalysis.current = true
 
       if (!isLocSeqAnalysisType) {

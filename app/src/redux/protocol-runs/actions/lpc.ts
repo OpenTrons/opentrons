@@ -2,7 +2,7 @@ import {
   PROCEED_STEP,
   SET_INITIAL_POSITION,
   SET_FINAL_POSITION,
-  START_LPC,
+  UPDATE_LPC,
   FINISH_LPC,
   GO_BACK_LAST_STEP,
   SET_SELECTED_LABWARE,
@@ -20,7 +20,7 @@ import {
 import type {
   FinalPositionAction,
   InitialPositionAction,
-  StartLPCAction,
+  UpdateLPCAction,
   LPCWizardState,
   PositionParams,
   ProceedStepAction,
@@ -120,11 +120,11 @@ export const applyWorkingOffsets = (
   payload: { runId, saveResult },
 })
 
-export const startLPC = (
+export const updateLPC = (
   runId: string,
   state: LPCWizardState
-): StartLPCAction => ({
-  type: START_LPC,
+): UpdateLPCAction => ({
+  type: UPDATE_LPC,
   payload: { runId, state },
 })
 

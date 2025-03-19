@@ -494,7 +494,6 @@ function PrepareToRun({
   const isAnyNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
-  const areOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
 
   const lpcSetupStepProps = (): Pick<
     ProtocolSetupStepProps,
@@ -502,7 +501,7 @@ function PrepareToRun({
   > => {
     if (totalOffsets === 0) {
       return { detail: t('offsets_not_required'), status: 'ready' }
-    } else if (areOffsetsApplied) {
+    } else if (offsetsConfirmed) {
       return {
         detail: t('num_offsets_applied', { num: totalOffsets }),
         status: 'ready',

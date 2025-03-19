@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import type {
   CompletedProtocolAnalysis,
@@ -10,7 +10,7 @@ import type {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
-  startLPC,
+  updateLPC,
   LPC_STEPS,
   OFFSET_SOURCE_CONFLICT,
   OFFSET_SOURCE_DATABASE,
@@ -22,6 +22,7 @@ import type {
   LPCWizardState,
   OffsetSources,
 } from '/app/redux/protocol-runs'
+import type { State } from '/app/redux/types'
 
 export interface UseLPCInitialStateProps {
   runId: string
@@ -35,8 +36,8 @@ export interface UseLPCInitialStateProps {
   lastFreshOffsetRunTs: string | null
 }
 
-// Initialize the LPC store if store data is sufficiently present.
-export function useInitLPCStore({
+// Update the LPC store if underlying store data is sufficiently present or changes.
+export function useUpdateLPCStore({
   analysis,
   runId,
   labwareDefs,
@@ -47,10 +48,18 @@ export function useInitLPCStore({
   ...rest
 }: UseLPCInitialStateProps): void {
   const dispatch = useDispatch()
+  const lpcState = useSelector(
+    (state: State) => state?.protocolRuns[runId]?.lpc
+  )
 
   const isReadyToInit =
-    analysis != null && protocolName != null && deckConfig != null
+    lpcState == null &&
+    runId != null &&
+    analysis != null &&
+    protocolName != null &&
+    deckConfig != null
 
+  // Initialize the store.
   useEffect(() => {
     if (isReadyToInit && robotType === FLEX_ROBOT_TYPE) {
       const activePipetteId = getActivePipetteId(analysis.pipettes)
@@ -80,7 +89,24 @@ export function useInitLPCStore({
         },
       }
 
-      dispatch(startLPC(runId, initialState))
+      dispatch(updateLPC(runId, initialState))
     }
-  }, [isReadyToInit, deckConfig, rest.labwareInfo, lastFreshOffsetRunTs])
+  }, [isReadyToInit])
+
+  // Update the store.
+  useEffect(() => {
+    if (lpcState != null) {
+      const updatedState: LPCWizardState = {
+        ...lpcState,
+        deckConfig: deckConfig != null ? deckConfig : lpcState.deckConfig,
+        labwareInfo: {
+          ...rest.labwareInfo,
+          areOffsetsApplied: lpcState.labwareInfo.areOffsetsApplied,
+          lastFreshOffsetRunTimestamp: lastFreshOffsetRunTs,
+        },
+      }
+
+      dispatch(updateLPC(runId, updatedState))
+    }
+  }, [deckConfig, rest.labwareInfo, lastFreshOffsetRunTs])
 }

@@ -19,6 +19,8 @@ import {
 import { useAddLabwareOffsetToRunMutation } from '@opentrons/react-api-client'
 import { useState } from 'react'
 
+// TOME TODO: Test that you can't launch LPC if you have steps that need to be complete first?
+
 export function SetupOffsetsHeader({
   runId,
   setSetupScreen,

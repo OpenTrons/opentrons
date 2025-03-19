@@ -7,6 +7,7 @@ import { OffsetTag } from '/app/organisms/LabwarePositionCheck'
 import { DeckInfoLabelTextTag } from '/app/molecules/DeckInfoLabelTextTag'
 import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
 
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck'
 import type { LocationSpecificOffsetDetailsWithCopy } from '/app/redux/protocol-runs'
 import type { AccordionChildrenProps } from './AccordionChildren'
@@ -47,7 +48,7 @@ export function AccordionDetail({
   }
 
   return (
-    <Flex css={DECK_LABEL_CONTAINER_STYLE}>
+    <Flex css={deckLabelContainerStyle(buildColThreeTag())}>
       <DeckInfoLabelTextTag
         colOneDeckInfoLabels={[
           <LabwareOffsetsDeckInfoLabels
@@ -63,12 +64,16 @@ export function AccordionDetail({
   )
 }
 
-const DECK_LABEL_CONTAINER_STYLE = css`
-  background-color: ${COLORS.grey20};
+const deckLabelContainerStyle = (
+  tagProps: OffsetTagProps
+): FlattenSimpleInterpolation => css`
+  background-color: ${COLORS.white};
   border-radius: ${BORDERS.borderRadius4};
+  padding-right: ${tagProps.kind === 'vector' ? '' : '2.188rem'};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey20};
     border-radius: ${BORDERS.borderRadius8};
+    padding-right: 0;
   }
 `

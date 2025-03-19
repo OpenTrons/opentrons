@@ -1,2 +1,3 @@
 export { useLPCLabwareInfo } from './useLPCLabwareInfo'
-export * from './useInitLPCStore'
+export * from './useUpdateLPCStore'
+export * from './useCompatibleAnalysis'

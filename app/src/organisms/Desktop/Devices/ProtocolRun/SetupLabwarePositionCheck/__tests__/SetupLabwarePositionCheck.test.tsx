@@ -11,7 +11,6 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { useLaunchLegacyLPC } from '/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
@@ -32,7 +31,6 @@ vi.mock('/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/config')
-vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
 vi.mock('/app/organisms/LabwarePositionCheck')
@@ -54,6 +52,7 @@ const render = () => {
         robotName={ROBOT_NAME}
         runId={RUN_ID}
         isNewLPC={false}
+        robotType={FLEX_ROBOT_TYPE}
       />
     </MemoryRouter>,
     {
@@ -77,10 +76,6 @@ describe('SetupLabwarePositionCheck', () => {
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-
-    when(vi.mocked(useLPCSuccessToast))
-      .calledWith()
-      .thenReturn({ setIsShowingLPCSuccessToast: vi.fn() })
 
     when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
@@ -134,18 +129,5 @@ describe('SetupLabwarePositionCheck', () => {
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(screen.queryByText('mock Labware Position Check')).toBeNull()
-  })
-
-  it('should close Labware Offset Success toast when LPC is launched', () => {
-    const mockSetIsShowingLPCSuccessToast = vi.fn()
-    when(vi.mocked(useLPCSuccessToast)).calledWith().thenReturn({
-      setIsShowingLPCSuccessToast: mockSetIsShowingLPCSuccessToast,
-    })
-    render()
-    const button = screen.getByRole('button', {
-      name: 'run labware position check',
-    })
-    fireEvent.click(button)
-    expect(mockSetIsShowingLPCSuccessToast).toHaveBeenCalledWith(false)
   })
 })

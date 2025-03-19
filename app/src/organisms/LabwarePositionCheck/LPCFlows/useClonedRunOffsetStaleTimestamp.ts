@@ -21,7 +21,8 @@ import type {
 // current run.
 export function useClonedRunOffsetStaleTimestamp(
   currentRunRecord: Run | undefined,
-  storedOffsetSearchParams: SearchLabwareOffsetsData
+  storedOffsetSearchParams: SearchLabwareOffsetsData,
+  isFlex: boolean
 ): string | null {
   // TODO(jh, 03-17-25): The assumption that we will be able to find the relevant
   //  run only works because a user can only clone a run from the past default
@@ -50,7 +51,7 @@ export function useClonedRunOffsetStaleTimestamp(
     data: searchOffsetsData,
     refetch: searchOffsetsRefetch,
   } = useSearchLabwareOffsets(storedOffsetSearchParams, {
-    enabled: storedOffsetSearchParams.filters.length > 0,
+    enabled: isFlex && storedOffsetSearchParams.filters.length > 0,
     staleTime: Infinity,
     cacheTime: Infinity,
     // Use a stable queryKey specific to this instance
@@ -76,25 +77,30 @@ export function useClonedRunOffsetStaleTimestamp(
 
   // On the desktop app, cloning a run should effectively reset hook state appropriately.
   useEffect(() => {
-    if (currentRunId != null && currentRunId !== thisCurrentRunId) {
+    if (isFlex && currentRunId != null && currentRunId !== thisCurrentRunId) {
       setThisCurrentRunId(currentRunId)
       setClonedLwOffsets(currentRunRecord?.data.labwareOffsets ?? null)
       // Reset our stored data reference when explicitly requesting a refetch
       initialOffsetDataRef.current = null
       void searchOffsetsRefetch()
     }
-  }, [currentRunId, thisCurrentRunId, searchOffsetsRefetch, currentRunRecord])
+  }, [
+    isFlex,
+    currentRunId,
+    thisCurrentRunId,
+    searchOffsetsRefetch,
+    currentRunRecord,
+  ])
 
-  if (
+  // No labware offsets means the run wasn't cloned with offsets.
+  if (!isFlex || clonedLwOffsets == null) {
+    return null
+  } else if (
     currentRunRecord == null ||
     storedOffsets == null ||
     historicRunData == null
   ) {
     return 'LOADING'
-  }
-  // No labware offsets means the run wasn't cloned with offsets.
-  else if (clonedLwOffsets == null) {
-    return null
   } else {
     const outdatedOffsetExists = outdatedOffsetExits(
       clonedLwOffsets,
