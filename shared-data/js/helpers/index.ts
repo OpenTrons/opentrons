@@ -44,6 +44,7 @@ export * from './formatRunTimeParameterValue'
 export * from './formatRunTimeParameterMinMax'
 export * from './orderRuntimeParameterRangeOptions'
 export * from './sortRunTimeParameters'
+export * from './parseAddressableArea'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
