@@ -124,16 +124,21 @@ export function useScrollRef(): {
   element: HTMLElement | null
 } {
   const refData = useContext(SharedScrollRefContext)
+  const isScrolling = useScrolling(refData?.element ?? null) // Assuming useScrolling is properly handling scroll state
 
-  if (!refData) {
-    throw new Error(
-      'useScrollRef must be used within a SharedScrollRefProvider'
+  if (refData == null) {
+    // log non critical error instead of throwing error to prevent white screens
+    console.error(
+      'useScrollRef must be used within a SharedScrollRefProvider. Falling back to dummy refs.'
     )
+    return {
+      refCallback: () => null,
+      isScrolling: false,
+      element: null,
+    }
   }
 
   const { refCallback, element } = refData
-
-  const isScrolling = useScrolling(element) // Assuming useScrolling is properly handling scroll state
 
   return {
     refCallback,
