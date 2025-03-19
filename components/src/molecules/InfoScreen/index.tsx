@@ -4,8 +4,6 @@ import { StyledText } from '../../atoms/StyledText'
 import { Icon } from '../../icons'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
-import { css } from 'styled-components'
-import { RESPONSIVENESS } from '@opentrons/components'
 
 interface InfoScreenProps {
   content: string
@@ -33,24 +31,20 @@ export function InfoScreen({
       padding={`${SPACING.spacing40} ${SPACING.spacing16}`}
       data-testid="InfoScreen"
     >
-      <Icon name="ot-alert" aria-label="alert" css={ICON_STYLE} />
+      <Icon
+        name="ot-alert"
+        size="1.25rem"
+        color={COLORS.grey60}
+        aria-label="alert"
+      />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing4}
       >
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
-          oddStyle="level4HeaderRegular"
-        >
-          {content}
-        </StyledText>
+        <StyledText desktopStyle="bodyDefaultSemiBold">{content}</StyledText>
         {subContent != null ? (
-          <StyledText
-            desktopStyle="bodyDefaultRegular"
-            oddStyle="level4HeaderRegular"
-            color={COLORS.grey60}
-          >
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {subContent}
           </StyledText>
         ) : null}
@@ -58,14 +52,3 @@ export function InfoScreen({
     </Flex>
   )
 }
-
-const ICON_STYLE = css`
-  height: ${SPACING.spacing20};
-  width: ${SPACING.spacing20};
-  color: ${COLORS.grey60};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: ${SPACING.spacing60};
-    width: ${SPACING.spacing60};
-  }
-`
