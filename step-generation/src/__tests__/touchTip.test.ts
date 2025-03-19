@@ -28,7 +28,7 @@ describe('touchTip', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   })
 
-  it('touchTip with tip, specifying offsetFromBottomMm and speed', () => {
+  it('touchTip with tip, specifying offsetFromBottomMm, speed, and mmFromEdge', () => {
     const result = touchTip(
       {
         pipetteId: DEFAULT_PIPETTE,
@@ -36,6 +36,7 @@ describe('touchTip', () => {
         wellName: 'A1',
         wellLocation,
         speed: 10,
+        mmFromEdge: 0.2,
       },
       invariantContext,
       robotStateWithTip
@@ -57,6 +58,7 @@ describe('touchTip', () => {
             },
           },
           speed: 10,
+          mmFromEdge: 0.2,
         },
       },
     ])
@@ -66,6 +68,7 @@ mockPythonName.touch_tip(
     mockPythonName["A1"],
     v_offset=10,
     speed=10,
+    mm_from_edge=0.2,
 )`.trimStart()
     )
   })
