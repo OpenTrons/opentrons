@@ -17,7 +17,7 @@ import {
   getRobotStateTimeline,
 } from '../../../../file-data/selectors'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
-import { ProtocolStepsDeck } from '../../DeckSetup/ProtocolStepsDeck'
+import { ProtocolStepsDeckContainer } from '../../DeckSetup/ProtocolStepsDeckContainer'
 import { OffDeck } from '../../../../components/organisms/OffDeck'
 import { SubStepsToolbox } from '../Timeline'
 import { DraggableSidebar } from '../DraggableSidebar'
@@ -36,7 +36,7 @@ vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
 vi.mock('../../../../components/organisms/OffDeck')
-vi.mock('../../DeckSetup/ProtocolStepsDeck')
+vi.mock('../../DeckSetup/ProtocolStepsDeckContainer')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {
     i18nInstance: i18n,
@@ -70,8 +70,8 @@ describe('ProtocolSteps', () => {
     vi.mocked(DraggableSidebar).mockReturnValue(
       <div>mock DraggableSidebar</div>
     )
-    vi.mocked(ProtocolStepsDeck).mockReturnValue(
-      <div>mock ProtocolStepsDeck</div>
+    vi.mocked(ProtocolStepsDeckContainer).mockReturnValue(
+      <div>mock ProtocolStepsDeckContainer</div>
     )
     vi.mocked(getSelectedTerminalItemId).mockReturnValue(null)
     vi.mocked(OffDeck).mockReturnValue(<div>mock OffDeck</div>)
@@ -90,12 +90,12 @@ describe('ProtocolSteps', () => {
   it('renders each component in ProtocolSteps', () => {
     render()
     screen.getByText('mock DraggableSidebar')
-    screen.getByText('mock ProtocolStepsDeck')
+    screen.getByText('mock ProtocolStepsDeckContainer')
   })
 
   it('renders the toggle when formData is null', () => {
     render()
-    screen.getByText('mock ProtocolStepsDeck')
+    screen.getByText('mock ProtocolStepsDeckContainer')
     fireEvent.click(screen.getByText('Off deck'))
     screen.getByText('mock OffDeck')
   })

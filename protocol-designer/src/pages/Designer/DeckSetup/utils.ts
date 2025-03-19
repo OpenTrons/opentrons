@@ -503,7 +503,7 @@ export const getSVGContainerWidth = (
     return '78.5%'
   }
   if (robotType !== OT2_ROBOT_TYPE && !isZoomed && tab !== 'protocolSteps') {
-    return '70%'
+    return '75%'
   }
   return '100%'
 }

@@ -41,9 +41,10 @@ import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
+// const WASTE_CHUTE_SPACE = 30
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
-export function ProtocolStepsDeck(): JSX.Element {
+export function ProtocolStepsDeckContainer(): JSX.Element {
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const _disableCollisionWarnings = useSelector(getDisableModuleRestrictions)
   const robotType = useSelector(getRobotType)
@@ -104,6 +105,10 @@ export function ProtocolStepsDeck(): JSX.Element {
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
 
+  const [viewBoxX, viewBoxY] = deckDef.cornerOffsetFromOrigin
+  const [viewBoxWidth, viewBoxHeight] = deckDef.dimensions
+  const viewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
+
   return (
     <>
       <Flex
@@ -122,7 +127,7 @@ export function ProtocolStepsDeck(): JSX.Element {
           width="100%"
           minWidth="auto"
           deckDef={deckDef}
-          // viewBox={initialViewBox}
+          viewBox={viewBox}
           transform={
             robotType === OT2_ROBOT_TYPE ? 'scale(1.3, -1.3)' : 'scale(1, -1)'
           }
@@ -137,7 +142,7 @@ export function ProtocolStepsDeck(): JSX.Element {
                   layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
                 />
               ) : (
-                // Note (kk, 03/18/25): this part will be exported as a component in the future
+                // ToDo export this as a component
                 <>
                   {filteredAddressableAreas.map(addressableArea => {
                     const cutoutId = getCutoutIdForAddressableArea(

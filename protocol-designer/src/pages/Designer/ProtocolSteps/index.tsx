@@ -40,7 +40,7 @@ import {
 } from '../../../file-data/selectors'
 
 import { DraggableSidebar } from './DraggableSidebar'
-import { ProtocolStepsDeck } from '../DeckSetup/ProtocolStepsDeck'
+import { ProtocolStepsDeckContainer } from '../DeckSetup/ProtocolStepsDeckContainer'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 
@@ -148,7 +148,7 @@ export function ProtocolSteps(): JSX.Element {
             height="100%"
           >
             {deckView === leftString ? (
-              <ProtocolStepsDeck />
+              <ProtocolStepsDeckContainer />
             ) : (
               <OffDeck tab="protocolSteps" />
             )}

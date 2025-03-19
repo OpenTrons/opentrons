@@ -14,17 +14,17 @@ export interface RobotCoordinateSpaceWithRefRenderProps {
 }
 
 interface RobotCoordinateSpaceWithRefProps extends ComponentProps<typeof Svg> {
-  viewBox?: string | null
+  viewBox: string
   deckDef?: DeckDefinition
-  zoomed?: boolean
   children?: (props: RobotCoordinateSpaceWithRefRenderProps) => ReactNode
 }
 
 export function RobotCoordinateSpaceWithRef(
   props: RobotCoordinateSpaceWithRefProps
 ): JSX.Element | null {
-  const { children, deckDef, viewBox, zoomed = false, ...restProps } = props
+  const { children, deckDef, viewBox, ...restProps } = props
   const wrapperRef = useRef<SVGSVGElement>(null)
+  if (deckDef == null) return null
   const getRobotCoordsFromDOMCoords: RobotCoordinateSpaceWithRefRenderProps['getRobotCoordsFromDOMCoords'] = (
     x,
     y
@@ -41,24 +41,23 @@ export function RobotCoordinateSpaceWithRef(
     )
   }
 
-  if (deckDef == null && viewBox == null) return null
+  // let wholeDeckViewBox
+  // let deckSlotsById = {}
+  // if (deckDef != null) {
+  // const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
+  // const [deckXDimension, deckYDimension] = deckDef.dimensions
 
-  let wholeDeckViewBox
-  let deckSlotsById = {}
-  if (deckDef != null) {
-    const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
-    const [deckXDimension, deckYDimension] = deckDef.dimensions
-
-    deckSlotsById = deckDef.locations.addressableAreas.reduce(
-      (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
-      {}
-    )
-    wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
-  }
+  const deckSlotsById = deckDef.locations.addressableAreas.reduce(
+    (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
+    {}
+  )
+  // wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
+  // }
 
   return (
     <Svg
-      viewBox={zoomed ? viewBox : wholeDeckViewBox}
+      // viewBox={viewBox !== null ? viewBox : wholeDeckViewBox}
+      viewBox={viewBox}
       ref={wrapperRef}
       transform="scale(1, -1)"
       width="100%"

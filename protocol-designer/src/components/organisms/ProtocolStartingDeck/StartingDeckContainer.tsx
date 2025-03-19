@@ -1,6 +1,5 @@
 import { useMemo, useState, Fragment } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import round from 'lodash/round'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -41,13 +40,12 @@ import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupDetails } from '../../../pages/Designer/DeckSetup/DeckSetupDetails'
 import {
-  DECK_SETUP_TOOLS_WIDTH_REM,
+  // DECK_SETUP_TOOLS_WIDTH_REM,
   DeckSetupTools,
 } from '../../../pages/Designer/DeckSetup/DeckSetupTools'
 import {
   animateZoom,
   getCutoutIdForAddressableArea,
-  getSVGContainerWidth,
   useDeckSetupWindowBreakPoint,
   zoomInOnCoordinate,
 } from '../../../pages/Designer/DeckSetup/utils'
@@ -64,11 +62,6 @@ import type {
   DeckSlot,
 } from '@opentrons/step-generation'
 import type { Fixture } from '../../../pages/Designer/DeckSetup/constants'
-// Note (kk, 03/18/25): import warning will be resolved in the future
-
-const WASTE_CHUTE_SPACE = 30
-const DETAILS_HOVER_SPACE = 60
-const STARTING_DECK_VIEW_MIN_WIDTH = '75%'
 
 export function StartingDeckContainer(): JSX.Element {
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
@@ -79,6 +72,9 @@ export function StartingDeckContainer(): JSX.Element {
   const robotType = useSelector(getRobotType)
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const [hoverSlot, setHoverSlot] = useState<DeckSlot | null>(null)
+  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
+  const [hoveredModule, setHoveredModule] = useState<ModuleModel | null>(null)
+  const [hoveredFixture, setHoveredFixture] = useState<Fixture | null>(null)
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -99,42 +95,13 @@ export function StartingDeckContainer(): JSX.Element {
       wasteChuteFixtures.length > 0
   )
 
-  const hasWasteChute =
-    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
-
-  const windowInnerWidthRem = window.innerWidth / 16
-  const deckMapRatio = round(
-    (windowInnerWidthRem - DECK_SETUP_TOOLS_WIDTH_REM) / windowInnerWidthRem,
-    2
-  )
-
-  const viewBoxX = deckDef.cornerOffsetFromOrigin[0]
-  const viewBoxY = hasWasteChute
-    ? deckDef.cornerOffsetFromOrigin[1] -
-      WASTE_CHUTE_SPACE -
-      DETAILS_HOVER_SPACE
-    : deckDef.cornerOffsetFromOrigin[1]
-  const viewBoxWidth = deckDef.dimensions[0] / deckMapRatio
-  const viewBoxHeight = deckDef.dimensions[1] + DETAILS_HOVER_SPACE
+  const [viewBoxX, viewBoxY] = deckDef.cornerOffsetFromOrigin
+  const [viewBoxWidth, viewBoxHeight] = deckDef.dimensions
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
 
   const [viewBox, setViewBox] = useState<string>(initialViewBox)
 
   const isZoomed = Object.values(zoomIn).some(val => val != null)
-  const viewBoxNumerical = viewBox?.split(' ').map(val => Number(val)) ?? []
-  const viewBoxAdjustedNumerical = [
-    ...viewBoxNumerical.slice(0, 2),
-    (viewBoxNumerical[2] - viewBoxNumerical[0]) / deckMapRatio +
-      viewBoxNumerical[0],
-    viewBoxNumerical[3],
-  ]
-  const viewBoxAdjusted = viewBoxAdjustedNumerical.reduce((acc, num, i) => {
-    return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
-  }, '')
-
-  const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
-  const [hoveredModule, setHoveredModule] = useState<ModuleModel | null>(null)
-  const [hoveredFixture, setHoveredFixture] = useState<Fixture | null>(null)
 
   const addEquipment = (slotId: string): void => {
     const cutoutId =
@@ -196,12 +163,6 @@ export function StartingDeckContainer(): JSX.Element {
     containerPadding = SPACING.spacing40
   }
 
-  const svgContainerWidth = getSVGContainerWidth(
-    robotType,
-    'startingDeck',
-    isZoomed
-  )
-
   return (
     <>
       <Flex
@@ -223,7 +184,7 @@ export function StartingDeckContainer(): JSX.Element {
           gridGap={SPACING.spacing12}
         >
           <Flex
-            width={svgContainerWidth}
+            width="100%"
             height="100%"
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
@@ -240,9 +201,8 @@ export function StartingDeckContainer(): JSX.Element {
             <RobotCoordinateSpaceWithRef
               height="100%"
               width={zoomIn.slot != null ? '100%' : '50%'}
-              minWidth={STARTING_DECK_VIEW_MIN_WIDTH}
               deckDef={deckDef}
-              viewBox={viewBoxAdjusted}
+              viewBox={viewBox}
               outline="auto"
               zoomed={zoomIn.slot != null}
               borderRadius={BORDERS.borderRadius12}
