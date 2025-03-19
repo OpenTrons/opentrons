@@ -25,7 +25,7 @@ import type {
 // If analysis is incompatible with LPC, force reanalysis and use that fresh analysis,
 // otherwise, use the current analysis.
 export function useCompatibleAnalysis(
-  runId: string,
+  runId: string | null,
   runRecord: Run | undefined,
   mostRecentAnalysis: CompletedProtocolAnalysis | null,
   isFlex: boolean

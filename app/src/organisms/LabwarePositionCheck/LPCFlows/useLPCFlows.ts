@@ -47,7 +47,7 @@ interface UseLPCFlowsLaunched extends UseLPCFlowsBase {
 export type UseLPCFlowsResult = UseLPCFlowsIdle | UseLPCFlowsLaunched
 
 export interface UseLPCFlowsProps {
-  runId: string
+  runId: string | null
   robotType: RobotType
   protocolName: string | undefined
 }
@@ -65,7 +65,7 @@ export function useLPCFlows({
   // run. Make sure run setup is disabled, too.
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
-  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId ?? null)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const compatibleFlexAnalysis = useCompatibleAnalysis(
     runId,
@@ -125,7 +125,7 @@ export function useLPCFlows({
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
   // TODO(jh, 01-14-25): There's no external error handing if LPC fails this series of POST requests.
   // If the server doesn't absorb this functionality for the redesign, add error handling.
-  useRunLoadedLabwareDefinitions(runId, {
+  useRunLoadedLabwareDefinitions(runId ?? null, {
     onSuccess: res => {
       void Promise.all(
         res.data.map(def => {
@@ -180,6 +180,7 @@ export function useLPCFlows({
   }
 
   const showLPC =
+    runId != null &&
     hasCreatedLPCRun &&
     maintenanceRunId != null &&
     protocolName != null &&
@@ -201,10 +202,15 @@ export function useLPCFlows({
           analysis: compatibleRobotAnalysis,
           protocolName,
           maintenanceRunId,
-          runRecordExistingOffsets: ot2Offsets,
+          ot2Offsets,
         },
       }
-    : { launchLPC, isLaunchingLPC: isLaunching, lpcProps: null, showLPC }
+    : {
+        launchLPC,
+        isLaunchingLPC: isLaunching,
+        lpcProps: null,
+        showLPC,
+      }
 }
 
 const RUN_REFETCH_INTERVAL = 5000

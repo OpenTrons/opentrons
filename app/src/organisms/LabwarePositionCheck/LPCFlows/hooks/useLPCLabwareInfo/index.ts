@@ -21,7 +21,7 @@ import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueVa
 const REFETCH_OFFSET_SEARCH_MS = 5000
 
 export type UseLPCLabwareInfoProps = GetUniqueValidLwLocationInfoByAnalysisParams & {
-  runId: string
+  runId: string | null
   robotType: RobotType
 }
 
@@ -57,7 +57,7 @@ function useFlexLPCLabwareInfo({
   UseLPCLabwareInfoResult,
   'labwareInfo' | 'storedOffsets' | 'searchLwOffsetsParams'
 > {
-  const runStatus = useRunStatus(runId)
+  const runStatus = useRunStatus(runId ?? null)
 
   const lwLocationCombos = useMemo(
     () =>
@@ -65,7 +65,6 @@ function useFlexLPCLabwareInfo({
         labwareDefs,
         protocolData,
         robotType,
-        runId,
       }),
     [labwareDefs?.length, protocolData?.commands.length, robotType]
   )
@@ -109,7 +108,7 @@ function useOT2LPCLabwareInfo({
   runId,
   robotType,
 }: UseLPCLabwareInfoProps): Pick<UseLPCLabwareInfoResult, 'legacyOffsets'> {
-  const { data: runRecord } = useNotifyRunQuery(runId, {
+  const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
     enabled: robotType === OT2_ROBOT_TYPE,
   })
   const legacyOffsets = runRecord?.data?.labwareOffsets ?? []
