@@ -17,7 +17,7 @@ import styled from 'styled-components'
 export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
   const {
     handleAttachProbeCheck,
-    handleNavToDetachProbe,
+    handleCloseWithoutHome,
   } = props.commandUtils.headerCommands
   const { t } = useTranslation('labware_position_check')
   const channelCount = useSelector(selectActivePipetteChannelCount(props.runId))
@@ -37,6 +37,21 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
     }
   }
 
+  const probei18nString = (): string => {
+    switch (channelCount) {
+      case 1:
+        return 'install_probe_1ch'
+      case 8:
+        return 'install_probe_8ch'
+      case 96:
+        return 'install_probe_96ch'
+      default: {
+        console.error('Unexpected channel count.')
+        return 'install_probe_1ch'
+      }
+    }
+  }
+
   return (
     <LPCContentContainer
       {...props}
@@ -47,7 +62,7 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
         buttonText: t('exit'),
         buttonCategory: 'rounded',
         buttonType: 'tertiaryLowLight',
-        onClick: handleNavToDetachProbe,
+        onClick: handleCloseWithoutHome,
       }}
     >
       <TwoColumn>
@@ -56,8 +71,11 @@ export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
           message={
             <Trans
               t={t}
-              i18nKey="install_probe"
-              components={{ block: <LegacyStyledText as="p" /> }}
+              i18nKey={probei18nString()}
+              components={{
+                block: <LegacyStyledText as="p" />,
+                bold: <strong />,
+              }}
             />
           }
         />

@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union, Any
 from typing_extensions import Literal
 
-
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
 
@@ -101,6 +100,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            operation_volume=volume,
         )
         if isinstance(move_result, DefinedErrorData):
             return move_result

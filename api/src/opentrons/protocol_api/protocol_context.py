@@ -449,13 +449,16 @@ class ProtocolContext(CommandPublisher):
             values as the ``load_name`` parameter of :py:meth:`.load_adapter`. The
             adapter will use the same namespace as the labware, and the API will
             choose the adapter's version automatically.
-        :param lid: A lid to load the on top of the main labware. Accepts the same
-            values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
-            lid will use the same namespace as the labware, and the API will
-            choose the lid's version automatically.
 
                         .. versionadded:: 2.15
         """
+        # TODO: re-include in docstring when 2.23 is ready
+        #         :param lid: A lid to load the on top of the main labware. Accepts the same
+        #             values as the ``load_name`` parameter of :py:meth:`.load_lid_stack`. The
+        #             lid will use the same namespace as the labware, and the API will
+        #             choose the lid's version automatically.
+        #
+        #                         .. versionadded:: 2.23
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
             raise APIVersionError(
                 api_element="Loading a labware off-deck",
@@ -865,7 +868,8 @@ class ProtocolContext(CommandPublisher):
                   .. versionchanged:: 2.15
                     Added ``MagneticBlockContext`` return value.
 
-                  .. versionchanged:: 2.23
+                  .. TODO uncomment when 2.23 is ready
+                    versionchanged:: 2.23
                     Added ``FlexStackerModuleContext`` return value.
         """
         if configuration:
@@ -1357,7 +1361,11 @@ class ProtocolContext(CommandPublisher):
         self,
         name: str,
     ) -> LiquidClass:
-        """Define a liquid class for use in the protocol."""
+        """
+        Define a liquid class for use in the protocol.
+
+        :meta private:
+        """
         return self._core.define_liquid_class(name=name)
 
     @property
@@ -1411,6 +1419,8 @@ class ProtocolContext(CommandPublisher):
             automatically.
 
         :return:  The initialized and loaded labware object representing the Lid Stack.
+
+        :meta private:
         """
         if self._api_version < validation.LID_STACK_VERSION_GATE:
             raise APIVersionError(
@@ -1504,6 +1514,8 @@ class ProtocolContext(CommandPublisher):
         Before moving a lid to or from a labware in a hardware module, make sure that the
         labware's current and new locations are accessible, i.e., open the Thermocycler lid
         or open the Heater-Shaker's labware latch.
+
+        :meta private:
         """
         source: Union[LabwareCore, DeckSlotName, StagingSlotName]
         if isinstance(source_location, Labware):

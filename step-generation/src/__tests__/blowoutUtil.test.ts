@@ -1,15 +1,11 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 import {
   blowoutUtil,
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils'
-import {
-  blowOutInPlace,
-  moveToAddressableArea,
-  blowout,
-} from '../commandCreators/atomic'
+import { blowOutInWell } from '../commandCreators/atomic'
+import { blowOutInWasteChute } from '../commandCreators/compound'
 import { curryCommandCreator } from '../utils/curryCommandCreator'
 import {
   DEFAULT_PIPETTE,
@@ -23,6 +19,7 @@ import {
 } from '../fixtures'
 import type { RobotState, InvariantContext } from '../types'
 import type { BlowoutParams } from '@opentrons/shared-data'
+
 vi.mock('../utils/curryCommandCreator')
 
 let blowoutArgs: {
@@ -62,7 +59,7 @@ describe('blowoutUtil', () => {
       ...blowoutArgs,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: blowoutArgs.sourceLabwareId,
       wellName: blowoutArgs.sourceWell,
@@ -94,14 +91,9 @@ describe('blowoutUtil', () => {
       destWell: null,
       blowoutLocation: wasteChuteId,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(moveToAddressableArea, {
-      addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWasteChute, {
       pipetteId: blowoutArgs.pipette,
-      offset: { x: 0, y: 0, z: 0 },
-    })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInPlace, {
       flowRate: 2.3,
-      pipetteId: blowoutArgs.pipette,
     })
   })
   it('blowoutUtil curries blowout with dest plate params', () => {
@@ -109,7 +101,7 @@ describe('blowoutUtil', () => {
       ...blowoutArgs,
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: blowoutArgs.destLabwareId,
       wellName: blowoutArgs.destWell,
@@ -127,7 +119,7 @@ describe('blowoutUtil', () => {
       ...blowoutArgs,
       blowoutLocation: TROUGH_LABWARE,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: TROUGH_LABWARE,
       wellName: 'A1',

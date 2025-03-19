@@ -12,7 +12,7 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { LINE_CLAMP_TEXT_STYLE } from '../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { getEnableLiquidClasses } from '../../feature-flags/selectors'
 import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 
@@ -67,7 +67,7 @@ export function LiquidDefinitions({
           Object.values(allIngredientGroupFields).map((liquid, index) => {
             return (
               <ListItem
-                type="noActive"
+                type="default"
                 key={`${liquid.displayName}_${liquid.displayColor}_${index}`}
               >
                 <ListItemDescriptor

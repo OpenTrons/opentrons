@@ -164,9 +164,6 @@ class TransferComponentsExecutor:
         # TODO: handle volume correction
         aspirate_props = self._transfer_properties.aspirate
         correction_volume = aspirate_props.correction_by_volume.get_for_volume(volume)
-        is_meniscus = bool(
-            aspirate_props.position_reference == PositionReference.LIQUID_MENISCUS
-        )
         self._instrument.aspirate(
             location=self._target_location,
             well_core=None,
@@ -174,7 +171,6 @@ class TransferComponentsExecutor:
             rate=1,
             flow_rate=aspirate_props.flow_rate_by_volume.get_for_volume(volume),
             in_place=True,
-            is_meniscus=is_meniscus,
             correction_volume=correction_volume,
         )
         self._tip_state.append_liquid(volume)
@@ -194,9 +190,6 @@ class TransferComponentsExecutor:
         correction_volume = dispense_properties.correction_by_volume.get_for_volume(
             volume
         )
-        is_meniscus = bool(
-            dispense_properties.position_reference == PositionReference.LIQUID_MENISCUS
-        )
         self._instrument.dispense(
             location=self._target_location,
             well_core=None,
@@ -205,7 +198,6 @@ class TransferComponentsExecutor:
             flow_rate=dispense_properties.flow_rate_by_volume.get_for_volume(volume),
             in_place=True,
             push_out=push_out_override,
-            is_meniscus=is_meniscus,
             correction_volume=correction_volume,
         )
         if push_out_override:
@@ -745,7 +737,6 @@ class TransferComponentsExecutor:
             rate=1,
             flow_rate=flow_rate,
             in_place=True,
-            is_meniscus=False,
             push_out=0,
             correction_volume=correction_volume,
         )
@@ -770,7 +761,11 @@ def absolute_point_from_position_reference_and_offset(
         case PositionReference.WELL_CENTER:
             reference_point = well.get_center()
         case PositionReference.LIQUID_MENISCUS:
-            reference_point = well.get_meniscus()
+            meniscus_point = well.get_meniscus()
+            if not isinstance(meniscus_point, Point):
+                reference_point = well.get_center()
+            else:
+                reference_point = meniscus_point
         case _:
             raise ValueError(f"Unknown position reference {position_reference}")
     return reference_point + Point(offset.x, offset.y, offset.z)

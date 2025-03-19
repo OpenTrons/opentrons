@@ -118,8 +118,6 @@ async def test_set_stored_labware_happypath(
     decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
         FlexStackerSubState(
             module_id=cast(FlexStackerId, module_id),
-            in_static_mode=False,
-            hopper_labware_ids=[],
             pool_primary_definition=None,
             pool_adapter_definition=None,
             pool_lid_definition=None,
@@ -194,12 +192,7 @@ async def test_set_stored_labware_happypath(
     )
 
 
-@pytest.mark.parametrize(
-    "hopper_labware,pool_count", [([], 1), (["fake-id"], 0), (["fake-id"], 1)]
-)
 async def test_set_stored_labware_requires_empty_hopper(
-    hopper_labware: list[str],
-    pool_count: int,
     decoy: Decoy,
     state_view: StateView,
     subject: SetStoredLabwareImpl,
@@ -209,13 +202,11 @@ async def test_set_stored_labware_requires_empty_hopper(
     decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
         FlexStackerSubState(
             module_id=cast(FlexStackerId, module_id),
-            in_static_mode=False,
-            hopper_labware_ids=hopper_labware,
             pool_primary_definition=None,
             pool_adapter_definition=None,
             pool_lid_definition=None,
-            pool_count=pool_count,
-            max_pool_count=pool_count,
+            pool_count=2,
+            max_pool_count=6,
         )
     )
     with pytest.raises(FlexStackerNotLogicallyEmptyError):
@@ -232,7 +223,7 @@ async def test_set_stored_labware_requires_empty_hopper(
         )
 
 
-@pytest.mark.parametrize("input_count,output_count", [(None, 5), (2, 2), (6, 5)])
+@pytest.mark.parametrize("input_count,output_count", [(None, 6), (2, 2), (7, 6)])
 async def test_set_stored_labware_limits_count(
     input_count: int | None,
     output_count: int,
@@ -255,8 +246,6 @@ async def test_set_stored_labware_limits_count(
     decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
         FlexStackerSubState(
             module_id=cast(FlexStackerId, module_id),
-            in_static_mode=False,
-            hopper_labware_ids=[],
             pool_primary_definition=None,
             pool_adapter_definition=None,
             pool_lid_definition=None,
@@ -278,7 +267,7 @@ async def test_set_stored_labware_limits_count(
         state_view.modules.stacker_max_pool_count_by_height(
             module_id, sentinel.pool_height
         )
-    ).then_return(5)
+    ).then_return(6)
 
     result = await subject.execute(params)
     assert result == SuccessData(
@@ -292,7 +281,7 @@ async def test_set_stored_labware_limits_count(
             flex_stacker_state_update=FlexStackerStateUpdate(
                 module_id=module_id,
                 pool_constraint=FlexStackerPoolConstraint(
-                    max_pool_count=5,
+                    max_pool_count=6,
                     primary_definition=sentinel.primary_definition,
                     lid_definition=None,
                     adapter_definition=None,

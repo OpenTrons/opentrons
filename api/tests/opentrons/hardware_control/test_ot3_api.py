@@ -75,6 +75,7 @@ from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
     PipetteLiquidNotFoundError,
+    UnexpectedTipRemovalError,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.types import (
@@ -1782,10 +1783,116 @@ async def test_plunger_ready_to_aspirate_after_dispense(
     assert ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate
 
     await ot3_hardware.aspirate(OT3Mount.LEFT, asp_vol)
-    await ot3_hardware.dispense(OT3Mount.LEFT, disp_vol, push_out=push_out)
+    await ot3_hardware.dispense(
+        OT3Mount.LEFT, disp_vol, push_out=push_out, is_full_dispense=disp_vol == asp_vol
+    )
     assert (
         ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate == is_ready
     )
+
+
+@pytest.mark.parametrize("is_ready", [True, False])
+@pytest.mark.parametrize("tip_present", [True, False])
+async def test_aspirate_while_tracking(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move: AsyncMock,
+    is_ready: bool,
+    tip_present: bool,
+) -> None:
+    mount = OT3Mount.LEFT
+
+    instr_data = AttachedPipette(
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 4),
+            PipetteOEMType.OT,
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
+    pipette = ot3_hardware.hardware_pipettes[OT3Mount.LEFT.to_mount()]
+    assert pipette
+
+    if tip_present:
+        ot3_hardware.add_tip(mount, 100)
+        if is_ready:
+            await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
+
+    if not tip_present:
+        with pytest.raises(UnexpectedTipRemovalError):
+            await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+    elif not is_ready:
+        with pytest.raises(RuntimeError):
+            await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+    else:
+        await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+        # make sure the move planning math stays the same
+        expected_target_pos = {
+            Axis.X: 477.2,
+            Axis.Y: 493.8,
+            Axis.Z_L: 261.475,
+            Axis.P_L: 65.983786,
+        }
+        expected_speed = 46.504982
+        called_target_pos = mock_move.call_args_list[-1][0][0]
+        called_speed = mock_move.call_args_list[-1][1]["speed"]
+        assert expected_target_pos == called_target_pos
+        assert expected_speed == called_speed
+
+
+@pytest.mark.parametrize("tip_present", [True, False])
+@pytest.mark.parametrize("is_ready", [True, False])
+async def test_dispense_while_tracking(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move: AsyncMock,
+    tip_present: bool,
+    is_ready: bool,
+) -> None:
+    mount = OT3Mount.LEFT
+
+    instr_data = AttachedPipette(
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 4),
+            PipetteOEMType.OT,
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
+    pipette = ot3_hardware.hardware_pipettes[OT3Mount.LEFT.to_mount()]
+    assert pipette
+
+    if tip_present:
+        ot3_hardware.add_tip(mount, 100)
+    if is_ready:
+        pipette.set_current_volume(80.0)
+
+    if not tip_present:
+        with pytest.raises(UnexpectedTipRemovalError):
+            await ot3_hardware.dispense_while_tracking(
+                mount, 8.0, 80.0, push_out=None, is_full_dispense=is_ready
+            )
+    else:
+        await ot3_hardware.dispense_while_tracking(
+            mount, 8.0, 80.0, push_out=None, is_full_dispense=True
+        )
+        if is_ready:
+            # make sure the move planning math stays the same
+            expected_target_pos = {
+                Axis.X: 477.2,
+                Axis.Y: 493.8,
+                Axis.Z_L: 261.475,
+                Axis.P_L: 72.75754527162978,
+            }
+            expected_speed = 46.504982
+            called_target_pos = mock_move.call_args_list[-1][0][0]
+            called_speed = mock_move.call_args_list[-1][1]["speed"]
+            assert expected_target_pos == called_target_pos
+            assert expected_speed == called_speed
+        else:
+            assert len(mock_move.call_args_list) == 0
 
 
 async def test_move_to_plunger_bottom(

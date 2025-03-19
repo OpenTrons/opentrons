@@ -6,6 +6,7 @@ import type { Selector } from 'reselect'
 import type { LoadedPipette, PipetteChannels } from '@opentrons/shared-data'
 import type { State } from '../../../types'
 
+// Returns the "active" pipette, the pipette used for LPC.
 export const selectActivePipette = (
   runId: string
 ): Selector<State, LoadedPipette | null> =>
@@ -26,6 +27,7 @@ export const selectActivePipette = (
     }
   )
 
+// Returns the channel count for the "active" pipette.
 export const selectActivePipetteChannelCount = (
   runId: string
 ): Selector<State, PipetteChannels> =>

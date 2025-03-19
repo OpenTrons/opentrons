@@ -39,7 +39,7 @@ describe('heaterShaker compound command creator', () => {
           id: HEATER_SHAKER_ID,
           type: HEATERSHAKER_MODULE_TYPE,
           model: HEATERSHAKER_MODULE_V1,
-          pythonName: 'mockPythonName',
+          pythonName: 'mock_heater_shaker_1',
         },
       },
     }
@@ -128,6 +128,9 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_heater_shaker_1.close_labware_latch()\nmock_heater_shaker_1.set_target_temperature(80)\nmock_heater_shaker_1.set_and_wait_for_shake_speed(444)\nprotocol.delay(seconds=30)\nmock_heater_shaker_1.deactivate_shaker()\nmock_heater_shaker_1.deactivate_heater()'
+    )
   })
   it('should NOT delay and deactivate the heater shaker when a user specificies a timer that is 0 seconds', () => {
     heaterShakerArgs = {
@@ -164,6 +167,9 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_heater_shaker_1.close_labware_latch()\nmock_heater_shaker_1.set_target_temperature(80)\nmock_heater_shaker_1.set_and_wait_for_shake_speed(444)'
+    )
   })
   it('should delay and emit open latch last if open latch is specified', () => {
     heaterShakerArgs = {
@@ -233,6 +239,9 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_heater_shaker_1.set_target_temperature(80)\nmock_heater_shaker_1.set_and_wait_for_shake_speed(444)\nprotocol.delay(seconds=20)\nmock_heater_shaker_1.deactivate_shaker()\nmock_heater_shaker_1.deactivate_heater()\nmock_heater_shaker_1.open_labware_latch()'
+    )
   })
   it('should not call deactivateShaker when it is not shaking but call activate temperature when setting target temp', () => {
     heaterShakerArgs = {
@@ -276,6 +285,9 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_heater_shaker_1.close_labware_latch()\nmock_heater_shaker_1.set_target_temperature(80)'
+    )
   })
   it('should call to open latch last', () => {
     heaterShakerArgs = {
@@ -313,5 +325,8 @@ describe('heaterShaker compound command creator', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_heater_shaker_1.deactivate_heater()\nmock_heater_shaker_1.open_labware_latch()'
+    )
   })
 })

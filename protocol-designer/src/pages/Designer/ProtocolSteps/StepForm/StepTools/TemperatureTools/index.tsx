@@ -12,7 +12,7 @@ import { getTemperatureLabwareOptions } from '../../../../../../ui/modules/selec
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { StepFormProps } from '../../types'

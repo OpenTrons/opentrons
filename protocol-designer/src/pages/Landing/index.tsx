@@ -8,7 +8,6 @@ import {
   COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
-  EndUserAgreementFooter,
   Flex,
   INFO_TOAST,
   JUSTIFY_CENTER,
@@ -17,14 +16,15 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { AnnouncementModal } from '../../organisms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
+import { EndUserAgreementFooter } from '../../components/molecules'
+import { AnnouncementModal } from '../../components/organisms'
 import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'
 import { toggleNewProtocolModal } from '../../navigation/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { getHasOptedIn } from '../../analytics/selectors'
-import { useAnnouncements } from '../../organisms/AnnouncementModal/announcements'
+import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
 import {
   getLocalStorageItem,
   localStorageAnnouncementKey,

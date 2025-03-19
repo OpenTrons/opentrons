@@ -20,7 +20,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../../../../../atoms'
+import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
   isTimeFormatMinutesSeconds,
   temperatureRangeFieldValue,

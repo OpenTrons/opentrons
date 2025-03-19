@@ -282,7 +282,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
         <tr>
           <TableHeader>{t('location')}</TableHeader>
           <TableHeader>{t('labware')}</TableHeader>
-          <TableHeader>{t('labware_offset_data')}</TableHeader>
+          <TableHeader>{t('legacy_labware_offset_data')}</TableHeader>
         </tr>
       </thead>
 

@@ -71,7 +71,14 @@ from opentrons.protocol_api.core.engine import (
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.advanced_control.transfers import common as tx_commons
-from opentrons.types import Location, Mount, MountType, Point, NozzleConfigurationType
+from opentrons.types import (
+    Location,
+    Mount,
+    MountType,
+    Point,
+    NozzleConfigurationType,
+    MeniscusTrackingTarget,
+)
 
 from ... import versions_below, versions_at_or_above
 
@@ -619,12 +626,15 @@ def test_aspirate_from_well(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
-            is_meniscus=None,
+            meniscus_tracking=None,
         )
     ).then_return(
-        LiquidHandlingWellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
-        )
+        (
+            LiquidHandlingWellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            False,
+        ),
     )
 
     subject.aspirate(
@@ -635,6 +645,7 @@ def test_aspirate_from_well(
         flow_rate=7.8,
         in_place=False,
         correction_volume=123,
+        meniscus_tracking=None,
     )
 
     decoy.verify(
@@ -679,6 +690,7 @@ def test_aspirate_from_coordinates(
         well_core=None,
         location=location,
         in_place=False,
+        meniscus_tracking=None,
     )
 
     decoy.verify(
@@ -721,11 +733,16 @@ def test_aspirate_from_meniscus(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
-            is_meniscus=True,
+            meniscus_tracking=MeniscusTrackingTarget.END,
         )
     ).then_return(
-        LiquidHandlingWellLocation(
-            origin=WellOrigin.MENISCUS, offset=WellOffset(x=3, y=2, z=1), volumeOffset=0
+        (
+            LiquidHandlingWellLocation(
+                origin=WellOrigin.MENISCUS,
+                offset=WellOffset(x=3, y=2, z=1),
+                volumeOffset="operationVolume",
+            ),
+            False,
         )
     )
 
@@ -736,7 +753,7 @@ def test_aspirate_from_meniscus(
         rate=5.6,
         flow_rate=7.8,
         in_place=False,
-        is_meniscus=True,
+        meniscus_tracking=MeniscusTrackingTarget.END,
     )
 
     decoy.verify(
@@ -785,6 +802,7 @@ def test_aspirate_in_place(
         well_core=None,
         location=location,
         in_place=True,
+        meniscus_tracking=None,
     )
 
     decoy.verify(
@@ -921,11 +939,14 @@ def test_dispense_to_well(
             labware_id="123abc",
             well_name="my cool well",
             absolute_point=Point(1, 2, 3),
-            is_meniscus=None,
+            meniscus_tracking=None,
         )
     ).then_return(
-        LiquidHandlingWellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+        (
+            LiquidHandlingWellLocation(
+                origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
+            ),
+            False,
         )
     )
 
@@ -938,6 +959,7 @@ def test_dispense_to_well(
         in_place=False,
         correction_volume=321,
         push_out=7,
+        meniscus_tracking=None,
     )
 
     decoy.verify(
@@ -985,6 +1007,7 @@ def test_dispense_in_place(
         location=location,
         in_place=True,
         push_out=None,
+        meniscus_tracking=None,
     )
 
     decoy.verify(
@@ -1017,6 +1040,7 @@ def test_dispense_to_coordinates(
         location=location,
         in_place=False,
         push_out=None,
+        meniscus_tracking=None,
     )
 
     decoy.verify(
@@ -1067,6 +1091,7 @@ def test_dispense_conditionally_clamps_volume(
         location=Location(point=Point(1, 2, 3), labware=None),
         in_place=True,
         push_out=None,
+        meniscus_tracking=None,
     )
 
     if expect_clampage:

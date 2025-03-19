@@ -5,7 +5,7 @@ import { LiquidIcon } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof LiquidIcon> = {
-  title: 'Library/Molecules/LiquidIcon',
+  title: 'Helix/Molecules/LiquidIcon',
   argTypes: {
     color: {
       control: {

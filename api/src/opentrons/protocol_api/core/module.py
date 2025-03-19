@@ -392,10 +392,6 @@ class AbstractFlexStackerCore(AbstractModuleCore):
         """Get the module's unique hardware serial number."""
 
     @abstractmethod
-    def set_static_mode(self, static: bool) -> None:
-        """Set the Flex Stacker's static mode."""
-
-    @abstractmethod
     def retrieve(self) -> None:
         """Release a labware from the hopper to the staging slot."""
 

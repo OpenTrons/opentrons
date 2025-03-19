@@ -335,7 +335,7 @@ export function QuickTransferAdvancedSettings(
         {selectedSetting == null
           ? baseSettingsItems.map(displayItem => (
               <ListItem
-                type="noActive"
+                type="default"
                 key={displayItem.option}
                 onClick={displayItem.onClick}
               >
@@ -411,7 +411,7 @@ export function QuickTransferAdvancedSettings(
           {selectedSetting === null
             ? aspirateSettingsItems.map(displayItem => (
                 <ListItem
-                  type="noActive"
+                  type="default"
                   key={displayItem.option}
                   onClick={displayItem.onClick}
                 >
@@ -520,7 +520,7 @@ export function QuickTransferAdvancedSettings(
           {selectedSetting === null
             ? dispenseSettingsItems.map(displayItem => (
                 <ListItem
-                  type="noActive"
+                  type="default"
                   key={displayItem.option}
                   onClick={displayItem.onClick}
                 >

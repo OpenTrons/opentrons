@@ -4212,7 +4212,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 26.85
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4388,7 +4388,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 26.85
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4488,7 +4488,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 26.85
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4784,7 +4784,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4920,7 +4920,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -5076,7 +5076,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -5108,7 +5108,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

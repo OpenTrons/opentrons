@@ -1,5 +1,6 @@
 import floor from 'lodash/floor'
-import { swatchColors } from '../../organisms/DefineLiquidsModal/swatchColors'
+import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
+import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
@@ -107,7 +108,22 @@ export const migrateFile = (
           dispense_submerge_speed: null,
           aspirate_touchTip_speed: null,
           dispense_touchTip_speed: null,
+          aspirate_touchTip_mmFromEdge: 0, // this field and the following were previously not configurable and defaulted to 0mm
+          dispense_touchTip_mmFromEdge: 0,
+          aspirate_position_reference: null,
+          aspirate_retract_position_reference: null,
+          aspirate_submerge_mmFromBottom: null,
+          aspirate_submerge_x_position: null,
+          aspirate_submerge_y_position: null,
+          aspirate_submerge_position_reference: null,
+          dispense_position_reference: null,
+          dispense_retract_position_reference: null,
+          dispense_submerge_mmFromBottom: null,
+          dispense_submerge_x_position: null,
+          dispense_submerge_y_position: null,
+          dispense_submerge_position_reference: null,
           liquidClassesSupported: liquidClassesSupported ?? false,
+          liquidClass: null,
         },
       }
     }
@@ -178,6 +194,10 @@ export const migrateFile = (
   )
   return {
     ...appData,
+    metadata: {
+      ...appData.metadata,
+      source: PROTOCOL_DESIGNER_SOURCE,
+    },
     designerApplication: {
       ...designerApplication,
       data: {

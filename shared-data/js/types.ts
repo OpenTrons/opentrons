@@ -29,6 +29,10 @@ import type {
   MAGNETIC_BLOCK_V1,
   FLEX_STACKER_MODULE_V1,
   FLEX_STACKER_MODULE_TYPE,
+  WELL_BOTTOM,
+  WELL_CENTER,
+  WELL_TOP,
+  LIQUID_MENISCUS,
 } from './constants'
 import type { RunTimeCommand, LoadedLabwareLocation } from '../command/types'
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../deck'
@@ -126,6 +130,7 @@ export interface LabwareParameters {
   isTiprack: boolean
   tipLength?: number
   isMagneticModuleCompatible: boolean
+  isDeckSlotCompatible?: boolean
   magneticModuleEngageHeight?: number
   quirks?: string[]
 }
@@ -260,6 +265,8 @@ export interface LabwareDefinition2 {
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
   stackLimit?: number
+  compatibleParentLabware?: string[]
+  innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
 export interface LabwareDefinition3 {
@@ -278,6 +285,8 @@ export interface LabwareDefinition3 {
   allowedRoles?: LabwareRoles[]
   stackingOffsetWithLabware?: Record<string, LabwareOffset>
   stackingOffsetWithModule?: Record<string, LabwareOffset>
+  stackLimit?: number
+  compatibleParentLabware?: string[]
   innerLabwareGeometry?: Record<string, InnerWellGeometry> | null
 }
 
@@ -705,11 +714,12 @@ export interface Liquid {
 
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>
 type LiquidHandlingPropertyByVolume = number[][]
-type PositionReference =
-  | 'well-bottom'
-  | 'well-top'
-  | 'well-center'
-  | 'liquid-meniscus'
+export type PositionReference =
+  | typeof WELL_BOTTOM
+  | typeof WELL_CENTER
+  | typeof WELL_TOP
+  | typeof LIQUID_MENISCUS
+
 type BlowoutLocation = 'source' | 'destination' | 'trash'
 interface DelayParams {
   duration: number
@@ -771,17 +781,17 @@ interface BaseLiquidHandlingProperties<RetractType> {
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
-interface AspirateProperties
+export interface AspirateProperties
   extends BaseLiquidHandlingProperties<RetractAspirate> {
   preWet: boolean
   mix: MixProperties
 }
-interface SingleDispenseProperties
+export interface SingleDispenseProperties
   extends BaseLiquidHandlingProperties<RetractDispense> {
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-interface MultiDispenseProperties {
+export interface MultiDispenseProperties {
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
 }

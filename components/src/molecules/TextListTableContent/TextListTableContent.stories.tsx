@@ -9,7 +9,7 @@ import type { ComponentProps } from 'react'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'Library/Molecules/TextListTableContent',
+  title: 'Helix/Molecules/TextListTableContent',
   component: TextListTableContentComponent,
   argTypes: {
     header: {

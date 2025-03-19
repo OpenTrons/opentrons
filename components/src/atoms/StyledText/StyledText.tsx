@@ -103,6 +103,15 @@ const helixProductStyleMap = {
       }
     `,
   },
+  bodyDefaultRegLink: {
+    as: 'p',
+    style: css`
+      @media not (${RESPONSIVENESS.touchscreenMediaQuerySpecs}) {
+        font: ${HELIX_TYPOGRAPHY.fontStyleBodyDefaultRegular};
+        text-decoration: ${TYPOGRAPHY.textDecorationUnderline};
+      }
+    `,
+  },
   captionSemiBold: {
     as: 'label',
     style: css`

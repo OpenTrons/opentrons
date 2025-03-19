@@ -1,8 +1,8 @@
 import flatMap from 'lodash/flatMap'
 import {
   LOW_VOLUME_PIPETTES,
-  COLUMN,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
+  ALL,
 } from '@opentrons/shared-data'
 import {
   repeatArray,
@@ -149,8 +149,8 @@ export const mix: CommandCreator<MixArgs> = (
     nozzles,
   } = data
 
-  const is96Channel =
-    invariantContext.pipetteEntities[pipette]?.spec.channels === 96
+  const isMultiChannelPipette =
+    invariantContext.pipetteEntities[pipette]?.spec.channels !== 1
 
   // Errors
   if (
@@ -197,8 +197,9 @@ export const mix: CommandCreator<MixArgs> = (
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
-  if (is96Channel && data.nozzles === COLUMN) {
+  if (isMultiChannelPipette && nozzles !== ALL) {
     const isAspirateSafePipetteMovement = getIsSafePipetteMovement(
+      data.nozzles,
       prevRobotState,
       invariantContext,
       pipette,
@@ -207,6 +208,7 @@ export const mix: CommandCreator<MixArgs> = (
       { x: xOffset, y: yOffset }
     )
     const isDispenseSafePipetteMovement = getIsSafePipetteMovement(
+      data.nozzles,
       prevRobotState,
       invariantContext,
       pipette,
@@ -273,7 +275,6 @@ export const mix: CommandCreator<MixArgs> = (
         flowRate: blowoutFlowRateUlSec,
         offsetFromTopMm: blowoutOffsetFromTopMm,
         invariantContext,
-        prevRobotState,
       })
       const mixCommands = mixUtil({
         pipette,

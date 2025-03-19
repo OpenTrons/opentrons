@@ -7,7 +7,7 @@ import { CommentTools } from '..'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../../../../../molecules/TextAreaField/index', () => {
+vi.mock('../../../../../../../components/molecules/TextAreaField/index', () => {
   return {
     TextAreaField: vi.fn(() => <div>mock TextAreaField</div>),
   }

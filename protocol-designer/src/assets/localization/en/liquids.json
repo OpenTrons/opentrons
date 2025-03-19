@@ -1,6 +1,8 @@
 {
   "add_liquid": "Add liquid",
   "add": "Add",
+  "apply_liquid_classes": "Apply liquid class settings for this transfer",
+  "assigned_liquid": "Assigned to {{liquidName}}",
   "clear_selected_wells": "Clear selected wells",
   "clear_wells": "Clear wells",
   "click_and_drag": "Click and drag to select wells",

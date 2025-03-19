@@ -2035,7 +2035,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -2135,6 +2135,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -2197,7 +2202,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -2297,6 +2302,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -2363,7 +2373,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -2463,6 +2473,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -2533,7 +2548,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -2633,6 +2648,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {
@@ -2707,7 +2727,7 @@
           "cornerOffsetFromSlot": {
             "x": 0,
             "y": 0,
-            "z": -0.71
+            "z": 0
           },
           "dimensions": {
             "xDimension": 127.7,
@@ -2807,6 +2827,11 @@
               "x": 0,
               "y": 0,
               "z": 6.492
+            },
+            "protocol_engine_lid_stack_object": {
+              "x": 0,
+              "y": 0,
+              "z": 0
             }
           },
           "stackingOffsetWithModule": {

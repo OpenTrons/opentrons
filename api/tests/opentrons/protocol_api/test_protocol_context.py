@@ -796,6 +796,10 @@ def test_load_labware_with_lid(
     decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+
     result = subject.load_labware(
         load_name="UPPERCASE_LABWARE",
         location=42,
@@ -855,6 +859,179 @@ def test_load_lid_stack(
 
     assert isinstance(result, Labware)
     assert result.name == "STACK_OBJECT"
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 23)])
+def test_move_lids_from_stack(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should move all the lids from a lid stack down to the base slot."""
+    mock_lid_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID")).then_return(
+        "lowercase_lid"
+    )
+
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_C1)
+
+    decoy.when(
+        mock_core.load_lid_stack(
+            load_name="lowercase_lid",
+            location=DeckSlotName.SLOT_C1,
+            quantity=5,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid_core)
+
+    decoy.when(mock_lid_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid_core.get_display_name()).then_return("")
+    decoy.when(mock_lid_core.get_well_columns()).then_return([])
+
+    stack = subject.load_lid_stack(
+        load_name="UPPERCASE_LID",
+        location=42,
+        quantity=5,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(stack, Labware)
+    assert stack.name == "STACK_OBJECT"
+
+    for i in range(5):
+        subject.move_lid(stack, "D3")
+
+    # Load another labware where the lidstack once was, verifying its engine object is gone
+    mock_lw_core = decoy.mock(cls=LabwareCore)
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_labware",
+            location=DeckSlotName.SLOT_C1,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lw_core)
+
+    decoy.when(mock_lw_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lw_core.get_display_name()).then_return("")
+    decoy.when(mock_lw_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        load_name="UPPERCASE_LABWARE",
+        location=42,
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+    assert isinstance(result, Labware)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 22)])
+def test_move_labware_lids_old(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """This should use the original loading lids as labware for backwards compatibility."""
+    mock_lid_core = decoy.mock(cls=LabwareCore)
+    mock_lid2_core = decoy.mock(cls=LabwareCore)
+    mock_lid3_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LID")).then_return(
+        "lowercase_lid"
+    )
+
+    decoy.when(mock_core.robot_type).then_return("OT-3 Standard")
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(42, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_C1)
+    decoy.when(
+        mock_validation.ensure_and_convert_deck_slot(43, api_version, "OT-3 Standard")
+    ).then_return(DeckSlotName.SLOT_C2)
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_lid",
+            location=DeckSlotName.SLOT_C1,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid_core)
+
+    decoy.when(mock_lid_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid_core.get_display_name()).then_return("")
+    decoy.when(mock_lid_core.get_well_columns()).then_return([])
+
+    lid_1 = subject.load_labware(
+        load_name="UPPERCASE_LID",
+        location=42,
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+    assert isinstance(lid_1, Labware)
+
+    decoy.when(
+        lid_1._protocol_core.load_labware(
+            load_name="lowercase_lid",
+            location=lid_1._core,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid2_core)
+    decoy.when(mock_lid2_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid2_core.get_display_name()).then_return("")
+    decoy.when(mock_lid2_core.get_well_columns()).then_return([])
+
+    lid_2 = lid_1.load_labware(
+        name="lowercase_lid",
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+    assert isinstance(lid_2, Labware)
+
+    decoy.when(
+        lid_2._protocol_core.load_labware(
+            load_name="lowercase_lid",
+            location=lid_2._core,
+            label=None,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_lid3_core)
+    decoy.when(mock_lid3_core.get_name()).then_return("STACK_OBJECT")
+    decoy.when(mock_lid3_core.get_display_name()).then_return("")
+    decoy.when(mock_lid3_core.get_well_columns()).then_return([])
+
+    lid_3 = lid_1.load_labware(
+        name="lowercase_lid",
+        label=None,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(lid_3, Labware)
+
+    subject.move_labware(lid_3, 43)
+    subject.move_labware(lid_2, lid_3)
+    subject.move_labware(lid_1, lid_2)
 
 
 def test_loaded_labware(
