@@ -28,6 +28,7 @@ class GCODE(str, Enum):
     STALLGUARD = 'M910'
     GET_STALLGUARD_VAL = 'M911'
     SET_SERIAL_NUM = 'M996'
+    SET_LED = 'M200'
     DEVICE_INFO = 'M115'
 
 class DIR(str, Enum):
@@ -57,6 +58,22 @@ class LABWARE_Z_HEIGHT(float, Enum):
     ARMADILLO_384_PLATE = 15.5
     THERMOCYLER_LID_WITH_ADAPTER = 40
 
+class LEDColor(Enum):
+    WHITE = 0
+    RED = 1
+    GREEN = 2
+    BLUE = 3
+    YELLOW = 4
+
+class LEDPattern(Enum):
+    STATIC = 0
+    FLASH = 1
+    PULSE = 2
+    CONFIRM = 3
+
+class MotorStallError(RuntimeError):
+    pass
+
 FS_BAUDRATE = 115200
 DEFAULT_FS_TIMEOUT = 0.1
 FS_COMMAND_TERMINATOR = "\r\n"
@@ -65,7 +82,7 @@ FS_STALL = "async ERR403:motor stall error" + FS_COMMAND_TERMINATOR.strip("\r")
 DEFAULT_COMMAND_RETRIES = 1
 TOTAL_TRAVEL_X = 192.5
 TOTAL_TRAVEL_Z = 136
-TOTAL_TRAVEL_L = 44
+TOTAL_TRAVEL_L = 22 #44
 RETRACT_DIST_X = 1
 RETRACT_DIST_Z = 1
 HOME_SPEED = 10
@@ -76,21 +93,22 @@ MOVE_ACCELERATION_X = 1500
 MOVE_ACCELERATION_Z = 500
 MOVE_ACCELERATION_L = 800
 MAX_SPEED_DISCONTINUITY_X = 40
-MAX_SPEED_DISCONTINUITY_Z = 40
+MAX_SPEED_DISCONTINUITY_Z = 25 #40
 MAX_SPEED_DISCONTINUITY_L = 40
-HOME_CURRENT_X = 1.8
-HOME_CURRENT_Z = 1.8
+HOME_CURRENT_X = 1.5 #1.8
+HOME_CURRENT_Z = 1.5 #1.8
 HOME_CURRENT_L = 0.8
 MOVE_CURRENT_X = 1.0
 MOVE_CURRENT_Z = 1.5
 MOVE_CURRENT_L = 0.6
 MOVE_SPEED_X = 200
-MOVE_SPEED_UPZ = 200
+MOVE_SPEED_UPZ = 150 #200
 MOVE_SPEED_L = 100
 MOVE_SPEED_DOWNZ = 200
-x_sg_value = 3
-z_sg_value = 3
-l_sg_value = 4
+x_sg_value = 2 #3
+z_sg_value = 2 #3
+l_sg_value = 2 #4
+GCODE_ROUNDING_PRECISION = 2
 
 class FlexStacker():
     """Flex Stacker Driver."""
@@ -150,9 +168,12 @@ class FlexStacker():
 
         Raises: SerialException
         """
-        return self._send_data(
+        # print(f"Request: {command.build()}")
+        response = self._send_data(
             data=command.build(), retries=retries, timeout=DEFAULT_FS_TIMEOUT
         )
+        # print(f"Response: {response}")
+        return response
 
     def _send_data(self, data: str, retries: int = 0, timeout: Optional[float] = None) -> str:
         """
@@ -239,7 +260,7 @@ class FlexStacker():
         """Get the serial number of the flex stacker unit"""
         c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.DEVICE_INFO)
-        #print(c)
+        # print(c)
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
         return response
 
@@ -308,6 +329,41 @@ class FlexStacker():
         )
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('CMD: rrr')
 
+        return response
+
+    def set_led(
+        self,
+        power: float,
+        color: Optional[LEDColor] = None,
+        external: Optional[bool] = None,
+        pattern: Optional[LEDPattern] = None,
+        duration: Optional[int] = None,
+        reps: Optional[int] = None,
+    ) -> bool:
+        """Set LED Status bar color and pattern.
+
+        :param power: Power of the LED (0-1.0), 0 is off, 1 is full power
+        :param color: Color of the LED
+        :param external: True if external LED, False if internal LED
+        :param pattern: Animation pattern of the LED status bar
+        :param duration: Animation duration in milliseconds (25-10000), 10s max
+        :param reps: Number of times to repeat the animation (-1 - 10), -1 is forever.
+        """
+        power = max(0, min(power, 1.0))
+        c = CommandBuilder(terminator=FS_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.SET_LED).add_float("P", power, GCODE_ROUNDING_PRECISION)
+        if color is not None:
+            c.add_int("C", color.value)
+        if external is not None:
+            c.add_int("K", int(external))
+        if pattern is not None:
+            c.add_int("A", pattern.value)
+        if duration is not None:
+            duration = max(MIN_DURATION_MS, min(duration, MAX_DURATION_MS))
+            c.add_int("D", duration)
+        if reps is not None:
+            c.add_int("R", max(-1, min(reps, MAX_REPS)))
+        response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES).strip('OK')
         return response
 
     def sensor_parse(self, cmd):
@@ -415,9 +471,11 @@ class FlexStacker():
 
             #print(c)
             response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
-            stall_detection = "async ERR403:motor stall error"
-            if response == stall_detection:
-                raise(f"Stall Detected on {axis}")
+            stall_detection = "ERR403:motor stall error"
+            if stall_detection in response:
+                self.disable_motor(AXIS.X)
+                self.disable_motor(AXIS.Z)
+                raise MotorStallError(f"Motor Stall Detected on {axis}!")
             if direction == DIR.POSITIVE and axis == AXIS.X:
                 self.current_position.update({'X': self.current_position['X'] + distance})
             elif direction == DIR.NEGATIVE and axis == AXIS.X:
@@ -491,7 +549,12 @@ class FlexStacker():
                                                             f'A{acceleration}'
                                                             )
         #print(c)
-        self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
+        response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
+        stall_detection = "ERR403:motor stall error"
+        if stall_detection in response:
+            self.disable_motor(AXIS.X)
+            self.disable_motor(AXIS.Z)
+            raise MotorStallError(f"Motor Stall Detected on {axis}!")
         if direction == DIR.POSITIVE_HOME and axis == AXIS.X:
             self.current_position.update({'X': TOTAL_TRAVEL_X})
         elif direction == DIR.NEGATIVE_HOME and axis == AXIS.X:
