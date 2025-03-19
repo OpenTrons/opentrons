@@ -91,6 +91,8 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+
+  // Scroll back to the place where the user was before they went into a specific RTP selection screen
   useEffect(() => {
     const isShowingParametersList =
       chooseValueScreen == null &&
