@@ -3,7 +3,11 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import { GRIPPER_MOVE_STEPS, RECOVERY_MAP_METADATA } from '../constants'
+import {
+  GRIPPER_MOVE_STEPS,
+  RECOVERY_MAP_METADATA,
+  RECOVERY_MAP,
+} from '../constants'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { ErrorRecoveryFlowsProps } from '../index'
@@ -35,13 +39,14 @@ export function useShowDoorInfo(
     isDoorOpen &&
     !isDoorPermittedOpen(recoveryMap) &&
     !GRIPPER_MOVE_STEPS.includes(currentStep)
+  //    ||
+  // recoveryMap.route === RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
 
   return { isDoorOpen, isProhibitedDoorOpen }
 }
 
 function isDoorPermittedOpen(recoveryMap: IRecoveryMap): boolean {
   const { route, step } = recoveryMap
-
   if (route in RECOVERY_MAP_METADATA) {
     const routeConfig = RECOVERY_MAP_METADATA[route]
 

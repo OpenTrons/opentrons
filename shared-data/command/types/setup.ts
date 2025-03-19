@@ -50,6 +50,15 @@ export interface LoadLidStackRunTimeCommand
     LoadLidStackCreateCommand {
   result?: LoadLidStackResult
 }
+export interface StackerRetriveCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/retrieve'
+  params: StackerRetriveParams
+}
+export interface StackerRetriveRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    StackerRetriveCreateCommand {
+  result?: StackerRetriveResult
+}
 export interface ReloadLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'reloadLabware'
   params: { labwareId: string }
@@ -123,6 +132,7 @@ export type SetupRunTimeCommand =
   | MoveLabwareRunTimeCommand
   | LoadLidRunTimeCommand
   | LoadLidStackRunTimeCommand
+  | StackerRetriveRunTimeCommand
 
 export type SetupCreateCommand =
   | ConfigureNozzleLayoutCreateCommand
@@ -135,6 +145,7 @@ export type SetupCreateCommand =
   | MoveLabwareCreateCommand
   | LoadLidCreateCommand
   | LoadLidStackCreateCommand
+  | StackerRetriveCreateCommand
 
 export type LabwareLocation =
   | 'offDeck'
@@ -315,12 +326,35 @@ interface LoadLidStackParams {
   quantity: number
 }
 
+interface StackerRetriveParams {
+  moduleId: string
+  labwareId?: string
+  displayName?: string
+  adapterId?: string
+  lidId?: string
+}
+
 interface LoadLidStackResult {
   stackLabwareId: string
   labwareIds: string[]
   definition?: LabwareDefinition2
   lidStackDefinition: LabwareDefinition2
   location: LabwareLocation
+  stackLocationSequence?: LabwareLocationSequence
+  locationSequences?: LabwareLocationSequence[]
+}
+
+interface StackerRetriveResult {
+  labwareId: string
+  adapterId: string
+  lidId: string
+  stackLabwareId: string
+  labwareIds: string[]
+  definition: LabwareDefinition2
+  location: LabwareLocation
+  adapterLabwareURI: string
+  definitionUri: string
+  primaryLabwareURI: string
   stackLocationSequence?: LabwareLocationSequence
   locationSequences?: LabwareLocationSequence[]
 }

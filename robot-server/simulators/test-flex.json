@@ -47,6 +47,18 @@
         "calls": []
       }
     ],
+    "flexstacker": [
+      {
+        "model": "flexStackerModuleV1",
+        "serial_number": "EMPTYSN",
+        "calls": []
+      },
+      {
+        "model": "flexStackerModuleV1",
+        "serial_number": "FSTA1020250119001",
+        "calls": []
+      }
+    ],
     "tempdeck": [
       {
         "model": "temperatureModuleV2",

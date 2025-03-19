@@ -18,6 +18,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
     SKIP_STEP_WITH_NEW_TIPS,
     MANUAL_MOVE_AND_SKIP,
     IGNORE_AND_SKIP,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands
@@ -46,6 +47,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         return t('skip_to_next_step_new_tips')
       case IGNORE_AND_SKIP.ROUTE:
       case MANUAL_MOVE_AND_SKIP.ROUTE:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
         return t('skip_to_next_step')
       default:
         console.error(
@@ -63,6 +65,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
       case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
         return 'failed_dispense_step_not_completed'
       case MANUAL_MOVE_AND_SKIP.ROUTE:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
         return 'robot_not_attempt_to_move_lw'
       default:
         console.error(
