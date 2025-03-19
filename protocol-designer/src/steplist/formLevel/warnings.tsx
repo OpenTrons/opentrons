@@ -184,7 +184,7 @@ export const lowVolumeTransfer = (
 ): FormWarning | null => {
   const { volume } = fields
 
-  return volume < 10 ? lowVolumeTransferWarning() : null
+  return volume <= 10 ? lowVolumeTransferWarning() : null
 }
 
 export const incompatiblePipettePath = (

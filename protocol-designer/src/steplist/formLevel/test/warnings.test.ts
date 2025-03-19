@@ -352,10 +352,17 @@ describe('Incompatible liquid classes', () => {
       tipRack: 'opentrons/opentrons_flex_96_tiprack_50ul/1',
     }
   })
-  it('should NOT return a warning when volume is greater than or equals to 10', () => {
+  it('should return a warning when volume is equal to 10', () => {
     const fields = {
       ...fieldsWithPipette,
-      volume: 11,
+      volume: 10,
+    }
+    expect(lowVolumeTransfer(fields)?.type).toBe('LOW_VOLUME_TRANSFER')
+  })
+  it('should NOT return a warning when volume is greater than 10', () => {
+    const fields = {
+      ...fieldsWithPipette,
+      volume: 50,
     }
     expect(lowVolumeTransfer(fields)).toBe(null)
   })

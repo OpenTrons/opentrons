@@ -464,7 +464,7 @@ export const getDisableLiquidClasses = (
   if (pipette == null) return null
   const disabledLiquidClasses = new Set<LiquidClassesOption>()
 
-  if (volume != null && volume < 10) {
+  if (volume != null && volume <= 10) {
     disabledLiquidClasses.add('Aqueous')
     disabledLiquidClasses.add('Viscous')
     disabledLiquidClasses.add('Volatile')
