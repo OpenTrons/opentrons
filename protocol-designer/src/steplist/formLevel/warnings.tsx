@@ -191,17 +191,16 @@ export const incompatiblePipettePath = (
   fields: HydratedFormData
 ): FormWarning | null => {
   const { pipette, tipRack, path } = fields
+  if (!pipette) return null
   const pipetteName = pipette.name as PipetteName
 
   const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
   if (path === 'multiDispense') {
-    const incompatiblePath = getIncompatibleLiquidClasses(
-      p =>
-        p.pipetteModel === pipetteModel &&
-        p.byTipType.some(
-          (t: { tiprack: string; multiDispense: any }) =>
-            t.tiprack === tipRack && t.multiDispense !== undefined
-        )
+    const incompatiblePath = getIncompatibleLiquidClasses(pipetteModel, p =>
+      p.byTipType.some(
+        (t: { tiprack: string; multiDispense: any }) =>
+          t.tiprack === tipRack && t.multiDispense !== undefined
+      )
     )
     return incompatiblePath.length > 0 ? incompatiblePipettePathWarning() : null
   }
@@ -213,18 +212,14 @@ export const incompatiblePipetteTiprack = (
   fields: HydratedFormData
 ): FormWarning | null => {
   const { pipette, tipRack } = fields
-
+  if (!pipette) return null
   const pipetteName = pipette.name as PipetteName
 
   const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
 
-  const incompatiblePipette = getIncompatibleLiquidClasses(
-    p => p.pipetteModel === pipetteModel
-  )
-  const incompatibleTiprack = getIncompatibleLiquidClasses(
-    p =>
-      p.pipetteModel === pipetteModel &&
-      p.byTipType.some((t: { tiprack: string }) => t.tiprack === tipRack)
+  const incompatiblePipette = getIncompatibleLiquidClasses(pipetteModel)
+  const incompatibleTiprack = getIncompatibleLiquidClasses(pipetteModel, p =>
+    p.byTipType.some((t: { tiprack: string }) => t.tiprack === tipRack)
   )
 
   const incompatiblePipetteCount = incompatiblePipette.length
