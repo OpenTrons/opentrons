@@ -203,13 +203,10 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
       },
     },
   ]
-  const pythonWellLocation =
-    wellLocation != null ? formatPyWellLocation(wellLocation) : ''
-
   return {
     commands,
     python: `${pipettePythonName}.blow_out(${labwarePythonName}[${formatPyStr(
       wellName
-    )}]${pythonWellLocation})`,
+    )}]${formatPyWellLocation(wellLocation)})`,
   }
 }
