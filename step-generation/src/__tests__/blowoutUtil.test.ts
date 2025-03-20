@@ -94,6 +94,7 @@ describe('blowoutUtil', () => {
     expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWasteChute, {
       pipetteId: blowoutArgs.pipette,
       flowRate: 2.3,
+      wasteChuteId,
     })
   })
   it('blowoutUtil curries blowout with dest plate params', () => {
