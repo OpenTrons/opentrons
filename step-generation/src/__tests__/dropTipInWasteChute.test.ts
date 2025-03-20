@@ -9,7 +9,7 @@ vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
 const mockWasteChuteId = 'mockWasteChuteId'
 
-let invariantContext: InvariantContext = {
+const invariantContext: InvariantContext = {
   ...makeContext(),
   additionalEquipmentEntities: {
     [mockWasteChuteId]: {
