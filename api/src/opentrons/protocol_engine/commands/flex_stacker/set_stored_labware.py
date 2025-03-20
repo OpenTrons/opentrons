@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-SetStoredLabwareCommandType = Literal["flexStacker/setStoredlabware"]
+SetStoredLabwareCommandType = Literal["flexStacker/setStoredLabware"]
 
 
 class StackerStoredLabwareDetails(BaseModel):
@@ -102,21 +102,16 @@ class SetStoredLabwareImpl(
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
-        error_messages: list[str] = []
-        if stacker_state.hopper_labware_ids != []:
-            error_messages.append(
-                f"{len(stacker_state.hopper_labware_ids)} unique labware"
-            )
+
         if stacker_state.pool_count != 0:
-            error_messages.append(f"a pool of {stacker_state.pool_count} labware")
-        if error_messages != []:
             # Note: this error catches if the protocol tells us the stacker is not empty, making this command
             # invalid at this point in the protocol. This error is not recoverable and should occur during
             # analysis; the protocol must be changed.
+
             raise FlexStackerNotLogicallyEmptyError(
                 message=(
                     "The Flex Stacker must be known to be empty before reconfiguring its labware pool, but it has "
-                    + " and ".join(error_messages)
+                    f"a pool of {stacker_state.pool_count} labware"
                 )
             )
 
@@ -179,7 +174,7 @@ class SetStoredLabware(
 ):
     """A command to setstoredlabware the Flex Stacker."""
 
-    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredlabware"
+    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredLabware"
     params: SetStoredLabwareParams
     result: Optional[SetStoredLabwareResult] = None
 
@@ -189,7 +184,7 @@ class SetStoredLabware(
 class SetStoredLabwareCreate(BaseCommandCreate[SetStoredLabwareParams]):
     """A request to execute a Flex Stacker SetStoredLabware command."""
 
-    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredlabware"
+    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredLabware"
     params: SetStoredLabwareParams
 
     _CommandCls: Type[SetStoredLabware] = SetStoredLabware

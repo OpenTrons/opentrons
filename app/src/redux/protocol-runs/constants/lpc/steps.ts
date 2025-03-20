@@ -23,3 +23,11 @@ export const LPC_STEPS = [
   LPC_STEP.DETACH_PROBE,
   LPC_STEP.LPC_COMPLETE,
 ]
+
+export const HANDLE_LW_SUBSTEP = {
+  LIST: 'handle-lw/list',
+  DETAILS: 'handle-lw/details',
+  EDIT_OFFSET_PREP_LW: 'handle-lw/edit-offset/prepare-labware',
+  EDIT_OFFSET_CHECK_LW: 'handle-lw/edit-offset/check-labware',
+  EDIT_OFFSET_SUCCESS: 'handle-lw/edit-offset/success',
+} as const

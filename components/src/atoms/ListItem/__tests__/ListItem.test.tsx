@@ -29,14 +29,16 @@ describe('ListItem', () => {
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red35}`)
     expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
-  it('should render correct style - noActive', () => {
-    props.type = 'noActive'
+
+  it('should render correct style - default', () => {
+    props.type = 'default'
     render(props)
     screen.getByText('mock listitem content')
-    const listItem = screen.getByTestId('ListItem_noActive')
+    const listItem = screen.getByTestId('ListItem_default')
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.grey20}`)
     expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
+
   it('should render correct style - success', () => {
     props.type = 'success'
     render(props)
@@ -45,6 +47,7 @@ describe('ListItem', () => {
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.green35}`)
     expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
+
   it('should render correct style - warning', () => {
     props.type = 'warning'
     render(props)
@@ -53,6 +56,43 @@ describe('ListItem', () => {
     expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.yellow35}`)
     expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
+
+  it('should render correct style - defaultOnColor', () => {
+    props.type = 'defaultOnColor'
+    render(props)
+    screen.getByText('mock listitem content')
+    const listItem = screen.getByTestId('ListItem_defaultOnColor')
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.white}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
+  })
+
+  it('should render correct style - successOnColor', () => {
+    props.type = 'successOnColor'
+    render(props)
+    screen.getByText('mock listitem content')
+    const listItem = screen.getByTestId('ListItem_successOnColor')
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.green20}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
+  })
+
+  it('should render correct style - warningOnColor', () => {
+    props.type = 'warningOnColor'
+    render(props)
+    screen.getByText('mock listitem content')
+    const listItem = screen.getByTestId('ListItem_warningOnColor')
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.yellow20}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
+  })
+
+  it('should render correct style - errorOnColor', () => {
+    props.type = 'errorOnColor'
+    render(props)
+    screen.getByText('mock listitem content')
+    const listItem = screen.getByTestId('ListItem_errorOnColor')
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red20}`)
+    expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
+  })
+
   it('should call on click when pressed', () => {
     render(props)
     const listItem = screen.getByText('mock listitem content')

@@ -1029,3 +1029,27 @@ class Protocols:
         file_extension="py",
         robot="Flex",
     )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_PD_8_4_2_Zymo_Magbead_DNA_Cells-Flex_96_channel.json
+
+    Flex_S_PD_8_4_2_Zymo_Magbead_DNA_Cells_Flex_96_channel: Protocol = Protocol(
+        file_stem="Flex_S_PD_8_4_2_Zymo_Magbead_DNA_Cells-Flex_96_channel",
+        file_extension="json",
+        robot="Flex",
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_PD8_4_2_Illumina_DNA_Prep_48x.json
+
+    Flex_S_PD8_4_2_Illumina_DNA_Prep_48x: Protocol = Protocol(
+        file_stem="Flex_S_PD8_4_2_Illumina_DNA_Prep_48x",
+        file_extension="json",
+        robot="Flex",
+    )
+
+    # analyses-snapshot-testing/files/protocols/OT2_S_PD_8_4_2_smoketest.json
+
+    OT2_S_PD_8_4_2_smoketest: Protocol = Protocol(
+        file_stem="OT2_S_PD_8_4_2_smoketest",
+        file_extension="json",
+        robot="OT2",
+    )

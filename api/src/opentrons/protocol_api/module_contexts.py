@@ -1112,45 +1112,6 @@ class FlexStackerContext(ModuleContext):
 
     _core: FlexStackerCore
 
-    @requires_version(2, 23)
-    def load_labware_to_hopper(
-        self,
-        load_name: str,
-        quantity: int,
-        label: Optional[str] = None,
-        namespace: Optional[str] = None,
-        version: Optional[int] = None,
-        lid: Optional[str] = None,
-    ) -> None:
-        """Load one or more labware onto the flex stacker."""
-        self._protocol_core.load_labware_to_flex_stacker_hopper(
-            module_core=self._core,
-            load_name=load_name,
-            quantity=quantity,
-            label=label,
-            namespace=namespace,
-            version=version,
-            lid=lid,
-        )
-
-    @requires_version(2, 23)
-    def enter_static_mode(self) -> None:
-        """Enter static mode.
-
-        In static mode, the Flex Stacker will not move labware between the hopper and
-        the deck, and can be used as a staging slot area.
-        """
-        self._core.set_static_mode(static=True)
-
-    @requires_version(2, 23)
-    def exit_static_mode(self) -> None:
-        """End static mode.
-
-        In static mode, the Flex Stacker will not move labware between the hopper and
-        the deck, and can be used as a staging slot area.
-        """
-        self._core.set_static_mode(static=False)
-
     @property
     @requires_version(2, 23)
     def serial_number(self) -> str:
@@ -1159,12 +1120,26 @@ class FlexStackerContext(ModuleContext):
 
     @requires_version(2, 23)
     def retrieve(self) -> Labware:
-        """Release and return a labware at the bottom of the labware stack."""
+        """Retrieve a labware from the Flex Stacker and place it on the shuttle.
+
+        :returns: The retrieved :py:class:`Labware` object. This will always be the main labware,
+                  even if the Flex Stacker contains labware on an adapter. To get the adapter object,
+                  call :py:class:`Labware.parent` on the returned labware.
+
+        """
         self._core.retrieve()
 
         labware_core = self._protocol_core.get_labware_on_module(self._core)
         if labware_core is not None and labware_core.is_adapter():
-            labware_core = self._protocol_core.get_labware_on_labware(labware_core)
+            adapter_core = labware_core
+            adapter = Labware(
+                core=adapter_core,
+                api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
+            )
+            self._core_map.add(adapter_core, adapter)
+            labware_core = self._protocol_core.get_labware_on_labware(adapter_core)
 
         # the core retrieve command should have already raised the error
         # if labware_core is None, this is just to satisfy the type checker
@@ -1185,12 +1160,8 @@ class FlexStackerContext(ModuleContext):
         return labware
 
     @requires_version(2, 23)
-    def store(self, labware: Labware) -> None:
-        """Store a labware at the bottom of the labware stack.
-
-        :param labware: The labware object to store.
-        """
-        assert labware._core is not None
+    def store(self) -> None:
+        """Move the labware currently on the Flex Stacker shuttle into the Flex Stacker."""
         self._core.store()
 
     @requires_version(2, 23)

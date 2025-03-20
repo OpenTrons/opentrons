@@ -79,7 +79,7 @@ export function ThermocyclerProfileSubsteps(
           return (
             <ListItem
               key={substep.id}
-              type="noActive"
+              type="default"
               width="100%"
               padding={SPACING.spacing12}
             >

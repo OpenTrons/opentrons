@@ -10,17 +10,18 @@ import {
 import {
   useCreateTargetedMaintenanceRunMutation,
   useMostRecentCompletedAnalysis,
-  useNotifyRunQuery,
 } from '/app/resources/runs'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import { useLPCLabwareInfo } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks'
+import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+import { useLPCLabwareInfo, useInitLPCStore } from './hooks'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   LegacySupportLPCFlowsProps,
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
+import { useCompatibleAnalysis } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useCompatibleAnalysis'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -55,20 +56,36 @@ export function useLPCFlows({
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
   const deckConfig = useNotifyDeckConfigurationQuery().data
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
-  const currentOffsets = runRecord?.data?.labwareOffsets ?? []
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const compatibleAnalysis = useCompatibleAnalysis(runId, mostRecentAnalysis)
 
   const labwareDefs = useMemo(() => {
     const labwareDefsFromCommands = getLabwareDefinitionsFromCommands(
-      mostRecentAnalysis?.commands ?? []
+      compatibleAnalysis?.commands ?? []
     )
     return labwareDefsFromCommands
-  }, [mostRecentAnalysis != null])
-  const labwareInfo = useLPCLabwareInfo({
-    currentOffsets,
+  }, [compatibleAnalysis?.commands.length])
+
+  const {
+    labwareInfo,
+    storedOffsets: flexOffsets,
+    legacyOffsets: ot2Offsets,
+  } = useLPCLabwareInfo({
     labwareDefs,
-    protocolData: mostRecentAnalysis,
+    protocolData: compatibleAnalysis,
+    robotType,
+    runId,
+  })
+
+  useInitLPCStore({
+    runId,
+    analysis: compatibleAnalysis,
+    protocolName,
+    maintenanceRunId,
+    labwareDefs,
+    labwareInfo,
+    deckConfig,
+    robotType,
   })
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
@@ -107,13 +124,7 @@ export function useLPCFlows({
     setIsLaunching(true)
 
     return createTargetedMaintenanceRun({
-      labwareOffsets: currentOffsets.map(
-        ({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        })
-      ),
+      labwareOffsets: getRelevantOffsets(robotType, ot2Offsets, flexOffsets),
     }).then(maintenanceRun => {
       setMaintenanceRunId(maintenanceRun.data.id)
     })
@@ -134,7 +145,7 @@ export function useLPCFlows({
     hasCreatedLPCRun &&
     maintenanceRunId != null &&
     protocolName != null &&
-    mostRecentAnalysis != null &&
+    compatibleAnalysis != null &&
     deckConfig != null
 
   return showLPC
@@ -149,10 +160,10 @@ export function useLPCFlows({
           deckConfig,
           labwareDefs,
           labwareInfo,
-          mostRecentAnalysis,
+          analysis: compatibleAnalysis,
           protocolName,
           maintenanceRunId,
-          existingOffsets: currentOffsets,
+          runRecordExistingOffsets: ot2Offsets,
         },
       }
     : { launchLPC, isLaunchingLPC: isLaunching, lpcProps: null, showLPC }

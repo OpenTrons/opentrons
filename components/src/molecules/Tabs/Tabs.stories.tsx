@@ -4,7 +4,7 @@ import { Tabs as TabsComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof TabsComponent> = {
-  title: 'Library/Molecules/Tabs',
+  title: 'Helix/Molecules/Tabs',
   component: TabsComponent,
   parameters: VIEWPORT.touchScreenViewport,
   argTypes: {

@@ -100,6 +100,11 @@ async def test_evotip_dispense_implementation(
     decoy.when(state_view.labware.get_definition("labware-id-abc123")).then_return(
         evotips_definition
     )
+    decoy.when(
+        state_view.pipettes.get_aspirated_volume("pipette-id-abc123")
+    ).then_return(100)
+
+    decoy.when(pipetting.get_state_view()).then_return(state_view)
 
     decoy.when(
         await pipetting.dispense_in_place(
@@ -107,6 +112,7 @@ async def test_evotip_dispense_implementation(
             volume=100.0,
             flow_rate=456.0,
             push_out=None,
+            is_full_dispense=True,
             correction_volume=0,
         )
     ).then_return(100)
@@ -130,6 +136,9 @@ async def test_evotip_dispense_implementation(
             ),
             pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
                 pipette_id="pipette-id-abc123", volume=100
+            ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id-abc123", ready_to_aspirate=False
             ),
         ),
     )

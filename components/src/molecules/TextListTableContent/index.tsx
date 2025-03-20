@@ -12,7 +12,7 @@ import type { ListTableProps } from '../../atoms/ListTable'
 export interface TextListTableContentProps {
   /* The text that appears above the table. */
   header: ReactNode
-  listTableHeaders: ListTableProps['headers']
+  listTableHeaders?: ListTableProps['headers']
   /* The ListTable content. See dev comments on ListTable for proper usage. */
   children: ReactNode
 }

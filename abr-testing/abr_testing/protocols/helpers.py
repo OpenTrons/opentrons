@@ -309,7 +309,7 @@ def create_plate_reader_compatible_labware_parameter(
     parameters.add_str(
         variable_name="labware_plate_reader_compatible",
         display_name="Plate Reader Labware",
-        default="corning_96_wellplate_360ul_flat",
+        default="hellma_reference_plate",
         choices=[
             {
                 "display_name": "Corning_96well",
@@ -514,7 +514,7 @@ def find_liquid_height(pipette: InstrumentContext, well_to_probe: Well) -> float
         )
     except PipetteLiquidNotFoundError:
         liquid_height = 0
-    return liquid_height
+    return liquid_height if isinstance(liquid_height, (float, int)) else 0
 
 
 def load_wells_with_custom_liquids(

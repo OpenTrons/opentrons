@@ -11,10 +11,14 @@ export * from './ListItemChildren'
 
 export type ListItemType =
   | 'error'
-  | 'noActive'
+  | 'default'
   | 'success'
   | 'warning'
   | 'unavailable'
+  | 'defaultOnColor'
+  | 'successOnColor'
+  | 'warningOnColor'
+  | 'errorOnColor'
 
 interface ListItemProps extends StyleProps {
   /** ListItem state type */
@@ -33,7 +37,7 @@ const LISTITEM_PROPS_BY_TYPE: Record<
   error: {
     backgroundColor: COLORS.red35,
   },
-  noActive: {
+  default: {
     backgroundColor: COLORS.grey20,
   },
   success: {
@@ -45,6 +49,18 @@ const LISTITEM_PROPS_BY_TYPE: Record<
   unavailable: {
     backgroundColor: COLORS.grey20,
     color: COLORS.grey40,
+  },
+  defaultOnColor: {
+    backgroundColor: COLORS.white,
+  },
+  successOnColor: {
+    backgroundColor: COLORS.green20,
+  },
+  warningOnColor: {
+    backgroundColor: COLORS.yellow20,
+  },
+  errorOnColor: {
+    backgroundColor: COLORS.red20,
   },
 }
 

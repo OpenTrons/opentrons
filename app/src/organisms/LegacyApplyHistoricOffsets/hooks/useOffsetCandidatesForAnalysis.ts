@@ -5,7 +5,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 import { useAllHistoricOffsets } from './useAllHistoricOffsets'
-import { getLabwareLocationCombos } from './getLabwareLocationCombos'
+import { getLegacyLabwareLocationCombos } from './getLegacyLabwareLocationCombos'
 
 import type {
   ProtocolAnalysisOutput,
@@ -25,7 +25,7 @@ export function useOffsetCandidatesForAnalysis(
   )
   if (allHistoricOffsets.length === 0 || analysisOutput == null) return []
   const { commands, labware, modules = [] } = analysisOutput
-  const labwareLocationCombos = getLabwareLocationCombos(
+  const labwareLocationCombos = getLegacyLabwareLocationCombos(
     commands,
     labware,
     modules

@@ -1,4 +1,5 @@
 """ProtocolEngine-based Protocol API core implementation."""
+
 from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING
 
@@ -224,7 +225,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
 
         load_result = self._engine_client.execute_command_without_recovery(
@@ -295,7 +296,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
         load_result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLabwareParams(
@@ -343,7 +344,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
         load_result = self._engine_client.execute_command_without_recovery(
             cmd.LoadLidParams(
@@ -788,6 +789,15 @@ class ProtocolCore(
                 load_module_result=load_module_result, model=model
             )
 
+    def add_or_get_labware_core(self, labware_id: str) -> LabwareCore:
+        """Create a LabwareCore and add it to the map or return one if it exists."""
+        if labware_id in self._labware_cores_by_id:
+            return self._labware_cores_by_id[labware_id]
+        else:
+            core = LabwareCore(labware_id, self._engine_client)
+            self._labware_cores_by_id[labware_id] = core
+            return core
+
     def load_robot(self) -> RobotCore:
         """Load a robot core into the RobotContext."""
         return RobotCore(
@@ -951,7 +961,7 @@ class ProtocolCore(
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            load_name, namespace, version, custom_labware_params, self._api_version
         )
 
         load_result = self._engine_client.execute_command_without_recovery(
@@ -1035,9 +1045,9 @@ class ProtocolCore(
             labware_id = self._engine_client.state.labware.get_id_by_module(
                 module_core.module_id
             )
-            return self._labware_cores_by_id[labware_id]
         except LabwareNotLoadedOnModuleError:
             return None
+        return self.add_or_get_labware_core(labware_id)
 
     def get_labware_on_labware(
         self, labware_core: LabwareCore
@@ -1047,9 +1057,9 @@ class ProtocolCore(
             labware_id = self._engine_client.state.labware.get_id_by_labware(
                 labware_core.labware_id
             )
-            return self._labware_cores_by_id[labware_id]
         except LabwareNotLoadedOnLabwareError:
             return None
+        return self.add_or_get_labware_core(labware_id)
 
     def get_slot_center(self, slot_name: Union[DeckSlotName, StagingSlotName]) -> Point:
         """Get the absolute coordinate of a slot's center."""
@@ -1153,7 +1163,7 @@ class ProtocolCore(
             OffDeckType,
             WasteChute,
             TrashBin,
-        ]
+        ],
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)

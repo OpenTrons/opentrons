@@ -11,7 +11,11 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getModuleModelsBySlot, getDeckErrors } from '../utils'
+import {
+  getDeckErrors,
+  getModuleModelsBySlot,
+  getSVGContainerWidth,
+} from '../utils'
 import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
 
 describe('getModuleModelsBySlot', () => {
@@ -109,5 +113,37 @@ describe('getDeckErrors', () => {
         robotType: OT2_ROBOT_TYPE,
       })
     ).toEqual('heater_shaker_adjacent_to')
+  })
+})
+
+describe('getSVGContainerWidth', () => {
+  it('returns 78.5% for OT2 robot type, startingDeck tab, and not zoomed', () => {
+    const result = getSVGContainerWidth(OT2_ROBOT_TYPE, 'startingDeck', false)
+    expect(result).toBe('78.5%')
+  })
+
+  it('returns 70% for non-OT2 robot type, not zoomed, and tab not protocolSteps', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'anotherTab', false)
+    expect(result).toBe('70%')
+  })
+
+  it('returns 100% for OT2 robot type, startingDeck tab, and zoomed', () => {
+    const result = getSVGContainerWidth(OT2_ROBOT_TYPE, 'startingDeck', true)
+    expect(result).toBe('100%')
+  })
+
+  it('returns 100% for non-OT2 robot type and zoomed', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'anotherTab', true)
+    expect(result).toBe('100%')
+  })
+
+  it('returns 100% for OT2 robot type and tab other than startingDeck or protocolSteps', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'protocolSteps', false)
+    expect(result).toBe('100%')
+  })
+
+  it('returns 100% for non-OT2 robot type and tab protocolSteps', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'protocolSteps', false)
+    expect(result).toBe('100%')
   })
 })

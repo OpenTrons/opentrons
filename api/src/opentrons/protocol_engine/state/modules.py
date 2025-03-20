@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import (
     Dict,
@@ -14,7 +15,6 @@ from typing import (
     Union,
     overload,
 )
-import math
 from numpy import array, dot, double as npdouble
 from numpy.typing import NDArray
 
@@ -384,8 +384,6 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         elif ModuleModel.is_flex_stacker(actual_model):
             self._state.substate_by_module_id[module_id] = FlexStackerSubState(
                 module_id=FlexStackerId(module_id),
-                in_static_mode=False,
-                hopper_labware_ids=[],
                 pool_primary_definition=None,
                 pool_adapter_definition=None,
                 pool_lid_definition=None,
@@ -1333,22 +1331,20 @@ class ModuleView:
         else:
             return False
 
-    def convert_absorbance_reader_data_points(
-        self, data: List[float]
-    ) -> Dict[str, float]:
+    @staticmethod
+    def convert_absorbance_reader_data_points(data: List[float]) -> Dict[str, float]:
         """Return the data from the Absorbance Reader module in a map of wells for each read value."""
         if len(data) == 96:
             # We have to reverse the reader values because the Opentrons Absorbance Reader is rotated 180 degrees on the deck
-            data.reverse()
+            raw_data = data.copy()
+            raw_data.reverse()
             well_map: Dict[str, float] = {}
-            for i, value in enumerate(data):
+            for i, value in enumerate(raw_data):
                 row = chr(ord("A") + i // 12)  # Convert index to row (A-H)
                 col = (i % 12) + 1  # Convert index to column (1-12)
                 well_key = f"{row}{col}"
-                truncated_value = float(
-                    "{:.5}".format(str(value))
-                )  # Truncate the returned value to the third decimal place
-                well_map[well_key] = truncated_value
+                # Truncate the value to the third decimal place
+                well_map[well_key] = math.floor(value * 1000) / 1000
             return well_map
         else:
             raise ValueError(

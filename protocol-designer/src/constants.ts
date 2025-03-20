@@ -194,4 +194,6 @@ export const ABSORBANCE_READER_COLOR_BY_WAVELENGTH: Record<number, string> = {
   650: 'Red',
 }
 
-export const GRIPPER_LOCATION: 'mounted' = 'mounted'
+export const OFFDECK: 'offDeck' = 'offDeck'
+
+export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer' // protocolSource for tracking analytics in the app

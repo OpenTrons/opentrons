@@ -11,9 +11,9 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
-import { getCutoutIdByAddressableArea } from '../../utils'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
   AddressableAreaName,
@@ -145,11 +145,14 @@ export function denormalizePipetteEntities(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
         )
       }
+      const is96Channel = spec.channels === 96
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,
         tiprackLabwareDef: pipette.tiprackDefURI.map(def => labwareDefs[def]),
-        pythonName: `pipette_${pipetteLocationUpdate[pipetteId]}`,
+        pythonName: is96Channel
+          ? 'pipette'
+          : `pipette_${pipetteLocationUpdate[pipetteId]}`,
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },
@@ -187,13 +190,16 @@ export const getSlotIdsBlockedBySpanningForThermocycler = (
   return []
 }
 
-//  TODO(jr, 3/13/24): refactor this util it is messy and confusing
+//  TODO(ja, 3/7/25): this util is very outdated, much of it is probably
+//  not even in use. we should refactor this!!!
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
   /* we don't always want to count the slot as full if there is a staging area present
      since labware/wasteChute can still go on top of staging areas  **/
-  includeStagingAreas?: boolean
+  includeStagingAreas?: boolean,
+  /* optional disallowing for additionalEquipmentAreas or not **/
+  discountAdditionalEquipmentAreas?: boolean
 ): boolean => {
   //   special-casing the TC's slot A1 for the Flex
   if (
@@ -233,6 +239,9 @@ export const getSlotIsEmpty = (
       return additionalEquipment.location?.includes(slot) && includeStaging
     }
   })
+  const additionalEquipment = discountAdditionalEquipmentAreas
+    ? []
+    : filteredAdditionalEquipmentOnDeck
   return (
     [
       ...values(initialDeckSetup.modules).filter(
@@ -246,7 +255,7 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
-      ...filteredAdditionalEquipmentOnDeck,
+      ...additionalEquipment,
     ].length === 0
   )
 }

@@ -82,7 +82,7 @@ async def delete_specific_pipette_offset_calibration(
     pipette_id: str,
     mount: pip_models.MountType,
     _: Annotated[API, Depends(get_ot2_hardware)],
-):
+) -> None:
     try:
         pipette_offset.delete_pipette_offset_file(
             pipette_id, ot_types.Mount[mount.upper()]

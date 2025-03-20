@@ -16,6 +16,7 @@ from .movement_common import (
     LiquidHandlingWellLocationMixin,
     DestinationPositionResult,
     StallOrCollisionError,
+    move_to_well,
 )
 from .command import (
     AbstractCommandImpl,
@@ -24,13 +25,14 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from ..state.update_types import StateUpdate
 from ..errors.exceptions import PipetteNotReadyToAspirateError
 from opentrons.hardware_control import HardwareControlAPI
 from ..state.update_types import CLEAR
 from ..types import CurrentWell, DeckPoint
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler, GantryMover
+    from ..execution import PipettingHandler, GantryMover, MovementHandler
     from ..resources import ModelUtils
     from ..state.state import StateView
     from ..notes import CommandNoteAdder
@@ -75,6 +77,7 @@ class AspirateWhileTrackingImplementation(
         command_note_adder: CommandNoteAdder,
         model_utils: ModelUtils,
         gantry_mover: GantryMover,
+        movement: MovementHandler,
         **kwargs: object,
     ) -> None:
         self._pipetting = pipetting
@@ -83,6 +86,7 @@ class AspirateWhileTrackingImplementation(
         self._command_note_adder = command_note_adder
         self._model_utils = model_utils
         self._gantry_mover = gantry_mover
+        self._movement = movement
 
     async def execute(self, params: AspirateWhileTrackingParams) -> _ExecuteReturn:
         """Move to and aspirate from the requested well.
@@ -91,8 +95,8 @@ class AspirateWhileTrackingImplementation(
             TipNotAttachedError: if no tip is attached to the pipette.
             PipetteNotReadyToAspirateError: pipette plunger is not ready.
         """
-        ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
-            pipette_id=params.pipetteId,
+        ready_to_aspirate = self._state_view.pipettes.get_ready_to_aspirate(
+            pipette_id=params.pipetteId
         )
         if not ready_to_aspirate:
             raise PipetteNotReadyToAspirateError(
@@ -103,6 +107,28 @@ class AspirateWhileTrackingImplementation(
 
         current_position = await self._gantry_mover.get_position(params.pipetteId)
         current_location = self._state_view.pipettes.get_current_location()
+
+        state_update = StateUpdate()
+        current_well = CurrentWell(
+            pipette_id=params.pipetteId,
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+        )
+        move_result = await move_to_well(
+            movement=self._movement,
+            model_utils=self._model_utils,
+            pipette_id=params.pipetteId,
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=params.wellLocation,
+            current_well=current_well,
+            operation_volume=-params.volume,
+        )
+        state_update.append(move_result.state_update)
+        if isinstance(move_result, DefinedErrorData):
+            return DefinedErrorData(
+                public=move_result.public, state_update=state_update
+            )
 
         aspirate_result = await aspirate_while_tracking(
             pipette_id=params.pipetteId,

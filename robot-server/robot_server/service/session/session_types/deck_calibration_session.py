@@ -10,14 +10,12 @@ from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
     CompletedCommand,
-    CommandQueue,
     CommandExecutor,
 )
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
 from ..models.session import SessionType, DeckCalibrationResponseAttributes
-from ..errors import UnsupportedFeature
 
 
 class DeckCalibrationCommandExecutor(CallableExecutor):
@@ -35,7 +33,7 @@ class DeckCalibrationSession(BaseSession):
         instance_meta: SessionMetaData,
         deck_cal_user_flow: DeckCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._deck_cal_user_flow = deck_cal_user_flow
         self._command_executor = DeckCalibrationCommandExecutor(
@@ -81,10 +79,6 @@ class DeckCalibrationSession(BaseSession):
         return self._command_executor
 
     @property
-    def command_queue(self) -> CommandQueue:
-        raise UnsupportedFeature()
-
-    @property
     def session_type(self) -> SessionType:
         return SessionType.deck_calibration
 
@@ -107,6 +101,6 @@ class DeckCalibrationSession(BaseSession):
             supportedCommands=supported_commands,
         )
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

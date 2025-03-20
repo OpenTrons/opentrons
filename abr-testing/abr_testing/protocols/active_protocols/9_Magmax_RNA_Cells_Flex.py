@@ -92,7 +92,6 @@ def run(protocol: ProtocolContext) -> None:
     plate_type = protocol.params.labware_plate_reader_compatible  # type: ignore [attr-defined]
     plate_orientation = protocol.params.plate_orientation  # type: ignore[attr-defined]
     helpers.comment_protocol_version(protocol, "02")
-
     plate_name_str = "hellma_plate_" + str(plate_orientation)
 
     # Protocol Parameters

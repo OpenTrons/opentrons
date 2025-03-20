@@ -8,6 +8,8 @@ import type { LabwareSort, LabwareFilter, LabwareDefAndDate } from '../types'
 const LABWARE_LOADNAME_BLOCKLIST = [
   'evotips_flex_96_tiprack_adapter',
   'evotips_opentrons_96_labware',
+  'evotips_tiprack_adapter',
+  'evotips_reservoir_adapter',
 ]
 
 export function useAllLabware(

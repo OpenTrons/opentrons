@@ -106,11 +106,12 @@ class Parameters2(BaseModel):
     tipOverlap: _NonNegativeNumber | None = None
     loadName: Annotated[str, Field(pattern=SAFE_STRING_REGEX)]
     isMagneticModuleCompatible: bool
+    isDeckSlotCompatible: bool | None = None
     magneticModuleEngageHeight: _NonNegativeNumber | None = None
 
 
 class Parameters3(Parameters2, BaseModel):
-    isDeckSlotCompatible: bool | None = None
+    pass  # Currently equivalent to Parameters2.
 
 
 class Dimensions(BaseModel):
@@ -127,6 +128,7 @@ class _WellCommon2(BaseModel):
     x: _NonNegativeNumber
     y: _NonNegativeNumber
     z: _NonNegativeNumber
+    geometryDefinitionId: str | None = None
 
 
 class CircularWellDefinition2(_WellCommon2, BaseModel):
@@ -141,35 +143,22 @@ class RectangularWellDefinition2(_WellCommon2, BaseModel):
 
 
 WellDefinition2 = Annotated[
-    CircularWellDefinition2 | RectangularWellDefinition2, Field(discriminator="shape")
+    CircularWellDefinition2 | RectangularWellDefinition2, Discriminator("shape")
 ]
 
 
-class _WellCommon3(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    depth: _NonNegativeNumber
-    totalLiquidVolume: _NonNegativeNumber
-    x: _NonNegativeNumber
-    y: _NonNegativeNumber
-    z: _NonNegativeNumber
-    geometryDefinitionId: str | None = None
+class CircularWellDefinition3(CircularWellDefinition2):
+    # Currently equivalent to CircularWellDefinition2.
+    pass
 
 
-class CircularWellDefinition3(_WellCommon3, BaseModel):
-    shape: Literal["circular"]
-    diameter: _NonNegativeNumber
-
-
-class RectangularWellDefinition3(_WellCommon3, BaseModel):
-    shape: Literal["rectangular"]
-    xDimension: _NonNegativeNumber
-    yDimension: _NonNegativeNumber
+class RectangularWellDefinition3(RectangularWellDefinition2):
+    # Currently equivalent to RectangularWellDefinition2.
+    pass
 
 
 WellDefinition3 = Annotated[
-    CircularWellDefinition3 | RectangularWellDefinition3,
-    Discriminator("shape"),
+    CircularWellDefinition3 | RectangularWellDefinition3, Discriminator("shape")
 ]
 
 
@@ -502,6 +491,8 @@ class LabwareDefinition2(BaseModel):
     gripForce: float | None = None
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
+    compatibleParentLabware: list[str] | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
 
 
 class LabwareDefinition3(BaseModel):
@@ -526,8 +517,8 @@ class LabwareDefinition3(BaseModel):
     gripForce: float | None = None
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
-    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
     compatibleParentLabware: list[str] | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None
 
 
 LabwareDefinition = Annotated[

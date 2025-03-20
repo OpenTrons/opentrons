@@ -78,6 +78,8 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: ./.github/actions/js/setup
       - name: 'build PD'
         env:

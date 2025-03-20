@@ -5,7 +5,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { InputStepFormField } from '../../../../../../molecules'
+import { InputStepFormField } from '../../../../../../components/molecules'
 import { getFormErrorsMappedToField } from '../../utils'
 import type { StepFormErrors } from '../../../../../../steplist'
 import type { FieldPropsByName } from '../../types'

@@ -19,10 +19,13 @@ import {
   selectDropdownItem,
   selectTerminalItem,
 } from '../../ui/steps/actions/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { generateNewProtocol } from '../../labware-ingred/actions'
-import { DefineLiquidsModal, DesignerNavigation } from '../../organisms'
+import {
+  DefineLiquidsModal,
+  DesignerNavigation,
+} from '../../components/organisms'
 import { selectDesignerTab } from '../../file-data/actions'
 import { getDesignerTab, getFileMetadata } from '../../file-data/selectors'
 import { DeckSetupContainer } from './DeckSetup'
@@ -197,8 +200,10 @@ export function Designer(): JSX.Element {
               {zoomIn.slot == null ? (
                 <Flex
                   justifyContent={JUSTIFY_FLEX_END}
+                  alignItems={ALIGN_CENTER}
                   alignSelf={ALIGN_STRETCH}
                   width="100%"
+                  height="2.25rem"
                 >
                   <ToggleGroup
                     selectedValue={deckView}
