@@ -35,23 +35,19 @@ describe('Labware', () => {
       .thenReturn([
         {
           labwareDef: fixtureTiprack10ul as LabwareDefinition2,
-          quantity: 1,
-          namespace: 'opentrons',
+          quantity: 2,
         },
         {
           labwareDef: fixtureTiprack300ul as LabwareDefinition2,
           quantity: 1,
-          namespace: 'opentrons',
         },
         {
           labwareDef: fixture96Plate as LabwareDefinition2,
           quantity: 1,
-          namespace: 'opentrons',
         },
         {
           labwareDef: fixtureTiprack10ul as LabwareDefinition2,
           quantity: 1,
-          namespace: 'opentrons',
         },
       ])
   })

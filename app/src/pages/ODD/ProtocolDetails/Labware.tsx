@@ -95,7 +95,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   paddingLeft={SPACING.spacing24}
                   alignItems={ALIGN_CENTER}
                 >
-                  {labware.namespace === 'opentrons' ? (
+                  {labware.labwareDef.namespace === 'opentrons' ? (
                     <Icon
                       color={COLORS.blue50}
                       name="check-decagram"

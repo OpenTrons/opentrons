@@ -89,7 +89,7 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
                   flexDirection={DIRECTION_ROW}
                   paddingLeft={SPACING.spacing24}
                 >
-                  {labware.namespace === 'opentrons' ? (
+                  {labware.labwareDef.namespace === 'opentrons' ? (
                     <Icon
                       color={COLORS.blue50}
                       name="check-decagram"

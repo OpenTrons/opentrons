@@ -8,9 +8,8 @@ import type {
 } from '@opentrons/shared-data'
 
 export interface RequiredLabwareDetails {
-  namespace: string
-  quantity: number
   labwareDef: LabwareDefinition2
+  quantity: number
   lidDisplayName?: string
 }
 type ProtocolDetailMap = Map<string, RequiredLabwareDetails>
@@ -47,7 +46,6 @@ export function getRequiredLabwareDetailsFromLoadCommands(
       const stackCount = command.result?.labwareIds.length
       if (!acc.has(defUri)) {
         acc.set(defUri, {
-          namespace: command.params.namespace,
           labwareDef: command.result?.definition,
           quantity: 0,
         })
@@ -70,7 +68,6 @@ export function getRequiredLabwareDetailsFromLoadCommands(
 
       if (!acc.has(defUri)) {
         acc.set(defUri, {
-          namespace: command.params.namespace,
           labwareDef: command.result?.definition,
           quantity: 0,
           lidDisplayName:

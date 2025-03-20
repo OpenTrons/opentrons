@@ -61,7 +61,7 @@ export const ProtocolLabwareDetails = (props: {
           {labwareAndLidDetails?.map((labware, index) => (
             <ProtocolLabwareDetailItem
               key={index}
-              namespace={labware.namespace}
+              namespace={labware.labwareDef.namespace}
               displayName={labware.labwareDef.metadata.displayName}
               quantity={labware.quantity}
               labware={{ definition: labware.labwareDef }}
