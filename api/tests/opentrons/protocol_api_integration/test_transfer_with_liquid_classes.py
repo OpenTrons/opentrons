@@ -1680,7 +1680,7 @@ def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
     ["new_tip", "expected_number_of_calls"],
     [("once", 1), ("always", 12), ("per_source", 12)],
 )
-def test_water_distribution_with_lpd(
+def test_water_transfer_with_lpd(
     simulated_protocol_context: ProtocolContext,
     new_tip: TransferTipPolicyV2Type,
     expected_number_of_calls: int,
@@ -1706,7 +1706,7 @@ def test_water_distribution_with_lpd(
     water = simulated_protocol_context.define_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"
+    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
 
@@ -1761,7 +1761,7 @@ def test_water_distribution_with_lpd(
     water = simulated_protocol_context.define_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"
+    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
 
@@ -1814,7 +1814,7 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
     water = simulated_protocol_context.define_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"
+    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
     pipette_1k.pick_up_tip()
