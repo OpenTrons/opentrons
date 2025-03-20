@@ -38,6 +38,7 @@ SLOTS = {
 }
 
 P1000_MAX_PUSH_OUT_UL = 79.0
+DISPENSE_MM_FROM_MENISCUS = 2.0
 
 # operator fills this labware with RED-DYE at protocol start
 # ~20-25 mL per destination plate (eg: 5x plates requires 100-125 mL)
@@ -351,7 +352,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_float(
         display_name="submerge_no_lld",
         variable_name="submerge_no_lld",
-        default=-3.0,
+        default=-1.5,
         minimum=-10.0,
         maximum=0.0,
     )
@@ -427,8 +428,6 @@ def run(ctx: ProtocolContext) -> None:
     #       requires a tip to be currently attached, else it raises an error.
     #       We call that function when pre-calculating stuff.
     pipette.pick_up_tip()
-    # FIXME: remove once horizontal crash bug is fixed
-    pipette._retract()
 
     # LOAD PLATE-READER
     reader_module = ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
@@ -527,21 +526,21 @@ def run(ctx: ProtocolContext) -> None:
 
         for trial in test_trials:
             # ADD DYE TO TEST-LABWARE
-            # NOTE: 1st trial has tip already attached
-            if not pipette.has_tip:
-                pipette.pick_up_tip()
-                # FIXME: remove once horizontal crash bug is fixed
-                pipette._retract()
             print(f"adding {trial.ul_to_add} uL")
-
             while trial.test_well.current_liquid_volume() < trial.ul_to_add:
                 remaining_ul = trial.ul_to_add - trial.test_well.current_liquid_volume()
+                # NOTE: 1st trial has tip already attached
+                if not pipette.has_tip:
+                    pipette.pick_up_tip()
+                    # FIXME: remove this once positioning bug is fixed in PE
+                    pipette.move_to(dye_src_well.top())
                 pipette.aspirate(
-                    min(remaining_ul, pipette.max_volume), dye_src_well.bottom(2)
+                    volume=min(remaining_ul, pipette.max_volume),
+                    location=dye_src_well.meniscus(target="dynamic", z=trial.submerge_mm)
                 )
                 pipette.dispense(
-                    pipette.current_volume,
-                    trial.test_well.top(),
+                    volume=pipette.current_volume,
+                    location=trial.test_well.meniscus(target="dynamic", z=DISPENSE_MM_FROM_MENISCUS),
                     push_out=P1000_MAX_PUSH_OUT_UL,
                 )
             pipette.drop_tip()
@@ -554,14 +553,18 @@ def run(ctx: ProtocolContext) -> None:
             if trial.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
                 pipette.require_liquid_presence(trial.test_well)
             pipette.aspirate(
-                trial.ul_to_remove,
-                trial.test_well.meniscus(target="dynamic", z=trial.submerge_mm),
+                volume=trial.ul_to_remove,
+                location=trial.test_well.meniscus(target="dynamic", z=trial.submerge_mm),
             )
 
             # MULTI-DISPENSE TO PLATE
             for w, v in zip(trial.destination_wells, trial.destination_volumes):
                 push_out = 0 if v < pipette.current_volume else P1000_MAX_PUSH_OUT_UL
-                pipette.dispense(v, w.top(), push_out=push_out)
+                pipette.dispense(
+                    volume=v,
+                    location=w.meniscus(target="dynamic", z=DISPENSE_MM_FROM_MENISCUS),
+                    push_out=push_out
+                )
             pipette.drop_tip()
 
         # MOVE PLATE TO SHAKER & SHAKE
