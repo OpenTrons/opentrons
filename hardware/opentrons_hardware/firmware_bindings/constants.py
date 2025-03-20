@@ -444,6 +444,7 @@ class MotorUsageValueType(int, Enum):
     right_gear_motor_distance = 0x2
     force_application_time = 0x3
     total_error_count = 0x4
+    overpressure_error_count = 0x5
 
 
 class MoveAckId(int, Enum):
