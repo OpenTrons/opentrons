@@ -72,13 +72,7 @@ import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolParameters } from './ProtocolParameters'
 import { AnnotatedSteps } from './AnnotatedSteps'
 
-import type {
-  JsonConfig,
-  PythonConfig,
-  LoadLabwareRunTimeCommand,
-  LoadLidRunTimeCommand,
-  LoadLidStackRunTimeCommand,
-} from '@opentrons/shared-data'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type {
   GroupedCommands,
   StoredProtocolData,
