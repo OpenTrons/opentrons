@@ -38,6 +38,7 @@ class Stacker_Axis_Acc_Lifetime_Test:
         self.stackers = []
         self.test_files = []
         self.serial_port_name = "/dev/"
+        self.port_list = None
         self.labware_height = flex_stacker_driver.LABWARE_Z_HEIGHT.OPENTRONS_TIPRACKS
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
         self.test_data = {
@@ -51,6 +52,7 @@ class Stacker_Axis_Acc_Lifetime_Test:
             "ZR":"None",
             "LR":"None",
         }
+        self.stackerAll_active = False
         self.stackerA_active = False
         self.stackerB_active = False
         self.stackerC_active = False
@@ -67,9 +69,8 @@ class Stacker_Axis_Acc_Lifetime_Test:
 
     async def stacker_setup(self):
         res = subprocess.check_output(["ls", "-la", "/dev"])
-        port_list = re.findall(r'ot_module_flexstacker[0-9]', res.decode())
-        print(port_list)
-        for port in port_list:
+        self.port_list = re.findall(r'ot_module_flexstacker[0-9]', res.decode())
+        for port in self.port_list:
             stacker = flex_stacker_driver.FlexStacker(None).create(f"{self.serial_port_name}{port}")
             stacker.set_led(power=1, color=flex_stacker_driver.LEDColor.GREEN, pattern=flex_stacker_driver.LEDPattern.STATIC)
             stacker.setup_stall_detection()
@@ -129,12 +130,11 @@ class Stacker_Axis_Acc_Lifetime_Test:
             stackerD_thread.join()
 
     def move_stackerA(self, stacker, test_file):
-        # stacker.unload_labware(self.labware_height)
-        # stacker.load_labware(self.labware_height)
+        cycle = 1
         self.stackerA_active = True
-        cycle = 0
         try:
             while self.stackerA_active and cycle <= self.cycles:
+                print(f"\n-> StackerA Test Cycle {cycle}/{self.cycles}")
                 serial_number = stacker.get_device_serial_number()
                 test_dataA = self.test_data.copy()
                 test_dataA["Cycle"] = str(cycle)
@@ -157,18 +157,20 @@ class Stacker_Axis_Acc_Lifetime_Test:
                 data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
                 cycle += 1
         except flex_stacker_driver.MotorStallError:
-            print("\nStackerA: Stall Error Detected!")
+            print(f"\nStacker {serial_number}: Stall Error Detected!")
+            self.exit_stacker()
+        except flex_stacker_driver.CommandTimeoutError:
+            print(f"\nStacker {serial_number}: Timeout Expired!")
             self.exit_stacker()
         except KeyboardInterrupt:
             self.exit_stacker()
 
     def move_stackerB(self, stacker, test_file):
-        # stacker.unload_labware(self.labware_height)
-        # stacker.load_labware(self.labware_height)
+        cycle = 1
         self.stackerB_active = True
-        cycle = 0
         try:
             while self.stackerB_active and cycle <= self.cycles:
+                print(f"\n-> StackerB Test Cycle {cycle}/{self.cycles}")
                 serial_number = stacker.get_device_serial_number()
                 test_dataB = self.test_data.copy()
                 test_dataB["Cycle"] = str(cycle)
@@ -191,18 +193,20 @@ class Stacker_Axis_Acc_Lifetime_Test:
                 data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
                 cycle += 1
         except flex_stacker_driver.MotorStallError:
-            print("\nStackerB: Stall Error Detected!")
+            print(f"\nStacker {serial_number}: Stall Error Detected!")
+            self.exit_stacker()
+        except flex_stacker_driver.CommandTimeoutError:
+            print(f"\nStacker {serial_number}: Timeout Expired!")
             self.exit_stacker()
         except KeyboardInterrupt:
             self.exit_stacker()
 
     def move_stackerC(self, stacker, test_file):
-        # stacker.unload_labware(self.labware_height)
-        # stacker.load_labware(self.labware_height)
+        cycle = 1
         self.stackerC_active = True
-        cycle = 0
         try:
             while self.stackerC_active and cycle <= self.cycles:
+                print(f"\n-> StackerC Test Cycle {cycle}/{self.cycles}")
                 serial_number = stacker.get_device_serial_number()
                 test_dataC = self.test_data.copy()
                 test_dataC["Cycle"] = str(cycle)
@@ -225,19 +229,20 @@ class Stacker_Axis_Acc_Lifetime_Test:
                 data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
                 cycle += 1
         except flex_stacker_driver.MotorStallError:
-            print("\nStackerC: Stall Error Detected!")
+            print(f"\nStacker {serial_number}: Stall Error Detected!")
+            self.exit_stacker()
+        except flex_stacker_driver.CommandTimeoutError:
+            print(f"\nStacker {serial_number}: Timeout Expired!")
             self.exit_stacker()
         except KeyboardInterrupt:
             self.exit_stacker()
 
     def move_stackerD(self, stacker, test_file):
-        # stacker.unload_labware(self.labware_height)
-        # stacker.load_labware(self.labware_height)
+        cycle = 1
         self.stackerD_active = True
-        cycle = 0
         try:
             while self.stackerD_active and cycle <= self.cycles:
-                print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
+                print(f"\n-> StackerD Test Cycle {cycle}/{self.cycles}")
                 serial_number = stacker.get_device_serial_number()
                 test_dataD = self.test_data.copy()
                 test_dataD["Cycle"] = str(cycle)
@@ -260,7 +265,10 @@ class Stacker_Axis_Acc_Lifetime_Test:
                 data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=test_file, data=test_data)
                 cycle += 1
         except flex_stacker_driver.MotorStallError:
-            print("\nStackerD: Stall Error Detected!")
+            print(f"\nStacker {serial_number}: Stall Error Detected!")
+            self.exit_stacker()
+        except flex_stacker_driver.CommandTimeoutError:
+            print(f"\nStacker {serial_number}: Timeout Expired!")
             self.exit_stacker()
         except KeyboardInterrupt:
             self.exit_stacker()
@@ -268,38 +276,47 @@ class Stacker_Axis_Acc_Lifetime_Test:
     async def _stacker_mode(self):
         # Sequential Mode
         if self.mode == "sequential":
-            for i in range(self.cycles):
-                cycle = i + 1
-                print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
-                for stacker in self.stackers:
-                    print(f"-> Unloading Labware...")
-                    stacker.unload_labware(self.labware_height)
-                    serial_number = stacker.get_device_serial_number()
-                    sensor_states = stacker.get_sensor_states()
-                    stacker_state = "Unloaded"
-                    self.test_data["Cycle"] = str(cycle)
-                    self.test_data["Stacker"] = serial_number
-                    self.test_data["State"] = stacker_state
-                    self.test_data.update(sensor_states)
-                    test_data = self.dict_values_to_line(self.test_data)
-                    for file in self.test_files:
-                        if serial_number in file:
-                            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=file, data=test_data)
+            self.stackerAll_active = True
+            while self.stackerAll_active:
+                for i in range(self.cycles):
+                    cycle = i + 1
+                    print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
+                    try:
+                        for stacker in self.stackers:
+                            print(f"-> Unloading Labware...")
+                            stacker.unload_labware(self.labware_height)
+                            serial_number = stacker.get_device_serial_number()
+                            sensor_states = stacker.get_sensor_states()
+                            stacker_state = "Unloaded"
+                            self.test_data["Cycle"] = str(cycle)
+                            self.test_data["Stacker"] = serial_number
+                            self.test_data["State"] = stacker_state
+                            self.test_data.update(sensor_states)
+                            test_data = self.dict_values_to_line(self.test_data)
+                            for file in self.test_files:
+                                if serial_number in file:
+                                    data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=file, data=test_data)
 
-                for stacker in self.stackers:
-                    print(f"-> Loading Labware...")
-                    stacker.load_labware(self.labware_height)
-                    serial_number = stacker.get_device_serial_number()
-                    sensor_states = stacker.get_sensor_states()
-                    stacker_state = "Loaded"
-                    self.test_data["Cycle"] = str(cycle)
-                    self.test_data["Stacker"] = serial_number
-                    self.test_data["State"] = stacker_state
-                    self.test_data.update(sensor_states)
-                    test_data = self.dict_values_to_line(self.test_data)
-                    for file in self.test_files:
-                        if serial_number in file:
-                            data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=file, data=test_data)
+                        for stacker in self.stackers:
+                            print(f"-> Loading Labware...")
+                            stacker.load_labware(self.labware_height)
+                            serial_number = stacker.get_device_serial_number()
+                            sensor_states = stacker.get_sensor_states()
+                            stacker_state = "Loaded"
+                            self.test_data["Cycle"] = str(cycle)
+                            self.test_data["Stacker"] = serial_number
+                            self.test_data["State"] = stacker_state
+                            self.test_data.update(sensor_states)
+                            test_data = self.dict_values_to_line(self.test_data)
+                            for file in self.test_files:
+                                if serial_number in file:
+                                    data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=file, data=test_data)
+
+                    except flex_stacker_driver.MotorStallError:
+                        print("\nStall Error Detected!")
+                        self.exit_stacker()
+                    except KeyboardInterrupt:
+                        self.exit_stacker()
         # Parallel Mode
         else:
             self.run_threading()
@@ -315,6 +332,7 @@ class Stacker_Axis_Acc_Lifetime_Test:
             await self.api.disengage_axes(self.axes)
 
     def exit_stacker(self):
+        self.stackerAll_active = False
         self.stackerA_active = False
         self.stackerB_active = False
         self.stackerC_active = False
