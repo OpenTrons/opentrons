@@ -104,13 +104,28 @@ describe('mix: change tip', () => {
       `
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.mix(2, 5, mockPythonName["A1"])
+mockPythonName.mix(
+    repetitions=2,
+    volume=5,
+    location=mockPythonName["A1"].bottom(z=3.2),
+    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
+)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.mix(2, 5, mockPythonName["B1"])
+mockPythonName.mix(
+    repetitions=2,
+    volume=5,
+    location=mockPythonName["B1"].bottom(z=3.2),
+    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
+)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.mix(2, 5, mockPythonName["C1"])`.trimStart()
+mockPythonName.mix(
+    repetitions=2,
+    volume=5,
+    location=mockPythonName["C1"].bottom(z=3.2),
+    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
+)`.trimStart()
     )
   })
 
@@ -326,7 +341,14 @@ describe('mix: advanced options', () => {
         times,
         changeTip: 'always',
         wells: ['A1', 'B1', 'C1'],
+        yOffset: 1,
       } as MixArgs
+      const mockWellLocationCustomXY: Partial<AspDispAirgapParams> = {
+        wellLocation: {
+          origin: 'bottom',
+          offset: { x: 0, y: 1, z: 3.2 },
+        },
+      }
 
       const result = mix(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
@@ -334,13 +356,13 @@ describe('mix: advanced options', () => {
       expect(res.commands).toEqual(
         flatMap(args.wells, (well, idx) => [
           ...replaceTipCommands(idx),
-          aspirateHelper(well, volume, mockWellLocation),
+          aspirateHelper(well, volume, mockWellLocationCustomXY),
           delayCommand(10),
-          dispenseHelper(well, volume, mockWellLocation),
+          dispenseHelper(well, volume, mockWellLocationCustomXY),
           delayCommand(12),
-          aspirateHelper(well, volume, mockWellLocation),
+          aspirateHelper(well, volume, mockWellLocationCustomXY),
           delayCommand(10),
-          dispenseHelper(well, volume, mockWellLocation),
+          dispenseHelper(well, volume, mockWellLocationCustomXY),
           delayCommand(12),
           blowoutHelper(blowoutLabwareId, {
             wellLocation: {
@@ -359,25 +381,25 @@ mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
 mockPythonName.aspirate(
     volume=8,
-    location=mockPythonName["A1"].bottom(z=3.2),
+    location=mockPythonName["A1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.1 / mockPythonName.flow_rate.aspirate,
 )
 protocol.delay(seconds=10)
 mockPythonName.dispense(
     volume=8,
-    location=mockPythonName["A1"].bottom(z=3.2),
+    location=mockPythonName["A1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
 )
 protocol.delay(seconds=12)
 mockPythonName.aspirate(
     volume=8,
-    location=mockPythonName["A1"].bottom(z=3.2),
+    location=mockPythonName["A1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.1 / mockPythonName.flow_rate.aspirate,
 )
 protocol.delay(seconds=10)
 mockPythonName.dispense(
     volume=8,
-    location=mockPythonName["A1"].bottom(z=3.2),
+    location=mockPythonName["A1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
 )
 protocol.delay(seconds=12)
@@ -391,25 +413,25 @@ mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
 mockPythonName.aspirate(
     volume=8,
-    location=mockPythonName["B1"].bottom(z=3.2),
+    location=mockPythonName["B1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.1 / mockPythonName.flow_rate.aspirate,
 )
 protocol.delay(seconds=10)
 mockPythonName.dispense(
     volume=8,
-    location=mockPythonName["B1"].bottom(z=3.2),
+    location=mockPythonName["B1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
 )
 protocol.delay(seconds=12)
 mockPythonName.aspirate(
     volume=8,
-    location=mockPythonName["B1"].bottom(z=3.2),
+    location=mockPythonName["B1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.1 / mockPythonName.flow_rate.aspirate,
 )
 protocol.delay(seconds=10)
 mockPythonName.dispense(
     volume=8,
-    location=mockPythonName["B1"].bottom(z=3.2),
+    location=mockPythonName["B1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
 )
 protocol.delay(seconds=12)
@@ -423,25 +445,25 @@ mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
 mockPythonName.aspirate(
     volume=8,
-    location=mockPythonName["C1"].bottom(z=3.2),
+    location=mockPythonName["C1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.1 / mockPythonName.flow_rate.aspirate,
 )
 protocol.delay(seconds=10)
 mockPythonName.dispense(
     volume=8,
-    location=mockPythonName["C1"].bottom(z=3.2),
+    location=mockPythonName["C1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
 )
 protocol.delay(seconds=12)
 mockPythonName.aspirate(
     volume=8,
-    location=mockPythonName["C1"].bottom(z=3.2),
+    location=mockPythonName["C1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.1 / mockPythonName.flow_rate.aspirate,
 )
 protocol.delay(seconds=10)
 mockPythonName.dispense(
     volume=8,
-    location=mockPythonName["C1"].bottom(z=3.2),
+    location=mockPythonName["C1"].bottom(z=3.2).move(types.Point(y=1)),
     rate=2.2 / mockPythonName.flow_rate.dispense,
 )
 protocol.delay(seconds=12)
@@ -454,7 +476,7 @@ mockPythonName.touch_tip(
       )
     })
   })
-  it('should create python commands with mix() with touchTip and blowOut and no delay set', () => {
+  it('should create python commands with mix() with touchTip and blowOut and no delay or x/y offset set', () => {
     const args: MixArgs = {
       ...mixinArgs,
       touchTip: true,
@@ -463,6 +485,8 @@ mockPythonName.touch_tip(
       times,
       changeTip: 'always',
       wells: ['A1', 'B1', 'C1'],
+      xOffset: 1,
+      yOffset: 1,
     } as MixArgs
 
     const result = mix(args, invariantContext, robotStateWithTip)
@@ -472,7 +496,12 @@ mockPythonName.touch_tip(
       `
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.mix(2, 8, mockPythonName["A1"])
+mockPythonName.mix(
+    repetitions=2,
+    volume=8,
+    location=mockPythonName["A1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
+)
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
 mockPythonName.touch_tip(
@@ -481,7 +510,12 @@ mockPythonName.touch_tip(
 )
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.mix(2, 8, mockPythonName["B1"])
+mockPythonName.mix(
+    repetitions=2,
+    volume=8,
+    location=mockPythonName["B1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
+)
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
 mockPythonName.touch_tip(
@@ -490,7 +524,12 @@ mockPythonName.touch_tip(
 )
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.mix(2, 8, mockPythonName["C1"])
+mockPythonName.mix(
+    repetitions=2,
+    volume=8,
+    location=mockPythonName["C1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
+    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
+)
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
 mockPythonName.touch_tip(

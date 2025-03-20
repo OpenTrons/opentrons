@@ -13,6 +13,8 @@ import {
   getHasWasteChute,
   curryWithoutPython,
   formatPyStr,
+  formatPyWellLocation,
+  indentPyLines,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import {
@@ -24,7 +26,10 @@ import {
 } from '../atomic'
 import { replaceTip } from './replaceTip'
 
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  NozzleConfigurationStyle,
+  WellLocation,
+} from '@opentrons/shared-data'
 import type {
   MixArgs,
   CommandCreator,
@@ -66,10 +71,13 @@ export function mixUtil(args: {
     nozzles,
     invariantContext,
   } = args
-  //  If either delay is specified, emit individual py commands
+  //  If delay is specified, emit individual py commands
   //  otherwise, emit mix()
-  const hasDelay = aspirateDelaySeconds != null || dispenseDelaySeconds != null
-  const curryCreator = hasDelay ? curryCommandCreator : curryWithoutPython
+  const hasUnsupportedMixApiArg =
+    aspirateDelaySeconds != null || dispenseDelaySeconds != null
+  const curryCreator = hasUnsupportedMixApiArg
+    ? curryCommandCreator
+    : curryWithoutPython
 
   const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
     seconds
@@ -84,13 +92,26 @@ export function mixUtil(args: {
     const { pipetteEntities, labwareEntities } = invariantContext
     const pipettePythonName = pipetteEntities[pipette].pythonName
     const labwarePythonName = labwareEntities[labware].pythonName
+    const pythonWellLocation: WellLocation = {
+      origin: 'bottom',
+      offset: { x: xOffset, y: yOffset, z: offsetFromBottomMm },
+    }
+    const pythonArgs = [
+      `repetitions=${times}`,
+      `volume=${volume}`,
+      `location=${labwarePythonName}[${formatPyStr(
+        well
+      )}]${formatPyWellLocation(pythonWellLocation)}`,
+      //  Note: just wiring up the aspirate flow rate?
+      `rate=(${aspirateFlowRateUlSec} / ${pipettePythonName}.flow_rate.aspirate) + (${dispenseFlowRateUlSec} / ${pipettePythonName}.flow_rate.dispense)`,
+    ]
     return {
       commands: [],
       //  Note: we do not support mix in trashBin or wasteChute so location
       //  will always be a well
-      python: `${pipettePythonName}.mix(${times}, ${volume}, ${labwarePythonName}[${formatPyStr(
-        well
-      )}])`,
+      python: `${pipettePythonName}.mix(\n${indentPyLines(
+        pythonArgs.join(',\n')
+      )},\n)`,
     }
   }
   return [
@@ -135,7 +156,7 @@ export function mixUtil(args: {
       ],
       times
     ),
-    ...(hasDelay ? [] : [pythonCommandCreator]),
+    ...(hasUnsupportedMixApiArg ? [] : [pythonCommandCreator]),
   ]
 }
 export const mix: CommandCreator<MixArgs> = (
