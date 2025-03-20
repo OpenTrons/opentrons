@@ -1,42 +1,34 @@
 import { describe, it, expect, vi } from 'vitest'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
-import { getSuccessResult, makeContext } from '../fixtures'
+import { DEFAULT_PIPETTE, getSuccessResult, makeContext } from '../fixtures'
 import { dropTipInWasteChute } from '../commandCreators'
 
-import type { InvariantContext, PipetteEntities, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
 const mockWasteChuteId = 'mockWasteChuteId'
-const mockId = 'mockId'
 
-const mockPipEntities: PipetteEntities = {
-  [mockId]: {
-    name: 'p50_single_flex',
-    id: mockId,
-    spec: { channels: 1 },
-  },
-} as any
-
-const invariantContext: InvariantContext = {
+let invariantContext: InvariantContext = {
   ...makeContext(),
-  pipetteEntities: mockPipEntities,
   additionalEquipmentEntities: {
     [mockWasteChuteId]: {
       name: 'wasteChute' as const,
       location: WASTE_CHUTE_CUTOUT,
       id: mockWasteChuteId,
+      pythonName: 'mock_waste_chute_1',
     },
   },
 }
 const prevRobotState: RobotState = {
-  tipState: { pipettes: { [mockId]: true } } as any,
+  tipState: { pipettes: { [DEFAULT_PIPETTE]: true } } as any,
 } as any
 
 describe('dropTipInWasteChute', () => {
-  it('returns correct commands for drop tip', () => {
+  it('returns correct commands for drop tip in waste chute', () => {
     const args = {
-      pipetteId: mockId,
+      pipetteId: DEFAULT_PIPETTE,
+      wasteChuteId: mockWasteChuteId,
     }
     const result = dropTipInWasteChute(args, invariantContext, prevRobotState)
     expect(getSuccessResult(result).commands).toEqual([
@@ -44,7 +36,7 @@ describe('dropTipInWasteChute', () => {
         commandType: 'moveToAddressableArea',
         key: expect.any(String),
         params: {
-          pipetteId: mockId,
+          pipetteId: DEFAULT_PIPETTE,
           addressableAreaName: '1ChannelWasteChute',
           offset: { x: 0, y: 0, z: 0 },
         },
@@ -53,9 +45,50 @@ describe('dropTipInWasteChute', () => {
         commandType: 'dropTipInPlace',
         key: expect.any(String),
         params: {
-          pipetteId: mockId,
+          pipetteId: DEFAULT_PIPETTE,
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe('mockPythonName.drop_tip()')
+  })
+  it('returns correct commands for drop tip in waste chute when trash bin also exists', () => {
+    const mockTrashId = 'mockTrashId'
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        ...invariantContext.additionalEquipmentEntities,
+        [mockTrashId]: {
+          name: 'trashBin',
+          location: 'cutoutA3',
+          id: mockTrashId,
+        },
+      },
+    }
+    const args = {
+      pipetteId: DEFAULT_PIPETTE,
+      wasteChuteId: mockWasteChuteId,
+    }
+    const result = dropTipInWasteChute(args, invariantContext, prevRobotState)
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'moveToAddressableArea',
+        key: expect.any(String),
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          addressableAreaName: '1ChannelWasteChute',
+          offset: { x: 0, y: 0, z: 0 },
+        },
+      },
+      {
+        commandType: 'dropTipInPlace',
+        key: expect.any(String),
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+        },
+      },
+    ])
+    expect(getSuccessResult(result).python).toBe(
+      'mockPythonName.drop_tip(mock_waste_chute_1)'
+    )
   })
 })
