@@ -56,7 +56,6 @@ describe('Settings', () => {
     screen.getByText('Reset')
     screen.getByText('Privacy')
     screen.getByText('Share analytics with Opentrons')
-    screen.debug()
   })
   it('renders the announcement modal when view release notes button is clicked', () => {
     vi.mocked(AnnouncementModal).mockReturnValue(
@@ -75,7 +74,7 @@ describe('Settings', () => {
   })
   it('renders the analytics toggle and calls the action when pressed', () => {
     render()
-    fireEvent.click(screen.getByTestId('analyticsToggle'))
+    fireEvent.click(screen.getByLabelText('Settings_Privacy'))
     expect(vi.mocked(optIn)).toHaveBeenCalled()
   })
   it('renders the dev ffs section when prerelease mode is turned on', () => {

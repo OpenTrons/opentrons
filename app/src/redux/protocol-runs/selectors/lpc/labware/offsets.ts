@@ -1,10 +1,10 @@
 import type { Selector } from 'reselect'
 import { createSelector } from 'reselect'
-import type { Coordinates } from '@opentrons/shared-data'
-import { getVectorDifference, getVectorSum } from '@opentrons/shared-data'
 
-import type { MissingOffsets, WorkingOffsetsByUri } from '../transforms'
 import {
+  getAreAllOffsetsHardCoded,
+  getCountHardCodedOffsets,
+  getDefaultOffsetDetailsForAllLabware,
   getLocationSpecificOffsetDetailsForAllLabware,
   getMissingOffsets,
   getSelectedLabwareWithOffsetDetails,
@@ -19,9 +19,11 @@ import {
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
+  RESET_TO_DEFAULT,
 } from '/app/redux/protocol-runs/constants'
+
 import type {
-  LegacyLabwareOffsetLocation,
+  StoredLabwareOffsetCreate,
   VectorOffset,
 } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
@@ -31,6 +33,7 @@ import type {
   LPCOffsetKind,
   WorkingOffset,
 } from '/app/redux/protocol-runs'
+import type { MissingOffsets, WorkingOffsetsByUri } from '../transforms'
 
 // Get the location specific offset details for the currently user-selected labware geometry.
 export const selectSelectedLwLocationSpecificOffsetDetails = (
@@ -179,8 +182,8 @@ export const selectMostRecentVectorOffsetForLwWithOffsetDetails = (
   )
 
 // NOTE: This count is analogous to the number of unique locations a labware geometry is utilized
-// in a run.
-export const selectCountLocationSpecificOffsetsForLw = (
+// in a run minus those locations that are hardcoded.
+export const selectCountNonHardcodedLocationSpecificOffsetsForLw = (
   runId: string,
   uri: string
 ): Selector<State, number> =>
@@ -188,12 +191,16 @@ export const selectCountLocationSpecificOffsetsForLw = (
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .locationSpecificOffsetDetails,
-    locationSpecificDetails =>
-      locationSpecificDetails != null ? locationSpecificDetails.length : 0
+    lsDetails =>
+      lsDetails != null
+        ? lsDetails.length - getCountHardCodedOffsets(lsDetails)
+        : 0
   )
 
 // Whether the default offset is "absent" for the given labware geometry.
 // The default offset only needs to be added client-side to be considered "not absent".
+// Note that the default offset is not considered absent if all locations that would
+// utilize the default offset in the run are "hardcoded".
 export const selectIsDefaultOffsetAbsent = (
   runId: string,
   uri: string
@@ -202,13 +209,19 @@ export const selectIsDefaultOffsetAbsent = (
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .defaultOffsetDetails,
-    details =>
-      details?.existingOffset == null &&
-      details?.workingOffset?.confirmedVector == null
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .locationSpecificOffsetDetails,
+    (defaultDetails, lsDetails) =>
+      defaultDetails?.existingOffset == null &&
+      defaultDetails?.workingOffset?.confirmedVector == null &&
+      !getAreAllOffsetsHardCoded(lsDetails)
   )
 
 // Whether the default offset is "missing" for the given labware geometry.
 // The default offset must be persisted on the robot-server to be considered "not missing".
+// Note that the default offset is not considered missing if all locations that would
+// utilize the default offset in the run are "hardcoded".
 export const selectIsDefaultOffsetMissing = (
   runId: string,
   uri: string
@@ -217,7 +230,12 @@ export const selectIsDefaultOffsetMissing = (
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .defaultOffsetDetails,
-    details => details?.existingOffset == null
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .locationSpecificOffsetDetails,
+    (defaultDetails, lsDetails) =>
+      defaultDetails?.existingOffset == null &&
+      !getAreAllOffsetsHardCoded(lsDetails)
   )
 
 export const selectWorkingOffsetsByUri = (
@@ -228,6 +246,22 @@ export const selectWorkingOffsetsByUri = (
     labware => getWorkingOffsetsByUri(labware)
   )
 
+// Whether any offsets are "hardcoded" for the given labware geometry.
+export const selectIsAnyOffsetHardCoded = (
+  runId: string,
+  uri: string
+): Selector<State, boolean> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .locationSpecificOffsetDetails,
+    details =>
+      details?.some(
+        detail => detail.locationDetails.hardCodedOffsetId != null
+      ) ?? false
+  )
+
+// TODO(jh, 03-14-24): Ensure we don't count hardcoded offsets as missing!
 // Returns the offset details for missing offsets, keyed by the labware URI.
 // Note: only offsets persisted on the robot-server are "not missing".
 export const selectMissingOffsets = (
@@ -239,59 +273,68 @@ export const selectMissingOffsets = (
   )
 
 export interface SelectOffsetsToApplyResult {
-  definitionUri: string
-  location: LegacyLabwareOffsetLocation
-  vector: Coordinates
+  toUpdate: StoredLabwareOffsetCreate[]
+  toDelete: string[] // existing offset ids
 }
 
-// TODO(jh 03-07-25): Update alongside the new API integration work.
-export const selectOffsetsToApply = (
+// Get all the offset data that requires server-side updating.
+export const selectPendingOffsetOperations = (
   runId: string
-): Selector<State, SelectOffsetsToApplyResult[]> =>
+): Selector<State, SelectOffsetsToApplyResult> =>
   createSelector(
     (state: State) =>
       getLocationSpecificOffsetDetailsForAllLabware(runId, state),
-    (state: State) => state.protocolRuns[runId]?.lpc?.protocolData,
-    (allDetails, protocolData): SelectOffsetsToApplyResult[] => {
-      if (protocolData == null) {
-        console.warn('LPC state not initalized before selector use.')
-        return []
-      }
+    (state: State) => getDefaultOffsetDetailsForAllLabware(runId, state),
+    (allLSDetails, allDefaultDetails): SelectOffsetsToApplyResult => {
+      const result: SelectOffsetsToApplyResult = { toUpdate: [], toDelete: [] }
 
-      return allDetails.flatMap(
-        ({ workingOffset, existingOffset, locationDetails }) => {
-          const definitionUri = locationDetails.definitionUri
-          const { initialPosition, finalPosition } = workingOffset ?? {}
+      allLSDetails.forEach(detail => {
+        if (detail.workingOffset?.confirmedVector != null) {
+          const confirmedVector = detail.workingOffset.confirmedVector
+          const { definitionUri, lwOffsetLocSeq } = detail.locationDetails
 
-          if (
-            finalPosition == null ||
-            initialPosition == null ||
-            definitionUri == null ||
-            existingOffset == null ||
-            // The slotName is null when applying a default offset. This condition
-            // is effectively a stub to maintain compatability with the legacy HTTP API,
-            // and will be refactored soon.
-            locationDetails.slotName == null
-          ) {
-            console.error(
-              `Cannot generate offsets for labware with incomplete details. ID: ${locationDetails.labwareId}`
-            )
-            return []
+          if (confirmedVector === RESET_TO_DEFAULT) {
+            const offsetId = detail.existingOffset?.id
+
+            if (offsetId == null) {
+              console.error(
+                `Cannot delete offset. Expected id, got none for ${JSON.stringify(
+                  detail
+                )}`
+              )
+            } else {
+              result.toDelete = [...result.toDelete, offsetId]
+            }
+          } else {
+            result.toUpdate = [
+              ...result.toUpdate,
+              {
+                definitionUri,
+                locationSequence: lwOffsetLocSeq,
+                vector: confirmedVector,
+              },
+            ]
           }
+        }
+      })
 
-          const existingOffsetVector = existingOffset.vector
-          const finalVector = getVectorSum(
-            existingOffsetVector,
-            getVectorDifference(finalPosition, initialPosition)
-          )
-          return [
+      // Note that we should never delete a default offset.
+      allDefaultDetails.forEach(detail => {
+        if (detail.workingOffset?.confirmedVector != null) {
+          const confirmedVector = detail.workingOffset.confirmedVector
+          const { definitionUri, lwOffsetLocSeq } = detail.locationDetails
+
+          result.toUpdate = [
+            ...result.toUpdate,
             {
               definitionUri,
-              location: { ...locationDetails },
-              vector: finalVector,
+              locationSequence: lwOffsetLocSeq,
+              vector: confirmedVector,
             },
           ]
         }
-      )
+      })
+
+      return result
     }
   )

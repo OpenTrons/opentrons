@@ -1,4 +1,5 @@
 import 'cypress-file-upload'
+import { SetupContent } from './SetupSteps'
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -34,6 +35,7 @@ declare global {
       mixaspirate: () => Cypress.Chainable<void>
       clickConfirm: () => Cypress.Chainable<void>
       verifyOverflowBtn: () => Cypress.Chainable<void>
+      verifyOnboardingPage: () => Cypress.Chainable<void>
     }
   }
 }
@@ -71,7 +73,7 @@ export const locators = {
   privacyPolicy: 'a[href="https://opentrons.com/privacy-policy"]',
   eula: 'a[href="https://opentrons.com/eula"]',
   privacyToggle: 'Settings_OT_PD_ENABLE_HOT_KEYS_DISPLAY',
-  analyticsToggleTestId: 'analyticsToggle',
+  analyticsToggleAriaLabel: 'Settings_Privacy',
   confirm: 'Confirm',
 }
 
@@ -107,6 +109,14 @@ Cypress.Commands.add('verifyFullHeader', () => {
 
 Cypress.Commands.add('verifyCreateNewHeader', () => {
   verifyUniversal()
+})
+
+// Onboarding page
+Cypress.Commands.add('verifyOnboardingPage', () => {
+  verifyUniversal()
+  cy.get(locators.privacyPolicy).should('exist').and('be.visible')
+  cy.get(locators.eula).should('exist').and('be.visible')
+  cy.contains(SetupContent.LetsGetStarted)
 })
 
 // Home Page
@@ -165,7 +175,7 @@ Cypress.Commands.add('verifySettingsPage', () => {
   cy.contains(content.privacy).should('exist').should('be.visible')
   cy.contains(content.shareSessions).should('exist').should('be.visible')
   cy.getByAriaLabel(locators.privacyToggle).should('exist').should('be.visible')
-  cy.getByTestId(locators.analyticsToggleTestId)
+  cy.getByAriaLabel(locators.analyticsToggleAriaLabel)
     .should('exist')
     .should('be.visible')
 })

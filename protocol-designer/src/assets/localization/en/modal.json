@@ -117,19 +117,32 @@
       "mix_touchTip_mmFromTop": "Change from where in the well the robot performs the touch tip.",
       "aspirate_delay_mmFromBottom": "Change from where in the well the robot delays after aspirating.",
       "dispense_delay_mmFromBottom": "Change from where in the well the robot delays after dispensing.",
-      "aspirate_retract_mmFromBottom": "Change where in the well the robot retracts the tip to.",
-      "dispense_retract_mmFromBottom": "Change where in the well the robot retracts the tip from."
+      "aspirate_retract_mmFromBottom": "Change where in the well the robot retracts the tip to after aspirating.",
+      "dispense_retract_mmFromBottom": "Change where in the well the robot retracts the tip to after dispensing.",
+      "aspirate_submerge_mmFromBottom": "Change where in the well the robot submerges from before aspirating.",
+      "dispense_submerge_mmFromBottom": "Change where in the well the robot submerges from before dispensing.."
     },
     "field_titles": {
       "z_position": "Z position",
       "x_position": "X position",
-      "y_position": "Y position"
+      "y_position": "Y position",
+      "reference_position": "Reference position"
+    },
+    "position_references": {
+      "liquid-meniscus": "Liquid meniscus",
+      "well-bottom": "Bottom of well",
+      "well-center": "Center of well",
+      "well-top": "Top of well"
     },
     "errors": {
       "TOO_MANY_DECIMALS": "a max of 1 decimal place is allowed",
       "OUT_OF_BOUNDS": "accepted range is {{minMm}} to {{maxMm}}"
     },
-    "field_label": "Distance from bottom of well"
+    "field_label": "Distance from bottom of well",
+    "view": {
+      "side": "Side view",
+      "top": "Top view"
+    }
   },
   "labware_upload_message": {
     "title": {

@@ -20,7 +20,7 @@
   "metadata": {
     "displayName": "Opentrons 96 Well Aluminum Block",
     "displayCategory": "aluminumBlock",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {

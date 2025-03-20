@@ -5,8 +5,8 @@ export function getOccludedSlotCountForModule(
   moduleType: ModuleType,
   robotType: RobotType
 ): number {
-  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-    return robotType === OT2_ROBOT_TYPE ? 4 : 2
+  if (moduleType === THERMOCYCLER_MODULE_TYPE && robotType === OT2_ROBOT_TYPE) {
+    return 4
   } else {
     return 1
   }

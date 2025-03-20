@@ -142,7 +142,7 @@ async def delete_specific_tip_length_calibration(
             ),
         ),
     ] = None,
-):
+) -> None:
     try:
         tip_length.delete_tip_length_calibration(
             pipette_id,

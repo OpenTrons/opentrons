@@ -61,11 +61,6 @@ export const getUnusedStagingAreas = (
   const stagingAreaCutoutIds = Object.values(additionalEquipment)
     .filter(equipment => equipment?.name === 'stagingArea')
     .map(equipment => {
-      if (equipment.location == null) {
-        console.error(
-          `expected to find staging area slot location with id ${equipment.id} but could not.`
-        )
-      }
       return equipment.location ?? ''
     })
 

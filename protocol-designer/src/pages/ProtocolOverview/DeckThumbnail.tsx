@@ -26,6 +26,7 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+import { FixedTrashText } from '../../components/molecules'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 
@@ -130,10 +131,13 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
         {() => (
           <>
             {robotType === OT2_ROBOT_TYPE ? (
-              <DeckFromLayers
-                robotType={robotType}
-                layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-              />
+              <>
+                <DeckFromLayers
+                  robotType={robotType}
+                  layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+                />
+                <FixedTrashText />
+              </>
             ) : (
               <>
                 {filteredAddressableAreas.map(addressableArea => {

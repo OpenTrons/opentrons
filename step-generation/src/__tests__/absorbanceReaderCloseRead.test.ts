@@ -4,6 +4,7 @@ import {
   absorbanceReaderStateGetter,
   getModuleState,
 } from '../robotStateSelectors'
+import { GRIPPER_LOCATION } from '../constants'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
 
@@ -50,6 +51,7 @@ describe('absorbanceReaderCloseRead compound command creator', () => {
         [GRIPPER_ID]: {
           id: GRIPPER_ID,
           name: 'gripper',
+          location: GRIPPER_LOCATION,
         },
       },
     }

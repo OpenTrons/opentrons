@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-SetStoredLabwareCommandType = Literal["flexStacker/setStoredlabware"]
+SetStoredLabwareCommandType = Literal["flexStacker/setStoredLabware"]
 
 
 class StackerStoredLabwareDetails(BaseModel):
@@ -174,7 +174,7 @@ class SetStoredLabware(
 ):
     """A command to setstoredlabware the Flex Stacker."""
 
-    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredlabware"
+    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredLabware"
     params: SetStoredLabwareParams
     result: Optional[SetStoredLabwareResult] = None
 
@@ -184,7 +184,7 @@ class SetStoredLabware(
 class SetStoredLabwareCreate(BaseCommandCreate[SetStoredLabwareParams]):
     """A request to execute a Flex Stacker SetStoredLabware command."""
 
-    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredlabware"
+    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredLabware"
     params: SetStoredLabwareParams
 
     _CommandCls: Type[SetStoredLabware] = SetStoredLabware

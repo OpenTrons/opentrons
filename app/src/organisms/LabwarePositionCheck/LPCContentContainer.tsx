@@ -76,12 +76,13 @@ export function LPCContentContainer(
   const showDesktopFooter = !commandUtils.isRobotMoving
 
   const handleExit = (): void => {
-    if (
-      step !== LPC_STEP.DETACH_PROBE &&
-      step !== LPC_STEP.LPC_COMPLETE &&
+    if (step === LPC_STEP.HANDLE_LABWARE && commandUtils.errorMessage == null) {
+      commandUtils.headerCommands.handleNavToDetachProbe()
+    } else if (
+      step === LPC_STEP.DETACH_PROBE &&
       commandUtils.errorMessage == null
     ) {
-      commandUtils.headerCommands.handleNavToDetachProbe()
+      commandUtils.headerCommands.handleCloseAndHome()
     } else {
       void commandUtils.handleCloseNoHome()
     }

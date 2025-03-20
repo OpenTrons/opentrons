@@ -56,6 +56,7 @@ import type {
 } from '@opentrons/step-generation'
 import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
+import { FixedTrashText } from '../../../components/molecules'
 
 const WASTE_CHUTE_SPACE = 30
 const DETAILS_HOVER_SPACE = 60
@@ -265,13 +266,16 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
               zoomed={zoomIn.slot != null}
               borderRadius={BORDERS.borderRadius12}
             >
-              {({ getRobotCoordsFromDOMCoords }) => (
+              {() => (
                 <>
                   {robotType === OT2_ROBOT_TYPE ? (
-                    <DeckFromLayers
-                      robotType={robotType}
-                      layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-                    />
+                    <>
+                      <DeckFromLayers
+                        robotType={robotType}
+                        layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+                      />
+                      <FixedTrashText />
+                    </>
                   ) : (
                     <>
                       {filteredAddressableAreas.map(addressableArea => {
@@ -367,7 +371,6 @@ export function DeckSetupContainer(props: DeckSetupTabType): JSX.Element {
                   )}
                   <DeckSetupDetails
                     selectedZoomInSlot={zoomIn.slot ?? undefined}
-                    getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
                     hoveredLabware={hoveredLabware}
                     hoveredModule={hoveredModule}
                     hoveredFixture={hoveredFixture}

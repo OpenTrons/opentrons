@@ -8,6 +8,7 @@ import {
   makeContext,
   getInitialRobotStateStandard,
 } from '../fixtures'
+import { GRIPPER_LOCATION } from '../constants'
 import { absorbanceReaderOpenLid } from '../commandCreators/atomic/absorbanceReaderOpenLid'
 import { absorbanceReaderStateGetter } from '../robotStateSelectors'
 import type {
@@ -34,6 +35,7 @@ describe('absorbanceReaderOpenLid', () => {
       gripperId: {
         name: 'gripper',
         id: 'gripperId',
+        location: GRIPPER_LOCATION,
       },
     }
 

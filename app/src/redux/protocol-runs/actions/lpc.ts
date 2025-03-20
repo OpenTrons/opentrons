@@ -34,6 +34,7 @@ import type {
   ResetLocationSpecificOffsetToDefaultAction,
   ClearSelectedLabwareWorkingOffsetsAction,
 } from '../types'
+import type { StoredLabwareOffset } from '@opentrons/api-client'
 
 export const proceedStep = (
   runId: string,
@@ -107,10 +108,10 @@ export const clearSelectedLabwareWorkingOffsets = (
 
 export const applyWorkingOffsets = (
   runId: string,
-  labwareUri: string
+  saveResult: StoredLabwareOffset[]
 ): ApplyWorkingOffsetsAction => ({
   type: APPLY_WORKING_OFFSETS,
-  payload: { runId, labwareUri },
+  payload: { runId, saveResult },
 })
 
 export const startLPC = (

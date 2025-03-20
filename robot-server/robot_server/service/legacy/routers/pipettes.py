@@ -59,7 +59,9 @@ async def get_pipettes(
 
     attached = hardware.attached_instruments
 
-    def make_pipette(mount: Mount, pipette_dict: PipetteDict, is_ot2: bool):
+    def make_pipette(
+        mount: Mount, pipette_dict: PipetteDict, is_ot2: bool
+    ) -> pipettes.AttachedPipette:
         if is_ot2:
             mount_axis = ot2_axis_to_string(Axis.by_mount(mount))
             plunger_axis = ot2_axis_to_string(Axis.of_plunger(mount))

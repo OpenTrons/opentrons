@@ -7,6 +7,9 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 )
 from opentrons.protocol_api import LiquidClass
 from opentrons.protocol_api import InstrumentContext, Labware
+from opentrons.protocols.advanced_control.transfers.common import (
+    NoLiquidClassPropertyError,
+)
 
 
 def test_create_liquid_class(
@@ -46,8 +49,8 @@ def test_get_for_raises_for_incorrect_pipette_or_tip(
     """It should raise an error when accessing non-existent properties."""
     liq_class = LiquidClass.create(minimal_liquid_class_def2)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(NoLiquidClassPropertyError):
         liq_class.get_for("flex_1channel_50", "no_such_tiprack")
 
-    with pytest.raises(ValueError):
+    with pytest.raises(NoLiquidClassPropertyError):
         liq_class.get_for("no_such_pipette", "opentrons_flex_96_tiprack_50ul")

@@ -7,6 +7,7 @@ import {
   HEATERSHAKER_MODULE_V1,
   fixture96Plate,
 } from '@opentrons/shared-data'
+import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { deleteContainer } from '../../../../labware-ingred/actions'
@@ -185,7 +186,11 @@ describe('DeckSetupTools', () => {
   })
   it('should save plate reader if gripper configured', () => {
     vi.mocked(getAdditionalEquipment).mockReturnValue({
-      gripperUri: { name: 'gripper', id: 'gripperId' },
+      gripperUri: {
+        name: 'gripper',
+        id: 'gripperId',
+        location: GRIPPER_LOCATION,
+      },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedLabwareDefUri: null,

@@ -7,6 +7,13 @@ from opentrons.drivers.asyncio.communication.errors import (
 )
 
 
+class EStopTriggered(ErrorResponse):
+    """Raised when the estop is triggered during a move."""
+
+    def __init__(self, port: str, response: str, command: str) -> None:
+        super().__init__(port, response, command)
+
+
 class MotorStallDetected(ErrorResponse):
     """Raised when a motor stall is detected."""
 
@@ -47,6 +54,7 @@ class StackerErrorCodes(BaseErrorCode):
     """Stacker-specific error codes."""
 
     UNHANDLED_GCODE = ("ERR003", UnhandledGcode)
+    ESTOP_TRIGGERED = ("ERR006", EStopTriggered)
     MOTOR_STALL_DETECTED = ("ERR403", MotorStallDetected)
     MOTOR_QUEUE_FULL = ("ERR404", MotorQueueFull)
     UNEXPECTED_LIMIT_SWITCH = ("ERR405", UnexpectedLimitSwitch)

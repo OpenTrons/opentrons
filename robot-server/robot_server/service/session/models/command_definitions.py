@@ -46,7 +46,7 @@ class RobotCommand(CommandDefinition):
     toggle_lights = "toggleLights"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "robot"
 
 
@@ -60,7 +60,7 @@ class ProtocolCommand(CommandDefinition):
     resume = "resume"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "protocol"
 
 
@@ -69,7 +69,7 @@ class EquipmentCommand(CommandDefinition):
     load_pipette = "loadPipette"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "equipment"
 
 
@@ -80,7 +80,7 @@ class PipetteCommand(CommandDefinition):
     pick_up_tip = "pickUpTip"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "pipette"
 
 
@@ -102,7 +102,7 @@ class CalibrationCommand(CommandDefinition):
     invalidate_last_action = "invalidateLastAction"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "calibration"
 
 
@@ -113,7 +113,7 @@ class DeckCalibrationCommand(CommandDefinition):
     move_to_point_three = "moveToPointThree"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "calibration.deck"
 
 
@@ -126,7 +126,7 @@ class CheckCalibrationCommand(CommandDefinition):
     transition = "transition"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "calibration.check"
 
 

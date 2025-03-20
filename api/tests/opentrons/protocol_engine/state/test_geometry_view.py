@@ -23,7 +23,13 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import Point, DeckSlotName, MountType, StagingSlotName
+from opentrons.types import (
+    Point,
+    DeckSlotName,
+    MountType,
+    StagingSlotName,
+    MeniscusTrackingTarget,
+)
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.labware.labware_definition import (
     CuboidalFrustum,
@@ -2081,11 +2087,14 @@ def test_get_relative_liquid_handling_well_location(
     subject: GeometryView,
 ) -> None:
     """It should get the relative location of a well given an absolute position."""
-    result = subject.get_relative_liquid_handling_well_location(
+    (
+        result,
+        dynamic_liquid_tracking,
+    ) = subject.get_relative_liquid_handling_well_location(
         labware_id="labware-id",
         well_name="B2",
         absolute_point=Point(x=0, y=0, z=-2),
-        is_meniscus=True,
+        meniscus_tracking=MeniscusTrackingTarget.END,
     )
 
     assert result == LiquidHandlingWellLocation(
@@ -2095,6 +2104,7 @@ def test_get_relative_liquid_handling_well_location(
             y=0.0,
             z=cast(float, pytest.approx(-2)),
         ),
+        volumeOffset="operationVolume",
     )
 
 
@@ -3596,7 +3606,7 @@ def test_get_well_height_at_volume(
     """Test getting the well height at a given volume."""
 
     def _get_labware_def() -> LabwareDefinition:
-        def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
+        def_dir = str(get_shared_data_root()) + f"/labware/definitions/2/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
         _labware_def = labware_definition_type_adapter.validate_python(
@@ -3605,9 +3615,7 @@ def test_get_well_height_at_volume(
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert (
-        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
-    )
+    assert labware_def.innerLabwareGeometry is not None
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -3664,7 +3672,7 @@ def test_get_well_volume_at_height(
     """Test getting the volume at a given height."""
 
     def _get_labware_def() -> LabwareDefinition:
-        def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
+        def_dir = str(get_shared_data_root()) + f"/labware/definitions/2/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
         _labware_def = labware_definition_type_adapter.validate_python(
@@ -3673,9 +3681,7 @@ def test_get_well_volume_at_height(
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert (
-        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
-    )
+    assert labware_def.innerLabwareGeometry is not None
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -4051,7 +4057,7 @@ def test_get_predicted_location_sequence_with_pending_labware(
             [
                 labware_definition_type_adapter.validate_python(
                     load_labware_definition(
-                        "opentrons_flex_tiprack_lid", version=1, schema=3
+                        "opentrons_flex_tiprack_lid", version=1, schema=2
                     )
                 ),
                 labware_definition_type_adapter.validate_python(
@@ -4118,3 +4124,35 @@ def test_virtual_find_height_and_volume(
     #  SimulatedProbeResult
     if isinstance(target_height_volume, SimulatedProbeResult):
         assert height_estimate == volume_estimate == target_height_volume
+
+
+def test_get_liquid_handling_z_change(
+    decoy: Decoy,
+    subject: GeometryView,
+    mock_labware_view: LabwareView,
+    mock_well_view: WellView,
+) -> None:
+    """Test for get_liquid_handling_z_change math."""
+    decoy.when(mock_labware_view.get_well_definition("labware-id", "A1")).then_return(
+        RectangularWellDefinition3.model_construct(totalLiquidVolume=1100000)  # type: ignore[call-arg]
+    )
+    decoy.when(mock_labware_view.get_well_geometry("labware-id", "A1")).then_return(
+        _TEST_INNER_WELL_GEOMETRY
+    )
+    probe_time = datetime.now()
+    decoy.when(mock_well_view.get_last_liquid_update("labware-id", "A1")).then_return(
+        probe_time
+    )
+    decoy.when(mock_well_view.get_well_liquid_info("labware-id", "A1")).then_return(
+        WellLiquidInfo(
+            loaded_volume=None,
+            probed_height=ProbedHeightInfo(height=40.0, last_probed=probe_time),
+            probed_volume=None,
+        )
+    )
+    # make sure that liquid handling z change math stays the same
+    change = subject.get_liquid_handling_z_change(
+        labware_id="labware-id", well_name="A1", operation_volume=199.0
+    )
+    expected_change = 3.2968
+    assert isclose(change, expected_change)

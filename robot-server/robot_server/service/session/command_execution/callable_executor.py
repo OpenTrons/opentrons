@@ -13,7 +13,7 @@ CommandHandler = typing.Callable[
 class CallableExecutor(CommandExecutor):
     """A command executor that passes off execution to a callable"""
 
-    def __init__(self, command_handler: CommandHandler):
+    def __init__(self, command_handler: CommandHandler) -> None:
         """
         Constructor
 

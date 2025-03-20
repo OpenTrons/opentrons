@@ -25,16 +25,13 @@ noqa-require-code = true
 # string lints in these modules; remove entries as they are fixed
 per-file-ignores =
     setup.py:ANN,D
-    robot_server/dependencies.py:ANN,D
-    robot_server/util.py:ANN,D
     robot_server/settings.py:ANN,D
     robot_server/robot/*:D
-    robot_server/service/*:ANN,D
+    robot_server/service/*:D
     tests/integration/*:ANN,D
     tests/robot/*:ANN,D
     tests/service/*:ANN,D
     tests/conftest.py:ANN,D
-    tests/test_util.py:ANN,D
 
 # Ignore Python Protocol API files that are used as opaque test input.
 extend-exclude =

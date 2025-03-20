@@ -97,11 +97,21 @@ export const getLocationSpecificOffsetDetailsForAllLabware = (
 ): LocationSpecificOffsetDetails[] => {
   const labware = state?.protocolRuns[runId]?.lpc?.labwareInfo.labware ?? {}
 
-  return Object(labware).values(
+  return Object.values(labware).flatMap(
     (details: LwGeometryDetails) => details.locationSpecificOffsetDetails
   )
 }
 
+export const getDefaultOffsetDetailsForAllLabware = (
+  runId: string,
+  state: State
+): DefaultOffsetDetails[] => {
+  const labware = state?.protocolRuns[runId]?.lpc?.labwareInfo.labware ?? {}
+
+  return Object.values(labware).map(
+    (details: LwGeometryDetails) => details.defaultOffsetDetails
+  )
+}
 type LabwareURI = string
 
 export interface MisingDefaultOffsets {
@@ -206,4 +216,24 @@ export function getWorkingOffsetsByUri(
   }
 
   return workingOffsetsByUri
+}
+
+export function getAreAllOffsetsHardCoded(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): boolean {
+  return (
+    lsDetails?.every(
+      detail => detail.locationDetails.hardCodedOffsetId != null
+    ) ?? false
+  )
+}
+
+export function getCountHardCodedOffsets(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): number {
+  return lsDetails != null
+    ? lsDetails.filter(
+        detail => detail.locationDetails.hardCodedOffsetId != null
+      ).length
+    : 0
 }

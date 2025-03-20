@@ -1,0 +1,1 @@
+export { FixedTrashText } from './FixedTrashText'

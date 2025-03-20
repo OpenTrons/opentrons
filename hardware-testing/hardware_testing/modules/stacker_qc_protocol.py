@@ -19,7 +19,7 @@ def run(protocol: ProtocolContext) -> None:
     # ======================= SIMPLE SETUP ARRANGEMENT ======================
     # STACKERS
     stacker: FlexStackerContext = protocol.load_module(
-        "flexStackerModuleV1", "A4"
+        "flexStackerModuleV1", "D4"
     )  # type: ignore[assignment]
     stacker.set_stored_labware(
         load_name="opentrons_flex_96_tiprack_200ul",
@@ -45,7 +45,7 @@ def run(protocol: ProtocolContext) -> None:
     stacker.empty("Emptying all labware from the Flex Stacker")
     stacker.set_stored_labware(
         load_name="opentrons_96_wellplate_200ul_pcr_full_skirt",
-        count=5,
+        count=6,
     )
     stacker.fill("Fill stacker with pcr plates")
 

@@ -18,14 +18,16 @@ LOG = getLogger(__name__)
 class PublisherNotifier:
     """An interface that invokes notification callbacks whenever a generic notify event occurs."""
 
-    def __init__(self, change_notifier: Union[ChangeNotifier, ChangeNotifier_ts]):
+    def __init__(
+        self, change_notifier: Union[ChangeNotifier, ChangeNotifier_ts]
+    ) -> None:
         self._change_notifier = change_notifier
         self._notifier: Optional[asyncio.Task[None]] = None
         self._callbacks: List[Callable[[], Awaitable[None]]] = []
 
     def register_publish_callbacks(
         self, callbacks: List[Callable[[], Awaitable[None]]]
-    ):
+    ) -> None:
         """Extend the list of callbacks with a given list of callbacks."""
         self._callbacks.extend(callbacks)
 

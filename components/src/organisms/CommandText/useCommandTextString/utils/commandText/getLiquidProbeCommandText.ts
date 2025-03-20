@@ -36,7 +36,7 @@ export function getLiquidProbeCommandText({
 
   const displayLocation = getLabwareDisplayLocation({
     loadedLabwares: commandTextData?.labware ?? [],
-    location: labwareLocation,
+    location: labwareLocation?.locationSequence ?? labwareLocation?.location,
     robotType,
     allRunDefs,
     loadedModules: commandTextData?.modules ?? [],

@@ -11,7 +11,7 @@ import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 
 // Inject the props specific to the legacy LPC flows, too.
 export interface LegacySupportLPCFlowsProps extends LPCFlowsProps {
-  existingOffsets: LabwareOffset[]
+  runRecordExistingOffsets: LabwareOffset[]
 }
 
 export interface LPCFlowsProps {
@@ -21,7 +21,7 @@ export interface LPCFlowsProps {
   deckConfig: DeckConfiguration
   labwareDefs: LabwareDefinition2[]
   labwareInfo: LPCLabwareInfo
-  mostRecentAnalysis: CompletedProtocolAnalysis
+  analysis: CompletedProtocolAnalysis
   protocolName: string
   maintenanceRunId: string
 }

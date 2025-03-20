@@ -6,4 +6,6 @@ export const prefixMap: Record<MoveLiquidPrefixType, string> = {
   mix: 'mix',
   aspirate_retract: 'retract',
   dispense_retract: 'retract',
+  aspirate_submerge: 'submerge',
+  dispense_submerge: 'submerge',
 }

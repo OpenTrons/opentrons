@@ -28,6 +28,7 @@ import type {
   PrepareToAspirateRunTimeCommand,
   RunTimeCommand,
   MoveToAddressableAreaForDropTipRunTimeCommand,
+  LoadLiquidClassRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { CommandTextData } from '../../ProtocolTimelineScrubber'
 import { getCommandTextData } from '../../ProtocolTimelineScrubber/utils'
@@ -692,6 +693,22 @@ describe('CommandText', () => {
       { i18nInstance: i18n }
     )
     screen.getByText('Load Water into fakeDisplayName')
+  })
+  it('renders correct text for loadLiquidClass', () => {
+    renderWithProviders(
+      <CommandText
+        allRunDefs={[]}
+        commandTextData={mockCommandTextData} // not relevant for loading liquid class
+        robotType={FLEX_ROBOT_TYPE}
+        command={
+          mockRobotSideAnalysis.commands.find(
+            c => c.commandType === 'loadLiquidClass'
+          ) as LoadLiquidClassRunTimeCommand
+        }
+      />,
+      { i18nInstance: i18n }
+    )
+    screen.getByText('Loading Volatile Liquid Class')
   })
   it('renders correct text for temperatureModule/setTargetTemperature', () => {
     const mockTemp = 20

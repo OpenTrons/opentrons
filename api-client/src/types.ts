@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from 'axios'
 import type { ResponsePromise } from './request'
-import type { ModuleModel } from '@opentrons/shared-data'
+import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
 
 export interface HostConfig {
   hostname: string
@@ -60,7 +60,7 @@ export interface OnModuleOffsetLocationSequenceComponent
 export interface OnAddressableAreaOffsetLocationSequenceComponent
   extends BaseOffsetLocationSequenceComponent {
   kind: 'onAddressableArea'
-  addressableAreaName: string
+  addressableAreaName: AddressableAreaName
 }
 
 export type LabwareOffsetLocationSequenceComponent =

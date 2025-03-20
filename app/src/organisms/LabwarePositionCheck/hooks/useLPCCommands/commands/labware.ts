@@ -4,35 +4,24 @@ import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 export function moveLabwareOffDeckCommands(
   offsetLocationDetails: OffsetLocationDetails
 ): CreateCommand[] {
-  const { adapterId, labwareId } = offsetLocationDetails
-
-  return adapterId != null
-    ? [
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
+  return offsetLocationDetails.lwModOnlyStackupDetails
+    .slice()
+    .reverse()
+    .reduce<CreateCommand[]>((acc, component) => {
+      if (component.kind === 'module') {
+        return acc
+      } else {
+        return [
+          ...acc,
+          {
+            commandType: 'moveLabware' as const,
+            params: {
+              labwareId: component.id,
+              newLocation: 'offDeck',
+              strategy: 'manualMoveWithoutPause',
+            },
           },
-        },
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId: adapterId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
-      ]
-    : [
-        {
-          commandType: 'moveLabware' as const,
-          params: {
-            labwareId,
-            newLocation: 'offDeck',
-            strategy: 'manualMoveWithoutPause',
-          },
-        },
-      ]
+        ]
+      }
+    }, [])
 }

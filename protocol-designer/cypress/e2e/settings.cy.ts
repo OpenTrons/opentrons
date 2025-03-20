@@ -27,21 +27,21 @@ describe('The Settings Page', () => {
       .should('be.visible')
       .should('have.attr', 'aria-checked', 'false')
     // Share sessions with Opentrons toggle defaults to off
-    cy.getByTestId('analyticsToggle')
+    cy.getByAriaLabel('Settings_Privacy')
       .should('exist')
       .should('be.visible')
       .find('path[aria-roledescription="ot-toggle-input-on"]')
       .should('exist')
     // Toggle the share sessions with Opentrons setting
-    cy.getByTestId('analyticsToggle').click()
-    cy.getByTestId('analyticsToggle')
+    cy.getByAriaLabel('Settings_Privacy').click()
+    cy.getByAriaLabel('Settings_Privacy')
       .find('path[aria-roledescription="ot-toggle-input-off"]')
       .should('exist')
     // Navigate away from the settings page
     // Then return to see privacy toggle remains toggled on
     cy.visit('/')
     cy.openSettingsPage()
-    cy.getByTestId('analyticsToggle').find(
+    cy.getByAriaLabel('Settings_Privacy').find(
       'path[aria-roledescription="ot-toggle-input-off"]'
     )
     // Toggle off editing timeline tips

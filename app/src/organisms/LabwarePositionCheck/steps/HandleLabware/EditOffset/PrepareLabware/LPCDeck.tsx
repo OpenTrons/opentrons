@@ -29,6 +29,9 @@ import type {
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
+// TODO(jh, 03-14-25): Current designs/behavior do not include rendering the
+//  adapter beneath the labware if present, but let's add this!
+
 /** On the LPC deck, the only visible labware should be the labware with an actively edited offset.
  * Modules are always visible if they are not in the actively utilized deck slot.
  * If modules are in the actively utilized deck slot:
@@ -47,27 +50,30 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   ) as LabwareDefinition2
 
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
-  const { moduleModel, kind: offsetKind } = offsetLocationDetails
+  const { closestBeneathModuleModel, kind: offsetKind } = offsetLocationDetails
 
   const buildModulesOnDeck = (): ModuleOnDeck[] => {
     const allModulesOnDeck = protocolData.modules.map(mod => {
       return {
         moduleModel: mod.model,
         moduleLocation: mod.location,
-        nestedLabwareDef: moduleModel != null ? labwareDef : null,
+        nestedLabwareDef: closestBeneathModuleModel != null ? labwareDef : null,
         innerProps:
-          moduleModel != null &&
-          getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
+          closestBeneathModuleModel != null &&
+          getModuleType(closestBeneathModuleModel) === THERMOCYCLER_MODULE_TYPE
             ? { lidMotorState: 'open' }
             : {},
       }
     })
 
-    if (offsetKind === OFFSET_KIND_DEFAULT || moduleModel == null) {
+    if (
+      offsetKind === OFFSET_KIND_DEFAULT ||
+      closestBeneathModuleModel == null
+    ) {
       return allModulesOnDeck.filter(
         moduleOnDeck =>
           moduleOnDeck.moduleLocation.slotName !==
-          offsetLocationDetails.slotName
+          offsetLocationDetails.addressableAreaName
       )
     } else {
       return allModulesOnDeck

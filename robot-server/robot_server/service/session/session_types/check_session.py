@@ -10,7 +10,6 @@ from robot_server.robot.calibration.check.models import (
 from robot_server.robot.calibration.check import util
 
 from robot_server.service.session.command_execution import (
-    CommandQueue,
     CallableExecutor,
     Command,
     CompletedCommand,
@@ -27,7 +26,6 @@ from robot_server.service.session.session_types.base_session import (
 from robot_server.service.session.errors import (
     SessionCreationException,
     CommandExecutionException,
-    UnsupportedFeature,
 )
 
 
@@ -46,7 +44,7 @@ class CheckSession(BaseSession):
         instance_meta: SessionMetaData,
         calibration_check: CheckCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._calibration_check = calibration_check
         self._command_executor = CheckSessionCommandExecutor(
@@ -138,13 +136,9 @@ class CheckSession(BaseSession):
         return self._command_executor
 
     @property
-    def command_queue(self) -> CommandQueue:
-        raise UnsupportedFeature()
-
-    @property
     def session_type(self) -> SessionType:
         return SessionType.calibration_check
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

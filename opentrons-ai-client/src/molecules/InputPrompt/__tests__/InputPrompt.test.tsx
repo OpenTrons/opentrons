@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { FormProvider, useForm } from 'react-hook-form'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
@@ -7,14 +7,14 @@ import { InputPrompt } from '../index'
 
 import type { ReactNode } from 'react'
 
-const mockUseTrackEvent = vi.fn()
+const mockTrackEvent = vi.fn()
 
 vi.mock('../../../resources/hooks/useTrackEvent', () => ({
-  useTrackEvent: () => mockUseTrackEvent,
+  useTrackEvent: () => mockTrackEvent,
 }))
 
 vi.mock('../../../hooks/useTrackEvent', () => ({
-  useTrackEvent: () => mockUseTrackEvent,
+  useTrackEvent: () => mockTrackEvent,
 }))
 
 const WrappingForm = (wrappedComponent: {
@@ -39,6 +39,10 @@ const render = () => {
 }
 
 describe('InputPrompt', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('should render textarea and disabled button', () => {
     render()
     screen.getByRole('textbox')
@@ -64,7 +68,7 @@ describe('InputPrompt', () => {
     fireEvent.click(sendButton)
 
     await waitFor(() => {
-      expect(mockUseTrackEvent).toHaveBeenCalledWith({
+      expect(mockTrackEvent).toHaveBeenCalledWith({
         name: 'chat-submitted',
         properties: {
           chat: 'test',

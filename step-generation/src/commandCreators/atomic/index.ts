@@ -4,7 +4,7 @@ import { absorbanceReaderOpenLid } from './absorbanceReaderOpenLid'
 import { absorbanceReaderRead } from './absorbanceReaderRead'
 import { aspirate } from './aspirate'
 import { aspirateInPlace } from './aspirateInPlace'
-import { blowout } from './blowout'
+import { blowOutInWell } from './blowOutInWell'
 import { blowOutInPlace } from './blowOutInPlace'
 import { configureForVolume } from './configureForVolume'
 import { configureNozzleLayout } from './configureNozzleLayout'
@@ -36,7 +36,7 @@ export {
   absorbanceReaderRead,
   aspirate,
   aspirateInPlace,
-  blowout,
+  blowOutInWell,
   blowOutInPlace,
   comment,
   configureForVolume,

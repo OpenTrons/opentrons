@@ -12,7 +12,6 @@ from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
     CompletedCommand,
-    CommandQueue,
     CommandExecutor,
 )
 from opentrons.protocol_api import labware
@@ -20,7 +19,6 @@ from opentrons.protocol_api import labware
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
 from ..models.session import SessionType, TipLengthCalibrationResponseAttributes
-from ..errors import UnsupportedFeature
 
 
 class TipLengthCalibrationCommandExecutor(CallableExecutor):
@@ -38,7 +36,7 @@ class TipLengthCalibration(BaseSession):
         instance_meta: SessionMetaData,
         tip_cal_user_flow: TipCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._tip_cal_user_flow = tip_cal_user_flow
         self._command_executor = TipLengthCalibrationCommandExecutor(
@@ -106,10 +104,6 @@ class TipLengthCalibration(BaseSession):
         return self._command_executor
 
     @property
-    def command_queue(self) -> CommandQueue:
-        raise UnsupportedFeature()
-
-    @property
     def session_type(self) -> SessionType:
         return SessionType.tip_length_calibration
 
@@ -129,6 +123,6 @@ class TipLengthCalibration(BaseSession):
             supportedCommands=self._tip_cal_user_flow.supported_commands,
         )
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

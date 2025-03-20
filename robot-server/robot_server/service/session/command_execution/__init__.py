@@ -1,4 +1,3 @@
-from .base_command_queue import CommandQueue  # noqa: F401
 from .base_executor import CommandExecutor  # noqa: F401
 from .command import (  # noqa: F401
     Command,

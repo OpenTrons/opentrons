@@ -47,9 +47,9 @@ DFU_PID = "df11"
 
 # Maximum distance in mm the axis can travel.
 MAX_TRAVEL = {
-    StackerAxis.X: 192.5,
-    StackerAxis.Z: 136.0,
-    StackerAxis.L: 23.0,
+    StackerAxis.X: 194.0,
+    StackerAxis.Z: 139.5,
+    StackerAxis.L: 22.0,
 }
 
 # The offset in mm to subtract from MAX_TRAVEL when moving an axis before we home.
@@ -122,8 +122,7 @@ class FlexStacker(mod_abc.AbstractModule):
         )
 
         # Enable stallguard
-        for axis in StackerAxis:
-            config = STALLGUARD_CONFIG[axis]
+        for axis, config in STALLGUARD_CONFIG.items():
             await driver.set_stallguard_threshold(
                 axis, config.enabled, config.threshold
             )
@@ -272,13 +271,14 @@ class FlexStacker(mod_abc.AbstractModule):
     ) -> bool:
         """Move the axis in a direction by the given distance in mm."""
         await self.reset_stall_detected()
-        motion_params = STACKER_MOTION_CONFIG[axis]["move"]
-        await self._driver.set_run_current(axis, current or motion_params.current or 0)
-        if any([speed, acceleration, current]):
-            motion_params = self._reader.motion_params[axis]
-            motion_params.current = current or motion_params.current
-            motion_params.max_speed = speed or motion_params.max_speed
-            motion_params.acceleration = acceleration or motion_params.acceleration
+        default = STACKER_MOTION_CONFIG[axis]["move"]
+        await self._driver.set_run_current(
+            axis, current if current is not None else default.run_current
+        )
+        await self._driver.set_ihold_current(axis, default.hold_current)
+        motion_params = default.move_params.update(
+            max_speed=speed, acceleration=acceleration
+        )
         distance = direction.distance(distance)
         res = await self._driver.move_in_mm(axis, distance, params=motion_params)
         if res == MoveResult.STALL_ERROR:
@@ -295,14 +295,14 @@ class FlexStacker(mod_abc.AbstractModule):
         current: Optional[float] = None,
     ) -> bool:
         await self.reset_stall_detected()
-        motion_params = STACKER_MOTION_CONFIG[axis]["home"]
-        await self._driver.set_run_current(axis, current or motion_params.current or 0)
-        # Set the max hold current for the Z axis
-        if axis == StackerAxis.Z:
-            await self._driver.set_ihold_current(axis, 1.8)
-        if any([speed, acceleration]):
-            motion_params.max_speed = speed or motion_params.max_speed
-            motion_params.acceleration = acceleration or motion_params.acceleration
+        default = STACKER_MOTION_CONFIG[axis]["home"]
+        await self._driver.set_run_current(
+            axis, current if current is not None else default.run_current
+        )
+        await self._driver.set_ihold_current(axis, default.hold_current)
+        motion_params = default.move_params.update(
+            max_speed=speed, acceleration=acceleration
+        )
         success = await self._driver.move_to_limit_switch(
             axis=axis, direction=direction, params=motion_params
         )
@@ -320,14 +320,11 @@ class FlexStacker(mod_abc.AbstractModule):
         # Dont move the latch if its already closed.
         if self.limit_switch_status[StackerAxis.L] == StackerAxisState.EXTENDED:
             return True
-        motion_params = STACKER_MOTION_CONFIG[StackerAxis.L]["move"]
-        speed = velocity or motion_params.max_speed
-        accel = acceleration or motion_params.acceleration
         success = await self.home_axis(
             StackerAxis.L,
             Direction.RETRACT,
-            speed=speed,
-            acceleration=accel,
+            speed=velocity,
+            acceleration=acceleration,
         )
         # Check that the latch is closed.
         await self._reader.get_limit_switch_status()
@@ -345,18 +342,14 @@ class FlexStacker(mod_abc.AbstractModule):
         # Dont move the latch if its already opened.
         if self.limit_switch_status[StackerAxis.L] == StackerAxisState.RETRACTED:
             return True
-        motion_params = STACKER_MOTION_CONFIG[StackerAxis.L]["move"]
-        speed = velocity or motion_params.max_speed
-        accel = acceleration or motion_params.acceleration
-        distance = MAX_TRAVEL[StackerAxis.L]
         # The latch only has one limit switch, so we have to travel a fixed distance
         # to open the latch.
         success = await self.move_axis(
             StackerAxis.L,
             Direction.EXTEND,
-            distance=distance,
-            speed=speed,
-            acceleration=accel,
+            distance=MAX_TRAVEL[StackerAxis.L],
+            speed=velocity,
+            acceleration=acceleration,
         )
         # Check that the latch is opened.
         await self._reader.get_limit_switch_status()
@@ -394,7 +387,9 @@ class FlexStacker(mod_abc.AbstractModule):
 
         # Transfer
         await self.open_latch()
-        z_speed = (STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].max_speed or 0) / 2
+        z_speed = (
+            STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed or 0
+        ) / 2
         await self.move_axis(
             StackerAxis.Z, Direction.EXTEND, (labware_height / 2), z_speed
         )
@@ -433,7 +428,9 @@ class FlexStackerReader(Reader):
         }
         self.platform_state = PlatformState.UNKNOWN
         self.hopper_door_closed = False
-        self.motion_params = {axis: MoveParams(axis=axis) for axis in StackerAxis}
+        self.motion_params: Dict[StackerAxis, Optional[MoveParams]] = {
+            axis: None for axis in StackerAxis
+        }
         self.get_config = True
 
     async def read(self) -> None:

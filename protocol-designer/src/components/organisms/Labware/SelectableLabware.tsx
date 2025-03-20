@@ -1,6 +1,7 @@
 import reduce from 'lodash/reduce'
+import { useEffect } from 'react'
 
-import { COLUMN } from '@opentrons/shared-data'
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
 import { COLORS } from '@opentrons/components'
 
 import {
@@ -39,7 +40,7 @@ export interface SelectableLabwareProps {
 
 type ChannelType = 8 | 96
 
-const getChannelsFromNozleType = (nozzleType: NozzleType): ChannelType => {
+const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
   if (nozzleType === '8-channel' || nozzleType === COLUMN) {
     return 8
   } else {
@@ -67,8 +68,8 @@ export const SelectableLabware = (
     selectedWells: WellGroup
   ) => WellGroup = selectedWells => {
     // Returns PRIMARY WELLS from the selection.
-    if (nozzleType != null) {
-      const channels = getChannelsFromNozleType(nozzleType)
+    if (nozzleType !== null && nozzleType !== SINGLE) {
+      const channels = getChannelsFromNozzleType(nozzleType)
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
       const primaryWells: WellGroup = reduce(
@@ -101,8 +102,8 @@ export const SelectableLabware = (
     rect
   ) => {
     if (!e.shiftKey) {
-      if (nozzleType != null) {
-        const channels = getChannelsFromNozleType(nozzleType)
+      if (nozzleType !== null && nozzleType !== SINGLE) {
+        const channels = getChannelsFromNozzleType(nozzleType)
         const selectedWells = _getWellsFromRect(rect)
         const allWellsForMulti: WellGroup = reduce(
           selectedWells,
@@ -142,8 +143,8 @@ export const SelectableLabware = (
   }
 
   const handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
-    if (nozzleType != null) {
-      const channels = getChannelsFromNozleType(nozzleType)
+    if (nozzleType !== null && nozzleType !== SINGLE) {
+      const channels = getChannelsFromNozzleType(nozzleType)
       const wellSet = getWellSetForMultichannel({
         labwareDef,
         wellName: args.wellName,
@@ -158,11 +159,11 @@ export const SelectableLabware = (
 
   // For rendering, show all wells not just primary wells
   const allSelectedWells =
-    nozzleType != null
+    nozzleType !== null && nozzleType !== SINGLE
       ? reduce<WellGroup, WellGroup>(
           selectedPrimaryWells,
           (acc, _, wellName): WellGroup => {
-            const channels = getChannelsFromNozleType(nozzleType)
+            const channels = getChannelsFromNozzleType(nozzleType)
             const wellSet = getWellSetForMultichannel({
               labwareDef,
               wellName,
@@ -195,6 +196,10 @@ export const SelectableLabware = (
       wellFillWithLiq[wellName] = wellFill[wellName]
     })
   }
+
+  useEffect(() => {
+    updateHighlightedWells({})
+  }, [])
 
   return (
     <SelectionRect

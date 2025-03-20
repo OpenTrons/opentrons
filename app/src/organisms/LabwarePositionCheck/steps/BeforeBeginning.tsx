@@ -39,7 +39,7 @@ export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
         buttonText: t('exit'),
         buttonCategory: 'rounded',
         buttonType: 'tertiaryLowLight',
-        onClick: commandUtils.headerCommands.handleNavToDetachProbe,
+        onClick: commandUtils.headerCommands.handleCloseWithoutHome,
       }}
     >
       <TwoColumn>

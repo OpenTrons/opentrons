@@ -59,6 +59,7 @@ class LabwareParameters2(TypedDict):
     isTiprack: bool
     loadName: str
     isMagneticModuleCompatible: bool
+    isDeckSlotCompatible: NotRequired[bool]
     quirks: NotRequired[list[str]]
     tipLength: NotRequired[float]
     tipOverlap: NotRequired[float]
@@ -66,7 +67,7 @@ class LabwareParameters2(TypedDict):
 
 
 class LabwareParameters3(LabwareParameters2, TypedDict):
-    isDeckSlotCompatible: NotRequired[bool]
+    pass  # Currently equivalent to LabwareParameters2.
 
 
 class LabwareBrandData(TypedDict):
@@ -94,6 +95,7 @@ class _WellCommon2(TypedDict):
     x: float
     y: float
     z: float
+    geometryDefinitionId: NotRequired[str | None]
 
 
 class CircularWellDefinition2(_WellCommon2, TypedDict):
@@ -110,24 +112,14 @@ class RectangularWellDefinition2(_WellCommon2, TypedDict):
 WellDefinition2 = CircularWellDefinition2 | RectangularWellDefinition2
 
 
-class _WellCommon3(TypedDict):
-    depth: float
-    totalLiquidVolume: float
-    x: float
-    y: float
-    z: float
-    geometryDefinitionId: NotRequired[str | None]
+class CircularWellDefinition3(CircularWellDefinition2, TypedDict):
+    # Currently equivalent to CircularWellDefinition2.
+    pass
 
 
-class CircularWellDefinition3(_WellCommon3, TypedDict):
-    shape: CircularType
-    diameter: float
-
-
-class RectangularWellDefinition3(_WellCommon3, TypedDict):
-    shape: RectangularType
-    xDimension: float
-    yDimension: float
+class RectangularWellDefinition3(RectangularWellDefinition2, TypedDict):
+    # Currently equivalent to RectangularWellDefinition2.
+    pass
 
 
 WellDefinition3 = CircularWellDefinition3 | RectangularWellDefinition3
@@ -164,6 +156,11 @@ class LabwareDefinition2(TypedDict):
     gripForce: NotRequired[float]
     gripHeightFromLabwareBottom: NotRequired[float]
     stackLimit: NotRequired[int]
+    compatibleParentLabware: NotRequired[list[str]]
+    # The innerLabwareGeometry dict values are not currently modeled in these
+    # TypedDict-based bindings. The only code that cares about them
+    # currentlyuses our Pydantic-based bindings instead.
+    innerLabwareGeometry: NotRequired[dict[str, object] | None]
 
 
 # Class to mix in the "$otSharedSchema" key. This cannot be defined with the normal
@@ -175,6 +172,7 @@ _OTSharedSchemaMixin = TypedDict(
 
 class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     schemaVersion: Literal[3]
+    # $otSharedSchema mixed in via subclassing
     version: int
     namespace: str
     metadata: LabwareMetadata
@@ -192,11 +190,11 @@ class LabwareDefinition3(_OTSharedSchemaMixin, TypedDict):
     gripForce: NotRequired[float]
     gripHeightFromLabwareBottom: NotRequired[float]
     stackLimit: NotRequired[int]
+    compatibleParentLabware: NotRequired[list[str]]
     # The innerLabwareGeometry dict values are not currently modeled in these
     # TypedDict-based bindings. The only code that cares about them
     # currentlyuses our Pydantic-based bindings instead.
     innerLabwareGeometry: NotRequired[dict[str, object] | None]
-    compatibleParentLabware: NotRequired[list[str]]
 
 
 LabwareDefinition = LabwareDefinition2 | LabwareDefinition3

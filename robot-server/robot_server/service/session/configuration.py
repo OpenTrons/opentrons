@@ -14,7 +14,7 @@ class SessionConfiguration:
         hardware: HardwareControlAPI,
         is_active: Callable[[IdentifierType], bool],
         motion_lock: ThreadedAsyncLock,
-    ):
+    ) -> None:
         self._hardware = hardware
         self._is_active = is_active
         self._motion_lock = motion_lock

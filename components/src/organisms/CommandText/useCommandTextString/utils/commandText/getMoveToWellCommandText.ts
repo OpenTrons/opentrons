@@ -23,10 +23,10 @@ export function getMoveToWellCommandText({
       : null
 
   const displayLocation = getLabwareDisplayLocation({
-    location: labwareLocation,
+    loadedLabwares: commandTextData?.labware ?? [],
+    location: labwareLocation?.locationSequence ?? labwareLocation?.location,
     robotType,
     allRunDefs,
-    loadedLabwares: commandTextData?.labware ?? [],
     loadedModules: commandTextData?.modules ?? [],
     t,
   })

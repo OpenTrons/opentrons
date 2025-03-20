@@ -29,7 +29,7 @@ class ErrorDef(ErrorCreateDef, Enum):
     """An enumeration of ErrorCreateDef Error definitions for use by
     RobotServerError"""
 
-    def __init__(self, e) -> None:
+    def __init__(self, e: Any) -> None:
         super().__init__(**(asdict(e)))
 
 
@@ -48,9 +48,9 @@ class RobotServerError(ApiError):
         source: Optional[ErrorSource] = None,
         meta: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[BaseException]] = None,
-        *fmt_args,
-        **fmt_kw_args
-    ):
+        *fmt_args: object,
+        **fmt_kw_args: object
+    ) -> None:
         """
         Constructor.
 

@@ -1,6 +1,7 @@
 import { expect, describe, it, beforeEach } from 'vitest'
 import { getIsSafePipetteMovement } from '../utils'
 import {
+  COLUMN,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
   fixture96Plate,
@@ -82,6 +83,7 @@ describe('getIsSafePipetteMovement', () => {
 
   it('returns true when the labware id is a trash bin', () => {
     const result = getIsSafePipetteMovement(
+      COLUMN,
       {
         labware: {},
         pipettes: {},
@@ -108,6 +110,7 @@ describe('getIsSafePipetteMovement', () => {
   })
   it('returns false when within pipette extents is false', () => {
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -131,6 +134,7 @@ describe('getIsSafePipetteMovement', () => {
       },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -148,6 +152,7 @@ describe('getIsSafePipetteMovement', () => {
       [mockAdapter]: { slot: 'D1' },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,
@@ -180,6 +185,7 @@ describe('getIsSafePipetteMovement', () => {
       },
     }
     const result = getIsSafePipetteMovement(
+      COLUMN,
       mockRobotState,
       mockInvariantProperties,
       mockPipId,

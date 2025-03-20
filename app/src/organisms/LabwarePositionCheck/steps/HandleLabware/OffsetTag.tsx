@@ -16,10 +16,15 @@ export interface OffsetTagNoOffsetKindProps {
   kind: 'noOffset'
 }
 
+export interface OffsetTagHardCodedKindProps {
+  kind: 'hardcoded'
+}
+
 export type OffsetTagProps =
   | OffsetTagDefaultKindProps
   | OffsetTagVectorKindProps
   | OffsetTagNoOffsetKindProps
+  | OffsetTagHardCodedKindProps
 
 export function OffsetTag(props: OffsetTagProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
@@ -34,6 +39,10 @@ export function OffsetTag(props: OffsetTagProps): JSX.Element {
     switch (props.kind) {
       case 'default':
         return t('default')
+      case 'hardcoded':
+        return t('hardcoded')
+      case 'noOffset':
+        return t('no_offset_data')
       case 'vector': {
         const { x, y, z } = props
 
@@ -43,8 +52,6 @@ export function OffsetTag(props: OffsetTagProps): JSX.Element {
           z: formatCoordinate(z),
         })
       }
-      case 'noOffset':
-        return t('no_offset_data')
     }
   }
 

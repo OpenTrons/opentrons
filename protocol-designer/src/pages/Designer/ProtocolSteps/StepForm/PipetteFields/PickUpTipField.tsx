@@ -7,7 +7,7 @@ import type { FieldProps } from '../types'
 
 export function PickUpTipField(props: FieldProps): JSX.Element {
   const { value: dropdownItem } = props
-  const { t } = useTranslation('form')
+  const { t } = useTranslation('protocol_steps')
   const tiprackOptions = useSelector(getAllTiprackOptions)
   const defaultOption: DropdownOption = {
     name: t('default_tip_option'),

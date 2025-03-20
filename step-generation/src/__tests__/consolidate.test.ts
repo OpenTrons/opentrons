@@ -609,7 +609,18 @@ describe('consolidate single-channel', () => {
       changeTip: 'once',
       mixInDestination: { times: 3, volume: 54 },
       blowoutLocation: FIXED_TRASH_ID,
+      dropTipLocation: 'trashBinId',
     } as ConsolidateArgs
+    invariantContext = {
+      ...invariantContext,
+      additionalEquipmentEntities: {
+        trashBinId: {
+          name: 'trashBin',
+          id: 'trashBinId',
+          location: 'cutoutA3',
+        },
+      },
+    }
 
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
@@ -1136,7 +1147,18 @@ describe('consolidate single-channel', () => {
         blowoutFlowRateUlSec: 2.3,
         blowoutOffsetFromTopMm: 3.3,
         dispenseAirGapVolume: 35,
+        dropTipLocation: 'trashBinId',
       } as ConsolidateArgs
+      invariantContext = {
+        ...invariantContext,
+        additionalEquipmentEntities: {
+          trashBinId: {
+            name: 'trashBin',
+            id: 'trashBinId',
+            location: 'cutoutA3',
+          },
+        },
+      }
 
       const result = consolidate(
         args,

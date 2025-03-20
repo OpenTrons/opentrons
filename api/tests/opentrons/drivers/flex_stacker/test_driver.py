@@ -89,7 +89,6 @@ async def test_get_motion_params(
     connection.send_command.return_value = "M120 M:X V:200.000 A:1500.000 D:5.000"
     response = await subject.get_motion_params(types.StackerAxis.X)
     assert response == types.MoveParams(
-        axis=types.StackerAxis.X,
         acceleration=1500.0,
         max_speed=200.0,
         max_speed_discont=5.0,

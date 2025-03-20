@@ -11,9 +11,9 @@ import { getInitialDeckSetup } from '../../../../step-forms/selectors'
 import { MaterialsListModal } from '..'
 
 import type { ComponentProps } from 'react'
+import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 import type { InfoScreen } from '@opentrons/components'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../../../step-forms'
-import type { FixtureInList } from '..'
 
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../labware-ingred/selectors')
@@ -44,7 +44,7 @@ const mockHardWare = [
 
 const mockFixture = [
   { location: 'cutoutB3', name: 'trashBin', id: 'mockId:trashBin' },
-] as FixtureInList[]
+] as AdditionalEquipmentEntity[]
 
 const mockLabware = [
   {

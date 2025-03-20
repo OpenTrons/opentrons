@@ -33,23 +33,17 @@ import { HandleEnter, LINE_CLAMP_TEXT_STYLE } from '../../atoms'
 import { getMainPagePortalEl } from '../Portal'
 
 import type {
-  AdditionalEquipmentName,
   LiquidEntities,
+  AdditionalEquipmentEntity,
 } from '@opentrons/step-generation'
 import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
 
 // ToDo (kk:09/04/2024) this should be removed when break-point is set up
 const MODAL_MIN_WIDTH = '37.125rem'
 
-export interface FixtureInList {
-  name: AdditionalEquipmentName
-  id: string
-  location?: string
-}
-
 interface MaterialsListModalProps {
   hardware: ModuleOnDeck[]
-  fixtures: FixtureInList[]
+  fixtures: AdditionalEquipmentEntity[]
   labware: LabwareOnDeck[]
   liquids: LiquidEntities
   setShowMaterialsListModal: (showMaterialsListModal: boolean) => void
@@ -98,16 +92,9 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            {fixture.location != null ? (
-                              <DeckInfoLabel
-                                deckLabel={fixture.location.replace(
-                                  'cutout',
-                                  ''
-                                )}
-                              />
-                            ) : (
-                              ''
-                            )}
+                            <DeckInfoLabel
+                              deckLabel={fixture.location.replace('cutout', '')}
+                            />
                           </Flex>
                         }
                         content={

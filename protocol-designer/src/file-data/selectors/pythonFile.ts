@@ -281,12 +281,11 @@ export function getLoadTrashBins(
   additionalEquipmentEntities: AdditionalEquipmentEntities
 ): string {
   const pythonLoadTrashBins = Object.values(additionalEquipmentEntities)
-    .filter(ae => ae.name === 'trashBin' && ae.location != null)
+    .filter(ae => ae.name === 'trashBin')
     ?.map(trashBin => {
-      const location =
-        trashBin.location != null
-          ? formatPyStr(getCutoutDisplayName(trashBin.location as CutoutId))
-          : 'unknown trash location' // note: should never hit unknown trash location since location is always defined for trashBin entity
+      const location = formatPyStr(
+        getCutoutDisplayName(trashBin.location as CutoutId)
+      )
       return `${trashBin.pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_trash_bin(${location})`
     })
     .join('\n')
