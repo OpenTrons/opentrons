@@ -6,7 +6,10 @@ import {
   GO_BACK_HANDLE_LW_SUBSTEP,
   GO_BACK_LAST_STEP,
   LPC_STEPS,
+  OFFSETS_CONFLICT,
+  OFFSETS_FROM_DATABASE,
   OFFSETS_FROM_RUN_RECORD,
+  OFFSETS_PENDING_SELECTION,
   PROCEED_HANDLE_LW_SUBSTEP,
   PROCEED_STEP,
   RESET_OFFSET_TO_DEFAULT,
@@ -14,10 +17,10 @@ import {
   SET_INITIAL_POSITION,
   SET_SELECTED_LABWARE,
   SET_SELECTED_LABWARE_URI,
-  UPDATE_LPC,
-  SOURCE_OFFSETS_FROM_RUN,
   SOURCE_OFFSETS_FROM_DATABASE,
-  OFFSETS_FROM_DATABASE,
+  SOURCE_OFFSETS_FROM_RUN,
+  UPDATE_CONFLICT_TIMESTAMP,
+  UPDATE_LPC,
 } from '../constants'
 import {
   clearAllWorkingOffsets,
@@ -230,6 +233,22 @@ export function LPCReducer(
           labwareInfo: {
             ...state.labwareInfo,
             sourcedOffsets: OFFSETS_FROM_DATABASE,
+          },
+        }
+      }
+
+      case UPDATE_CONFLICT_TIMESTAMP: {
+        const { info } = action.payload
+
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            conflictTimestampInfo: info,
+            sourcedOffsets:
+              info.timestamp != null
+                ? OFFSETS_CONFLICT
+                : OFFSETS_PENDING_SELECTION,
           },
         }
       }

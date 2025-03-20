@@ -6,16 +6,16 @@ import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
 import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
+import {
+  getTotalCountNonHardCodedLocationSpecificOffsets,
+  OFFSETS_SOURCE_INITIALIZING,
+} from '/app/redux/protocol-runs'
+import type { UseLPCLabwareInfoProps } from '..'
+import type { StoredLabwareOffset } from '@opentrons/api-client'
 import type {
   LabwareLocationInfo,
   LPCLabwareInfo,
 } from '/app/redux/protocol-runs'
-import {
-  getTotalCountNonHardCodedLocationSpecificOffsets,
-  OFFSETS_FROM_DATABASE,
-} from '/app/redux/protocol-runs'
-import type { UseLPCLabwareInfoProps } from '..'
-import type { StoredLabwareOffset } from '@opentrons/api-client'
 
 interface GetLPCLabwareInfoParams {
   currentOffsets: StoredLabwareOffset[] | undefined
@@ -37,8 +37,10 @@ export function getLPCLabwareInfoFrom(
     areOffsetsApplied,
     selectedLabware: null,
     labware,
-    lastFreshOffsetRunTimestamp: null,
-    sourcedOffsets: OFFSETS_FROM_DATABASE,
+    initialRunRecordOffsets: [],
+    initialDatabaseOffsets: [],
+    conflictTimestampInfo: { timestamp: null, isInitialized: false },
+    sourcedOffsets: OFFSETS_SOURCE_INITIALIZING,
   }
 }
 

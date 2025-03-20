@@ -1,4 +1,5 @@
 import type {
+  ConflictTimestampInfo,
   LocationSpecificOffsetLocationDetails,
   LPCStep,
   LPCWizardState,
@@ -107,6 +108,11 @@ export interface SourceOffsetsFromDatabaseAction {
   payload: { runId: string }
 }
 
+export interface UpdateConflictTimestampAction {
+  type: 'UPDATE_CONFLICT_TIMESTAMP'
+  payload: { runId: string; info: ConflictTimestampInfo }
+}
+
 export type LPCWizardAction =
   | UpdateLPCAction
   | FinishLPCAction
@@ -124,3 +130,4 @@ export type LPCWizardAction =
   | AppliedOffsetsToRunAction
   | SourceOffsetsFromRunAction
   | SourceOffsetsFromDatabaseAction
+  | UpdateConflictTimestampAction

@@ -9,11 +9,7 @@ import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
 import { getLPCSearchParams } from './getLPCSearchParams'
 import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 
-import type {
-  LabwareOffset,
-  StoredLabwareOffset,
-  SearchLabwareOffsetsData,
-} from '@opentrons/api-client'
+import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
 import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueValidLwLocationInfoByAnalysis'
@@ -29,7 +25,6 @@ export interface UseLPCLabwareInfoResult {
   labwareInfo: LPCLabwareInfo
   storedOffsets: StoredLabwareOffset[] | undefined
   legacyOffsets: LabwareOffset[]
-  searchLwOffsetsParams: SearchLabwareOffsetsData
 }
 
 // Prepare LPC-able labware info for injection into LPC flows, querying for
@@ -39,13 +34,9 @@ export function useLPCLabwareInfo(
   props: UseLPCLabwareInfoProps
 ): UseLPCLabwareInfoResult {
   const { legacyOffsets } = useOT2LPCLabwareInfo(props)
-  const {
-    labwareInfo,
-    storedOffsets,
-    searchLwOffsetsParams,
-  } = useFlexLPCLabwareInfo(props)
+  const { labwareInfo, storedOffsets } = useFlexLPCLabwareInfo(props)
 
-  return { storedOffsets, labwareInfo, legacyOffsets, searchLwOffsetsParams }
+  return { storedOffsets, labwareInfo, legacyOffsets }
 }
 
 function useFlexLPCLabwareInfo({
@@ -55,7 +46,7 @@ function useFlexLPCLabwareInfo({
   runId,
 }: UseLPCLabwareInfoProps): Pick<
   UseLPCLabwareInfoResult,
-  'labwareInfo' | 'storedOffsets' | 'searchLwOffsetsParams'
+  'labwareInfo' | 'storedOffsets'
 > {
   const runStatus = useRunStatus(runId ?? null)
 
@@ -101,7 +92,7 @@ function useFlexLPCLabwareInfo({
     [storedOffsets, labwareDefs, lwLocationCombos, protocolData]
   )
 
-  return { labwareInfo, storedOffsets, searchLwOffsetsParams }
+  return { labwareInfo, storedOffsets }
 }
 
 function useOT2LPCLabwareInfo({

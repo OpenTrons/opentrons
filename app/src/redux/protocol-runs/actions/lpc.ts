@@ -15,6 +15,7 @@ import {
   APPLIED_OFFSETS_TO_RUN,
   SOURCE_OFFSETS_FROM_RUN,
   SOURCE_OFFSETS_FROM_DATABASE,
+  UPDATE_CONFLICT_TIMESTAMP,
 } from '../constants'
 
 import type {
@@ -39,6 +40,8 @@ import type {
   AppliedOffsetsToRunAction,
   SourceOffsetsFromRunAction,
   SourceOffsetsFromDatabaseAction,
+  UpdateConflictTimestampAction,
+  ConflictTimestampInfo,
 } from '../types'
 import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
 
@@ -168,4 +171,12 @@ export const sourceOffsetsFromDatabase = (
 ): SourceOffsetsFromDatabaseAction => ({
   type: SOURCE_OFFSETS_FROM_DATABASE,
   payload: { runId },
+})
+
+export const updateConflictTimestamp = (
+  runId: string,
+  info: ConflictTimestampInfo
+): UpdateConflictTimestampAction => ({
+  type: UPDATE_CONFLICT_TIMESTAMP,
+  payload: { runId, info },
 })

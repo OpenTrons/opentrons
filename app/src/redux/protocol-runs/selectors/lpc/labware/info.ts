@@ -1,22 +1,22 @@
+import type { Selector } from 'reselect'
 import { createSelector } from 'reselect'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getIsTiprack, getLabwareDefURI } from '@opentrons/shared-data'
 
 import {
+  getIsDefaultOffsetAbsent,
   getItemLabwareDef,
   getSelectedLabwareDefFrom,
-  getIsDefaultOffsetAbsent,
 } from '../transforms'
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
-  OFFSETS_FROM_DATABASE,
+  OFFSETS_SOURCE_INITIALIZING,
 } from '/app/redux/protocol-runs/constants'
-
-import type { Selector } from 'reselect'
 import type { State } from '/app/redux/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
+  ConflictTimestampInfo,
   LPCFlowType,
   LwGeometryDetails,
   OffsetSources,
@@ -171,13 +171,13 @@ export const selectSelectedLwDef = (
     }
   )
 
-export const selectLastFreshOffsetRunTimestamp = (
+export const selectConflictTimestampInfo = (
   runId: string
-): Selector<State, string | null> =>
+): Selector<State, ConflictTimestampInfo> =>
   createSelector(
     (state: State) =>
-      state.protocolRuns[runId]?.lpc?.labwareInfo.lastFreshOffsetRunTimestamp,
-    ts => ts ?? null
+      state.protocolRuns[runId]?.lpc?.labwareInfo.conflictTimestampInfo,
+    ts => ts ?? { timestamp: null, isInitialized: false }
   )
 
 export const selectOffsetSource = (
@@ -186,5 +186,5 @@ export const selectOffsetSource = (
   createSelector(
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.sourcedOffsets,
-    source => source ?? OFFSETS_FROM_DATABASE
+    source => source ?? OFFSETS_SOURCE_INITIALIZING
   )

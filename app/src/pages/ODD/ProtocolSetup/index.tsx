@@ -97,6 +97,7 @@ import {
   selectTotalCountLocationSpecificOffsets,
 } from '/app/redux/protocol-runs'
 import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -701,6 +702,8 @@ function PrepareToRun({
   )
 }
 
+const MAINTENANCE_RUN_POLL_MS = 5000
+
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
@@ -732,6 +735,9 @@ export function ProtocolSetup(): JSX.Element {
     isPollingForCompletedAnalysis,
     setIsPollingForCompletedAnalysis,
   ] = useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const isMaintenanceRunActive =
+    useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
+      .data?.data.id != null
 
   const {
     data: mostRecentAnalysis = null,
@@ -932,7 +938,7 @@ export function ProtocolSetup(): JSX.Element {
           onConfirmClick={handleProceedToRunClick}
         />
       ) : null}
-      {offsetSource === OFFSETS_CONFLICT ? (
+      {offsetSource === OFFSETS_CONFLICT && !isMaintenanceRunActive ? (
         <LabwareOffsetsConflictModal
           runId={runId}
           runRecord={runRecord}

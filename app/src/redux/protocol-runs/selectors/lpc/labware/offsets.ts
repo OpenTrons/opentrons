@@ -37,6 +37,7 @@ import type { State } from '/app/redux/types'
 import type {
   DefaultOffsetDetails,
   LocationSpecificOffsetDetails,
+  LPCLabwareInfo,
   LPCOffsetKind,
   WorkingOffset,
 } from '/app/redux/protocol-runs'
@@ -51,6 +52,24 @@ export const selectAreOffsetsApplied = (
     (state: State) =>
       state.protocolRuns[runId]?.lpc?.labwareInfo.areOffsetsApplied,
     areOffsetsApplied => areOffsetsApplied ?? false
+  )
+
+export const selectInitialRunRecordOffsets = (
+  runId: string
+): Selector<State, LPCLabwareInfo['initialRunRecordOffsets']> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.initialRunRecordOffsets,
+    loadedOffsets => loadedOffsets ?? []
+  )
+
+export const selectInitialDatabaseOffsets = (
+  runId: string
+): Selector<State, LPCLabwareInfo['initialDatabaseOffsets']> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.initialDatabaseOffsets,
+    loadedOffsets => loadedOffsets ?? []
   )
 
 export interface LocationSpecificOffsetDetailsWithCopy

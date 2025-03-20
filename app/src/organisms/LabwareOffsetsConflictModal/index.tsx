@@ -19,7 +19,7 @@ import {
 } from '@opentrons/components'
 
 import {
-  selectLastFreshOffsetRunTimestamp,
+  selectConflictTimestampInfo,
   sourceOffsetsFromDatabase,
   sourceOffsetsFromRun,
 } from '/app/redux/protocol-runs'
@@ -45,8 +45,8 @@ export function LabwareOffsetsConflictModal({
 }: OffsetsConflictModalProps): JSX.Element {
   const dispatch = useDispatch()
   const clonedRunOffsets = runRecord?.data.labwareOffsets ?? []
-  const ts = useSelector(selectLastFreshOffsetRunTimestamp(runId))
-  const tsFormatted = formatTimestamp(ts ?? '')
+  const tsInfo = useSelector(selectConflictTimestampInfo(runId))
+  const tsFormatted = formatTimestamp(tsInfo.timestamp ?? '')
 
   const onRunRecordOffsets = (): void => {
     dispatch(sourceOffsetsFromRun(runId, clonedRunOffsets))

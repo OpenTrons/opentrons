@@ -38,7 +38,7 @@ export function updateLPCLabwareInfoFrom(
 
       // Whether the cloned run offset location matches a location-specific offset location
       // in the LPC store keyed at the same labware URI.
-      const relevantLSIdx = locationSpecificOffsetDetails.findIndex(
+      const relevantLSIdx = locationSpecificOffsetDetails.findLastIndex(
         lsStoreOffset =>
           isEqual(
             lsStoreOffset.locationDetails.lwOffsetLocSeq,
