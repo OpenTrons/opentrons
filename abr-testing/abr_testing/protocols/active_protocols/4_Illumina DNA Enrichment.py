@@ -94,8 +94,8 @@ def run(protocol: ProtocolContext) -> None:
         helpers.hs_str, "1"
     )  # type: ignore[assignment]
     heatershaker.close_labware_latch()
-    sample_plate_2 = heatershaker.load_labware(
-        "thermoscientificnunc_96_wellplate_1300ul"
+    sample_plate_2, hs_adapter = helpers.load_hs_adapter_and_labware(
+        "nest_96_wellplate_2ml_deep", heatershaker, "Sample Plate 2"
     )
     reservoir = protocol.load_labware("nest_96_wellplate_2ml_deep", "2", "Liquid Waste")
     temp_block: TemperatureModuleContext = protocol.load_module(
@@ -163,6 +163,7 @@ def run(protocol: ProtocolContext) -> None:
                 pipette.dispense(dispense_volume, well.top())
                 protocol.delay(minutes=0.1)
                 pipette.blow_out(well.top())
+                pipette.touch_tip(well)
 
                 # Update the tracking dictionary
                 liquid_trash_list[well] += dispense_volume
@@ -293,6 +294,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.dispense(
                     NHB2Vol, sample_plate_1[X].bottom(z=dot_bottom)
                 )  # original = ()
+                p50.touch_tip(sample_plate_1[X])
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -303,6 +305,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.pick_up_tip()
                 p50.aspirate(PanelVol, Panel.bottom(z=dot_bottom))  # original = ()
                 p50.dispense(PanelVol, sample_plate_1[X].bottom(z=dot_bottom))
+                p50.touch_tip(sample_plate_1[X])
                 # original = ()
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                 p50_tips += 1
@@ -318,9 +321,11 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.dispense(
                     EHB2Vol, sample_plate_1[X].bottom(z=dot_bottom)
                 )  # original = ()
+                p1000.touch_tip(sample_plate_1[X])
                 p1000.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p1000.mix(EHB2MixRep, EHB2MixVol)
                 # checked
+                p1000.touch_tip(sample_plate_1[X])
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -405,6 +410,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.dispense(
                     TransferSup + 1, sample_plate_2[column_2_list[loop]].bottom(z=1)
                 )
+                p1000.touch_tip(sample_plate_2[column_2_list[loop]])
                 # checked
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                 p200_tips += 1
@@ -452,6 +458,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.move_to(sample_plate_2[X].top(z=5))
                 p1000.move_to(sample_plate_2[X].top(z=0))
                 p1000.move_to(sample_plate_2[X].top(z=5))
+                p1000.touch_tip(sample_plate_2[X])
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
@@ -495,7 +502,7 @@ def run(protocol: ProtocolContext) -> None:
 
             # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
             helpers.move_labware_to_hs(
-                protocol, sample_plate_2, heatershaker, heatershaker
+                protocol, sample_plate_2, heatershaker, hs_adapter
             )
 
             protocol.comment("--> Repeating 6 washes")
@@ -513,6 +520,7 @@ def run(protocol: ProtocolContext) -> None:
                     p1000.dispense(
                         EEWVol, sample_plate_2[X].bottom(z=dot_bottom)
                     )  # original = ()
+                    p1000.touch_tip(sample_plate_2[X])
                     p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
@@ -551,7 +559,7 @@ def run(protocol: ProtocolContext) -> None:
                 # ============================================================================================
                 # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
                 helpers.move_labware_to_hs(
-                    protocol, sample_plate_2, heatershaker, heatershaker
+                    protocol, sample_plate_2, heatershaker, hs_adapter
                 )
                 washcount += 1
 
@@ -565,6 +573,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.dispense(
                     EEWVol, sample_plate_2[X].bottom(z=dot_bottom)
                 )  # original = ()
+                p1000.touch_tip(sample_plate_2[X])
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
@@ -641,6 +650,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.dispense(
                     EluteVol, sample_plate_2[X].bottom(z=dot_bottom)
                 )  # original = ()
+                p50.touch_tip(sample_plate_2[X])
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -648,7 +658,7 @@ def run(protocol: ProtocolContext) -> None:
             # ============================================================================================
             # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
             helpers.move_labware_to_hs(
-                protocol, sample_plate_2, heatershaker, heatershaker
+                protocol, sample_plate_2, heatershaker, hs_adapter
             )
             # ============================================================================================
             helpers.set_hs_speed(
@@ -673,6 +683,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.dispense(
                     TransferSup + 1, sample_plate_1[column_4_list[loop]].bottom(z=1)
                 )
+                p50.touch_tip(sample_plate_1[column_4_list[loop]])
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -687,8 +698,10 @@ def run(protocol: ProtocolContext) -> None:
                 p50.dispense(
                     ET2Vol, sample_plate_1[X].bottom(z=dot_bottom)
                 )  # original = ()
+                p50.touch_tip(sample_plate_1[X])
                 p50.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.mix(ET2MixRep, ET2MixVol)
+                p50.touch_tip(sample_plate_1[X])
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -720,6 +733,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.dispense(
                     EPMVol, sample_plate_1[X].bottom(z=dot_bottom)
                 )  # original = ()
+                p50.touch_tip(sample_plate_1[X])
                 p50.move_to(sample_plate_1[X].bottom(z=dot_bottom))  # original = ()
                 p50.mix(EPMMixRep, EPMMixVol)
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
@@ -786,7 +800,7 @@ def run(protocol: ProtocolContext) -> None:
 
             # GRIPPER MOVE sample_plate_2 FROM MAGPLATE TO heatershaker
             helpers.move_labware_to_hs(
-                protocol, sample_plate_2, heatershaker, heatershaker
+                protocol, sample_plate_2, heatershaker, hs_adapter
             )
 
             protocol.comment("--> Transfer Elution")
@@ -798,6 +812,7 @@ def run(protocol: ProtocolContext) -> None:
                 p50.dispense(
                     TransferSup + 1, sample_plate_2[column_5_list[loop]].bottom(z=1)
                 )
+                p50.touch_tip(sample_plate_2[column_5_list[loop]])
                 p50.return_tip() if TIP_TRASH is False else p50.drop_tip()
                 p50_tips += 1
                 tipcheck()
@@ -812,6 +827,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.mix(AMPurePremix, AMPureVol + 10, AMPure.bottom(z=1))
                 p1000.aspirate(AMPureVol, AMPure.bottom(z=1), rate=0.25)
                 p1000.dispense(AMPureVol, sample_plate_2[X].bottom(z=1), rate=0.25)
+                p1000.touch_tip(sample_plate_2[X])
                 p1000.default_speed = 5
                 p1000.move_to(sample_plate_2[X].bottom(z=5))
                 for Mix in range(2):
@@ -881,6 +897,7 @@ def run(protocol: ProtocolContext) -> None:
                     p1000.move_to(sample_plate_2[X].top(z=5))
                     p1000.move_to(sample_plate_2[X].top(z=0))
                     p1000.move_to(sample_plate_2[X].top(z=5))
+                    p1000.touch_tip(sample_plate_2[X])
                     p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                     p200_tips += 1
                     tipcheck()
@@ -929,7 +946,7 @@ def run(protocol: ProtocolContext) -> None:
 
             # GRIPPER MOVE PLATE FROM MAG PLATE TO HEATER SHAKER
             helpers.move_labware_to_hs(
-                protocol, sample_plate_2, heatershaker, heatershaker
+                protocol, sample_plate_2, heatershaker, hs_adapter
             )
 
             protocol.comment("--> Adding RSB")
@@ -996,14 +1013,13 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.dispense(
                     TransferSup + 1, sample_plate_1[column_6_list[loop]].bottom(z=1)
                 )
+                p1000.touch_tip(sample_plate_1[column_6_list[loop]])
                 p1000.return_tip() if TIP_TRASH is False else p1000.drop_tip()
                 p200_tips += 1
                 tipcheck()
     liquids_to_probe_at_end = [
         Liquid_trash_well_1,
         Liquid_trash_well_2,
-        Liquid_trash_well_3,
-        Liquid_trash_well_4,
     ]
     helpers.find_liquid_height_of_all_wells(protocol, p50, liquids_to_probe_at_end)
     if deactivate_modules_bool:

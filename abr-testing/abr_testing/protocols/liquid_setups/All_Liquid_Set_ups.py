@@ -220,7 +220,7 @@ def run(protocol: ProtocolContext) -> None:
             "nest_96_wellplate_2ml_deep", str(SLOTS["LABWARE"][0]), "Reservoir 1"
         )  # Reservoir
         sample_plate_2 = protocol.load_labware(
-            "thermoscientificnunc_96_wellplate_1300ul",
+            "nest_96_wellplate_2ml_deep",
             str(SLOTS["LABWARE"][1]),
             "Sample Plate 2",
         )  # Reservoir
