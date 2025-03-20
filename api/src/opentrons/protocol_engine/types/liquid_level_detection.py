@@ -44,25 +44,25 @@ class SimulatedProbeResult(BaseModel):
     def __gt__(
         self, other: float | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
-        """Bypass subtraction and just return self."""
+        """Bypass 'greater than' and just return self."""
         return self
 
     def __lt__(
         self, other: float | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
-        """Bypass subtraction and just return self."""
+        """Bypass 'less than' and just return self."""
         return self
 
     def __ge__(
         self, other: float | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
-        """Bypass subtraction and just return self."""
+        """Bypass 'greater than or eaqual to' and just return self."""
         return self
 
     def __le__(
         self, other: float | SimulatedProbeResult
     ) -> float | SimulatedProbeResult:
-        """Bypass subtraction and just return self."""
+        """Bypass 'less than or eaqual to' and just return self."""
         return self
 
     def __eq__(self, other: object) -> bool:
