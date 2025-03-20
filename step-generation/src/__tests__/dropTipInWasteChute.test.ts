@@ -49,44 +49,6 @@ describe('dropTipInWasteChute', () => {
         },
       },
     ])
-    expect(getSuccessResult(result).python).toBe('mockPythonName.drop_tip()')
-  })
-  it('returns correct commands for drop tip in waste chute when trash bin also exists', () => {
-    const mockTrashId = 'mockTrashId'
-    invariantContext = {
-      ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
-        [mockTrashId]: {
-          name: 'trashBin',
-          location: 'cutoutA3',
-          id: mockTrashId,
-        },
-      },
-    }
-    const args = {
-      pipetteId: DEFAULT_PIPETTE,
-      wasteChuteId: mockWasteChuteId,
-    }
-    const result = dropTipInWasteChute(args, invariantContext, prevRobotState)
-    expect(getSuccessResult(result).commands).toEqual([
-      {
-        commandType: 'moveToAddressableArea',
-        key: expect.any(String),
-        params: {
-          pipetteId: DEFAULT_PIPETTE,
-          addressableAreaName: '1ChannelWasteChute',
-          offset: { x: 0, y: 0, z: 0 },
-        },
-      },
-      {
-        commandType: 'dropTipInPlace',
-        key: expect.any(String),
-        params: {
-          pipetteId: DEFAULT_PIPETTE,
-        },
-      },
-    ])
     expect(getSuccessResult(result).python).toBe(
       'mockPythonName.drop_tip(mock_waste_chute_1)'
     )
