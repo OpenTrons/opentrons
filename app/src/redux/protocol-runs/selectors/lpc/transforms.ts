@@ -141,24 +141,25 @@ export const getMissingLSOffsets = (
   }
 
   if (labware != null) {
-    // Location specific missing offsets.
     Object.entries(labware).forEach(([uri, lwDetails]) => {
-      lwDetails.locationSpecificOffsetDetails.forEach(detail => {
-        const locationDetails = detail.locationDetails
-        const isHardcoded = detail.locationDetails.hardCodedOffsetId != null
+      if (lwDetails.defaultOffsetDetails.existingOffset?.vector == null) {
+        lwDetails.locationSpecificOffsetDetails.forEach(detail => {
+          const locationDetails = detail.locationDetails
+          const isHardcoded = detail.locationDetails.hardCodedOffsetId != null
 
-        if (detail.existingOffset == null && !isHardcoded) {
-          missingOffsets.totalCount += 1
+          if (detail.existingOffset == null && !isHardcoded) {
+            missingOffsets.totalCount += 1
 
-          missingOffsets.locationSpecificOffsets[uri] =
-            missingOffsets.locationSpecificOffsets[uri] != null
-              ? [
-                  ...missingOffsets.locationSpecificOffsets[uri],
-                  locationDetails,
-                ]
-              : [locationDetails]
-        }
-      })
+            missingOffsets.locationSpecificOffsets[uri] =
+              missingOffsets.locationSpecificOffsets[uri] != null
+                ? [
+                    ...missingOffsets.locationSpecificOffsets[uri],
+                    locationDetails,
+                  ]
+                : [locationDetails]
+          }
+        })
+      }
     })
   }
 
@@ -296,9 +297,28 @@ export function getIsNecessaryDefaultOffsetMissing(
   defaultDetails: DefaultOffsetDetails | undefined,
   lsDetails: LocationSpecificOffsetDetails[] | undefined
 ): boolean {
-  return (
-    defaultDetails?.existingOffset == null &&
-    !getAreAllOffsetsHardCoded(lsDetails) &&
-    !getAreAnyLocationSpecificOffsetsMissing(lsDetails)
-  )
+  if (!getAreAnyLocationSpecificOffsetsMissing(lsDetails)) {
+    return false
+  } else if (getAreAllOffsetsHardCoded(lsDetails)) {
+    return false
+  } else {
+    return defaultDetails?.existingOffset == null
+  }
+}
+
+export function getIsAnyNecessaryDefaultOffsetMissing(
+  labware: LPCLabwareInfo['labware'] | undefined
+): boolean {
+  if (labware == null) {
+    return false
+  }
+
+  return Object.values(labware).some(details => {
+    const {
+      defaultOffsetDetails: defaultDetails,
+      locationSpecificOffsetDetails: lsDetails,
+    } = details
+
+    return getIsNecessaryDefaultOffsetMissing(defaultDetails, lsDetails)
+  })
 }

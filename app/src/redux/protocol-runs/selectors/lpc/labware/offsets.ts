@@ -4,7 +4,6 @@ import { getLabwareDisplayLocation } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
-  getAreAnyLocationSpecificOffsetsMissing,
   getAreAllOffsetsHardCoded,
   getDefaultOffsetDetailsForAllLabware,
   getLocationSpecificOffsetDetailsForAllLabware,
@@ -14,6 +13,8 @@ import {
   getTotalCountLocationSpecificOffsets,
   getCountNonHardcodedLocationSpecificOffsets,
   getIsNecessaryDefaultOffsetMissing,
+  getTotalCountNonHardCodedLocationSpecificOffsets,
+  getIsAnyNecessaryDefaultOffsetMissing,
 } from '../transforms'
 
 import {
@@ -273,7 +274,18 @@ export const selectTotalCountLocationSpecificOffsets = (
     labware => getTotalCountLocationSpecificOffsets(labware)
   )
 
-export const selectCountMissingLocationSpecificOffsets = (
+// The total count of all non-hardcoded location specific offsets utilized in a run.
+export const selectTotalCountNonHardCodedLSOffsets = (
+  runId: string
+): Selector<State, number> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => getTotalCountNonHardCodedLocationSpecificOffsets(labware)
+  )
+
+// The total count of missing location-specific offsets that do not have an associated default offset.
+// Note: only offsets persisted on the robot-server are "not missing."
+export const selectCountMissingLSOffsetsWithoutDefault = (
   runId: string
 ): Selector<State, number> =>
   createSelector(
@@ -328,24 +340,7 @@ export const selectIsAnyNecessaryDefaultOffsetMissing = (
 ): Selector<State, boolean> =>
   createSelector(
     (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
-    labware => {
-      if (labware == null) {
-        return false
-      }
-
-      return Object.values(labware).some(details => {
-        const {
-          defaultOffsetDetails: defaultDetails,
-          locationSpecificOffsetDetails: lsDetails,
-        } = details
-
-        return (
-          defaultDetails.existingOffset == null &&
-          !getAreAllOffsetsHardCoded(lsDetails) &&
-          !getAreAnyLocationSpecificOffsetsMissing(lsDetails)
-        )
-      })
-    }
+    labware => getIsAnyNecessaryDefaultOffsetMissing(labware)
   )
 
 export const selectWorkingOffsetsByUri = (
@@ -481,12 +476,6 @@ export const selectLabwareOffsetsToAddToRun = (
                   locationSequence,
                 })
               } else {
-                console.error(
-                  `CRITICAL ERROR: Expected to apply a default offset to the run, but did not for lw: ${uri}, details: ${JSON.stringify(
-                    details
-                  )}`
-                )
-
                 throw new Error('Missing required offset.')
               }
             }

@@ -91,7 +91,7 @@ import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import {
   OFFSETS_CONFLICT,
   selectAreOffsetsApplied,
-  selectCountMissingLocationSpecificOffsets,
+  selectCountMissingLSOffsetsWithoutDefault,
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
@@ -496,7 +496,7 @@ function PrepareToRun({
     selectTotalCountLocationSpecificOffsets(runId)
   )
   const numMissingLSOffsets = useSelector(
-    selectCountMissingLocationSpecificOffsets(runId)
+    selectCountMissingLSOffsetsWithoutDefault(runId)
   )
   const isAnyNecessaryDefaultOffsetMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)

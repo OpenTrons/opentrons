@@ -20,6 +20,7 @@ import {
   selectAreOffsetsApplied,
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectLabwareOffsetsToAddToRun,
+  selectTotalCountNonHardCodedLSOffsets,
 } from '/app/redux/protocol-runs'
 
 import type { SetupLabwarePositionCheckProps } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck'
@@ -50,6 +51,9 @@ export function LPCSetupFlexBtns({
   ] = useHoverTooltip({
     placement: TOOLTIP_BOTTOM,
   })
+
+  const anyOffsetsToLpc =
+    useSelector(selectTotalCountNonHardCodedLSOffsets(runId)) === 0
   const lwOffsetsForRun = useSelector(selectLabwareOffsetsToAddToRun(runId))
   const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
 
@@ -58,7 +62,6 @@ export function LPCSetupFlexBtns({
   const isApplyOffsetsBtnDisabled =
     offsetsConfirmed ||
     isNecessaryDefaultOffsetMissing ||
-    lwOffsetsForRun == null ||
     lpcDisabledReason !== null
   const applyOffsetsDisabledTooltipText = (): string | null => {
     if (lpcDisabledReason != null) {
@@ -67,7 +70,7 @@ export function LPCSetupFlexBtns({
       return t('add_missing_labware_offsets')
     } else if (offsetsConfirmed) {
       return t('offsets_already_applied')
-    } else if (lwOffsetsForRun == null) {
+    } else if (!anyOffsetsToLpc) {
       return t('no_offsets_found')
     } else {
       return null

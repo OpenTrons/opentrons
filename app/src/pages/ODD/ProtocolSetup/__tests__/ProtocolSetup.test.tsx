@@ -68,7 +68,7 @@ import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 import {
   selectTotalCountLocationSpecificOffsets,
-  selectCountMissingLocationSpecificOffsets,
+  selectCountMissingLSOffsetsWithoutDefault,
   selectAreOffsetsApplied,
   selectIsAnyNecessaryDefaultOffsetMissing,
 } from '/app/redux/protocol-runs'
@@ -343,7 +343,7 @@ describe('ProtocolSetup', () => {
       selectTotalCountLocationSpecificOffsets
     ).mockImplementation(() => () => 3)
     vi.mocked(
-      selectCountMissingLocationSpecificOffsets
+      selectCountMissingLSOffsetsWithoutDefault
     ).mockImplementation(() => () => 1)
     vi.mocked(
       selectIsAnyNecessaryDefaultOffsetMissing
