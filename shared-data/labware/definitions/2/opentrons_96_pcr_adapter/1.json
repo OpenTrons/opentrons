@@ -20,7 +20,7 @@
   "metadata": {
     "displayName": "Opentrons 96 PCR Heater-Shaker Adapter",
     "displayCategory": "adapter",
-    "displayVolumeUnits": "\u00b5L",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {

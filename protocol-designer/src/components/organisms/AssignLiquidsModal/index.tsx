@@ -7,6 +7,7 @@ import {
   BORDERS,
   Box,
   COLORS,
+  DISPLAY_GRID,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -68,14 +69,18 @@ export function AssignLiquidsModal(): JSX.Element | null {
           padding={SPACING.spacing60}
           backgroundColor={COLORS.white}
           borderRadius={BORDERS.borderRadius12}
+          display={DISPLAY_GRID}
+          gap={SPACING.spacing12}
         >
           <Flex
-            marginBottom={SPACING.spacing12}
             justifyContent={JUSTIFY_CENTER}
             width="100%"
             color={COLORS.grey60}
           >
-            <StyledText desktopStyle="headingSmallRegular">
+            <StyledText
+              desktopStyle="headingSmallRegular"
+              css={{ userSelect: 'none' }}
+            >
               {t('click_and_drag')}
             </StyledText>
           </Flex>
@@ -84,7 +89,7 @@ export function AssignLiquidsModal(): JSX.Element | null {
             labwareProps={{
               wellLabelOption: WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE,
               definition: labwareDef,
-              highlightedWells: highlightedWells,
+              highlightedWells,
               wellFill: wellFillFromWellContents(
                 wellContents,
                 liquidDisplayColors
