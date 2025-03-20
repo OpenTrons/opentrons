@@ -526,7 +526,6 @@ def run(ctx: ProtocolContext) -> None:
 
         for trial in test_trials:
             # ADD DYE TO TEST-LABWARE
-            print(f"adding {trial.ul_to_add} uL")
             while trial.test_well.current_liquid_volume() < trial.ul_to_add:
                 remaining_ul = trial.ul_to_add - trial.test_well.current_liquid_volume()
                 # NOTE: 1st trial has tip already attached
@@ -534,6 +533,7 @@ def run(ctx: ProtocolContext) -> None:
                     pipette.pick_up_tip()
                 # FIXME: remove this once positioning bug is fixed in PE
                 pipette.move_to(dye_src_well.top())
+                pipette.prepare_to_aspirate()
                 pipette.aspirate(
                     volume=min(remaining_ul, pipette.max_volume),
                     location=dye_src_well.meniscus(
@@ -560,6 +560,7 @@ def run(ctx: ProtocolContext) -> None:
                 pipette.require_liquid_presence(trial.test_well)
             # FIXME: remove this once positioning bug is fixed in PE
             pipette.move_to(trial.test_well.top())
+            pipette.prepare_to_aspirate()
             pipette.aspirate(
                 volume=trial.ul_to_remove,
                 location=trial.test_well.meniscus(
