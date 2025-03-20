@@ -107,15 +107,19 @@ class WellInfoSummary(BaseModel):
     @field_validator("probed_height", "probed_volume", mode="before")
     @classmethod
     def validate_simulated_probe_result(
-        cls, input_val: str | None
+        cls, input_val: str | LiquidTrackingType | None
     ) -> LiquidTrackingType | None:
         """Return the appropriate input to WellInfoSummary from json data."""
         if not input_val:
             return None
-        if input_val.isdigit():
-            return float(input_val)
-        else:
-            return SimulatedProbeResult()
+        if isinstance(input_val, LiquidTrackingType):
+            return input_val
+        if isinstance(input_val, str):
+            if input_val.isdigit():
+                return float(input_val)
+            elif input_val == "SimulatedProbeResult":
+                return SimulatedProbeResult()
+        return None
 
     labware_id: str
     well_name: str
