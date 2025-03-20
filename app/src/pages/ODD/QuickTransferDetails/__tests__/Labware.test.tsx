@@ -34,32 +34,24 @@ describe('Labware', () => {
       .calledWith(MOCK_PROTOCOL_ID)
       .thenReturn([
         {
-          definition: fixtureTiprack10ul as LabwareDefinition2,
-          initialLocation: { slotName: '1' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          quantity: 1,
+          namespace: 'opentrons',
         },
         {
-          definition: fixtureTiprack300ul as LabwareDefinition2,
-          initialLocation: { slotName: '3' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+          quantity: 1,
+          namespace: 'opentrons',
         },
         {
-          definition: fixture96Plate as LabwareDefinition2,
-          initialLocation: { slotName: '5' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixture96Plate as LabwareDefinition2,
+          quantity: 1,
+          namespace: 'opentrons',
         },
         {
-          definition: fixtureTiprack10ul as LabwareDefinition2,
-          initialLocation: { slotName: '7' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          quantity: 1,
+          namespace: 'opentrons',
         },
       ])
   })

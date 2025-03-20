@@ -81,9 +81,9 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
         </tr>
       </thead>
       <tbody>
-        {labwareItems.map(labware => {
+        {labwareItems.map((labware, index) => {
           return (
-            <TableRow key={labware.displayName}>
+            <TableRow key={index}>
               <TableDatum>
                 <Flex
                   flexDirection={DIRECTION_ROW}
@@ -101,14 +101,17 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
                   ) : (
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
-                  <StyledText as="p" alignItems={ALIGN_CENTER}>
-                    {labware.displayName}
+                  <StyledText
+                    oddStyle="bodyTextSemiBold"
+                    alignItems={ALIGN_CENTER}
+                  >
+                    {labware.labwareDef.metadata.displayName}
                   </StyledText>
                 </Flex>
               </TableDatum>
               <TableDatum>
                 <StyledText
-                  as="p"
+                  oddStyle="bodyTextSemiBold"
                   alignItems={ALIGN_CENTER}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >

@@ -86,9 +86,9 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         </tr>
       </thead>
       <tbody>
-        {labwareItems.map(labware => {
+        {labwareItems.map((labware, index) => {
           return (
-            <TableRow key={labware.displayName}>
+            <TableRow key={index}>
               <TableDatum>
                 <Flex
                   flexDirection={DIRECTION_ROW}
@@ -107,16 +107,19 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   ) : (
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
-                  <Flex flexDirection={DIRECTION_COLUMN}>
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing4}
+                  >
                     <StyledText
-                      oddStyle="bodyTextRegular"
+                      oddStyle="bodyTextSemiBold"
                       alignItems={ALIGN_CENTER}
                     >
-                      {labware.displayName}
+                      {labware.labwareDef.metadata.displayName}
                     </StyledText>
                     {labware.lidDisplayName ? (
                       <StyledText
-                        oddStyle="smallBodyTextRegular"
+                        oddStyle="bodyTextRegular"
                         alignItems={ALIGN_CENTER}
                         color={COLORS.grey60}
                       >
@@ -128,7 +131,7 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               </TableDatum>
               <TableDatum>
                 <StyledText
-                  oddStyle="bodyTextRegular"
+                  oddStyle="bodyTextSemiBold"
                   alignItems={ALIGN_CENTER}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >

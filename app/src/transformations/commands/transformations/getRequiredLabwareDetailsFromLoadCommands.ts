@@ -9,7 +9,6 @@ import type {
 
 export interface RequiredLabwareDetails {
   namespace: string
-  displayName: string
   quantity: number
   labwareDef: LabwareDefinition2
   lidDisplayName?: string
@@ -49,7 +48,6 @@ export function getRequiredLabwareDetailsFromLoadCommands(
       if (!acc.has(defUri)) {
         acc.set(defUri, {
           namespace: command.params.namespace,
-          displayName: command.result?.definition.metadata.displayName,
           labwareDef: command.result?.definition,
           quantity: 0,
         })
@@ -73,7 +71,6 @@ export function getRequiredLabwareDetailsFromLoadCommands(
       if (!acc.has(defUri)) {
         acc.set(defUri, {
           namespace: command.params.namespace,
-          displayName: command.result?.definition.metadata.displayName,
           labwareDef: command.result?.definition,
           quantity: 0,
           lidDisplayName:

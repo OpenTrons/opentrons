@@ -36,32 +36,25 @@ describe('Labware', () => {
       .calledWith(MOCK_PROTOCOL_ID)
       .thenReturn([
         {
-          definition: fixtureTiprack10ul as LabwareDefinition2,
-          initialLocation: { slotName: '1' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          lidDisplayName: 'tiprack lid',
+          quantity: 1,
+          namespace: 'opentrons',
         },
         {
-          definition: fixtureTiprack300ul as LabwareDefinition2,
-          initialLocation: { slotName: '3' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack300ul as LabwareDefinition2,
+          quantity: 2,
+          namespace: 'opentrons',
         },
         {
-          definition: fixture96Plate as LabwareDefinition2,
-          initialLocation: { slotName: '5' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixture96Plate as LabwareDefinition2,
+          quantity: 1,
+          namespace: 'opentrons',
         },
         {
-          definition: fixtureTiprack10ul as LabwareDefinition2,
-          initialLocation: { slotName: '7' },
-          moduleLocation: null,
-          moduleModel: null,
-          nickName: null,
+          labwareDef: fixtureTiprack10ul as LabwareDefinition2,
+          quantity: 1,
+          namespace: 'opentrons',
         },
       ])
   })
@@ -76,8 +69,10 @@ describe('Labware', () => {
   })
   it('should render the correct location, name, and connected status in each table row', () => {
     render(props)
-    screen.getByRole('row', { name: 'Opentrons GEB 10uL Tiprack 2' })
-    screen.getByRole('row', { name: '300ul Tiprack FIXTURE 1' })
+    screen.getByRole('row', {
+      name: 'Opentrons GEB 10uL Tiprack with tiprack lid 1',
+    })
+    screen.getByRole('row', { name: '300ul Tiprack FIXTURE 2' })
     screen.getByRole('row', { name: 'ANSI 96 Standard Microplate 1' })
   })
 })
