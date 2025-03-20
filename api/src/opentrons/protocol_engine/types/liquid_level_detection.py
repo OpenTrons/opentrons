@@ -66,7 +66,7 @@ class SimulatedProbeResult(BaseModel):
     def __neq__(self, other: object) -> bool:
         """A SimulatedProbeResult should only be equal to the same instance of its class."""
         if not isinstance(other, SimulatedProbeResult):
-            return False
+            return True
         return self is not other
 
     def simulate_probed_aspirate_dispense(self, volume: float) -> None:
