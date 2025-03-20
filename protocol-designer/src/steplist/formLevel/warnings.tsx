@@ -2,8 +2,9 @@ import {
   MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME,
   getIncompatibleLiquidClasses,
   getWellTotalVolume,
-  PIPETTE_NAMES_MAP,
+  isFlexPipette,
 } from '@opentrons/shared-data'
+import { getFlexNameConversion } from '../../file-data/selectors/utils'
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
 import type { FormError } from './errors'
 
@@ -196,8 +197,11 @@ export const incompatiblePipettePath = (
   const { pipette, tipRack, path } = fields
   if (!pipette) return null
   const pipetteName = pipette.name as PipetteName
+  const pipetteModel =
+    isFlexPipette(pipetteName) === true
+      ? getFlexNameConversion(pipette.spec)
+      : pipetteName
 
-  const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
   if (path === 'multiDispense') {
     const incompatiblePath = getIncompatibleLiquidClasses(pipetteModel, p =>
       p.byTipType.some(
@@ -218,7 +222,10 @@ export const incompatiblePipetteTiprack = (
   if (!pipette) return null
   const pipetteName = pipette.name as PipetteName
 
-  const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
+  const pipetteModel =
+    isFlexPipette(pipetteName) === true
+      ? getFlexNameConversion(pipette.spec)
+      : pipetteName
 
   const incompatiblePipette = getIncompatibleLiquidClasses(pipetteModel)
   const incompatibleTiprack = getIncompatibleLiquidClasses(pipetteModel, p =>

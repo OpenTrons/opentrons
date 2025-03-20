@@ -1,5 +1,4 @@
 import type { CutoutFixtureId, CutoutId, AddressableAreaName } from '../deck'
-import type { PipetteName } from './pipettes'
 import type { ModuleModel, ModuleType } from './types'
 
 // constants for dealing with robot coordinate system (eg in labwareTools)
@@ -665,25 +664,3 @@ export const WELL_BOTTOM: 'well-bottom' = 'well-bottom'
 export const LIQUID_MENISCUS: 'liquid-meniscus' = 'liquid-meniscus'
 
 export const MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME = 10
-
-export const PIPETTE_NAMES_MAP: Record<PipetteName, string> = {
-  p10_single: 'p10_single',
-  p10_multi: 'p10_multi',
-  p20_single_gen2: 'p20_single_gen2',
-  p20_multi_gen2: 'p20_multi_gen2',
-  p50_single: 'p50_single',
-  p50_multi: 'p50_multi',
-  p50_single_flex: 'flex_1channel_50',
-  p50_multi_flex: 'flex_8channel_50',
-  p300_single: 'p300_single',
-  p300_multi: 'p300_multi',
-  p300_single_gen2: 'p300_single_gen2',
-  p300_multi_gen2: 'p300_multi_gen2',
-  p1000_single: 'p1000_single',
-  p1000_single_gen2: 'p1000_single_gen2',
-  p1000_single_flex: 'flex_1channel_1000',
-  p1000_multi_flex: 'flex_8channel_1000',
-  p1000_multi_em_flex: 'flex_8channel_1000_em',
-  p1000_96: 'flex_96channel_1000',
-  p200_96: 'flex_96channel_200',
-}

@@ -11,12 +11,14 @@ import {
 import {
   getDisabledLiquidClasses,
   getSortedLiquidClassDefs,
-  PIPETTE_NAMES_MAP,
+  isFlexPipette,
 } from '@opentrons/shared-data'
+import { selectors as stepFormSelectors } from '../../../../../../step-forms'
 import { getLiquidEntities } from '../../../../../../step-forms/selectors'
 import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
-import { selectors as stepFormSelectors } from '../../../../../../step-forms'
+import { getFlexNameConversion } from '../../../../../../file-data/selectors/utils'
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { LiquidClassesOption } from '@opentrons/shared-data'
 import type { FieldPropsByName } from '../../types'
 import type { FormData } from '../../../../../../form-types'
 
@@ -35,7 +37,12 @@ export const LiquidClassesStepTools = ({
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
   const pipetteName = pipetteEntities[formData.pipette]?.name
-  const pipetteModel = PIPETTE_NAMES_MAP[pipetteName]
+  const pipetteSpec = pipetteEntities[formData.pipette]?.spec
+  const pipetteModel =
+    isFlexPipette(pipetteName) === true
+      ? getFlexNameConversion(pipetteSpec)
+      : pipetteName
+
   const { volume, tipRack, pipette, path } = formData
   const disabledLiquidClasses = getDisabledLiquidClasses(
     {
@@ -137,7 +144,7 @@ export const LiquidClassesStepTools = ({
                 align: 'vertical',
               }}
               largeDesktopBorderRadius
-              disabled={disabledLiquidClasses?.has(name)}
+              disabled={disabledLiquidClasses?.has(name as LiquidClassesOption)}
             />
           )
         })}

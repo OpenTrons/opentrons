@@ -44,7 +44,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
     vi.mocked(getPipetteEntities).mockReturnValue({
       [pipetteId]: {
         name: 'p50_single_flex',
-        spec: {} as any,
+        spec: { channels: 1, liquids: { default: { maxVolume: 50 } } } as any,
         id: pipetteId,
         tiprackLabwareDef: [],
         tiprackDefURI: ['mockDefURI1', 'mockDefURI2'],

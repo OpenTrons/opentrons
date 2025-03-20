@@ -339,7 +339,10 @@ describe('Max dispense well volume', () => {
 
 describe('Incompatible liquid classes', () => {
   let fieldsWithPipette: {
-    pipette: { name: string }
+    pipette: {
+      name: string
+      spec: { channels: number; liquids: { default: { maxVolume: number } } }
+    }
     path: string
     tipRack: string
   }
@@ -347,6 +350,7 @@ describe('Incompatible liquid classes', () => {
     fieldsWithPipette = {
       pipette: {
         name: 'p50_single_flex',
+        spec: { channels: 1, liquids: { default: { maxVolume: 50 } } },
       },
       path: 'multiDispense',
       tipRack: 'opentrons/opentrons_flex_96_tiprack_50ul/1',
