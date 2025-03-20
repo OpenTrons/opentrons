@@ -27,18 +27,18 @@ def run(ctx):
     ETHANOL_SOURCE_WELL = "A2"
     GLYCEROL_SOURCE_WELL = "A3"
 
-    WATER_SOURCE_WELLS = ["A4", "A5", "A6", "A7"]
-    ETHANOL_SOURCE_WELLS = ["A8", "A9", "A10", "A11"]
-    GLYCEROL_SOURCE_WELLS = ["A12", "B1", "B2", "B3"]
+    WATER_SOURCE_WELLS = ["A1", "A5", "A6", "A7"]
+    ETHANOL_SOURCE_WELLS = ["A2", "A8", "A9", "A10", "A11"]
+    GLYCEROL_SOURCE_WELLS = ["A3", "A12"]
 
     water = ctx.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
     ethanol = ctx.define_liquid(name="Volatile", description="80%% ethanol solution", display_color="#59c0f0")
     glycerol = ctx.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
 
     # Load liquids into source wells
-    for well in WATER_SOURCE_WELLS + WATER_SOURCE_WELL:
+    for well in WATER_SOURCE_WELLS:
         source.wells_by_name()[well].load_liquid(liquid=water, volume=1000)
-    for well in ETHANOL_SOURCE_WELLS + ETHANOL_SOURCE_WELL:
+    for well in ETHANOL_SOURCE_WELLS:
         source.wells_by_name()[well].load_liquid(liquid=ethanol, volume=1000)
     for well in GLYCEROL_SOURCE_WELLS:
         source.wells_by_name()[well].load_liquid(liquid=glycerol, volume=1000)

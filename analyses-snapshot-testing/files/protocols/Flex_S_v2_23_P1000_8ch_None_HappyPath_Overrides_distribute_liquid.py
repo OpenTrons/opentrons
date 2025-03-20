@@ -1,11 +1,17 @@
 # I am going to get added to in the test runner
 # uncomment to test
-key = "50"
+
+# These pass
 # key = "50_filter"
 # key = "200"
-# key = "200_filter"
-# key = "1000"
 # key = "1000_filter"
+
+# RuntimeError: Distribute liquid uses a disposal volume but location for disposing of the disposal volume cannot be found when blowout is disabled. Specify a blowout location and enable blowout when using a disposal volume.
+# the volume of these is all under the tip capacity
+# key = "1000"
+# key = "50"
+# key = "200_filter"
+
 # protocol.override_variable_name = key
 
 from dataclasses import dataclass
