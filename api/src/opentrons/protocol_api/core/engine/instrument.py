@@ -1567,9 +1567,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     # We configure the mode based on the last dispense volume and disposal volume
                     # since the mode is only used to determine the dispense push out volume
                     # and we can do a push out only at the last dispense, that too if there is no disposal volume.
-                    volume_for_pipette_mode_configuration=vol_dest_combo[-1][0]
-                    if not disposal_vol
-                    else self.get_max_volume(),
+                    volume_for_pipette_mode_configuration=vol_dest_combo[-1][0],
                     conditioning_volume=conditioning_vol,
                 )
 
@@ -1784,14 +1782,18 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     )
                 ]
             with self.lpd_for_transfer(enable=False):
-                for step_volume, step_source in vol_aspirate_combo:
+                for step_num, (step_volume, step_source) in enumerate(
+                    vol_aspirate_combo
+                ):
                     tip_contents = self.aspirate_liquid_class(
                         volume=step_volume,
                         source=step_source,
                         transfer_properties=transfer_props,
                         transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
                         tip_contents=tip_contents,
-                        volume_for_pipette_mode_configuration=total_dispense_volume,
+                        volume_for_pipette_mode_configuration=total_dispense_volume
+                        if step_num == 0
+                        else None,
                     )
             tip_contents = self.dispense_liquid_class(
                 volume=total_dispense_volume,
