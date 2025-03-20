@@ -17,7 +17,6 @@ export {
   dropTip,
   dropTipInPlace,
   dropTipInTrash,
-  dropTipInWasteChute,
   engageMagnet,
   heaterShaker,
   mix,

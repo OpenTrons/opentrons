@@ -386,7 +386,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInWasteChute, {
             pipetteId: args.pipette,
-            wasteChuteId: dropTipEntity.id,
           }),
         ]
       }

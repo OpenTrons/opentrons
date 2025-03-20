@@ -1,5 +1,5 @@
 import {
-  curryWithoutPython,
+  curryCommandCreator,
   getWasteChuteAddressableAreaNamePip,
   reduceCommandCreators,
 } from '../../utils'
@@ -9,7 +9,6 @@ import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface DropTipInWasteChuteArgs {
   pipetteId: string
-  wasteChuteId: string
 }
 
 export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
@@ -18,16 +17,12 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   prevRobotState
 ) => {
   const offset = ZERO_OFFSET
-  const { pipetteId, wasteChuteId } = args
-  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
-  const pipetteChannels = pipetteEntities[pipetteId].spec.channels
+  const { pipetteId } = args
+  const pipetteChannels =
+    invariantContext.pipetteEntities[pipetteId].spec.channels
   const addressableAreaName = getWasteChuteAddressableAreaNamePip(
     pipetteChannels
   )
-  const hasTrashBin =
-    Object.values(additionalEquipmentEntities).find(
-      ae => ae.name === 'trashBin'
-    ) != null
 
   let commandCreators: CurriedCommandCreator[] = []
 
@@ -35,30 +30,15 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   if (!prevRobotState.tipState.pipettes[pipetteId]) {
     commandCreators = []
   } else {
-    const pipettePythonName = pipetteEntities[pipetteId].pythonName
-    const wasteChutePythonName =
-      additionalEquipmentEntities[wasteChuteId].pythonName
-    //  if there is no trash bin selected, drop tip will occur at the default
-    //  trash container, which would be the waste_chute since we do not support
-    //  having no trash container in PD. Since our code generator always generates
-    //  the trash bins first, if a trash bin exists, we will have to provide the
-    //  waste chute location.
-    const pythonLocation = hasTrashBin ? [wasteChutePythonName] : []
-    const pythonCommandCreator: CurriedCommandCreator = () => ({
-      commands: [],
-      python: `${pipettePythonName}.drop_tip(${pythonLocation})`,
-    })
-
     commandCreators = [
-      curryWithoutPython(moveToAddressableArea, {
+      curryCommandCreator(moveToAddressableArea, {
         pipetteId,
         addressableAreaName,
         offset,
       }),
-      curryWithoutPython(dropTipInPlace, {
+      curryCommandCreator(dropTipInPlace, {
         pipetteId,
       }),
-      pythonCommandCreator,
     ]
   }
   return reduceCommandCreators(

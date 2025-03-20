@@ -545,7 +545,6 @@ export const transfer: CommandCreator<TransferArgs> = (
             dropTipCommand = [
               curryCommandCreator(dropTipInWasteChute, {
                 pipetteId: args.pipette,
-                wasteChuteId: dropTipEntity.id,
               }),
             ]
           }
