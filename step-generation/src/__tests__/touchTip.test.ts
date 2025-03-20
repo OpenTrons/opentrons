@@ -12,11 +12,6 @@ import {
 } from '../fixtures'
 import type { InvariantContext, RobotState } from '../types'
 
-const wellLocation: any = {
-  origin: 'bottom',
-  offset: { z: 10 },
-}
-
 describe('touchTip', () => {
   let invariantContext: InvariantContext
   let initialRobotState: RobotState
@@ -34,7 +29,7 @@ describe('touchTip', () => {
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        wellLocation,
+        zOffsetFromTop: 10,
         speed: 10,
         mmFromEdge: 0.2,
       },
@@ -52,7 +47,7 @@ describe('touchTip', () => {
           labwareId: SOURCE_LABWARE,
           wellName: 'A1',
           wellLocation: {
-            origin: 'bottom',
+            origin: 'top',
             offset: {
               z: 10,
             },
@@ -79,6 +74,7 @@ mockPythonName.touch_tip(
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
+        zOffsetFromTop: 10,
       },
       invariantContext,
       robotStateWithTip
@@ -89,6 +85,7 @@ mockPythonName.touch_tip(
       `
 mockPythonName.touch_tip(
     mockPythonName["A1"],
+    v_offset=10,
 )`.trimStart()
     )
   })
@@ -99,7 +96,7 @@ mockPythonName.touch_tip(
         pipetteId: 'badPipette',
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        wellLocation,
+        zOffsetFromTop: 10,
       },
       invariantContext,
       robotStateWithTip
@@ -115,7 +112,7 @@ mockPythonName.touch_tip(
         pipetteId: DEFAULT_PIPETTE,
         labwareId: SOURCE_LABWARE,
         wellName: 'A1',
-        wellLocation,
+        zOffsetFromTop: 10,
       },
       invariantContext,
       initialRobotState

@@ -453,6 +453,10 @@ def test_virtual_get_is_ready_to_aspirate(
         mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
     ).then_raise(TipNotAttachedError())
 
+    decoy.when(
+        mock_state_view.pipettes.get_ready_to_aspirate(pipette_id="pipette-id")
+    ).then_return(True)
+
     with pytest.raises(TipNotAttachedError):
         subject.get_is_ready_to_aspirate(pipette_id="pipette-id")
 
@@ -460,7 +464,17 @@ def test_virtual_get_is_ready_to_aspirate(
         mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id-123")
     ).then_return(0)
 
+    decoy.when(
+        mock_state_view.pipettes.get_ready_to_aspirate(pipette_id="pipette-id-123")
+    ).then_return(True)
+
     assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is True
+
+    decoy.when(
+        mock_state_view.pipettes.get_ready_to_aspirate(pipette_id="pipette-id-123")
+    ).then_return(False)
+
+    assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is False
 
 
 async def test_virtual_aspirate_in_place(

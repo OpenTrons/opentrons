@@ -60,7 +60,10 @@ describe('blowOutInWell', () => {
       },
     ])
     expect(res.python).toBe(
-      'mockPythonName.blow_out(mockPythonName["A1"].top(z=-1.3))'
+      `
+mockPythonName.flow_rate.blow_out = 21.1
+mockPythonName.blow_out(mockPythonName["A1"].top(z=-1.3))
+`.trim()
     )
   })
   it('blowout with invalid pipette ID should throw error', () => {

@@ -46,5 +46,9 @@
   "OT_PD_ENABLE_PARTIAL_TIP_SUPPORT": {
     "title": "Enable partial tip support",
     "description": "Partial tip configurations that are not released yet"
+  },
+  "OT_PD_ENABLE_STACKING": {
+    "title": "Enable more labware capabilities",
+    "description": "Ability to stack labware, add lids, etc"
   }
 }
