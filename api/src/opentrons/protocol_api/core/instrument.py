@@ -253,6 +253,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         ...
 
     @abstractmethod
+    def get_has_clean_tip(self) -> bool:
+        ...
+
+    @abstractmethod
     def get_available_volume(self) -> float:
         ...
 
