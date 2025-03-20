@@ -11,6 +11,7 @@ from .pipetting_common import (
     DispenseVolumeMixin,
     BaseLiquidHandlingResult,
     dispense_in_place,
+    increase_evo_disp_count,
     DEFAULT_CORRECTION_VOLUME,
 )
 from .movement_common import (
@@ -102,6 +103,9 @@ class EvotipDispenseImplementation(
             return move_result
 
         current_position = await self._gantry_mover.get_position(params.pipetteId)
+        await increase_evo_disp_count(
+            pipette_id=params.pipetteId, pipetting=self._pipetting
+        )
         result = await dispense_in_place(
             pipette_id=params.pipetteId,
             volume=params.volume,

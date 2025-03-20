@@ -3130,3 +3130,10 @@ class OT3API(
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         return await self._backend.get_hepa_uv_state()
+
+    async def increase_evo_disp_count(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+    ) -> None:
+        realmount = OT3Mount.from_mount(mount)
+        await self._backend.increase_evo_disp_count(realmount)
