@@ -14,7 +14,7 @@ from hardware_testing.protocols import (
 import math
 from typing import Tuple
 
-metadata = {"protocolName": "LLD 1uL PCR-to-MVS-07MAR"}
+metadata = {"protocolName": "LLD 1uL PCR-to-MVS-20MAR"}
 requirements = {"robotType": "Flex", "apiLevel": "2.22"}
 
 SLOTS = {
@@ -29,8 +29,6 @@ SLOTS = {
 # OPEN AREAS C3 AND C4
 
 TARGET_UL = 1
-SUBMERGE_MM_LLD = -1.5
-SUBMERGE_MM = -1.5
 
 TIP_VOLUME = 50
 PIP_VOLUME = 50
@@ -83,8 +81,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="use_test_matrix", display_name="Use Test Matrix", default=True
     )
     parameters.add_float(
-        variable_name = "dot_bottom_submerge_depth",
-        display_name = "Dot bottom submerge depth",
+        variable_name = "submerge_depth",
+        display_name = "All submerge depths",
         default = 1.5,
         maximum = 2,
         minimum = 0.5
@@ -117,7 +115,9 @@ def run(ctx: ProtocolContext) -> None:
     test_gripper_only = ctx.params.test_gripper_only  # type: ignore[attr-defined]
     single_plate_vol = ctx.params.single_plate_vol # type: ignore[attr-defined]
     TRIALS = columns * 8 * num_of_plates
-    BOTTOM_MM = ctx.params.dot_bottom_submerge_depth # type: ignore[attr-defined]
+    SUBMERGE_MM = ctx.params.submerge_depth # type: ignore[attr-defined]
+    SUBMERGE_MM = -1 * SUBMERGE_MM
+    BOTTOM_MM = 1.5
     ctx.load_trash_bin("A1")
     # Test Matrix
     test_matrix = {
@@ -274,7 +274,8 @@ def run(ctx: ProtocolContext) -> None:
             pipette.configure_for_volume(dye_needed_in_well)
             pipette.pick_up_tip()
             num_of_transfers = 1
-            
+            if (src_well.well_name =="A1") or (src_well.well_name == "A5"):
+                ctx.pause(f"measure static of {src_well.well_name}")
             if dye_needed_in_well > pipette.max_volume:
                 dye_needed_in_well = dye_needed_in_well / 2
                 num_of_transfers = 2
@@ -283,6 +284,8 @@ def run(ctx: ProtocolContext) -> None:
                     pipette.aspirate(dye_needed_in_well, src_holder["A1"])
                 else:
                     pipette.aspirate(dye_needed_in_well, src_holder["A2"])
+                    if (src_well.well_name =="A1") or (src_well.well_name == "A5"):
+                        ctx.pause(f"measure static of {src_well.well_name} and top of well")
                 pipette.dispense(dye_needed_in_well, src_well.bottom(BOTTOM_MM))
                 pipette.touch_tip(speed = 30)
             pipette.drop_tip()
@@ -375,13 +378,11 @@ def run(ctx: ProtocolContext) -> None:
                 pipette.drop_tip()
                 pipette.pick_up_tip()
                 tip_counter += 1
-            SUBMERGE_MM = SUBMERGE_MM_LLD
         pipette.configure_for_volume(target_ul)
         # ASPIRATE
         if "M" in asp_behavior:
             # NOTE: if liquid height is <2.5mm, protocol may error out
             #       this can be avoided by adding extra starting liquid in the SRC labware
-            SUBMERGE_MM = -1.5
             pipette.aspirate(target_ul, src_well.meniscus(SUBMERGE_MM))
             pipette.touch_tip(speed = 30)
         else:
@@ -389,7 +390,6 @@ def run(ctx: ProtocolContext) -> None:
             pipette.touch_tip(speed = 30)
         # DISPENSE
         if "M" in dsp_behavior:
-            SUBMERGE_MM = -1.5
             pipette.dispense(
                 target_ul, dst_well.meniscus(SUBMERGE_MM), push_out=push_out
             )  # contact
