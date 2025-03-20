@@ -10,6 +10,7 @@ import {
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
   LOW_VOLUME_PIPETTES,
 } from '@opentrons/shared-data'
+import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntities,
@@ -273,11 +274,21 @@ export const getLabwarePythonName = (
 
 export const getAdditionalEquipmentPythonName = (
   fixtureName: 'wasteChute' | 'trashBin',
-  typeCount: number
+  typeCount: number,
+  location?: string
 ): string => {
-  return fixtureName === 'wasteChute'
-    ? snakeCase(fixtureName)
-    : `${snakeCase(fixtureName)}_${typeCount}`
+  switch (fixtureName) {
+    case 'wasteChute': {
+      return snakeCase(fixtureName)
+    }
+    case 'trashBin': {
+      if (location === 'cutout12') {
+        return `${PROTOCOL_CONTEXT_NAME}.fixed_trash`
+      } else {
+        return `${snakeCase(fixtureName)}_${typeCount}`
+      }
+    }
+  }
 }
 
 /**

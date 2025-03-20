@@ -154,10 +154,9 @@ export const SecondStepsMoveLiquidTools = ({
     pipetteSpec
   )
 
-  const minXYDimension = getMinXYDimension(
-    labwares[formData[`${tab}_labware`]].def,
-    ['A1']
-  )
+  const minXYDimension = isDestinationTrash
+    ? null
+    : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
   const minRadiusForTouchTip =
     minXYDimension != null ? round(minXYDimension / 2, 1) : null
 
@@ -450,6 +449,7 @@ export const SecondStepsMoveLiquidTools = ({
           tooltipText={
             propsForFields[`${tab}_touchTip_checkbox`].tooltipContent
           }
+          disabled={propsForFields[`${tab}_touchTip_checkbox`].disabled}
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>

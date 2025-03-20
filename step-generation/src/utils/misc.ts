@@ -392,7 +392,7 @@ export const blowoutUtil = (args: {
     return [
       curryCommandCreator(blowOutInTrash, {
         pipetteId: pipette,
-        trashLocation: trashBin?.location as CutoutId,
+        trashId: trashBin?.id as string,
         flowRate,
       }),
     ]
@@ -620,6 +620,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
+        wasteChuteId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   } else {
@@ -628,8 +629,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
-        trashLocation: additionalEquipmentEntities[destinationId]
-          .location as CutoutId,
+        trashId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   }
