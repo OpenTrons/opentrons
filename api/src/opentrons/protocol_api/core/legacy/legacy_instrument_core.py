@@ -500,6 +500,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         """Get the current volume."""
         return self.get_hardware_state()["current_volume"]
 
+    def get_has_clean_tip(self) -> bool:
+        """Get if has a clean tip, only used with LLD and engine commands."""
+        return False
+
     def get_available_volume(self) -> float:
         """Get the available volume."""
         return self.get_hardware_state()["available_volume"]

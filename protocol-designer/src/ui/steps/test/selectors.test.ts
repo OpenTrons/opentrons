@@ -477,6 +477,14 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: false,
           isIndeterminate: false,
         },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_mix_checkbox: {
           value: true,
           isIndeterminate: false,
@@ -864,6 +872,14 @@ describe('_getSavedMultiSelectFieldValues', () => {
         },
         preWetTip: {
           isIndeterminate: true,
+        },
+        pushOut_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
         },
         aspirate_mix_checkbox: {
           isIndeterminate: true,
