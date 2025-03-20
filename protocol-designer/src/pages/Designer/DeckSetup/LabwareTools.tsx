@@ -65,6 +65,7 @@ import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { CategoryExpand } from './DeckSetupTools'
+import { getEnableStacking } from '../../../feature-flags/selectors'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
@@ -103,6 +104,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
+  const enableStacking = useSelector(getEnableStacking)
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
@@ -381,8 +383,11 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                             />
 
                             {uri === selectedLabwareDefUri &&
-                              getLabwareCompatibleWithAdapter(defs, loadName)
-                                ?.length > 0 && (
+                              getLabwareCompatibleWithAdapter(
+                                defs,
+                                enableStacking,
+                                loadName
+                              )?.length > 0 && (
                                 <ListButtonAccordionContainer
                                   id={`nestedAccordionContainer_${loadName}`}
                                 >
@@ -433,6 +438,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                         )
                                       : getLabwareCompatibleWithAdapter(
                                           { ...defs, ...customLabwareDefs },
+                                          enableStacking,
                                           loadName
                                         ).map(nestedDefUri => {
                                           const nestedDef =
