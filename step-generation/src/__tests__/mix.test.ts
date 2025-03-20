@@ -405,10 +405,7 @@ mockPythonName.dispense(
 protocol.delay(seconds=12)
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
-mockPythonName.touch_tip(
-    mockPythonName["A1"],
-    v_offset=-3.4,
-)
+mockPythonName.touch_tip(mockPythonName["A1"], v_offset=-3.4)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
 mockPythonName.aspirate(
@@ -437,10 +434,7 @@ mockPythonName.dispense(
 protocol.delay(seconds=12)
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
-mockPythonName.touch_tip(
-    mockPythonName["B1"],
-    v_offset=-3.4,
-)
+mockPythonName.touch_tip(mockPythonName["B1"], v_offset=-3.4)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
 mockPythonName.aspirate(
@@ -469,10 +463,7 @@ mockPythonName.dispense(
 protocol.delay(seconds=12)
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
-mockPythonName.touch_tip(
-    mockPythonName["C1"],
-    v_offset=-3.4,
-)`.trimStart()
+mockPythonName.touch_tip(mockPythonName["C1"], v_offset=-3.4)`.trimStart()
       )
     })
   })
@@ -504,10 +495,7 @@ mockPythonName.mix(
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
-mockPythonName.touch_tip(
-    mockPythonName["A1"],
-    v_offset=-3.4,
-)
+mockPythonName.touch_tip(mockPythonName["A1"], v_offset=-3.4)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
 mockPythonName.mix(
@@ -518,10 +506,7 @@ mockPythonName.mix(
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
-mockPythonName.touch_tip(
-    mockPythonName["B1"],
-    v_offset=-3.4,
-)
+mockPythonName.touch_tip(mockPythonName["B1"], v_offset=-3.4)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
 mockPythonName.mix(
@@ -532,10 +517,7 @@ mockPythonName.mix(
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
-mockPythonName.touch_tip(
-    mockPythonName["C1"],
-    v_offset=-3.4,
-)`.trimStart()
+mockPythonName.touch_tip(mockPythonName["C1"], v_offset=-3.4)`.trimStart()
     )
   })
 })
