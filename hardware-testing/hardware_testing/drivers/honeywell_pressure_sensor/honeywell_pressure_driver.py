@@ -121,7 +121,7 @@ async def pressure_sensor_func():
     global pipette_action
     pipette_action = True
     with open('pressure_data.csv', 'w', newline='') as csvfile:
-        test_data = {'Time(s)': None, 'Cycle': None, 'Error': None}
+        test_data = {'Time(s)': None, 'Pressure(Pa)': None,'State':None, 'Error': None}
         writer = csv.DictWriter(csvfile, test_data)
         writer.writeheader()
         try:
