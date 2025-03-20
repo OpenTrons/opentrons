@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, model_serializer
+from pydantic import BaseModel, model_serializer, field_validator
 
 
 class SimulatedProbeResult(BaseModel):
@@ -103,6 +103,19 @@ class ProbedVolumeInfo(BaseModel):
 
 class WellInfoSummary(BaseModel):
     """Payload for a well's liquid info in StateSummary."""
+
+    @field_validator("probed_height", "probed_volume", mode="before")
+    @classmethod
+    def validate_simulated_probe_result(
+        cls, input_val: str | None
+    ) -> LiquidTrackingType | None:
+        """Return the appropriate input to WellInfoSummary from json data."""
+        if not input_val:
+            return None
+        if input_val.isdigit():
+            return float(input_val)
+        else:
+            return SimulatedProbeResult()
 
     labware_id: str
     well_name: str
