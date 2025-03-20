@@ -14,7 +14,7 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 
-import { useRobot } from '/app/redux-resources/robots'
+import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import {
   useCloseCurrentRun,
@@ -50,6 +50,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     HSConfirmationModalUtils,
   } = runHeaderModalContainerUtils
 
+  const isFlex = useIsFlex(robotName)
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { isProtocolAnalyzing, protocolData } = useProtocolDetailsForRun(runId)
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
@@ -70,8 +71,11 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const isSetupComplete =
     isCalibrationComplete &&
     isModuleCalibrationComplete &&
-    areOffsetsApplied &&
     missingModuleIds.length === 0
+  const isRobotTypeSetupComplete = isFlex
+    ? isSetupComplete && areOffsetsApplied
+    : isSetupComplete
+
   const isCurrentRun = currentRunId === runId
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
@@ -80,7 +84,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
 
   const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
     isCurrentRun,
-    isSetupComplete,
+    isSetupComplete: isRobotTypeSetupComplete,
     isOtherRunCurrent,
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
@@ -93,7 +97,8 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const robotSerialNumber = getFallbackRobotSerialNumber(robot)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
-  const validRunAgainButRequiresSetup = isValidRunAgain && !isSetupComplete
+  const validRunAgainButRequiresSetup =
+    isValidRunAgain && !isRobotTypeSetupComplete
 
   const {
     buttonText,

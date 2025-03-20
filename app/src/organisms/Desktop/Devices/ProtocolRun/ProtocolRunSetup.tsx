@@ -105,16 +105,18 @@ export function ProtocolRunSetup({
     (state: State): StepKey[] => getMissingSetupSteps(state, runId)
   )
 
-  const offsetsMissing = useSelector(
+  const flexOffsetsMissing = useSelector(
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
-  // We update two slices of the two with this check. Prevent accidental torn state.
-  const offsetsConfirmed =
-    useSelector(selectAreOffsetsApplied(runId)) &&
-    !missingSteps.includes(LPC_STEP_KEY)
+  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const offsetsConfirmed = isFlex
+    ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
+    : !missingSteps.includes(LPC_STEP_KEY)
   const buildLPCIncompleteText = (): string | null => {
     if (isFlex) {
-      return offsetsMissing ? t('offsets_missing') : t('offsets_not_applied')
+      return flexOffsetsMissing
+        ? t('offsets_missing')
+        : t('offsets_not_applied')
     } else {
       return null
     }
