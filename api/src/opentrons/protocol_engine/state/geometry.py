@@ -1070,13 +1070,6 @@ class GeometryView:
                 slot_name
             )
 
-            # For protocol analysis identify collisions with trash fixtures
-            if maybe_fixture is None:
-                # todo(chb 2025-03-19): This can go away once we solve the problem of no deck config in analysis
-                maybe_fixture = self._get_potential_disposal_location_cutout_fixtures(
-                    slot_name
-                )
-
             # Ignore generic single slot fixtures
             if maybe_fixture and maybe_fixture["id"] in {
                 "singleLeftSlot",
@@ -1088,6 +1081,13 @@ class GeometryView:
             maybe_module = self._modules.get_by_slot(
                 slot_name=slot_name,
             ) or self._modules.get_overflowed_module_in_slot(slot_name=slot_name)
+
+            # For situations in which the deck config is none
+            if maybe_fixture is None and maybe_labware is None and maybe_module is None:
+                # todo(chb 2025-03-19): This can go away once we solve the problem of no deck config in analysis
+                maybe_fixture = self._get_potential_disposal_location_cutout_fixtures(
+                    slot_name
+                )
         else:
             # Modules and fixtures can't be loaded on staging slots
             maybe_fixture = None
