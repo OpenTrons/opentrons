@@ -43,7 +43,7 @@ class Stacker_Axis_Acc_Lifetime_Test:
         self.axes = [Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R]
         self.test_data = {
             "Cycle":"None",
-            "Gripper":"None",
+            # "Gripper":"None",
             "Stacker":"None",
             "State":"None",
             "XE":"None",
@@ -60,9 +60,9 @@ class Stacker_Axis_Acc_Lifetime_Test:
 
     async def test_setup(self):
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
-        self.mount = OT3Mount.GRIPPER
+        self.mount = OT3Mount.LEFT
         await self.stacker_setup()
-        await self.gripper_setup()
+        # await self.gripper_setup()
         self.file_setup()
         print(f"\n-> Starting Stacker Test!\n")
         self.start_time = time.time()
@@ -78,6 +78,7 @@ class Stacker_Axis_Acc_Lifetime_Test:
 
     async def gripper_setup(self):
         await self.api.cache_instruments()
+        self.mount = OT3Mount.GRIPPER
         if self.simulate:
             self.gripper_id = "SIMULATION"
         else:
