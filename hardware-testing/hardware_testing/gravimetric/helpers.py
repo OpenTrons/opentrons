@@ -359,19 +359,7 @@ def _drop_tip(
     if return_tip:
         pipette.return_tip(home_after=False)
     else:
-        if offset is not None:
-            # we don't actually need the offset, if this is an 8 channel we always center channel
-            # a1 over the back of the trash
-            trash_well = pipette.trash_container.well(0)  # type: ignore[union-attr]
-            trash_container = trash_well.center().move(
-                Point(0, trash_well.width / 2, 0)  # type: ignore[union-attr, operator]
-            )
-            pipette.drop_tip(
-                trash_container,
-                home_after=False,
-            )
-        else:
-            pipette.drop_tip(home_after=False)
+        pipette.drop_tip(home_after=False)
     if minimum_z_height > 0:
         cur_location = pipette._get_last_location_by_api_version()
         if cur_location is not None:
