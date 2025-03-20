@@ -334,12 +334,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   pipetteId: args.pipette,
                   labwareId: args.sourceLabware,
                   wellName: sourceWell,
-                  wellLocation: {
-                    origin: 'top',
-                    offset: {
-                      z: args.touchTipAfterAspirateOffsetMmFromTop,
-                    },
-                  },
+                  zOffsetFromTop: args.touchTipAfterAspirateOffsetMmFromTop,
                   ...(args.touchTipAfterAspirateSpeed != null
                     ? { speed: args.touchTipAfterAspirateSpeed }
                     : {}),
@@ -354,12 +349,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     pipetteId: args.pipette,
                     labwareId: args.destLabware,
                     wellName: destinationWell,
-                    wellLocation: {
-                      origin: 'top',
-                      offset: {
-                        z: args.touchTipAfterDispenseOffsetMmFromTop,
-                      },
-                    },
+                    zOffsetFromTop: args.touchTipAfterDispenseOffsetMmFromTop,
                     ...(args.touchTipAfterDispenseSpeed != null
                       ? { speed: args.touchTipAfterDispenseSpeed }
                       : {}),
@@ -555,6 +545,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             dropTipCommand = [
               curryCommandCreator(dropTipInWasteChute, {
                 pipetteId: args.pipette,
+                wasteChuteId: dropTipEntity.id,
               }),
             ]
           }

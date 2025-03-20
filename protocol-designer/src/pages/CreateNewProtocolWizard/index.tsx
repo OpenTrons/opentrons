@@ -1,5 +1,5 @@
 import * as Yup from 'yup'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import reduce from 'lodash/reduce'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
@@ -39,7 +39,6 @@ import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
-import { getNewProtocolModal } from '../../navigation/selectors'
 import { SelectModules } from '../../components/organisms/SelectModules'
 import { SelectRobot } from './SelectRobot'
 import { SelectPipettes } from './SelectPipettes'
@@ -157,7 +156,6 @@ const validationSchema: any = Yup.object().shape({
 
 export function CreateNewProtocolWizard(): JSX.Element | null {
   const navigate = useNavigate()
-  const showWizard = useSelector(getNewProtocolModal)
   const [analyticsStartTime] = useState<Date>(new Date())
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
@@ -166,12 +164,6 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
   const [wizardSteps, setWizardSteps] = useState<WizardStep[]>(WIZARD_STEPS)
 
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-
-  useEffect(() => {
-    if (!showWizard) {
-      navigate('/overview')
-    }
-  }, [showWizard])
 
   const createProtocolFile = (values: WizardFormState): void => {
     navigate('/overview')
@@ -382,7 +374,7 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
     }
   }
 
-  return showWizard ? (
+  return (
     <Box backgroundColor={COLORS.grey10} height="calc(100vh - 48px)">
       <CreateFileForm
         currentWizardStep={currentWizardStep}
@@ -393,7 +385,7 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
         analyticsStartTime={analyticsStartTime}
       />
     </Box>
-  ) : null
+  )
 }
 
 interface CreateFileFormProps {

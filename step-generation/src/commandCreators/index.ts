@@ -19,7 +19,7 @@ export {
   absorbanceReaderOpenLid,
   absorbanceReaderRead,
   aspirate,
-  blowout,
+  blowOutInWell,
   comment,
   deactivateTemperature,
   delay,

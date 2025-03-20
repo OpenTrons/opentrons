@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { round } from 'lodash'
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -8,6 +9,7 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+import { getMinXYDimension } from '@opentrons/shared-data'
 import { getTrashOrLabware } from '@opentrons/step-generation'
 
 import {
@@ -145,6 +147,12 @@ export const SecondStepsMoveLiquidTools = ({
     ]
   }
 
+  const minXYDimension = isDestinationTrash
+    ? null
+    : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
+  const minRadiusForTouchTip =
+    minXYDimension != null ? round(minXYDimension / 2, 1) : null
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -195,16 +203,26 @@ export const SecondStepsMoveLiquidTools = ({
             )
           ]
         }
+        referenceField={`${tab}_position_reference`}
       />
       {enableLiquidClasses ? (
         <>
           <Divider marginY="0" />
           <MultiInputField
             name={t('submerge')}
-            prefix={tab}
+            prefix={`${tab}_submerge`}
             tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
             propsForFields={propsForFields}
             fields={getFields('submerge')}
+            isWellPosition
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('submerge_mmFromBottom')
+                )
+              ]
+            }
+            referenceField={`${tab}_submerge_position_reference`}
           />
           <Divider marginY="0" />
           <MultiInputField
@@ -213,7 +231,7 @@ export const SecondStepsMoveLiquidTools = ({
             tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
             propsForFields={propsForFields}
             fields={getFields('retract')}
-            isWellPosition={true}
+            isWellPosition
             labwareId={
               formData[
                 getLabwareFieldForPositioningField(
@@ -221,6 +239,7 @@ export const SecondStepsMoveLiquidTools = ({
                 )
               ]
             }
+            referenceField={`${tab}_retract_position_reference`}
           />
         </>
       ) : null}
@@ -327,18 +346,6 @@ export const SecondStepsMoveLiquidTools = ({
                   mappedErrorsToField
                 )}
               />
-              <PositionField
-                prefix={tab}
-                propsForFields={propsForFields}
-                zField={`${tab}_delay_mmFromBottom`}
-                labwareId={
-                  formData[
-                    getLabwareFieldForPositioningField(
-                      addFieldNamePrefix('delay_mmFromBottom')
-                    )
-                  ]
-                }
-              />
             </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
@@ -403,6 +410,7 @@ export const SecondStepsMoveLiquidTools = ({
           tooltipText={
             propsForFields[`${tab}_touchTip_checkbox`].tooltipContent
           }
+          disabled={propsForFields[`${tab}_touchTip_checkbox`].disabled}
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
@@ -417,7 +425,24 @@ export const SecondStepsMoveLiquidTools = ({
                 )}
                 units={t('application:units.millimeterPerSec')}
               />
-
+              <InputStepFormField
+                showTooltip={false}
+                padding="0"
+                title={t('form:step_edit_form.field.touchTip_mmFromEdge.label')}
+                {...propsForFields[`${tab}_touchTip_mmFromEdge`]}
+                errorToShow={getFormLevelError(
+                  `${tab}_touchTip_mmFromEdge`,
+                  mappedErrorsToField
+                )}
+                caption={t(
+                  `form:step_edit_form.field.touchTip_mmFromEdge.caption`,
+                  {
+                    min: 0,
+                    max: minRadiusForTouchTip,
+                  }
+                )}
+                units={t('application:units.millimeter')}
+              />
               <PositionField
                 prefix={tab}
                 propsForFields={propsForFields}

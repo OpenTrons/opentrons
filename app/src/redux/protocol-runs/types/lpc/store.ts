@@ -17,7 +17,7 @@ export interface LPCWizardState {
   labwareDefs: LabwareDefinition2[]
   deckConfig: DeckConfiguration
   protocolName: string
-  maintenanceRunId: string
+  maintenanceRunId: string | null
 }
 
 export interface StepInfo {
