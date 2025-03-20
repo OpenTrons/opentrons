@@ -438,7 +438,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     expect(res.commands).toEqual([
       aspirateHelper('A1', 200),
       ...delayWithOffset('A1', SOURCE_LABWARE),
-      makeMoveToWellHelper('A1', undefined, 'top', 1),
+      makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
 
@@ -448,7 +448,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
 
       aspirateHelper('A1', 200),
       ...delayWithOffset('A1', SOURCE_LABWARE),
-      makeMoveToWellHelper('A1', undefined, 'top', 1),
+      makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
       delayCommand(12),
       makeDispenseAirGapHelper('A4', 5),
@@ -477,14 +477,14 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       aspirateHelper('A1', 200),
-      makeMoveToWellHelper('A1', undefined, 'top', 1),
+      makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
       makeDispenseAirGapHelper('A2', 5),
       dispenseHelper('A2', 100),
       dispenseHelper('A3', 100),
 
       aspirateHelper('A1', 200),
-      makeMoveToWellHelper('A1', undefined, 'top', 1),
+      makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
       makeDispenseAirGapHelper('A4', 5),
       dispenseHelper('A4', 100),
@@ -513,7 +513,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       aspirateHelper('A1', 200),
-      makeMoveToWellHelper('A1', undefined, 'top', 1),
+      makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
 
       makeDispenseAirGapHelper('A2', 5),
@@ -524,7 +524,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       ...delayWithOffset('A3', DEST_LABWARE),
 
       aspirateHelper('A1', 200),
-      makeMoveToWellHelper('A1', undefined, 'top', 1),
+      makeMoveToWellHelper('A1'),
       makeAirGapAfterAspirateHelper(5),
 
       makeDispenseAirGapHelper('A4', 5),
@@ -930,7 +930,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -993,7 +993,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1026,7 +1026,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         makeDispenseAirGapHelper('A4', 31),
@@ -1038,7 +1038,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A4', { labwareId: DEST_LABWARE }),
         ...blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
-        makeMoveToWellHelper('A4', DEST_LABWARE, 'top', 1),
+        makeMoveToWellHelper('A4', DEST_LABWARE),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1091,7 +1091,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1108,7 +1108,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A3', { labwareId: DEST_LABWARE }),
         ...blowoutSingleToTrash,
         // dispense > air gap since we are about to change the tip
-        makeMoveToWellHelper('A3', DEST_LABWARE, 'top', 1),
+        makeMoveToWellHelper('A3', DEST_LABWARE),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1145,7 +1145,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
@@ -1157,7 +1157,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A4', { labwareId: DEST_LABWARE }),
         ...blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
-        makeMoveToWellHelper('A4', DEST_LABWARE, 'top', 1),
+        makeMoveToWellHelper('A4', DEST_LABWARE),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1211,7 +1211,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1243,7 +1243,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
@@ -1255,7 +1255,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         touchTipHelper('A4', { labwareId: DEST_LABWARE }),
         ...blowoutSingleToTrash,
         // use the dispense > air gap here before moving to trash
-        makeMoveToWellHelper('A4', DEST_LABWARE, 'top', 1),
+        makeMoveToWellHelper('A4', DEST_LABWARE),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1306,7 +1306,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1339,7 +1339,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
@@ -1353,7 +1353,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutSingleToSourceA1,
         // use the dispense > air gap here before moving to trash since it is the final dispense in the step
         // dispense > air gap from source since blowout location is source
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1406,7 +1406,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1424,7 +1424,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // blowout location is source so need to blowout
         blowoutSingleToSourceA1,
         // dispense > air gap so no liquid drops off the tip as pipette moves from source well to trash
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         ...makeAirGapHelper(3),
         // delay after aspirating air
         delayCommand(11),
@@ -1462,7 +1462,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
@@ -1475,7 +1475,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // blowout location is source so need to blowout
         blowoutSingleToSourceA1,
         // dispense > air gap so no liquid drops off the tip as pipette moves from source well to trash
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1528,7 +1528,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1561,7 +1561,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
@@ -1574,7 +1574,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // use the dispense > air gap here before moving to trash
         // since it is the final dispense in the step
         blowoutSingleToSourceA1,
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1625,7 +1625,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1658,7 +1658,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
@@ -1672,7 +1672,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutSingleToDestA4,
         // use the dispense > air gap here before moving to trash
         // since it is the final dispense in the step
-        makeMoveToWellHelper('A4', DEST_LABWARE, 'top', 1),
+        makeMoveToWellHelper('A4', DEST_LABWARE),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1725,7 +1725,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1743,7 +1743,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // blowout location is dest so we gotta blowout
         blowoutSingleToDestA3,
         // dispense > air gap so no liquid drops off the tip as pipette moves from destination well to trash
-        makeMoveToWellHelper('A3', DEST_LABWARE, 'top', 1),
+        makeMoveToWellHelper('A3', DEST_LABWARE),
         ...makeAirGapHelper(3),
         // dispense delay
         delayCommand(11),
@@ -1780,7 +1780,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
@@ -1793,7 +1793,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         // use the dispense > air gap here before moving to trash
         // since it is the final dispense in the step
         blowoutSingleToDestA4,
-        makeMoveToWellHelper('A4', DEST_LABWARE, 'top', 1),
+        makeMoveToWellHelper('A4', DEST_LABWARE),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip
@@ -1846,7 +1846,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #1
@@ -1879,7 +1879,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
           },
         }),
         // aspirate > air gap
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(31),
         delayCommand(11),
         // dispense #3
@@ -1893,7 +1893,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
         blowoutSingleToDestA4,
         // use the dispense > air gap here before moving to trash
         // since it is the final dispense in the step
-        makeMoveToWellHelper('A4', DEST_LABWARE, 'top', 1),
+        makeMoveToWellHelper('A4', DEST_LABWARE),
         ...makeAirGapHelper(3),
         delayCommand(11),
         // since we used dispense > air gap, drop the tip

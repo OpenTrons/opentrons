@@ -7,6 +7,7 @@ import {
   DEFAULT_BLOWOUT_WELL,
   DEST_LABWARE,
 } from './data'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
 import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 
 import type {
@@ -129,12 +130,7 @@ export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     ...params,
   },
 })
-export const makeMoveToWellHelper = (
-  wellName: string,
-  labwareId?: string,
-  origin?: string,
-  zOffset?: number
-) => ({
+export const makeMoveToWellHelper = (wellName: string, labwareId?: string) => ({
   commandType: 'moveToWell',
   key: expect.any(String),
   params: {
@@ -142,11 +138,11 @@ export const makeMoveToWellHelper = (
     labwareId: labwareId ?? SOURCE_LABWARE,
     wellName,
     wellLocation: {
-      origin: origin ?? 'bottom',
+      origin: 'top',
       offset: {
         x: 0,
         y: 0,
-        z: zOffset ?? 11.54,
+        z: AIR_GAP_OFFSET_FROM_TOP,
       },
     },
   },

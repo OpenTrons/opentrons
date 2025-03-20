@@ -158,7 +158,7 @@ describe('pick up tip if no tip on pipette', () => {
       pickUpTipHelper('A1'),
       aspirateHelper('A1', 30),
       dispenseHelper('B2', 30),
-      makeMoveToWellHelper('B2', 'destPlateId', 'top', 1),
+      makeMoveToWellHelper('B2', 'destPlateId'),
       ...makeAirGapHelper(5),
       //   drop tip at end
       {
@@ -873,12 +873,12 @@ describe('advanced options', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 295),
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
         makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 295),
         aspirateHelper('A1', 55),
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
         makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 55),
@@ -895,13 +895,13 @@ describe('advanced options', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 150),
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
         makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 150),
 
         aspirateHelper('A1', 150),
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
         makeDispenseAirGapHelper('B1', 5),
         dispenseHelper('B1', 150),
@@ -920,7 +920,7 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         aspirateHelper('A1', 295),
         ...delayWithOffset('A1', SOURCE_LABWARE),
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
         delayCommand(12),
 
@@ -929,7 +929,7 @@ describe('advanced options', () => {
 
         aspirateHelper('A1', 55),
         ...delayWithOffset('A1', SOURCE_LABWARE),
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
         delayCommand(12),
 
@@ -949,7 +949,7 @@ describe('advanced options', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         aspirateHelper('A1', 295),
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
 
         makeDispenseAirGapHelper('B1', 5),
@@ -959,7 +959,7 @@ describe('advanced options', () => {
         ...delayWithOffset('B1', DEST_LABWARE),
 
         aspirateHelper('A1', 55),
-        makeMoveToWellHelper('A1', undefined, 'top', 1),
+        makeMoveToWellHelper('A1'),
         makeAirGapAfterAspirateHelper(5),
 
         makeDispenseAirGapHelper('B1', 5),

@@ -6,6 +6,7 @@ import {
   SOURCE_LABWARE,
   DEST_LABWARE,
 } from '../fixtures'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
 import { airGapInWell } from '../commandCreators/compound'
 import type { RobotState, InvariantContext } from '../types'
 import type { AirGapInWellType } from '../commandCreators/compound/airGapInWell'
@@ -41,7 +42,7 @@ describe('airGapInWell', () => {
             offset: {
               x: 0,
               y: 0,
-              z: 1,
+              z: AIR_GAP_OFFSET_FROM_TOP,
             },
             origin: 'top',
           },
@@ -89,7 +90,7 @@ describe('airGapInWell', () => {
             offset: {
               x: 0,
               y: 0,
-              z: 1,
+              z: AIR_GAP_OFFSET_FROM_TOP,
             },
             origin: 'top',
           },
@@ -137,7 +138,7 @@ describe('airGapInWell', () => {
             offset: {
               x: 0,
               y: 0,
-              z: 1,
+              z: AIR_GAP_OFFSET_FROM_TOP,
             },
             origin: 'top',
           },
