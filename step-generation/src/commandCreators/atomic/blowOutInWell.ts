@@ -11,23 +11,26 @@ import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
+  formatPyStr,
+  formatPyWellLocation,
 } from '../../utils'
 import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CreateCommand, BlowoutParams } from '@opentrons/shared-data'
 import type { CommandCreatorError, CommandCreator } from '../../types'
 
-export const blowout: CommandCreator<BlowoutParams> = (
+export const blowOutInWell: CommandCreator<BlowoutParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
   /** Blowout with given args. Requires tip. */
   const { pipetteId, labwareId, wellName, wellLocation, flowRate } = args
-
+  const { pipetteEntities, labwareEntities } = invariantContext
+  const pipette = pipetteEntities[pipetteId]
   const actionName = 'blowout'
   const errors: CommandCreatorError[] = []
-  const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
+  const pipetteSpec = pipette?.spec
   const isFlexPipette =
     (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
@@ -184,6 +187,9 @@ export const blowout: CommandCreator<BlowoutParams> = (
     }
   }
 
+  const pipettePythonName = pipette.pythonName
+  const labwarePythonName = labwareEntities[labwareId].pythonName
+
   const commands: CreateCommand[] = [
     {
       commandType: 'blowout',
@@ -199,5 +205,12 @@ export const blowout: CommandCreator<BlowoutParams> = (
   ]
   return {
     commands,
+    python:
+      // The Python blow_out() does not take a flow rate argument, so we have to
+      // reconfigure the pipette's default blow out rate instead:
+      `${pipettePythonName}.flow_rate.blow_out = ${flowRate}\n` +
+      `${pipettePythonName}.blow_out(${labwarePythonName}[${formatPyStr(
+        wellName
+      )}]${formatPyWellLocation(wellLocation)})`,
   }
 }
