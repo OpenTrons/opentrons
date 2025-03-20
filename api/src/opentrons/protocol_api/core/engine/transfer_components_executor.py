@@ -175,7 +175,7 @@ class TransferComponentsExecutor:
                 and self._instrument.get_liquid_presence_detection()
             ):
                 self._instrument.liquid_probe_with_recovery(
-                    self._target_well, submerge_start_location
+                    well_core=self._target_well, loc=submerge_start_location
                 )
             # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
             self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)  # type: ignore[arg-type]
