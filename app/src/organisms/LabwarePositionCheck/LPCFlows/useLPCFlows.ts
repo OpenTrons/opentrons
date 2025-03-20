@@ -33,6 +33,7 @@ interface UseLPCFlowsBase {
   showLPC: boolean
   lpcProps: LPCFlowsProps | null
   isLaunchingLPC: boolean
+  isFlexLPCInitializing: boolean
   launchLPC: () => Promise<void>
 }
 interface UseLPCFlowsIdle extends UseLPCFlowsBase {
@@ -96,6 +97,7 @@ export function useLPCFlows({
     runId,
   })
 
+  const isFlexLPCInitializing = flexOffsets == null
   const lastFreshOffsetRunTs = useClonedRunOffsetStaleTimestamp(
     runRecord,
     flexOffsetSearchParams,
@@ -191,6 +193,7 @@ export function useLPCFlows({
     ? {
         launchLPC,
         isLaunchingLPC: false,
+        isFlexLPCInitializing,
         showLPC,
         lpcProps: {
           onCloseClick: handleCloseLPC,
@@ -208,6 +211,7 @@ export function useLPCFlows({
     : {
         launchLPC,
         isLaunchingLPC: isLaunching,
+        isFlexLPCInitializing,
         lpcProps: null,
         showLPC,
       }

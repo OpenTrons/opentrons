@@ -131,6 +131,7 @@ interface PrepareToRunProps {
   labwareConfirmed: boolean
   liquidsConfirmed: boolean
   offsetsConfirmed: boolean
+  isLPCInitializing: boolean
 }
 
 function PrepareToRun({
@@ -143,6 +144,7 @@ function PrepareToRun({
   labwareConfirmed,
   liquidsConfirmed,
   offsetsConfirmed,
+  isLPCInitializing,
   confirmStepsComplete,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
@@ -267,6 +269,7 @@ function PrepareToRun({
   const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
+    isLPCInitializing ||
     (protocolHasModules && attachedModules == null)
 
   const speccedInstrumentCount =
@@ -847,6 +850,7 @@ export function ProtocolSetup(): JSX.Element {
         labwareConfirmed={labwareConfirmed}
         liquidsConfirmed={liquidsConfirmed}
         offsetsConfirmed={offsetsConfirmed}
+        isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
       />
     ),
     instruments: (
