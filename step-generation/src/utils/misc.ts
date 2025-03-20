@@ -620,6 +620,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
+        wasteChuteId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   } else {

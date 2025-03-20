@@ -10,17 +10,27 @@ import type { InvariantContext, PipetteEntities, RobotState } from '../types'
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
 const mockId = 'mockId'
+const mockWasteChuteId = 'mockWasteChute'
 const mockPipEntities: PipetteEntities = {
   [mockId]: {
     name: 'p50_single_flex',
     id: mockId,
     spec: { channels: 1 },
+    pythonName: 'mock_pipette_left',
   },
 } as any
 
 const invariantContext: InvariantContext = {
   ...makeContext(),
   pipetteEntities: mockPipEntities,
+  additionalEquipmentEntities: {
+    [mockWasteChuteId]: {
+      id: mockWasteChuteId,
+      name: 'wasteChute',
+      pythonName: 'mock_waste_chute_1',
+      location: mockWasteChuteId,
+    },
+  },
 }
 const prevRobotState: RobotState = getInitialRobotStateStandard(
   invariantContext
@@ -33,6 +43,7 @@ describe('dispenseInWasteChute', () => {
         pipetteId: mockId,
         volume: 10,
         flowRate: 10,
+        wasteChuteId: mockWasteChuteId,
       },
       invariantContext,
       prevRobotState
@@ -57,5 +68,13 @@ describe('dispenseInWasteChute', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mock_pipette_left.dispense(
+    volume=10,
+    location=mock_waste_chute_1,
+    rate=10 / mock_pipette_left.flow_rate.dispense,
+)`.trimStart()
+    )
   })
 })
