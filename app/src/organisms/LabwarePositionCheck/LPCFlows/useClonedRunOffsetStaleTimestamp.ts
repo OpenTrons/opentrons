@@ -12,6 +12,8 @@ import type {
   SearchLabwareOffsetsData,
 } from '@opentrons/api-client'
 
+// TOME TODO: You need to move a lot of this to redux to make it persistent upon navigation.
+
 // TODO(jh, 03-18-25): Much of the complexity here is because of the desktop
 //  run tabs not fully re-rendering when clicking "run again". Revisit total tab
 //  state re-rendering.

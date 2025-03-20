@@ -23,7 +23,6 @@ import {
   Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   useCreateRunMutation,
   useHost,
@@ -52,8 +51,6 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
-import { selectLabwareOffsetsToAddToRun } from '/app/redux/protocol-runs'
 
 import type { Protocol } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
@@ -309,7 +306,6 @@ export function QuickTransferDetails(): JSX.Element | null {
   const [currentOption, setCurrentOption] = useState<TabOption>(
     transferSectionTabOptions[0]
   )
-  const [createdRunId, setCreatedRunId] = useState<string | null>(null)
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
   const {
@@ -325,21 +321,11 @@ export function QuickTransferDetails(): JSX.Element | null {
   let pinnedTransferIds = useSelector(getPinnedQuickTransferIds) ?? []
   const pinned = pinnedTransferIds.includes(transferId)
 
-  useLPCFlows({
-    runId: createdRunId,
-    robotType: FLEX_ROBOT_TYPE,
-    protocolName: protocolRecord?.data.metadata.protocolName,
-  })
-  const lwOffsetsForRun = useSelector(
-    selectLabwareOffsetsToAddToRun(createdRunId ?? '')
-  )
-
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
         console.error(`could not invalidate runs cache: ${e.message}`)
       })
-      setCreatedRunId(data.data.id)
     },
   })
 
@@ -360,7 +346,7 @@ export function QuickTransferDetails(): JSX.Element | null {
     )
   }
   const handleRunTransfer = (): void => {
-    createRun({ protocolId: transferId, labwareOffsets: lwOffsetsForRun ?? [] })
+    createRun({ protocolId: transferId })
   }
   const [
     showConfirmDeleteTransfer,
