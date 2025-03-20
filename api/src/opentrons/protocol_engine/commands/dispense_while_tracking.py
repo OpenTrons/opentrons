@@ -107,7 +107,6 @@ class DispenseWhileTrackingImplementation(
             labware_id=params.labwareId,
             well_name=params.wellName,
             well_location=params.wellLocation,
-            operation_volume=params.volume,
         )
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):
