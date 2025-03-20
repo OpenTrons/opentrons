@@ -52,9 +52,11 @@ describe('useRequiredProtocolLabware', () => {
   it('should return LabwareSetupItem array', () => {
     const { result } = renderHook(() => useRequiredProtocolLabware(PROTOCOL_ID))
     expect(result.current.length).toBe(1)
-    expect(result.current[0].nickName).toEqual('first labware nickname')
-    expect(result.current[0].definition.dimensions.xDimension).toBe(127.76)
-    expect(result.current[0].definition.metadata.displayName).toEqual(
+    expect(result.current[0].labwareDef.metadata.displayName).toEqual(
+      '300ul Tiprack FIXTURE'
+    )
+    expect(result.current[0].labwareDef.dimensions.xDimension).toBe(127.76)
+    expect(result.current[0].labwareDef.metadata.displayName).toEqual(
       '300ul Tiprack FIXTURE'
     )
   })
