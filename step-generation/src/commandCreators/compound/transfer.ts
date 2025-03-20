@@ -286,6 +286,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: aspirateXOffset,
                   yOffset: aspirateYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
           const mixBeforeAspirateCommands =
@@ -305,6 +306,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: aspirateXOffset,
                   yOffset: aspirateYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
           const delayAfterAspirateCommands =
@@ -374,6 +376,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: dispenseXOffset,
                   yOffset: dispenseYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
 

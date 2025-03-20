@@ -331,6 +331,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               xOffset: aspirateXOffset,
               yOffset: aspirateYOffset,
               nozzles,
+              invariantContext,
             })
           : []
       const preWetTipCommands = args.preWetTip // Pre-wet tip is equivalent to a single mix, with volume equal to the consolidate volume.
@@ -349,6 +350,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             xOffset: aspirateXOffset,
             yOffset: aspirateYOffset,
             nozzles,
+            invariantContext,
           })
         : []
       //  can not mix in a waste chute
@@ -369,6 +371,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               xOffset: dispenseXOffset,
               yOffset: dispenseYOffset,
               nozzles,
+              invariantContext,
             })
           : []
 
