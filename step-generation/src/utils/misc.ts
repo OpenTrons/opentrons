@@ -392,7 +392,7 @@ export const blowoutUtil = (args: {
     return [
       curryCommandCreator(blowOutInTrash, {
         pipetteId: pipette,
-        trashLocation: trashBin?.location as CutoutId,
+        trashId: trashBin?.id as string,
         flowRate,
       }),
     ]
