@@ -235,6 +235,13 @@
       "preWetTip": {
         "label": "pre-wet tip"
       },
+      "pushOut": {
+        "pushOut_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Push out volume"
+        },
+        "title": "Push out"
+      },
       "setTemperature": {
         "options": {
           "false": "Deactivate module",

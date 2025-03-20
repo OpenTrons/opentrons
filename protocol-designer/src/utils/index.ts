@@ -1,5 +1,6 @@
-import uuidv1 from 'uuid/v4'
+import round from 'lodash/round'
 import snakeCase from 'lodash/snakeCase'
+import uuidv1 from 'uuid/v4'
 import {
   makeWellSetHelpers,
   getDeckDefFromRobotType,
@@ -16,13 +17,14 @@ import type {
   PipetteEntity,
 } from '@opentrons/step-generation'
 import type {
-  WellSetHelpers,
   AddressableAreaName,
   CutoutId,
-  SupportedTip,
   LabwareDefinition2,
-  ModuleType,
   LabwareDisplayCategory,
+  ModuleType,
+  PipetteV2Specs,
+  SupportedTip,
+  WellSetHelpers,
 } from '@opentrons/shared-data'
 import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
@@ -276,4 +278,49 @@ export const getAdditionalEquipmentPythonName = (
   return fixtureName === 'wasteChute'
     ? snakeCase(fixtureName)
     : `${snakeCase(fixtureName)}_${typeCount}`
+}
+
+/**
+ * Gets maximum pushout volume for a given transfer plan given transfer volume and pipette spec
+ *
+ * @param {number} transferVolume - The transfer volume for the transfer plan
+ * @param {PipetteV2Specs} - The specs for the pipette used for the transfer
+ * @returns {number} - The maximum supported push out volume for each dispense
+ */
+export const getMaxPushOutVolume = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs
+): number => {
+  const { liquids, plungerPositionsConfigurations, shaftULperMM } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const { bottom, blowout } = isInLowVolumeMode
+    ? plungerPositionsConfigurations.lowVolumeDefault ??
+      plungerPositionsConfigurations.default
+    : plungerPositionsConfigurations.default
+  return round((blowout - bottom) * shaftULperMM, 1)
+}
+
+export const getDefaultPushOutVolume = (
+  transferVolume: number,
+  pipetteSpecs: PipetteV2Specs,
+  tiprackDefinition: LabwareDefinition2
+): number => {
+  const { liquids } = pipetteSpecs
+  if (tiprackDefinition == null) {
+    return 0
+  }
+  console.assert(
+    tiprackDefinition.metadata.displayCategory === 'tipRack',
+    'Specified labware entity must be tiprack'
+  )
+  const tipVolume = Object.values(tiprackDefinition.wells)[0].totalLiquidVolume
+  const lookupKey =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+      ? 'lowVolumeDefalt'
+      : 'default'
+  const tipVolumeKey = `t${tipVolume}`
+  return (
+    liquids[lookupKey].supportedTips[tipVolumeKey]?.defaultPushOutVolume ?? 0
+  )
 }
