@@ -5,7 +5,11 @@ import {
   isFlexPipette,
 } from '@opentrons/shared-data'
 import { getFlexNameConversion } from '../../file-data/selectors/utils'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  PipetteName,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
 import type { FormError } from './errors'
 
 /*******************
@@ -199,7 +203,7 @@ export const incompatiblePipettePath = (
   const pipetteName = pipette.name as PipetteName
   const pipetteModel =
     isFlexPipette(pipetteName) === true
-      ? getFlexNameConversion(pipette.spec)
+      ? getFlexNameConversion(pipette.spec as PipetteV2Specs)
       : pipetteName
 
   if (path === 'multiDispense') {
@@ -224,7 +228,7 @@ export const incompatiblePipetteTiprack = (
 
   const pipetteModel =
     isFlexPipette(pipetteName) === true
-      ? getFlexNameConversion(pipette.spec)
+      ? getFlexNameConversion(pipette.spec as PipetteV2Specs)
       : pipetteName
 
   const incompatiblePipette = getIncompatibleLiquidClasses(pipetteModel)
