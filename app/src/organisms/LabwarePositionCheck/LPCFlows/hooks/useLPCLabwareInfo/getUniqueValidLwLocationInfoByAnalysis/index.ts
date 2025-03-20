@@ -8,6 +8,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { LabwareLocationInfo } from '/app/redux/protocol-runs'
+import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useUpdateLPCStore/utils'
 
 export interface GetUniqueValidLwLocationInfoByAnalysisParams {
   protocolData: CompletedProtocolAnalysis | null
@@ -21,7 +22,10 @@ export function getUniqueValidLwLocationInfoByAnalysis({
 }: GetUniqueValidLwLocationInfoByAnalysisParams & {
   robotType: RobotType
 }): LabwareLocationInfo[] {
-  if (protocolData == null || labwareDefs == null) {
+  // If there's no pipette, there's nothing to LPC.
+  const activePipetteId = getActivePipetteId(protocolData?.pipettes ?? [])
+
+  if (protocolData == null || labwareDefs == null || activePipetteId == null) {
     return []
   } else if (robotType !== FLEX_ROBOT_TYPE) {
     return []

@@ -4,6 +4,7 @@ import { OT2SetupLPC } from './OT2SetupLPC'
 import { FlexSetupLPC } from './FlexSetupLPC'
 
 import type { RobotType } from '@opentrons/shared-data'
+import type { UseLPCFlowsResult } from '/app/organisms/LabwarePositionCheck'
 
 export interface SetupLabwarePositionCheckProps {
   offsetsConfirmed: boolean
@@ -11,6 +12,7 @@ export interface SetupLabwarePositionCheckProps {
   robotName: string
   robotType: RobotType
   runId: string
+  lpcUtils: UseLPCFlowsResult
 }
 
 export function SetupLabwarePositionCheck(

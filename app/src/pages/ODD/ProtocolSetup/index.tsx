@@ -504,10 +504,14 @@ function PrepareToRun({
 
   const lpcSetupStepProps = (): Pick<
     ProtocolSetupStepProps,
-    'detail' | 'status'
+    'detail' | 'status' | 'interactionDisabled'
   > => {
     if (totalOffsets === 0) {
-      return { detail: t('offsets_not_required'), status: 'ready' }
+      return {
+        detail: t('offsets_not_required'),
+        status: 'ready',
+        interactionDisabled: true,
+      }
     } else if (offsetsConfirmed) {
       return {
         detail: t('num_offsets_applied', { num: totalOffsets }),

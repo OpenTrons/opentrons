@@ -36,6 +36,9 @@ export interface UseLPCInitialStateProps {
   lastFreshOffsetRunTs: string | null
 }
 
+// TODO(jh, 03-19-25): There's a lot of conditional, initial state patching
+//  that occurs here and upstream. For clarity, consolidate.
+
 // Update the LPC store if underlying store data is sufficiently present or changes.
 export function useUpdateLPCStore({
   analysis,
@@ -70,7 +73,7 @@ export function useUpdateLPCStore({
         ...rest,
         protocolData: analysis,
         labwareDefs,
-        activePipetteId,
+        activePipetteId: activePipetteId ?? 'NO_PIPETTE',
         protocolName,
         deckConfig,
         labwareInfo: {

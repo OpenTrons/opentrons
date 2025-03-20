@@ -19,6 +19,7 @@ import {
   OT2_ROBOT_TYPE,
   parseAllRequiredModuleModels,
 } from '@opentrons/shared-data'
+import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { Line } from '/app/atoms/structure'
 import { InfoMessage } from '/app/molecules/InfoMessage'
@@ -39,6 +40,7 @@ import {
   useUnmatchedModulesForProtocol,
   useModuleCalibrationStatus,
   useProtocolAnalysisErrors,
+  useNotifyRunQuery,
 } from '/app/resources/runs'
 import {
   ROBOT_CALIBRATION_STEP_KEY,
@@ -51,6 +53,7 @@ import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   appliedOffsetsToRun,
   selectAreOffsetsApplied,
+  selectTotalCountLocationSpecificOffsets,
 } from '/app/redux/protocol-runs'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
@@ -60,6 +63,7 @@ import { SetupStep } from './SetupStep'
 import { SetupLiquids } from './SetupLiquids'
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 
 import type { RefObject } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
@@ -100,6 +104,23 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: protocolRecord } = useProtocolQuery(
+    runRecord?.data.protocolId ?? null,
+    {
+      staleTime: Infinity,
+    }
+  )
+  const protocolName =
+    protocolRecord?.data.metadata.protocolName ??
+    protocolRecord?.data.files[0].name ??
+    ''
+
+  const lpcUtils = useLPCFlows({
+    runId,
+    robotType,
+    protocolName,
+  })
 
   const missingSteps = useSelector<State, StepKey[]>(
     (state: State): StepKey[] => getMissingSetupSteps(state, runId)
@@ -109,6 +130,9 @@ export function ProtocolRunSetup({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const noLwOffsetsInRun =
+    useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0
+
   const offsetsConfirmed = isFlex
     ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
     : !missingSteps.includes(LPC_STEP_KEY)
@@ -246,14 +270,19 @@ export function ProtocolRunSetup({
             }
           }}
           offsetsConfirmed={offsetsConfirmed}
+          lpcUtils={lpcUtils}
         />
       ),
-      description: t('labware_position_check_step_description'),
+      description: noLwOffsetsInRun
+        ? t('no_offsets_in_run')
+        : t('labware_position_check_step_description'),
       descriptionElement: <LearnAboutOffsetsLink />,
       rightElProps: {
         stepKey: LPC_STEP_KEY,
         complete: offsetsConfirmed,
-        completeText: t('offsets_applied'),
+        completeText: noLwOffsetsInRun
+          ? t('offsets_not_required')
+          : t('offsets_applied'),
         incompleteText: buildLPCIncompleteText(),
         incompleteElement: null,
       },
@@ -348,7 +377,8 @@ export function ProtocolRunSetup({
                 (stepKey === 'liquid_setup_step' && !hasLiquids) ||
                 (stepKey === 'module_setup_step' &&
                   ((!isFlex && !hasModules) ||
-                    (isFlex && !hasModules && !hasFixtures)))
+                    (isFlex && !hasModules && !hasFixtures))) ||
+                (stepKey === 'labware_position_check_step' && noLwOffsetsInRun)
               return (
                 <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
                   {showEmptySetupStep ? (
