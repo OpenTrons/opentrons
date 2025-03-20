@@ -1,5 +1,5 @@
 import {
-  curryCommandCreator,
+  curryWithoutPython,
   getWasteChuteAddressableAreaNamePip,
   reduceCommandCreators,
 } from '../../utils'
@@ -9,6 +9,7 @@ import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface DropTipInWasteChuteArgs {
   pipetteId: string
+  wasteChuteId: string
 }
 
 export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
@@ -17,9 +18,9 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   prevRobotState
 ) => {
   const offset = ZERO_OFFSET
-  const { pipetteId } = args
-  const pipetteChannels =
-    invariantContext.pipetteEntities[pipetteId].spec.channels
+  const { pipetteId, wasteChuteId } = args
+  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
+  const pipetteChannels = pipetteEntities[pipetteId].spec.channels
   const addressableAreaName = getWasteChuteAddressableAreaNamePip(
     pipetteChannels
   )
@@ -30,15 +31,24 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   if (!prevRobotState.tipState.pipettes[pipetteId]) {
     commandCreators = []
   } else {
+    const pipettePythonName = pipetteEntities[pipetteId].pythonName
+    const wasteChutePythonName =
+      additionalEquipmentEntities[wasteChuteId].pythonName
+    const pythonCommandCreator: CurriedCommandCreator = () => ({
+      commands: [],
+      python: `${pipettePythonName}.drop_tip(${wasteChutePythonName})`,
+    })
+
     commandCreators = [
-      curryCommandCreator(moveToAddressableArea, {
+      curryWithoutPython(moveToAddressableArea, {
         pipetteId,
         addressableAreaName,
         offset,
       }),
-      curryCommandCreator(dropTipInPlace, {
+      curryWithoutPython(dropTipInPlace, {
         pipetteId,
       }),
+      pythonCommandCreator,
     ]
   }
   return reduceCommandCreators(
