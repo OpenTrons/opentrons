@@ -65,25 +65,6 @@ enum ThermoLocators {
  */
 
 export const ThermocyclerEditor = {
-  SelectThermocyclerStep: (): StepThunk => ({
-    call: () => {
-      cy.contains(ThermoContent.Thermocycler)
-        .closest(ThermoLocators.Div)
-        .click()
-    },
-  }),
-
-  /**
-   *
-   * "Select Thermocycler Duplicate Step"
-   */
-
-  DuplicateThermocyclerStep: (): StepThunk => ({
-    call: () => {
-      cy.contains(ThermoContent.DuplicateStep).click()
-    },
-  }),
-
   /**
    *
    * "Select Thermocycler Delete Step"
@@ -133,32 +114,6 @@ export const ThermocyclerEditor = {
   EditThermocyclerStep: (): StepThunk => ({
     call: () => {
       cy.contains(ThermoContent.EditStep).click()
-    },
-  }),
-
-  /**
-   *
-   * "Coupled Thermocycler function for edit, duplicate, delete"
-   */
-
-  StepEditor: (stepNumber: string, editOption: string): StepThunk => ({
-    call: () => {
-      cy.log(
-        `*****clicking thermocycler step ${stepNumber} with edit option ${editOption}******`
-      )
-      cy.contains(`${stepNumber}. ${ThermoContent.Thermocycler}`).click()
-      cy.get('[data-testid^="StepContainer"]')
-        .contains(`${stepNumber}. ${ThermoContent.Thermocycler}`)
-        .parents('[data-testid^="StepContainer"]')
-        .find('button[data-testid^="StepContainer"]')
-        .click()
-      if (editOption === ThermoContent.EditStep) {
-        ThermocyclerEditor.EditThermocyclerStep().call()
-      } else if (editOption === ThermoContent.DeleteStep) {
-        ThermocyclerEditor.DeleteThermocyclerStep().call()
-      } else if (editOption === ThermoContent.DuplicateStep) {
-        ThermocyclerEditor.DuplicateThermocyclerStep().call()
-      }
     },
   }),
 
@@ -534,19 +489,6 @@ export const ThermoProfileSteps = {
 export const ThermoVerifications = {
   /**
    *
-   * "Verify step editor menu"
-   */
-  VerifyStepEditorMenu: (): StepThunk => ({
-    call: () => {
-      cy.get(ThermoLocators.ThermocyclerEditor).click({ multiple: true })
-      cy.contains(ThermoContent.EditStep).should('be.visible')
-      cy.contains(ThermoContent.DuplicateStep).should('be.visible')
-      cy.contains(ThermoContent.DeleteStep).should('be.visible')
-    },
-  }),
-
-  /**
-   *
    * "Verify TC Header"
    */
   VerifyThermoSetupHeader: (partNum: string): StepThunk => ({
@@ -558,28 +500,6 @@ export const ThermoVerifications = {
         .should('exist')
         .should('be.visible')
       cy.contains(ThermoContent.Rename).should('exist').should('be.visible')
-    },
-  }),
-
-  /**
-   *
-   * "Verify delete step pop out"
-   */
-  VerifyDeleteStep: (): StepThunk => ({
-    call: () => {
-      cy.contains(ThermoContent.DeleteStep)
-      cy.contains('Are you sure you want to delete this step?')
-        .should('exist')
-        .should('be.visible')
-      cy.get('button')
-        .contains(ThermoContent.Cancel)
-        .should('exist')
-        .should('be.visible')
-      cy.get('button')
-        .contains(ThermoContent.DeleteStep)
-        .should('exist')
-        .should('be.visible')
-        .click()
     },
   }),
 

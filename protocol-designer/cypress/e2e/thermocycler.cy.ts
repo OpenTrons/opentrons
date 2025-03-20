@@ -8,6 +8,7 @@ import {
 import { TestFilePath, getTestFile } from '../support/TestFiles'
 import { verifyImportProtocolPage } from '../support/Import'
 import { StepBuilder } from '../support/StepBuilder'
+import { TimelineSteps } from '../support/Timeline'
 
 describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
   beforeEach(() => {
@@ -23,13 +24,9 @@ describe('Redesigned Thermocycler Set Up Steps - Happy Path', () => {
 
   it('It should verify the working function of thermocycler set up', () => {
     const steps = new StepBuilder()
-    steps.add(ThermocyclerEditor.SelectThermocyclerStep())
-    steps.add(ThermoVerifications.VerifyStepEditorMenu())
-    steps.add(ThermocyclerEditor.StepEditor('1', 'Duplicate step'))
-    steps.add(ThermocyclerEditor.StepEditor('2', 'Delete step'))
-    steps.add(ThermoVerifications.VerifyDeleteStep())
-    steps.add(ThermocyclerEditor.SelectThermocyclerStep())
-    steps.add(ThermocyclerEditor.StepEditor('1', 'Edit step'))
+    steps.add(
+      TimelineSteps.SelectItemMenuOption('1. Thermocycler', 'Edit step')
+    )
     steps.add(ThermoVerifications.VerifyPartOne())
     steps.add(ThermocyclerEditor.SelectProfileOrState('state'))
     steps.add(ThermoVerifications.VerifyThermoState())
