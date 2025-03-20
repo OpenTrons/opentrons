@@ -238,7 +238,7 @@ well_plate_2 = magnetic_block_2.load_labware(
 )
 well_plate_3 = protocol.load_labware(
     "fixture_96_plate",
-    "C2",
+    location="C2",
     label="sample plate",
     namespace="fixture",
     version=1,
