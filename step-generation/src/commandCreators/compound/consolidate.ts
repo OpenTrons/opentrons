@@ -460,6 +460,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInWasteChute, {
             pipetteId: args.pipette,
+            wasteChuteId: dropTipEntity.id,
           }),
         ]
       }
