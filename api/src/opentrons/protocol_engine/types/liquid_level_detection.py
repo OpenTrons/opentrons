@@ -41,29 +41,21 @@ class SimulatedProbeResult(BaseModel):
         """Bypass subtraction and just return self."""
         return self
 
-    def __gt__(
-        self, other: float | SimulatedProbeResult
-    ) -> float | SimulatedProbeResult:
+    def __gt__(self, other: float | SimulatedProbeResult) -> bool:
         """Bypass 'greater than' and just return self."""
-        return self
+        return True
 
-    def __lt__(
-        self, other: float | SimulatedProbeResult
-    ) -> float | SimulatedProbeResult:
+    def __lt__(self, other: float | SimulatedProbeResult) -> bool:
         """Bypass 'less than' and just return self."""
-        return self
+        return False
 
-    def __ge__(
-        self, other: float | SimulatedProbeResult
-    ) -> float | SimulatedProbeResult:
+    def __ge__(self, other: float | SimulatedProbeResult) -> bool:
         """Bypass 'greater than or eaqual to' and just return self."""
-        return self
+        return True
 
-    def __le__(
-        self, other: float | SimulatedProbeResult
-    ) -> float | SimulatedProbeResult:
-        """Bypass 'less than or eaqual to' and just return self."""
-        return self
+    def __le__(self, other: float | SimulatedProbeResult) -> bool:
+        """Bypass 'less than or equal to' and just return self."""
+        return False
 
     def __eq__(self, other: object) -> bool:
         """A SimulatedProbeResult should only be equal to the same instance of its class."""
