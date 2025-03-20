@@ -1,8 +1,8 @@
 import {
   getTrashBinAddressableAreaName,
   reduceCommandCreators,
-  curryCommandCreator,
   indentPyLines,
+  curryWithoutPython,
 } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
 import { dispenseInPlace, moveToAddressableArea } from '../atomic'
@@ -44,12 +44,12 @@ export const dispenseInTrash: CommandCreator<DispenseInTrashParams> = (
   })
 
   const commandCreators = [
-    curryCommandCreator(moveToAddressableArea, {
+    curryWithoutPython(moveToAddressableArea, {
       pipetteId,
       addressableAreaName,
       offset: ZERO_OFFSET,
     }),
-    curryCommandCreator(dispenseInPlace, {
+    curryWithoutPython(dispenseInPlace, {
       pipetteId,
       volume,
       flowRate,
