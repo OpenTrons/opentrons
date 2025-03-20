@@ -41,11 +41,41 @@ class SimulatedProbeResult(BaseModel):
         """Bypass subtraction and just return self."""
         return self
 
+    def __gt__(
+        self, other: float | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass subtraction and just return self."""
+        return self
+
+    def __lt__(
+        self, other: float | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass subtraction and just return self."""
+        return self
+
+    def __ge__(
+        self, other: float | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass subtraction and just return self."""
+        return self
+
+    def __le__(
+        self, other: float | SimulatedProbeResult
+    ) -> float | SimulatedProbeResult:
+        """Bypass subtraction and just return self."""
+        return self
+
     def __eq__(self, other: object) -> bool:
         """A SimulatedProbeResult should only be equal to the same instance of its class."""
         if not isinstance(other, SimulatedProbeResult):
             return False
         return self is other
+
+    def __neq__(self, other: object) -> bool:
+        """A SimulatedProbeResult should only be equal to the same instance of its class."""
+        if not isinstance(other, SimulatedProbeResult):
+            return False
+        return self is not other
 
     def simulate_probed_aspirate_dispense(self, volume: float) -> None:
         """Record the current state of aspirate/dispense calls."""
