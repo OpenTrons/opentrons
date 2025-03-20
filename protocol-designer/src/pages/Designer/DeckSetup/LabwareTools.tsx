@@ -45,6 +45,7 @@ import { getRobotType } from '../../../file-data/selectors'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getEnableStacking } from '../../../feature-flags/selectors'
 import {
   selectLabware,
   selectNestedLabware,
@@ -65,7 +66,6 @@ import type { ModuleOnDeck } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type { CategoryExpand } from './DeckSetupTools'
-import { getEnableStacking } from '../../../feature-flags/selectors'
 
 const STANDARD_X_DIMENSION = 127.75
 const STANDARD_Y_DIMENSION = 85.48
