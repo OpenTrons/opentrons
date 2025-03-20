@@ -1,4 +1,4 @@
-import { useMemo, useState, Fragment } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
@@ -72,6 +72,7 @@ export function StartingDeckContainer(): JSX.Element {
   const [hoveredLabware, setHoveredLabware] = useState<string | null>(null)
   const [hoveredModule, setHoveredModule] = useState<ModuleModel | null>(null)
   const [hoveredFixture, setHoveredFixture] = useState<Fixture | null>(null)
+  console.log('zoomIn', zoomIn)
   const trash = Object.values(activeDeckSetup.additionalEquipmentOnDeck).find(
     ae => ae.name === 'trashBin'
   )
@@ -95,7 +96,6 @@ export function StartingDeckContainer(): JSX.Element {
   const [viewBoxX, viewBoxY] = deckDef.cornerOffsetFromOrigin
   const [viewBoxWidth, viewBoxHeight] = deckDef.dimensions
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
-
   const [viewBox, setViewBox] = useState<string>(initialViewBox)
 
   const isZoomed = Object.values(zoomIn).some(val => val != null)
@@ -155,11 +155,6 @@ export function StartingDeckContainer(): JSX.Element {
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
 
-  let containerPadding = '0'
-  if (!isZoomed) {
-    containerPadding = SPACING.spacing40
-  }
-
   return (
     <>
       <Flex
@@ -168,7 +163,7 @@ export function StartingDeckContainer(): JSX.Element {
         width="100%"
         height="100%"
         flexDirection={DIRECTION_COLUMN}
-        padding={containerPadding}
+        padding={isZoomed ? '0' : SPACING.spacing40}
         justifyContent={JUSTIFY_CENTER}
         position="relative"
         maxHeight="auto"
@@ -201,7 +196,6 @@ export function StartingDeckContainer(): JSX.Element {
               deckDef={deckDef}
               viewBox={viewBox}
               outline="auto"
-              zoomed={zoomIn.slot != null}
               borderRadius={BORDERS.borderRadius12}
             >
               {() => (
