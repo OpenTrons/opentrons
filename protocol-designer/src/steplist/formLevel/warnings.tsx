@@ -1,10 +1,11 @@
 import {
-  PIPETTE_NAMES_MAP,
+  MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME,
   getIncompatibleLiquidClasses,
   getWellTotalVolume,
+  PIPETTE_NAMES_MAP,
 } from '@opentrons/shared-data'
-import type { FormError } from './errors'
 import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type { FormError } from './errors'
 
 /*******************
  ** Warning Messages **
@@ -184,7 +185,9 @@ export const lowVolumeTransfer = (
 ): FormWarning | null => {
   const { volume } = fields
 
-  return volume <= 10 ? lowVolumeTransferWarning() : null
+  return volume <= MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME
+    ? lowVolumeTransferWarning()
+    : null
 }
 
 export const incompatiblePipettePath = (

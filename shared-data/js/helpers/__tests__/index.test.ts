@@ -1,7 +1,7 @@
 import { describe, expect, vi, it } from 'vitest'
 
 import {
-  getDisableLiquidClasses,
+  getDisabledLiquidClasses,
   getIncompatibleLiquidClasses,
   getSortedLiquidClassDefs,
 } from '..'
@@ -124,10 +124,10 @@ describe('getIncompatibleLiquidClasses', () => {
   })
 })
 
-describe('getDisableLiquidClasses', () => {
+describe('getDisabledLiquidClasses', () => {
   it('should returns a list of liquid class names that should be diasbled given incompatible volume', () => {
     const valuesForLiquidClasses = { volume: 10, pipette: 'mockId' }
-    const disabledLiquidClasses = getDisableLiquidClasses(
+    const disabledLiquidClasses = getDisabledLiquidClasses(
       valuesForLiquidClasses,
       'mockPipetteModel1'
     )

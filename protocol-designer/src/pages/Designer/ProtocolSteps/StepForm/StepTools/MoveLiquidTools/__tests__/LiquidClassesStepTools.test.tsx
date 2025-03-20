@@ -54,6 +54,7 @@ describe('LiquidClassesStepMoveLiquidTools', () => {
   })
 
   it('renders fields and buttons', () => {
+    props.formData.volume = 11
     render(props)
     screen.getByText('Apply liquid class settings for this transfer')
     screen.getByText("Don't use a liquid class")

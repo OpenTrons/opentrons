@@ -53,7 +53,7 @@
   "pipette": "af1e518a-0e00-4270-a22a-ca5b43daff30",
   "preWetTip": false,
   "tipRack": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-  "volume": 20,
+  "volume": "10",
   "stepType": "moveLiquid",
   "stepName": "transfer",
   "stepDetails": "",

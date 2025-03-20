@@ -1,6 +1,9 @@
 import uniq from 'lodash/uniq'
 
-import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
+import {
+  MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME,
+  OPENTRONS_LABWARE_NAMESPACE,
+} from '../constants'
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import type {
@@ -456,7 +459,7 @@ export interface ValuesForLiquidClasses {
   tipRack?: string | null
   pipette?: string | null
 }
-export const getDisableLiquidClasses = (
+export const getDisabledLiquidClasses = (
   values: ValuesForLiquidClasses,
   pipetteModel: string
 ): Set<LiquidClassesOption> | null => {
@@ -464,7 +467,7 @@ export const getDisableLiquidClasses = (
   if (pipette == null) return null
   const disabledLiquidClasses = new Set<LiquidClassesOption>()
 
-  if (volume != null && volume <= 10) {
+  if (volume != null && volume <= MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME) {
     disabledLiquidClasses.add('Aqueous')
     disabledLiquidClasses.add('Viscous')
     disabledLiquidClasses.add('Volatile')
