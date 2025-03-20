@@ -507,6 +507,8 @@ def run(ctx: ProtocolContext) -> None:
 
     # DETECT LIQUID
     # NOTE: pipette should already have tip attached
+    # FIXME: remove this once positioning bug is fixed in PE
+    pipette.move_to(dye_src_well.top())
     pipette.require_liquid_presence(dye_src_well)
     if not ctx.is_simulating():
         assert dye_src_well.current_liquid_volume() >= min_dye_required_in_reservoir, (
@@ -520,9 +522,7 @@ def run(ctx: ProtocolContext) -> None:
 
         # MOVE PLATE TO DECK SLOT
         # TODO: stack plate w/ lids
-        ctx.move_labware(
-            dst_plate, new_location=SLOTS["dst_plate"], use_gripper=True
-        )
+        ctx.move_labware(dst_plate, new_location=SLOTS["dst_plate"], use_gripper=True)
 
         for trial in test_trials:
             # ADD DYE TO TEST-LABWARE
@@ -532,15 +532,21 @@ def run(ctx: ProtocolContext) -> None:
                 # NOTE: 1st trial has tip already attached
                 if not pipette.has_tip:
                     pipette.pick_up_tip()
-                    # FIXME: remove this once positioning bug is fixed in PE
-                    pipette.move_to(dye_src_well.top())
+                # FIXME: remove this once positioning bug is fixed in PE
+                pipette.move_to(dye_src_well.top())
                 pipette.aspirate(
                     volume=min(remaining_ul, pipette.max_volume),
-                    location=dye_src_well.meniscus(target="dynamic", z=trial.submerge_mm)
+                    location=dye_src_well.meniscus(
+                        target="dynamic", z=trial.submerge_mm
+                    ),
                 )
+                # FIXME: remove this once positioning bug is fixed in PE
+                pipette.move_to(trial.test_well.top())
                 pipette.dispense(
                     volume=pipette.current_volume,
-                    location=trial.test_well.meniscus(target="dynamic", z=DISPENSE_MM_FROM_MENISCUS),
+                    location=trial.test_well.meniscus(
+                        target="dynamic", z=DISPENSE_MM_FROM_MENISCUS
+                    ),
                     push_out=P1000_MAX_PUSH_OUT_UL,
                 )
             pipette.drop_tip()
@@ -548,22 +554,28 @@ def run(ctx: ProtocolContext) -> None:
             # REMOVE DYE FROM TEST-LABWARE
             print(f"removing {trial.ul_to_remove} uL")
             pipette.pick_up_tip()
-            # FIXME: remove once horizontal crash bug is fixed
-            pipette._retract()
             if trial.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
+                # FIXME: remove this once positioning bug is fixed in PE
+                pipette.move_to(trial.test_well.top())
                 pipette.require_liquid_presence(trial.test_well)
+            # FIXME: remove this once positioning bug is fixed in PE
+            pipette.move_to(trial.test_well.top())
             pipette.aspirate(
                 volume=trial.ul_to_remove,
-                location=trial.test_well.meniscus(target="dynamic", z=trial.submerge_mm),
+                location=trial.test_well.meniscus(
+                    target="dynamic", z=trial.submerge_mm
+                ),
             )
 
             # MULTI-DISPENSE TO PLATE
             for w, v in zip(trial.destination_wells, trial.destination_volumes):
                 push_out = 0 if v < pipette.current_volume else P1000_MAX_PUSH_OUT_UL
+                # FIXME: remove this once positioning bug is fixed in PE
+                pipette.move_to(w.top())
                 pipette.dispense(
                     volume=v,
                     location=w.meniscus(target="dynamic", z=DISPENSE_MM_FROM_MENISCUS),
-                    push_out=push_out
+                    push_out=push_out,
                 )
             pipette.drop_tip()
 
