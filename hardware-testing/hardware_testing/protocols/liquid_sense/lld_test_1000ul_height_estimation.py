@@ -251,7 +251,7 @@ def _load_labware(
     # finally, load it as empty (why not?)
     try:
         labware_def_location = (
-            f"{get_shared_data_root()}/labware/definitions/3/{load_name}/"
+            f"{get_shared_data_root()}/labware/definitions/2/{load_name}/"
         )
         assert isdir(labware_def_location)
         labware_def_latest = sorted(listdir(labware_def_location))[-1]
