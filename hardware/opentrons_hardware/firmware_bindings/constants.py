@@ -244,6 +244,7 @@ class MessageId(int, Enum):
     max_sensor_value_request = 0x70
     max_sensor_value_response = 0x71
 
+    increase_evo_disp_count_request = 0x80
     batch_read_sensor_response = 0x81
     read_sensor_request = 0x82
     write_sensor_request = 0x83
@@ -446,6 +447,7 @@ class MotorUsageValueType(int, Enum):
     force_application_time = 0x3
     total_error_count = 0x4
     overpressure_error_count = 0x5
+    resin_tip_dispense_count = 0x6
 
 
 class MoveAckId(int, Enum):

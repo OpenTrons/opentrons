@@ -432,3 +432,7 @@ async def blow_out_in_place(
             public=EmptyResult(),
             state_update=StateUpdate().set_fluid_empty(pipette_id=pipette_id),
         )
+
+
+async def increase_evo_disp_count(pipette_id: str, pipetting: PipettingHandler) -> None:
+    await pipetting.increase_evo_disp_count(pipette_id)

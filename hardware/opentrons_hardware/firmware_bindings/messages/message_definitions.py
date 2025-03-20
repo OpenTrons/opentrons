@@ -1067,3 +1067,12 @@ class SendAccumulatedSensorDataRequest(BaseMessage):
     message_id: Literal[
         MessageId.send_accumulated_sensor_data
     ] = MessageId.send_accumulated_sensor_data
+
+
+@dataclass
+class IncreaseEvoTipDispenseCountRequestRequest(EmptyPayloadMessage):
+    """Send all the saved sensor data."""
+
+    message_id: Literal[
+        MessageId.increase_evo_disp_count_request
+    ] = MessageId.increase_evo_disp_count_request
