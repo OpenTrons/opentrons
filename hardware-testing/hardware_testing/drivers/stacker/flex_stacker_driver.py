@@ -74,6 +74,9 @@ class LEDPattern(Enum):
 class MotorStallError(RuntimeError):
     pass
 
+class CommandTimeoutError(RuntimeError):
+    pass
+
 FS_BAUDRATE = 115200
 DEFAULT_FS_TIMEOUT = 0.1
 FS_COMMAND_TERMINATOR = "\r\n"
@@ -123,6 +126,8 @@ class FlexStacker():
         self._stacker_connection = connection
         self._ack = FS_ACK.encode()
         self._stall = FS_STALL.encode()
+        self._stall_error = "ERR403:motor stall error"
+        self._timeout_error = "No response error"
         self.move_speed_x = MOVE_SPEED_X
         self.move_speed_up_z = MOVE_SPEED_UPZ
         self.move_speed_down_z = MOVE_SPEED_DOWNZ
@@ -213,8 +218,9 @@ class FlexStacker():
                 #print(f'Stall: {str_response}')
                 break
             end = time.time()
-            if (end-start) > 120:
-                str_response = b"OK\n"
+            total_time = end-start
+            if (total_time) > 30:
+                str_response = self._timeout_error
                 condition = False
 
         return str_response
@@ -471,11 +477,14 @@ class FlexStacker():
 
             #print(c)
             response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
-            stall_detection = "ERR403:motor stall error"
-            if stall_detection in response:
+            if self._stall_error in response:
                 self.disable_motor(AXIS.X)
                 self.disable_motor(AXIS.Z)
                 raise MotorStallError(f"Motor Stall Detected on {axis}!")
+            elif self._timeout_error in response:
+                self.disable_motor(AXIS.X)
+                self.disable_motor(AXIS.Z)
+                raise CommandTimeoutError(f"Command timeout on {axis}!")
             if direction == DIR.POSITIVE and axis == AXIS.X:
                 self.current_position.update({'X': self.current_position['X'] + distance})
             elif direction == DIR.NEGATIVE and axis == AXIS.X:
@@ -550,11 +559,14 @@ class FlexStacker():
                                                             )
         #print(c)
         response = self.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
-        stall_detection = "ERR403:motor stall error"
-        if stall_detection in response:
+        if self._stall_error in response:
             self.disable_motor(AXIS.X)
             self.disable_motor(AXIS.Z)
             raise MotorStallError(f"Motor Stall Detected on {axis}!")
+        elif self._timeout_error in response:
+            self.disable_motor(AXIS.X)
+            self.disable_motor(AXIS.Z)
+            raise CommandTimeoutError(f"Command timeout on {axis}!")
         if direction == DIR.POSITIVE_HOME and axis == AXIS.X:
             self.current_position.update({'X': TOTAL_TRAVEL_X})
         elif direction == DIR.NEGATIVE_HOME and axis == AXIS.X:
