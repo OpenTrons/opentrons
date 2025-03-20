@@ -332,6 +332,7 @@ class SensorType(int, Enum):
     pressure_temperature = 0x04
     humidity = 0x05
     temperature = 0x06
+    UNUSED = 0x07
 
 
 @unique
