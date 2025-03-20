@@ -102,7 +102,6 @@ export function mixUtil(args: {
       `location=${labwarePythonName}[${formatPyStr(
         well
       )}]${formatPyWellLocation(pythonWellLocation)}`,
-      //  Note: just wiring up the aspirate flow rate?
       `rate=(${aspirateFlowRateUlSec} / ${pipettePythonName}.flow_rate.aspirate) + (${dispenseFlowRateUlSec} / ${pipettePythonName}.flow_rate.dispense)`,
     ]
     return {
