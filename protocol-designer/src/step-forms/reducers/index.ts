@@ -1260,7 +1260,8 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
               location,
               pythonName: getAdditionalEquipmentPythonName(
                 'trashBin',
-                index + 1
+                index + 1,
+                location
               ),
             },
           }),
@@ -1345,7 +1346,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
           pythonName:
             name === 'stagingArea'
               ? undefined
-              : getAdditionalEquipmentPythonName(name, typeCount + 1),
+              : getAdditionalEquipmentPythonName(name, typeCount + 1, location),
         },
       }
     },
