@@ -43,8 +43,8 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
             ),
             pytest.raises(
                 RuntimeError,
-                match="Received submerge start location of Location\\(point=Point\\(x=4, y=5, z=6\\), labware=, is_meniscus=False\\)"
-                " and aspirate location of Location\\(point=Point\\(x=5, y=6, z=7\\), labware=, is_meniscus=False\\)."
+                match="Received submerge start location of Location\\(point=Point\\(x=4, y=5, z=6\\), labware=, meniscus_tracking=None\\)"
+                " and aspirate location of Location\\(point=Point\\(x=5, y=6, z=7\\), labware=, meniscus_tracking=None\\)."
                 " Submerge start location z should not be lower than the aspirate location z.",
             ),
         ),
@@ -57,8 +57,8 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
             ),
             pytest.raises(
                 RuntimeError,
-                match="Received retract end location of Location\\(point=Point\\(x=4, y=5, z=6\\), labware=, is_meniscus=False\\)"
-                " and dispense location of Location\\(point=Point\\(x=5, y=6, z=7\\), labware=, is_meniscus=False\\)."
+                match="Received retract end location of Location\\(point=Point\\(x=4, y=5, z=6\\), labware=, meniscus_tracking=None\\)"
+                " and dispense location of Location\\(point=Point\\(x=5, y=6, z=7\\), labware=, meniscus_tracking=None\\)."
                 " Retract end location z should not be lower than the dispense location z.",
             ),
         ),
@@ -102,7 +102,7 @@ def test_raise_only_if_pip_location_below_target(
             pytest.raises(
                 RuntimeError,
                 match="Retract end location Location\\(point=Point\\(x=4, y=5, z=6\\), labware=,"
-                " is_meniscus=False\\) is inside the liquid in well Well A1 of"
+                " meniscus_tracking=None\\) is inside the liquid in well Well A1 of"
                 " test_labware when it should be outside\\(above\\) the liquid.",
             ),
         ),
@@ -113,7 +113,7 @@ def test_raise_only_if_pip_location_below_target(
             pytest.raises(
                 RuntimeError,
                 match="Retract end location Location\\(point=Point\\(x=5, y=6, z=7\\), labware=,"
-                " is_meniscus=False\\) is inside the liquid in well Well A1 of"
+                " meniscus_tracking=None\\) is inside the liquid in well Well A1 of"
                 " test_labware when it should be outside\\(above\\) the liquid.",
             ),
         ),

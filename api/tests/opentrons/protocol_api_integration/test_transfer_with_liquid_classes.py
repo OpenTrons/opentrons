@@ -1678,7 +1678,7 @@ def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
 )
 @pytest.mark.parametrize(
     ["new_tip", "expected_number_of_calls"],
-    [("once", 1), ("always", 12), ("per_source", 12)],
+    [("always", 12), ("per source", 12)],
 )
 def test_water_transfer_with_lpd(
     simulated_protocol_context: ProtocolContext,
@@ -1867,6 +1867,14 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
             source=nest_plate.rows()[0],
             dest=arma_plate.rows()[0][0],
             new_tip="always",
+            trash_location=trash,
+        )
+        pipette_1k.transfer_liquid(
+            liquid_class=water,
+            volume=40,
+            source=nest_plate.rows()[0],
+            dest=arma_plate.rows()[0],
+            new_tip="once",
             trash_location=trash,
         )
         patched_liquid_probe.assert_not_called()
