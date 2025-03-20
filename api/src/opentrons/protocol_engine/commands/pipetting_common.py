@@ -297,7 +297,7 @@ async def dispense_while_tracking(
         pipetting.get_state_view().pipettes.get_aspirated_volume(pipette_id) or 0.0
     )
     is_full_dispense = bool(numpy.isclose(current_volume - volume, 0))
-    ready = push_out == 0 if push_out is not None else not is_full_dispense
+    ready: bool = push_out == 0 if push_out is not None else not is_full_dispense
     try:
         volume_dispensed = await pipetting.dispense_while_tracking(
             pipette_id=pipette_id,
