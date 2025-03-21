@@ -6,10 +6,10 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_AUTO,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
@@ -58,7 +58,6 @@ export function ProtocolSteps(): JSX.Element {
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
-  // Note (02/03/25:kk) use DrraggableSidebar's initial width
   const [targetWidth, setTargetWidth] = useState<number>(235)
 
   const currentHoveredStepId = useSelector(getHoveredStepId)
@@ -82,54 +81,51 @@ export function ProtocolSteps(): JSX.Element {
       backgroundColor={COLORS.grey10}
       height="calc(100vh - 4rem)"
       width="100%"
-      minHeight={FLEX_MAX_CONTENT}
-      id="container"
     >
       <Flex height="100%" padding={SPACING.spacing12}>
         <DraggableSidebar setTargetWidth={setTargetWidth} />
       </Flex>
       <Flex
-        alignItems={ALIGN_CENTER}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
         flex="2.85"
-        paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
         height="100%"
         position={POSITION_RELATIVE}
+        paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
+        overflow={OVERFLOW_AUTO}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing24}
           width={CONTENT_MAX_WIDTH}
-          height="100%"
           justifyContent={JUSTIFY_CENTER}
           paddingY={SPACING.spacing120}
         >
-          {showTimelineAlerts ? (
+          {showTimelineAlerts && (
             <TimelineAlerts
               justifyContent={JUSTIFY_CENTER}
               width="100%"
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing4}
             />
-          ) : null}
+          )}
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
             height="2.25rem"
           >
-            {currentStep != null && hoveredTerminalItem == null ? (
+            {currentStep && hoveredTerminalItem == null && (
               <StyledText desktopStyle="headingSmallBold">
                 {i18n.format(currentStep.stepName, 'titleCase')}
               </StyledText>
-            ) : null}
+            )}
             {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
-            currentHoveredStepId == null ? (
-              <StyledText desktopStyle="headingSmallBold">
-                {t(hoveredTerminalItem ?? selectedTerminalItem)}
-              </StyledText>
-            ) : null}
-
+              currentHoveredStepId == null && (
+                <StyledText desktopStyle="headingSmallBold">
+                  {t(hoveredTerminalItem ?? selectedTerminalItem)}
+                </StyledText>
+              )}
             <ToggleGroup
               selectedValue={deckView}
               leftText={leftString}
@@ -152,7 +148,6 @@ export function ProtocolSteps(): JSX.Element {
             ) : (
               <OffDeck tab="protocolSteps" />
             )}
-            {/* avoid shifting the deck view container */}
             <Flex
               height="5.5rem"
               opacity={formData == null ? 1 : 0}
@@ -165,18 +160,15 @@ export function ProtocolSteps(): JSX.Element {
             </Flex>
           </Flex>
         </Flex>
-        {enableHotKeyDisplay ? (
-          <HotKeyDisplay targetWidth={targetWidth} />
-        ) : null}
+        {enableHotKeyDisplay && <HotKeyDisplay targetWidth={targetWidth} />}
       </Flex>
-      {formData == null && selectedSubstep ? (
-        <SubStepsToolbox stepId={selectedSubstep} />
-      ) : null}
-      <Flex padding={SPACING.spacing12}>
+      <Flex height="100%" padding={SPACING.spacing12}>
         <StepForm />
       </Flex>
-
-      {isMultiSelectMode ? <BatchEditToolbox /> : null}
+      {isMultiSelectMode && <BatchEditToolbox />}
+      {formData == null && selectedSubstep && (
+        <SubStepsToolbox stepId={selectedSubstep} />
+      )}
     </Flex>
   )
 }

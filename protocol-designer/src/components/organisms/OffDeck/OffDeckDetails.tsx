@@ -79,11 +79,7 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
       <Flex
         flex="0 0 auto"
         width={OFF_DECK_MAP_WIDTH}
-        height={
-          tab === 'startingDeck'
-            ? OFF_DECK_MAP_HEIGHT
-            : OFF_DECK_MAP_HEIGHT_FOR_STEP
-        }
+        height="100%"
         alignItems={ALIGN_CENTER}
         borderRadius={SPACING.spacing12}
         padding={`${SPACING.spacing16} ${SPACING.spacing40}`}
