@@ -462,3 +462,7 @@ class FlexBackend(Protocol):
 
     async def get_hepa_uv_state(self) -> Optional[HepaUVState]:
         ...
+
+    async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
+        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
+        ...

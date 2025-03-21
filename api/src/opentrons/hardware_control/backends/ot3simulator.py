@@ -871,3 +871,6 @@ class OT3Simulator(FlexBackend):
         """This is something we only use in the simulator.
         It is required so that PE simulations using ot3api don't break."""
         self._sim_tip_state[mount] = status
+
+    async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
+        pass
