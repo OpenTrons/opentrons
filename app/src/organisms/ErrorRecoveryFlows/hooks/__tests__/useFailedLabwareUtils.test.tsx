@@ -189,7 +189,9 @@ const render = (props: ComponentProps<typeof TestWrapper>) => {
 }
 
 describe('useRelevantFailedLwLocations', () => {
-  const mockRunRecord = { data: { modules: [], labware: [] } } as any
+  const mockRunRecord = {
+    data: { modules: [{ id: 'module-id' }], labware: [] },
+  } as any
   const mockFailedLabware = {
     location: { slotName: 'D1' },
   } as any
@@ -208,6 +210,38 @@ describe('useRelevantFailedLwLocations', () => {
 
     screen.getByText('Current Loc: Slot D1')
     screen.getByText('New Loc: null')
+
+    const { result } = renderHook(() =>
+      useRelevantFailedLwLocations({
+        failedLabware: mockFailedLabware,
+        failedCommandByRunRecord: mockFailedCommand,
+        runRecord: mockRunRecord,
+        errorKind: ERROR_KINDS.GENERAL_ERROR,
+      })
+    )
+
+    expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
+    expect(result.current.newLoc).toBeNull()
+  })
+
+  it('should return current location for flex stacker commands', () => {
+    const mockFailedCommand = {
+      commandType: 'flexStacker/retrive',
+      location: { slotName: 'D3' },
+      params: {
+        moduleId: 'module-id',
+      },
+    } as any
+
+    render({
+      failedLabware: mockFailedLabware,
+      failedCommandByRunRecord: mockFailedCommand,
+      runRecord: mockRunRecord,
+      errorKind: ERROR_KINDS.GENERAL_ERROR,
+    })
+
+    screen.getByText('Current Loc: Stacker C')
+    screen.getByText('New Loc: Slot D3')
 
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
