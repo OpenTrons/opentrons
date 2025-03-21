@@ -15,7 +15,12 @@ import {
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { reduceCommandCreators } from './index'
-import { dispense } from '../commandCreators/atomic'
+import {
+  delay,
+  dispense,
+  moveToAddressableArea,
+  moveToWell,
+} from '../commandCreators/atomic'
 import {
   airGapInTrash,
   blowOutInTrash,
@@ -24,9 +29,8 @@ import {
   airGapInWasteChute,
   blowOutInWasteChute,
   dispenseInWasteChute,
-  delayInWasteChute,
-  delayInTrash,
 } from '../commandCreators/compound'
+import { ZERO_OFFSET } from '../constants'
 import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import { curryCommandCreator } from './curryCommandCreator'
 import type {
@@ -52,7 +56,6 @@ import type {
   RobotState,
   SourceAndDest,
 } from '../types'
-import { delayInWell } from '../commandCreators/compound/delayInWell'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -742,28 +745,39 @@ export const moveAndDelayLocationHelper: CommandCreator<MoveAndDelayLocationHelp
 
   if (well != null && trashOrLabware === 'labware') {
     commands = [
-      curryCommandCreator(delayInWell, {
-        destinationId,
-        well,
-        zOffset,
-        seconds,
-        pipetteId,
+      curryCommandCreator(moveToWell, {
+        pipetteId: pipetteId,
+        labwareId: destinationId,
+        wellName: well,
+        wellLocation: {
+          origin: 'bottom',
+          offset: { x: 0, y: 0, z: zOffset },
+        },
+      }),
+      curryCommandCreator(delay, {
+        seconds: seconds,
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
     commands = [
-      curryCommandCreator(delayInWasteChute, {
-        destinationId,
-        seconds,
+      curryCommandCreator(moveToAddressableArea, {
         pipetteId,
+        fixtureId: destinationId,
+        offset: ZERO_OFFSET,
+      }),
+      curryCommandCreator(delay, {
+        seconds: seconds,
       }),
     ]
   } else {
     commands = [
-      curryCommandCreator(delayInTrash, {
-        destinationId,
-        seconds,
+      curryCommandCreator(moveToAddressableArea, {
         pipetteId,
+        fixtureId: destinationId,
+        offset: ZERO_OFFSET,
+      }),
+      curryCommandCreator(delay, {
+        seconds: seconds,
       }),
     ]
   }
