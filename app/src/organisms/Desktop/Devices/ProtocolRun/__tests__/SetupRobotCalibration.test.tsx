@@ -94,7 +94,7 @@ describe('SetupRobotCalibration', () => {
   })
 
   it('changes Proceed CTA copy based on next step', () => {
-    render({ nextStep: 'labware_setup_step' })
+    render({ nextStep: 'labware_liquids_setup_step' })
     screen.getByRole('button', { name: 'Proceed to labware' })
   })
 

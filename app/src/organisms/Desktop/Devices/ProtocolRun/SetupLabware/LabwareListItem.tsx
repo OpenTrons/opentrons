@@ -57,12 +57,9 @@ import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTyp
 const LabwareRow = styled.div`
   display: ${DISPLAY_GRID};
   grid-template-columns: 90px 12fr;
-  border-style: ${BORDERS.styleSolid};
-  border-width: 1px;
-  border-color: ${COLORS.grey30};
+  background-color: ${COLORS.grey20};
   border-radius: ${BORDERS.borderRadius4};
-  padding: ${SPACING.spacing12} ${SPACING.spacing16} ${SPACING.spacing12}
-    ${SPACING.spacing24};
+  padding: ${SPACING.spacing12} ${SPACING.spacing16} ${SPACING.spacing12};
 `
 
 interface LabwareListItemProps extends LabwareSetupItem {
@@ -248,7 +245,11 @@ export function LabwareListItem(
 
   return (
     <LabwareRow>
-      <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2} width="5rem">
+      <Flex
+        alignItems={ALIGN_CENTER}
+        gridGap={SPACING.spacing2}
+        width="6.25rem"
+      >
         {slotInfo != null && isFlex ? (
           <DeckInfoLabel deckLabel={slotInfo} />
         ) : (
@@ -259,9 +260,16 @@ export function LabwareListItem(
             {slotInfo}
           </StyledText>
         )}
+        {moduleType != null ? (
+          <DeckInfoLabel iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]} />
+        ) : null}
         {isStacked ? <DeckInfoLabel iconName="stacked" /> : null}
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing12}
+        marginLeft={SPACING.spacing24}
+      >
         <>
           <Flex>
             {showLabwareSVG && topLabwareDefinition != null ? (

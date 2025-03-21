@@ -38,11 +38,11 @@ export function SetupLabwareList(
     >
       <Flex
         gridGap={SPACING.spacing16}
-        paddingLeft={SPACING.spacing24}
+        paddingLeft={SPACING.spacing16}
         paddingTop={SPACING.spacing20}
       >
         <StyledText
-          width="5rem"
+          width="6.25rem"
           desktopStyle="bodyDefaultRegular"
           color={COLORS.grey60}
         >

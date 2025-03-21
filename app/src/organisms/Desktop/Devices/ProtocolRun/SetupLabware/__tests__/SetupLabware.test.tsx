@@ -94,14 +94,14 @@ describe('SetupLabware', () => {
     vi.resetAllMocks()
   })
 
-  it('should render the list view, clicking the toggle button will turn to map view', () => {
+  it('should render the map view, clicking the toggle button will turn to list view', () => {
     render()
-    screen.getByText('mock setup labware list')
-    screen.getByRole('button', { name: 'List View' })
-    screen.getByRole('button', { name: 'Confirm placements' })
-    const mapView = screen.getByRole('button', { name: 'Map View' })
-    fireEvent.click(mapView)
     screen.getByText('mock setup labware map')
+    screen.getByRole('button', { name: 'Map View' })
+    screen.getByRole('button', { name: 'Confirm placements' })
+    const listView = screen.getByRole('button', { name: 'List View' })
+    fireEvent.click(listView)
+    screen.getByText('mock setup labware list')
   })
 
   it('disables the confirmation button if the run has already started', () => {
