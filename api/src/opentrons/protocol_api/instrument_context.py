@@ -1898,7 +1898,7 @@ class InstrumentContext(publisher.CommandPublisher):
             limit) with the pressure sensors disabled can damage the pipette.
 
 
-        :param location: Tells the robot where to The location into which to dispense.
+        :param location: Tells the robot where to dispense.
         :type location: :py:class:`~.types.Location`
 
         :param volume: The volume that the plunger should displace, in µL. Does not directly relate
@@ -1907,7 +1907,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :param rate: How quickly the plunger moves to displace the commanded volume. The plunger speed
                      in µL/s is calculated as ``rate`` multiplied by
-                     :py:attr:`flow_rate.dispense<flow_rate>`. This rate oes not directly relate to
+                     :py:attr:`flow_rate.dispense<flow_rate>`. This rate does not directly relate to
                      the flow rate of liquid out of the resin tip.
 
                      The default value of ``10.0`` is recommended.
