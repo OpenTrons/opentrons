@@ -43,7 +43,7 @@ import type {
   UpdateConflictTimestampAction,
   ConflictTimestampInfo,
 } from '../types'
-import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
+import type { StoredLabwareOffset } from '@opentrons/api-client'
 
 export const proceedStep = (
   runId: string,

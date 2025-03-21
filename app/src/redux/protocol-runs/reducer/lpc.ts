@@ -32,8 +32,10 @@ import {
 } from './transforms'
 
 import type {
+  LPCLabwareInfo,
   LPCWizardAction,
   LPCWizardState,
+  OffsetSources,
   SelectedLwOverview,
 } from '../types'
 
@@ -238,15 +240,41 @@ export function LPCReducer(
       case UPDATE_CONFLICT_TIMESTAMP: {
         const { info } = action.payload
 
+        const noDbOffsets =
+          state.labwareInfo.initialDatabaseOffsets.length === 0
+
+        const offsetSource = (): OffsetSources => {
+          if (info.timestamp == null) {
+            if (noDbOffsets) {
+              return OFFSETS_FROM_RUN_RECORD
+            } else {
+              return OFFSETS_FROM_DATABASE
+            }
+          } else {
+            return OFFSETS_CONFLICT
+          }
+        }
+
+        const updatedLw = (): LPCLabwareInfo['labware'] => {
+          switch (offsetSource()) {
+            case OFFSETS_FROM_RUN_RECORD: {
+              return updateLPCLabwareInfoFrom(
+                state.labwareInfo.initialRunRecordOffsets,
+                state.labwareInfo.labware
+              )
+            }
+            default:
+              return state.labwareInfo.labware
+          }
+        }
+
         return {
           ...state,
           labwareInfo: {
             ...state.labwareInfo,
             conflictTimestampInfo: info,
-            sourcedOffsets:
-              info.timestamp != null
-                ? OFFSETS_CONFLICT
-                : OFFSETS_PENDING_SELECTION,
+            sourcedOffsets: offsetSource(),
+            labware: updatedLw(),
           },
         }
       }
