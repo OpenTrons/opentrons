@@ -14,7 +14,7 @@ import {
   LPC_STEPS,
   OFFSETS_SOURCE_INITIALIZING,
 } from '/app/redux/protocol-runs'
-import { getActivePipetteId } from './utils'
+import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
 
 import type { Run, StoredLabwareOffset } from '@opentrons/api-client'
 import type { LPCWizardState, LPCLabwareInfo } from '/app/redux/protocol-runs'
@@ -33,11 +33,8 @@ export interface UseLPCInitialStateProps {
   flexStoredOffsets: StoredLabwareOffset[] | undefined
 }
 
-// TODO(jh, 03-19-25): There's a lot of conditional, initial state patching
-//  that occurs here and upstream. For clarity, consolidate.
-
-// Update the LPC store if underlying store data is sufficiently present or changes.
-export function useUpdateLPCStore({
+// Initialize the LPC store if underlying store data is sufficiently presen.
+export function useInitLPCStore({
   analysis,
   runId,
   labwareDefs,
@@ -63,7 +60,7 @@ export function useUpdateLPCStore({
     flexStoredOffsets !== undefined &&
     runRecordOffsets !== undefined
 
-  // Initialize the store.
+  // Initialize the store. This effect should only occur once.
   useEffect(() => {
     if (isReadyToInit && robotType === FLEX_ROBOT_TYPE) {
       const activePipetteId = getActivePipetteId(analysis.pipettes)
@@ -93,19 +90,4 @@ export function useUpdateLPCStore({
       dispatch(updateLPC(runId, initialState))
     }
   }, [isReadyToInit])
-
-  // TOME TODO: Probably make a more specific state update just for the deck fonig
-  //  and use it elsewhere. Change the name back to init.
-
-  // Update the store.
-  useEffect(() => {
-    if (lpcState != null && runId != null) {
-      const updatedState: LPCWizardState = {
-        ...lpcState,
-        deckConfig: deckConfig ?? lpcState.deckConfig,
-      }
-
-      dispatch(updateLPC(runId, updatedState))
-    }
-  }, [deckConfig, rest.labwareInfo])
 }

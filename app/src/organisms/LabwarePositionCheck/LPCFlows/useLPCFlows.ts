@@ -18,8 +18,8 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
 import {
   useLPCLabwareInfo,
-  useUpdateLPCStore,
   useCompatibleAnalysis,
+  useUpdateDeckConfig,
 } from './hooks'
 import { useOffsetConflictTimestamp } from './useOffsetConflictTimestamp'
 
@@ -28,6 +28,7 @@ import type {
   LegacySupportLPCFlowsProps,
   LPCFlowsProps,
 } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
+import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
@@ -97,10 +98,8 @@ export function useLPCFlows({
   })
 
   useOffsetConflictTimestamp(isFlex, runId, runRecord)
-
-  const isFlexLPCInitializing = flexOffsets == null
-
-  useUpdateLPCStore({
+  useUpdateDeckConfig(runId, deckConfig)
+  useInitLPCStore({
     runId,
     runRecord,
     analysis: compatibleRobotAnalysis,
@@ -177,6 +176,8 @@ export function useLPCFlows({
       })
     }
   }
+
+  const isFlexLPCInitializing = flexOffsets == null
 
   const showLPC =
     runId != null &&

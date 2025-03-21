@@ -1,3 +1,4 @@
 export * from './useLPCLabwareInfo'
-export * from './useUpdateLPCStore'
+export * from './useInitLPCStore'
 export * from './useCompatibleAnalysis'
+export * from './useUpdateDeckConfig'
