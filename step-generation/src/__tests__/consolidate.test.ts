@@ -140,6 +140,7 @@ describe('consolidate single-channel', () => {
           name: 'wasteChute',
           id: 'wasteChuteId',
           location: 'cutoutD3',
+          pythonName: 'mock_waste_chute',
         },
       },
     }
@@ -618,6 +619,7 @@ describe('consolidate single-channel', () => {
           name: 'trashBin',
           id: 'trashBinId',
           location: 'cutoutA3',
+          pythonName: 'mock_trash_bin',
         },
       },
     }
@@ -1156,6 +1158,7 @@ describe('consolidate single-channel', () => {
             name: 'trashBin',
             id: 'trashBinId',
             location: 'cutoutA3',
+            pythonName: 'mock_trash_bin',
           },
         },
       }

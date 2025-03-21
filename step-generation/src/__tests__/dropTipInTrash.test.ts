@@ -30,6 +30,7 @@ const invariantContext: InvariantContext = {
       name: 'trashBin' as const,
       location: mockCutout,
       id: mockTrashBinId,
+      pythonName: 'mock_trash_bin',
     },
   },
 }

@@ -9,7 +9,11 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInformation, formatTime } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type {
+  StagingAreaEntity,
+  TrashBinEntity,
+  WasteChuteEntity,
+} from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../../step-forms'
 
 const mockLabOnDeck1 = {
@@ -61,7 +65,12 @@ const mockOt2DeckSetup: AllTemporalPropertiesForTimelineFrame = {
     },
   },
   additionalEquipmentOnDeck: {
-    trash: { name: 'trashBin', id: 'mockTrashId', location: '12' },
+    trash: {
+      name: 'trashBin',
+      id: 'mockTrashId',
+      location: '12',
+      pythonName: 'mock_trash_bin',
+    },
   },
 }
 
@@ -80,18 +89,20 @@ const mockHSFlex = {
   moduleState: {} as any,
   pythonName: 'mockPythonName',
 }
-const mockTrash = {
-  name: 'trashBin' as AdditionalEquipmentName,
+const mockTrash: TrashBinEntity = {
+  name: 'trashBin',
   id: 'mockTrashId',
   location: 'cutoutA3',
+  pythonName: 'mock_trash_bin',
 }
-const mockWasteChute = {
-  name: 'wasteChute' as AdditionalEquipmentName,
+const mockWasteChute: WasteChuteEntity = {
+  name: 'wasteChute',
   id: 'mockWasteChuteId',
   location: WASTE_CHUTE_CUTOUT,
+  pythonName: 'mock_waste_chute',
 }
-const mockStagingArea = {
-  name: 'stagingArea' as AdditionalEquipmentName,
+const mockStagingArea: StagingAreaEntity = {
+  name: 'stagingArea',
   id: 'mockStagingAreaId',
   location: WASTE_CHUTE_CUTOUT,
 }

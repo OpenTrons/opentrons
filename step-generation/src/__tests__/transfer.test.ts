@@ -115,6 +115,7 @@ describe('pick up tip if no tip on pipette', () => {
           name: 'wasteChute',
           id: 'wasteChuteId',
           location: 'cutoutD3',
+          pythonName: 'mock_waste_chute',
         },
       },
     }
@@ -246,6 +247,7 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
         name: 'wasteChute',
         id: mockWasteChuteId,
         location: WASTE_CHUTE_CUTOUT,
+        pythonName: 'mock_waste_chute',
       },
     },
   }

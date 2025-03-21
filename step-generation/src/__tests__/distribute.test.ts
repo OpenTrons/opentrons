@@ -1938,6 +1938,7 @@ it('should return an error for the labware already being discarded in previous s
         name: 'wasteChute',
         id: mockWasteChuteId,
         location: WASTE_CHUTE_CUTOUT,
+        pythonName: 'mock_waste_chute',
       },
     },
   } as InvariantContext

@@ -368,6 +368,7 @@ describe('moveLabware', () => {
           name: 'wasteChute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
+          pythonName: 'mock_waste_chute',
         },
       },
     } as InvariantContext
@@ -674,6 +675,7 @@ describe('moveLabware', () => {
           name: 'wasteChute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
+          pythonName: 'mock_waste_chute',
         },
       },
     } as InvariantContext

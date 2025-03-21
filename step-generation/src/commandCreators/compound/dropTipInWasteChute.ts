@@ -1,7 +1,11 @@
 import { curryWithoutPython, reduceCommandCreators } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
 import { dropTipInPlace, moveToAddressableArea } from '../atomic'
-import type { CommandCreator, CurriedCommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  CurriedCommandCreator,
+  WasteChuteEntity,
+} from '../../types'
 
 interface DropTipInWasteChuteArgs {
   pipetteId: string
@@ -24,8 +28,10 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
     commandCreators = []
   } else {
     const pipettePythonName = pipetteEntities[pipetteId].pythonName
-    const wasteChutePythonName =
-      additionalEquipmentEntities[wasteChuteId].pythonName
+    const wasteChuteEntity = additionalEquipmentEntities[
+      wasteChuteId
+    ] as WasteChuteEntity
+    const wasteChutePythonName = wasteChuteEntity.pythonName
     const pythonCommandCreator: CurriedCommandCreator = () => ({
       commands: [],
       python: `${pipettePythonName}.drop_tip(${wasteChutePythonName})`,

@@ -142,6 +142,7 @@ export function makeContext(): InvariantContext {
       id: FIXED_TRASH_ID,
       name: 'trashBin',
       location: 'cutoutA3',
+      pythonName: 'protocol.fixed_trash',
     },
   }
   const pipetteEntities: PipetteEntities = {

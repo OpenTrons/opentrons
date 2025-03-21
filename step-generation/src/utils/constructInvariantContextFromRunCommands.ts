@@ -124,6 +124,7 @@ export function constructInvariantContextFromRunCommands(
             name,
             id,
             location,
+            pythonName: 'n/a',
           },
         }
         return {

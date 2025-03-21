@@ -845,6 +845,7 @@ exports[`snapshot tests > makeContext 1`] = `
       "id": "fixedTrash",
       "location": "cutoutA3",
       "name": "trashBin",
+      "pythonName": "protocol.fixed_trash",
     },
   },
   "config": {

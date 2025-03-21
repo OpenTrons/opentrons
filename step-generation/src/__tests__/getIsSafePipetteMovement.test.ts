@@ -97,7 +97,12 @@ describe('getIsSafePipetteMovement', () => {
         moduleEntities: {},
         liquidEntities: {},
         additionalEquipmentEntities: {
-          trashBin: { name: 'trashBin', location: 'A3', id: 'trashBin' },
+          trashBin: {
+            name: 'trashBin',
+            location: 'A3',
+            id: 'trashBin',
+            pythonName: 'mock_trash_bin',
+          },
         },
         config: {} as any,
       },

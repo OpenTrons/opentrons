@@ -8,7 +8,11 @@ import type {
   CutoutId,
   MoveToAddressableAreaParams,
 } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  TrashBinEntity,
+  WasteChuteEntity,
+} from '../../types'
 
 interface MoveToAddressableAreaAtomicParams
   extends Omit<MoveToAddressableAreaParams, 'addressableAreaName'> {
@@ -24,7 +28,9 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaAtomicPa
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteChannels = pipetteEntity.spec.channels
   const pipettePythonName = pipetteEntity.pythonName
-  const fixtureEntity = additionalEquipmentEntities[fixtureId]
+  const fixtureEntity = additionalEquipmentEntities[fixtureId] as
+    | TrashBinEntity
+    | WasteChuteEntity
   const fixturePythonName = fixtureEntity.pythonName
 
   let addressableAreaName: AddressableAreaName = getWasteChuteAddressableAreaNamePip(

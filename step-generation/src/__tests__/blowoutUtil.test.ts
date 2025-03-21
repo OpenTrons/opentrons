@@ -81,6 +81,7 @@ describe('blowoutLocationHelper', () => {
           id: wasteChuteId,
           name: 'wasteChute',
           location: 'cutoutD3',
+          pythonName: 'mock_waste_chute',
         },
       },
     }

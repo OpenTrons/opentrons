@@ -5,7 +5,11 @@ import {
 } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
 import { dispenseInPlace, moveToAddressableArea } from '../atomic'
-import type { CommandCreator, CurriedCommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  CurriedCommandCreator,
+  WasteChuteEntity,
+} from '../../types'
 
 interface DispenseInWasteChuteArgs {
   pipetteId: string
@@ -21,8 +25,10 @@ export const dispenseInWasteChute: CommandCreator<DispenseInWasteChuteArgs> = (
 ) => {
   const { pipetteId, flowRate, volume, wasteChuteId } = args
   const { pipetteEntities, additionalEquipmentEntities } = invariantContext
-  const wasteChutePythonName =
-    additionalEquipmentEntities[wasteChuteId].pythonName
+  const wasteChuteEntity = additionalEquipmentEntities[
+    wasteChuteId
+  ] as WasteChuteEntity
+  const wasteChutePythonName = wasteChuteEntity.pythonName
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
   const pythonArgs = [
     `volume=${volume}`,
