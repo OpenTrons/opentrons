@@ -93,7 +93,6 @@ export function ProtocolRunHeader(
         runStatus={runStatus}
         runHeaderModalContainerUtils={runHeaderModalContainerUtils}
         runErrors={runErrors}
-        runRecord={runRecord}
         protocolRunControls={protocolRunControls}
         {...props}
       />

@@ -159,11 +159,10 @@ export const appliedOffsetsToRun = (
 })
 
 export const sourceOffsetsFromRun = (
-  runId: string,
-  offsets: LabwareOffset[]
+  runId: string
 ): SourceOffsetsFromRunAction => ({
   type: SOURCE_OFFSETS_FROM_RUN,
-  payload: { runId, offsets },
+  payload: { runId },
 })
 
 export const sourceOffsetsFromDatabase = (

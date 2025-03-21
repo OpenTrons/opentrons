@@ -19,6 +19,7 @@ export interface LPCLabwareInfo {
   // From which source the offsets that populate LPCLabwareInfo are sourced.
   sourcedOffsets: OffsetSources
   // Offsets initially present on the run record immediately after LPC initialization.
+  // Sorted by most recent first. Duplicate entries removed.
   initialRunRecordOffsets: LabwareOffset[]
   // Run-relevant offsets initially stored on the robot-server immediately after LPC initialization.
   initialDatabaseOffsets: StoredLabwareOffset[]

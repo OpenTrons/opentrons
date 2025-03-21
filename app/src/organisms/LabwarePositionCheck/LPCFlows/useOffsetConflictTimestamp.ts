@@ -72,7 +72,7 @@ export function useOffsetConflictTimestamp(
 
     if (outdatedOffsetExists) {
       // Find the most recent historic run.
-      const matchingRecord = historicRunData.findLast(
+      const matchingRecord = historicRunData.find(
         run =>
           run.protocolId != null &&
           run.protocolId === currentRunRecord.data.protocolId
@@ -98,27 +98,8 @@ function outdatedOffsetExits(
   initialRunRecordLwOffsets: LabwareOffset[],
   initialStoredOffsets: StoredLabwareOffset[]
 ): boolean {
-  const sortedUniqueInitialRunRecordOffsets = initialRunRecordLwOffsets
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-    .reduce<LabwareOffset[]>((acc, offset) => {
-      if (
-        acc.some(
-          existingOffset =>
-            isEqual(existingOffset.definitionUri, offset.definitionUri) &&
-            isEqual(existingOffset.locationSequence, offset.locationSequence)
-        )
-      ) {
-        return acc
-      } else {
-        return [...acc, offset]
-      }
-    }, [])
-
   const { anyKnownOutdated, unknownOutdated } = getOutdatedLSOffsetInfo(
-    sortedUniqueInitialRunRecordOffsets,
+    initialRunRecordLwOffsets,
     initialStoredOffsets
   )
 
@@ -172,7 +153,7 @@ function getAnyOutdatedDefaultOffset(
   initialStoredOffsets: StoredLabwareOffset[]
 ): boolean {
   return unmatchedInitialRunRecordOffsets.some(clonedOffset => {
-    const matchingStoredOffset = initialStoredOffsets.findLast(storedOffset => {
+    const matchingStoredOffset = initialStoredOffsets.find(storedOffset => {
       return (
         storedOffset.locationSequence === 'anyLocation' &&
         isEqual(clonedOffset.definitionUri, storedOffset.definitionUri)

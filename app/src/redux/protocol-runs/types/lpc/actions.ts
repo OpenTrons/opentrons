@@ -5,11 +5,7 @@ import type {
   LPCWizardState,
   OffsetLocationDetails,
 } from '/app/redux/protocol-runs/types/lpc'
-import type {
-  LabwareOffset,
-  StoredLabwareOffset,
-  VectorOffset,
-} from '@opentrons/api-client'
+import type { StoredLabwareOffset, VectorOffset } from '@opentrons/api-client'
 
 export interface PositionParams {
   labwareUri: string
@@ -100,7 +96,7 @@ export interface AppliedOffsetsToRunAction {
 
 export interface SourceOffsetsFromRunAction {
   type: 'SOURCE_OFFSETS_FROM_RUN'
-  payload: { runId: string; offsets: LabwareOffset[] }
+  payload: { runId: string }
 }
 
 export interface SourceOffsetsFromDatabaseAction {

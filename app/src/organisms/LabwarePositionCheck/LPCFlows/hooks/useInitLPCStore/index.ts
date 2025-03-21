@@ -19,6 +19,7 @@ import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows
 import type { Run, StoredLabwareOffset } from '@opentrons/api-client'
 import type { LPCWizardState, LPCLabwareInfo } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
+import { sortUniqueOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
 
 export interface UseLPCInitialStateProps {
   runId: string | null
@@ -75,7 +76,7 @@ export function useInitLPCStore({
         labwareInfo: {
           ...rest.labwareInfo,
           sourcedOffsets: OFFSETS_SOURCE_INITIALIZING,
-          initialRunRecordOffsets: runRecordOffsets,
+          initialRunRecordOffsets: sortUniqueOffsets(runRecordOffsets),
           initialDatabaseOffsets: flexStoredOffsets,
         },
         steps: {

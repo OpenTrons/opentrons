@@ -935,11 +935,7 @@ export function ProtocolSetup(): JSX.Element {
         />
       ) : null}
       {offsetSource === OFFSETS_CONFLICT && !isMaintenanceRunActive ? (
-        <LabwareOffsetsConflictModal
-          runId={runId}
-          runRecord={runRecord}
-          isOnDevice={true}
-        />
+        <LabwareOffsetsConflictModal runId={runId} isOnDevice={true} />
       ) : null}
       <Flex css={buildSetupScreenStyle(setupScreen)}>
         {setupComponentByScreen[setupScreen]}

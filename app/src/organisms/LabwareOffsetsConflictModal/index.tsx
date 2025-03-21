@@ -29,27 +29,23 @@ import { OddModal } from '/app/molecules/OddModal'
 import { formatTimestamp } from '/app/transformations/runs'
 
 import type { IconProps } from '@opentrons/components'
-import type { Run } from '@opentrons/api-client'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 export interface OffsetsConflictModalProps {
   runId: string
-  runRecord: Run | undefined
   isOnDevice: boolean
 }
 
 export function LabwareOffsetsConflictModal({
   runId,
-  runRecord,
   isOnDevice,
 }: OffsetsConflictModalProps): JSX.Element {
   const dispatch = useDispatch()
-  const clonedRunOffsets = runRecord?.data.labwareOffsets ?? []
   const tsInfo = useSelector(selectConflictTimestampInfo(runId))
   const tsFormatted = formatTimestamp(tsInfo.timestamp ?? '')
 
   const onRunRecordOffsets = (): void => {
-    dispatch(sourceOffsetsFromRun(runId, clonedRunOffsets))
+    dispatch(sourceOffsetsFromRun(runId))
   }
 
   const onDatabaseOffsets = (): void => {

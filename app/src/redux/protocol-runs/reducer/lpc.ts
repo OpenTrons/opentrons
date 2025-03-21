@@ -212,14 +212,12 @@ export function LPCReducer(
       }
 
       case SOURCE_OFFSETS_FROM_RUN: {
-        const { offsets } = action.payload
-
         return {
           ...state,
           labwareInfo: {
             ...state.labwareInfo,
             labware: updateLPCLabwareInfoFrom(
-              offsets,
+              state.labwareInfo.initialRunRecordOffsets,
               state.labwareInfo.labware
             ),
             sourcedOffsets: OFFSETS_FROM_RUN_RECORD,
