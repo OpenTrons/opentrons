@@ -104,6 +104,9 @@ class ProbedVolumeInfo(BaseModel):
 class WellInfoSummary(BaseModel):
     """Payload for a well's liquid info in StateSummary."""
 
+    # TODO(cm): 3/21/25: refactor SimulatedLiquidProbe in a way that
+    # doesn't require models like this one that are just using it to
+    # need a custom validator
     @field_validator("probed_height", "probed_volume", mode="before")
     @classmethod
     def validate_simulated_probe_result(
