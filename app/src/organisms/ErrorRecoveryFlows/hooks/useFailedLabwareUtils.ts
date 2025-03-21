@@ -50,8 +50,6 @@ interface RelevantFailedLabwareLocations {
   newLoc: LabwareLocation | null
 }
 
-export type interventionLayout = 'default' | 'stacked'
-
 export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   /* The name of the labware relevant to the failed command, if any.  */
   failedLabwareName: string | null
@@ -63,7 +61,6 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   failedLabwareNickname: string | null
   /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
-  layout: interventionLayout
   labwareQuantity: string | null
 }
 
@@ -128,17 +125,12 @@ export function useFailedLabwareUtils({
     errorKind,
   })
 
-  console.log('WTFFFF: ', recentRelevantFailedLabwareCmd)
+  console.log('WTFFFF: ', failedLabwareLocations)
   const labwareQuantity = getFailedLabwareQuantity(
     runCommands,
     recentRelevantFailedLabwareCmd,
     errorKind
   )
-
-  let layout
-  if (errorKind !== ERROR_KINDS.STALL_WHILE_STACKING) {
-    layout = 'default'
-  } else layout = 'stacked'
 
   return {
     ...tipSelectionUtils,
@@ -147,7 +139,6 @@ export function useFailedLabwareUtils({
     relevantWellName,
     failedLabwareNickname: failedLabwareDetails?.nickname ?? null,
     failedLabwareLocations,
-    layout,
     labwareQuantity,
   }
 }
@@ -478,6 +469,7 @@ export function useRelevantFailedLwLocations({
     RelevantFailedLabwareLocations,
     'displayNameNewLoc' | 'newLoc'
   > => {
+    console.log('in new location:', failedCommandByRunRecord?.commandType)
     switch (failedCommandByRunRecord?.commandType) {
       case 'moveLabware':
         return {
@@ -486,6 +478,19 @@ export function useRelevantFailedLwLocations({
             location: failedCommandByRunRecord.params.newLocation,
           }),
           newLoc: failedCommandByRunRecord.params.newLocation,
+        }
+      case 'flexStacker/retrieve':
+      case 'flexStacker/store':
+        return {
+          displayNameNewLoc: getLabwareDisplayLocation({
+            ...BASE_DISPLAY_PARAMS,
+            location: BASE_DISPLAY_PARAMS.loadedModules.find(
+              m => m.id === failedCommandByRunRecord?.params.moduleId
+            ).location,
+          }),
+          newLoc: {
+            moduleId: failedCommandByRunRecord?.params.moduleId,
+          },
         }
       default:
         return {

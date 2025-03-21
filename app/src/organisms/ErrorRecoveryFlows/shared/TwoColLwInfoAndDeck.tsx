@@ -133,6 +133,18 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
+  const buildLayoutType = (): ComponentProps<
+    typeof InterventionContent
+  >['infoProps']['layout'] => {
+    switch (selectedRecoveryOption) {
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
+      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
+        return 'stacked'
+      default:
+        return 'default'
+    }
+  }
+
   // TODO(jh, 10-22-24): Componentize an app-only abstraction above MoveLabwareOnDeck. EXEC-788.
   const buildDeckView = (): JSX.Element => {
     switch (selectedRecoveryOption) {
@@ -210,6 +222,7 @@ export function TwoColLwInfoAndDeck(
           {...props}
           title={buildTitle()}
           type={buildType()}
+          layout={buildLayoutType()}
           bannerText={buildBannerText()}
         />
         <Flex marginTop="0.7rem">{buildDeckView()}</Flex>

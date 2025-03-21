@@ -6,6 +6,7 @@ import type { RecoveryContentProps } from '../types'
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string
   type: ComponentProps<typeof InterventionContent>['infoProps']['type']
+  layout: ComponentProps<typeof InterventionContent>['infoProps']['layout']
   /* Renders a warning InlineNotification if provided. */
   bannerText?: string
 }
@@ -15,13 +16,13 @@ export function LeftColumnLabwareInfo({
   title,
   failedLabwareUtils,
   type,
+  layout,
   bannerText,
 }: LeftColumnLabwareInfoProps): JSX.Element | null {
   const {
     failedLabwareName,
     failedLabwareNickname,
     failedLabwareLocations,
-    layout,
     labwareQuantity,
   } = failedLabwareUtils
   const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
