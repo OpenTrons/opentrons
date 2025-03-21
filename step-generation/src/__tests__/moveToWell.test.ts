@@ -23,6 +23,7 @@ import {
   SOURCE_LABWARE,
 } from '../fixtures'
 import type { InvariantContext, RobotState } from '../types'
+import type { WellOrigin } from '@opentrons/shared-data'
 
 vi.mock('../utils/absorbanceReaderCollision')
 vi.mock('../utils/thermocyclerPipetteCollision')
@@ -46,6 +47,10 @@ describe('moveToWell', () => {
       pipetteId: DEFAULT_PIPETTE,
       labwareId: SOURCE_LABWARE,
       wellName: 'A1',
+      wellLocation: {
+        origin: 'bottom' as WellOrigin,
+        offset: { z: 1 },
+      },
     }
     const result = moveToWell(params, invariantContext, robotStateWithTip)
     expect(getSuccessResult(result).commands).toEqual([
@@ -56,9 +61,18 @@ describe('moveToWell', () => {
           pipetteId: DEFAULT_PIPETTE,
           labwareId: SOURCE_LABWARE,
           wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom' as any,
+            offset: {
+              z: 1,
+            },
+          },
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      'mockPythonName.move_to(mockPythonName["A1"].bottom(z=1)'
+    )
   })
   it('should apply the optional params to the command', () => {
     const params = {
