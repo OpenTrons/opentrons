@@ -48,6 +48,7 @@ from ..types import (
     ModuleDefinition,
     AddressableAreaLocation,
     LoadedLabware,
+    OnLabwareLocation,
 )
 
 
@@ -94,6 +95,23 @@ class LoadedConfigureForVolumeData:
     serial_number: str
     volume: float
     static_config: pipette_data_provider.LoadedStaticPipetteData
+
+
+@dataclass(frozen=True)
+class LoadedLabwarePoolData:
+    """The result of loading a labware pool with details for batch loads and location sequencing."""
+
+    primary_id: str
+    primary_uri: str
+    adapter_id: Optional[str] = None
+    adapter_uri: str | None = None
+    lid_id: Optional[str] = None
+    lid_uri: str | None = None
+    definitions_by_id: dict[str, LabwareDefinition] = {}
+    offset_ids_by_id: dict[str, Optional[str]] = {}
+    display_names_by_id: dict[str, str | None] = {}
+    new_locations_by_id: dict[str, LabwareLocation] = {}
+    labware_by_id: dict[str, LoadedLabware] = {}
 
 
 class EquipmentHandler:
@@ -199,6 +217,129 @@ class EquipmentHandler:
 
         return LoadedLabwareData(
             labware_id=labware_id, definition=definition, offsetId=offset_id
+        )
+
+    async def load_labware_pool_from_definitions(
+        self,
+        pool_primary_definition: LabwareDefinition,
+        pool_adapter_definition: Optional[LabwareDefinition],
+        pool_lid_definition: Optional[LabwareDefinition],
+        location: LabwareLocation,
+        primary_id: Optional[str],
+        adapter_id: Optional[str],
+        lid_id: Optional[str],
+    ) -> LoadedLabwarePoolData:
+        """Load a pool of labware from already-found definitions."""
+        adapter_lw = None
+        lid_lw = None
+        definitions_by_id: dict[str, LabwareDefinition] = {}
+        offset_ids_by_id: dict[str, str | None] = {}
+        display_names_by_id: dict[str, str | None] = {}
+        new_locations_by_id: dict[str, LabwareLocation] = {}
+        labware_by_id: dict[str, LoadedLabware] = {}
+        adapter_uri: str | None = None
+        if pool_adapter_definition is not None:
+            adapter_location = location
+            adapter_lw = await self.load_labware_from_definition(
+                definition=pool_adapter_definition,
+                location=adapter_location,
+                labware_id=adapter_id,
+                labware_pending_load=labware_by_id,
+            )
+            definitions_by_id[adapter_lw.labware_id] = adapter_lw.definition
+            offset_ids_by_id[adapter_lw.labware_id] = adapter_lw.offsetId
+            display_names_by_id[
+                adapter_lw.labware_id
+            ] = adapter_lw.definition.metadata.displayName
+            new_locations_by_id[adapter_lw.labware_id] = adapter_location
+            adapter_uri = str(
+                uri_from_details(
+                    namespace=adapter_lw.definition.namespace,
+                    load_name=adapter_lw.definition.parameters.loadName,
+                    version=adapter_lw.definition.version,
+                )
+            )
+            labware_by_id[adapter_lw.labware_id] = LoadedLabware.model_construct(
+                id=adapter_lw.labware_id,
+                location=adapter_location,
+                loadName=adapter_lw.definition.parameters.loadName,
+                definitionUri=adapter_uri,
+                offsetId=None,
+            )
+
+        primary_location: LabwareLocation = (
+            location
+            if adapter_lw is None
+            else OnLabwareLocation(labwareId=adapter_lw.labware_id)
+        )
+        loaded_labware = await self.load_labware_from_definition(
+            definition=pool_primary_definition,
+            location=primary_location,
+            labware_id=primary_id,
+            labware_pending_load={lw_id: lw for lw_id, lw in labware_by_id.items()},
+        )
+        definitions_by_id[loaded_labware.labware_id] = loaded_labware.definition
+        offset_ids_by_id[loaded_labware.labware_id] = loaded_labware.offsetId
+        display_names_by_id[
+            loaded_labware.labware_id
+        ] = loaded_labware.definition.metadata.displayName
+        new_locations_by_id[loaded_labware.labware_id] = primary_location
+        primary_uri = str(
+            uri_from_details(
+                namespace=loaded_labware.definition.namespace,
+                load_name=loaded_labware.definition.parameters.loadName,
+                version=loaded_labware.definition.version,
+            )
+        )
+        labware_by_id[loaded_labware.labware_id] = LoadedLabware.model_construct(
+            id=loaded_labware.labware_id,
+            location=primary_location,
+            loadName=loaded_labware.definition.parameters.loadName,
+            definitionUri=primary_uri,
+        )
+
+        lid_uri: str | None = None
+        # If there is a lid load it
+        if pool_lid_definition is not None:
+            lid_location = OnLabwareLocation(labwareId=loaded_labware.labware_id)
+            lid_lw = await self.load_labware_from_definition(
+                definition=pool_lid_definition,
+                location=lid_location,
+                labware_id=lid_id,
+                labware_pending_load={lw_id: lw for lw_id, lw in labware_by_id.items()},
+            )
+            lid_uri = str(
+                uri_from_details(
+                    namespace=lid_lw.definition.namespace,
+                    load_name=lid_lw.definition.parameters.loadName,
+                    version=lid_lw.definition.version,
+                )
+            )
+            definitions_by_id[lid_lw.labware_id] = lid_lw.definition
+            offset_ids_by_id[lid_lw.labware_id] = lid_lw.offsetId
+            display_names_by_id[
+                lid_lw.labware_id
+            ] = lid_lw.definition.metadata.displayName
+            new_locations_by_id[lid_lw.labware_id] = lid_location
+            labware_by_id[lid_lw.labware_id] = LoadedLabware.model_construct(
+                id=lid_lw.labware_id,
+                location=lid_location,
+                loadName=lid_lw.definition.parameters.loadName,
+                definitionUri=lid_uri,
+                offsetId=None,
+            )
+        return LoadedLabwarePoolData(
+            primary_id=loaded_labware.labware_id,
+            primary_uri=primary_uri,
+            adapter_id=adapter_lw.labware_id if adapter_lw is not None else None,
+            adapter_uri=adapter_uri,
+            lid_id=lid_lw.labware_id if lid_lw is not None else None,
+            lid_uri=lid_uri,
+            definitions_by_id=definitions_by_id,
+            offset_ids_by_id=offset_ids_by_id,
+            display_names_by_id=display_names_by_id,
+            new_locations_by_id=new_locations_by_id,
+            labware_by_id=labware_by_id,
         )
 
     async def load_labware(
