@@ -53,5 +53,10 @@ describe('delayInWell', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      `
+mockPythonName.move_to(mockPythonName["B1"].bottom(z=10))
+protocol.delay(seconds=30)`.trimStart()
+    )
   })
 })

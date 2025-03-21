@@ -51,5 +51,10 @@ describe('delayInTrash', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      `
+mockPythonName.move_to(mock_trash_bin_1)
+protocol.delay(seconds=30)`.trimStart()
+    )
   })
 })

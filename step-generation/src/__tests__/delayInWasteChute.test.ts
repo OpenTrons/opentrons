@@ -29,6 +29,7 @@ describe('delayInWasteChute', () => {
     const args = {
       pipetteId: 'p10SingleId',
       seconds: 30,
+      destinationId: wasteChuteId,
     }
 
     const result = delayInWasteChute(args, invariantContext, prevRobotState)
@@ -51,5 +52,10 @@ describe('delayInWasteChute', () => {
         },
       },
     ])
+    expect(res.python).toBe(
+      `
+mockPythonName.move_to(mock_waste_chute_1)
+protocol.delay(seconds=30)`.trimStart()
+    )
   })
 })

@@ -753,6 +753,7 @@ export const moveAndDelayLocationHelper: CommandCreator<MoveAndDelayLocationHelp
   } else if (trashOrLabware === 'wasteChute') {
     commands = [
       curryCommandCreator(delayInWasteChute, {
+        destinationId,
         seconds,
         pipetteId,
       }),
