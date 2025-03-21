@@ -13,7 +13,7 @@ import {
   useRunHeaderDropTip,
 } from './hooks'
 import { useErrorRecoveryFlows } from '/app/organisms/ErrorRecoveryFlows'
-import { useProtocolDetailsForRun } from '/app/resources/runs'
+import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -89,6 +89,7 @@ export function useRunHeaderModalContainer({
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const isLabwareOffsetConflict =
     useSelector(selectOffsetSource(runId)) === OFFSETS_CONFLICT
+  const isThisRunCurrent = runId === useCurrentRunId()
 
   function handleProceedToRunClick(): void {
     navigate(`/devices/${robotName}/protocol-runs/${runId}/run-preview`)
@@ -145,7 +146,7 @@ export function useRunHeaderModalContainer({
     missingStepsModalUtils,
     dropTipUtils,
     offsetConflictModalUtils: {
-      showModal: isLabwareOffsetConflict,
+      showModal: isLabwareOffsetConflict && isThisRunCurrent,
     },
   }
 }
