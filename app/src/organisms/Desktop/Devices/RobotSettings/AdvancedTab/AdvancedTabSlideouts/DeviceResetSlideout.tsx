@@ -52,7 +52,6 @@ interface DeviceResetSlideoutProps {
   updateResetStatus: (connected: boolean, rOptions?: ResetConfigRequest) => void
 }
 
-// Note (kk:08/30/2023) lines that are related to module calibration will be activated when the be is ready
 export function DeviceResetSlideout({
   isExpanded,
   onCloseClick,
