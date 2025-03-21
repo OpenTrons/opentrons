@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 
-import { Flex, RESPONSIVENESS, COLORS, BORDERS } from '@opentrons/components'
+import {
+  Flex,
+  RESPONSIVENESS,
+  COLORS,
+  BORDERS,
+  NO_WRAP,
+} from '@opentrons/components'
 
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck'
 import { DeckInfoLabelTextTag } from '/app/molecules/DeckInfoLabelTextTag'
@@ -72,6 +78,7 @@ const deckLabelContainerStyle = (
   background-color: ${COLORS.white};
   border-radius: ${BORDERS.borderRadius4};
   padding-right: ${tagProps.kind === 'vector' ? '' : '2.188rem'};
+  text-wrap: ${NO_WRAP};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     background-color: ${COLORS.grey20};

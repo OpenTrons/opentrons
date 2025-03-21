@@ -7,6 +7,8 @@ import {
   ListAccordion,
   StyledText,
   RESPONSIVENESS,
+  Flex,
+  SPACING,
 } from '@opentrons/components'
 
 import { selectAllLabwareInfoAndDefaultStatusSorted } from '/app/redux/protocol-runs'
@@ -36,7 +38,7 @@ export function LabwareOffsetsTable(
   }
 
   return (
-    <>
+    <Flex marginBottom={SPACING.spacing80}>
       <ListTable headers={[t('labware_type'), t('total_offsets')]}>
         {labwareInfo.map(aLwInfo => (
           <ListAccordion
@@ -63,7 +65,7 @@ export function LabwareOffsetsTable(
           </ListAccordion>
         ))}
       </ListTable>
-    </>
+    </Flex>
   )
 }
 
