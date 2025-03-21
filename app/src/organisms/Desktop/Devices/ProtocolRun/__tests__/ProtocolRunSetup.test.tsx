@@ -200,6 +200,7 @@ describe('ProtocolRunSetup', () => {
       lpcProps: null,
       showLPC: false,
       isLaunchingLPC: false,
+      isFlexLPCInitializing: false,
     })
     vi.mocked(
       selectIsAnyNecessaryDefaultOffsetMissing

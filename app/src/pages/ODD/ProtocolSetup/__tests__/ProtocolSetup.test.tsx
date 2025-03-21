@@ -71,7 +71,9 @@ import {
   selectCountMissingLSOffsetsWithoutDefault,
   selectAreOffsetsApplied,
   selectIsAnyNecessaryDefaultOffsetMissing,
+  selectOffsetSource,
 } from '/app/redux/protocol-runs'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -124,6 +126,7 @@ vi.mock('/app/resources/modules')
 vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/redux/protocol-runs')
+vi.mock('/app/resources/maintenance_runs')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -236,6 +239,9 @@ describe('ProtocolSetup', () => {
     MockConfirmSetupStepsCompleteModal.mockReturnValue(
       <div>Mock ConfirmSetupStepsCompleteModal</div>
     )
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
+      data: { data: { id: 'mock-id' } },
+    } as any)
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -348,6 +354,7 @@ describe('ProtocolSetup', () => {
     vi.mocked(
       selectIsAnyNecessaryDefaultOffsetMissing
     ).mockImplementation(() => () => false)
+    vi.mocked(selectOffsetSource).mockImplementation(() => () => 'fromDatabase')
   })
 
   it('should render text, image, and buttons', () => {

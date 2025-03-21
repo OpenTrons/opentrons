@@ -114,7 +114,6 @@ describe('RobotSettingsDashboard', () => {
     screen.getByText('Choose what data to share with Opentrons.')
     screen.getByText('Device Reset')
     screen.getByText('Update Channel')
-    screen.getByText('Use stored data when setting up a protocol.')
     screen.getByText('Developer Tools')
     screen.getByText('Access additional logging and feature flags.')
   })

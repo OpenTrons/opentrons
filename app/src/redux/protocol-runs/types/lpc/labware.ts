@@ -4,7 +4,7 @@ import type {
   LocationSpecificOffsetDetails,
   OffsetLocationDetails,
 } from './offsets'
-import {
+import type {
   OFFSETS_FROM_RUN_RECORD,
   OFFSETS_FROM_DATABASE,
   OFFSETS_CONFLICT,
