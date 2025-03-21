@@ -125,7 +125,7 @@ Flex and OT-2 pipettes dispense at :ref:`default flow rates <new-plunger-flow-ra
 Push Out After Dispense
 -----------------------
 
-Dispensing all liquid from the tip usually requires an additional volume of air to ensure no droplets remain. In a push out after dispense, the pipette dispenses all liquid by returning the plunger to its aspirate start position. Then, without without stopping, the plunger moves further down to dispense the additional push out volume. 
+Dispensing all liquid from the tip usually requires an additional volume of air to ensure no droplets remain. In a push out after dispense, the pipette dispenses all liquid by returning the plunger to its aspirate start position. Then, without stopping, the plunger moves further down to dispense the additional push out volume. 
 
 Use the optional ``push_out`` parameter of ``dispense()`` for applications that require moving the pipette plunger lower than the default, without performing a full :ref:`blow out <blow-out>`.
 
