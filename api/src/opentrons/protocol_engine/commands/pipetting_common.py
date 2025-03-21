@@ -435,4 +435,5 @@ async def blow_out_in_place(
 
 
 async def increase_evo_disp_count(pipette_id: str, pipetting: PipettingHandler) -> None:
+    """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
     await pipetting.increase_evo_disp_count(pipette_id)

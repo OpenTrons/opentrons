@@ -3135,5 +3135,6 @@ class OT3API(
         self,
         mount: Union[top_types.Mount, OT3Mount],
     ) -> None:
+        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
         realmount = OT3Mount.from_mount(mount)
         await self._backend.increase_evo_disp_count(realmount)
