@@ -390,11 +390,12 @@ class SubsystemManager:
                 tool_nodes.add(NodeId.pipette_right)
             if update.gripper != ToolType.nothing_attached:
                 tool_nodes.add(NodeId.gripper)
-            base_nodes: Set[FirmwareTarget] = {
+            base_can_nodes: List[NodeId] = [
                 NodeId.pipette_left,
                 NodeId.pipette_right,
                 NodeId.gripper,
-            }
+            ]
+            base_nodes: Set[FirmwareTarget] = {n for n in base_can_nodes}
             try:
                 self._network_info.mark_absent(base_nodes - tool_nodes)
                 await self._probe_network_and_cache_fw_updates(
@@ -412,6 +413,9 @@ class SubsystemManager:
             )
             self._present_tools = await self._tool_detector.resolve(to_resolve, 10.0)
             log.info(f"Present tools are now {self._present_tools}")
+            await network.log_motor_usage_data(
+                self._can_messenger, base_can_nodes + [t for t in tool_nodes]
+            )
             async with self._tool_task_condition:
                 self._tool_task_state = True
                 self._tool_task_condition.notify_all()
