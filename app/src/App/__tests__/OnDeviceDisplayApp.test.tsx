@@ -27,7 +27,7 @@ import { getOnDeviceDisplaySettings } from '/app/redux/config'
 import { getIsShellReady } from '/app/redux/shell'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
-import { useProtocolReceiptToast } from '../hooks'
+import { useProtocolReceiptToast, useScrollRef } from '../hooks'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
 
@@ -93,6 +93,11 @@ describe('OnDeviceDisplayApp', () => {
     vi.mocked(getIsShellReady).mockReturnValue(true)
     vi.mocked(ODDTopLevelRedirects).mockReturnValue(null)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useScrollRef).mockReturnValue({
+      isScrolling: false,
+      refCallback: () => null,
+      element: null,
+    })
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
       data: {
         data: {

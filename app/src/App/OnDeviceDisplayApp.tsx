@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { css } from 'styled-components'
@@ -9,7 +9,6 @@ import {
   COLORS,
   OVERFLOW_AUTO,
   POSITION_RELATIVE,
-  useScrolling,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import NiceModal from '@ebay/nice-modal-react'
@@ -46,13 +45,18 @@ import { Welcome } from '/app/pages/ODD/Welcome'
 import { InitialLoadingScreen } from '/app/pages/ODD/InitialLoadingScreen'
 import { DeckConfigurationEditor } from '/app/pages/ODD/DeckConfiguration'
 import { PortalRoot as ModalPortalRoot } from './portal'
+import { SharedScrollRefProvider } from './ODDProviders/ScrollRefProvider'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
 import { updateBrightness } from '/app/redux/shell'
 import { useScreenIdle, SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
-import { useProtocolReceiptToast, useSoftwareUpdatePoll } from './hooks'
+import {
+  useProtocolReceiptToast,
+  useScrollRef,
+  useSoftwareUpdatePoll,
+} from './hooks'
 import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { ReactQueryDevtools } from '/app/App/tools'
 
@@ -199,7 +203,9 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                     <NiceModal.Provider>
                       <ToasterOven>
                         <ProtocolReceiptToasts />
-                        <OnDeviceDisplayAppRoutes />
+                        <SharedScrollRefProvider>
+                          <OnDeviceDisplayAppRoutes />
+                        </SharedScrollRefProvider>
                       </ToasterOven>
                     </NiceModal.Provider>
                   </MaintenanceRunTakeover>
@@ -225,14 +231,10 @@ const getTargetPath = (unfinishedUnboxingFlowRoute: string | null): string => {
 // split to a separate function because scrollRef rerenders on every route change
 // this avoids rerendering parent providers as well
 export function OnDeviceDisplayAppRoutes(): JSX.Element {
-  const [currentNode, setCurrentNode] = useState<null | HTMLElement>(null)
-  const scrollRef = useCallback((node: HTMLElement | null) => {
-    setCurrentNode(node)
-  }, [])
-  const isScrolling = useScrolling(currentNode)
+  const { isScrolling, refCallback, element } = useScrollRef()
   const location = useLocation()
   useEffect(() => {
-    currentNode?.scrollTo({
+    element?.scrollTo({
       top: 0,
       left: 0,
       behavior: 'auto',
@@ -271,7 +273,7 @@ export function OnDeviceDisplayAppRoutes(): JSX.Element {
           key={path}
           path={path}
           element={
-            <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+            <Box css={TOUCH_SCREEN_STYLE} ref={refCallback}>
               <ModalPortalRoot />
               {getPathComponent(path)}
             </Box>
