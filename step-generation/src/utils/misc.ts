@@ -675,25 +675,18 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    const pipetteChannels =
-      invariantContext.pipetteEntities[pipetteId].spec.channels
     commands = [
       curryCommandCreator(moveToAddressableArea, {
         pipetteId,
-        addressableAreaName: getWasteChuteAddressableAreaNamePip(
-          pipetteChannels
-        ),
+        fixtureId: additionalEquipmentEntities[destinationId].id,
         offset: { x: 0, y: 0, z: 0 },
       }),
     ]
   } else {
-    const addressableAreaName = getTrashBinAddressableAreaName(
-      additionalEquipmentEntities[destinationId].location as CutoutId
-    )
     commands = [
       curryCommandCreator(moveToAddressableArea, {
         pipetteId,
-        addressableAreaName,
+        fixtureId: additionalEquipmentEntities[destinationId].id,
         offset: ZERO_OFFSET,
       }),
     ]
@@ -763,7 +756,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
         pipetteId,
         volume,
         flowRate,
-        invariantContext,
+        wasteChuteId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   } else {
@@ -772,8 +765,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
         pipetteId,
         volume,
         flowRate,
-        trashLocation: additionalEquipmentEntities[destinationId]
-          .location as CutoutId,
+        trashId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   }
