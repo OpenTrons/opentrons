@@ -43,7 +43,7 @@ export function getSlotFromAddressableAreaName(
       return slotName
     }
   }
-  return ''
+  return addressableArea
 }
 
 export function getModuleModelFromAddressableArea(
