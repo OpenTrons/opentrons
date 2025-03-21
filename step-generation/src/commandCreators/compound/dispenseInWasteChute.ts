@@ -1,6 +1,5 @@
 import {
   curryWithoutPython,
-  getWasteChuteAddressableAreaNamePip,
   indentPyLines,
   reduceCommandCreators,
 } from '../../utils'
@@ -22,10 +21,6 @@ export const dispenseInWasteChute: CommandCreator<DispenseInWasteChuteArgs> = (
 ) => {
   const { pipetteId, flowRate, volume, wasteChuteId } = args
   const { pipetteEntities, additionalEquipmentEntities } = invariantContext
-  const pipetteChannels = pipetteEntities[pipetteId].spec.channels
-  const addressableAreaName = getWasteChuteAddressableAreaNamePip(
-    pipetteChannels
-  )
   const wasteChutePythonName =
     additionalEquipmentEntities[wasteChuteId].pythonName
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
@@ -47,7 +42,7 @@ export const dispenseInWasteChute: CommandCreator<DispenseInWasteChuteArgs> = (
   const commandCreators = [
     curryWithoutPython(moveToAddressableArea, {
       pipetteId,
-      addressableAreaName,
+      fixtureId: wasteChuteId,
       offset: ZERO_OFFSET,
     }),
     curryWithoutPython(dispenseInPlace, {
