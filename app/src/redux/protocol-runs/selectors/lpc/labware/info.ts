@@ -1,29 +1,73 @@
+import type { Selector } from 'reselect'
 import { createSelector } from 'reselect'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getIsTiprack, getLabwareDefURI } from '@opentrons/shared-data'
 
-import { getItemLabwareDef, getSelectedLabwareDefFrom } from '../transforms'
+import {
+  getAreAnyLocationSpecificOffsetsMissing,
+  getIsDefaultOffsetAbsent,
+  getItemLabwareDef,
+  getSelectedLabwareDefFrom,
+} from '../transforms'
 import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
+  OFFSETS_SOURCE_INITIALIZING,
 } from '/app/redux/protocol-runs/constants'
-
-import type { Selector } from 'reselect'
 import type { State } from '/app/redux/types'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
+  ConflictTimestampInfo,
   LPCFlowType,
-  LPCLabwareInfo,
+  LwGeometryDetails,
+  OffsetSources,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
-// Returns all the LPC labware info for the labware used in the current run.
-export const selectAllLabwareInfo = (
+export interface LPCLabwareInfoAndDefaultStatus {
+  uri: string
+  info: LwGeometryDetails
+  isMissingNecessaryDefaultOffset: boolean
+}
+
+// Returns all the LPC labware info for the labware used in the current run,
+// sorted by URI display name. Default offsets are not marked missing if all location
+// specific offset vectors for the uri are present or the offsets are hardcoded.
+export const selectAllLabwareInfoAndDefaultStatusSorted = (
   runId: string
-): Selector<State, LPCLabwareInfo['labware']> =>
+): Selector<State, LPCLabwareInfoAndDefaultStatus[]> =>
   createSelector(
     (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
-    labware => labware ?? {}
+    labwareInfo => {
+      if (labwareInfo == null) {
+        return []
+      }
+
+      return Object.entries(labwareInfo)
+        .map(([uri, info]) => {
+          const isMissingNecessaryDefaultOffset = getAreAnyLocationSpecificOffsetsMissing(
+            info.locationSpecificOffsetDetails
+          )
+            ? getIsDefaultOffsetAbsent(info)
+            : false
+
+          return {
+            uri,
+            info,
+            isMissingNecessaryDefaultOffset,
+          }
+        })
+        .sort((a, b) => {
+          if (
+            a.isMissingNecessaryDefaultOffset !==
+            b.isMissingNecessaryDefaultOffset
+          ) {
+            return a.isMissingNecessaryDefaultOffset ? -1 : 1
+          }
+
+          return a.info.displayName.localeCompare(b.info.displayName)
+        })
+    }
   )
 
 // Returns the labware overview for the currently user-selected labware, if any.
@@ -136,4 +180,22 @@ export const selectSelectedLwDef = (
         })
       }
     }
+  )
+
+export const selectConflictTimestampInfo = (
+  runId: string
+): Selector<State, ConflictTimestampInfo> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.conflictTimestampInfo,
+    ts => ts ?? { timestamp: null, isInitialized: false }
+  )
+
+export const selectOffsetSource = (
+  runId: string
+): Selector<State, OffsetSources> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.sourcedOffsets,
+    source => source ?? OFFSETS_SOURCE_INITIALIZING
   )

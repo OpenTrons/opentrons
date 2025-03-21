@@ -40,23 +40,17 @@ import type {
   CsvFileParameterFileData,
 } from '@opentrons/shared-data'
 import type { ProtocolSetupStepStatus } from '../ProtocolSetupStep'
-import type {
-  FileData,
-  LegacyLabwareOffsetCreateData,
-} from '@opentrons/api-client'
+import type { FileData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {
   protocolId: string
   runTimeParameters: RunTimeParameter[]
-  labwareOffsets?: LegacyLabwareOffsetCreateData[]
   mostRecentAnalysis?: CompletedProtocolAnalysis | null
 }
 
 export function ProtocolSetupParameters({
   protocolId,
-  labwareOffsets,
   runTimeParameters,
-  mostRecentAnalysis,
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
@@ -219,7 +213,6 @@ export function ProtocolSetupParameters({
             onSuccess: () => {
               createRun({
                 protocolId,
-                labwareOffsets,
                 runTimeParameterValues,
                 runTimeParameterFiles,
               })

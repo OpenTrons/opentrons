@@ -11,7 +11,7 @@ import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 export function useMostRecentCompletedAnalysis(
   runId: string | null
 ): CompletedProtocolAnalysis | null {
-  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId ?? null)
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolData } = useProtocolQuery(protocolId, {
     enabled: protocolId != null,

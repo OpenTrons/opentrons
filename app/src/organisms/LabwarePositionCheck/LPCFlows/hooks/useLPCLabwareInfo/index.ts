@@ -17,13 +17,13 @@ import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueVa
 const REFETCH_OFFSET_SEARCH_MS = 5000
 
 export type UseLPCLabwareInfoProps = GetUniqueValidLwLocationInfoByAnalysisParams & {
-  runId: string
+  runId: string | null
   robotType: RobotType
 }
 
 export interface UseLPCLabwareInfoResult {
   labwareInfo: LPCLabwareInfo
-  storedOffsets: StoredLabwareOffset[]
+  storedOffsets: StoredLabwareOffset[] | undefined
   legacyOffsets: LabwareOffset[]
 }
 
@@ -48,7 +48,7 @@ function useFlexLPCLabwareInfo({
   UseLPCLabwareInfoResult,
   'labwareInfo' | 'storedOffsets'
 > {
-  const runStatus = useRunStatus(runId)
+  const runStatus = useRunStatus(runId ?? null)
 
   const lwLocationCombos = useMemo(
     () =>
@@ -56,7 +56,6 @@ function useFlexLPCLabwareInfo({
         labwareDefs,
         protocolData,
         robotType,
-        runId,
       }),
     [labwareDefs?.length, protocolData?.commands.length, robotType]
   )
@@ -70,14 +69,17 @@ function useFlexLPCLabwareInfo({
 
   // We have to poll, because it's possible for a user to update the
   // offsets on a different app while a view utilizing this data is active.
-  const { data } = useSearchLabwareOffsets(searchLwOffsetsParams, {
-    enabled:
-      searchLwOffsetsParams.filters.length > 0 &&
-      robotType === FLEX_ROBOT_TYPE &&
-      runStatus === RUN_STATUS_IDLE,
-    refetchInterval: REFETCH_OFFSET_SEARCH_MS,
-  })
-  const storedOffsets = data?.data ?? []
+  const { data: lwOffsetsData } = useSearchLabwareOffsets(
+    searchLwOffsetsParams,
+    {
+      enabled:
+        searchLwOffsetsParams.filters.length > 0 &&
+        robotType === FLEX_ROBOT_TYPE &&
+        runStatus === RUN_STATUS_IDLE,
+      refetchInterval: REFETCH_OFFSET_SEARCH_MS,
+    }
+  )
+  const storedOffsets = lwOffsetsData?.data
 
   const labwareInfo = useMemo(
     () =>
@@ -87,11 +89,7 @@ function useFlexLPCLabwareInfo({
         labwareDefs,
         protocolData,
       }),
-    [
-      JSON.stringify(storedOffsets),
-      labwareDefs?.length,
-      lwLocationCombos.length,
-    ]
+    [storedOffsets, labwareDefs, lwLocationCombos, protocolData]
   )
 
   return { labwareInfo, storedOffsets }
@@ -101,8 +99,7 @@ function useOT2LPCLabwareInfo({
   runId,
   robotType,
 }: UseLPCLabwareInfoProps): Pick<UseLPCLabwareInfoResult, 'legacyOffsets'> {
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
+  const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
     enabled: robotType === OT2_ROBOT_TYPE,
   })
   const legacyOffsets = runRecord?.data?.labwareOffsets ?? []
