@@ -58,7 +58,10 @@ export function useNotifyDataReady<TData, TError = Error>({
   const forcePollingFF = useFeatureFlag('forceHttpPolling')
   const seenHostname = useRef<string | null>(null)
   const [refetch, setRefetch] = useState<HTTPRefetchFrequency>(null)
-  const [isNotifyEnabled, setIsNotifyEnabled] = useState(true)
+  const [
+    hasEncounteredNotificationsError,
+    setHasEncounteredNotificationsError,
+  ] = useState(false)
 
   const { enabled, staleTime, forceHttpPolling } = options
 
@@ -80,8 +83,6 @@ export function useNotifyDataReady<TData, TError = Error>({
       })
       dispatch(notifySubscribeAction(hostname, topic))
       seenHostname.current = hostname
-    } else {
-      setIsNotifyEnabled(false)
     }
 
     return () => {
@@ -98,7 +99,7 @@ export function useNotifyDataReady<TData, TError = Error>({
 
   const onDataEvent = useCallback((data: NotifyResponseData): void => {
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
-      setIsNotifyEnabled(false)
+      setHasEncounteredNotificationsError(true)
       if (data === 'ECONNREFUSED') {
         doTrackEvent({
           name: ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR,
@@ -120,6 +121,8 @@ export function useNotifyDataReady<TData, TError = Error>({
     [refetch, options.onSettled]
   )
 
+  const isNotifyEnabled =
+    shouldUseNotifications && !hasEncounteredNotificationsError
   const queryOptionsNotify = {
     ...options,
     onSettled: isNotifyEnabled ? notifyOnSettled : options.onSettled,
