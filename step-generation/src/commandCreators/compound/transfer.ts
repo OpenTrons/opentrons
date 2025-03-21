@@ -8,9 +8,9 @@ import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import { dropTipInTrash } from './dropTipInTrash'
 import {
-  blowoutUtil,
+  blowoutLocationHelper,
   curryCommandCreator,
-  airGapHelper,
+  airGapLocationHelper,
   reduceCommandCreators,
   getTrashOrLabware,
   dispenseLocationHelper,
@@ -475,7 +475,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                 ]
               : []
 
-          const blowoutCommand = blowoutUtil({
+          const blowoutCommand = blowoutLocationHelper({
             pipette: args.pipette,
             sourceLabwareId: args.sourceLabware,
             sourceWell: sourceWell,
@@ -490,7 +490,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
               ? [
-                  curryCommandCreator(airGapHelper, {
+                  curryCommandCreator(airGapLocationHelper, {
                     sourceWell,
                     blowOutLocation: args.blowoutLocation,
                     sourceId: args.sourceLabware,

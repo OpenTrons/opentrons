@@ -317,7 +317,7 @@ export function getWellsForTips(
 // Set blowout location depending on the 'blowoutLocation' arg: set it to
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
-export const blowoutUtil = (args: {
+export const blowoutLocationHelper = (args: {
   pipette: BlowoutParams['pipetteId']
   sourceLabwareId: string
   sourceWell: BlowoutParams['wellName']
@@ -702,7 +702,7 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-interface AirGapArgs {
+interface AirGapLocationArgs {
   //  destinationId is either labware or addressableAreaName for waste chute
   destinationId: string
   destWell: string | null
@@ -713,7 +713,7 @@ interface AirGapArgs {
   sourceId?: string
   sourceWell?: string
 }
-export const airGapHelper: CommandCreator<AirGapArgs> = (
+export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
   args,
   invariantContext,
   prevRobotState

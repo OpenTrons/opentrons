@@ -13,11 +13,11 @@ import { dropTipInTrash } from './dropTipInTrash'
 import {
   curryCommandCreator,
   reduceCommandCreators,
-  blowoutUtil,
+  blowoutLocationHelper,
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
   getHasWasteChute,
-  airGapHelper,
+  airGapLocationHelper,
 } from '../../utils'
 import {
   aspirate,
@@ -325,7 +325,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
           ? [
-              curryCommandCreator(airGapHelper, {
+              curryCommandCreator(airGapLocationHelper, {
                 pipetteId: args.pipette,
                 destinationId: dispenseAirGapLabware,
                 destWell: dispenseAirGapWell,
@@ -369,7 +369,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const dropTipAfterDispenseAirGap =
         airGapAfterDispenseCommands.length > 0 ? dropTipCommand : []
       const blowoutCommands = disposalVolume
-        ? blowoutUtil({
+        ? blowoutLocationHelper({
             pipette: pipette,
             sourceLabwareId: args.sourceLabware,
             sourceWell: args.sourceWell,
