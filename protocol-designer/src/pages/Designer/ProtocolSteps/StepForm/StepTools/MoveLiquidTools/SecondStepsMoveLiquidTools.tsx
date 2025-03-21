@@ -29,7 +29,9 @@ import {
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
+  getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
+import { getMaxPushOutVolume } from '../../../../../../utils'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
@@ -70,7 +72,7 @@ export const SecondStepsMoveLiquidTools = ({
     getAdditionalEquipmentEntities
   )
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-
+  const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
@@ -147,10 +149,14 @@ export const SecondStepsMoveLiquidTools = ({
     ]
   }
 
-  const minXYDimension = getMinXYDimension(
-    labwares[formData[`${tab}_labware`]].def,
-    ['A1']
+  const maxPushoutVolume = getMaxPushOutVolume(
+    Number(formData.volume),
+    pipetteSpec
   )
+
+  const minXYDimension = isDestinationTrash
+    ? null
+    : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
   const minRadiusForTouchTip =
     minXYDimension != null ? round(minXYDimension / 2, 1) : null
 
@@ -318,6 +324,38 @@ export const SecondStepsMoveLiquidTools = ({
             </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
+        {tab === 'dispense' ? (
+          <CheckboxExpandStepFormField
+            title={i18n.format(
+              t('form:step_edit_form.field.pushOut.title'),
+              'capitalize'
+            )}
+            checkboxValue={propsForFields.pushOut_checkbox.value}
+            isChecked={propsForFields.pushOut_checkbox.value === true}
+            checkboxUpdateValue={propsForFields.pushOut_checkbox.updateValue}
+            tooltipText={propsForFields.pushOut_checkbox.tooltipContent}
+          >
+            {formData.pushOut_checkbox === true ? (
+              <InputStepFormField
+                showTooltip={false}
+                padding="0"
+                title={t(
+                  'form:step_edit_form.field.pushOut.pushOut_volume.label'
+                )}
+                caption={t(
+                  'form:step_edit_form.field.pushOut.pushOut_volume.caption',
+                  { min: 0, max: maxPushoutVolume }
+                )}
+                {...propsForFields.pushOut_volume}
+                units={t('application:units.microliter')}
+                errorToShow={getFormLevelError(
+                  'pushOut_volume',
+                  mappedErrorsToField
+                )}
+              />
+            ) : null}
+          </CheckboxExpandStepFormField>
+        ) : null}
         <CheckboxExpandStepFormField
           title={i18n.format(
             t('form:step_edit_form.field.delay.label'),
@@ -411,6 +449,7 @@ export const SecondStepsMoveLiquidTools = ({
           tooltipText={
             propsForFields[`${tab}_touchTip_checkbox`].tooltipContent
           }
+          disabled={propsForFields[`${tab}_touchTip_checkbox`].disabled}
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>

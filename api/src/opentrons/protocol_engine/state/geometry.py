@@ -76,6 +76,7 @@ from ..types import (
     OnAddressableAreaLocationSequenceComponent,
     OnCutoutFixtureLocationSequenceComponent,
     NotOnDeckLocationSequenceComponent,
+    AreaType,
     labware_location_is_off_deck,
     labware_location_is_system,
 )
@@ -907,6 +908,32 @@ class GeometryView:
             fixtures = None
         return fixtures
 
+    def _get_potential_disposal_location_cutout_fixtures(
+        self, slot_name: DeckSlotName
+    ) -> CutoutFixture | None:
+        for area in self._addressable_areas.get_all():
+            if (
+                self._addressable_areas.get_addressable_area(area).area_type
+                == AreaType.WASTE_CHUTE
+                or self._addressable_areas.get_addressable_area(area).area_type
+                == AreaType.MOVABLE_TRASH
+            ) and slot_name == self._addressable_areas.get_addressable_area_base_slot(
+                area
+            ):
+                # Given we only have one Waste Chute fixture and one type of Trash bin fixture it's
+                # fine to return the first result of our potential fixtures here. This will need to
+                # change in the future if there multiple trash fixtures that share the same area type.
+                potential_fixture = (
+                    deck_configuration_provider.get_potential_cutout_fixtures(
+                        area, self._addressable_areas.deck_definition
+                    )[1].pop()
+                )
+                return deck_configuration_provider.get_cutout_fixture(
+                    potential_fixture.cutout_fixture_id,
+                    self._addressable_areas.deck_definition,
+                )
+        return None
+
     def get_labware_grip_point(
         self,
         labware_definition: LabwareDefinition,
@@ -1042,6 +1069,7 @@ class GeometryView:
             maybe_fixture = self._addressable_areas.get_fixture_by_deck_slot_name(
                 slot_name
             )
+
             # Ignore generic single slot fixtures
             if maybe_fixture and maybe_fixture["id"] in {
                 "singleLeftSlot",
@@ -1053,6 +1081,13 @@ class GeometryView:
             maybe_module = self._modules.get_by_slot(
                 slot_name=slot_name,
             ) or self._modules.get_overflowed_module_in_slot(slot_name=slot_name)
+
+            # For situations in which the deck config is none
+            if maybe_fixture is None and maybe_labware is None and maybe_module is None:
+                # todo(chb 2025-03-19): This can go away once we solve the problem of no deck config in analysis
+                maybe_fixture = self._get_potential_disposal_location_cutout_fixtures(
+                    slot_name
+                )
         else:
             # Modules and fixtures can't be loaded on staging slots
             maybe_fixture = None

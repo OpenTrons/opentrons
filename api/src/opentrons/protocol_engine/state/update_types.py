@@ -323,6 +323,7 @@ class PipetteEmptyFluidUpdate:
     """Sets the pipette to be valid and empty."""
 
     pipette_id: str
+    clean_tip: bool
     type: typing.Literal["empty"] = "empty"
 
 
@@ -776,10 +777,10 @@ class StateUpdate:
         )
         return self
 
-    def set_fluid_empty(self: Self, pipette_id: str) -> Self:
-        """Update record fo fluid held inside a pipette. See `PipetteEmptyFluidUpdate`."""
+    def set_fluid_empty(self: Self, pipette_id: str, clean_tip: bool = False) -> Self:
+        """Update record of fluid held inside a pipette. See `PipetteEmptyFluidUpdate`."""
         self.pipette_aspirated_fluid = PipetteEmptyFluidUpdate(
-            type="empty", pipette_id=pipette_id
+            type="empty", pipette_id=pipette_id, clean_tip=clean_tip
         )
         return self
 

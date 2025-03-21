@@ -317,7 +317,7 @@ export function getWellsForTips(
 // Set blowout location depending on the 'blowoutLocation' arg: set it to
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
-export const blowoutUtil = (args: {
+export const blowoutLocationHelper = (args: {
   pipette: BlowoutParams['pipetteId']
   sourceLabwareId: string
   sourceWell: BlowoutParams['wellName']
@@ -379,10 +379,14 @@ export const blowoutUtil = (args: {
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
+    const wasteChute = Object.values(additionalEquipmentEntities).find(
+      ae => ae.name === 'wasteChute'
+    )
     return [
       curryCommandCreator(blowOutInWasteChute, {
         pipetteId: pipette,
         flowRate,
+        wasteChuteId: wasteChute?.id as string,
       }),
     ]
   } else {
@@ -392,7 +396,7 @@ export const blowoutUtil = (args: {
     return [
       curryCommandCreator(blowOutInTrash, {
         pipetteId: pipette,
-        trashLocation: trashBin?.location as CutoutId,
+        trashId: trashBin?.id as string,
         flowRate,
       }),
     ]
@@ -620,6 +624,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
+        wasteChuteId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   } else {
@@ -628,8 +633,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
-        trashLocation: additionalEquipmentEntities[destinationId]
-          .location as CutoutId,
+        trashId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   }
@@ -671,25 +675,18 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    const pipetteChannels =
-      invariantContext.pipetteEntities[pipetteId].spec.channels
     commands = [
       curryCommandCreator(moveToAddressableArea, {
         pipetteId,
-        addressableAreaName: getWasteChuteAddressableAreaNamePip(
-          pipetteChannels
-        ),
+        fixtureId: additionalEquipmentEntities[destinationId].id,
         offset: { x: 0, y: 0, z: 0 },
       }),
     ]
   } else {
-    const addressableAreaName = getTrashBinAddressableAreaName(
-      additionalEquipmentEntities[destinationId].location as CutoutId
-    )
     commands = [
       curryCommandCreator(moveToAddressableArea, {
         pipetteId,
-        addressableAreaName,
+        fixtureId: additionalEquipmentEntities[destinationId].id,
         offset: ZERO_OFFSET,
       }),
     ]
@@ -698,19 +695,18 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-interface AirGapArgs {
+interface AirGapLocationArgs {
   //  destinationId is either labware or addressableAreaName for waste chute
   destinationId: string
   destWell: string | null
   flowRate: number
-  offsetFromBottomMm: number
   pipetteId: string
   volume: number
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
 }
-export const airGapHelper: CommandCreator<AirGapArgs> = (
+export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -720,7 +716,6 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     destinationId,
     destWell,
     flowRate,
-    offsetFromBottomMm,
     pipetteId,
     sourceId,
     sourceWell,
@@ -748,11 +743,11 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     commands = [
       curryCommandCreator(airGapInWell, {
         flowRate,
-        offsetFromBottomMm,
         pipetteId,
         labwareId: dispenseAirGapLabware,
         wellName: dispenseAirGapWell,
         volume,
+        type: 'dispense',
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -761,7 +756,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
         pipetteId,
         volume,
         flowRate,
-        invariantContext,
+        wasteChuteId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   } else {
@@ -770,8 +765,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
         pipetteId,
         volume,
         flowRate,
-        trashLocation: additionalEquipmentEntities[destinationId]
-          .location as CutoutId,
+        trashId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   }

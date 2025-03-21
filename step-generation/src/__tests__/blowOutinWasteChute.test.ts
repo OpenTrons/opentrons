@@ -1,26 +1,27 @@
 import { describe, it, expect, vi } from 'vitest'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
+  DEFAULT_PIPETTE,
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../fixtures'
 import { blowOutInWasteChute } from '../commandCreators/compound'
-import type { InvariantContext, PipetteEntities, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../types'
 
 vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
-const mockId = 'mockId'
-const mockPipEntities: PipetteEntities = {
-  [mockId]: {
-    name: 'p50_single_flex',
-    id: mockId,
-    spec: { channels: 1 },
-  },
-} as any
-
+const wasteChuteId = 'wasteChuteId'
 const invariantContext: InvariantContext = {
   ...makeContext(),
-  pipetteEntities: mockPipEntities,
+  additionalEquipmentEntities: {
+    [wasteChuteId]: {
+      id: wasteChuteId,
+      name: 'wasteChute',
+      pythonName: 'mock_waste_chute_1',
+      location: WASTE_CHUTE_CUTOUT,
+    },
+  },
 }
 const prevRobotState: RobotState = getInitialRobotStateStandard(
   invariantContext
@@ -30,8 +31,9 @@ describe('blowOutInWasteChute', () => {
   it('returns correct commands for blowing out in waste chute', () => {
     const result = blowOutInWasteChute(
       {
-        pipetteId: mockId,
+        pipetteId: DEFAULT_PIPETTE,
         flowRate: 10,
+        wasteChuteId,
       },
       invariantContext,
       prevRobotState
@@ -41,7 +43,7 @@ describe('blowOutInWasteChute', () => {
         commandType: 'moveToAddressableArea',
         key: expect.any(String),
         params: {
-          pipetteId: mockId,
+          pipetteId: DEFAULT_PIPETTE,
           addressableAreaName: '1ChannelWasteChute',
           offset: { x: 0, y: 0, z: 0 },
         },
@@ -50,10 +52,15 @@ describe('blowOutInWasteChute', () => {
         commandType: 'blowOutInPlace',
         key: expect.any(String),
         params: {
-          pipetteId: mockId,
+          pipetteId: DEFAULT_PIPETTE,
           flowRate: 10,
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mockPythonName.flow_rate.blow_out = 10
+mockPythonName.blow_out(mock_waste_chute_1)`.trim()
+    )
   })
 })

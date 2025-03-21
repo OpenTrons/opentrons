@@ -121,7 +121,7 @@ def test_round_trip(
     )
 
     with TemporaryDirectory() as tmp_dir, make_sql_engine(Path(tmp_dir)) as sql_engine:
-        subject = LabwareOffsetStore(sql_engine)
+        subject = LabwareOffsetStore(sql_engine, labware_offsets_publisher=None)
         subject.add(offset_to_add)
         [offset_retrieved_by_get_all] = subject.get_all()
         [offset_retrieved_by_search] = subject.search([SearchFilter(id=id)])
@@ -228,7 +228,7 @@ class LabwareStoreMachine(hypothesis.stateful.RuleBasedStateMachine):
         self._exit_stack = ExitStack()
         temp_dir = Path(self._exit_stack.enter_context(TemporaryDirectory()))
         sql_engine = self._exit_stack.enter_context(make_sql_engine(temp_dir))
-        self._subject = LabwareOffsetStore(sql_engine)
+        self._subject = LabwareOffsetStore(sql_engine, labware_offsets_publisher=None)
         self._simulated_model = SimulatedStore()
         self._added_ids = set[str]()
 

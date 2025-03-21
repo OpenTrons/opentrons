@@ -30,6 +30,7 @@
   "gripper_successfully_detached": "Flex Gripper successfully detached",
   "help_us_improve_send_error_report": "Help us improve your experience by sending an error report to {{support_email}}",
   "ip_description_second": "Opentrons recommends working with your network administrator to assign a static IP address to the robot.",
+  "labware_offsets_conflict_description": "Your Flex's stored labware offsets were updated after the last protocol run on <strong>{{timestamp}}</strong>. Which offsets do you want to use to run this protocol again?",
   "language_preference_description": "The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.",
   "learn_uninstalling": "Learn more about uninstalling the Opentrons App",
   "loosen_screws_and_detach": "Loosen screws and detach Flex Gripper",

@@ -81,8 +81,16 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   }
 
   const buildLabwareOnDeck = (): LabwareOnDeck[] => [
-    { labwareLocation: offsetLocationDetails, definition: labwareDef },
+    {
+      labwareLocation: {
+        ...offsetLocationDetails,
+        slotName: offsetLocationDetails.addressableAreaName,
+      },
+      definition: labwareDef,
+    },
   ]
+
+  console.log('=>(LPCDeck.tsx:84) buildLabwareOnDeck', buildLabwareOnDeck())
 
   return (
     <Flex css={DECK_CONTAINER_STYLE}>

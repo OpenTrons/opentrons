@@ -7,11 +7,12 @@ import type {
   LegacyLabwareOffsetCreateData,
   RunTimeParameterValuesCreateData,
   RunTimeParameterFilesCreateData,
+  LabwareOffsetCreateData,
 } from './types'
 
 export interface CreateRunData {
   protocolId?: string
-  labwareOffsets?: LegacyLabwareOffsetCreateData[]
+  labwareOffsets?: LegacyLabwareOffsetCreateData[] | LabwareOffsetCreateData[]
   runTimeParameterValues?: RunTimeParameterValuesCreateData
   runTimeParameterFiles?: RunTimeParameterFilesCreateData
 }
