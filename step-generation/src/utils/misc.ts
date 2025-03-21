@@ -379,10 +379,14 @@ export const blowoutUtil = (args: {
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
+    const wasteChute = Object.values(additionalEquipmentEntities).find(
+      ae => ae.name === 'wasteChute'
+    )
     return [
       curryCommandCreator(blowOutInWasteChute, {
         pipetteId: pipette,
         flowRate,
+        wasteChuteId: wasteChute?.id as string,
       }),
     ]
   } else {
