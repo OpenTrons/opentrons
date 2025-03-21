@@ -306,7 +306,7 @@ export function getFailedLabwareQuantity(
   runCommands: CommandsData | undefined,
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
-): string | null {
+): string | undefined {
   if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
     const itemsBeforefailedCmd = runCommands?.data.slice(
       0,
@@ -319,18 +319,20 @@ export function getFailedLabwareQuantity(
     )
     console.log('setStoredLabware: ', setStoredLabware)
     let total = 0
-    if (setStoredLabware?.params['initialCount']) {
+    if ('initialCount' in (setStoredLabware?.params ?? {})) {
       total = setStoredLabware?.params.initialCount
-      const retreiveCmds = itemsBeforefailedCmd?.filter(
-        cmd => cmd.commandType === 'flexStacker/retrieve'
-      ).length ?? 0
-      const storeCmds = itemsBeforefailedCmd?.filter(
-        cmd => cmd.commandType === 'flexStacker/store'
-      ).length ?? 0
+      const retreiveCmds =
+        itemsBeforefailedCmd?.filter(
+          cmd => cmd.commandType === 'flexStacker/retrieve'
+        ).length ?? 0
+      const storeCmds =
+        itemsBeforefailedCmd?.filter(
+          cmd => cmd.commandType === 'flexStacker/store'
+        ).length ?? 0
       return 'Quantity: ' + (total - retreiveCmds + storeCmds)
     } else return 'Quantity: 0'
   }
-  return null
+  return undefined
 }
 
 // Get the name of the relevant labware relevant to the failed command, if any.
@@ -486,7 +488,8 @@ export function useRelevantFailedLwLocations({
           displayNameNewLoc: getLabwareDisplayLocation({
             ...BASE_DISPLAY_PARAMS,
             location: BASE_DISPLAY_PARAMS.loadedModules.find(
-              (m : LoadedModule) => m.id === failedCommandByRunRecord?.params.moduleId
+              (m: LoadedModule) =>
+                m.id === failedCommandByRunRecord?.params.moduleId
             ).location,
           }),
           newLoc: {
