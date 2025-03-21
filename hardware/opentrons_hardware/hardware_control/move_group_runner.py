@@ -5,6 +5,7 @@ import logging
 from typing import List, Set, Tuple, Iterator, Union, Optional
 import numpy as np
 import time
+from opentrons_hardware.hardware_control import MOVE_PROFILE_LOG_NAME
 
 from opentrons_shared_data.errors.exceptions import (
     GeneralError,
@@ -85,6 +86,8 @@ from opentrons_hardware.hardware_control.motor_position_status import (
 from .types import NodeDict, MotorPositionStatus
 
 log = logging.getLogger(__name__)
+
+PROFILE_LOG = logging.getLogger(MOVE_PROFILE_LOG_NAME)
 
 _AcceptableMoves = Union[MoveCompleted, TipActionResponse]
 _CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
@@ -171,8 +174,14 @@ class MoveGroupRunner:
         ensure tighter timing, if you want something else to start as soon as
         possible to the actual execution of the move.
         """
+        start = time.time()
+        PROFILE_LOG.info(f"MoveGroupRunner.run\tstart\t{start}")
         await self.prep(can_messenger)
-        return await self.execute(can_messenger)
+        ret = await self.execute(can_messenger)
+        end = time.time()
+        PROFILE_LOG.info(f"MoveGroupRunner.run\tend\t{end}")
+        PROFILE_LOG.info(f"MoveGroupRunner.run\tduration\t{end - start}")
+        return ret
 
     @staticmethod
     def _accumulate_move_completions(
@@ -257,6 +266,8 @@ class MoveGroupRunner:
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to set up the message groups."""
+        start = time.time()
+        PROFILE_LOG.info(f"MoveGroupRunner._send_groups\tstart\t{start}")
         for group_i, group in enumerate(self._move_groups):
             for seq_i, sequence in enumerate(group):
                 for node, step in sequence.items():
@@ -266,6 +277,9 @@ class MoveGroupRunner:
                             step, group_i + self._start_at_index, seq_i
                         ),
                     )
+        end = time.time()
+        PROFILE_LOG.info(f"MoveGroupRunner._send_groups\tend\t{end}")
+        PROFILE_LOG.info(f"MoveGroupRunner._send_groups\tduration\t{end - start}")
 
     def _convert_velocity(
         self, velocity: Union[float, np.float64], interrupts: int
@@ -657,9 +671,10 @@ class MoveScheduler:
 
     async def _run_one_group(self, group_id: int, can_messenger: CanMessenger) -> None:
         self._event.clear()
-
         log.debug(f"Executing move group {group_id}.")
         self._current_group = group_id - self._start_at_index
+        start = time.time()
+        PROFILE_LOG.info(f"ExecuteMoveGroupRequest\tstart\t{start}")
         error = await can_messenger.ensure_send(
             node_id=NodeId.broadcast,
             message=ExecuteMoveGroupRequest(
@@ -674,25 +689,25 @@ class MoveScheduler:
             expected_nodes=self._get_nodes_in_move_group(group_id),
         )
         if error != ErrorCode.ok:
-            log.error(f"received error trying to execute move group: {str(error)}")
+            err_msg = f"received error trying to execute move group: {str(error)}"
+            PROFILE_LOG.error(err_msg)
+            log.error(err_msg)
 
-        expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
-        full_timeout = max(5.0, self._durations[group_id - self._start_at_index] * 2)
+        seconds_moving = self._durations[group_id - self._start_at_index]
+        PROFILE_LOG.info(f"ExecuteMoveGroupRequest\tduration-moving\t{seconds_moving}")
+        expected_time = max(3.0, seconds_moving * 1.1)
+        full_timeout = max(5.0, seconds_moving * 2)
         start_time = time.time()
-
         try:
             # The staged timeout handles some times when a move takes a liiiittle extra
             await asyncio.wait_for(
                 self._event.wait(),
                 full_timeout,
             )
-            duration = time.time() - start_time
+            end = time.time()
+            PROFILE_LOG.info(f"ExecuteMoveGroupRequest\tend\t{end}")
+            PROFILE_LOG.info(f"ExecuteMoveGroupRequest\tduration\t{end - start}")
             await self._send_stop_if_necessary(can_messenger, group_id)
-
-            if duration >= expected_time:
-                log.warning(
-                    f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
-                )
         except asyncio.TimeoutError:
             missing_node_msg = ", ".join(
                 node.name for node in self._get_nodes_in_move_group(group_id)
@@ -719,6 +734,8 @@ class MoveScheduler:
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
+        start = time.time()
+        PROFILE_LOG.info(f"MoveGroupRunner.run\tstart\t{start}")
         for group_id in range(
             self._start_at_index, self._start_at_index + len(self._moves)
         ):
@@ -728,4 +745,7 @@ class MoveScheduler:
             while not self._completion_queue.empty():
                 yield self._completion_queue.get_nowait()
 
-        return list(_reify_queue_iter())
+        ret = list(_reify_queue_iter())
+        end = time.time()
+        PROFILE_LOG.info(f"MoveGroupRunner.run\tend\t{end}")
+        return ret
