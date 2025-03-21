@@ -21,7 +21,7 @@ import { RecoveryInterventionModal } from './shared'
 
 import type {
   ClientDataRecovery,
-  UseUpdateClientDataRecoveryResult,
+  UseUpdateClientDataLPCResult,
 } from '/app/resources/client_data'
 import type { ErrorRecoveryFlowsProps } from '.'
 import {
@@ -81,7 +81,7 @@ interface RecoveryTakeoverProps {
   isRunStatusAwaitingRecovery: boolean
   robotName: string
   isOnDevice: boolean
-  clearClientData: UseUpdateClientDataRecoveryResult['clearClientData']
+  clearClientData: UseUpdateClientDataLPCResult['clearClientData']
 }
 
 export function RecoveryTakeoverComponent(
