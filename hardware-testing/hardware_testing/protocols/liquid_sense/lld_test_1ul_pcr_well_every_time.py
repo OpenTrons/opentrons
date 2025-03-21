@@ -14,7 +14,7 @@ from hardware_testing.protocols import (
 import math
 from typing import Tuple
 
-metadata = {"protocolName": "LLD 1uL PCR-to-MVS-20MAR"}
+metadata = {"protocolName": "LLD 1uL PCR-to-MVS-21MAR"}
 requirements = {"robotType": "Flex", "apiLevel": "2.22"}
 
 SLOTS = {
@@ -47,7 +47,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Number of Columns",
         minimum=1,
         maximum=12,
-        default=2,
+        default=1,
     )
     parameters.add_bool(
         variable_name="baseline", display_name="Baseline", default=False
@@ -61,7 +61,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Number of Plates",
         minimum=1,
         maximum=5,
-        default=5,
+        default=4,
     )
     parameters.add_bool(
         variable_name="skip_diluent", display_name="Skip Diluent", default=False
@@ -83,9 +83,9 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_float(
         variable_name = "submerge_depth",
         display_name = "All submerge depths",
-        default = 1.5,
+        default = 0.4,
         maximum = 2,
-        minimum = 0.5
+        minimum = 0.01
     )
     parameters.add_float(
         variable_name = "single_plate_vol",
@@ -94,6 +94,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1.0, 
         maximum=5.0
     )
+    
 
 
 def get_latest_version(load_name: str) -> int:
@@ -114,6 +115,8 @@ def run(ctx: ProtocolContext) -> None:
     use_test_matrix = ctx.params.use_test_matrix  # type: ignore[attr-defined]
     test_gripper_only = ctx.params.test_gripper_only  # type: ignore[attr-defined]
     single_plate_vol = ctx.params.single_plate_vol # type: ignore[attr-defined]
+    dye_src_well = ctx.params.dye_source_well # type: ignore[attr-defined]
+    
     TRIALS = columns * 8 * num_of_plates
     SUBMERGE_MM = ctx.params.submerge_depth # type: ignore[attr-defined]
     SUBMERGE_MM = -1 * SUBMERGE_MM
@@ -207,6 +210,9 @@ def run(ctx: ProtocolContext) -> None:
     # DYE - two different types for appropriate volumes
     volume_list = [1.0, 1.2, 1.5, 2.0, 5.0]
     volume_list_d = [1.0, 1.2, 1.5]
+    if num_of_plates == 4:
+        volume_list = volume_list[1:]
+        volume_list_d = volume_list[1:]
     total_dye_needed_d = (
         sum([(vol * 24) + 10 for vol in volume_list_d[:num_of_plates]]) * 3
     )
@@ -240,13 +246,16 @@ def run(ctx: ProtocolContext) -> None:
     dye_c = ctx.define_liquid("dye_c", "F1C232")
 
     # SOURCE WELL
+    split_well = [char for char in dye_src_well]
+    dye_src_well_2 = split_well[0]+ str(int(split_well[1]) + 1)
+    print(dye_src_well_2)
     if baseline:
         # if baseline, do not load dye
-        src_holder.load_empty([src_holder["A1"]])
-        src_holder.load_empty([src_holder["A2"]])
+        src_holder.load_empty([src_holder[dye_src_well]])
+        src_holder.load_empty([src_holder[dye_src_well_2]])
     else:
-        src_holder.load_liquid([src_holder["A1"]], total_dye_needed_d + 100, dye_d)
-        src_holder.load_liquid([src_holder["A2"]], total_dye_needed_c + 100, dye_c)
+        src_holder.load_liquid([src_holder[dye_src_well]], total_dye_needed_d + 100, dye_d)
+        src_holder.load_liquid([src_holder[dye_src_well_2]], total_dye_needed_c + 100, dye_c)
         src_labware.load_empty(src_labware.wells())
     for dst_labware in dst_labwares:
         if not diluent:
