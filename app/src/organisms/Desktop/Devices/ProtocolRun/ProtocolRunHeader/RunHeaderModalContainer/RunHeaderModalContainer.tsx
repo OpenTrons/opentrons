@@ -10,6 +10,7 @@ import {
   ConfirmMissingStepsModal,
 } from './modals'
 import { ConfirmAttachmentModal } from '/app/organisms/ModuleCard/ConfirmAttachmentModal'
+import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { RunControls } from '/app/organisms/RunTimeControl'
@@ -41,6 +42,7 @@ export function RunHeaderModalContainer(
     recoveryModalUtils,
     missingStepsModalUtils,
     dropTipUtils,
+    offsetConflictModalUtils,
   } = runHeaderModalContainerUtils
   const { dropTipModalUtils, dropTipWizardUtils } = dropTipUtils
 
@@ -89,6 +91,9 @@ export function RunHeaderModalContainer(
       )}
       {missingStepsModalUtils.showModal && (
         <ConfirmMissingStepsModal {...missingStepsModalUtils.modalProps} />
+      )}
+      {offsetConflictModalUtils.showModal && (
+        <LabwareOffsetsConflictModal {...props} isOnDevice={false} />
       )}
     </>
   )

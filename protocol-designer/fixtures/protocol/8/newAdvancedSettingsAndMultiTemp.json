@@ -140,7 +140,9 @@
           "stepName": "transfer",
           "stepDetails": "",
           "dispense_touchTip_mmfromTop": null,
-          "id": "292e8b18-f59e-4c63-b0f3-e242bf50094b"
+          "id": "292e8b18-f59e-4c63-b0f3-e242bf50094b",
+          "pushOut_checkbox": true,
+          "pushOut_volume": 2
         },
         "960c2d3b-9cf9-49b0-ab4c-af4113f6671a": {
           "moduleId": "d6966555-6c0e-45e0-8056-428d7c486401:temperatureModuleType",

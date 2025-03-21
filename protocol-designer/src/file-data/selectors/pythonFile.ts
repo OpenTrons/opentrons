@@ -163,7 +163,7 @@ export function getLoadLabware(
         `${formatPyStr(parameters.loadName)}`,
         ...(!onModule && !onAdapter
           ? [
-              `${formatPyStr(
+              `location=${formatPyStr(
                 labwareSlot === 'offDeck' ? OFF_DECK : labwareSlot
               )}`,
             ]

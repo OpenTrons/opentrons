@@ -9,6 +9,7 @@ import {
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
   LIQUID_SETUP_STEP_KEY,
+  selectTotalCountLocationSpecificOffsets,
 } from '/app/redux/protocol-runs'
 
 import type {
@@ -47,7 +48,8 @@ const NO_ANALYSIS_STEPS_IN_ORDER = [
 ]
 
 const keysInOrder = (
-  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null,
+  noLwOffsetsInRun: boolean
 ): UseRequiredSetupStepsInOrderReturn => {
   const orderedSteps =
     protocolAnalysis == null ? NO_ANALYSIS_STEPS_IN_ORDER : ALL_STEPS_IN_ORDER
@@ -65,6 +67,8 @@ const keysInOrder = (
             stepKey === LIQUID_SETUP_STEP_KEY &&
             protocolAnalysis.liquids.length === 0
           ) {
+            return false
+          } else if (stepKey === LPC_STEP_KEY && noLwOffsetsInRun) {
             return false
           } else {
             return true
@@ -86,9 +90,11 @@ export function useRequiredSetupStepsInOrder({
   const requiredSteps = useSelector<State>(state =>
     getSetupStepsRequired(state, runId)
   )
+  const noLwOffsetsInRun =
+    useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0
 
   useEffect(() => {
-    const applicable = keysInOrder(protocolAnalysis)
+    const applicable = keysInOrder(protocolAnalysis, noLwOffsetsInRun)
     dispatch(
       updateRunSetupStepsRequired(runId, {
         ...ALL_STEPS_IN_ORDER.reduce<

@@ -258,7 +258,9 @@
           "stepName": "transfer",
           "stepDetails": "",
           "id": "3961e4c0-75c7-11ea-b42f-4b64e50f43e5",
-          "dispense_touchTip_mmfromTop": null
+          "dispense_touchTip_mmfromTop": null,
+          "pushOut_checkbox": false,
+          "pushOut_volume": 0
         },
         "4f4057e0-75c7-11ea-b42f-4b64e50f43e5": {
           "engageHeight": "6",

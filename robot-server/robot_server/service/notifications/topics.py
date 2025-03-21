@@ -30,6 +30,7 @@ RUNS_COMMANDS_LINKS = TopicName(f"{_TOPIC_BASE}/runs/commands_links")
 RUNS = TopicName(f"{_TOPIC_BASE}/runs")
 DECK_CONFIGURATION = TopicName(f"{_TOPIC_BASE}/deck_configuration")
 RUNS_PRE_SERIALIZED_COMMANDS = TopicName(f"{_TOPIC_BASE}/runs/pre_serialized_commands")
+LABWARE_OFFSETS = TopicName(f"{_TOPIC_BASE}/labwareOffsets")
 
 
 def client_data(key: str) -> TopicName:

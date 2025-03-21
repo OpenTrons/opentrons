@@ -1,14 +1,16 @@
 import { useHistoricRunDetails } from './useHistoricRunDetails'
 
 import type { LabwareOffset, HostConfig } from '@opentrons/api-client'
+import type { UseNotifyAllRunsQueryOptions } from '/app/resources/runs'
 
 interface HistoricOffset extends LabwareOffset {
   runCreatedAt: string
 }
 export function useAllHistoricOffsets(
-  hostOverride?: HostConfig | null
+  hostOverride?: HostConfig | null,
+  queryOptions?: UseNotifyAllRunsQueryOptions
 ): HistoricOffset[] {
-  const historicRunDetails = useHistoricRunDetails(hostOverride)
+  const historicRunDetails = useHistoricRunDetails(hostOverride, queryOptions)
   return historicRunDetails
     .map(
       run =>

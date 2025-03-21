@@ -1,14 +1,11 @@
 import {
-  dropTipInPlace,
-  moveToAddressableArea,
-  getWasteChuteAddressableAreaNamePip,
   dropTipInTrash,
+  dropTipInWasteChute,
   curryCommandCreator,
   dropTip,
   reduceCommandCreators,
   commandCreatorsTimeline,
   getPipetteIdFromCCArgs,
-  ZERO_OFFSET,
 } from '@opentrons/step-generation'
 import { commandCreatorFromStepArgs } from '../file-data/helpers'
 import type { StepArgsAndErrorsById } from '../steplist/types'
@@ -75,11 +72,6 @@ export const generateRobotStateTimeline = (
         const isWasteChute = dropTipEntity?.name === 'wasteChute'
         const isTrashBin = dropTipEntity?.name === 'trashBin'
 
-        const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
-        const addressableAreaNameWasteChute = getWasteChuteAddressableAreaNamePip(
-          pipetteSpec.channels
-        )
-
         let dropTipCommands = [
           curryCommandCreator(dropTip, {
             pipette: pipetteId,
@@ -88,13 +80,9 @@ export const generateRobotStateTimeline = (
         ]
         if (isWasteChute) {
           dropTipCommands = [
-            curryCommandCreator(moveToAddressableArea, {
+            curryCommandCreator(dropTipInWasteChute, {
               pipetteId,
-              addressableAreaName: addressableAreaNameWasteChute,
-              offset: ZERO_OFFSET,
-            }),
-            curryCommandCreator(dropTipInPlace, {
-              pipetteId,
+              wasteChuteId: dropTipEntity.id,
             }),
           ]
         }

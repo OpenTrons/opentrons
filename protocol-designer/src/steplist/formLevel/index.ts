@@ -55,6 +55,8 @@ import {
   dispenseTouchTipMmFromEdgeOutOfRange,
   aspirateTouchTipMmFromEdgeRequired,
   dispenseTouchTipMmFromEdgeRequired,
+  pushOutVolumeRequired,
+  pushOutVolumeOutOfRange,
 } from './errors'
 
 import {
@@ -159,6 +161,8 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       dispenseWellsRequired,
       aspirateTouchTipSpeedRequired,
       dispenseTouchTipSpeedRequired,
+      pushOutVolumeRequired,
+      pushOutVolumeOutOfRange,
       aspirateTouchTipMmFromEdgeOutOfRange,
       dispenseTouchTipMmFromEdgeOutOfRange,
       aspirateTouchTipMmFromEdgeRequired,

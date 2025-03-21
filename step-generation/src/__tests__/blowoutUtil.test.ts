@@ -1,6 +1,6 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest'
 import {
-  blowoutUtil,
+  blowoutLocationHelper,
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils'
@@ -34,7 +34,7 @@ let blowoutArgs: {
   invariantContext: InvariantContext
   prevRobotState: RobotState
 }
-describe('blowoutUtil', () => {
+describe('blowoutLocationHelper', () => {
   let invariantContext: InvariantContext
 
   beforeEach(() => {
@@ -54,8 +54,8 @@ describe('blowoutUtil', () => {
     }
     vi.mocked(curryCommandCreator).mockClear()
   })
-  it('blowoutUtil curries blowout with source well params', () => {
-    blowoutUtil({
+  it('blowoutLocationHelper curries blowout with source well params', () => {
+    blowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
@@ -72,7 +72,7 @@ describe('blowoutUtil', () => {
       },
     })
   })
-  it('blowoutUtil curries waste chute commands when there is no well', () => {
+  it('blowoutLocationHelper curries waste chute commands when there is no well', () => {
     const wasteChuteId = 'wasteChuteId'
     invariantContext = {
       ...invariantContext,
@@ -84,7 +84,7 @@ describe('blowoutUtil', () => {
         },
       },
     }
-    blowoutUtil({
+    blowoutLocationHelper({
       ...blowoutArgs,
       destLabwareId: wasteChuteId,
       invariantContext: invariantContext,
@@ -94,10 +94,11 @@ describe('blowoutUtil', () => {
     expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWasteChute, {
       pipetteId: blowoutArgs.pipette,
       flowRate: 2.3,
+      wasteChuteId,
     })
   })
-  it('blowoutUtil curries blowout with dest plate params', () => {
-    blowoutUtil({
+  it('blowoutLocationHelper curries blowout with dest plate params', () => {
+    blowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
@@ -114,8 +115,8 @@ describe('blowoutUtil', () => {
       },
     })
   })
-  it('blowoutUtil curries blowout with an arbitrary labware Id', () => {
-    blowoutUtil({
+  it('blowoutLocationHelper curries blowout with an arbitrary labware Id', () => {
+    blowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: TROUGH_LABWARE,
     })
@@ -132,8 +133,8 @@ describe('blowoutUtil', () => {
       },
     })
   })
-  it('blowoutUtil returns an empty array if not given a blowoutLocation', () => {
-    const result = blowoutUtil({
+  it('blowoutLocationHelper returns an empty array if not given a blowoutLocation', () => {
+    const result = blowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: null,
     })

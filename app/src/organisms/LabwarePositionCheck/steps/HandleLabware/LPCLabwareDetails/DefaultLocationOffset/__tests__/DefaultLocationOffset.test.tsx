@@ -17,7 +17,7 @@ import {
   proceedEditOffsetSubstep,
   selectSelectedLwDisplayName,
 } from '/app/redux/protocol-runs'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -29,7 +29,7 @@ vi.mock('react-redux', async () => {
     useDispatch: vi.fn(),
   }
 })
-vi.mock('/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag')
+vi.mock('/app/organisms/LabwarePositionCheck/OffsetTag')
 vi.mock(
   '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareDetails/DefaultLocationOffset/ManageDefaultOffsetBtn',
   () => ({

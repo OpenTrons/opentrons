@@ -217,6 +217,8 @@ describe('createPresavedStepForm', () => {
       disposalVolume_volume: '1',
       path: 'single',
       preWetTip: false,
+      pushOut_checkbox: null,
+      pushOut_volume: null,
       stepDetails: '',
       stepName: 'transfer',
       volume: null,

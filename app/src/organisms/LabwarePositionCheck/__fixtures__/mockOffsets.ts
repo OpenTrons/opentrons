@@ -1,6 +1,6 @@
 import type {
   DefaultOffsetDetails,
-  LocationSpecificOffsetDetails,
+  LocationSpecificOffsetDetailsWithCopy,
 } from '/app/redux/protocol-runs'
 
 export const mockOffset = {
@@ -42,7 +42,7 @@ export const mockDefaultOffsetDetailsWithOffset: DefaultOffsetDetails = {
   },
 }
 
-export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] = [
+export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetailsWithCopy[] = [
   {
     existingOffset: {
       createdAt: '2025-03-01T12:00:00Z',
@@ -66,6 +66,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
         { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
       ],
     },
+    slotCopy: 'C1',
   },
   {
     existingOffset: null,
@@ -86,6 +87,7 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
         { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
       ],
     },
+    slotCopy: 'A2',
   },
   {
     existingOffset: {
@@ -111,5 +113,6 @@ export const mockLocationSpecificOffsetDetails: LocationSpecificOffsetDetails[] 
         { kind: 'labware', labwareUri: 'def-uri-1', id: '123' },
       ],
     },
+    slotCopy: 'B3',
   },
 ]

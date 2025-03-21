@@ -31,7 +31,7 @@ const MOCK_RUN_EARLIER: RunData = {
 
 describe('useHistoricRunDetails', () => {
   when(useNotifyAllRunsQuery)
-    .calledWith({}, {}, undefined)
+    .calledWith({}, undefined, undefined)
     .thenReturn(
       mockSuccessQueryResults({
         data: [MOCK_RUN_LATER, MOCK_RUN_EARLIER],
@@ -50,7 +50,7 @@ describe('useHistoricRunDetails', () => {
   })
   it('returns historical run details with newest first to specific host', async () => {
     when(useNotifyAllRunsQuery)
-      .calledWith({}, {}, { hostname: 'fakeIp' })
+      .calledWith({}, undefined, { hostname: 'fakeIp' })
       .thenReturn(
         mockSuccessQueryResults({
           data: [MOCK_RUN_EARLIER, MOCK_RUN_EARLIER, MOCK_RUN_LATER],

@@ -18,7 +18,6 @@ import {
   selectStepInfo,
   goBackEditOffsetSubstep,
   applyWorkingOffsets,
-  selectCountNonHardcodedLocationSpecificOffsetsForLw,
   selectIsAnyOffsetHardCoded,
 } from '/app/redux/protocol-runs'
 
@@ -141,9 +140,6 @@ describe('LPCLabwareDetails', () => {
       } as any)
     )
     vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => false)
-    vi.mocked(
-      selectCountNonHardcodedLocationSpecificOffsetsForLw
-    ).mockImplementation(() => () => 0)
     vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => false)
     vi.mocked(goBackEditOffsetSubstep).mockReturnValue({
       type: 'GO_BACK_HANDLE_LW_SUBSTEP',

@@ -1,8 +1,4 @@
-import {
-  curryCommandCreator,
-  getWasteChuteAddressableAreaNamePip,
-  reduceCommandCreators,
-} from '../../utils'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
 import {
   airGapInPlace,
@@ -15,6 +11,7 @@ interface AirGapInWasteChuteArgs {
   pipetteId: string
   volume: number
   flowRate: number
+  wasteChuteId: string
 }
 
 export const airGapInWasteChute: CommandCreator<AirGapInWasteChuteArgs> = (
@@ -22,17 +19,12 @@ export const airGapInWasteChute: CommandCreator<AirGapInWasteChuteArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, volume, flowRate } = args
-  const pipetteChannels =
-    invariantContext.pipetteEntities[pipetteId].spec.channels
-  const addressableAreaName = getWasteChuteAddressableAreaNamePip(
-    pipetteChannels
-  )
+  const { pipetteId, volume, flowRate, wasteChuteId } = args
 
   const commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
-      addressableAreaName,
+      fixtureId: wasteChuteId,
       offset: ZERO_OFFSET,
     }),
     curryCommandCreator(prepareToAspirate, {

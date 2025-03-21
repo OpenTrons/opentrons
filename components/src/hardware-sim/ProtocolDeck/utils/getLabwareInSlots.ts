@@ -111,74 +111,13 @@ export const getTopMostLabwareInSlots = (
   const initialLoadedLabwareByAdapter = getInitialLoadedLabwareByAdapter(
     commands
   )
-  const labwareObjects: LabwareInSlot[] = commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .reduce<LabwareInSlot[]>((acc, command) => {
-      const labwareId = command.result?.labwareId
-      const location = command.params.location
-      const labwareDef = command.result?.definition
-      if (
-        location === 'offDeck' ||
-        location === 'systemLocation' ||
-        'moduleId' in location ||
-        'labwareId' in location
-      )
-        return acc
-      if (labwareId == null) {
-        console.warn(
-          `expected to find labware id from command id ${String(
-            command.id
-          )} but could not`
-        )
-        return acc
-      }
-      if (labwareDef == null) {
-        console.warn(
-          `expected to find labware def for labware id ${String(
-            labwareId
-          )} in command id ${String(command.id)}but could not`
-        )
-        return acc
-      }
-
-      const slotName =
-        'addressableAreaName' in location
-          ? location.addressableAreaName
-          : location.slotName
-
-      const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
-
-      //  NOTE: only grabbing the labware on top most layer so
-      //  either the adapter or the labware but not both
-      const topLabwareDefinition =
-        labwareInAdapter?.result?.definition ?? labwareDef
-      const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
-      const topLabwareNickName =
-        labwareInAdapter?.params?.displayName ??
-        command.params.displayName ??
-        null
-
-      return [
-        ...acc,
-        {
-          labwareId: topLabwareId,
-          labwareDef: topLabwareDefinition,
-          labwareNickName: topLabwareNickName,
-          location: { slotName },
-        },
-      ]
-    }, [])
-
   const lidStackObjects: LabwareInSlot[] = commands
     .filter(
       (command): command is LoadLidStackRunTimeCommand =>
         command.commandType === 'loadLidStack'
     )
     .reduce<LabwareInSlot[]>((acc, command) => {
-      const labwareId = command.result?.labwareIds[0]
+      const labwareId = command.result?.labwareIds.at(-1)
       if (labwareId == null) {
         console.warn(
           `expected to find labware id from command id ${String(
@@ -238,6 +177,74 @@ export const getTopMostLabwareInSlots = (
         },
       ]
     }, [])
+  const labwareObjects: LabwareInSlot[] = commands
+    .filter(
+      (command): command is LoadLabwareRunTimeCommand =>
+        command.commandType === 'loadLabware'
+    )
+    .reduce<LabwareInSlot[]>((acc, command) => {
+      const labwareId = command.result?.labwareId
+      const location = command.params.location
+      const labwareDef = command.result?.definition
+      if (
+        location === 'offDeck' ||
+        location === 'systemLocation' ||
+        'moduleId' in location ||
+        'labwareId' in location
+      )
+        return acc
+      const slotName =
+        'addressableAreaName' in location
+          ? location.addressableAreaName
+          : location.slotName
+      // if there is a lid stack in this slot, don't add the adapter below it
+      if (
+        lidStackObjects.some(
+          lidStackObject => lidStackObject.location.slotName === slotName
+        )
+      ) {
+        return acc
+      }
+      if (labwareId == null) {
+        console.warn(
+          `expected to find labware id from command id ${String(
+            command.id
+          )} but could not`
+        )
+        return acc
+      }
+      if (labwareDef == null) {
+        console.warn(
+          `expected to find labware def for labware id ${String(
+            labwareId
+          )} in command id ${String(command.id)}but could not`
+        )
+        return acc
+      }
+
+      const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
+
+      //  NOTE: only grabbing the labware on top most layer so
+      //  either the adapter or the labware but not both
+      const topLabwareDefinition =
+        labwareInAdapter?.result?.definition ?? labwareDef
+      const topLabwareId = labwareInAdapter?.result?.labwareId ?? labwareId
+      const topLabwareNickName =
+        labwareInAdapter?.params?.displayName ??
+        command.params.displayName ??
+        null
+
+      return [
+        ...acc,
+        {
+          labwareId: topLabwareId,
+          labwareDef: topLabwareDefinition,
+          labwareNickName: topLabwareNickName,
+          location: { slotName },
+        },
+      ]
+    }, [])
+
   return labwareObjects.concat(lidStackObjects)
 }
 

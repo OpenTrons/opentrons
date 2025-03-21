@@ -18,92 +18,23 @@ import {
   StyledText,
   useMenuHandleClickOutside,
 } from '@opentrons/components'
-import { getLabwareDefURI } from '@opentrons/shared-data'
 import { Divider } from '/app/atoms/structure'
 import { getTopPortalEl } from '/app/App/portal'
 import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
-
+import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
 import type { MouseEventHandler } from 'react'
-import type {
-  LoadLabwareRunTimeCommand,
-  LoadLidStackRunTimeCommand,
-  LoadLidRunTimeCommand,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
-interface ProtocolLabwareDetailsProps {
-  loadLabwareCommands: Array<
-    | LoadLabwareRunTimeCommand
-    | LoadLidStackRunTimeCommand
-    | LoadLidRunTimeCommand
-  > | null
-}
-
-export const ProtocolLabwareDetails = (
-  props: ProtocolLabwareDetailsProps
-): JSX.Element => {
-  const { loadLabwareCommands } = props
+export const ProtocolLabwareDetails = (props: {
+  commands: RunTimeCommand[]
+}): JSX.Element => {
+  const { commands } = props
   const { t } = useTranslation('protocol_details')
 
-  const labwareAndLidDetails =
-    loadLabwareCommands != null
-      ? [
-          ...loadLabwareCommands
-            .reduce((acc, command) => {
-              if (command.result?.definition == null) return acc
-              else if (command.commandType === 'loadLid') return acc
-              else if (command.commandType === 'loadLidStack') {
-                if (!acc.has(getLabwareDefURI(command.result.definition))) {
-                  acc.set(getLabwareDefURI(command.result.definition), {
-                    ...command,
-                    quantity: 0,
-                  })
-                }
-                acc.get(
-                  getLabwareDefURI(command.result?.definition)
-                ).quantity += command.result?.labwareIds.length
-                return acc
-              } else {
-                let defUri = getLabwareDefURI(command.result?.definition)
-                const lidCommand = loadLabwareCommands.find(
-                  c =>
-                    c.commandType === 'loadLid' &&
-                    c.params.location !== 'offDeck' &&
-                    c.params.location !== 'systemLocation' &&
-                    'labwareId' in c.params.location &&
-                    c.params.location.labwareId === command.result?.labwareId
-                )
-                if (
-                  lidCommand != null &&
-                  lidCommand.result?.definition != null
-                ) {
-                  defUri = `${defUri}_${getLabwareDefURI(
-                    lidCommand.result.definition
-                  )}`
-
-                  if (!acc.has(defUri)) {
-                    acc.set(defUri, {
-                      ...command,
-                      quantity: 0,
-                      lid: lidCommand.result.definition,
-                    })
-                  }
-                } else {
-                  if (!acc.has(defUri)) {
-                    acc.set(defUri, {
-                      ...command,
-                      quantity: 0,
-                    })
-                  }
-                }
-                acc.get(defUri).quantity++
-                return acc
-              }
-            }, new Map())
-            .values(),
-        ]
-      : []
+  const labwareAndLidDetails = getRequiredLabwareDetailsFromLoadCommands(
+    commands
+  )
 
   return (
     <>
@@ -130,11 +61,11 @@ export const ProtocolLabwareDetails = (
           {labwareAndLidDetails?.map((labware, index) => (
             <ProtocolLabwareDetailItem
               key={index}
-              namespace={labware.params.namespace}
-              displayName={labware.result?.definition?.metadata?.displayName}
+              namespace={labware.labwareDef.namespace}
+              displayName={labware.labwareDef.metadata.displayName}
               quantity={labware.quantity}
-              labware={{ definition: labware.result?.definition }}
-              lid={labware.lid}
+              labware={{ definition: labware.labwareDef }}
+              lidDisplayName={labware.lidDisplayName}
               data-testid={`ProtocolLabwareDetails_item_${index}`}
             />
           ))}
@@ -149,8 +80,8 @@ export const ProtocolLabwareDetails = (
 interface ProtocolLabwareDetailItemProps {
   namespace: string
   displayName: string
-  quantity: string
-  lid?: LabwareDefinition2
+  quantity: number
+  lidDisplayName?: string
   labware: LabwareDefAndDate
 }
 
@@ -158,7 +89,7 @@ export const ProtocolLabwareDetailItem = (
   props: ProtocolLabwareDetailItemProps
 ): JSX.Element => {
   const { t } = useTranslation('protocol_details')
-  const { namespace, displayName, quantity, labware, lid } = props
+  const { namespace, displayName, quantity, labware, lidDisplayName } = props
   return (
     <>
       <Divider width="100%" />
@@ -192,13 +123,13 @@ export const ProtocolLabwareDetailItem = (
             >
               {displayName}
             </StyledText>
-            {lid != null ? (
+            {lidDisplayName != null ? (
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 color={COLORS.grey60}
                 paddingRight={SPACING.spacing32}
               >
-                {t('with_lid_name', { lid: lid.metadata.displayName })}
+                {t('with_lid_name', { lid: lidDisplayName })}
               </StyledText>
             ) : null}
           </Flex>

@@ -16,10 +16,10 @@ export function appendUniqValidLocCombo(
     return acc
   } else {
     const isUniqueCombo = !acc.some(accCombo => {
-      const { labwareId, ...comboNoLwId } = combo
-      const { labwareId: accLwId, ...accComboNoLwId } = accCombo
+      const { lwOffsetLocSeq: comboOffsetLs, definitionUri: comboUri } = combo
+      const { lwOffsetLocSeq: accOffsetLs, definitionUri: accUri } = accCombo
 
-      return isEqual(accComboNoLwId, comboNoLwId)
+      return isEqual(comboOffsetLs, accOffsetLs) && isEqual(comboUri, accUri)
     })
     const isValidCombo = isValidLocCombo(lwDefs, combo)
 

@@ -1,23 +1,19 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import {
-  TYPOGRAPHY,
-  LegacyStyledText,
-  getLabwareDisplayLocation,
-} from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 
 import {
   selectIsSelectedLwTipRack,
   selectSelectedLwOverview,
   OFFSET_KIND_DEFAULT,
   selectLwDisplayName,
+  getFlexSlotNameOnly,
 } from '/app/redux/protocol-runs'
 import { UnorderedList } from '/app/molecules/UnorderedList'
 import { DescriptionContent } from '/app/molecules/InterventionModal'
 
-import type { DisplayLocationParams } from '@opentrons/components'
+import type { TFunction } from 'i18next'
 import type {
   LPCWizardState,
   SelectedLwOverview,
@@ -49,21 +45,11 @@ export function PlaceItemInstruction(
       location: slotOnlyDisplayLocation,
     })
 
-  const buildDisplayParams = (): Omit<
-    DisplayLocationParams,
-    'detailLevel'
-  > => ({
-    t: commandTextT,
-    loadedModules: protocolData.modules,
-    loadedLabwares: protocolData.labware,
-    robotType: FLEX_ROBOT_TYPE,
-    location: offsetLocationDetails,
-  })
-
-  const slotOnlyDisplayLocation = getLabwareDisplayLocation({
-    detailLevel: 'slot-only',
-    ...buildDisplayParams(),
-  })
+  const slotOnlyDisplayLocation = getFlexSlotNameOnly(
+    offsetLocationDetails,
+    protocolData,
+    commandTextT as TFunction
+  )
 
   // The "clear deck" copy handles the module case.
   const lwOnlyLocSeq = offsetLocationDetails.lwModOnlyStackupDetails.filter(

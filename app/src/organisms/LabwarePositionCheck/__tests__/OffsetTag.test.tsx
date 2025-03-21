@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { Tag } from '@opentrons/components'
 
 vi.mock('@opentrons/components', () => ({

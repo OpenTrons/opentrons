@@ -1,30 +1,40 @@
 import {
-  PROCEED_STEP,
-  SET_SELECTED_LABWARE,
-  SET_INITIAL_POSITION,
-  SET_FINAL_POSITION,
-  FINISH_LPC,
-  START_LPC,
-  GO_BACK_LAST_STEP,
-  SET_SELECTED_LABWARE_URI,
+  APPLIED_OFFSETS_TO_RUN,
   APPLY_WORKING_OFFSETS,
-  LPC_STEPS,
-  PROCEED_HANDLE_LW_SUBSTEP,
-  GO_BACK_HANDLE_LW_SUBSTEP,
-  RESET_OFFSET_TO_DEFAULT,
   CLEAR_WORKING_OFFSETS,
+  FINISH_LPC,
+  GO_BACK_HANDLE_LW_SUBSTEP,
+  GO_BACK_LAST_STEP,
+  LPC_STEPS,
+  OFFSETS_CONFLICT,
+  OFFSETS_FROM_DATABASE,
+  OFFSETS_FROM_RUN_RECORD,
+  PROCEED_HANDLE_LW_SUBSTEP,
+  PROCEED_STEP,
+  RESET_OFFSET_TO_DEFAULT,
+  SET_FINAL_POSITION,
+  SET_INITIAL_POSITION,
+  SET_SELECTED_LABWARE,
+  SET_SELECTED_LABWARE_URI,
+  SOURCE_OFFSETS_FROM_DATABASE,
+  SOURCE_OFFSETS_FROM_RUN,
+  UPDATE_CONFLICT_TIMESTAMP,
+  UPDATE_LPC,
 } from '../constants'
 import {
-  updateOffsetsForURI,
-  proceedToNextHandleLwSubstep,
+  clearAllWorkingOffsets,
   goBackToPreviousHandleLwSubstep,
   handleApplyWorkingOffsets,
-  clearAllWorkingOffsets,
+  proceedToNextHandleLwSubstep,
+  updateLPCLabwareInfoFrom,
+  updateOffsetsForURI,
 } from './transforms'
 
 import type {
+  LPCLabwareInfo,
   LPCWizardAction,
   LPCWizardState,
+  OffsetSources,
   SelectedLwOverview,
 } from '../types'
 
@@ -35,7 +45,7 @@ export function LPCReducer(
   state: LPCWizardState | undefined,
   action: LPCWizardAction
 ): LPCWizardState | undefined {
-  if (action.type === START_LPC) {
+  if (action.type === UPDATE_LPC) {
     return action.payload.state
   } else if (state == null) {
     return undefined
@@ -174,8 +184,6 @@ export function LPCReducer(
         }
       }
 
-      // TODO(jh, 03-12-25): Revisit whether we need to set the store back to undefined, and
-      // if we can avoid having an `undefined` store at any point in the store's lifecycle.
       case FINISH_LPC:
         return {
           ...state,
@@ -193,6 +201,82 @@ export function LPCReducer(
             currentSubstep: null,
           },
         }
+
+      case APPLIED_OFFSETS_TO_RUN: {
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            areOffsetsApplied: true,
+          },
+        }
+      }
+
+      case SOURCE_OFFSETS_FROM_RUN: {
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            labware: updateLPCLabwareInfoFrom(
+              state.labwareInfo.initialRunRecordOffsets,
+              state.labwareInfo.labware
+            ),
+            sourcedOffsets: OFFSETS_FROM_RUN_RECORD,
+          },
+        }
+      }
+
+      case SOURCE_OFFSETS_FROM_DATABASE: {
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            sourcedOffsets: OFFSETS_FROM_DATABASE,
+          },
+        }
+      }
+
+      case UPDATE_CONFLICT_TIMESTAMP: {
+        const { info } = action.payload
+
+        const noDbOffsets =
+          state.labwareInfo.initialDatabaseOffsets.length === 0
+
+        const offsetSource = (): OffsetSources => {
+          if (info.timestamp == null) {
+            if (noDbOffsets) {
+              return OFFSETS_FROM_RUN_RECORD
+            } else {
+              return OFFSETS_FROM_DATABASE
+            }
+          } else {
+            return OFFSETS_CONFLICT
+          }
+        }
+
+        const updatedLw = (): LPCLabwareInfo['labware'] => {
+          switch (offsetSource()) {
+            case OFFSETS_FROM_RUN_RECORD: {
+              return updateLPCLabwareInfoFrom(
+                state.labwareInfo.initialRunRecordOffsets,
+                state.labwareInfo.labware
+              )
+            }
+            default:
+              return state.labwareInfo.labware
+          }
+        }
+
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            conflictTimestampInfo: info,
+            sourcedOffsets: offsetSource(),
+            labware: updatedLw(),
+          },
+        }
+      }
 
       default:
         return state

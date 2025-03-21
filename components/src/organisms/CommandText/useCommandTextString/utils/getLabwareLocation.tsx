@@ -173,7 +173,9 @@ export function getLabwareLocation(
   } else if ('slotName' in location) {
     return { slotName: location.slotName }
   } else if ('addressableAreaName' in location) {
-    return { slotName: location.addressableAreaName }
+    return {
+      slotName: getSlotFromAddressableAreaName(location.addressableAreaName),
+    }
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModel(loadedModules, location.moduleId)
     if (moduleModel == null) {

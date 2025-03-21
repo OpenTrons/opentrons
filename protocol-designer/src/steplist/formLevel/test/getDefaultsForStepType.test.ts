@@ -84,6 +84,8 @@ describe('getDefaultsForStepType', () => {
         blowout_location: null,
         blowout_flowRate: null,
         preWetTip: false,
+        pushOut_checkbox: null,
+        pushOut_volume: null,
 
         aspirate_airGap_checkbox: false,
         aspirate_airGap_volume: null,

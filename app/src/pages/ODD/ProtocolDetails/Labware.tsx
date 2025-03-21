@@ -8,11 +8,11 @@ import {
   Flex,
   Icon,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
 import { EmptySection } from './EmptySection'
@@ -52,21 +52,8 @@ const TableDatum = styled('td')`
 
 export const Labware = (props: { protocolId: string }): JSX.Element => {
   const labwareItems = useRequiredProtocolLabware(props.protocolId)
-  const labwareNames = labwareItems.map(li =>
-    getLabwareDisplayName(li.definition)
-  )
 
-  const countedNames = labwareNames.reduce(
-    (allNames: Record<string, number>, name: string) => {
-      const currCount: number = allNames[name] ?? 0
-      return {
-        ...allNames,
-        [name]: currCount + 1,
-      }
-    },
-    {}
-  )
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_details')
 
   return labwareItems.length === 0 ? (
     <EmptySection section="labware" />
@@ -75,17 +62,17 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
       <thead>
         <tr>
           <TableHeader>
-            <LegacyStyledText
+            <StyledText
               color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('labware_name'), 'titleCase')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
           <TableHeader>
-            <LegacyStyledText
+            <StyledText
               alignItems={ALIGN_CENTER}
               color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize20}
@@ -94,23 +81,21 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {i18n.format(t('quantity'), 'sentenceCase')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
         </tr>
       </thead>
       <tbody>
-        {Object.entries(countedNames).map(([name, count]) => {
-          const definition = labwareItems.find(
-            li => getLabwareDisplayName(li.definition) === name
-          )?.definition
+        {labwareItems.map((labware, index) => {
           return (
-            <TableRow key={name}>
+            <TableRow key={index}>
               <TableDatum>
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   paddingLeft={SPACING.spacing24}
+                  alignItems={ALIGN_CENTER}
                 >
-                  {definition?.namespace === 'opentrons' ? (
+                  {labware.labwareDef.namespace === 'opentrons' ? (
                     <Icon
                       color={COLORS.blue50}
                       name="check-decagram"
@@ -122,19 +107,36 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
                   ) : (
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
-                  <LegacyStyledText as="p" alignItems={ALIGN_CENTER}>
-                    {name}
-                  </LegacyStyledText>
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing4}
+                  >
+                    <StyledText
+                      oddStyle="bodyTextSemiBold"
+                      alignItems={ALIGN_CENTER}
+                    >
+                      {labware.labwareDef.metadata.displayName}
+                    </StyledText>
+                    {labware.lidDisplayName ? (
+                      <StyledText
+                        oddStyle="bodyTextRegular"
+                        alignItems={ALIGN_CENTER}
+                        color={COLORS.grey60}
+                      >
+                        {t('with_lid_name', { lid: labware.lidDisplayName })}
+                      </StyledText>
+                    ) : null}
+                  </Flex>
                 </Flex>
               </TableDatum>
               <TableDatum>
-                <LegacyStyledText
-                  as="p"
+                <StyledText
+                  oddStyle="bodyTextSemiBold"
                   alignItems={ALIGN_CENTER}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
-                  {count}
-                </LegacyStyledText>
+                  {labware.quantity}
+                </StyledText>
               </TableDatum>
             </TableRow>
           )

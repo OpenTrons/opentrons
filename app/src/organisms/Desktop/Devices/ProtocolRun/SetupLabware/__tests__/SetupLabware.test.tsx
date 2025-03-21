@@ -7,7 +7,6 @@ import { useHoverTooltip } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
 import { LegacyLabwarePositionCheck } from '/app/organisms/LegacyLabwarePositionCheck'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
@@ -35,7 +34,6 @@ vi.mock('/app/organisms/LegacyLabwarePositionCheck')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/config')
-vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
 
@@ -77,10 +75,6 @@ describe('SetupLabware', () => {
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-
-    when(vi.mocked(useLPCSuccessToast))
-      .calledWith()
-      .thenReturn({ setIsShowingLPCSuccessToast: vi.fn() })
 
     when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)

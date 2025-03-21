@@ -72,6 +72,7 @@
       "nozzles": "Partial pickup requires a tip rack directly on the deck. Full rack pickup requires the Flex 96 Tip Rack Adapter.",
       "pipette": "Select the pipette you want to use",
       "preWetTip": "Pre-wet by aspirating and dispensing the total aspiration volume",
+      "pushOut_checkbox": "Helps ensure all liquid leaves the tip",
       "setTemperature": "Select the temperature to set your module to",
       "wells": "Select wells",
       "volume": "Volume to dispense in each well"

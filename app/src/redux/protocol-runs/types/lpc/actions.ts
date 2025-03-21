@@ -1,4 +1,5 @@
 import type {
+  ConflictTimestampInfo,
   LocationSpecificOffsetLocationDetails,
   LPCStep,
   LPCWizardState,
@@ -12,8 +13,8 @@ export interface PositionParams {
   position: VectorOffset
 }
 
-export interface StartLPCAction {
-  type: 'START_LPC'
+export interface UpdateLPCAction {
+  type: 'UPDATE_LPC'
   payload: { runId: string; state: LPCWizardState }
 }
 
@@ -88,8 +89,28 @@ export interface GoBackHandleLwSubstepAction {
   payload: { runId: string }
 }
 
+export interface AppliedOffsetsToRunAction {
+  type: 'APPLIED_OFFSETS_TO_RUN'
+  payload: { runId: string }
+}
+
+export interface SourceOffsetsFromRunAction {
+  type: 'SOURCE_OFFSETS_FROM_RUN'
+  payload: { runId: string }
+}
+
+export interface SourceOffsetsFromDatabaseAction {
+  type: 'SOURCE_OFFSETS_FROM_DATABASE'
+  payload: { runId: string }
+}
+
+export interface UpdateConflictTimestampAction {
+  type: 'UPDATE_CONFLICT_TIMESTAMP'
+  payload: { runId: string; info: ConflictTimestampInfo }
+}
+
 export type LPCWizardAction =
-  | StartLPCAction
+  | UpdateLPCAction
   | FinishLPCAction
   | SelectedLabwareNameAction
   | SelectedLabwareAction
@@ -102,3 +123,7 @@ export type LPCWizardAction =
   | GoBackStepAction
   | ProceedHandleLwSubstepAction
   | GoBackHandleLwSubstepAction
+  | AppliedOffsetsToRunAction
+  | SourceOffsetsFromRunAction
+  | SourceOffsetsFromDatabaseAction
+  | UpdateConflictTimestampAction

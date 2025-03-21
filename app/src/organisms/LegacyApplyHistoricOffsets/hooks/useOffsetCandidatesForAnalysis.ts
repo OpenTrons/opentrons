@@ -18,12 +18,16 @@ export interface OffsetCandidate extends LabwareOffset {
 }
 export function useOffsetCandidatesForAnalysis(
   analysisOutput: ProtocolAnalysisOutput | CompletedProtocolAnalysis | null,
+  isFlex: boolean,
   robotIp?: string | null
 ): OffsetCandidate[] {
   const allHistoricOffsets = useAllHistoricOffsets(
-    robotIp != null ? { hostname: robotIp } : null
+    robotIp != null ? { hostname: robotIp } : null,
+    { enabled: !isFlex }
   )
-  if (allHistoricOffsets.length === 0 || analysisOutput == null) return []
+  // don't attempt to scrape offsets on the Flex ever.
+  if (allHistoricOffsets.length === 0 || analysisOutput == null || isFlex)
+    return []
   const { commands, labware, modules = [] } = analysisOutput
   const labwareLocationCombos = getLegacyLabwareLocationCombos(
     commands,

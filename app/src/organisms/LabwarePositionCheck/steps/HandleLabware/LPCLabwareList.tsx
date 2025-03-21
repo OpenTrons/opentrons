@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
-import { useLayoutEffect, useMemo, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 
 import {
   Flex,
@@ -21,11 +21,11 @@ import {
 } from '@opentrons/components'
 
 import {
-  selectAllLabwareInfo,
   setSelectedLabwareUri,
-  selectCountNonHardcodedLocationSpecificOffsetsForLw,
   proceedEditOffsetSubstep,
-  selectIsDefaultOffsetMissing,
+  selectIsNecessaryDefaultOffsetMissing,
+  selectAllLabwareInfoAndDefaultStatusSorted,
+  selectTotalOrMissingOffsetRequiredCountForLwCopy,
 } from '/app/redux/protocol-runs'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { getIsOnDevice } from '/app/redux/config'
@@ -33,6 +33,7 @@ import { getIsOnDevice } from '/app/redux/config'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LwGeometryDetails } from '/app/redux/protocol-runs'
 import type { LPCContentContainerProps } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
+import type { TFunction } from 'i18next'
 
 export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
@@ -85,36 +86,13 @@ interface LPCLabwareListContentProps extends LPCWizardContentProps {
 function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const { runId } = props
-  const labwareInfo = useSelector(selectAllLabwareInfo(runId))
-
-  const getIsDefaultOffsetAbsent = (info: LwGeometryDetails): boolean => {
-    return (
-      info?.defaultOffsetDetails?.existingOffset == null &&
-      info?.defaultOffsetDetails?.workingOffset?.confirmedVector == null
-    )
-  }
-  // Create and sort the labware entries
-  const sortedLabwareEntries = useMemo(() => {
-    return Object.entries(labwareInfo)
-      .map(([uri, info]) => ({
-        uri,
-        info,
-        isMissingDefaultOffset: getIsDefaultOffsetAbsent(info),
-      }))
-      .sort((a, b) => {
-        // Primary sort: isMissingDefaultOffset (true values first).
-        if (a.isMissingDefaultOffset !== b.isMissingDefaultOffset) {
-          return a.isMissingDefaultOffset ? -1 : 1
-        }
-
-        // Secondary sort: alphabetical by displayName.
-        return a.info.displayName.localeCompare(b.info.displayName)
-      })
-  }, [labwareInfo])
+  const labwareInfo = useSelector(
+    selectAllLabwareInfoAndDefaultStatusSorted(runId)
+  )
 
   // On the initial render, select the first uri from the list of labware (for desktop app purposes).
   useLayoutEffect(() => {
-    props.setSelectedUri(sortedLabwareEntries[0].uri)
+    props.setSelectedUri(labwareInfo[0].uri)
   }, [])
 
   return (
@@ -135,7 +113,7 @@ function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
           </tr>
         </thead>
       </Flex>
-      {sortedLabwareEntries.map(({ uri, info }) => (
+      {labwareInfo.map(({ uri, info }) => (
         <LabwareItem key={`labware_${uri}`} uri={uri} info={info} {...props} />
       ))}
       {/* Accommodate scrolling on the ODD. */}
@@ -158,27 +136,17 @@ function LabwareItem({
   selectedUri,
 }: LabwareItemProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
-  const isMissingDefaultOffset = useSelector(
-    selectIsDefaultOffsetMissing(runId, uri)
+  const isNecessaryDefaultOffsetMissing = useSelector(
+    selectIsNecessaryDefaultOffsetMissing(runId, uri)
   )
-  const countLocationSpecificOffsets = useSelector(
-    selectCountNonHardcodedLocationSpecificOffsetsForLw(runId, uri)
+  const offsetCopy = useSelector(
+    selectTotalOrMissingOffsetRequiredCountForLwCopy(runId, uri, t as TFunction)
   )
   const isOnDevice = useSelector(getIsOnDevice)
 
-  const getOffsetCopy = (): string => {
-    if (countLocationSpecificOffsets > 1) {
-      return isMissingDefaultOffset
-        ? t('num_missing_offsets', { num: countLocationSpecificOffsets })
-        : t('num_offsets', { num: countLocationSpecificOffsets })
-    } else {
-      return isMissingDefaultOffset ? t('one_missing_offset') : t('one_offset')
-    }
-  }
-
   return isOnDevice ? (
     <ListButton
-      type={isMissingDefaultOffset ? 'notConnected' : 'noActive'}
+      type={isNecessaryDefaultOffsetMissing ? 'notConnected' : 'noActive'}
       onClick={handlePrimaryOnClickOdd}
       width="100%"
     >
@@ -188,7 +156,7 @@ function LabwareItem({
             {info.displayName}
           </StyledText>
           <StyledText oddStyle="bodyTextRegular" css={SUBTEXT_STYLE}>
-            {getOffsetCopy()}
+            {offsetCopy}
           </StyledText>
         </Flex>
         <Icon name="chevron-right" css={ICON_STYLE} />
@@ -199,7 +167,7 @@ function LabwareItem({
       buttonLabel={info.displayName}
       buttonValue={info.displayName}
       largeDesktopBorderRadius={true}
-      buttonSubLabel={{ label: getOffsetCopy() }}
+      buttonSubLabel={{ label: offsetCopy }}
       isSelected={selectedUri === uri}
       onChange={() => {
         setSelectedUri(uri)

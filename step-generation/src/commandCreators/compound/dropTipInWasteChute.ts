@@ -1,14 +1,11 @@
-import {
-  curryCommandCreator,
-  getWasteChuteAddressableAreaNamePip,
-  reduceCommandCreators,
-} from '../../utils'
+import { curryWithoutPython, reduceCommandCreators } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
 import { dropTipInPlace, moveToAddressableArea } from '../atomic'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface DropTipInWasteChuteArgs {
   pipetteId: string
+  wasteChuteId: string
 }
 
 export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
@@ -17,12 +14,8 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   prevRobotState
 ) => {
   const offset = ZERO_OFFSET
-  const { pipetteId } = args
-  const pipetteChannels =
-    invariantContext.pipetteEntities[pipetteId].spec.channels
-  const addressableAreaName = getWasteChuteAddressableAreaNamePip(
-    pipetteChannels
-  )
+  const { pipetteId, wasteChuteId } = args
+  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
 
   let commandCreators: CurriedCommandCreator[] = []
 
@@ -30,15 +23,24 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
   if (!prevRobotState.tipState.pipettes[pipetteId]) {
     commandCreators = []
   } else {
+    const pipettePythonName = pipetteEntities[pipetteId].pythonName
+    const wasteChutePythonName =
+      additionalEquipmentEntities[wasteChuteId].pythonName
+    const pythonCommandCreator: CurriedCommandCreator = () => ({
+      commands: [],
+      python: `${pipettePythonName}.drop_tip(${wasteChutePythonName})`,
+    })
+
     commandCreators = [
-      curryCommandCreator(moveToAddressableArea, {
+      curryWithoutPython(moveToAddressableArea, {
         pipetteId,
-        addressableAreaName,
+        fixtureId: wasteChuteId,
         offset,
       }),
-      curryCommandCreator(dropTipInPlace, {
+      curryWithoutPython(dropTipInPlace, {
         pipetteId,
       }),
+      pythonCommandCreator,
     ]
   }
   return reduceCommandCreators(

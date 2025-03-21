@@ -64,14 +64,16 @@ const mockRobotIp = 'fakeRobotIp'
 describe('useOffsetCandidatesForAnalysis', () => {
   beforeEach(() => {
     when(useAllHistoricOffsets)
-      .calledWith({ hostname: mockRobotIp })
+      .calledWith({ hostname: mockRobotIp }, { enabled: true })
       .thenReturn([
         mockFirstDupCandidate,
         mockThirdCandidate,
         mockSecondCandidate,
         mockFirstCandidate,
       ])
-    when(useAllHistoricOffsets).calledWith(null).thenReturn([])
+    when(useAllHistoricOffsets)
+      .calledWith(null, { enabled: true })
+      .thenReturn([])
     when(getLegacyLabwareLocationCombos)
       .calledWith(expect.any(Array), expect.any(Array), expect.any(Array))
       .thenReturn([
@@ -106,7 +108,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
       children,
     }) => <div>{children}</div>
     const { result } = renderHook(
-      () => useOffsetCandidatesForAnalysis(null, mockRobotIp),
+      () => useOffsetCandidatesForAnalysis(null, false, mockRobotIp),
       { wrapper }
     )
     await waitFor(() => {
@@ -122,6 +124,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
       () =>
         useOffsetCandidatesForAnalysis(
           storedProtocolDataFixture.mostRecentAnalysis,
+          false,
           null
         ),
       { wrapper }
@@ -138,6 +141,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
       () =>
         useOffsetCandidatesForAnalysis(
           storedProtocolDataFixture.mostRecentAnalysis,
+          false,
           mockRobotIp
         ),
       { wrapper }

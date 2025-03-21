@@ -383,6 +383,7 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
               backgroundColor={COLORS.grey10}
               padding={SPACING.spacing12}
               borderRadius={BORDERS.borderRadius4}
+              data-testid={`cycleStep-${cycleStepIndex}`}
             >
               <Flex
                 flexDirection={DIRECTION_COLUMN}
@@ -503,6 +504,7 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
               backgroundColor={COLORS.grey10}
               padding={SPACING.spacing12}
               borderRadius={BORDERS.borderRadius4}
+              data-testid={`cycleStep-${cycleStepIndex}`}
             >
               <StyledText
                 desktopStyle="bodyDefaultRegular"
@@ -561,6 +563,7 @@ export function ThermocyclerCycle(props: ThermocyclerCycleProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius4}
+      data-testid="thermocyclerCycle"
     >
       {header}
       {bodyContent}

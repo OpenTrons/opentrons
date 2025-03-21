@@ -8,11 +8,10 @@ import {
   Flex,
   Icon,
   SPACING,
-  LegacyStyledText,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { useRequiredProtocolLabware } from '/app/resources/protocols'
 
@@ -51,38 +50,24 @@ const TableDatum = styled('td')`
 
 export const Labware = (props: { transferId: string }): JSX.Element => {
   const labwareItems = useRequiredProtocolLabware(props.transferId)
-  const labwareNames = labwareItems.map(li =>
-    getLabwareDisplayName(li.definition)
-  )
-
-  const countedNames = labwareNames.reduce(
-    (allNames: Record<string, number>, name: string) => {
-      const currCount: number = allNames[name] ?? 0
-      return {
-        ...allNames,
-        [name]: currCount + 1,
-      }
-    },
-    {}
-  )
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_details')
 
   return (
     <Table>
       <thead>
         <tr>
           <TableHeader>
-            <LegacyStyledText
+            <StyledText
               color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
               {i18n.format(t('labware_name'), 'titleCase')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
           <TableHeader>
-            <LegacyStyledText
+            <StyledText
               alignItems={ALIGN_CENTER}
               color={COLORS.grey60}
               fontSize={TYPOGRAPHY.fontSize20}
@@ -91,23 +76,20 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
               textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {t('quantity')}
-            </LegacyStyledText>
+            </StyledText>
           </TableHeader>
         </tr>
       </thead>
       <tbody>
-        {Object.entries(countedNames).map(([name, count]) => {
-          const definition = labwareItems.find(
-            li => getLabwareDisplayName(li.definition) === name
-          )?.definition
+        {labwareItems.map((labware, index) => {
           return (
-            <TableRow key={name}>
+            <TableRow key={index}>
               <TableDatum>
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   paddingLeft={SPACING.spacing24}
                 >
-                  {definition?.namespace === 'opentrons' ? (
+                  {labware.labwareDef.namespace === 'opentrons' ? (
                     <Icon
                       color={COLORS.blue50}
                       name="check-decagram"
@@ -119,19 +101,22 @@ export const Labware = (props: { transferId: string }): JSX.Element => {
                   ) : (
                     <Flex marginLeft={SPACING.spacing20} />
                   )}
-                  <LegacyStyledText as="p" alignItems={ALIGN_CENTER}>
-                    {name}
-                  </LegacyStyledText>
+                  <StyledText
+                    oddStyle="bodyTextSemiBold"
+                    alignItems={ALIGN_CENTER}
+                  >
+                    {labware.labwareDef.metadata.displayName}
+                  </StyledText>
                 </Flex>
               </TableDatum>
               <TableDatum>
-                <LegacyStyledText
-                  as="p"
+                <StyledText
+                  oddStyle="bodyTextSemiBold"
                   alignItems={ALIGN_CENTER}
                   textAlign={TYPOGRAPHY.textAlignCenter}
                 >
-                  {count}
-                </LegacyStyledText>
+                  {labware.quantity}
+                </StyledText>
               </TableDatum>
             </TableRow>
           )
