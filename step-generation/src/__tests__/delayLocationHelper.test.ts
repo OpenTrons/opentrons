@@ -5,7 +5,7 @@ import {
   getInitialRobotStateStandard,
   SOURCE_LABWARE,
 } from '../fixtures'
-import { moveAndDelayLocationHelper } from '../utils'
+import { delayLocationHelper } from '../utils'
 import type { RobotState, InvariantContext } from '../types'
 
 const mockTrashBinId = 'trashBinId'
@@ -24,7 +24,7 @@ const prevRobotState: RobotState = getInitialRobotStateStandard(
   invariantContext
 )
 
-describe('moveAndDelayLocationHelper', () => {
+describe('delayLocationHelper', () => {
   it('moves to waste chute and delays', () => {
     const args = {
       pipetteId: 'p10SingleId',
@@ -34,11 +34,7 @@ describe('moveAndDelayLocationHelper', () => {
       zOffset: 0,
     }
 
-    const result = moveAndDelayLocationHelper(
-      args,
-      invariantContext,
-      prevRobotState
-    )
+    const result = delayLocationHelper(args, invariantContext, prevRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
@@ -73,11 +69,7 @@ protocol.delay(seconds=30)`.trimStart()
       seconds: 30,
     }
 
-    const result = moveAndDelayLocationHelper(
-      args,
-      invariantContext,
-      prevRobotState
-    )
+    const result = delayLocationHelper(args, invariantContext, prevRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
@@ -131,11 +123,7 @@ protocol.delay(seconds=30)`.trimStart()
       zOffset: 0,
     }
 
-    const result = moveAndDelayLocationHelper(
-      args,
-      invariantContext,
-      prevRobotState
-    )
+    const result = delayLocationHelper(args, invariantContext, prevRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {

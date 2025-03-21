@@ -720,7 +720,7 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-interface MoveAndDelayLocationHelperArgs {
+interface DelayLocationHelperArgs {
   pipetteId: string
   destinationId: string
   well: string | null
@@ -728,7 +728,7 @@ interface MoveAndDelayLocationHelperArgs {
   seconds: number
 }
 
-export const moveAndDelayLocationHelper: CommandCreator<MoveAndDelayLocationHelperArgs> = (
+export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   args,
   invariantContext,
   prevRobotState

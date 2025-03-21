@@ -15,7 +15,7 @@ import {
   getTrashOrLabware,
   dispenseLocationHelper,
   getHasWasteChute,
-  moveAndDelayLocationHelper,
+  delayLocationHelper,
 } from '../../utils'
 import {
   aspirate,
@@ -295,7 +295,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const delayAfterAspirateCommands =
             aspirateDelay != null
               ? [
-                  curryCommandCreator(moveAndDelayLocationHelper, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
                     destinationId: args.sourceLabware,
                     well: sourceWell,
@@ -453,7 +453,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [
-                  curryCommandCreator(moveAndDelayLocationHelper, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
                     destinationId: args.destLabware,
                     well: destinationWell,

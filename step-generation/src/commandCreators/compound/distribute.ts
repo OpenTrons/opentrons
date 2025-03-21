@@ -18,7 +18,7 @@ import {
   getIsSafePipetteMovement,
   getHasWasteChute,
   airGapLocationHelper,
-  moveAndDelayLocationHelper,
+  delayLocationHelper,
 } from '../../utils'
 import {
   aspirate,
@@ -241,7 +241,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [
-                  curryCommandCreator(moveAndDelayLocationHelper, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
                     destinationId: args.destLabware,
                     well: destWell,
@@ -376,7 +376,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const delayAfterAspirateCommands =
         aspirateDelay != null
           ? [
-              curryCommandCreator(moveAndDelayLocationHelper, {
+              curryCommandCreator(delayLocationHelper, {
                 pipetteId: args.pipette,
                 destinationId: args.sourceLabware,
                 well: args.sourceWell,

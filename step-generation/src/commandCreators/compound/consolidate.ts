@@ -15,7 +15,7 @@ import {
   dispenseLocationHelper,
   getHasWasteChute,
   getIsSafePipetteMovement,
-  moveAndDelayLocationHelper,
+  delayLocationHelper,
   reduceCommandCreators,
 } from '../../utils'
 import {
@@ -199,7 +199,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           const delayAfterAspirateCommands =
             aspirateDelay != null
               ? [
-                  curryCommandCreator(moveAndDelayLocationHelper, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
                     destinationId: args.sourceLabware,
                     well: sourceWell,
@@ -361,7 +361,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const delayAfterDispenseCommands =
         dispenseDelay != null
           ? [
-              curryCommandCreator(moveAndDelayLocationHelper, {
+              curryCommandCreator(delayLocationHelper, {
                 pipetteId: args.pipette,
                 destinationId: args.destLabware,
                 well: destinationWell,
