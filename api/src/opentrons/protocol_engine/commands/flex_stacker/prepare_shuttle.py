@@ -1,4 +1,4 @@
-"""Command models to home the stacker."""
+"""Command models to prepare the stacker shuttle for movement."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from typing_extensions import Type
 
 from pydantic import BaseModel, Field
 
-from ..flex_stacker.common import FlexStackerStallOrCollisionError
+from .common import FlexStackerStallOrCollisionError
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 
 from ..command import (
@@ -25,26 +25,27 @@ if TYPE_CHECKING:
     from ...state.state import StateView
     from ...execution import EquipmentHandler
 
-HomeCommandType = Literal["flexStacker/home"]
+PrepareShuttleCommandType = Literal["flexStacker/prepareShuttle"]
 
 
-class HomeParams(BaseModel):
-    """The parameters defining how a stacker should be emptied."""
+class PrepareShuttleParams(BaseModel):
+    """The parameters for a PrepareShuttle command."""
 
     moduleId: str = Field(..., description="Unique ID of the Flex Stacker")
 
 
-class HomeResult(BaseModel):
-    """Result data from a stacker empty command."""
+class PrepareShuttleResult(BaseModel):
+    """Result data from a stacker PrepareShuttle command."""
 
 
 _ExecuteReturn = Union[
-    SuccessData[HomeResult], DefinedErrorData[FlexStackerStallOrCollisionError]
+    SuccessData[PrepareShuttleResult],
+    DefinedErrorData[FlexStackerStallOrCollisionError],
 ]
 
 
-class HomeImpl(AbstractCommandImpl[HomeParams, _ExecuteReturn]):
-    """Implementation of a stacker empty command."""
+class PrepareShuttleImpl(AbstractCommandImpl[PrepareShuttleParams, _ExecuteReturn]):
+    """Implementation of a stacker prepare shuttle command."""
 
     def __init__(
         self,
@@ -57,8 +58,8 @@ class HomeImpl(AbstractCommandImpl[HomeParams, _ExecuteReturn]):
         self._equipment = equipment
         self._model_utils = model_utils
 
-    async def execute(self, params: HomeParams) -> _ExecuteReturn:
-        """Execute the stacker empty command."""
+    async def execute(self, params: PrepareShuttleParams) -> _ExecuteReturn:
+        """Execute the stacker prepare shuttle command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
@@ -82,24 +83,27 @@ class HomeImpl(AbstractCommandImpl[HomeParams, _ExecuteReturn]):
                     ],
                 ),
             )
+        # TODO we should also add a check for shuttle not detected error
 
-        return SuccessData(public=HomeResult())
-
-
-class Home(BaseCommand[HomeParams, HomeResult, ErrorOccurrence]):
-    """A command to home a Flex Stacker."""
-
-    commandType: HomeCommandType = "flexStacker/home"
-    params: HomeParams
-    result: HomeResult | None = None
-
-    _ImplementationCls: Type[HomeImpl] = HomeImpl
+        return SuccessData(public=PrepareShuttleResult())
 
 
-class HomeCreate(BaseCommandCreate[HomeParams]):
-    """A request to execute a Flex Stacker home command."""
+class PrepareShuttle(
+    BaseCommand[PrepareShuttleParams, PrepareShuttleResult, ErrorOccurrence]
+):
+    """A command to prepare Flex Stacker shuttle."""
 
-    commandType: HomeCommandType = "flexStacker/home"
-    params: HomeParams
+    commandType: PrepareShuttleCommandType = "flexStacker/prepareShuttle"
+    params: PrepareShuttleParams
+    result: PrepareShuttleResult | None = None
 
-    _CommandCls: Type[Home] = Home
+    _ImplementationCls: Type[PrepareShuttleImpl] = PrepareShuttleImpl
+
+
+class PrepareShuttleCreate(BaseCommandCreate[PrepareShuttleParams]):
+    """A request to execute a Flex Stacker PrepareShuttle command."""
+
+    commandType: PrepareShuttleCommandType = "flexStacker/prepareShuttle"
+    params: PrepareShuttleParams
+
+    _CommandCls: Type[PrepareShuttle] = PrepareShuttle

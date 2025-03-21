@@ -29,7 +29,13 @@ from .fill import FillCommandType, FillParams, FillResult, Fill, FillCreate
 
 from .empty import EmptyCommandType, EmptyParams, EmptyResult, Empty, EmptyCreate
 
-from .home import HomeCommandType, HomeParams, HomeResult, Home, HomeCreate
+from .prepare_shuttle import (
+    PrepareShuttleCommandType,
+    PrepareShuttleParams,
+    PrepareShuttleResult,
+    PrepareShuttle,
+    PrepareShuttleCreate,
+)
 
 
 __all__ = [
@@ -64,10 +70,10 @@ __all__ = [
     "EmptyResult",
     "Empty",
     "EmptyCreate",
-    # flexStacker/home
-    "HomeCommandType",
-    "HomeParams",
-    "HomeResult",
-    "Home",
-    "HomeCreate",
+    # flexStacker/prepareShuttle
+    "PrepareShuttleCommandType",
+    "PrepareShuttleParams",
+    "PrepareShuttleResult",
+    "PrepareShuttle",
+    "PrepareShuttleCreate",
 ]

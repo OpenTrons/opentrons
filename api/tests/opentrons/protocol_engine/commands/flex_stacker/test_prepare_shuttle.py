@@ -1,4 +1,4 @@
-"""Test Flex Stacker home command implementation."""
+"""Test Flex Stacker prepare shuttle command implementation."""
 
 from datetime import datetime
 
@@ -19,7 +19,9 @@ from opentrons.protocol_engine.state.module_substates import (
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import flex_stacker
 from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
-from opentrons.protocol_engine.commands.flex_stacker.home import HomeImpl
+from opentrons.protocol_engine.commands.flex_stacker.prepare_shuttle import (
+    PrepareShuttleImpl,
+)
 
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 
@@ -27,21 +29,23 @@ from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 @pytest.fixture
 def subject(
     state_view: StateView, equipment: EquipmentHandler, model_utils: ModelUtils
-) -> HomeImpl:
-    """Get a home command to test."""
-    return HomeImpl(state_view=state_view, equipment=equipment, model_utils=model_utils)
+) -> PrepareShuttleImpl:
+    """Get a PrepareShuttle command to test."""
+    return PrepareShuttleImpl(
+        state_view=state_view, equipment=equipment, model_utils=model_utils
+    )
 
 
 async def test_home_command(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: HomeImpl,
+    subject: PrepareShuttleImpl,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should return a success data."""
-    data = flex_stacker.HomeParams(moduleId=stacker_id)
+    data = flex_stacker.PrepareShuttleParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -59,14 +63,14 @@ async def test_home_command(
 
     decoy.verify(await stacker_hardware.home_all(), times=1)
 
-    assert result == SuccessData(public=flex_stacker.HomeResult())
+    assert result == SuccessData(public=flex_stacker.PrepareShuttleResult())
 
 
 async def test_home_command_with_stall_detected(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: HomeImpl,
+    subject: PrepareShuttleImpl,
     model_utils: ModelUtils,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
@@ -75,7 +79,7 @@ async def test_home_command_with_stall_detected(
     err_id = "error-id"
     err_timestamp = datetime(year=2025, month=3, day=19)
 
-    data = flex_stacker.HomeParams(moduleId=stacker_id)
+    data = flex_stacker.PrepareShuttleParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
