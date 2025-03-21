@@ -55,6 +55,7 @@ import type {
   RobotState,
   SourceAndDest,
 } from '../types'
+import { delayInWell } from '../commandCreators/compound/delayInWell'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -774,6 +775,44 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
         flowRate,
         trashLocation: additionalEquipmentEntities[destinationId]
           .location as CutoutId,
+      }),
+    ]
+  }
+
+  return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+interface MoveAndDelayLocationHelperArgs {
+  pipetteId: string
+  destinationId: string
+  well: string | null
+  zOffset: number
+  seconds: number
+}
+
+export const moveAndDelayLocationHelper: CommandCreator<MoveAndDelayLocationHelperArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
+  const { pipetteId, destinationId, well, zOffset, seconds } = args
+  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const trashOrLabware = getTrashOrLabware(
+    labwareEntities,
+    additionalEquipmentEntities,
+    destinationId
+  )
+
+  let commands: CurriedCommandCreator[] = []
+
+  if (well != null && trashOrLabware === 'labware') {
+    commands = [
+      curryCommandCreator(delayInWell, {
+        destinationId,
+        well,
+        zOffset,
+        seconds,
+        pipetteId,
       }),
     ]
   }
