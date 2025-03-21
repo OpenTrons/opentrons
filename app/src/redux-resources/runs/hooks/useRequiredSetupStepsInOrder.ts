@@ -8,7 +8,6 @@ import {
   MODULE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
-  LIQUID_SETUP_STEP_KEY,
 } from '/app/redux/protocol-runs'
 
 import type {
@@ -37,7 +36,6 @@ const ALL_STEPS_IN_ORDER = [
   MODULE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
-  LIQUID_SETUP_STEP_KEY,
 ] as const
 
 const NO_ANALYSIS_STEPS_IN_ORDER = [
@@ -59,11 +57,6 @@ const keysInOrder = (
           if (
             stepKey === MODULE_SETUP_STEP_KEY &&
             protocolAnalysis.modules.length === 0
-          ) {
-            return false
-          } else if (
-            stepKey === LIQUID_SETUP_STEP_KEY &&
-            protocolAnalysis.liquids.length === 0
           ) {
             return false
           } else {

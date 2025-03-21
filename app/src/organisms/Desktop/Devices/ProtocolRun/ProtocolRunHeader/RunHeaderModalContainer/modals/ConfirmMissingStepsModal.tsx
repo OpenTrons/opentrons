@@ -15,7 +15,6 @@ import {
 import {
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
-  LIQUID_SETUP_STEP_KEY,
   MODULE_SETUP_STEP_KEY,
   ROBOT_CALIBRATION_STEP_KEY,
 } from '/app/redux/protocol-runs'
@@ -24,7 +23,6 @@ import type { StepKey } from '/app/redux/protocol-runs'
 const STEP_KEY_TO_I18N_KEY = {
   [LPC_STEP_KEY]: 'applied_labware_offsets',
   [LABWARE_SETUP_STEP_KEY]: 'labware_placement',
-  [LIQUID_SETUP_STEP_KEY]: 'liquids',
   [MODULE_SETUP_STEP_KEY]: 'module_setup',
   [ROBOT_CALIBRATION_STEP_KEY]: 'robot_calibration',
 }

@@ -3,7 +3,6 @@ import type {
   MODULE_SETUP_STEP_KEY,
   LPC_STEP_KEY,
   LABWARE_SETUP_STEP_KEY,
-  LIQUID_SETUP_STEP_KEY,
   UPDATE_RUN_SETUP_STEPS_COMPLETE,
   UPDATE_RUN_SETUP_STEPS_REQUIRED,
 } from '../constants'
@@ -12,14 +11,12 @@ export type RobotCalibrationStepKey = typeof ROBOT_CALIBRATION_STEP_KEY
 export type ModuleSetupStepKey = typeof MODULE_SETUP_STEP_KEY
 export type LPCStepKey = typeof LPC_STEP_KEY
 export type LabwareSetupStepKey = typeof LABWARE_SETUP_STEP_KEY
-export type LiquidSetupStepKey = typeof LIQUID_SETUP_STEP_KEY
 
 export type StepKey =
   | RobotCalibrationStepKey
   | ModuleSetupStepKey
   | LPCStepKey
   | LabwareSetupStepKey
-  | LiquidSetupStepKey
 
 export interface StepState {
   required: boolean
