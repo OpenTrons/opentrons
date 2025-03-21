@@ -1155,6 +1155,7 @@ describe('advanced options', () => {
       } as TransferArgs
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
+
       expect(res.commands).toEqual([
         // Pre-wet
         {
@@ -1878,6 +1879,7 @@ describe('advanced options', () => {
 
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
+
       expect(res.commands).toEqual([
         // Pre-wet
         {
@@ -2600,6 +2602,7 @@ describe('advanced options', () => {
 
       const result = transfer(args, invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
+
       expect(res.commands).toEqual([
         // get fresh tip b/c it's per source
         {

@@ -1,5 +1,6 @@
 import {
   curryCommandCreator,
+  curryWithoutPython,
   getWasteChuteAddressableAreaNamePip,
   reduceCommandCreators,
 } from '../../utils'
@@ -37,12 +38,12 @@ export const blowOutInWasteChute: CommandCreator<BlowOutInWasteChuteArgs> = (
       `${pipettePythonName}.blow_out(${wasteChutePythonName})`,
   })
   const commandCreators = [
-    curryCommandCreator(moveToAddressableArea, {
+    curryWithoutPython(moveToAddressableArea, {
       pipetteId,
       addressableAreaName,
       offset: ZERO_OFFSET,
     }),
-    curryCommandCreator(blowOutInPlace, {
+    curryWithoutPython(blowOutInPlace, {
       pipetteId,
       flowRate,
     }),
