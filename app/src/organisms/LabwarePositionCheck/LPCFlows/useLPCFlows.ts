@@ -21,8 +21,8 @@ import {
   useCompatibleAnalysis,
   useUpdateDeckConfig,
   useHandleClientAppliedOffsets,
+  useOffsetConflictTimestamp,
 } from './hooks'
-import { useOffsetConflictTimestamp } from './useOffsetConflictTimestamp'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type {
