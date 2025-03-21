@@ -8,7 +8,7 @@ import {
   getSelectedLabwareWithOffsetDetails,
   getWorkingOffsetsByUri,
   getTotalCountLocationSpecificOffsets,
-  getCountNonHardcodedLocationSpecificOffsets,
+  getCountMissingLSOffsetsWithoutDefault,
   getIsNecessaryDefaultOffsetMissing,
   getTotalCountNonHardCodedLocationSpecificOffsets,
   getIsAnyNecessaryDefaultOffsetMissing,
@@ -128,7 +128,7 @@ export const selectTotalOrMissingOffsetRequiredCountForLwCopy = (
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .locationSpecificOffsetDetails,
     (defaultDetails, lsDetails) => {
-      const countLSOffsetsNoHC = getCountNonHardcodedLocationSpecificOffsets(
+      const countLSOffsetsNoHC = getCountMissingLSOffsetsWithoutDefault(
         lsDetails
       )
       const countLSOffsetsTotal = lsDetails?.length ?? 0

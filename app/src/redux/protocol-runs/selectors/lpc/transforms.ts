@@ -318,11 +318,11 @@ export function getTotalCountNonHardCodedLocationSpecificOffsets(
   return count
 }
 
-export function getCountNonHardcodedLocationSpecificOffsets(
+export function getCountMissingLSOffsetsWithoutDefault(
   lsDetails: LocationSpecificOffsetDetails[] | undefined
 ): number {
   return lsDetails != null
-    ? lsDetails.length - getCountHardCodedOffsets(lsDetails)
+    ? lsDetails.filter(detail => detail.existingOffset?.vector == null).length
     : 0
 }
 
