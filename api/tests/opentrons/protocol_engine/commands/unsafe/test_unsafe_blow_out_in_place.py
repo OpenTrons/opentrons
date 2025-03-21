@@ -46,7 +46,7 @@ async def test_blow_out_in_place_implementation(
         public=UnsafeBlowOutInPlaceResult(),
         state_update=update_types.StateUpdate(
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                pipette_id="pipette-id"
+                pipette_id="pipette-id", clean_tip=False
             ),
             ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                 pipette_id="pipette-id", ready_to_aspirate=False

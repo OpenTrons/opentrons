@@ -7,6 +7,7 @@ import {
   DEFAULT_BLOWOUT_WELL,
   DEST_LABWARE,
 } from './data'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
 import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 
 import type {
@@ -100,17 +101,7 @@ export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => (
 type MakeAspDispHelper<P> = (
   bakedParams?: Partial<P>
 ) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
-type MakeAirGapHelper<P> = (
-  bakedParams: Partial<P> & {
-    wellLocation: {
-      origin: 'bottom'
-      offset: {
-        z: number
-      }
-    }
-  }
-) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
-type MakeDispenseAirGapHelper<P> = MakeAirGapHelper<P>
+
 const _defaultAspirateParams = {
   pipetteId: DEFAULT_PIPETTE,
   labwareId: SOURCE_LABWARE,
@@ -147,11 +138,11 @@ export const makeMoveToWellHelper = (wellName: string, labwareId?: string) => ({
     labwareId: labwareId ?? SOURCE_LABWARE,
     wellName,
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         x: 0,
         y: 0,
-        z: 11.54,
+        z: AIR_GAP_OFFSET_FROM_TOP,
       },
     },
   },
@@ -255,19 +246,26 @@ export const makeDispenseHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     ...params,
   },
 })
-export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AspDispAirgapParams> = bakedParams => (
-  wellName,
-  volume,
-  params
-) => ({
+export const makeDispenseAirGapHelper = (
+  wellName: string,
+  volume: number
+): CreateCommand => ({
   commandType: 'dispense',
   key: expect.any(String),
   params: {
-    ..._defaultDispenseParams,
-    ...bakedParams,
+    pipetteId: DEFAULT_PIPETTE,
+    labwareId: DEST_LABWARE,
+    wellLocation: {
+      origin: 'top' as const,
+      offset: {
+        y: 0,
+        x: 0,
+        z: 1,
+      },
+    },
+    flowRate: DISPENSE_FLOW_RATE,
     wellName,
     volume,
-    ...params,
   },
   meta: AIR_GAP_META,
 })

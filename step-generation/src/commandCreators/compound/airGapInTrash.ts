@@ -1,8 +1,4 @@
-import {
-  getTrashBinAddressableAreaName,
-  reduceCommandCreators,
-  curryCommandCreator,
-} from '../../utils'
+import { reduceCommandCreators, curryCommandCreator } from '../../utils'
 import { ZERO_OFFSET } from '../../constants'
 import {
   airGapInPlace,
@@ -10,25 +6,23 @@ import {
   prepareToAspirate,
 } from '../atomic'
 import type { CurriedCommandCreator, CommandCreator } from '../../types'
-import type { CutoutId } from '@opentrons/shared-data'
 
 interface AirGapInTrashParams {
   pipetteId: string
   flowRate: number
   volume: number
-  trashLocation: CutoutId
+  trashId: string
 }
 export const airGapInTrash: CommandCreator<AirGapInTrashParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, trashLocation, flowRate, volume } = args
-  const addressableAreaName = getTrashBinAddressableAreaName(trashLocation)
+  const { pipetteId, trashId, flowRate, volume } = args
   const commandCreators: CurriedCommandCreator[] = [
     curryCommandCreator(moveToAddressableArea, {
       pipetteId,
-      addressableAreaName,
+      fixtureId: trashId,
       offset: ZERO_OFFSET,
     }),
     curryCommandCreator(prepareToAspirate, {

@@ -239,7 +239,9 @@
           "stepName": "transfer",
           "stepDetails": "",
           "id": "d2f74144-a7bf-4ba2-aaab-30d70b2b62c7",
-          "dispense_touchTip_mmfromTop": null
+          "dispense_touchTip_mmfromTop": null,
+          "pushOut_checkbox": true,
+          "pushOut_volume": 7
         },
         "240a2c96-3db8-4679-bdac-049306b7b9c4": {
           "blockIsActive": true,

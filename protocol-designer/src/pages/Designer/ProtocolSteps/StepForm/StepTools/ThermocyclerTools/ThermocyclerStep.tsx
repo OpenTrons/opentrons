@@ -333,6 +333,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius4}
+      data-testid="thermocyclerStep"
     >
       {header}
       {showEdit ? editContent : null}
