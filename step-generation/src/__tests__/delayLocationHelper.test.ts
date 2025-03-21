@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import {
   makeContext,
   getSuccessResult,
@@ -8,15 +9,15 @@ import {
 import { delayLocationHelper } from '../utils'
 import type { RobotState, InvariantContext } from '../types'
 
-const mockTrashBinId = 'trashBinId'
+const mockWasteChuteId = 'wasteChuteId'
 let invariantContext: InvariantContext = {
   ...makeContext(),
   additionalEquipmentEntities: {
-    [mockTrashBinId]: {
-      id: mockTrashBinId,
-      name: 'trashBin',
-      pythonName: 'mock_trash_bin_1',
-      location: 'cutoutA3',
+    [mockWasteChuteId]: {
+      id: mockWasteChuteId,
+      name: 'wasteChute',
+      pythonName: 'mock_waste_chute_1',
+      location: WASTE_CHUTE_CUTOUT,
     },
   },
 }
@@ -28,7 +29,7 @@ describe('delayLocationHelper', () => {
   it('moves to waste chute and delays', () => {
     const args = {
       pipetteId: 'p10SingleId',
-      destinationId: mockTrashBinId,
+      destinationId: mockWasteChuteId,
       seconds: 30,
       well: null,
       zOffset: 0,
@@ -43,7 +44,7 @@ describe('delayLocationHelper', () => {
         params: {
           pipetteId: 'p10SingleId',
           offset: { x: 0, y: 0, z: 0 },
-          addressableAreaName: 'movableTrashA3',
+          addressableAreaName: '1ChannelWasteChute',
         },
       },
       {
@@ -56,7 +57,7 @@ describe('delayLocationHelper', () => {
     ])
     expect(res.python).toBe(
       `
-mockPythonName.move_to(mock_trash_bin_1)
+mockPythonName.move_to(mock_waste_chute_1)
 protocol.delay(seconds=30)`.trimStart()
     )
   })
@@ -104,6 +105,7 @@ protocol.delay(seconds=30)`.trimStart()
     )
   })
   it('moves to trash bin and delays', () => {
+    const mockTrashBinId = 'trashBinId'
     invariantContext = {
       ...invariantContext,
       additionalEquipmentEntities: {
