@@ -97,6 +97,9 @@ export function useNotifyDataReady<TData, TError = Error>({
   }, [topic, hostname, shouldUseNotifications])
 
   const onDataEvent = useCallback((data: NotifyResponseData): void => {
+    if (topic === 'robot-server/labwareOffsets') {
+      console.error('MAX onDataEvent:', data)
+    }
     if (data === 'ECONNFAILED' || data === 'ECONNREFUSED') {
       setIsNotifyEnabled(false)
       if (data === 'ECONNREFUSED') {
@@ -112,7 +115,10 @@ export function useNotifyDataReady<TData, TError = Error>({
 
   const notifyOnSettled = useCallback(
     (data: TData | undefined, error: TError | null) => {
+      console.error('MAX: notifyOnSettled')
+
       if (refetch === 'once') {
+        console.error('MAX: notifyOnSettled and set refetch to null')
         setRefetch(null)
       }
       options.onSettled?.(data, error)

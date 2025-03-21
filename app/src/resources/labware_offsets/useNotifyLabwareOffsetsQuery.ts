@@ -21,6 +21,12 @@ export function useNotifySearchLabwareOffsets(
     topic: 'robot-server/labwareOffsets',
     options,
   })
+  console.error('MAX: useNotifySearchLabwareOffsets', {
+    request,
+    options,
+    shouldRefetch,
+    queryOptionsNotify,
+  })
 
   const httpQueryResult = useSearchLabwareOffsets(request, queryOptionsNotify)
 
