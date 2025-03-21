@@ -30,7 +30,6 @@ export function LeftColumnLabwareInfo({
   const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
   const { step } = recoveryMap
   const {
-    MANUAL_REPLACE_AND_RETRY,
     MANUAL_REPLACE_STACKER_AND_RETRY,
     MANUAL_LOAD_IN_STACKER_AND_SKIP,
   } = RECOVERY_MAP
@@ -62,13 +61,13 @@ export function LeftColumnLabwareInfo({
     }
   }
 
-  const buildQuntity = (): string | null => {
+  const buildQuntity = (): string | undefined => {
     switch (step) {
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
         return labwareQuantity
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
-        return null
+        return undefined
       default:
         return labwareQuantity
     }

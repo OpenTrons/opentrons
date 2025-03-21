@@ -59,6 +59,7 @@ export function FillWell(props: RecoveryContentProps): JSX.Element | null {
               well: failedLabwareUtils.relevantWellName,
             })}
             type="location"
+            layout='default'
           />
         </Flex>
         <Flex marginTop="1.742rem">

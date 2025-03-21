@@ -23,6 +23,7 @@ import type {
   MoveLabwareRunTimeCommand,
   StackerRetriveRunTimeCommand,
   LabwareLocation,
+  LoadedModule,
 } from '@opentrons/shared-data'
 
 import {
@@ -61,7 +62,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   failedLabwareNickname: string | null
   /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
-  labwareQuantity: string | null
+  labwareQuantity: string | undefined
 }
 
 /** Utils for labware relating to the failedCommand.
@@ -322,11 +323,11 @@ export function getFailedLabwareQuantity(
       total = setStoredLabware?.params.initialCount
       const retreiveCmds = itemsBeforefailedCmd?.filter(
         cmd => cmd.commandType === 'flexStacker/retrieve'
-      ).length
+      ).length ?? 0
       const storeCmds = itemsBeforefailedCmd?.filter(
         cmd => cmd.commandType === 'flexStacker/store'
-      ).length
-      return 'Quantity: ' + total - retreiveCmds + storeCmds
+      ).length ?? 0
+      return 'Quantity: ' + (total - retreiveCmds + storeCmds)
     } else return 'Quantity: 0'
   }
   return null
@@ -485,7 +486,7 @@ export function useRelevantFailedLwLocations({
           displayNameNewLoc: getLabwareDisplayLocation({
             ...BASE_DISPLAY_PARAMS,
             location: BASE_DISPLAY_PARAMS.loadedModules.find(
-              m => m.id === failedCommandByRunRecord?.params.moduleId
+              (m : LoadedModule) => m.id === failedCommandByRunRecord?.params.moduleId
             ).location,
           }),
           newLoc: {
