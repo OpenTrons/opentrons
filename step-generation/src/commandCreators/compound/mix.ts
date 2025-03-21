@@ -102,15 +102,17 @@ export function mixUtil(args: {
       `location=${labwarePythonName}[${formatPyStr(
         well
       )}]${formatPyWellLocation(pythonWellLocation)}`,
-      `rate=(${aspirateFlowRateUlSec} / ${pipettePythonName}.flow_rate.aspirate) + (${dispenseFlowRateUlSec} / ${pipettePythonName}.flow_rate.dispense)`,
     ]
     return {
       commands: [],
       //  Note: we do not support mix in trashBin or wasteChute so location
       //  will always be a well
-      python: `${pipettePythonName}.mix(\n${indentPyLines(
-        pythonArgs.join(',\n')
-      )},\n)`,
+      python:
+        `${pipettePythonName}.flow_rate.aspirate = ${aspirateFlowRateUlSec}\n` +
+        `${pipettePythonName}.flow_rate.dispense = ${dispenseFlowRateUlSec}\n` +
+        `${pipettePythonName}.mix(\n${indentPyLines(
+          pythonArgs.join(',\n')
+        )},\n)`,
     }
   }
   return [

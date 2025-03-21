@@ -104,27 +104,30 @@ describe('mix: change tip', () => {
       `
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.flow_rate.aspirate = 2.1
+mockPythonName.flow_rate.dispense = 2.2
 mockPythonName.mix(
     repetitions=2,
     volume=5,
     location=mockPythonName["A1"].bottom(z=3.2),
-    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
 )
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.flow_rate.aspirate = 2.1
+mockPythonName.flow_rate.dispense = 2.2
 mockPythonName.mix(
     repetitions=2,
     volume=5,
     location=mockPythonName["B1"].bottom(z=3.2),
-    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
 )
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.flow_rate.aspirate = 2.1
+mockPythonName.flow_rate.dispense = 2.2
 mockPythonName.mix(
     repetitions=2,
     volume=5,
     location=mockPythonName["C1"].bottom(z=3.2),
-    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
 )`.trimStart()
     )
   })
@@ -487,33 +490,36 @@ mockPythonName.touch_tip(mockPythonName["C1"], v_offset=-3.4)`.trimStart()
       `
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.flow_rate.aspirate = 2.1
+mockPythonName.flow_rate.dispense = 2.2
 mockPythonName.mix(
     repetitions=2,
     volume=8,
     location=mockPythonName["A1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
-    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
 mockPythonName.touch_tip(mockPythonName["A1"], v_offset=-3.4)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.flow_rate.aspirate = 2.1
+mockPythonName.flow_rate.dispense = 2.2
 mockPythonName.mix(
     repetitions=2,
     volume=8,
     location=mockPythonName["B1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
-    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
 mockPythonName.touch_tip(mockPythonName["B1"], v_offset=-3.4)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
+mockPythonName.flow_rate.aspirate = 2.1
+mockPythonName.flow_rate.dispense = 2.2
 mockPythonName.mix(
     repetitions=2,
     volume=8,
     location=mockPythonName["C1"].bottom(z=3.2).move(types.Point(x=1, y=1)),
-    rate=(2.1 / mockPythonName.flow_rate.aspirate) + (2.2 / mockPythonName.flow_rate.dispense),
 )
 mockPythonName.flow_rate.blow_out = 2.3
 mockPythonName.blow_out(mockPythonName["A1"].top(z=3.3))
