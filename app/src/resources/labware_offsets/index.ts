@@ -1,1 +1,1 @@
-export * from './useNotifyLabwareOffsetsQuery'
+export * from './useNotifySearchLabwareOffsets'
