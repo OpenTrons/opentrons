@@ -19,7 +19,7 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
-import { canPipetteUseLabware } from '../../utils'
+import { canPipetteUseLabware, getMaxPushOutVolume } from '../../utils'
 import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
 
@@ -423,6 +423,7 @@ const ASPIRATE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
+  tab: 'aspirate',
 }
 const DISPENSE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   title: 'Touch tip speed required',
@@ -430,6 +431,7 @@ const DISPENSE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
+  tab: 'dispense',
 }
 const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   title: 'Value falls outside of accepted range',
@@ -437,6 +439,7 @@ const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
+  tab: 'aspirate',
 }
 const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   title: 'Value falls outside of accepted range',
@@ -444,6 +447,7 @@ const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
+  tab: 'dispense',
 }
 const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
   title: 'Value required',
@@ -451,6 +455,7 @@ const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
+  tab: 'aspirate',
 }
 const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
   title: 'Value required',
@@ -458,6 +463,15 @@ const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
   showAtForm: false,
   showAtField: true,
   page: 2,
+  tab: 'dispense',
+}
+const PUSH_OUT_VOLUME_REQUIRED: FormError = {
+  title: 'Push out volume required',
+  dependentFields: ['pushOut_volume'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
 }
 
 export interface HydratedFormData {
@@ -1071,6 +1085,27 @@ export const dispenseTouchTipMmFromEdgeRequired = (
   const { dispense_touchTip_checkbox, dispense_touchTip_mmFromEdge } = fields
   return dispense_touchTip_checkbox && !dispense_touchTip_mmFromEdge
     ? DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED
+    : null
+}
+export const pushOutVolumeRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { pushOut_checkbox, pushOut_volume } = fields
+  return pushOut_checkbox && !pushOut_volume ? PUSH_OUT_VOLUME_REQUIRED : null
+}
+export const pushOutVolumeOutOfRange = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { pushOut_checkbox, pushOut_volume, pipette, volume } = fields
+  if (pipette == null) {
+    return null
+  }
+  const maxPushOutVolume = getMaxPushOutVolume(
+    Number(volume),
+    (pipette as PipetteEntity).spec
+  )
+  return pushOut_checkbox && pushOut_volume > maxPushOutVolume
+    ? PUSH_OUT_VOLUME_REQUIRED
     : null
 }
 

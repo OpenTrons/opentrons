@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   repeatArray,
-  blowoutUtil,
+  blowoutLocationHelper,
   curryCommandCreator,
   reduceCommandCreators,
   getIsSafePipetteMovement,
@@ -256,16 +256,11 @@ export const mix: CommandCreator<MixArgs> = (
               pipetteId: pipette,
               labwareId: labware,
               wellName: well,
-              wellLocation: {
-                origin: 'top',
-                offset: {
-                  z: data.touchTipMmFromTop,
-                },
-              },
+              zOffsetFromTop: data.touchTipMmFromTop,
             }),
           ]
         : []
-      const blowoutCommand = blowoutUtil({
+      const blowoutCommand = blowoutLocationHelper({
         pipette: data.pipette,
         sourceLabwareId: data.labware,
         sourceWell: well,

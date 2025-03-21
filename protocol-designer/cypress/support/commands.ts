@@ -36,6 +36,7 @@ declare global {
       clickConfirm: () => Cypress.Chainable<void>
       verifyOverflowBtn: () => Cypress.Chainable<void>
       verifyOnboardingPage: () => Cypress.Chainable<void>
+      closeReleaseNotesModal: () => Cypress.Chainable<void>
     }
   }
 }
@@ -74,6 +75,7 @@ export const locators = {
   eula: 'a[href="https://opentrons.com/eula"]',
   privacyToggle: 'Settings_OT_PD_ENABLE_HOT_KEYS_DISPLAY',
   analyticsToggleAriaLabel: 'Settings_Privacy',
+  releaseNote: '[data-testid="Toast_info"]',
   confirm: 'Confirm',
 }
 
@@ -187,6 +189,10 @@ Cypress.Commands.add('verifyOverflowBtn', () => {
   cy.contains(content.pause).should('exist').should('be.visible')
   cy.contains(content.heaterShaker).should('exist').should('be.visible')
   cy.contains(content.thermocyler).should('exist').should('be.visible')
+})
+
+Cypress.Commands.add('closeReleaseNotesModal', () => {
+  cy.get(locators.releaseNote).find('button').click()
 })
 
 /// /////////////////////////////////////////////////////////////////

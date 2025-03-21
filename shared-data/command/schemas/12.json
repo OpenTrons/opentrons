@@ -3068,7 +3068,7 @@
       "description": "Parameters for mix.",
       "properties": {
         "repetitions": {
-          "description": "Number of mixing repetitions.",
+          "description": "Number of mixing repetitions. 0 is valid, but no mixing will occur.",
           "minimum": 0,
           "title": "Repetitions",
           "type": "integer"
@@ -3076,9 +3076,11 @@
         "volume": {
           "anyOf": [
             {
+              "exclusiveMinimum": 0,
               "type": "integer"
             },
             {
+              "exclusiveMinimum": 0.0,
               "type": "number"
             }
           ],

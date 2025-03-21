@@ -512,6 +512,13 @@ export interface FlowRateSpec {
   max: number
 }
 
+interface PlungerPositionsConfiguration {
+  top: number
+  bottom: number
+  blowout: number
+  drop: number
+}
+
 interface pressAndCamConfigurationValues {
   speed: number
   distance: number
@@ -547,12 +554,8 @@ export interface PipetteV2GeneralSpecs {
     run: number
   }
   plungerPositionsConfigurations: {
-    default: {
-      top: number
-      bottom: number
-      blowout: number
-      drop: number
-    }
+    default: PlungerPositionsConfiguration
+    lowVolumeDefault?: PlungerPositionsConfiguration
   }
   availableSensors: {
     sensors: string[]
