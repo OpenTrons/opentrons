@@ -5,6 +5,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { getIsTiprack, getLabwareDefURI } from '@opentrons/shared-data'
 
 import {
+  getAreAnyLocationSpecificOffsetsMissing,
   getIsDefaultOffsetAbsent,
   getItemLabwareDef,
   getSelectedLabwareDefFrom,
@@ -26,11 +27,12 @@ import type {
 export interface LPCLabwareInfoAndDefaultStatus {
   uri: string
   info: LwGeometryDetails
-  isMissingDefaultOffset: boolean
+  isMissingNecessaryDefaultOffset: boolean
 }
 
 // Returns all the LPC labware info for the labware used in the current run,
-// sorted by URI display name.
+// sorted by URI display name. Default offsets are not marked missing if all location
+// specific offset vectors for the uri are present or the offsets are hardcoded.
 export const selectAllLabwareInfoAndDefaultStatusSorted = (
   runId: string
 ): Selector<State, LPCLabwareInfoAndDefaultStatus[]> =>
@@ -42,18 +44,27 @@ export const selectAllLabwareInfoAndDefaultStatusSorted = (
       }
 
       return Object.entries(labwareInfo)
-        .map(([uri, info]) => ({
-          uri,
-          info,
-          isMissingDefaultOffset: getIsDefaultOffsetAbsent(info),
-        }))
+        .map(([uri, info]) => {
+          const isMissingNecessaryDefaultOffset = getAreAnyLocationSpecificOffsetsMissing(
+            info.locationSpecificOffsetDetails
+          )
+            ? getIsDefaultOffsetAbsent(info)
+            : false
+
+          return {
+            uri,
+            info,
+            isMissingNecessaryDefaultOffset,
+          }
+        })
         .sort((a, b) => {
-          // Primary sort: isMissingDefaultOffset (true values first).
-          if (a.isMissingDefaultOffset !== b.isMissingDefaultOffset) {
-            return a.isMissingDefaultOffset ? -1 : 1
+          if (
+            a.isMissingNecessaryDefaultOffset !==
+            b.isMissingNecessaryDefaultOffset
+          ) {
+            return a.isMissingNecessaryDefaultOffset ? -1 : 1
           }
 
-          // Secondary sort: alphabetical by displayName.
           return a.info.displayName.localeCompare(b.info.displayName)
         })
     }

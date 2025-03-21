@@ -41,7 +41,7 @@ export function LabwareOffsetsTable(
         {labwareInfo.map(aLwInfo => (
           <ListAccordion
             key={aLwInfo.uri}
-            alertKind={alertKind(aLwInfo.isMissingDefaultOffset)}
+            alertKind={alertKind(aLwInfo.isMissingNecessaryDefaultOffset)}
             tableHeaders={[
               <StyledText key="location" css={LOCATION_COLUMN_STYLE}>
                 {t('location')}
