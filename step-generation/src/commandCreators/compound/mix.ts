@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   repeatArray,
-  blowoutUtil,
+  blowoutLocationHelper,
   curryCommandCreator,
   reduceCommandCreators,
   getIsSafePipetteMovement,
@@ -260,7 +260,7 @@ export const mix: CommandCreator<MixArgs> = (
             }),
           ]
         : []
-      const blowoutCommand = blowoutUtil({
+      const blowoutCommand = blowoutLocationHelper({
         pipette: data.pipette,
         sourceLabwareId: data.labware,
         sourceWell: well,

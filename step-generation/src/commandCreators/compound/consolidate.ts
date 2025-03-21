@@ -9,10 +9,10 @@ import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import { dropTipInTrash } from './dropTipInTrash'
 import {
-  blowoutUtil,
+  blowoutLocationHelper,
   curryCommandCreator,
   reduceCommandCreators,
-  airGapHelper,
+  airGapLocationHelper,
   dispenseLocationHelper,
   moveHelper,
   getIsSafePipetteMovement,
@@ -383,7 +383,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             ]
           : []
 
-      const blowoutCommand = blowoutUtil({
+      const blowoutCommand = blowoutLocationHelper({
         pipette: args.pipette,
         sourceLabwareId: args.sourceLabware,
         sourceWell: sourceWellChunk[0],
@@ -399,7 +399,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       const airGapAfterDispenseCommands =
         dispenseAirGapVolume && !willReuseTip
           ? [
-              curryCommandCreator(airGapHelper, {
+              curryCommandCreator(airGapLocationHelper, {
                 pipetteId: args.pipette,
                 volume: dispenseAirGapVolume,
                 destinationId: args.destLabware,
