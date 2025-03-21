@@ -3,6 +3,7 @@ import {
   DeckInfoLabel,
   MODULE_ICON_NAME_BY_TYPE,
   Flex,
+  SPACING,
 } from '@opentrons/components'
 
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
@@ -30,7 +31,7 @@ export function LabwareOffsetsDeckInfoLabels({
   }
 
   return (
-    <Flex>
+    <Flex gridGap={SPACING.spacing4}>
       <DeckInfoLabel deckLabel={slotCopy} />
       {isLabwareInLwStackup() && (
         <DeckInfoLabel

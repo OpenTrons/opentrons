@@ -1,8 +1,5 @@
 import { createSelector } from 'reselect'
 
-import { getLabwareDisplayLocation } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import {
   getAreAllOffsetsHardCoded,
   getDefaultOffsetDetailsForAllLabware,
@@ -15,6 +12,7 @@ import {
   getIsNecessaryDefaultOffsetMissing,
   getTotalCountNonHardCodedLocationSpecificOffsets,
   getIsAnyNecessaryDefaultOffsetMissing,
+  getFlexSlotNameOnly,
 } from '../transforms'
 
 import {
@@ -94,16 +92,11 @@ export const selectSortedLSOffsetDetailsWithCopy = (
         const lsDetails = labware[uri].locationSpecificOffsetDetails
 
         const lsDetailsWithCopy = lsDetails.map(offset => {
-          const slotCopy = getLabwareDisplayLocation({
-            t,
-            loadedModules: protocolData.modules,
-            loadedLabwares: protocolData.labware,
-            robotType: FLEX_ROBOT_TYPE,
-            location: {
-              addressableAreaName: offset.locationDetails.addressableAreaName,
-            },
-            detailLevel: 'slot-only',
-          }).slice(-2) // ex, "C1" instead of "Slot C1"
+          const slotCopy = getFlexSlotNameOnly(
+            offset.locationDetails,
+            protocolData,
+            t
+          )
 
           return {
             ...offset,

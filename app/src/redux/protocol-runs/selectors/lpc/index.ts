@@ -3,4 +3,7 @@
 export * from './labware'
 export * from './pipettes'
 export * from './steps'
-export { getTotalCountNonHardCodedLocationSpecificOffsets } from './transforms'
+export {
+  getTotalCountNonHardCodedLocationSpecificOffsets,
+  getFlexSlotNameOnly,
+} from './transforms'

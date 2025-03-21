@@ -12,6 +12,7 @@ import {
   HEATERSHAKER_MODULE_V1,
   ABSORBANCE_READER_V1,
   FLEX_STACKER_MODULE_V1,
+  THERMOCYCLER_ADDRESSABLE_AREA,
 } from '../constants'
 import type { ModuleModel } from '../types'
 import type { AddressableAreaName } from '../../deck'
@@ -27,8 +28,11 @@ export function getSlotFromAddressableAreaName(
     ].includes(addressableArea as AddressableAreaName)
   ) {
     return addressableArea
+  } else if (addressableArea === THERMOCYCLER_ADDRESSABLE_AREA) {
+    return 'A1+B1'
   } else {
     const slotName = addressableArea.slice(-2)
+
     if (
       [
         ...FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
