@@ -366,7 +366,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
                          When not specified or set to ``None``, the plunger moves by a non-zero default amount.
 
-                         See :ref:`push-out-dispense` for details.
+
+                         For a table of default values, see :ref:`push-out-dispense`.
         :type push_out: float
 
         :returns: This instance.
