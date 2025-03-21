@@ -1,0 +1,228 @@
+{
+  "ordering": [
+    ["A1"],
+    ["A2"],
+    ["A3"],
+    ["A4"],
+    ["A5"],
+    ["A6"],
+    ["A7"],
+    ["A8"],
+    ["A9"],
+    ["A10"],
+    ["A11"],
+    ["A12"]
+  ],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": ["999-00260"],
+    "links": [
+      "https://opentrons.com/products/opentrons-tough-22-ml-12-well-reservoir-25-count/"
+    ]
+  },
+  "metadata": {
+    "displayName": "Opentrons Tough 22mL 12 Well Reservoir",
+    "displayCategory": "reservoir",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 45.3
+  },
+  "wells": {
+    "A1": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 14.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A2": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 23.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A3": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 32.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A4": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 41.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A5": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 50.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A6": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 59.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A7": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 68.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A8": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 77.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A9": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 86.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A10": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 95.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A11": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 104.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    },
+    "A12": {
+      "depth": 42.3,
+      "shape": "rectangular",
+      "xDimension": 8.2,
+      "yDimension": 70.7,
+      "totalLiquidVolume": 22000,
+      "x": 113.38,
+      "y": 42.74,
+      "z": 3,
+      "geometryDefinitionId": "MainWellGeometry"
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "wellBottomShape": "v"
+      },
+      "wells": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12"
+      ]
+    }
+  ],
+  "parameters": {
+    "format": "trough",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
+    "loadName": "opentrons_tough_12_reservoir_22ml"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "innerLabwareGeometry": {
+    "MainWellGeometry": {
+      "sections": [
+        {
+          "shape": "cuboidal",
+          "bottomHeight": 2,
+          "topHeight": 42.3,
+          "bottomXDimension": 7.5,
+          "bottomYDimension": 70,
+          "topXDimension": 8.2,
+          "topYDimension": 70.7
+        },
+        {
+          "shape": "cuboidal",
+          "bottomHeight": 0,
+          "topHeight": 2,
+          "bottomXDimension": 2.15,
+          "bottomYDimension": 67.46,
+          "topXDimension": 7.5,
+          "topYDimension": 70
+        }
+      ]
+    }
+  }
+}
