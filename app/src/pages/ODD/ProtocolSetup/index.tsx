@@ -116,10 +116,6 @@ import type {
 
 const FETCH_DURATION_MS = 5000
 
-// TOME TODO: I think you HAVE to have the behavior that if someone else updates offsets,
-// for the run, you HAVE to consider those offsets as applied. Otherwise that could lead
-//  to offset confusion.
-
 const ANALYSIS_POLL_MS = 5000
 interface PrepareToRunProps {
   runId: string

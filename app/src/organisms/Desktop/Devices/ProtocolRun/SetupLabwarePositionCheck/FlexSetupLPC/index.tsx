@@ -9,10 +9,6 @@ import { LPCSetupOffsetsTable } from './LPCSetupOffsetsTable'
 
 import type { SetupLabwarePositionCheckProps } from '..'
 
-// TOME TODO: The state updates don't seem to work if offsets are applied for some reason.
-//  Is there any way to sync that info? I guess it's not terrible if you can't, but
-//  applying offsets once to a run per app seems wise.
-
 export function FlexSetupLPC(
   props: SetupLabwarePositionCheckProps
 ): JSX.Element {
