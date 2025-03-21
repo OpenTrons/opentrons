@@ -197,6 +197,6 @@ export const moveToWell: CommandCreator<MoveToWellParams> = (
     commands,
     python: `${pipettePythonName}.move_to(${labwarePythonName}[${formatPyStr(
       wellName
-    )}]${formatPyWellLocation(wellLocation)}`,
+    )}]${formatPyWellLocation(wellLocation)})`,
   }
 }
