@@ -261,9 +261,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
           checkboxUpdateValue={
             propsForFields[`${tab}_delay_checkbox`].updateValue
           }
-          tooltipText={
-            propsForFields[`${tab}_delay_checkbox`].tooltipContent ?? null
-          }
+          tooltipText={propsForFields[`${tab}_delay_checkbox`].tooltipContent}
         >
           {formData[`${tab}_delay_checkbox`] === true ? (
             <InputStepFormField
@@ -290,9 +288,8 @@ export function MixTools(props: StepFormProps): JSX.Element {
               checkboxValue={propsForFields.blowout_checkbox.value}
               isChecked={propsForFields.blowout_checkbox.value === true}
               checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
-              tooltipText={
-                propsForFields.blowout_checkbox.tooltipContent ?? null
-              }
+              tooltipText={propsForFields.blowout_checkbox.tooltipContent}
+              disabled={propsForFields.blowout_checkbox.disabled}
             >
               {formData.blowout_checkbox === true ? (
                 <Flex
@@ -338,9 +335,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
               checkboxUpdateValue={
                 propsForFields.mix_touchTip_checkbox.updateValue
               }
-              tooltipText={
-                propsForFields.mix_touchTip_checkbox.tooltipContent ?? null
-              }
+              tooltipText={propsForFields.mix_touchTip_checkbox.tooltipContent}
             >
               {formData.mix_touchTip_checkbox === true ? (
                 <PositionField
