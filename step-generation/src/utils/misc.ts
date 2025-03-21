@@ -700,7 +700,7 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
         pipetteId,
         volume,
         flowRate,
-        invariantContext,
+        wasteChuteId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   } else {
@@ -709,8 +709,7 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
         pipetteId,
         volume,
         flowRate,
-        trashLocation: additionalEquipmentEntities[destinationId]
-          .location as CutoutId,
+        trashId: additionalEquipmentEntities[destinationId].id,
       }),
     ]
   }
