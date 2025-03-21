@@ -2,6 +2,7 @@ import { InterventionContent } from '/app/molecules/InterventionModal/Interventi
 
 import type { ComponentProps } from 'react'
 import type { RecoveryContentProps } from '../types'
+import { RECOVERY_MAP } from '../constants'
 
 type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   title: string
@@ -18,6 +19,7 @@ export function LeftColumnLabwareInfo({
   type,
   layout,
   bannerText,
+  recoveryMap,
 }: LeftColumnLabwareInfoProps): JSX.Element | null {
   const {
     failedLabwareName,
@@ -26,6 +28,12 @@ export function LeftColumnLabwareInfo({
     labwareQuantity,
   } = failedLabwareUtils
   const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
+  const { step } = recoveryMap
+  const {
+    MANUAL_REPLACE_AND_RETRY,
+    MANUAL_REPLACE_STACKER_AND_RETRY,
+    MANUAL_LOAD_IN_STACKER_AND_SKIP,
+  } = RECOVERY_MAP
 
   const buildNewLocation = (): ComponentProps<
     typeof InterventionContent
@@ -34,18 +42,48 @@ export function LeftColumnLabwareInfo({
       ? { deckLabel: displayNameNewLoc.toUpperCase() }
       : undefined
 
+  const buildCurrentLocation = (): ComponentProps<
+    typeof InterventionContent
+  >['infoProps']['currentLocationProps'] => {
+    switch (step) {
+      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
+        return {
+          deckLabel: displayNameCurrentLoc.toUpperCase(),
+        }
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+        return {
+          deckLabel: displayNameNewLoc?.toUpperCase() ?? '',
+        }
+      default:
+        return {
+          deckLabel: displayNameCurrentLoc.toUpperCase(),
+        }
+    }
+  }
+
+  const buildQuntity = (): string | null => {
+    switch (step) {
+      case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
+        return labwareQuantity
+      case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
+        return null
+      default:
+        return labwareQuantity
+    }
+  }
+
   return (
     <InterventionContent
       headline={title}
       infoProps={{
         layout: layout,
-        tagText: labwareQuantity,
+        tagText: buildQuntity(),
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',
-        currentLocationProps: {
-          deckLabel: displayNameCurrentLoc.toUpperCase(),
-        },
+        currentLocationProps: buildCurrentLocation(),
         newLocationProps: buildNewLocation(),
       }}
       notificationProps={

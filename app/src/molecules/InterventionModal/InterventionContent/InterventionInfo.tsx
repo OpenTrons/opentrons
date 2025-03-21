@@ -33,7 +33,7 @@ export interface InterventionInfoStackedProps
   extends Omit<InterventionInfoDefaultProps, 'layout'> {
   layout: 'stacked'
   subText: string
-  tagText: string
+  tagText?: string
 }
 
 export type InterventionInfoProps =
@@ -74,7 +74,9 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
             >
               {props.subText}
             </StyledText>
-            <Tag type="default" text={props.tagText} shrinkToContent={true} />
+            {props.tagText && (
+              <Tag type="default" text={props.tagText} shrinkToContent={true} />
+            )}
             <Divider
               borderColor={COLORS.grey35}
               css={`
