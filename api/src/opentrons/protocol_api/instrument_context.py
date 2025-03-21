@@ -1790,19 +1790,19 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 22)
+    @requires_version(2, 23)
     def resin_tip_seal(
         self,
         location: Union[labware.Well, labware.Labware],
     ) -> InstrumentContext:
         """Seal resin tips onto the pipette.
 
-        The location provided should contain resin tips. Sealing the
-        tip will perform a `pick up` action but there will be no tip tracking
-        associated with the pipette.
+        The location provided should contain resin tips. The pipette will attach itself
+        to the resin tips but does not check any tip presence sensors. Before the pipette
+        seals to the tips, the plunger will rise to the top of its working range so that
+        it can perform a :py:func:`resin_tip_dispense` immediately.
 
         :param location: A location containing resin tips, must be a Labware or a Well.
-
         :type location: :py:class:`~.types.Location`
         """
         if isinstance(location, labware.Labware):
@@ -1822,7 +1822,7 @@ class InstrumentContext(publisher.CommandPublisher):
             )
         return self
 
-    @requires_version(2, 22)
+    @requires_version(2, 23)
     def resin_tip_unseal(
         self,
         location: Union[labware.Well, labware.Labware],
@@ -1860,31 +1860,62 @@ class InstrumentContext(publisher.CommandPublisher):
 
         return self
 
-    @requires_version(2, 22)
+    @requires_version(2, 23)
     def resin_tip_dispense(
         self,
         location: types.Location,
         volume: Optional[float] = None,
         rate: Optional[float] = None,
     ) -> InstrumentContext:
-        """Dispense a volume from resin tips into a labware.
+        """Push liquid out of resin tips that are currently sealed to a pipette.
 
-        The location provided should contain resin tips labware as well as a
-        receptical for dispensed liquid. Dispensing from tip will perform a
-        `dispense` action of the specified volume at a desired flow rate.
+        The volume and rate parameters for this function control the motion of the plunger
+        to create a desired pressure profile inside the pipette chamber. Unlike a regular
+        dispense action, the volume and rate do not correspond to liquid volume or flow rate
+        dispensed from the resin tips. Select your values for volume and flow rate based on
+        experimentation with the resin tips to create a pressure profile.
 
-        :param location: A location containing resin tips.
+        The common way to use this function is as follows:
+
+        #. Seal resin tips to the pipette using :py:meth:`InstrumentContext.resin_tip_seal`.
+
+        #. Use :py:meth:`InstrumentContext.resin_tip_dispense` to displace an experimentally
+           derived volume at an experimentally derived rate to create an experimentally derived
+           target pressure inside the pipette.
+
+        #. Use :py:meth:`ProtocolContext.delay` to wait an experimentally derived amount of
+           time for the pressure inside the pipette to push liquid into and through the resin tip
+           and out the other side.
+
+        #. As liquid passes through the resin tip, the pressure inside the pipette will
+           fall. If not all liquid has been dispensed from the resin tip, repeat steps 2
+           and 3.
+
+        #. Unseal resin tips from the pipette using :py:meth:`InstrumentContext.resin_tip_unseal`.
+
+        Flex pipette pressure sensors will raise an overpressure when a differential pressure
+        inside the pipette chamber above sensor limits is detected. You may need to disable the
+        pressure sensor to create the required pressure profile.
+
+        .. warning::
+            Building excessive pressure inside the pipette chamber (significantly above the sensor
+            limit) with the pressure sensors disabled can damage the pipette.
+
+
+        :param location: Tells the robot where to dispense.
         :type location: :py:class:`~.types.Location`
 
-        :param volume: Will default to maximum, recommended to use the default.
-                       The volume, in µL, that the pipette will prepare to handle.
+        :param volume: The volume that the plunger should displace, in µL. Does not directly relate
+                       to the volume of liquid that will be dispensed.
         :type volume: float
 
-        :param rate: Will default to 10.0, recommended to use the default. How quickly
-                     a pipette dispenses liquid. The speed in µL/s is calculated as
-                     ``rate`` multiplied by :py:attr:`flow_rate.dispense<flow_rate>`.
-        :type rate: float
+        :param rate: How quickly the plunger moves to displace the commanded volume. The plunger speed
+                     in µL/s is calculated as ``rate`` multiplied by
+                     :py:attr:`flow_rate.dispense<flow_rate>`. This rate does not directly relate to
+                     the flow rate of liquid out of the resin tip.
 
+                     The default value of ``10.0`` is recommended.
+        :type rate: float
         """
         well: Optional[labware.Well] = None
         last_location = self._get_last_location_by_api_version()
