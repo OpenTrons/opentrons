@@ -20,6 +20,7 @@ import {
   useLPCLabwareInfo,
   useCompatibleAnalysis,
   useUpdateDeckConfig,
+  useHandleClientAppliedOffsets,
 } from './hooks'
 import { useOffsetConflictTimestamp } from './useOffsetConflictTimestamp'
 
@@ -97,6 +98,7 @@ export function useLPCFlows({
 
   useOffsetConflictTimestamp(isFlex, runId, runRecord)
   useUpdateDeckConfig(runId, deckConfig)
+  useHandleClientAppliedOffsets(runId)
   useInitLPCStore({
     runId,
     runRecord,
