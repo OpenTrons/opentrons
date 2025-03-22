@@ -70,13 +70,11 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
         })
       : ''
 
-  const { value, updateValue } = propsForFields.disposalVolume_checkbox
+  const { value } = propsForFields.disposalVolume_checkbox
   return (
     <CheckboxExpandStepFormField
       title={t('protocol_steps:multi_dispense_options')}
-      checkboxValue={value}
-      isChecked={value === true}
-      checkboxUpdateValue={updateValue}
+      fieldProps={propsForFields.disposalVolume_checkbox}
     >
       {value ? (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>

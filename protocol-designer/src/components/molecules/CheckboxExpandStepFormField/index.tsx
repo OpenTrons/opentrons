@@ -14,30 +14,26 @@ import {
 } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
+import type { FieldProps } from '../../../pages/Designer/ProtocolSteps/types'
 
 interface CheckboxExpandStepFormFieldProps {
   title: string
-  checkboxUpdateValue: (value: unknown) => void
-  checkboxValue: unknown
-  isChecked: boolean
+  fieldProps: FieldProps
+  tooltipOverride?: string
   children?: ReactNode
-  tooltipText?: string | null
-  disabled?: boolean
   testId?: string
 }
 export function CheckboxExpandStepFormField(
   props: CheckboxExpandStepFormFieldProps
 ): JSX.Element {
+  const { children, title, tooltipOverride, testId, fieldProps } = props
+
   const {
-    checkboxUpdateValue,
-    checkboxValue,
-    children,
-    isChecked,
-    title,
-    tooltipText,
+    value,
+    updateValue,
+    tooltipContent = tooltipOverride,
     disabled = false,
-    testId,
-  } = props
+  } = fieldProps
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   return (
@@ -48,7 +44,7 @@ export function CheckboxExpandStepFormField(
         disabled={disabled}
         onClick={() => {
           if (!disabled) {
-            checkboxUpdateValue(!checkboxValue)
+            updateValue(!value)
           }
         }}
         color={disabled ? COLORS.grey40 : COLORS.black90}
@@ -69,12 +65,12 @@ export function CheckboxExpandStepFormField(
               <Btn
                 data-testid={testId}
                 onClick={() => {
-                  checkboxUpdateValue(!checkboxValue)
+                  updateValue(!value)
                 }}
               >
                 <Check
                   color={COLORS.blue50}
-                  isChecked={isChecked}
+                  isChecked={value === true}
                   disabled={disabled}
                 />
               </Btn>
@@ -83,8 +79,8 @@ export function CheckboxExpandStepFormField(
           {children}
         </Flex>
       </ListButton>
-      {tooltipText != null ? (
-        <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
+      {tooltipContent != null ? (
+        <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
       ) : null}
     </>
   )
