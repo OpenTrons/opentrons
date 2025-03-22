@@ -5,10 +5,12 @@ from opentrons.util.async_helpers import ensure_yield
 
 from .abstract import AbstractFlexStackerDriver
 from .types import (
+    ActiveRange,
     LEDColor,
     LEDPattern,
     MeasurementKind,
     MoveResult,
+    SpadMapID,
     StackerAxis,
     PlatformStatus,
     Direction,
@@ -17,6 +19,7 @@ from .types import (
     MoveParams,
     LimitSwitchStatus,
     StallGuardParams,
+    TOFConfiguration,
     TOFMeasurement,
     TOFMeasurementResult,
     TOFSensor,
@@ -49,18 +52,21 @@ class SimulatingDriver(AbstractFlexStackerDriver):
             s: TOFSensorStatus(s, TOFSensorState.IDLE, TOFSensorMode.MEASURE, True)
             for s in TOFSensor
         }
+        self._tof_sensor_configuration: Dict[TOFSensor, TOFConfiguration] = {
+            s: TOFConfiguration(
+                s, SpadMapID.SPAD_MAP_ID_14, ActiveRange.SHORT_RANGE, 4000, 500, True
+            )
+            for s in TOFSensor
+        }
 
-    def set_limit_switch(self, status: LimitSwitchStatus) -> bool:
+    def set_limit_switch(self, status: LimitSwitchStatus) -> None:
         self._limit_switch_status = status
-        return True
 
-    def set_platform_sensor(self, status: PlatformStatus) -> bool:
+    def set_platform_sensor(self, status: PlatformStatus) -> None:
         self._platform_sensor_status = status
-        return True
 
-    def set_door_closed(self, door_closed: bool) -> bool:
+    def set_door_closed(self, door_closed: bool) -> None:
         self._door_closed = door_closed
-        return True
 
     @ensure_yield
     async def connect(self) -> None:
@@ -83,47 +89,43 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         return StackerInfo(fw="stacker-fw", hw=HardwareRevision.EVT, sn=self._sn)
 
     @ensure_yield
-    async def set_serial_number(self, sn: str) -> bool:
+    async def set_serial_number(self, sn: str) -> None:
         """Set Serial Number."""
         self._sn = sn
-        return True
 
     @ensure_yield
-    async def enable_motors(self, axis: List[StackerAxis]) -> bool:
+    async def enable_motors(self, axis: List[StackerAxis]) -> None:
         """Enables the axis motor if present, disables it otherwise."""
-        return True
+        pass
 
     @ensure_yield
-    async def stop_motors(self) -> bool:
+    async def stop_motors(self) -> None:
         """Stop all motor movement."""
-        return True
+        pass
 
     @ensure_yield
-    async def set_run_current(self, axis: StackerAxis, current: float) -> bool:
+    async def set_run_current(self, axis: StackerAxis, current: float) -> None:
         """Set axis peak run current in amps."""
-
-        return True
+        pass
 
     @ensure_yield
-    async def set_ihold_current(self, axis: StackerAxis, current: float) -> bool:
+    async def set_ihold_current(self, axis: StackerAxis, current: float) -> None:
         """Set axis hold current in amps."""
-        return True
+        pass
 
     @ensure_yield
     async def set_stallguard_threshold(
         self, axis: StackerAxis, enable: bool, threshold: int
-    ) -> bool:
+    ) -> None:
         """Enables and sets the stallguard threshold for the given axis motor."""
         self._stallgard_threshold[axis] = StallGuardParams(axis, enable, threshold)
-        return True
 
     @ensure_yield
-    async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> bool:
+    async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> None:
         """Enable or disable the TOF sensor."""
         state = TOFSensorState.IDLE if enable else TOFSensorState.DISABLED
         self._tof_sensor_status[sensor].state = state
         self._tof_sensor_status[sensor].ok = enable
-        return True
 
     @ensure_yield
     async def manage_tof_measurement(
@@ -152,13 +154,33 @@ class SimulatingDriver(AbstractFlexStackerDriver):
             bins={c: [b for b in range(NUMBER_OF_BINS)] for c in range(10)},
         )
 
+    async def set_tof_configuration(
+        self,
+        sensor: TOFSensor,
+        spad_map_id: SpadMapID,
+        active_range: Optional[ActiveRange] = None,
+        kilo_iterations: Optional[int] = None,
+        report_period_ms: Optional[int] = None,
+        histogram_dump: Optional[bool] = None,
+    ) -> None:
+        """Set the configuration of the TOF sensor."""
+        config = self._tof_sensor_configuration[sensor]
+        config.spad_map_id = spad_map_id
+        config.active_range = active_range or config.active_range
+        config.kilo_iterations = kilo_iterations or config.kilo_iterations
+        config.report_period_ms = report_period_ms or config.report_period_ms
+        config.histogram_dump = histogram_dump or config.histogram_dump
+
+    async def get_tof_configuration(self, sensor: TOFSensor) -> TOFConfiguration:
+        """Get the configuration of the TOF sensor."""
+        return self._tof_sensor_configuration[sensor]
+
     @ensure_yield
     async def set_motor_driver_register(
         self, axis: StackerAxis, reg: int, value: int
-    ) -> bool:
+    ) -> None:
         """Set the register of the given motor axis driver to the given value."""
         self._motor_registers[axis].update({reg: value})
-        return True
 
     @ensure_yield
     async def get_motor_driver_register(self, axis: StackerAxis, reg: int) -> int:
@@ -168,10 +190,9 @@ class SimulatingDriver(AbstractFlexStackerDriver):
     @ensure_yield
     async def set_tof_driver_register(
         self, sensor: TOFSensor, reg: int, value: int
-    ) -> bool:
+    ) -> None:
         """Set the register of the given tof sensor driver to the given value."""
         self._tof_registers[sensor].update({reg: value})
-        return True
 
     @ensure_yield
     async def get_tof_driver_register(self, sensor: TOFSensor, reg: int) -> int:
@@ -263,9 +284,9 @@ class SimulatingDriver(AbstractFlexStackerDriver):
         pattern: Optional[LEDPattern] = None,
         duration: Optional[int] = None,
         reps: Optional[int] = None,
-    ) -> bool:
+    ) -> None:
         """Set LED Status bar color and pattern."""
-        return True
+        pass
 
     @ensure_yield
     async def enter_programming_mode(self) -> None:

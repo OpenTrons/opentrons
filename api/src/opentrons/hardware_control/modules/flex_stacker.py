@@ -254,7 +254,7 @@ class FlexStacker(mod_abc.AbstractModule):
         pattern: Optional[LEDPattern] = None,
         duration: Optional[int] = None,
         reps: Optional[int] = None,
-    ) -> bool:
+    ) -> None:
         """Sets the statusbar state."""
         return await self._driver.set_led(
             power, color=color, pattern=pattern, duration=duration, reps=reps
