@@ -1,5 +1,7 @@
 import enum
 from dataclasses import dataclass
+
+from pydantic import BaseModel
 from typing_extensions import Literal, TypedDict
 from typing import Dict, List, Mapping, NewType, Union, Tuple, cast
 
@@ -26,6 +28,16 @@ PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5, 6, 7]
 class LiquidClasses(enum.Enum):
     default = enum.auto()
     lowVolumeDefault = enum.auto()
+
+
+class Vector(BaseModel):
+    x: float
+    y: float
+    z: float
+
+
+LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP = Vector(x=0, y=0, z=2)
+"""The (x, y, z) offset from well top to use as start location for probing liquid in that well."""
 
 
 class PipetteTipType(enum.Enum):
