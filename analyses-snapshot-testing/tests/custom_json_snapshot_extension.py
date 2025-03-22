@@ -17,7 +17,18 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
                 (r"line \d+,", "line N,"),
             ],
         }
-        self.id_keys_to_replace = ["id", "pipetteId", "labwareId", "serialNumber", "moduleId", "liquidId", "offsetId", "lidId"]
+        self.id_keys_to_replace = [
+            "id",
+            "pipetteId",
+            "labwareId",
+            "serialNumber",
+            "moduleId",
+            "liquidId",
+            "offsetId",
+            "lidId",
+            "liquidClassId",
+            "labwareIds",
+        ]
         self.timestamp_keys_to_replace = [
             "createdAt",
             "startedAt",
@@ -39,6 +50,8 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
 
     def process_field(self, key: str, value: Union[str, Any]) -> Union[str, Any]:
         if key in self.id_keys_to_replace:
+            if isinstance(value, list):
+                return ["UUID"] * len(value)
             return "UUID"
         if key in self.timestamp_keys_to_replace:
             return "TIMESTAMP"
