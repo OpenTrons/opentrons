@@ -27,6 +27,7 @@ export interface MultiDeckLabelTagBtn {
   buttonText: string
   onClick: () => void
   disabled?: boolean
+  ariaDisabled?: boolean
   buttonType?: SmallButtonTypes
 }
 

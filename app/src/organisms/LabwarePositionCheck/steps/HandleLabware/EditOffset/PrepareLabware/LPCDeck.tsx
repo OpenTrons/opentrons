@@ -90,8 +90,6 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
     },
   ]
 
-  console.log('=>(LPCDeck.tsx:84) buildLabwareOnDeck', buildLabwareOnDeck())
-
   return (
     <Flex css={DECK_CONTAINER_STYLE}>
       <BaseDeck

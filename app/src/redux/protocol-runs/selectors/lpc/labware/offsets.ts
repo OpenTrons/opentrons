@@ -167,6 +167,17 @@ export const selectSelectedLwDefaultOffsetDetails = (
     }
   )
 
+export const selectSelectedLwWithOffsetDetailsOffsets = (
+  runId: string
+): Selector<
+  State,
+  LocationSpecificOffsetDetails | DefaultOffsetDetails | null
+> =>
+  createSelector(
+    (state: State) => getSelectedLabwareWithOffsetDetails(runId, state),
+    details => details ?? null
+  )
+
 // Get the working offsets for the currently user-selected labware geometry with offset details.
 export const selectSelectedLwWithOffsetDetailsWorkingOffsets = (
   runId: string
