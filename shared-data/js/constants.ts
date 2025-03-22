@@ -662,3 +662,5 @@ export const WELL_TOP: 'well-top' = 'well-top'
 export const WELL_CENTER: 'well-center' = 'well-center'
 export const WELL_BOTTOM: 'well-bottom' = 'well-bottom'
 export const LIQUID_MENISCUS: 'liquid-meniscus' = 'liquid-meniscus'
+
+export const MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME = 10
