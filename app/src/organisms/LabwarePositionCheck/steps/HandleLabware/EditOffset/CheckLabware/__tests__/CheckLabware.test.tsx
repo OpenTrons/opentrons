@@ -65,6 +65,7 @@ vi.mock('/app/redux/protocol-runs', () => ({
   goBackEditOffsetSubstep: vi.fn(),
   proceedEditOffsetSubstep: vi.fn(),
   selectSelectedLwWithOffsetDetailsWorkingOffsets: vi.fn(),
+  getFlexSlotNameOnly: vi.fn(),
 }))
 vi.mock('/app/redux/config', () => ({
   getIsOnDevice: vi.fn(),

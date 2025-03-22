@@ -9,7 +9,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  getLabwareDisplayLocation,
   JUSTIFY_FLEX_END,
   LegacyStyledText,
   RESPONSIVENESS,
@@ -18,7 +17,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getVectorDifference,
   getVectorSum,
   IDENTITY_VECTOR,
@@ -34,16 +32,17 @@ import {
   goBackEditOffsetSubstep,
   proceedEditOffsetSubstep,
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
+  getFlexSlotNameOnly,
 } from '/app/redux/protocol-runs'
 import { getIsOnDevice } from '/app/redux/config'
 import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
 import { LPCLabwareJogRender } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCLabwareJogRender'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
+import type { TFunction } from 'i18next'
 import type { LoadedPipette, Coordinates } from '@opentrons/shared-data'
 import type { VectorOffset } from '@opentrons/api-client'
-import type { DisplayLocationParams } from '@opentrons/components'
 import type {
   LPCWizardState,
   SelectedLwOverview,
@@ -109,21 +108,11 @@ export function CheckLabware(props: CheckLabwareProps): JSX.Element {
     }
   }, [])
 
-  const buildDisplayParams = (): Omit<
-    DisplayLocationParams,
-    'detailLevel'
-  > => ({
-    t: commandTextT,
-    loadedModules: protocolData.modules,
-    loadedLabwares: protocolData.labware,
-    robotType: FLEX_ROBOT_TYPE,
-    location: selectedLwInfo.offsetLocationDetails,
-  })
-
-  const slotOnlyDisplayLocation = getLabwareDisplayLocation({
-    detailLevel: 'slot-only',
-    ...buildDisplayParams(),
-  })
+  const slotOnlyDisplayLocation = getFlexSlotNameOnly(
+    selectedLwInfo.offsetLocationDetails,
+    protocolData,
+    commandTextT as TFunction
+  )
 
   const buildSectionHeader = (): string =>
     t('check_item_in_location', {

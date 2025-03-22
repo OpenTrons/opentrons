@@ -22,11 +22,11 @@ import {
   selectSelectedLwDisplayName,
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { ManageDefaultOffsetBtn } from './ManageDefaultOffsetBtn'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
+import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import type { DefaultOffsetDetails } from '/app/redux/protocol-runs'
 
 export function DefaultLocationOffset(

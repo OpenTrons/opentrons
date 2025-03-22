@@ -15,22 +15,24 @@ import {
   InfoScreen,
   JUSTIFY_FLEX_START,
   LegacyStyledText,
+  MODULE_ICON_NAME_BY_TYPE,
   OVERFLOW_HIDDEN,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
-  getModuleDisplayName,
+  getModuleType,
 } from '@opentrons/shared-data'
 import { useCsvFileQuery } from '@opentrons/react-api-client'
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useDeckCalibrationData } from './hooks'
 import { OffsetVector } from '/app/molecules/OffsetVector'
-import type { RunData } from '@opentrons/api-client'
+import type { LabwareOffset, RunData } from '@opentrons/api-client'
 
 interface HistoricalProtocolRunDrawerProps {
   run: RunData
@@ -42,9 +44,11 @@ export function HistoricalProtocolRunDrawer(
 ): JSX.Element | null {
   const { i18n, t } = useTranslation('run_details')
   const { run, robotName } = props
-  const allLabwareOffsets = run.labwareOffsets?.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
+  const allLabwareOffsets: LabwareOffset[] =
+    run.labwareOffsets?.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ) ?? []
   const runDataFileIds =
     'runTimeParameters' in run
       ? run.runTimeParameters.reduce<string[]>((acc, parameter) => {
@@ -60,16 +64,21 @@ export function HistoricalProtocolRunDrawer(
     runDataFileIds.push(...run.outputFileIds)
   }
 
-  const uniqueLabwareOffsets = allLabwareOffsets?.filter(
+  const uniqueLabwareOffsets = allLabwareOffsets.filter(
     (offset, index, array) => {
       return (
         array.findIndex(
           firstOffset =>
-            firstOffset.location.slotName === offset.location.slotName &&
-            firstOffset.definitionUri === offset.definitionUri
-        ) === index && !isEqual(offset.vector, { x: 0, y: 0, z: 0 })
+            isEqual(firstOffset.locationSequence, offset.locationSequence) &&
+            isEqual(firstOffset.definitionUri, offset.definitionUri)
+        ) === index
       )
     }
+  )
+  const sortedUniqueLwOffsets = uniqueLabwareOffsets.sort((a, b) =>
+    a.location.slotName.localeCompare(b.location.slotName, 'en', {
+      numeric: true,
+    })
   )
 
   const deckCalibrationData = useDeckCalibrationData(robotName)
@@ -82,11 +91,10 @@ export function HistoricalProtocolRunDrawer(
 
   const isOutOfDate =
     typeof lastModifiedDeckCal === 'string' &&
-    uniqueLabwareOffsets != null &&
-    uniqueLabwareOffsets.length > 0 &&
+    sortedUniqueLwOffsets.length > 0 &&
     new Date(lastModifiedDeckCal).getTime() >
       new Date(
-        uniqueLabwareOffsets[uniqueLabwareOffsets?.length - 1].createdAt
+        sortedUniqueLwOffsets[sortedUniqueLwOffsets?.length - 1].createdAt
       ).getTime()
   const outOfDateBanner = isOutOfDate ? (
     <Banner
@@ -153,7 +161,7 @@ export function HistoricalProtocolRunDrawer(
     )
 
   const labwareOffsets =
-    uniqueLabwareOffsets == null || uniqueLabwareOffsets.length === 0 ? (
+    sortedUniqueLwOffsets == null || sortedUniqueLwOffsets.length === 0 ? (
       <InfoScreen content={t('no_offsets_available')} />
     ) : (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
@@ -198,7 +206,7 @@ export function HistoricalProtocolRunDrawer(
           </Box>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          {uniqueLabwareOffsets.map((offset, index) => {
+          {sortedUniqueLwOffsets.map((offset, index) => {
             const labwareDefinitions =
               protocolDetails?.commands != null
                 ? getLoadedLabwareDefinitionsByUri(protocolDetails?.commands)
@@ -227,11 +235,25 @@ export function HistoricalProtocolRunDrawer(
                   alignItems={ALIGN_CENTER}
                 >
                   <DeckInfoLabel deckLabel={offset.location.slotName} />
-                  <LegacyStyledText as="p">
-                    {offset.location.moduleModel != null
-                      ? getModuleDisplayName(offset.location.moduleModel)
-                      : null}
-                  </LegacyStyledText>
+                  {offset.locationSequence?.some(
+                    seq => seq.kind === 'onLabware'
+                  ) && (
+                    <DeckInfoLabel
+                      iconName={
+                        MODULE_ICON_NAME_BY_TYPE[FLEX_STACKER_MODULE_TYPE]
+                      }
+                      key="stacked-icon"
+                    />
+                  )}
+                  {offset.location.moduleModel && (
+                    <DeckInfoLabel
+                      iconName={
+                        MODULE_ICON_NAME_BY_TYPE[
+                          getModuleType(offset.location.moduleModel)
+                        ]
+                      }
+                    />
+                  )}
                 </Flex>
                 <Box width="33%">
                   <LegacyStyledText as="p" title={labwareName}>
