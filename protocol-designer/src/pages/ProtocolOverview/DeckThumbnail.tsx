@@ -1,5 +1,6 @@
 import { Fragment, useMemo } from 'react'
 import { useSelector } from 'react-redux'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -26,6 +27,12 @@ import {
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
+
+import {
+  darkFill,
+  lightFill,
+  OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST,
+} from '../../components/atoms'
 import { FixedTrashText } from '../../components/molecules'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
@@ -36,20 +43,6 @@ import type { CutoutId, DeckSlotId, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 const RIGHT_COLUMN_FIXTURE_PADDING = 50 // mm
-const WASTE_CHUTE_SPACE = 30
-const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-  'fixedTrash',
-]
-
-const lightFill = COLORS.grey35
-const darkFill = COLORS.grey60
 
 interface DeckThumbnailProps {
   hoverSlot: DeckSlotId | null
@@ -94,14 +87,19 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       wasteChuteFixtures.length > 0
   )
 
-  const hasWasteChute =
-    wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
-
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
   const hasRightColumnFixtures =
     stagingAreaFixtures.length + wasteChuteFixtures.length > 0
+
+  const viewBoxX = `${deckDef.cornerOffsetFromOrigin[0]} ${
+    deckDef.cornerOffsetFromOrigin[1]
+  } ${
+    hasRightColumnFixtures
+      ? deckDef.dimensions[0] + RIGHT_COLUMN_FIXTURE_PADDING
+      : deckDef.dimensions[0]
+  } ${deckDef.dimensions[1]}`
   return (
     <Flex
       width="100%"
@@ -117,16 +115,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
         height="100%"
         width="100%"
         deckDef={deckDef}
-        viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${
-          hasWasteChute
-            ? deckDef.cornerOffsetFromOrigin[1] - WASTE_CHUTE_SPACE
-            : deckDef.cornerOffsetFromOrigin[1]
-        } ${
-          hasRightColumnFixtures
-            ? deckDef.dimensions[0] + RIGHT_COLUMN_FIXTURE_PADDING
-            : deckDef.dimensions[0]
-        } ${deckDef.dimensions[1]}`}
-        zoomed
+        viewBox={viewBoxX}
       >
         {() => (
           <>

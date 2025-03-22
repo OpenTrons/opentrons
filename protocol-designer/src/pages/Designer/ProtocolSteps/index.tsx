@@ -6,15 +6,13 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
-  FLEX_MAX_CONTENT,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  POSITION_FIXED,
+  OVERFLOW_AUTO,
   POSITION_RELATIVE,
   SPACING,
   StyledText,
-  Tag,
   ToggleGroup,
 } from '@opentrons/components'
 import {
@@ -30,8 +28,8 @@ import {
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
 } from '../../../ui/steps/selectors'
-import { DeckSetupContainer } from '../DeckSetup'
-import { OffDeck } from '../OffDeck'
+import { HotKeyDisplay } from '../../../components/molecules'
+import { OffDeck, TimelineAlerts } from '../../../components/organisms'
 import { SubStepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
 import { StepSummary } from './StepSummary'
@@ -40,8 +38,9 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
-import { TimelineAlerts } from '../../../components/organisms'
+
 import { DraggableSidebar } from './DraggableSidebar'
+import { ProtocolStepsDeckContainer } from './ProtocolStepsDeckContainer'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 
@@ -59,7 +58,6 @@ export function ProtocolSteps(): JSX.Element {
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
-  // Note (02/03/25:kk) use DrraggableSidebar's initial width
   const [targetWidth, setTargetWidth] = useState<number>(235)
 
   const currentHoveredStepId = useSelector(getHoveredStepId)
@@ -83,54 +81,51 @@ export function ProtocolSteps(): JSX.Element {
       backgroundColor={COLORS.grey10}
       height="calc(100vh - 4rem)"
       width="100%"
-      minHeight={FLEX_MAX_CONTENT}
-      id="container"
     >
       <Flex height="100%" padding={SPACING.spacing12}>
         <DraggableSidebar setTargetWidth={setTargetWidth} />
       </Flex>
       <Flex
-        alignItems={ALIGN_CENTER}
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
         flex="2.85"
-        paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
         height="100%"
         position={POSITION_RELATIVE}
+        paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
+        overflow={OVERFLOW_AUTO}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing24}
           width={CONTENT_MAX_WIDTH}
-          height="100%"
           justifyContent={JUSTIFY_CENTER}
           paddingY={SPACING.spacing120}
         >
-          {showTimelineAlerts ? (
+          {showTimelineAlerts && (
             <TimelineAlerts
               justifyContent={JUSTIFY_CENTER}
               width="100%"
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing4}
             />
-          ) : null}
+          )}
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
             height="2.25rem"
           >
-            {currentStep != null && hoveredTerminalItem == null ? (
+            {currentStep && hoveredTerminalItem == null && (
               <StyledText desktopStyle="headingSmallBold">
                 {i18n.format(currentStep.stepName, 'titleCase')}
               </StyledText>
-            ) : null}
+            )}
             {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
-            currentHoveredStepId == null ? (
-              <StyledText desktopStyle="headingSmallBold">
-                {t(hoveredTerminalItem ?? selectedTerminalItem)}
-              </StyledText>
-            ) : null}
-
+              currentHoveredStepId == null && (
+                <StyledText desktopStyle="headingSmallBold">
+                  {t(hoveredTerminalItem ?? selectedTerminalItem)}
+                </StyledText>
+              )}
             <ToggleGroup
               selectedValue={deckView}
               leftText={leftString}
@@ -149,11 +144,10 @@ export function ProtocolSteps(): JSX.Element {
             height="100%"
           >
             {deckView === leftString ? (
-              <DeckSetupContainer tab="protocolSteps" />
+              <ProtocolStepsDeckContainer />
             ) : (
               <OffDeck tab="protocolSteps" />
             )}
-            {/* avoid shifting the deck view container */}
             <Flex
               height="5.5rem"
               opacity={formData == null ? 1 : 0}
@@ -166,40 +160,15 @@ export function ProtocolSteps(): JSX.Element {
             </Flex>
           </Flex>
         </Flex>
-        {enableHotKeyDisplay ? (
-          <Flex
-            position={POSITION_FIXED}
-            left={`calc(1.5rem + ${targetWidth}px)`}
-            bottom="0.75rem"
-            gridGap={SPACING.spacing4}
-            flexDirection={DIRECTION_COLUMN}
-          >
-            <Tag
-              text={t('double_click_to_edit')}
-              type="default"
-              shrinkToContent
-            />
-            <Tag
-              text={t('shift_click_to_select_range')}
-              type="default"
-              shrinkToContent
-            />
-            <Tag
-              text={t('command_click_to_multi_select')}
-              type="default"
-              shrinkToContent
-            />
-          </Flex>
-        ) : null}
+        {enableHotKeyDisplay && <HotKeyDisplay targetWidth={targetWidth} />}
       </Flex>
-      {formData == null && selectedSubstep ? (
-        <SubStepsToolbox stepId={selectedSubstep} />
-      ) : null}
-      <Flex padding={SPACING.spacing12}>
+      <Flex height="100%" padding={SPACING.spacing12}>
         <StepForm />
       </Flex>
-
-      {isMultiSelectMode ? <BatchEditToolbox /> : null}
+      {isMultiSelectMode && <BatchEditToolbox />}
+      {formData == null && selectedSubstep && (
+        <SubStepsToolbox stepId={selectedSubstep} />
+      )}
     </Flex>
   )
 }

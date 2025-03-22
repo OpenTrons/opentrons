@@ -17,26 +17,26 @@ import {
   getRobotStateTimeline,
 } from '../../../../file-data/selectors'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
-import { DeckSetupContainer } from '../../DeckSetup'
-import { OffDeck } from '../../OffDeck'
+import { ProtocolStepsDeckContainer } from '../ProtocolStepsDeckContainer'
+import { OffDeck } from '../../../../components/organisms/OffDeck'
 import { SubStepsToolbox } from '../Timeline'
 import { DraggableSidebar } from '../DraggableSidebar'
 import { ProtocolSteps } from '..'
 
 import type { SavedStepFormState } from '../../../../step-forms'
 
-vi.mock('../../OffDeck')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../ui/steps/selectors')
 vi.mock('../../../../ui/labware/selectors')
 vi.mock('../StepForm')
-vi.mock('../../DeckSetup')
 vi.mock('../StepSummary.tsx')
 vi.mock('../Timeline')
 vi.mock('../DraggableSidebar')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../components/organisms/Alerts')
+vi.mock('../../../../components/organisms/OffDeck')
+vi.mock('../ProtocolStepsDeckContainer')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {
     i18nInstance: i18n,
@@ -70,8 +70,8 @@ describe('ProtocolSteps', () => {
     vi.mocked(DraggableSidebar).mockReturnValue(
       <div>mock DraggableSidebar</div>
     )
-    vi.mocked(DeckSetupContainer).mockReturnValue(
-      <div>mock DeckSetupContainer</div>
+    vi.mocked(ProtocolStepsDeckContainer).mockReturnValue(
+      <div>mock ProtocolStepsDeckContainer</div>
     )
     vi.mocked(getSelectedTerminalItemId).mockReturnValue(null)
     vi.mocked(OffDeck).mockReturnValue(<div>mock OffDeck</div>)
@@ -90,12 +90,12 @@ describe('ProtocolSteps', () => {
   it('renders each component in ProtocolSteps', () => {
     render()
     screen.getByText('mock DraggableSidebar')
-    screen.getByText('mock DeckSetupContainer')
+    screen.getByText('mock ProtocolStepsDeckContainer')
   })
 
   it('renders the toggle when formData is null', () => {
     render()
-    screen.getByText('mock DeckSetupContainer')
+    screen.getByText('mock ProtocolStepsDeckContainer')
     fireEvent.click(screen.getByText('Off deck'))
     screen.getByText('mock OffDeck')
   })

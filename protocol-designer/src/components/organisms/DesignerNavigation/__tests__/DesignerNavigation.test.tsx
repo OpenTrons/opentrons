@@ -10,7 +10,6 @@ import { DesignerNavigation } from '..'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
-import type { TabProps } from '@opentrons/components'
 
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../molecules/LiquidButton')
@@ -40,16 +39,6 @@ describe('DesignerNavigation', () => {
   beforeEach(() => {
     props = {
       hasZoomInSlot: false,
-      tabs: [
-        {
-          text: 'Protocol starting deck',
-          isActive: true,
-        },
-        {
-          text: 'Protocol steps',
-          isActive: false,
-        },
-      ] as TabProps[],
       hasTrashEntity: false,
       showLiquidOverflowMenu: vi.fn(),
     }

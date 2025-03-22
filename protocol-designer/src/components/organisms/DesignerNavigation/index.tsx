@@ -16,36 +16,38 @@ import {
   Tabs,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getFileMetadata } from '../../../file-data/selectors'
+import { getDesignerTab, getFileMetadata } from '../../../file-data/selectors'
 import {
   selectDropdownItem,
   selectTerminalItem,
 } from '../../../ui/steps/actions/actions'
+import { selectDesignerTab } from '../../../file-data/actions'
 import { LINE_CLAMP_TEXT_STYLE, NAV_BAR_HEIGHT_REM } from '../../atoms'
 import { useKitchen } from '../Kitchen/hooks'
 import { LiquidButton } from '../../molecules/LiquidButton'
 
-import type { StyleProps, TabProps } from '@opentrons/components'
+import type { StyleProps } from '@opentrons/components'
 
 interface DesignerNavigationProps {
   hasZoomInSlot?: boolean
-  tabs?: TabProps[]
   hasTrashEntity?: boolean
   showLiquidOverflowMenu?: (liquidOverflowMenu: boolean) => void
 }
 // Note: this navigation is used in design page and liquids page
 export function DesignerNavigation({
   hasZoomInSlot,
-  tabs = [],
+  // tabs = [],
   hasTrashEntity,
   showLiquidOverflowMenu,
 }: DesignerNavigationProps): JSX.Element {
-  const { t } = useTranslation('starting_deck_state')
+  const { t } = useTranslation(['starting_deck_state', 'protocol_steps'])
   const location = useLocation()
   const metadata = useSelector(getFileMetadata)
   const { makeSnackbar } = useKitchen()
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const tab = useSelector(getDesignerTab)
+
   const isLiquidsPage = location.pathname === '/liquids'
 
   const showProtocolEditButtons = !(hasZoomInSlot === true || isLiquidsPage)
@@ -56,6 +58,34 @@ export function DesignerNavigation({
   } else if (hasZoomInSlot === true) {
     metadataText = t('add_hardware_labware')
   }
+
+  const startingDeckTab = {
+    text: t('protocol_starting_deck'),
+    isActive: tab === 'startingDeck',
+    onClick: () => {
+      dispatch(selectDesignerTab({ tab: 'startingDeck' }))
+      dispatch(
+        selectDropdownItem({
+          selection: null,
+          mode: 'clear',
+        })
+      )
+    },
+  }
+  const protocolStepTab = {
+    text: t('protocol_steps:protocol_steps'),
+    isActive: tab === 'protocolSteps',
+    onClick: () => {
+      if (hasTrashEntity === true) {
+        dispatch(selectDesignerTab({ tab: 'protocolSteps' }))
+      } else {
+        makeSnackbar(t('trash_required') as string)
+      }
+    },
+  }
+
+  const tabs = [startingDeckTab, protocolStepTab]
+
   return (
     <NavContainer showShadow={!showProtocolEditButtons}>
       {showProtocolEditButtons ? <Tabs tabs={tabs} /> : null}
