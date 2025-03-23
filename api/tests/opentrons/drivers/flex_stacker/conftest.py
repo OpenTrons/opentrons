@@ -4,7 +4,7 @@ from typing_extensions import Dict, List
 
 
 @pytest.fixture
-def histogram_bins() -> Dict[int, List[int]]:
+def histogram_bins() -> Dict[int, List[float]]:
     return {
         0: [
             3289601,

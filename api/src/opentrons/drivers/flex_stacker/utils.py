@@ -1,5 +1,12 @@
+import json
+from pathlib import Path
+from functools import lru_cache
+from typing import Dict, List, Union
+
+
 NUMBER_OF_ZONES = 10
 NUMBER_OF_BINS = 128
+TOF_BASELINE_FILE = "tof_baseline.json"
 
 
 def validate_histogram_frame(data: bytes, next_frame_id: int) -> bool:
@@ -17,3 +24,17 @@ def validate_histogram_frame(data: bytes, next_frame_id: int) -> bool:
         frame_len == 128  # len is always 128
     ), f"Invalid frame length, expected 128 got {frame_len}."
     return True
+
+
+@lru_cache
+def load_tof_baseline(path: Union[str, Path]) -> Dict[str, Dict[int, List[float]]]:
+    """Load the TOF sensor measurement baseline values."""
+    baseline: Dict[str, Dict[int, List[float]]] = {}
+    try:
+        with open(path, "r") as fd:
+            baseline = json.load(fd)
+            assert "X" in baseline
+            assert "Z" in baseline
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+    return baseline
