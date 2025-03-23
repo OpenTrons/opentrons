@@ -69,7 +69,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
         {selectedValue === t('list_view') ? (
           <SetupLabwareList
             attachedModuleInfo={moduleRenderInfoById}
-            commands={protocolAnalysis?.commands ?? []}
+            protocolAnalysis={protocolAnalysis}
             extraAttentionModules={moduleTypesThatRequireExtraAttention}
             isFlex={isFlex}
           />

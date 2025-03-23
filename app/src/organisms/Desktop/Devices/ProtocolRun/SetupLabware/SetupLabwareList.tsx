@@ -6,29 +6,48 @@ import {
   StyledText,
   COLORS,
 } from '@opentrons/components'
-import { getLabwareSetupItemGroups } from '/app/transformations/commands'
+import { getStackedItemsOnStartingDeck } from '/app/transformations/commands/transformations/getStackedItemsOnStartingDeck'
 import { LabwareListItem } from './LabwareListItem'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import type { LabwareSetupItem } from '/app/transformations/commands'
 
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
-  commands: RunTimeCommand[]
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
   isFlex: boolean
 }
 export function SetupLabwareList(
   props: SetupLabwareListProps
 ): JSX.Element | null {
-  const { attachedModuleInfo, commands, extraAttentionModules, isFlex } = props
+  const {
+    attachedModuleInfo,
+    protocolAnalysis,
+    extraAttentionModules,
+    isFlex,
+  } = props
   const { t } = useTranslation('protocol_setup')
-  const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(commands)
-  const allItems: LabwareSetupItem[] = []
-  allItems.push.apply(allItems, onDeckItems)
-  allItems.push.apply(allItems, offDeckItems)
+
+  const startingDeck = getStackedItemsOnStartingDeck(
+    protocolAnalysis?.commands ?? [],
+    protocolAnalysis?.labware ?? [],
+    protocolAnalysis?.modules ?? []
+  )
+  const sortedStartingDeckEntries = Object.entries(startingDeck)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .filter(([key]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    ? startingDeck['offDeck']
+    : null
+
+  // const allItems: LabwareSetupItem[] = []
+  // allItems.push.apply(allItems, onDeckItems)
+  // allItems.push.apply(allItems, offDeckItems)
 
   return (
     <Flex
@@ -52,26 +71,31 @@ export function SetupLabwareList(
           {t('labware_name')}
         </StyledText>
       </Flex>
-      {allItems.map((labwareItem, index) => {
-        // filtering out all labware that aren't on a module or the deck
-        const labwareOnAdapter = allItems.find(
-          item =>
-            labwareItem.initialLocation !== 'offDeck' &&
-            labwareItem.initialLocation !== 'systemLocation' &&
-            'labwareId' in labwareItem.initialLocation &&
-            item.labwareId === labwareItem.initialLocation.labwareId
-        )
-        return labwareOnAdapter != null ? null : (
+      {sortedStartingDeckEntries.map(([key, value]) => {
+        return (
           <LabwareListItem
-            commands={commands}
-            key={index}
+            key={key}
             attachedModuleInfo={attachedModuleInfo}
             extraAttentionModules={extraAttentionModules}
+            isFlex={isFlex}
+            slotName={key}
+            stackedItems={value}
+          />
+        )
+      })}
+      {/* {offDeckItems?.forEach(item) => {
+        return (
+          <LabwareListItem
+            key={item.labwareId}
+            attachedModuleInfo={attachedModuleInfo}
+            extraAttentionModules={extraAttentionModules}
+            slotName={'offDeck'}
+            stackedItems={[item]}
             {...labwareItem}
             isFlex={isFlex}
           />
         )
-      })}
+      })} */}
     </Flex>
   )
 }

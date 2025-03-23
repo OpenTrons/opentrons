@@ -19,19 +19,19 @@ import type {
   LoadLidParams,
 } from '@opentrons/shared-data'
 
-interface LabwareInStack {
+export interface LabwareInStack {
   definitionUri: string
   displayName: string
   labwareId: string
   lidId?: string
   lidDisplayName?: string
 }
-interface ModuleInStack {
+export interface ModuleInStack {
   moduleModel: ModuleModel
   moduleId: string
 }
 
-type StackItem = LabwareInStack | ModuleInStack
+export type StackItem = LabwareInStack | ModuleInStack
 
 export interface StackedItemsOnDeck {
   [slotName: string]: StackItem[]
