@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
+  FLEX_MAX_CONTENT,
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
@@ -79,8 +80,9 @@ export function ProtocolSteps(): JSX.Element {
   return (
     <Flex
       backgroundColor={COLORS.grey10}
-      height="calc(100vh - 4rem)"
+      height="100%"
       width="100%"
+      minHeight={FLEX_MAX_CONTENT}
     >
       <Flex height="100%" padding={SPACING.spacing12}>
         <DraggableSidebar setTargetWidth={setTargetWidth} />
@@ -100,26 +102,25 @@ export function ProtocolSteps(): JSX.Element {
           gridGap={SPACING.spacing24}
           width={CONTENT_MAX_WIDTH}
           justifyContent={JUSTIFY_CENTER}
-          paddingY={SPACING.spacing120}
         >
-          {showTimelineAlerts && (
+          {showTimelineAlerts ? (
             <TimelineAlerts
               justifyContent={JUSTIFY_CENTER}
               width="100%"
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing4}
             />
-          )}
+          ) : null}
           <Flex
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
             height="2.25rem"
           >
-            {currentStep && hoveredTerminalItem == null && (
+            {currentStep != null && hoveredTerminalItem == null ? (
               <StyledText desktopStyle="headingSmallBold">
                 {i18n.format(currentStep.stepName, 'titleCase')}
               </StyledText>
-            )}
+            ) : null}
             {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
               currentHoveredStepId == null && (
                 <StyledText desktopStyle="headingSmallBold">
@@ -160,15 +161,17 @@ export function ProtocolSteps(): JSX.Element {
             </Flex>
           </Flex>
         </Flex>
-        {enableHotKeyDisplay && <HotKeyDisplay targetWidth={targetWidth} />}
+        {enableHotKeyDisplay ? (
+          <HotKeyDisplay targetWidth={targetWidth} />
+        ) : null}
       </Flex>
-      <Flex height="100%" padding={SPACING.spacing12}>
+      {formData == null && selectedSubstep ? (
+        <SubStepsToolbox stepId={selectedSubstep} />
+      ) : null}
+      <Flex padding={SPACING.spacing12}>
         <StepForm />
       </Flex>
-      {isMultiSelectMode && <BatchEditToolbox />}
-      {formData == null && selectedSubstep && (
-        <SubStepsToolbox stepId={selectedSubstep} />
-      )}
+      {isMultiSelectMode ? <BatchEditToolbox /> : null}
     </Flex>
   )
 }

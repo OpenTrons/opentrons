@@ -30,7 +30,8 @@ import type { DeckSlotId } from '@opentrons/shared-data'
 import type { DeckSetupTabType } from '../../../pages/Designer/types'
 
 const OFF_DECK_MAP_WIDTH = '41.625rem'
-
+const OFF_DECK_MAP_HEIGHT = '44rem'
+const OFF_DECK_MAP_HEIGHT_FOR_STEP = '30.3rem'
 interface OffDeckDetailsProps extends DeckSetupTabType {
   addLabware: () => void
 }
@@ -79,6 +80,11 @@ export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
         flex="0 0 auto"
         width={OFF_DECK_MAP_WIDTH}
         height="100%"
+        maxHeight={
+          tab === 'startingDeck'
+            ? OFF_DECK_MAP_HEIGHT
+            : OFF_DECK_MAP_HEIGHT_FOR_STEP
+        }
         alignItems={ALIGN_CENTER}
         borderRadius={SPACING.spacing12}
         padding={`${SPACING.spacing16} ${SPACING.spacing40}`}
