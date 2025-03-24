@@ -2,15 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
-import {
-  Flex,
-  DeckInfoLabel,
-  MODULE_ICON_NAME_BY_TYPE,
-  COLORS,
-  BORDERS,
-  RESPONSIVENESS,
-} from '@opentrons/components'
-import { FLEX_STACKER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
+import { Flex, COLORS, BORDERS, RESPONSIVENESS } from '@opentrons/components'
 
 import {
   OFFSET_KIND_DEFAULT,
@@ -21,13 +13,14 @@ import {
   selectMostRecentVectorOffsetForLwWithOffsetDetails,
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
-import { OffsetTag } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
+import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { MultiDeckLabelTagBtns } from '/app/molecules/MultiDeckLabelTagBtns'
+import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
+import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 
-import type { ModuleType } from '@opentrons/shared-data'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
-import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/OffsetTag'
+import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 
 interface LabwareLocationItemProps extends LPCWizardContentProps {
   locationSpecificOffsetDetails: LocationSpecificOffsetDetails
@@ -46,6 +39,7 @@ export function LabwareLocationItem({
   const { definitionUri } = locationDetails
   const isHardcodedOffset = locationDetails.hardCodedOffsetId != null
   const dispatch = useDispatch()
+  const { makeHardCodedSnackbar } = useLPCSnackbars(runId)
 
   const mostRecentOffset = useSelector(
     selectMostRecentVectorOffsetForLwWithOffsetDetails(
@@ -54,7 +48,7 @@ export function LabwareLocationItem({
       locationSpecificOffsetDetails
     )
   )
-  const isMissingDefaultOffset = useSelector(
+  const isDefaultOffsetAbsent = useSelector(
     selectIsDefaultOffsetAbsent(runId, definitionUri)
   )
 
@@ -92,71 +86,34 @@ export function LabwareLocationItem({
     }
   }
 
-  const buildDeckInfoLabels = (): JSX.Element[] => {
-    const moduleIconType = (): ModuleType | null => {
-      const moduleModel = locationDetails.closestBeneathModuleModel
-
-      if (moduleModel != null) {
-        return getModuleType(moduleModel)
-      } else {
-        return null
-      }
-    }
-
-    const isLabwareInLwStackup = (): boolean => {
-      const { lwModOnlyStackupDetails } = locationDetails
-      const lwOnlyStackup = lwModOnlyStackupDetails.filter(
-        component => component.kind === 'labware'
-      )
-
-      return lwOnlyStackup.length > 1
-    }
-
-    const deckInfoLabels = [
-      <DeckInfoLabel deckLabel={slotCopy} key={slotCopy} />,
-    ]
-
-    if (isLabwareInLwStackup()) {
-      // We use the flex stacker's stacked icon to represent stacked labware.
-      deckInfoLabels.push(
-        <DeckInfoLabel
-          iconName={MODULE_ICON_NAME_BY_TYPE[FLEX_STACKER_MODULE_TYPE]}
-          key="stacked-icon"
-        />
-      )
-    }
-
-    const moduleType = moduleIconType()
-    if (moduleType !== null) {
-      deckInfoLabels.push(
-        <DeckInfoLabel
-          iconName={MODULE_ICON_NAME_BY_TYPE[moduleType]}
-          key="module-icon"
-        />
-      )
-    }
-
-    return deckInfoLabels
-  }
-
   return (
     <Flex css={DECK_LABEL_CONTAINER_STYLE}>
       <MultiDeckLabelTagBtns
-        colOneDeckInfoLabels={buildDeckInfoLabels()}
+        colOneDeckInfoLabels={[
+          <LabwareOffsetsDeckInfoLabels
+            key="1"
+            detail={locationSpecificOffsetDetails}
+            slotCopy={slotCopy}
+          />,
+        ]}
         colTwoTag={<OffsetTag {...buildOffsetTagProps()} />}
         colThreePrimaryBtn={{
           buttonText: lpcTextT('adjust'),
-          onClick: handleLaunchEditOffset,
+          onClick: isHardcodedOffset
+            ? makeHardCodedSnackbar
+            : handleLaunchEditOffset,
           buttonType: 'secondary',
-          disabled: isMissingDefaultOffset || isHardcodedOffset,
+          disabled: isDefaultOffsetAbsent,
+          ariaDisabled: isHardcodedOffset,
         }}
         colThreeSecondaryBtn={{
           buttonText: lpcTextT('reset_to_default'),
-          onClick: handleResetOffset,
+          onClick: isHardcodedOffset
+            ? makeHardCodedSnackbar
+            : handleResetOffset,
           buttonType: 'tertiaryHighLight',
-          disabled:
-            mostRecentOffset?.kind !== OFFSET_KIND_LOCATION_SPECIFIC ||
-            isHardcodedOffset,
+          disabled: mostRecentOffset?.kind !== OFFSET_KIND_LOCATION_SPECIFIC,
+          ariaDisabled: isHardcodedOffset,
         }}
       />
     </Flex>

@@ -17,6 +17,7 @@ import {
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
   airGapLocationHelper,
+  delayLocationHelper,
 } from '../../utils'
 import {
   aspirate,
@@ -24,7 +25,6 @@ import {
   delay,
   dispense,
   dropTip,
-  moveToWell,
   touchTip,
 } from '../atomic'
 import { mixUtil } from './mix'
@@ -240,20 +240,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [
-                  curryCommandCreator(moveToWell, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
-                    labwareId: args.destLabware,
-                    wellName: destWell,
-                    wellLocation: {
-                      origin: 'bottom',
-                      offset: {
-                        x: 0,
-                        y: 0,
-                        z: dispenseDelay.mmFromBottom,
-                      },
-                    },
-                  }),
-                  curryCommandCreator(delay, {
+                    destinationId: args.destLabware,
+                    well: destWell,
+                    zOffset: dispenseDelay.mmFromBottom,
                     seconds: dispenseDelay.seconds,
                   }),
                 ]
@@ -387,20 +378,11 @@ export const distribute: CommandCreator<DistributeArgs> = (
       const delayAfterAspirateCommands =
         aspirateDelay != null
           ? [
-              curryCommandCreator(moveToWell, {
+              curryCommandCreator(delayLocationHelper, {
                 pipetteId: args.pipette,
-                labwareId: args.sourceLabware,
-                wellName: args.sourceWell,
-                wellLocation: {
-                  origin: 'bottom',
-                  offset: {
-                    x: 0,
-                    y: 0,
-                    z: aspirateDelay.mmFromBottom,
-                  },
-                },
-              }),
-              curryCommandCreator(delay, {
+                destinationId: args.sourceLabware,
+                well: args.sourceWell,
+                zOffset: aspirateDelay.mmFromBottom,
                 seconds: aspirateDelay.seconds,
               }),
             ]

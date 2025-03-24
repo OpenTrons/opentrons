@@ -1,7 +1,12 @@
 import { css } from 'styled-components'
 
 import { StyledText } from '../StyledText'
-import { DIRECTION_COLUMN, DISPLAY_FLEX, DISPLAY_GRID } from '../../styles'
+import {
+  DIRECTION_COLUMN,
+  DISPLAY_FLEX,
+  DISPLAY_GRID,
+  FLEX_MAX_CONTENT,
+} from '../../styles'
 import { SPACING, RESPONSIVENESS } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
 
@@ -10,7 +15,7 @@ import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface ListTableProps {
   children: ReactNode
-  headers?: [string?, string?, string?, string?] // maximum of 4
+  headers?: [ReactNode?, ReactNode?, ReactNode?, ReactNode?] // maximum of 4
 }
 
 // ListTable contains the semantic HTML table identity.
@@ -51,10 +56,18 @@ const TABLE_STYLE = css`
   border-spacing: 0;
 `
 
+// TODO(jh, 03-19-25): Work with Design to decide whether they want the
+//  column spacing to be opinionated. Various component designs conflict with feature designs (ex, LPC).
 const trStyle = (numHeaders: number): FlattenSimpleInterpolation => css`
   display: ${DISPLAY_GRID};
-  grid-template-columns: repeat(${numHeaders}, 1fr);
+  grid-template-columns: ${numHeaders === 3
+    ? `${FLEX_MAX_CONTENT} 1fr ${FLEX_MAX_CONTENT}`
+    : `repeat(${numHeaders}, 1fr)`};
   gap: ${SPACING.spacing24};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    grid-template-columns: repeat(${numHeaders}, 1fr);
+  }
 `
 
 const TH_STYLE = css`

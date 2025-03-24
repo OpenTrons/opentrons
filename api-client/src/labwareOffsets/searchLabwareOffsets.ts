@@ -7,7 +7,7 @@ import type {
 } from '../types'
 import type { ANY_LOCATION, StoredLabwareOffset } from './types'
 
-export interface SearchLabwareOffsetsData {
+export interface SearchLabwareOffsetsRequest {
   /** Filters are ORed together. Within a single filter, criteria are ANDed together. */
   filters: Array<{
     id?: string
@@ -31,10 +31,10 @@ export interface SearchLabwareOffsetsResponse {
  */
 export function searchLabwareOffsets(
   config: HostConfig,
-  data: SearchLabwareOffsetsData
+  data: SearchLabwareOffsetsRequest
 ): ResponsePromise<SearchLabwareOffsetsResponse> {
   return request<
     SearchLabwareOffsetsResponse,
-    { data: SearchLabwareOffsetsData }
+    { data: SearchLabwareOffsetsRequest }
   >(POST, '/labwareOffsets/searches', { data }, config)
 }

@@ -1,14 +1,18 @@
-import type { Selector } from 'reselect'
 import { createSelector } from 'reselect'
 
 import {
   getAreAllOffsetsHardCoded,
-  getCountHardCodedOffsets,
   getDefaultOffsetDetailsForAllLabware,
   getLocationSpecificOffsetDetailsForAllLabware,
-  getMissingOffsets,
+  getMissingLSOffsets,
   getSelectedLabwareWithOffsetDetails,
   getWorkingOffsetsByUri,
+  getTotalCountLocationSpecificOffsets,
+  getCountMissingLSOffsetsWithoutDefault,
+  getIsNecessaryDefaultOffsetMissing,
+  getTotalCountNonHardCodedLocationSpecificOffsets,
+  getIsAnyNecessaryDefaultOffsetMissing,
+  getFlexSlotNameOnly,
 } from '../transforms'
 
 import {
@@ -23,6 +27,7 @@ import {
 } from '/app/redux/protocol-runs/constants'
 
 import type {
+  LabwareOffsetCreateData,
   StoredLabwareOffsetCreate,
   VectorOffset,
 } from '@opentrons/api-client'
@@ -30,25 +35,116 @@ import type { State } from '/app/redux/types'
 import type {
   DefaultOffsetDetails,
   LocationSpecificOffsetDetails,
+  LPCLabwareInfo,
   LPCOffsetKind,
   WorkingOffset,
 } from '/app/redux/protocol-runs'
-import type { MissingOffsets, WorkingOffsetsByUri } from '../transforms'
+import type { WorkingOffsetsByUri } from '../transforms'
+import type { TFunction } from 'i18next'
+import type { Selector } from 'reselect'
 
-// Get the location specific offset details for the currently user-selected labware geometry.
-export const selectSelectedLwLocationSpecificOffsetDetails = (
+export const selectAreOffsetsApplied = (
   runId: string
-): Selector<State, LocationSpecificOffsetDetails[]> =>
+): Selector<State, boolean> =>
   createSelector(
     (state: State) =>
-      state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware?.uri,
+      state.protocolRuns[runId]?.lpc?.labwareInfo.areOffsetsApplied,
+    areOffsetsApplied => areOffsetsApplied ?? false
+  )
+
+export const selectInitialRunRecordOffsets = (
+  runId: string
+): Selector<State, LPCLabwareInfo['initialRunRecordOffsets']> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.initialRunRecordOffsets,
+    loadedOffsets => loadedOffsets ?? []
+  )
+
+export const selectInitialDatabaseOffsets = (
+  runId: string
+): Selector<State, LPCLabwareInfo['initialDatabaseOffsets']> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.initialDatabaseOffsets,
+    loadedOffsets => loadedOffsets ?? []
+  )
+
+export interface LocationSpecificOffsetDetailsWithCopy
+  extends LocationSpecificOffsetDetails {
+  slotCopy: string
+}
+
+// Get the location specific offset details for the currently user-selected labware geometry.
+export const selectSortedLSOffsetDetailsWithCopy = (
+  runId: string,
+  uri: string,
+  t: TFunction
+): Selector<State, LocationSpecificOffsetDetailsWithCopy[]> =>
+  createSelector(
     (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
-    (uri, lw) => {
-      if (uri == null || lw == null) {
+    (state: State) => state.protocolRuns[runId]?.lpc?.protocolData,
+    (labware, protocolData) => {
+      if (labware == null || protocolData == null) {
         console.warn('Failed to access labware details.')
         return []
       } else {
-        return lw[uri].locationSpecificOffsetDetails ?? []
+        const lsDetails = labware[uri].locationSpecificOffsetDetails
+
+        const lsDetailsWithCopy = lsDetails.map(offset => {
+          const slotCopy = getFlexSlotNameOnly(
+            offset.locationDetails,
+            protocolData,
+            t
+          )
+
+          return {
+            ...offset,
+            slotCopy,
+          }
+        })
+
+        return [...lsDetailsWithCopy].sort((a, b) =>
+          a.slotCopy.localeCompare(b.slotCopy, 'en', {
+            numeric: true,
+          })
+        )
+      }
+    }
+  )
+
+// If no offsets are missing, returns copy for the total number of location-specific offsets.
+// If offsets are missing, returns copy for the total number of location-specific offsets missing.
+export const selectTotalOrMissingOffsetRequiredCountForLwCopy = (
+  runId: string,
+  uri: string,
+  t: TFunction
+): Selector<State, string> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .defaultOffsetDetails,
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
+        .locationSpecificOffsetDetails,
+    (defaultDetails, lsDetails) => {
+      const countLSOffsetsNoHC = getCountMissingLSOffsetsWithoutDefault(
+        lsDetails
+      )
+      const countLSOffsetsTotal = lsDetails?.length ?? 0
+      const isNecessaryDefaultOffsetMising = getIsNecessaryDefaultOffsetMissing(
+        defaultDetails,
+        lsDetails
+      )
+
+      if (countLSOffsetsTotal > 1) {
+        return isNecessaryDefaultOffsetMising
+          ? t('num_missing_offsets', { num: countLSOffsetsNoHC })
+          : t('num_offsets', { num: countLSOffsetsTotal })
+      } else {
+        return isNecessaryDefaultOffsetMising
+          ? t('one_missing_offset')
+          : t('one_offset')
       }
     }
   )
@@ -69,6 +165,17 @@ export const selectSelectedLwDefaultOffsetDetails = (
         return lw[uri].defaultOffsetDetails ?? null
       }
     }
+  )
+
+export const selectSelectedLwWithOffsetDetailsOffsets = (
+  runId: string
+): Selector<
+  State,
+  LocationSpecificOffsetDetails | DefaultOffsetDetails | null
+> =>
+  createSelector(
+    (state: State) => getSelectedLabwareWithOffsetDetails(runId, state),
+    details => details ?? null
   )
 
 // Get the working offsets for the currently user-selected labware geometry with offset details.
@@ -181,20 +288,32 @@ export const selectMostRecentVectorOffsetForLwWithOffsetDetails = (
     }
   )
 
-// NOTE: This count is analogous to the number of unique locations a labware geometry is utilized
-// in a run minus those locations that are hardcoded.
-export const selectCountNonHardcodedLocationSpecificOffsetsForLw = (
-  runId: string,
-  uri: string
+// The total count of all location specific offsets utilized in a run.
+export const selectTotalCountLocationSpecificOffsets = (
+  runId: string
 ): Selector<State, number> =>
   createSelector(
-    (state: State) =>
-      state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
-        .locationSpecificOffsetDetails,
-    lsDetails =>
-      lsDetails != null
-        ? lsDetails.length - getCountHardCodedOffsets(lsDetails)
-        : 0
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => getTotalCountLocationSpecificOffsets(labware)
+  )
+
+// The total count of all non-hardcoded location specific offsets utilized in a run.
+export const selectTotalCountNonHardCodedLSOffsets = (
+  runId: string
+): Selector<State, number> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => getTotalCountNonHardCodedLocationSpecificOffsets(labware)
+  )
+
+// The total count of missing location-specific offsets that do not have an associated default offset.
+// Note: only offsets persisted on the robot-server are "not missing."
+export const selectCountMissingLSOffsetsWithoutDefault = (
+  runId: string
+): Selector<State, number> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => getMissingLSOffsets(labware).totalCount
   )
 
 // Whether the default offset is "absent" for the given labware geometry.
@@ -221,8 +340,9 @@ export const selectIsDefaultOffsetAbsent = (
 // Whether the default offset is "missing" for the given labware geometry.
 // The default offset must be persisted on the robot-server to be considered "not missing".
 // Note that the default offset is not considered missing if all locations that would
-// utilize the default offset in the run are "hardcoded".
-export const selectIsDefaultOffsetMissing = (
+// utilize the default offset in the run are "hardcoded" or have existing location-specific
+// offsets.
+export const selectIsNecessaryDefaultOffsetMissing = (
   runId: string,
   uri: string
 ): Selector<State, boolean> =>
@@ -234,8 +354,16 @@ export const selectIsDefaultOffsetMissing = (
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .locationSpecificOffsetDetails,
     (defaultDetails, lsDetails) =>
-      defaultDetails?.existingOffset == null &&
-      !getAreAllOffsetsHardCoded(lsDetails)
+      getIsNecessaryDefaultOffsetMissing(defaultDetails, lsDetails)
+  )
+
+// Is any default offset missing for the run. See selectIsNecessaryDefaultOffsetMissing.
+export const selectIsAnyNecessaryDefaultOffsetMissing = (
+  runId: string
+): Selector<State, boolean> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => getIsAnyNecessaryDefaultOffsetMissing(labware)
   )
 
 export const selectWorkingOffsetsByUri = (
@@ -259,17 +387,6 @@ export const selectIsAnyOffsetHardCoded = (
       details?.some(
         detail => detail.locationDetails.hardCodedOffsetId != null
       ) ?? false
-  )
-
-// TODO(jh, 03-14-24): Ensure we don't count hardcoded offsets as missing!
-// Returns the offset details for missing offsets, keyed by the labware URI.
-// Note: only offsets persisted on the robot-server are "not missing".
-export const selectMissingOffsets = (
-  runId: string
-): Selector<State, MissingOffsets> =>
-  createSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
-    labware => getMissingOffsets(labware)
   )
 
 export interface SelectOffsetsToApplyResult {
@@ -336,5 +453,61 @@ export const selectPendingOffsetOperations = (
       })
 
       return result
+    }
+  )
+
+// Returns offsets for injection into the run. Prefer the location-specific
+// offset if it exists, otherwise use the default offset. Locations with hardcoded
+// offsets are ignored.
+export const selectLabwareOffsetsToAddToRun = (
+  runId: string
+): Selector<State, LabwareOffsetCreateData[] | null> =>
+  createSelector(
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
+    labware => {
+      if (labware == null) {
+        return []
+      }
+
+      try {
+        const result: LabwareOffsetCreateData[] = []
+
+        Object.entries(labware).forEach(([uri, details]) => {
+          const {
+            defaultOffsetDetails,
+            locationSpecificOffsetDetails: lsDetails,
+          } = details
+          const defaultVector = defaultOffsetDetails.existingOffset?.vector
+
+          lsDetails.forEach(detail => {
+            const { vector: lsVector } = detail.existingOffset ?? {
+              vector: null,
+            }
+            const locationSequence = detail.locationDetails.lwOffsetLocSeq
+
+            if (detail.locationDetails.hardCodedOffsetId == null) {
+              if (lsVector != null) {
+                result.push({
+                  definitionUri: uri,
+                  vector: lsVector,
+                  locationSequence,
+                })
+              } else if (defaultVector != null) {
+                result.push({
+                  definitionUri: uri,
+                  vector: defaultVector,
+                  locationSequence,
+                })
+              } else {
+                throw new Error('Missing required offset.')
+              }
+            }
+          })
+        })
+
+        return result
+      } catch (error) {
+        return null
+      }
     }
   )

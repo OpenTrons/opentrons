@@ -125,14 +125,40 @@ Flex and OT-2 pipettes dispense at :ref:`default flow rates <new-plunger-flow-ra
 Push Out After Dispense
 -----------------------
 
-The optional ``push_out`` parameter of ``dispense()`` helps ensure all liquid leaves the tip. Use ``push_out`` for applications that require moving the pipette plunger lower than the default, without performing a full :ref:`blow out <blow-out>`.
+Dispensing all liquid from the tip usually requires an additional volume of air to ensure no droplets remain. In a push out after dispense, the pipette dispenses all liquid by returning the plunger to its aspirate start position. Then, without stopping, the plunger moves further down to dispense the additional push out volume. 
 
-For example, this dispense action moves the plunger the equivalent of an additional 5 µL beyond where it would stop if ``push_out`` was set to zero or omitted::
+Use the optional ``push_out`` parameter of ``dispense()`` for applications that require moving the pipette plunger lower than the default, without performing a full :ref:`blow out <blow-out>`.
 
+Flex pipettes include a push out of air by default for any dispense that completely empties the attached pipette tip. Both default and maximum push out volumes depend on your Flex pipette and tip combination. 
+
++----------------------------------+-----------+---------------------------+----------------------------+
+|              Pipette             |  Tip      |         Default           |          Maximum           |
+|                                  |           |         push out          |          push out          |
++==================================+===========+===========================+============================+ 
+| 50 µL (1- and 8-channel)         | 50 µL     | - Regular: 2 µL           | - Regular: 3.9 µL          | 
+|                                  |           | - Low-volume mode: 7 µL   | - Low-volume mode: 11.7 µL | 
++----------------------------------+-----------+---------------------------+---------+------------------+ 
+| 1000 µL (1-, 8-, and 96-channel) | 50 µL     |          7 µL             |         79.5 µL            | 
+|                                  +-----------+---------------------------+----------------------------+
+|                                  | 200 µL    |          5 µL             |         79.5 µL            | 
+|                                  +-----------+---------------------------+----------------------------+
+|                                  | 1000 µL   |          20 µL            |         79.5 µL            |
++----------------------------------+-----------+---------------------------+----------------------------+
+
+OT-2 pipettes do not include a push out by default. 
+
+You can change the push out volume for any :py:meth:`~.InstrumentContext.dispense` command. For this example dispense of all 100 µL of liquid in a 200 µL tip, the Flex 1-Channel 1000 µL pipette plunger will move the equivalent of 7 µL (an additional 2 µL more than the default) beyond the aspirate start position to push out any remaining liquid in the tip. 
+
+.. code-block:: python
+    
     pipette.pick_up_tip()
     pipette.aspirate(100, plate["A1"])
-    pipette.dispense(100, plate["B1"], push_out=5)
+    pipette.dispense(100, plate["B1"], push_out=7)
     pipette.drop_tip()
+
+Set ``push_out`` to override the default if you observe problems with dispensing. If liquid remains inside the tip after dispensing, set ``push_out`` higher. If no liquid remains, but contact dispenses create too many bubbles, set ``push_out`` lower. 
+
+To disable ``push_out`` during any dispense action, set ``push_out=0``. You can use this to avoid multiple ``push_out`` actions during a mix step. 
 
 .. versionadded:: 2.15
 
