@@ -1,6 +1,6 @@
 export * from './parseProtocolAnalysisOutput'
 export * from './getProtocolModulesInfo'
-export * from './getLabwareOffsetLocation'
+export * from './getLegacyLabwareOffsetLocation'
 export * from './getLabwareRenderInfo'
 export * from './liquids'
 export * from './getAttachedProtocolModuleMatches'

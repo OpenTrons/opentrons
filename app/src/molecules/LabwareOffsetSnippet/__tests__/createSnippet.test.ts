@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import '@testing-library/jest-dom/vitest'
-import { transfer_settings } from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE, transfer_settings } from '@opentrons/shared-data'
 import { createSnippet } from '../createSnippet'
 import type {
   ModuleModel,
@@ -145,10 +145,10 @@ const analysisCommands = protocolWithMagTempTC.commands.map(c => {
   return c
 })
 
-const juptyerPrefix =
-  'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.13")\n\n'
+const jupyterPrefix =
+  'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.18")\n\n'
 const cliPrefix =
-  'from opentrons import protocol_api\n\nmetadata = {\n    "apiLevel": "2.13"\n}\n\ndef run(protocol: protocol_api.ProtocolContext):'
+  'from opentrons import protocol_api\n\nmetadata = {\n    "apiLevel": "2.18"\n}\n\ndef run(protocol: protocol_api.ProtocolContext):'
 
 describe('createSnippet', () => {
   it('should generate expected python snippet for jupyter rounding vector values to 2 fixed decimal values', () => {
@@ -159,15 +159,16 @@ describe('createSnippet', () => {
     const wellPlateLoadAndOffset =
       'labware_9 = protocol.load_labware("corning_24_wellplate_3.4ml_flat", location="6")\nlabware_9.set_offset(x=0.00, y=0.00, z=3.00)'
 
-    const resultingSnippet = createSnippet(
-      'jupyter',
-      analysisCommands,
-      protocolWithMagTempTC.labware,
-      protocolWithMagTempTC.modules,
-      labwareOffsets
-    )
+    const resultingSnippet = createSnippet({
+      mode: 'jupyter',
+      commands: analysisCommands,
+      labware: protocolWithMagTempTC.labware,
+      modules: protocolWithMagTempTC.modules,
+      labwareOffsets,
+      robotType: OT2_ROBOT_TYPE,
+    })
 
-    expect(resultingSnippet).toContain(juptyerPrefix)
+    expect(resultingSnippet).toContain(jupyterPrefix)
     expect(resultingSnippet).not.toContain(cliPrefix)
 
     expect(resultingSnippet).toContain(
@@ -210,13 +211,14 @@ describe('createSnippet', () => {
       'labware_7 = module_3.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")\n    labware_7.set_offset(x=0.00, y=2.00, z=0.00)'
     const wellPlateLoadAndOffset =
       'labware_9 = protocol.load_labware("corning_24_wellplate_3.4ml_flat", location="6")\n    labware_9.set_offset(x=0.00, y=0.00, z=3.00)'
-    const resultingSnippet = createSnippet(
-      'cli',
-      analysisCommands,
-      protocolWithMagTempTC.labware,
-      protocolWithMagTempTC.modules,
-      labwareOffsets
-    )
+    const resultingSnippet = createSnippet({
+      mode: 'cli',
+      commands: analysisCommands,
+      labware: protocolWithMagTempTC.labware,
+      modules: protocolWithMagTempTC.modules,
+      labwareOffsets,
+      robotType: OT2_ROBOT_TYPE,
+    })
 
     expect(resultingSnippet).toContain(
       'module_1 = protocol.load_module("magneticModuleV2", location="1")'
@@ -246,7 +248,7 @@ describe('createSnippet', () => {
     expect(resultingSnippet).toContain(
       'labware_8 = protocol.load_labware("opentrons_96_tiprack_20ul", location="9")'
     )
-    expect(resultingSnippet).not.toContain(juptyerPrefix)
+    expect(resultingSnippet).not.toContain(jupyterPrefix)
     expect(resultingSnippet).toContain(cliPrefix)
     expect(resultingSnippet).toContain(tipRackLoadAndOffset)
     expect(resultingSnippet).toContain(tcPlateLoadAndOffset)

@@ -12,7 +12,7 @@ import type {
 // is required because the backend needs to know a module's model (not its ID)
 // in order to apply offsets. This logic should be removed once the backend can
 // accept a module id as a labware's location (to match the LabwareLocation interface)
-export const getLabwareOffsetLocation = (
+export const getLegacyLabwareOffsetLocation = (
   labwareId: string,
   commands: ProtocolAnalysisOutput['commands'],
   modules: LoadedModule[],

@@ -7,7 +7,7 @@ import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
 
 // Returns the offset location sequence, which is used to get/store offsets from the server,
 // and drive LPC UI.
-export function getLwOffsetLocSeqFrom(
+export function getLwOffsetLocSeqFromLocSeq(
   locSequence: LabwareLocationSequence,
   lw: LoadedLabware[],
   modules: LoadedModule[]

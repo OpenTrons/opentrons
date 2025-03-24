@@ -10,6 +10,7 @@ import {
   getVectorDifference,
   getVectorSum,
   IDENTITY_VECTOR,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import {
@@ -32,7 +33,7 @@ import {
   getLabwareDefinitionsFromCommands,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   getIsOnDevice,
@@ -132,21 +133,23 @@ export const ResultsSummary = (
     />
   )
   const JupyterSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="jupyter"
       labwareOffsets={offsetsToApply}
       commands={protocolData?.commands ?? []}
       labware={protocolData?.labware ?? []}
       modules={protocolData?.modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const CommandLineSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="cli"
       labwareOffsets={offsetsToApply}
       commands={protocolData?.commands ?? []}
       labware={protocolData?.labware ?? []}
       modules={protocolData?.modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
 
