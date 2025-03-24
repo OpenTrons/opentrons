@@ -15,7 +15,6 @@ import {
 } from '@opentrons/step-generation'
 import { getFlexNameConversion } from './utils'
 import type {
-  AdditionalEquipmentEntities,
   InvariantContext,
   LabwareEntities,
   LabwareLiquidState,

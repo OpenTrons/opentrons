@@ -15,7 +15,6 @@ import {
   getTrashOrLabware,
   dispenseLocationHelper,
   moveHelper,
-  getHasWasteChute,
 } from '../../utils'
 import {
   aspirate,

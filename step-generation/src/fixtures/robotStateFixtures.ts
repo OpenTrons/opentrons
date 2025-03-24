@@ -34,7 +34,7 @@ import type {
   TEMPERATURE_AT_TARGET,
 } from '../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AdditionalEquipmentEntities, TrashBinEntities } from '../types'
+import type { TrashBinEntities } from '../types'
 import type {
   Config,
   InvariantContext,

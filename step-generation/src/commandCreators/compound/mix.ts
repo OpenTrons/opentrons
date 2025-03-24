@@ -10,7 +10,6 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
   getIsSafePipetteMovement,
-  getHasWasteChute,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import {

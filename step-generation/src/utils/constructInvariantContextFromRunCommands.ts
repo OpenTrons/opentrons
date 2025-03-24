@@ -13,7 +13,6 @@ import type {
   LabwareEntities,
   PipetteEntities,
   ModuleEntities,
-  AdditionalEquipmentEntities,
   AdditionalEquipmentName,
   TrashBinEntities,
   WasteChuteEntities,
@@ -110,13 +109,11 @@ export function constructInvariantContextFromRunCommands(
       ) {
         const addressableAreaName = command.params.addressableAreaName
         const id = `${uuid()}:${addressableAreaName}`
-        let name: AdditionalEquipmentName = 'trashBin'
         let location: string = GRIPPER_LOCATION
         if (addressableAreaName === 'fixedTrash') {
           location = '12'
         } else if (addressableAreaName.includes('WasteChute')) {
           location = 'D3'
-          name = 'wasteChute'
         } else if (addressableAreaName.includes('movableTrash')) {
           location = addressableAreaName.split('movableTrash')[1]
         }

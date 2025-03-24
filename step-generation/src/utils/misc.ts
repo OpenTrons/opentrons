@@ -6,7 +6,6 @@ import {
   getIsTiprack,
   getLabwareDefURI,
   getWellNamePerMultiTip,
-  WASTE_CHUTE_CUTOUT,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -43,8 +42,6 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type {
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentEntity,
   CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
@@ -526,16 +523,6 @@ export function makeInitialRobotState(args: {
       ),
     },
   }
-}
-
-export const getHasWasteChute = (
-  additionalEquipmentEntities: AdditionalEquipmentEntities
-): boolean => {
-  return Object.values(additionalEquipmentEntities).some(
-    additionalEquipmentEntity =>
-      additionalEquipmentEntity.location === WASTE_CHUTE_CUTOUT &&
-      additionalEquipmentEntity.name === 'wasteChute'
-  )
 }
 
 export const getTiprackHasTips = (

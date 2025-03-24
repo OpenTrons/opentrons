@@ -177,7 +177,7 @@ export interface TrashBinEntities {
   [trashBinId: string]: TrashBinEntity
 }
 
-export type StagingAreaEntity = {
+export interface StagingAreaEntity {
   id: string
   location: string
 }

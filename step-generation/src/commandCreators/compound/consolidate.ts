@@ -16,7 +16,6 @@ import {
   dispenseLocationHelper,
   moveHelper,
   getIsSafePipetteMovement,
-  getHasWasteChute,
 } from '../../utils'
 import {
   aspirate,

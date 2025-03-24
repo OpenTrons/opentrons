@@ -13,7 +13,7 @@ import {
   SOURCE_LABWARE,
   TIPRACK_1,
 } from '../fixtures'
-import { DEST_LABWARE, GRIPPER_LOCATION, moveLabware } from '..'
+import { DEST_LABWARE, moveLabware } from '..'
 
 import type {
   LabwareDefinition2,
@@ -22,7 +22,6 @@ import type {
 import type { InvariantContext, RobotState } from '../types'
 
 const mockWasteChuteId = 'mockWasteChuteId'
-const mockGripperId = 'mockGripperId'
 const mockTrashBinId = 'mockTrashBinId'
 const mockStagingAreaId = 'mockStagingAreaId'
 describe('moveLabware', () => {

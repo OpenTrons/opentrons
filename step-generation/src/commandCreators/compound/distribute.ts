@@ -16,7 +16,6 @@ import {
   blowoutLocationHelper,
   getDispenseAirGapLocation,
   getIsSafePipetteMovement,
-  getHasWasteChute,
   airGapLocationHelper,
 } from '../../utils'
 import {

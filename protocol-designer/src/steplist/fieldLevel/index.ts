@@ -44,8 +44,6 @@ import type {
   PipetteEntity,
   InvariantContext,
   LabwareEntities,
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentEntity,
   WasteChuteEntities,
   StagingAreaEntities,
   WasteChuteEntity,

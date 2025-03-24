@@ -8,7 +8,6 @@ import {
   makeContext,
   getInitialRobotStateStandard,
 } from '../fixtures'
-import { GRIPPER_LOCATION } from '../constants'
 import { absorbanceReaderCloseLid } from '../commandCreators/atomic/absorbanceReaderCloseLid'
 import { absorbanceReaderStateGetter } from '../robotStateSelectors'
 import type {
