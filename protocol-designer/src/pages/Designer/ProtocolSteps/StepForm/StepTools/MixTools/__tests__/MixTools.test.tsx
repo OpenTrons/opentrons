@@ -12,8 +12,8 @@ import {
   getEnableReturnTip,
 } from '../../../../../../../feature-flags/selectors'
 import { getFormErrorsMappedToField } from '../../../utils'
-import { MixToolsFirstStep } from '../MixToolsFirstStep'
-import { MixToolsSecondStep } from '../MixToolsSecondStep'
+import { FirstStepMixTools } from '../FirstStepMixTools'
+import { SecondStepMixTools } from '../SecondStepMixTools'
 import { MixTools } from '..'
 
 import type { ComponentProps } from 'react'
@@ -68,21 +68,21 @@ describe('MixToolFirstStep', () => {
     vi.mocked(getEnableReturnTip).mockReturnValue(false)
     vi.mocked(getEnablePartialTipSupport).mockReturnValue(false)
     vi.mocked(getFormErrorsMappedToField).mockReturnValue({})
-    vi.mocked(MixToolsFirstStep).mockReturnValue(
-      <div>mock MixToolsFirstStep</div>
+    vi.mocked(FirstStepMixTools).mockReturnValue(
+      <div>mock FirstStepMixTools</div>
     )
-    vi.mocked(MixToolsSecondStep).mockReturnValue(
-      <div>mock MixToolsSecondStep</div>
+    vi.mocked(SecondStepMixTools).mockReturnValue(
+      <div>mock SecondStepMixTools</div>
     )
   })
 
-  it('renders MixToolFirstStep when toolboxStep is 0', () => {
+  it('renders FirstStepMixTools when toolboxStep is 0', () => {
     render(props)
-    screen.getByText('mock MixToolsFirstStep')
+    screen.getByText('mock FirstStepMixTools')
   })
-  it('renders MixToolsSecondStep when toolboxStep is 1', () => {
+  it('renders SecondStepMixTools when toolboxStep is 1', () => {
     props.toolboxStep = 1
     render(props)
-    screen.getByText('mock MixToolsSecondStep')
+    screen.getByText('mock SecondStepMixTools')
   })
 })

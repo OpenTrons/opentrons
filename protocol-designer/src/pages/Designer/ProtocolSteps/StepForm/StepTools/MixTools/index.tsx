@@ -9,8 +9,8 @@ import {
   getEnableReturnTip,
 } from '../../../../../../feature-flags/selectors'
 import { getFormErrorsMappedToField } from '../../utils'
-import { MixToolsFirstStep } from './MixToolsFirstStep'
-import { MixToolsSecondStep } from './MixToolsSecondStep'
+import { FirstStepMixTools } from './FirstStepMixTools'
+import { SecondStepMixTools } from './SecondStepMixTools'
 
 import type { StepFormProps } from '../../types'
 
@@ -46,7 +46,7 @@ export function MixTools(
   const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   return toolboxStep === 0 ? (
-    <MixToolsFirstStep
+    <FirstStepMixTools
       propsForFields={propsForFields}
       formData={formData}
       enablePartialTip={enablePartialTip}
@@ -58,7 +58,7 @@ export function MixTools(
       userSelectedDropTipLocation={userSelectedDropTipLocation}
     />
   ) : (
-    <MixToolsSecondStep
+    <SecondStepMixTools
       propsForFields={propsForFields}
       formData={formData}
       mappedErrorsToField={mappedErrorsToField}

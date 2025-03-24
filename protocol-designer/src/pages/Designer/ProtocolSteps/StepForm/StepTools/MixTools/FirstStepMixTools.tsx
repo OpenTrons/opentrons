@@ -23,7 +23,7 @@ import type { ErrorMappedToField } from '../../utils'
 import type { FormData } from '../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../steplist'
 
-interface MixToolFirstStepProps {
+interface FirstStepMixToolsProps {
   propsForFields: FieldPropsByName
   formData: FormData
   enablePartialTip: boolean
@@ -35,7 +35,7 @@ interface MixToolFirstStepProps {
   userSelectedDropTipLocation: boolean
 }
 
-export function MixToolsFirstStep({
+export function FirstStepMixTools({
   propsForFields,
   formData,
   enablePartialTip,
@@ -45,7 +45,7 @@ export function MixToolsFirstStep({
   enableReturnTip,
   userSelectedPickUpTipLocation,
   userSelectedDropTipLocation,
-}: MixToolFirstStepProps): JSX.Element {
+}: FirstStepMixToolsProps): JSX.Element {
   const { t } = useTranslation(['application', 'form'])
   const is96Channel =
     propsForFields.pipette.value != null &&

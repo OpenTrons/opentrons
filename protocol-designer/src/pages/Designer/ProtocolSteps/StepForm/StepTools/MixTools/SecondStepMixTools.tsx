@@ -31,7 +31,7 @@ import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { ErrorMappedToField } from '../../utils'
 import type { FormData } from '../../../../../../form-types'
 
-interface MixToolsSecondStepProps {
+interface SecondStepMixToolsProps {
   propsForFields: FieldPropsByName
   formData: FormData
   mappedErrorsToField: ErrorMappedToField
@@ -40,13 +40,13 @@ interface MixToolsSecondStepProps {
 }
 
 // ToDo (kk:03/24/2025) component name might be changed
-export function MixToolsSecondStep({
+export function SecondStepMixTools({
   propsForFields,
   formData,
   mappedErrorsToField,
   tab,
   setTab,
-}: MixToolsSecondStepProps): JSX.Element {
+}: SecondStepMixToolsProps): JSX.Element {
   const { t, i18n } = useTranslation(['application', 'form'])
 
   const aspirateTab = {
