@@ -1,4 +1,5 @@
 import { createContext, useCallback, useState } from 'react'
+import type { FC, ReactNode } from 'react'
 
 export interface SharedScrollRefContextType {
   refCallback: (node: HTMLElement | null) => void
@@ -11,8 +12,8 @@ export const SharedScrollRefContext = createContext<SharedScrollRefContextType |
 
 // This provider exists to capture the ref of the main scrollable Box element in the ODD
 // This is so that we can do things like auto scroll (using the ref) across components
-export const SharedScrollRefProvider: React.FC<{
-  children: React.ReactNode
+export const SharedScrollRefProvider: FC<{
+  children: ReactNode
 }> = ({ children }) => {
   const [element, setCurrentElement] = useState<HTMLElement | null>(null)
 
