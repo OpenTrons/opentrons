@@ -12,8 +12,9 @@ import {
   getStateAndContextTempTCModules,
   SOURCE_LABWARE,
   TIPRACK_1,
+  DEST_LABWARE,
 } from '../fixtures'
-import { DEST_LABWARE, moveLabware } from '..'
+import { moveLabware } from '../commandCreators/atomic'
 
 import type {
   LabwareDefinition2,

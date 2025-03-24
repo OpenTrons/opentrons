@@ -12,10 +12,9 @@ import type { RobotState, InvariantContext } from '../types'
 const mockWasteChuteId = 'wasteChuteId'
 let invariantContext: InvariantContext = {
   ...makeContext(),
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {
     [mockWasteChuteId]: {
       id: mockWasteChuteId,
-      name: 'wasteChute',
       pythonName: 'mock_waste_chute_1',
       location: WASTE_CHUTE_CUTOUT,
     },
@@ -108,10 +107,9 @@ protocol.delay(seconds=30)`.trimStart()
     const mockTrashBinId = 'trashBinId'
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      trashBinEntities: {
         [mockTrashBinId]: {
           id: mockTrashBinId,
-          name: 'trashBin',
           pythonName: 'mock_trash_bin_1',
           location: 'cutoutA3',
         },

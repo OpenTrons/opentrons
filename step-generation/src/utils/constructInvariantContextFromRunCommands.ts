@@ -13,7 +13,6 @@ import type {
   LabwareEntities,
   PipetteEntities,
   ModuleEntities,
-  AdditionalEquipmentName,
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'
@@ -148,6 +147,8 @@ export function constructInvariantContextFromRunCommands(
       pipetteEntities: {},
       wasteChuteEntities: {},
       trashBinEntities: {},
+      //  this util is used for the timeline scrubber. It grabs staging area info from
+      //  command analysis. Also, it does not visualize the gripper right now
       stagingAreaEntities: {},
       hasGripperEntity: false,
       //  this util is used for the timeline scrubber. It grabs liquid info from analysis

@@ -15,7 +15,7 @@ import {
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
-import { COLUMN_4_SLOTS, getHasWasteChute } from '@opentrons/step-generation'
+import { COLUMN_4_SLOTS } from '@opentrons/step-generation'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
@@ -115,7 +115,10 @@ export const getUnoccupiedLabwareLocationOptions: Selector<
   ) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const cutoutFixtures = deckDef.cutoutFixtures
-    const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    const hasWasteChute =
+      Object.values(additionalEquipmentEntities).find(
+        ae => ae.name === 'wasteChute'
+      ) != null
     const allSlotIds = deckDef.locations.addressableAreas.reduce<
       AddressableAreaName[]
     >((acc, slot) => {
