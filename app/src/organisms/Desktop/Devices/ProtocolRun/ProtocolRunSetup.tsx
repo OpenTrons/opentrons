@@ -131,7 +131,7 @@ export function ProtocolRunSetup({
   )
   const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const noLwOffsetsInRun =
-    useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0
+    useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
 
   const offsetsConfirmed = isFlex
     ? flexOffsetsApplied && !missingSteps.includes(LPC_STEP_KEY)
@@ -143,6 +143,14 @@ export function ProtocolRunSetup({
         : t('offsets_not_applied')
     } else {
       return null
+    }
+  }
+
+  const buildLPCCompleteText = (): string => {
+    if (noLwOffsetsInRun) {
+      return t('offsets_not_required')
+    } else {
+      return isFlex ? t('offsets_applied') : t('offsets_ready')
     }
   }
 
@@ -280,9 +288,7 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: LPC_STEP_KEY,
         complete: offsetsConfirmed,
-        completeText: noLwOffsetsInRun
-          ? t('offsets_not_required')
-          : t('offsets_applied'),
+        completeText: buildLPCCompleteText(),
         incompleteText: buildLPCIncompleteText(),
         incompleteElement: null,
       },
