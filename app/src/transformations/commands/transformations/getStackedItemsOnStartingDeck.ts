@@ -4,6 +4,7 @@ import {
   getCutoutDisplayName,
   OnCutoutFixtureLocationSequenceComponent,
   THERMOCYCLER_MODULE_V2,
+  getSlotFromAddressableAreaName,
 } from '@opentrons/shared-data'
 
 import type {
@@ -17,6 +18,7 @@ import type {
   CutoutId,
   LoadedModule,
   LoadLidParams,
+  OnAddressableAreaLocationSequenceComponent,
 } from '@opentrons/shared-data'
 
 export interface LabwareInStack {
@@ -135,10 +137,20 @@ export function getStackedItemsOnStartingDeck(
           ): sequenceItem is OnCutoutFixtureLocationSequenceComponent =>
             sequenceItem.kind === 'onCutoutFixture'
         )?.cutoutId
-        location = getCutoutDisplayName(cutoutId as CutoutId)
-        if (cutoutId == null || Object.keys(acc).includes(location)) {
-          return acc
-        }
+        const addressableArea = locationSequence.find(
+          (
+            sequenceItem
+          ): sequenceItem is OnAddressableAreaLocationSequenceComponent =>
+            sequenceItem.kind === 'onAddressableArea'
+        )?.addressableAreaName
+        if (cutoutId == null && addressableArea == null) return acc
+        location =
+          addressableArea != null
+            ? getSlotFromAddressableAreaName(addressableArea)
+            : getCutoutDisplayName(cutoutId as CutoutId)
+
+        if (Object.keys(acc).includes(location)) return acc
+
         const topLabware: LabwareInStack = {
           labwareId: command.result.labwareId,
           definitionUri: getLabwareDefURI(command.result.definition),
@@ -191,6 +203,7 @@ export function getStackedItemsOnStartingDeck(
                 moduleId: sequenceItem.moduleId,
                 moduleModel: module.model,
               }
+              // change location for ot2 thermocycler also
               if (module.model === THERMOCYCLER_MODULE_V2) {
                 location = 'A1+B1'
               }
