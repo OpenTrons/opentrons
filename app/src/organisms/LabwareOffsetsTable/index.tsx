@@ -38,7 +38,7 @@ export function LabwareOffsetsTable(
   }
 
   return (
-    <Flex marginBottom={SPACING.spacing80}>
+    <Flex css={CONTAINER_STYLE}>
       <ListTable headers={[t('labware_type'), t('total_offsets')]}>
         {labwareInfo.map(aLwInfo => (
           <ListAccordion
@@ -68,6 +68,14 @@ export function LabwareOffsetsTable(
     </Flex>
   )
 }
+
+const CONTAINER_STYLE = css`
+  width: 100%;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    margin-bottom: ${SPACING.spacing80};
+  }
+`
 
 const LOCATION_COLUMN_STYLE = css`
   padding-right: 3.5rem;
