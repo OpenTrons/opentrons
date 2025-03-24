@@ -636,7 +636,7 @@ describe('moveLabware', () => {
   it('should return an error when trying to move with gripper when there is no gripper', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {},
+      hasGripperEntity: false,
     } as InvariantContext
 
     const params = {

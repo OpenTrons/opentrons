@@ -81,7 +81,7 @@ describe('absorbanceReaderCloseLid', () => {
     })
   })
   it('creates returns error if no gripper', () => {
-    invariantContext.hasGripperEntity = true
+    invariantContext.hasGripperEntity = false
     const result = absorbanceReaderCloseLid(
       {
         moduleId,

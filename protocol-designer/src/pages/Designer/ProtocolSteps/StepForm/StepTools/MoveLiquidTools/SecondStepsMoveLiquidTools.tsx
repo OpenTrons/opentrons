@@ -87,8 +87,8 @@ export const SecondStepsMoveLiquidTools = ({
     formData.dispense_labware != null
       ? getTrashOrLabware(
           labwares,
-          trashBinEntities,
           wasteChuteEntities,
+          trashBinEntities,
           formData.dispense_labware as string
         )
       : null

@@ -53,9 +53,9 @@ export function dispenseUpdateLiquidState(
   //  TODO: fix this bug, i guess if both entities exist, we default to updating liquid state
   //  into the first one listed which is wrong if the user is using the 2nd one listed
   const trashId =
-    Object.values(invariantContext.wasteChuteEntities).length > 0
-      ? invariantContext.wasteChuteEntities[0].id
-      : invariantContext.trashBinEntities[0].id
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
+      ? Object.keys(invariantContext.wasteChuteEntities)[0]
+      : Object.keys(invariantContext.trashBinEntities)[0]
 
   const sourceId =
     labwareId != null

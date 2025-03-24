@@ -121,10 +121,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   if (
     !args.dropTipLocation ||
-    !(
-      invariantContext.wasteChuteEntities[args.dropTipLocation] &&
-      invariantContext.trashBinEntities[args.dropTipLocation]
-    )
+    (invariantContext.wasteChuteEntities[args.dropTipLocation] == null &&
+      invariantContext.trashBinEntities[args.dropTipLocation] == null)
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }

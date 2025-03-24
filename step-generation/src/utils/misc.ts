@@ -350,10 +350,11 @@ export const blowoutLocationHelper = (args: {
   } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    trashBinEntities,
     wasteChuteEntities,
+    trashBinEntities,
     destLabwareId
   )
+
   let labware: LabwareEntity | null = null
   let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
@@ -391,14 +392,14 @@ export const blowoutLocationHelper = (args: {
       curryCommandCreator(blowOutInWasteChute, {
         pipetteId: pipette,
         flowRate,
-        wasteChuteId: wasteChuteEntities[0]?.id as string,
+        wasteChuteId: Object.keys(wasteChuteEntities)[0] as string,
       }),
     ]
   } else {
     return [
       curryCommandCreator(blowOutInTrash, {
         pipetteId: pipette,
-        trashId: trashBinEntities[0]?.id as string,
+        trashId: Object.keys(trashBinEntities)[0] as string,
         flowRate,
       }),
     ]
@@ -596,8 +597,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
   } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    trashBinEntities,
     wasteChuteEntities,
+    trashBinEntities,
     destinationId
   )
 
@@ -741,8 +742,8 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
   } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    trashBinEntities,
     wasteChuteEntities,
+    trashBinEntities,
     destinationId
   )
 

@@ -2,9 +2,6 @@
 
 exports[`snapshot tests > createEmptyLiquidState 1`] = `
 {
-  "additionalEquipment": {
-    "fixedTrash": {},
-  },
   "labware": {
     "destPlateId": {
       "A1": {},
@@ -835,21 +832,19 @@ exports[`snapshot tests > createEmptyLiquidState 1`] = `
       "0": {},
     },
   },
+  "trashBins": {
+    "fixedTrash": {},
+  },
+  "wasteChute": {},
 }
 `;
 
 exports[`snapshot tests > makeContext 1`] = `
 {
-  "additionalEquipmentEntities": {
-    "fixedTrash": {
-      "id": "fixedTrash",
-      "location": "cutoutA3",
-      "name": "trashBin",
-    },
-  },
   "config": {
     "OT_PD_DISABLE_MODULE_RESTRICTIONS": false,
   },
+  "hasGripperEntity": false,
   "labwareEntities": {
     "destPlateId": {
       "def": {
@@ -18384,6 +18379,15 @@ exports[`snapshot tests > makeContext 1`] = `
       ],
     },
   },
+  "stagingAreaEntities": {},
+  "trashBinEntities": {
+    "fixedTrash": {
+      "id": "fixedTrash",
+      "location": "cutoutA3",
+      "pythonName": "trash_bin_1",
+    },
+  },
+  "wasteChuteEntities": {},
 }
 `;
 
@@ -18413,9 +18417,6 @@ exports[`snapshot tests > makeState 1`] = `
     },
   },
   "liquidState": {
-    "additionalEquipment": {
-      "fixedTrash": {},
-    },
     "labware": {
       "destPlateId": {
         "A1": {},
@@ -19246,6 +19247,10 @@ exports[`snapshot tests > makeState 1`] = `
         "0": {},
       },
     },
+    "trashBins": {
+      "fixedTrash": {},
+    },
+    "wasteChute": {},
   },
   "modules": {},
   "pipettes": {

@@ -119,10 +119,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
   if (
     !args.dropTipLocation ||
-    !(
-      invariantContext.wasteChuteEntities[args.dropTipLocation] &&
-      invariantContext.trashBinEntities[args.dropTipLocation]
-    )
+    (invariantContext.wasteChuteEntities[args.dropTipLocation] == null &&
+      invariantContext.trashBinEntities[args.dropTipLocation] == null)
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }

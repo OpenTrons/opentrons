@@ -279,7 +279,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     } else if (matchingTrashId != null && !isWasteChuteLocation) {
       location = trashBinEntities[matchingTrashId]?.pythonName ?? ''
     } else if (matchingTrashId == null && isWasteChuteLocation) {
-      location = wasteChuteEntities[0].pythonName ?? ''
+      location = Object.values(wasteChuteEntities)[0].pythonName ?? ''
     } else {
       location = ''
     }

@@ -332,7 +332,8 @@ describe('steps actions', () => {
                     liquidState: {
                       labware: {},
                       pipettes: {},
-                      additionalEquipment: {},
+                      trashBins: {},
+                      wasteChute: {},
                     },
                     modules: {},
                     pipettes: {
@@ -478,7 +479,8 @@ describe('steps actions', () => {
                     liquidState: {
                       labware: {},
                       pipettes: {},
-                      additionalEquipment: {},
+                      trashBins: {},
+                      wasteChute: {},
                     },
                     modules: {},
                     pipettes: {

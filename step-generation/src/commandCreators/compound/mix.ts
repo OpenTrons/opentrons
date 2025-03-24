@@ -191,10 +191,8 @@ export const mix: CommandCreator<MixArgs> = (
 
   if (
     !dropTipLocation ||
-    !(
-      invariantContext.wasteChuteEntities[dropTipLocation] &&
-      invariantContext.trashBinEntities[dropTipLocation]
-    )
+    (invariantContext.wasteChuteEntities[dropTipLocation] == null &&
+      invariantContext.trashBinEntities[dropTipLocation] == null)
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }

@@ -128,7 +128,7 @@ const getIsAdditionalEquipmentLocation = (
   )
 
   const isNewLocationInWasteChute =
-    wasteChuteEntities[0]?.location === newLocation
+    Object.values(wasteChuteEntities)[0]?.location === newLocation
 
   const isNewLocationInStagingArea =
     stagingAreaCutoutIds != null &&
