@@ -81,20 +81,19 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="use_test_matrix", display_name="Use Test Matrix", default=True
     )
     parameters.add_float(
-        variable_name = "submerge_depth",
-        display_name = "All submerge depths",
-        default = 0.4,
-        maximum = 2,
-        minimum = 0.01
+        variable_name="submerge_depth",
+        display_name="All submerge depths",
+        default=0.4,
+        maximum=2,
+        minimum=0.01,
     )
     parameters.add_float(
-        variable_name = "single_plate_vol",
+        variable_name="single_plate_vol",
         display_name="Single Plate Volume",
-        default = 5.0,
-        minimum=1.0, 
-        maximum=5.0
+        default=5.0,
+        minimum=1.0,
+        maximum=5.0,
     )
-    
 
 
 def get_latest_version(load_name: str) -> int:
@@ -114,11 +113,11 @@ def run(ctx: ProtocolContext) -> None:
     push_out = ctx.params.push_out  # type: ignore[attr-defined]
     use_test_matrix = ctx.params.use_test_matrix  # type: ignore[attr-defined]
     test_gripper_only = ctx.params.test_gripper_only  # type: ignore[attr-defined]
-    single_plate_vol = ctx.params.single_plate_vol # type: ignore[attr-defined]
-    dye_src_well = ctx.params.dye_source_well # type: ignore[attr-defined]
-    
+    single_plate_vol = ctx.params.single_plate_vol  # type: ignore[attr-defined]
+    dye_src_well = ctx.params.dye_source_well  # type: ignore[attr-defined]
+
     TRIALS = columns * 8 * num_of_plates
-    SUBMERGE_MM = ctx.params.submerge_depth # type: ignore[attr-defined]
+    SUBMERGE_MM = ctx.params.submerge_depth  # type: ignore[attr-defined]
     SUBMERGE_MM = -1 * SUBMERGE_MM
     BOTTOM_MM = 1.5
     ctx.load_trash_bin("A1")
@@ -199,7 +198,12 @@ def run(ctx: ProtocolContext) -> None:
     # DILUENT
     total_diluent_needed = 200 * TRIALS  # total diluent needed
     number_of_wells_needed = math.ceil(
-        total_diluent_needed / (diluent_reservoir["A1"].max_volume - (diluent_pipette.channels * 200) - DEAD_VOL_DILUENT)
+        total_diluent_needed
+        / (
+            diluent_reservoir["A1"].max_volume
+            - (diluent_pipette.channels * 200)
+            - DEAD_VOL_DILUENT
+        )
     )  # total number of wells needed
     total_diluent_per_well = (
         total_diluent_needed / number_of_wells_needed
@@ -233,29 +237,34 @@ def run(ctx: ProtocolContext) -> None:
         if single_plate_vol >= 2.0:
             dye_c_plates = 1
             total_dye_needed_c = (
-                sum([(vol * 24) + 10 for vol in volume_list_c[:num_of_plates]]) * dye_c_plates
+                sum([(vol * 24) + 10 for vol in volume_list_c[:num_of_plates]])
+                * dye_c_plates
             )
             total_dye_needed_d = 0.0
         else:
-             total_dye_needed_d = (
-                sum([(vol * 24) + 10 for vol in volume_list_d[:num_of_plates]]) 
+            total_dye_needed_d = sum(
+                [(vol * 24) + 10 for vol in volume_list_d[:num_of_plates]]
             )
-             total_dye_needed_c = 0
-            
+            total_dye_needed_c = 0
+
     dye_d = ctx.define_liquid("dye_d", "#FF0000")
     dye_c = ctx.define_liquid("dye_c", "F1C232")
 
     # SOURCE WELL
     split_well = [char for char in dye_src_well]
-    dye_src_well_2 = split_well[0]+ str(int(split_well[1]) + 1)
+    dye_src_well_2 = split_well[0] + str(int(split_well[1]) + 1)
     print(dye_src_well_2)
     if baseline:
         # if baseline, do not load dye
         src_holder.load_empty([src_holder[dye_src_well]])
         src_holder.load_empty([src_holder[dye_src_well_2]])
     else:
-        src_holder.load_liquid([src_holder[dye_src_well]], total_dye_needed_d + 100, dye_d)
-        src_holder.load_liquid([src_holder[dye_src_well_2]], total_dye_needed_c + 100, dye_c)
+        src_holder.load_liquid(
+            [src_holder[dye_src_well]], total_dye_needed_d + 100, dye_d
+        )
+        src_holder.load_liquid(
+            [src_holder[dye_src_well_2]], total_dye_needed_c + 100, dye_c
+        )
         src_labware.load_empty(src_labware.wells())
     for dst_labware in dst_labwares:
         if not diluent:
@@ -283,7 +292,7 @@ def run(ctx: ProtocolContext) -> None:
             pipette.configure_for_volume(dye_needed_in_well)
             pipette.pick_up_tip()
             num_of_transfers = 1
-            if (src_well.well_name =="A1") or (src_well.well_name == "A5"):
+            if (src_well.well_name == "A1") or (src_well.well_name == "A5"):
                 ctx.pause(f"measure static of {src_well.well_name}")
             if dye_needed_in_well > pipette.max_volume:
                 dye_needed_in_well = dye_needed_in_well / 2
@@ -293,10 +302,12 @@ def run(ctx: ProtocolContext) -> None:
                     pipette.aspirate(dye_needed_in_well, src_holder["A1"])
                 else:
                     pipette.aspirate(dye_needed_in_well, src_holder["A2"])
-                    if (src_well.well_name =="A1") or (src_well.well_name == "A5"):
-                        ctx.pause(f"measure static of {src_well.well_name} and top of well")
+                    if (src_well.well_name == "A1") or (src_well.well_name == "A5"):
+                        ctx.pause(
+                            f"measure static of {src_well.well_name} and top of well"
+                        )
                 pipette.dispense(dye_needed_in_well, src_well.bottom(BOTTOM_MM))
-                pipette.touch_tip(speed = 30)
+                pipette.touch_tip(speed=30)
             pipette.drop_tip()
             tip_counter += 1
         ctx.move_labware(
@@ -308,7 +319,12 @@ def run(ctx: ProtocolContext) -> None:
         return tip_counter
 
     def fill_plate_with_diluent(
-        plate: Labware, baseline: bool, initial_fill: bool, vol: float, diluent_src_index: int, total_diluent_ul: float
+        plate: Labware,
+        baseline: bool,
+        initial_fill: bool,
+        vol: float,
+        diluent_src_index: int,
+        total_diluent_ul: float,
     ) -> Tuple[int, float]:
         """Fill plate with diluent."""
         # fill with diluent
@@ -339,20 +355,24 @@ def run(ctx: ProtocolContext) -> None:
                     diluent_pipette.dispense(
                         diluent_ul, plate[f"A{i_index+1}"].top(), push_out=20
                     )
-                    total_diluent_ul += (diluent_ul * 8)
+                    total_diluent_ul += diluent_ul * 8
                     print(f"initial fill, filling index {i_index} with {diluent_ul}")
                 elif not initial_fill and i_index % 2 != 0:
                     diluent_ul = 200 - (100 + vol)
-                    print(f"not initial fill, filling index {i_index} with {diluent_ul}")
+                    print(
+                        f"not initial fill, filling index {i_index} with {diluent_ul}"
+                    )
                     diluent_pipette.aspirate(diluent_ul, diluent_well.bottom(BOTTOM_MM))
                     diluent_pipette.dispense(
                         diluent_ul, plate[f"A{i_index+1}"].top(), push_out=20
                     )
-                    total_diluent_ul += (diluent_ul * 8)
+                    total_diluent_ul += diluent_ul * 8
                 if (total_diluent_per_well - total_diluent_ul) <= DEAD_VOL_DILUENT:
-                    diluent_src_index +=1
+                    diluent_src_index += 1
                     total_diluent_ul = 0
-                    print(f"total diluent ul {total_diluent_ul} diluent src index {diluent_src_index}")
+                    print(
+                        f"total diluent ul {total_diluent_ul} diluent src index {diluent_src_index}"
+                    )
         ctx.move_labware(
             diluent_lid,
             diluent_reservoir,
@@ -393,10 +413,10 @@ def run(ctx: ProtocolContext) -> None:
             # NOTE: if liquid height is <2.5mm, protocol may error out
             #       this can be avoided by adding extra starting liquid in the SRC labware
             pipette.aspirate(target_ul, src_well.meniscus(SUBMERGE_MM))
-            pipette.touch_tip(speed = 30)
+            pipette.touch_tip(speed=30)
         else:
             pipette.aspirate(target_ul, src_well.bottom(BOTTOM_MM))
-            pipette.touch_tip(speed = 30)
+            pipette.touch_tip(speed=30)
         # DISPENSE
         if "M" in dsp_behavior:
             pipette.dispense(
@@ -410,6 +430,7 @@ def run(ctx: ProtocolContext) -> None:
             pipette.dispense(target_ul, dst_well.top(), push_out=push_out)  # top
         pipette.drop_tip()
         return tip_counter
+
     diluent_src_index = 0
     total_diluent_ul = 0
     n = 0
@@ -441,10 +462,15 @@ def run(ctx: ProtocolContext) -> None:
             ctx.move_labware(plate, "D3", use_gripper=True)
             # FILL PLATE WITH DILUENT
             diluent_src_index, total_diluent_ul = fill_plate_with_diluent(
-                plate=plate, baseline=baseline, initial_fill=True, vol=vol, diluent_src_index=diluent_src_index, total_diluent_ul=total_diluent_ul
+                plate=plate,
+                baseline=baseline,
+                initial_fill=True,
+                vol=vol,
+                diluent_src_index=diluent_src_index,
+                total_diluent_ul=total_diluent_ul,
             )
             if not baseline:
-                
+
                 if not test_gripper_only:
                     for i, row in enumerate(plate.rows()):
                         # FILL SOURCE PLATE WITH DYE
@@ -452,7 +478,11 @@ def run(ctx: ProtocolContext) -> None:
                         src_well = src_labware[f"{well_letter}{n+1}"]
                         print(src_well)
                         tip_counter = fill_well_with_dye(
-                            plate=plate, vol=vol, plate_num=n, tip_counter=tip_counter, src_well = src_well
+                            plate=plate,
+                            vol=vol,
+                            plate_num=n,
+                            tip_counter=tip_counter,
+                            src_well=src_well,
                         )
                         for w in row[:columns]:
                             # FILL DESTINATION PLATE WITH DYE
@@ -464,7 +494,12 @@ def run(ctx: ProtocolContext) -> None:
                             )
             # FILL REMAINING COLUMNS WITH DILUENT
             diluent_src_index, total_diluent_ul = fill_plate_with_diluent(
-                plate=plate, baseline=baseline, initial_fill=False, vol=vol,diluent_src_index = diluent_src_index, total_diluent_ul=total_diluent_ul
+                plate=plate,
+                baseline=baseline,
+                initial_fill=False,
+                vol=vol,
+                diluent_src_index=diluent_src_index,
+                total_diluent_ul=total_diluent_ul,
             )
             if vol == 5:
                 push_out = 3.9
