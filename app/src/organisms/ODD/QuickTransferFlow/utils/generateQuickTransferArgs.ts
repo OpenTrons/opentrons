@@ -63,11 +63,12 @@ function getInvariantContextAndRobotState(
   const pipetteEntities: PipetteEntities = {
     [pipetteId]: {
       name: pipetteName as PipetteName,
-      id: pipetteId,
+    id: pipetteId,
       tiprackDefURI: [tipRackDefURI],
       tiprackLabwareDef: [quickTransferState.tipRack],
       spec: quickTransferState.pipette,
-      pythonName: 'pipette_left',
+      pythonName:
+        quickTransferState.pipette.channels === 96 ? 'pipette' : 'pipette_left',
     },
   }
   const pipetteLocations: RobotState['pipettes'] = {
