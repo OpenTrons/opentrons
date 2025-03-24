@@ -416,6 +416,26 @@ class FlexStacker(mod_abc.AbstractModule):
         await self.close_latch()
         return True
 
+    async def home_all(self, ignore_latch: bool = False) -> None:
+        """Home all axes based on current state, assuming normal operation.
+
+        If ignore_latch is True, we will not attempt to close the latch. This
+        is useful when we want the shuttle to be out of the way for error
+        recovery (e.g. when the latch is stuck open).
+        """
+        await self._reader.read()
+        # we should always be able to home the X axis first
+        await self.home_axis(StackerAxis.X, Direction.RETRACT)
+        # If latch is open, we must first close it
+        if not ignore_latch and self.latch_state == LatchState.OPENED:
+            if self.limit_switch_status[StackerAxis.Z] != StackerAxisState.RETRACTED:
+                # it was likely in the middle of a dispense/store command
+                # z should be moved up before we can safely close the latch
+                await self.home_axis(StackerAxis.Z, Direction.EXTEND)
+            await self.close_latch()
+        await self.home_axis(StackerAxis.Z, Direction.RETRACT)
+        await self.home_axis(StackerAxis.X, Direction.EXTEND)
+
 
 class FlexStackerReader(Reader):
     error: Optional[str]

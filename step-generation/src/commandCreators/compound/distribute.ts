@@ -414,6 +414,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               xOffset: aspirateXOffset,
               yOffset: aspirateYOffset,
               nozzles,
+              invariantContext,
             })
           : []
 
@@ -452,6 +453,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               xOffset: aspirateXOffset,
               yOffset: aspirateYOffset,
               nozzles,
+              invariantContext,
             })
           : []
       return [
