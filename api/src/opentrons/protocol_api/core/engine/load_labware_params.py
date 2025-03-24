@@ -1,5 +1,3 @@
-from typing import Dict, Tuple, List, Optional
-
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.protocol_engine.state.labware import LabwareLoadParams
 from opentrons.protocols.api_support.types import APIVersion
@@ -10,7 +8,7 @@ from opentrons.protocols.api_support.types import APIVersion
 #
 # TODO(jbl 2023-08-01) this needs to be done more holistically, both to find the version and make sure that
 #   it corresponds to the API level is was released with
-_APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
+_APILEVEL_2_14_OT_DEFAULT_VERSIONS: dict[str, int] = {
     # v1 of many labware definitions have wrong `zDimension`s. (Jira RSS-202.)
     # For "opentrons_96_aluminumblock_generic_pcr_strip_200ul" and
     # "opentrons_24_aluminumblock_generic_2ml_screwcap", they're wrong enough to
@@ -35,7 +33,7 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     "corning_24_wellplate_3.4ml_flat": 2,
 }
 
-_APILEVEL_2_23_OT_DEFAULT_VERSIONS: Dict[str, int] = {
+_APILEVEL_2_23_OT_DEFAULT_VERSIONS: dict[str, int] = {
     "evotips_opentrons_96_labware": 2,
     "evotips_flex_96_tiprack_adapter": 2,
 }
@@ -47,11 +45,11 @@ class AmbiguousLoadLabwareParamsError(RuntimeError):
 
 def resolve(
     load_name: str,
-    namespace: Optional[str],
-    version: Optional[int],
-    custom_load_labware_params: List[LabwareLoadParams],
+    namespace: str | None,
+    version: int | None,
+    custom_load_labware_params: list[LabwareLoadParams],
     api_version: APIVersion,
-) -> Tuple[str, int]:
+) -> tuple[str, int]:
     """Resolve the load labware parameters that best matches any custom labware, or default to opentrons standards
 
     Args:
