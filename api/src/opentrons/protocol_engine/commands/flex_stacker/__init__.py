@@ -29,6 +29,21 @@ from .fill import FillCommandType, FillParams, FillResult, Fill, FillCreate
 
 from .empty import EmptyCommandType, EmptyParams, EmptyResult, Empty, EmptyCreate
 
+from .close_latch import (
+    CloseLatchCommandType,
+    CloseLatchParams,
+    CloseLatchResult,
+    CloseLatch,
+    CloseLatchCreate,
+)
+from .open_latch import (
+    OpenLatchCommandType,
+    OpenLatchParams,
+    OpenLatchResult,
+    OpenLatch,
+    OpenLatchCreate,
+)
+
 
 __all__ = [
     # flexStacker/store
@@ -62,4 +77,16 @@ __all__ = [
     "EmptyResult",
     "Empty",
     "EmptyCreate",
+    # flexStacker/closeLatch
+    "CloseLatchCommandType",
+    "CloseLatchParams",
+    "CloseLatchResult",
+    "CloseLatch",
+    "CloseLatchCreate",
+    # flexStacker/openLatch
+    "OpenLatchCommandType",
+    "OpenLatchParams",
+    "OpenLatchResult",
+    "OpenLatch",
+    "OpenLatchCreate",
 ]
