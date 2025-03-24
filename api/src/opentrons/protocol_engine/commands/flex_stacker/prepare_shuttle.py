@@ -32,6 +32,9 @@ class PrepareShuttleParams(BaseModel):
     """The parameters for a PrepareShuttle command."""
 
     moduleId: str = Field(..., description="Unique ID of the Flex Stacker")
+    ignoreLatch: bool = Field(
+        default=False, description="Ignore the latch state of the shuttle"
+    )
 
 
 class PrepareShuttleResult(BaseModel):
@@ -68,7 +71,7 @@ class PrepareShuttleImpl(AbstractCommandImpl[PrepareShuttleParams, _ExecuteRetur
 
         try:
             if stacker_hw is not None:
-                await stacker_hw.home_all()
+                await stacker_hw.home_all(params.ignoreLatch)
         except FlexStackerStallError as e:
             return DefinedErrorData(
                 public=FlexStackerStallOrCollisionError(

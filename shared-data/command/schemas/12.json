@@ -4162,6 +4162,12 @@
     "PrepareShuttleParams": {
       "description": "The parameters for a PrepareShuttle command.",
       "properties": {
+        "ignoreLatch": {
+          "default": false,
+          "description": "Ignore the latch state of the shuttle",
+          "title": "Ignorelatch",
+          "type": "boolean"
+        },
         "moduleId": {
           "description": "Unique ID of the Flex Stacker",
           "title": "Moduleid",
