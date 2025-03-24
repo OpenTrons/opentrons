@@ -43,6 +43,14 @@ from .open_latch import (
     OpenLatch,
     OpenLatchCreate,
 )
+  
+from .prepare_shuttle import (
+    PrepareShuttleCommandType,
+    PrepareShuttleParams,
+    PrepareShuttleResult,
+    PrepareShuttle,
+    PrepareShuttleCreate,
+)
 
 
 __all__ = [
@@ -89,4 +97,10 @@ __all__ = [
     "OpenLatchResult",
     "OpenLatch",
     "OpenLatchCreate",
+    # flexStacker/prepareShuttle
+    "PrepareShuttleCommandType",
+    "PrepareShuttleParams",
+    "PrepareShuttleResult",
+    "PrepareShuttle",
+    "PrepareShuttleCreate",
 ]
