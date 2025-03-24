@@ -16,6 +16,7 @@ import {
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { MultiDeckLabelTagBtns } from '/app/molecules/MultiDeckLabelTagBtns'
 import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
+import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
@@ -38,6 +39,7 @@ export function LabwareLocationItem({
   const { definitionUri } = locationDetails
   const isHardcodedOffset = locationDetails.hardCodedOffsetId != null
   const dispatch = useDispatch()
+  const { makeHardCodedSnackbar } = useLPCSnackbars(runId)
 
   const mostRecentOffset = useSelector(
     selectMostRecentVectorOffsetForLwWithOffsetDetails(
@@ -97,17 +99,21 @@ export function LabwareLocationItem({
         colTwoTag={<OffsetTag {...buildOffsetTagProps()} />}
         colThreePrimaryBtn={{
           buttonText: lpcTextT('adjust'),
-          onClick: handleLaunchEditOffset,
+          onClick: isHardcodedOffset
+            ? makeHardCodedSnackbar
+            : handleLaunchEditOffset,
           buttonType: 'secondary',
-          disabled: isDefaultOffsetAbsent || isHardcodedOffset,
+          disabled: isDefaultOffsetAbsent,
+          ariaDisabled: isHardcodedOffset,
         }}
         colThreeSecondaryBtn={{
           buttonText: lpcTextT('reset_to_default'),
-          onClick: handleResetOffset,
+          onClick: isHardcodedOffset
+            ? makeHardCodedSnackbar
+            : handleResetOffset,
           buttonType: 'tertiaryHighLight',
-          disabled:
-            mostRecentOffset?.kind !== OFFSET_KIND_LOCATION_SPECIFIC ||
-            isHardcodedOffset,
+          disabled: mostRecentOffset?.kind !== OFFSET_KIND_LOCATION_SPECIFIC,
+          ariaDisabled: isHardcodedOffset,
         }}
       />
     </Flex>
