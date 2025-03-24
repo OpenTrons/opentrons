@@ -56,8 +56,7 @@ export function getErrorKind(
       return ERROR_KINDS.GRIPPER_ERROR
     } else if (errorType === DEFINED_ERROR_TYPES.STALL_OR_COLLISION) {
       return ERROR_KINDS.STALL_OR_COLLISION
-    }
-    else if (errorType === DEFINED_ERROR_TYPES.STACKER_STALL) {
+    } else if (errorType === DEFINED_ERROR_TYPES.STACKER_STALL) {
       return ERROR_KINDS.STALL_WHILE_STACKING
     }
   }

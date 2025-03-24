@@ -169,7 +169,7 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
         },
       } as any,
     })
-    console.log("result: ", result )
+    console.log('result: ', result)
     expect(result).toBeNull()
   })
 })
@@ -192,7 +192,16 @@ const render = (props: ComponentProps<typeof TestWrapper>) => {
 
 describe('useRelevantFailedLwLocations', () => {
   const mockRunRecord = {
-    data: { modules: [{ id: 'module-id', model: FLEX_STACKER_MODULE_V1, location: {slotName:"D1"} }], labware: [] },
+    data: {
+      modules: [
+        {
+          id: 'module-id',
+          model: FLEX_STACKER_MODULE_V1,
+          location: { slotName: 'D1' },
+        },
+      ],
+      labware: [],
+    },
   } as any
   const mockFailedLabware = {
     location: { slotName: 'D1' },
@@ -250,12 +259,14 @@ describe('useRelevantFailedLwLocations', () => {
         failedLabware: mockFailedLabware,
         failedCommandByRunRecord: mockFailedCommand,
         runRecord: mockRunRecord,
-        errorKind: ERROR_KINDS.GENERAL_ERROR,
+        errorKind: ERROR_KINDS.STALL_WHILE_STACKING,
       })
     )
 
+    console.log('result: ', result)
+
     expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
-    expect(result.current.newLoc).toStrictEqual({ slotName: 'D1' })
+    expect(result.current.newLoc).toStrictEqual({ moduleId: 'module-id' })
   })
 
   it('should return current and new locations for moveLabware commands', () => {

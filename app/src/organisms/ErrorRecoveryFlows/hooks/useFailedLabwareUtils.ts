@@ -176,6 +176,9 @@ export function getRelevantFailedLabwareCmdFrom({
   const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
   const errorKind = getErrorKind(failedCommand)
 
+  console.log('errorKind: ', errorKind)
+  console.log('failedCommandByRunRecord: ', failedCommandByRunRecord)
+
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:
       return failedCommandByRunRecord as LiquidProbeRunTimeCommand
@@ -186,7 +189,6 @@ export function getRelevantFailedLabwareCmdFrom({
       return getRelevantPickUpTipCommand(failedCommandByRunRecord, runCommands)
     case ERROR_KINDS.GRIPPER_ERROR:
       return failedCommandByRunRecord as MoveLabwareRunTimeCommand
-    case ERROR_KINDS.GENERAL_ERROR:
     case ERROR_KINDS.STALL_WHILE_STACKING:
       return failedCommandByRunRecord as StackerRetriveRunTimeCommand
     default:
