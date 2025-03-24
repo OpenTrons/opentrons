@@ -167,7 +167,6 @@ function getInvariantContextAndRobotState(
     const trashId = `${uuid()}_trashBin`
     trashBinEntities = {
       [trashId]: {
-        pythonName: 'trash_bin_1',
         id: trashId,
         location: trashLocation,
         pythonName: pythonTrashBinName,
@@ -189,7 +188,6 @@ function getInvariantContextAndRobotState(
       trashBinEntities = {
         ...trashBinEntities,
         [trashId]: {
-          pythonName: 'trash_bin_1',
           id: trashId,
           location: trashLocation,
           pythonName: pythonTrashBinName,
@@ -207,7 +205,6 @@ function getInvariantContextAndRobotState(
     const wasteChuteId = `${uuid()}_wasteChute`
     wasteChuteEntities = {
       [wasteChuteId]: {
-        pythonName: 'waste_chute',
         id: wasteChuteId,
         location: wasteChuteLocation,
         pythonName: pythonWasteChuteName,
@@ -228,7 +225,6 @@ function getInvariantContextAndRobotState(
       const wasteChuteId = `${uuid()}_wasteChute`
       wasteChuteEntities = {
         [wasteChuteId]: {
-          pythonName: 'waste_chute',
           id: wasteChuteId,
           location: wasteChuteLocation,
           pythonName: pythonWasteChuteName,
