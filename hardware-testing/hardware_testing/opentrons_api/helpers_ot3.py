@@ -596,6 +596,18 @@ async def update_pick_up_distance(
     pipette.pick_up_configurations.press_fit = config_model
 
 
+async def update_pick_up_speed(
+    api: OT3API, mount: OT3Mount, speed: float = 5.0, tip_count: int = 10,
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    pipette.get_pick_up_configuration_for_tip_count(tip_count).speed = speed
+    # print(f'Settings: {pipette.get_pick_up_configuration_for_tip_count(tip_count)}')
+    # config_model = pipette.pick_up_configurations.press_fit
+    # config_model.speed = speed
+    # pipette.pick_up_configurations = config_model
+
+
 async def move_plunger_absolute_ot3(
     api: OT3API,
     mount: OT3Mount,
