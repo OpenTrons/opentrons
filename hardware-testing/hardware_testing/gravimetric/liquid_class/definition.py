@@ -27,7 +27,6 @@ class DispenseSettings(LiquidSettings):
     """Dispense Settings."""
 
     blow_out_submerged: float  # microliters
-    blow_out_flow_rate: float  # ul/s
 
 
 @dataclass

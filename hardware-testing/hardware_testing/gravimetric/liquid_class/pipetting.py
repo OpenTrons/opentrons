@@ -313,7 +313,7 @@ def _pipette_with_liquid_settings(  # noqa: C901
     # PHASE 1: APPROACH
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
     pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
-    pipette.flow_rate.blow_out = liquid_class.dispense.blow_out_flow_rate
+    pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate or mix else _dispense_on_approach()
 
