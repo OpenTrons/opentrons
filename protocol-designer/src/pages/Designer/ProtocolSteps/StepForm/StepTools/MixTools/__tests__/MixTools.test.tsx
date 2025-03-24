@@ -25,8 +25,8 @@ import type { StepFormErrors } from '../../../../../../../steplist'
 vi.mock('../../../../../../../step-forms/selectors')
 vi.mock('../../../../../../../feature-flags/selectors')
 vi.mock('../../../utils')
-vi.mock('../MixToolsFirstStep')
-vi.mock('../MixToolsSecondStep')
+vi.mock('../FirstStepMixTools')
+vi.mock('../SecondStepMixTools')
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
