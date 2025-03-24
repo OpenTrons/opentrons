@@ -1,14 +1,19 @@
 import { css } from 'styled-components'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
   COLORS,
+  DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_CENTER,
   LabwareRender,
   PipetteRender,
+  RESPONSIVENESS,
   RobotWorkSpace,
   SPACING,
+  TEXT_ALIGN_CENTER,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
 
@@ -35,11 +40,7 @@ export function LPCLabwareJogRender({
   const itemLwDef = useSelector(
     selectSelectedLwDef(runId)
   ) as LabwareDefinition2
-  const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
 
-  const levelSrc = isLwTiprack ? levelProbeWithTip : levelProbeWithLabware
-
-  // TODO(jh, 03-07-25): RQA-3972.
   return (
     <Flex css={RENDER_CONTAINER_STYLE}>
       <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
@@ -61,12 +62,7 @@ export function LPCLabwareJogRender({
           </>
         )}
       </RobotWorkSpace>
-      <img
-        width="89px"
-        height="145px"
-        src={levelSrc}
-        alt={`level with ${isLwTiprack ? 'tip' : 'labware'}`}
-      />
+      <LevelWithLabware runId={runId} />
     </Flex>
   )
 }
@@ -74,5 +70,63 @@ export function LPCLabwareJogRender({
 const RENDER_CONTAINER_STYLE = css`
   flex: 1;
   align-items: ${ALIGN_CENTER};
-  grid-gap: ${SPACING.spacing20};
+`
+
+function LevelWithLabware({ runId }: { runId: string }): JSX.Element {
+  const { t } = useTranslation('labware_position_check')
+  const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
+
+  const levelSrc = isLwTiprack ? levelProbeWithTip : levelProbeWithLabware
+
+  return (
+    <Flex css={LEVEL_CONTAINER_STYLE}>
+      <img
+        css={isLwTiprack ? TIP_RACK_IMAGE_STYLE : LABWARE_IMAGE_STYLE}
+        src={levelSrc}
+        alt={`level with ${isLwTiprack ? 'tip' : 'labware'}`}
+      />
+      {!isLwTiprack && (
+        <Flex css={LEVEL_LABWARE_COPY_STYLE}>
+          {t('align_to_top_of_labware')}
+        </Flex>
+      )}
+    </Flex>
+  )
+}
+
+const LEVEL_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+  gap: ${SPACING.spacing16};
+`
+
+const TIP_RACK_IMAGE_STYLE = css`
+  width: 89px;
+  height: 145px;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 229px;
+  }
+`
+
+const LABWARE_IMAGE_STYLE = css`
+  width: 89px;
+  height: 125px;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 89px;
+    height: 145px;
+  }
+`
+
+const LEVEL_LABWARE_COPY_STYLE = css`
+  width: 93px;
+  height: 57px;
+
+  text-align: ${TEXT_ALIGN_CENTER};
+  color: ${COLORS.blue50};
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 100%;
 `
