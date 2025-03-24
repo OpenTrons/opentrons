@@ -79,6 +79,7 @@ export function LeftColumnLabwareInfo({
       infoProps={{
         layout: layout,
         tagText: buildQuntity(),
+        subText: undefined,
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',

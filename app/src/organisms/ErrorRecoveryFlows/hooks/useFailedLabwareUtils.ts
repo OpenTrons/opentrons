@@ -310,27 +310,34 @@ export function getFailedLabwareQuantity(
   errorKind: ErrorKind
 ): string | undefined {
   if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
-    const itemsBeforefailedCmd = runCommands?.data.slice(
+    const commandsBeforefailedCmd = runCommands?.data.slice(
       0,
       runCommands?.data.findIndex(
         x => x.id === recentRelevantFailedLabwareCmd?.id
       )
     )
-    const setStoredLabware = itemsBeforefailedCmd?.findLast(
+    const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
       cmd => cmd.commandType === 'flexStacker/setStoredLabware'
     )
-    console.log('setStoredLabware: ', setStoredLabware)
+    const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
+      cmd => cmd.commandType === 'flexStacker/setStoredLabware'
+    )
+    const firstIndexOfSetStoredLabware = commandsBeforefailedCmd
+      ?.slice(0, setStoredLabwareLastIndex)
+      .findLastIndex(cmd => cmd.commandType === 'flexStacker/setStoredLabware')
+    const itemsToCheck = commandsBeforefailedCmd?.slice(
+      firstIndexOfSetStoredLabware,
+      setStoredLabwareLastIndex
+    )
     let total = 0
-    if ('initialCount' in (setStoredLabware?.params ?? {})) {
-      total = setStoredLabware?.params.initialCount
+    if ('initialCount' in (setStoredLabwareLast?.params ?? {})) {
+      total = setStoredLabwareLast?.params.initialCount ?? 0
       const retreiveCmds =
-        itemsBeforefailedCmd?.filter(
-          cmd => cmd.commandType === 'flexStacker/retrieve'
-        ).length ?? 0
+        itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/retrieve')
+          .length ?? 0
       const storeCmds =
-        itemsBeforefailedCmd?.filter(
-          cmd => cmd.commandType === 'flexStacker/store'
-        ).length ?? 0
+        itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
+          .length ?? 0
       return 'Quantity: ' + (total - retreiveCmds + storeCmds)
     } else return 'Quantity: 0'
   }
@@ -402,12 +409,13 @@ function getFailedLabware(
 // Return the name of the well(s) related to the failed command, if any.
 export function getRelevantWellName(
   failedPipetteInfo: UseFailedLabwareUtilsProps['failedPipetteInfo'],
-  recentRelevantPickUpTipCmd: FailedCommandRelevantLabwarewithoutStacker
+  recentRelevantPickUpTipCmd: FailedCommandRelevantLabware
 ): string {
   if (
     failedPipetteInfo == null ||
     recentRelevantPickUpTipCmd == null ||
-    recentRelevantPickUpTipCmd.commandType === 'moveLabware'
+    recentRelevantPickUpTipCmd.commandType in
+      ['moveLabware', 'flexStacker/retrieve', 'flexStacker/store']
   ) {
     return ''
   }
@@ -442,9 +450,10 @@ export function useRelevantFailedLwLocations({
 }: GetRelevantLwLocationsParams): RelevantFailedLabwareLocations {
   const { t } = useTranslation('protocol_command_text')
 
+  const loadedModules = runRecord?.data?.modules ?? []
   const BASE_DISPLAY_PARAMS: Omit<DisplayLocationSlotOnlyParams, 'location'> = {
     loadedLabwares: runRecord?.data?.labware ?? [],
-    loadedModules: runRecord?.data?.modules ?? [],
+    loadedModules,
     robotType: FLEX_ROBOT_TYPE,
     t,
     detailLevel: 'slot-only',
@@ -454,8 +463,15 @@ export function useRelevantFailedLwLocations({
   let location
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
-      location = {
-        moduleId: failedCommandByRunRecord?.params.moduleId,
+      if (
+        failedCommandByRunRecord?.params != null &&
+        'moduleId' in failedCommandByRunRecord?.params
+      ) {
+        location = {
+          moduleId: failedCommandByRunRecord?.params.moduleId,
+        }
+      } else {
+        location = null
       }
       break
     default:
@@ -489,10 +505,11 @@ export function useRelevantFailedLwLocations({
         return {
           displayNameNewLoc: getLabwareDisplayLocation({
             ...BASE_DISPLAY_PARAMS,
-            location: BASE_DISPLAY_PARAMS.loadedModules.find(
-              (m: LoadedModule) =>
-                m.id === failedCommandByRunRecord?.params.moduleId
-            ).location,
+            location:
+              loadedModules.find(
+                (m: LoadedModule) =>
+                  m.id === failedCommandByRunRecord?.params.moduleId
+              )?.location ?? 'offDeck',
           }),
           newLoc: {
             moduleId: failedCommandByRunRecord?.params.moduleId,

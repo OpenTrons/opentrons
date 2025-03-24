@@ -20,8 +20,8 @@ import { Divider } from '/app/atoms/structure/Divider'
 
 import type { DeckInfoLabelProps } from '@opentrons/components'
 
-export interface InterventionInfoDefaultProps {
-  layout: 'default'
+export interface BaseInterventionInfo {
+  layout: 'default' | 'stacked'
   type: 'location-arrow-location' | 'location-colon-location' | 'location'
   labwareName: string
   labwareNickname?: string
@@ -29,12 +29,18 @@ export interface InterventionInfoDefaultProps {
   newLocationProps?: DeckInfoLabelProps
 }
 
-export interface InterventionInfoStackedProps
-  extends Omit<InterventionInfoDefaultProps, 'layout'> {
-  layout: 'stacked'
-  subText: string
-  tagText?: string
+export interface InterventionInfoDefaultProps extends BaseInterventionInfo {
+  layout: 'default'
+  subText?: undefined
 }
+
+export interface InterventionInfoStackedProps extends BaseInterventionInfo {
+  layout: 'stacked'
+  subText?: string | null
+  tagText?: string | null
+}
+
+// base intervention type and they will extend in both, undifiend in default and str in stacked
 
 export type InterventionInfoProps =
   | InterventionInfoDefaultProps
