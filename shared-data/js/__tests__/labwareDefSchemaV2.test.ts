@@ -193,6 +193,21 @@ const expectGroupsFollowConvention = (
   })
 
   test(`${filename} should not specify certain fields in 'groups' if it is a reservoir or wellPlate`, () => {
+    // Certain fields in `groups` are intended to supplement labware-level information,
+    // e.g. an Opentrons-brand tube rack might hold a group of Eppendorf-brand tubes.
+    //
+    // Those fields don't make sense on reservoirs or well plates, because the wells are
+    // an inherent part of the labware. The information should just be specified in the
+    // labware-level brand and metadata.
+
+    if (
+      labwareDef.parameters.loadName === 'nest_96_wellplate_2ml_deep' &&
+      (labwareDef.version === 1 || labwareDef.version === 2)
+    ) {
+      // Bug in v1 and v2 of this labware, fixed in v3.
+      return
+    }
+
     const { displayCategory } = labwareDef.metadata
     const noGroupsMetadataAllowed =
       displayCategory === 'reservoir' || displayCategory === 'wellPlate'
@@ -374,10 +389,7 @@ describe('test schemas of all opentrons definitions', () => {
       expect(labwareDef.namespace).toEqual('opentrons')
     })
 
-    if (labwareDef.parameters.loadName !== 'nest_96_wellplate_2ml_deep') {
-      // TODO(IL, 2020-06-22): make nest_96_wellplate_2ml_deep confirm to groups convention
-      expectGroupsFollowConvention(labwareDef, labwarePath)
-    }
+    expectGroupsFollowConvention(labwareDef, labwarePath)
   })
 })
 
