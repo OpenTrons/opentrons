@@ -71,10 +71,14 @@ export function mixUtil(args: {
     nozzles,
     invariantContext,
   } = args
-  //  If delay is specified, emit individual py commands
-  //  otherwise, emit mix()
+  //  If delay is specified to something other than 0,
+  //  emit individual py commands. Otherwise, emit mix()
   const hasUnsupportedMixApiArg =
-    aspirateDelaySeconds != null || dispenseDelaySeconds != null
+    aspirateDelaySeconds != null ||
+    (aspirateDelaySeconds != null && aspirateDelaySeconds === 0) ||
+    dispenseDelaySeconds != null ||
+    (dispenseDelaySeconds != null && dispenseDelaySeconds === 0)
+
   const curryCreator = hasUnsupportedMixApiArg
     ? curryCommandCreator
     : curryWithoutPython
