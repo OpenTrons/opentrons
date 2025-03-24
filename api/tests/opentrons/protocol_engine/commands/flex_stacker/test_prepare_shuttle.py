@@ -61,7 +61,7 @@ async def test_home_command(
 
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.home_all(), times=1)
+    decoy.verify(await stacker_hardware.home_all(False), times=1)
 
     assert result == SuccessData(public=flex_stacker.PrepareShuttleResult())
 
@@ -95,7 +95,7 @@ async def test_home_command_with_stall_detected(
     decoy.when(model_utils.generate_id()).then_return(err_id)
     decoy.when(model_utils.get_timestamp()).then_return(err_timestamp)
 
-    decoy.when(await stacker_hardware.home_all()).then_raise(
+    decoy.when(await stacker_hardware.home_all(False)).then_raise(
         FlexStackerStallError(serial="123", axis=StackerAxis.Z)
     )
 
