@@ -12,6 +12,7 @@ import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
 
 import type { ComponentProps } from 'react'
 import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
+import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {
@@ -168,6 +169,7 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
         },
       } as any,
     })
+    console.log("result: ", result )
     expect(result).toBeNull()
   })
 })
@@ -190,7 +192,7 @@ const render = (props: ComponentProps<typeof TestWrapper>) => {
 
 describe('useRelevantFailedLwLocations', () => {
   const mockRunRecord = {
-    data: { modules: [{ id: 'module-id' }], labware: [] },
+    data: { modules: [{ id: 'module-id', model: FLEX_STACKER_MODULE_V1, location: {slotName:"D1"} }], labware: [] },
   } as any
   const mockFailedLabware = {
     location: { slotName: 'D1' },
@@ -226,7 +228,7 @@ describe('useRelevantFailedLwLocations', () => {
 
   it('should return current location for flex stacker commands', () => {
     const mockFailedCommand = {
-      commandType: 'flexStacker/retrive',
+      commandType: 'flexStacker/retrieve',
       location: { slotName: 'D3' },
       params: {
         moduleId: 'module-id',
@@ -237,11 +239,11 @@ describe('useRelevantFailedLwLocations', () => {
       failedLabware: mockFailedLabware,
       failedCommandByRunRecord: mockFailedCommand,
       runRecord: mockRunRecord,
-      errorKind: ERROR_KINDS.GENERAL_ERROR,
+      errorKind: ERROR_KINDS.STALL_WHILE_STACKING,
     })
 
-    screen.getByText('Current Loc: Stacker C')
-    screen.getByText('New Loc: Slot D3')
+    screen.getByText('Current Loc: Stacker D')
+    screen.getByText('New Loc: Slot D1')
 
     const { result } = renderHook(() =>
       useRelevantFailedLwLocations({
@@ -253,7 +255,7 @@ describe('useRelevantFailedLwLocations', () => {
     )
 
     expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
-    expect(result.current.newLoc).toBeNull()
+    expect(result.current.newLoc).toStrictEqual({ slotName: 'D1' })
   })
 
   it('should return current and new locations for moveLabware commands', () => {
