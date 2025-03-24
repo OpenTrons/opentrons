@@ -327,8 +327,9 @@ export const getIsSafePipetteMovement = (
     tiprackEntityId != null
       ? labwareEntities[tiprackEntityId].def.parameters.tipLength
       : 0
-  const stagingAreaSlots = Object.values(stagingAreaEntities)
-  .map(stagingArea => stagingArea.location as string)
+  const stagingAreaSlots = Object.values(stagingAreaEntities).map(
+    stagingArea => stagingArea.location as string
+  )
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteHasTip = tipState.pipettes[pipetteId]
   // account for tip length if picking up tip
