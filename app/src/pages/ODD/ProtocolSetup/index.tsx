@@ -47,7 +47,6 @@ import {
   ProtocolSetupDeckConfiguration,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
-  ProtocolSetupLiquids,
   ProtocolSetupModulesAndDeck,
   ProtocolSetupOffsets,
   ProtocolSetupStep,
@@ -655,28 +654,11 @@ function PrepareToRun({
               onClickSetupStep={() => {
                 setSetupScreen('labware')
               }}
-              title={i18n.format(t('labware'), 'capitalize')}
+              title={t('labware_liquids_setup_step_title')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
               status={labwareConfirmed ? 'ready' : 'general'}
               disabled={labwareDetail == null}
-            />
-            <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('liquids')
-              }}
-              title={i18n.format(t('liquids'), 'capitalize')}
-              status={
-                liquidsConfirmed || !areLiquidsInProtocol ? 'ready' : 'general'
-              }
-              detail={
-                areLiquidsInProtocol
-                  ? t('initial_liquids_num', {
-                      count: liquidsInProtocol.length,
-                    })
-                  : t('liquids_not_in_setup')
-              }
-              interactionDisabled={!areLiquidsInProtocol}
             />
           </>
         ) : (
@@ -882,14 +864,6 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         isConfirmed={labwareConfirmed}
         setIsConfirmed={setLabwareConfirmed}
-      />
-    ),
-    liquids: (
-      <ProtocolSetupLiquids
-        runId={runId}
-        setSetupScreen={setSetupScreen}
-        isConfirmed={liquidsConfirmed}
-        setIsConfirmed={setLiquidsConfirmed}
       />
     ),
     'deck configuration': (

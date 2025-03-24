@@ -6,6 +6,7 @@ import {
   THERMOCYCLER_MODULE_V2,
   getSlotFromAddressableAreaName,
 } from '@opentrons/shared-data'
+import { getLiquidsByIdForLabware } from '../../analysis'
 
 import type {
   LabwareDefinition2,
@@ -20,6 +21,7 @@ import type {
   LoadLidParams,
   OnAddressableAreaLocationSequenceComponent,
 } from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '@opentrons/components'
 
 export interface LabwareInStack {
   definitionUri: string
@@ -46,6 +48,11 @@ interface LoadLidOnLabwareParams extends Omit<LoadLidParams, 'location'> {
 }
 interface LoadLidOnLabwareCommad extends Omit<LoadLidRunTimeCommand, 'params'> {
   params: LoadLidOnLabwareParams
+}
+
+export interface LabwareLiquidRenderInfo extends LabwareInStack {
+  quantity: number
+  liquids: number
 }
 
 /**
@@ -263,4 +270,34 @@ export function getStackedItemsOnStartingDeck(
       }
       return { ...acc, [location]: stackFromCommand }
     }, {})
+}
+
+export function getLabwareLiquidRenderInfoFromStack(
+  labwareInStack: LabwareInStack[],
+  labwareByLiquidId: LabwareByLiquidId
+): LabwareLiquidRenderInfo[] {
+  return labwareInStack.reduce<LabwareLiquidRenderInfo[]>((acc, stackItem) => {
+    const liquidInfo =
+      labwareByLiquidId != null
+        ? getLiquidsByIdForLabware(stackItem.labwareId, labwareByLiquidId)
+        : {}
+    const liquidCount = Object.keys(liquidInfo).length
+    const matchingLabwareIndex = acc.findIndex(
+      lw =>
+        lw.definitionUri === stackItem.definitionUri &&
+        (lw.lidDisplayName == null ||
+          lw.lidDisplayName === stackItem.lidDisplayName)
+    )
+    if (matchingLabwareIndex != -1 && matchingLabwareIndex === acc.length - 1) {
+      acc[matchingLabwareIndex].quantity += 1
+      acc[matchingLabwareIndex].liquids += liquidCount
+    } else {
+      acc.push({
+        ...stackItem,
+        quantity: 1,
+        liquids: liquidCount,
+      })
+    }
+    return acc
+  }, [])
 }

@@ -39,6 +39,7 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { getLiquidsByIdForLabware } from '/app/transformations/analysis'
+import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
 import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
@@ -99,37 +100,11 @@ export function LabwareListItem(
   const labwareInStack = stackedItems.filter(
     (lw): lw is LabwareInStack => 'labwareId' in lw
   )
-  /**
-   * if acc includes this defUri and the lid name matches and its the last entry in the array
-   * inrease the quantity
-   * otherwise push new with quantity 0
-   */
-  const labwareLiquidRenderInfo = labwareInStack.reduce<
-    LabwareLiquidRenderInfo[]
-  >((acc, stackItem) => {
-    const liquidInfo =
-      labwareByLiquidId != null
-        ? getLiquidsByIdForLabware(stackItem.labwareId, labwareByLiquidId)
-        : {}
-    const liquidCount = Object.keys(liquidInfo).length
-    const matchingLabwareIndex = acc.findIndex(
-      lw =>
-        lw.definitionUri === stackItem.definitionUri &&
-        (lw.lidDisplayName == null ||
-          lw.lidDisplayName === stackItem.lidDisplayName)
-    )
-    if (matchingLabwareIndex != -1 && matchingLabwareIndex === acc.length - 1) {
-      acc[matchingLabwareIndex].quantity += 1
-      acc[matchingLabwareIndex].liquids += liquidCount
-    } else {
-      acc.push({
-        ...stackItem,
-        quantity: 1,
-        liquids: liquidCount,
-      })
-    }
-    return acc
-  }, [])
+
+  const labwareLiquidRenderInfo = getLabwareLiquidRenderInfoFromStack(
+    labwareInStack,
+    labwareByLiquidId
+  )
 
   const isStacked =
     labwareLiquidRenderInfo.length > 1 ||

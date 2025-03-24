@@ -88,7 +88,6 @@ export function SetupLabwareMap({
       protocolAnalysis.liquids,
       labwareByLiquidId
     )
-    const hasLiquids = Object.keys(wellFill).length > 0
 
     return {
       moduleModel: module.moduleDef.model,
@@ -119,7 +118,7 @@ export function SetupLabwareMap({
           onMouseLeave={() => {
             setHoverLabwareId(null)
           }}
-          cursor={isLabwareStacked ? 'pointer' : ''}
+          cursor={'pointer'}
         >
           {topLabwareDefinition != null && topLabwareInfo != null ? (
             <LabwareInfoOverlay
@@ -127,7 +126,6 @@ export function SetupLabwareMap({
               labwareId={topLabwareId}
               displayName={topLabwareDisplayName}
               runId={runId}
-              labwareHasLiquid={hasLiquids}
             />
           ) : null}
         </g>
@@ -179,7 +177,7 @@ export function SetupLabwareMap({
             wellFill: wellFill,
             labwareChildren: (
               <g
-                cursor={isLabwareInStack ? 'pointer' : ''}
+                cursor={'pointer'}
                 onClick={() => {
                   if (isLabwareInStack) {
                     setLabwareStackDetailsLabwareId(topLabwareId)

@@ -7,7 +7,7 @@ import {
   StyledText,
   COLORS,
 } from '@opentrons/components'
-import { getStackedItemsOnStartingDeck } from '/app/transformations/commands/transformations/getStackedItemsOnStartingDeck'
+import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 import { LabwareListItem } from './LabwareListItem'
 
 import type {

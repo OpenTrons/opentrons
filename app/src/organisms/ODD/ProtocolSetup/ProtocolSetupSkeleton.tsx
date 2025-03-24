@@ -39,7 +39,6 @@ export function ProtocolSetupStepSkeleton(): JSX.Element {
       <SetupSkeleton />
       <SetupSkeleton />
       <SetupSkeleton />
-      <SetupSkeleton />
     </>
   )
 }
