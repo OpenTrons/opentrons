@@ -161,6 +161,43 @@ export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
 
+export interface NormalizedWasteChuteById {
+  [wasteChuteId: string]: {
+    id: string
+    pythonName: string
+  }
+}
+
+export type WasteChuteEntity = NormalizedWasteChuteById[keyof NormalizedWasteChuteById]
+export interface WasteChuteEntities {
+  [wasteChuteId: string]: WasteChuteEntity
+}
+
+export interface NormalizedTrashBinById {
+  [trashBinId: string]: {
+    id: string
+    location: string
+    pythonName: string
+  }
+}
+
+export type TrashBinEntity = NormalizedTrashBinById[keyof NormalizedTrashBinById]
+export interface TrashBinEntities {
+  [trashBinId: string]: TrashBinEntity
+}
+
+export interface NormalizedStagingAreaById {
+  [stagingAreaId: string]: {
+    id: string
+    location: string
+  }
+}
+
+export type StagingAreaEntity = NormalizedStagingAreaById[keyof NormalizedStagingAreaById]
+export interface StagingAreaEntities {
+  [stagingAreaId: string]: StagingAreaEntity
+}
+
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
@@ -542,7 +579,10 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities
+  trashBinEntities: TrashBinEntities
+  stagingAreaEntities: StagingAreaEntities
+  hasGripperEntity: boolean
   liquidEntities: LiquidEntities
   config: Config
 }

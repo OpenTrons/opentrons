@@ -24,6 +24,8 @@ import type {
   PipetteEntities,
   Timeline,
   TimelineFrame,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type { CutoutId, RobotType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../types'
@@ -277,12 +279,9 @@ export function getLoadLiquids(
   return pythonLoadLiquids ? `# Load Liquids:\n${pythonLoadLiquids}` : ''
 }
 
-export function getLoadTrashBins(
-  additionalEquipmentEntities: AdditionalEquipmentEntities
-): string {
-  const pythonLoadTrashBins = Object.values(additionalEquipmentEntities)
-    .filter(ae => ae.name === 'trashBin')
-    ?.map(trashBin => {
+export function getLoadTrashBins(trashBinEntities: TrashBinEntities): string {
+  const pythonLoadTrashBins = Object.values(trashBinEntities)
+    .map(trashBin => {
       const location = formatPyStr(
         getCutoutDisplayName(trashBin.location as CutoutId)
       )
@@ -294,14 +293,12 @@ export function getLoadTrashBins(
 }
 
 export function getLoadWasteChute(
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities
 ): string {
-  const pythonLoadWasteChute = Object.values(additionalEquipmentEntities)
-    .filter(ae => ae.name === 'wasteChute')
-    ?.map(
-      wasteChute =>
-        `${wasteChute.pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_waste_chute()`
-    )
+  const pythonLoadWasteChute = Object.values(wasteChuteEntities).map(
+    wasteChute =>
+      `${wasteChute.pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_waste_chute()`
+  )
 
   return pythonLoadWasteChute.length > 0
     ? `# Load Waste Chute:\n${pythonLoadWasteChute}`
@@ -321,7 +318,8 @@ export function pythonDefRun(
     labwareEntities,
     pipetteEntities,
     liquidEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
   } = invariantContext
   const { modules, labware, pipettes } = robotState
   const sections: string[] = [
@@ -336,8 +334,8 @@ export function pythonDefRun(
     getLoadPipettes(pipetteEntities, labwareEntities, pipettes),
     ...(robotType === FLEX_ROBOT_TYPE
       ? [
-          getLoadTrashBins(additionalEquipmentEntities),
-          getLoadWasteChute(additionalEquipmentEntities),
+          getLoadTrashBins(trashBinEntities),
+          getLoadWasteChute(wasteChuteEntities),
         ]
       : []),
     getDefineLiquids(liquidEntities),
