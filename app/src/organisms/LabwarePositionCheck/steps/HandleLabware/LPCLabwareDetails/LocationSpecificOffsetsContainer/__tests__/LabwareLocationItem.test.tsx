@@ -17,6 +17,7 @@ import {
   OFFSET_KIND_DEFAULT,
   OFFSET_KIND_LOCATION_SPECIFIC,
 } from '/app/redux/protocol-runs'
+import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
@@ -66,6 +67,7 @@ vi.mock('/app/redux/protocol-runs', () => ({
   OFFSET_KIND_DEFAULT: 'default',
   OFFSET_KIND_LOCATION_SPECIFIC: 'location-specific',
 }))
+vi.mock('/app/organisms/LabwarePositionCheck/hooks')
 
 const render = (props: ComponentProps<typeof LabwareLocationItem>) => {
   return renderWithProviders(<LabwareLocationItem {...props} />, {
@@ -78,11 +80,13 @@ describe('LabwareLocationItem', () => {
   let mockDispatch: Mock
   let mockToggleRobotMoving: Mock
   let mockHandleCheckItemsPrepModules: Mock
+  let mockHardcodedSnackbar: Mock
 
   beforeEach(() => {
     mockDispatch = vi.fn().mockImplementation(action => action)
     mockToggleRobotMoving = vi.fn().mockResolvedValue(undefined)
     mockHandleCheckItemsPrepModules = vi.fn().mockResolvedValue(undefined)
+    mockHardcodedSnackbar = vi.fn()
 
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
 
@@ -122,6 +126,9 @@ describe('LabwareLocationItem', () => {
     } as any)
     vi.mocked(resetLocationSpecificOffsetToDefault).mockReturnValue({
       type: 'RESET_OFFSET_TO_DEFAULT',
+    } as any)
+    vi.mocked(useLPCSnackbars).mockReturnValue({
+      makeHardCodedSnackbar: mockHardcodedSnackbar,
     } as any)
   })
 
@@ -173,5 +180,27 @@ describe('LabwareLocationItem', () => {
     const multiDeckBtnsProps = MultiDeckLabelTagBtnsMock.mock.calls[0][0]
 
     expect(multiDeckBtnsProps.colThreeSecondaryBtn.disabled).toBe(true)
+  })
+
+  it('calls the snackbar onClick when buttons tied to a hardcoded offset are pressed', () => {
+    props.locationSpecificOffsetDetails = {
+      ...props.locationSpecificOffsetDetails,
+      locationDetails: {
+        ...props.locationSpecificOffsetDetails.locationDetails,
+        hardCodedOffsetId: 'some-hardcoded-id',
+      },
+    }
+
+    render(props)
+
+    const multiDeckBtnsProps = MultiDeckLabelTagBtnsMock.mock.calls[0][0]
+
+    multiDeckBtnsProps.colThreePrimaryBtn.onClick()
+    expect(mockHardcodedSnackbar).toHaveBeenCalled()
+
+    mockHardcodedSnackbar.mockClear()
+
+    multiDeckBtnsProps.colThreeSecondaryBtn.onClick()
+    expect(mockHardcodedSnackbar).toHaveBeenCalled()
   })
 })
