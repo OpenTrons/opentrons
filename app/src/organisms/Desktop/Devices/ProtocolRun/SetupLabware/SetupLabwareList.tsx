@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import {
+  getLabwareInfoByLiquidId,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -38,16 +39,15 @@ export function SetupLabwareList(
     protocolAnalysis?.labware ?? [],
     protocolAnalysis?.modules ?? []
   )
+  const labwareByLiquidId = getLabwareInfoByLiquidId(
+    protocolAnalysis?.commands ?? []
+  )
   const sortedStartingDeckEntries = Object.entries(startingDeck)
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key]) => key !== 'offDeck')
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
     ? startingDeck['offDeck']
     : null
-
-  // const allItems: LabwareSetupItem[] = []
-  // allItems.push.apply(allItems, onDeckItems)
-  // allItems.push.apply(allItems, offDeckItems)
 
   return (
     <Flex
@@ -80,22 +80,20 @@ export function SetupLabwareList(
             isFlex={isFlex}
             slotName={key}
             stackedItems={value}
+            labwareByLiquidId={labwareByLiquidId}
           />
         )
       })}
-      {/* {offDeckItems?.forEach(item) => {
-        return (
-          <LabwareListItem
-            key={item.labwareId}
-            attachedModuleInfo={attachedModuleInfo}
-            extraAttentionModules={extraAttentionModules}
-            slotName={'offDeck'}
-            stackedItems={[item]}
-            {...labwareItem}
-            isFlex={isFlex}
-          />
-        )
-      })} */}
+      {offDeckItems?.forEach((item, index) => (
+        <LabwareListItem
+          key={index}
+          attachedModuleInfo={attachedModuleInfo}
+          extraAttentionModules={extraAttentionModules}
+          slotName={'offDeck'}
+          stackedItems={[item]}
+          isFlex={isFlex}
+        />
+      ))}
     </Flex>
   )
 }

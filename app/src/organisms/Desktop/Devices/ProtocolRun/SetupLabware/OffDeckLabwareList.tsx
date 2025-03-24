@@ -1,18 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 import { LabwareListItem } from './LabwareListItem'
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareSetupItem } from '/app/transformations/commands'
+import type { StackItem } from '/app/transformations/commands'
 
 interface OffDeckLabwareListProps {
-  labwareItems: LabwareSetupItem[]
+  labwareItems: StackItem[]
   isFlex: boolean
-  commands: RunTimeCommand[]
 }
 export function OffDeckLabwareList(
   props: OffDeckLabwareListProps
 ): JSX.Element | null {
-  const { labwareItems, isFlex, commands } = props
+  const { labwareItems, isFlex } = props
   const { t } = useTranslation('protocol_setup')
   if (labwareItems.length < 1) return null
   return (
@@ -30,9 +28,9 @@ export function OffDeckLabwareList(
           key={index}
           attachedModuleInfo={{}}
           extraAttentionModules={[]}
-          {...labwareItem}
+          stackedItems={[labwareItem]}
+          slotName="offDeck"
           isFlex={isFlex}
-          commands={commands}
           showLabwareSVG
         />
       ))}

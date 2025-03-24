@@ -38,7 +38,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-
+import { getLiquidsByIdForLabware } from '/app/transformations/analysis'
 import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
@@ -56,6 +56,7 @@ import type {
   LabwareInStack,
 } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 
 const LabwareRow = styled.div`
   display: ${DISPLAY_GRID};
@@ -67,7 +68,7 @@ const LabwareRow = styled.div`
 
 interface LabwareLiquidRenderInfo extends LabwareInStack {
   quantity: number
-  liquids?: number
+  liquids: number
 }
 
 interface LabwareListItemProps {
@@ -76,6 +77,7 @@ interface LabwareListItemProps {
   isFlex: boolean
   slotName: string
   stackedItems: StackItem[]
+  labwareByLiquidId?: LabwareByLiquidId
   showLabwareSVG?: boolean
 }
 
@@ -88,6 +90,7 @@ export function LabwareListItem(
     attachedModuleInfo,
     extraAttentionModules,
     isFlex,
+    labwareByLiquidId,
     showLabwareSVG,
   } = props
   const moduleInStack = stackedItems.find(
@@ -104,6 +107,11 @@ export function LabwareListItem(
   const labwareLiquidRenderInfo = labwareInStack.reduce<
     LabwareLiquidRenderInfo[]
   >((acc, stackItem) => {
+    const liquidInfo =
+      labwareByLiquidId != null
+        ? getLiquidsByIdForLabware(stackItem.labwareId, labwareByLiquidId)
+        : {}
+    const liquidCount = Object.keys(liquidInfo).length
     const matchingLabwareIndex = acc.findIndex(
       lw =>
         lw.definitionUri === stackItem.definitionUri &&
@@ -112,10 +120,12 @@ export function LabwareListItem(
     )
     if (matchingLabwareIndex != -1 && matchingLabwareIndex === acc.length - 1) {
       acc[matchingLabwareIndex].quantity += 1
+      acc[matchingLabwareIndex].liquids += liquidCount
     } else {
       acc.push({
         ...stackItem,
         quantity: 1,
+        liquids: liquidCount,
       })
     }
     return acc
@@ -329,7 +339,7 @@ export function LabwareListItem(
                             })}
                           />
                         ) : null}
-                        {labware.liquids != null ? (
+                        {labware.liquids > 0 ? (
                           <Tag
                             type="default"
                             text={
@@ -337,6 +347,7 @@ export function LabwareListItem(
                                 ? t('multiple_liquid_layouts')
                                 : t('number_of_liquids', {
                                     number: labware.liquids,
+                                    count: labware.liquids,
                                   })
                             }
                           />
