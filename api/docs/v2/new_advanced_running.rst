@@ -18,6 +18,7 @@ Access your robot’s Jupyter Notebook by either:
 
 - Going to the **Advanced** tab of Robot Settings and clicking **Launch Jupyter Notebook**.
 - Going directly to ``http://<robot-ip>:48888`` in your web browser (if you know your robot's IP address).
+- On **Flex** robot, running Jupyter Notebook requires stopping the Opentrons Robot Server. In the first cell of your Jupyter Notebook, enter and run ``!systemctl stop opentrons-robot-server``. This will cause the Opentrons App to display the message: "This robot's API server is not responding correctly to requests at IP address xxx.xxx.xxx.xxx."
 
 Once you've launched Jupyter Notebook, you can create a notebook file or edit an existing one. These notebook files are stored on the the robot. If you want to save code from a notebook to your computer, go to **File > Download As** in the notebook interface.
 
