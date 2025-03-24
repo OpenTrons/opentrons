@@ -40,8 +40,6 @@ export interface InterventionInfoStackedProps extends BaseInterventionInfo {
   tagText?: string | null
 }
 
-// base intervention type and they will extend in both, undifiend in default and str in stacked
-
 export type InterventionInfoProps =
   | InterventionInfoDefaultProps
   | InterventionInfoStackedProps

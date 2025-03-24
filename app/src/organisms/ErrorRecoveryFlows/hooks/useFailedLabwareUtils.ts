@@ -126,7 +126,6 @@ export function useFailedLabwareUtils({
     errorKind,
   })
 
-  console.log('WTFFFF: ', failedLabwareLocations)
   const labwareQuantity = getFailedLabwareQuantity(
     runCommands,
     recentRelevantFailedLabwareCmd,
@@ -175,9 +174,6 @@ export function getRelevantFailedLabwareCmdFrom({
 }: RelevantFailedLabwareCmd): FailedCommandRelevantLabware {
   const failedCommandByRunRecord = failedCommand?.byRunRecord ?? null
   const errorKind = getErrorKind(failedCommand)
-
-  console.log('errorKind: ', errorKind)
-  console.log('failedCommandByRunRecord: ', failedCommandByRunRecord)
 
   switch (errorKind) {
     case ERROR_KINDS.NO_LIQUID_DETECTED:
@@ -354,7 +350,6 @@ export function getFailedCmdRelevantLabware(
   const lwDefsByURI = getLoadedLabwareDefinitionsByUri(
     protocolAnalysis?.commands ?? []
   )
-  console.log('lwDefsByURI: ', lwDefsByURI)
   let labwareNickname, failedLWURI
   switch (errorKind) {
     case ERROR_KINDS.STALL_WHILE_STACKING:
@@ -490,7 +485,6 @@ export function useRelevantFailedLwLocations({
     RelevantFailedLabwareLocations,
     'displayNameNewLoc' | 'newLoc'
   > => {
-    console.log('in new location:', failedCommandByRunRecord?.commandType)
     switch (failedCommandByRunRecord?.commandType) {
       case 'moveLabware':
         return {
