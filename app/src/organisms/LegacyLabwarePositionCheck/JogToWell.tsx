@@ -9,6 +9,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
   LegacyStyledText,
@@ -19,6 +20,7 @@ import {
   RobotWorkSpace,
   SecondaryButton,
   SPACING,
+  TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
   WELL_LABEL_OPTIONS,
 } from '@opentrons/components'
@@ -159,12 +161,19 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               </>
             )}
           </RobotWorkSpace>
-          <img
-            width="89px"
-            height="145px"
-            src={levelSrc}
-            alt={`level with ${isTipRack ? 'tip' : 'labware'}`}
-          />
+          <Flex css={LEVEL_CONTAINER_STYLE}>
+            <img
+              width="89px"
+              height={isTipRack ? '145px' : '125px'}
+              src={levelSrc}
+              alt={`level with ${isTipRack ? 'tip' : 'labware'}`}
+            />
+            {!isTipRack && (
+              <Flex css={LEVEL_LABWARE_COPY_STYLE}>
+                {t('align_to_top_of_labware')}
+              </Flex>
+            )}
+          </Flex>
         </Flex>
       </Flex>
       {isOnDevice ? (
@@ -270,4 +279,22 @@ const Header = styled.h1`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold}
   }
+`
+
+const LEVEL_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+  gap: ${SPACING.spacing16};
+`
+
+const LEVEL_LABWARE_COPY_STYLE = css`
+  width: 93px;
+  height: 57px;
+
+  text-align: ${TEXT_ALIGN_CENTER};
+  color: ${COLORS.blue50};
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 100%;
 `
