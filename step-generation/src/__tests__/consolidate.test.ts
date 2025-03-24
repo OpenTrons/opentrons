@@ -135,11 +135,11 @@ describe('consolidate single-channel', () => {
 
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         wasteChuteId: {
-          name: 'wasteChute',
           id: 'wasteChuteId',
           location: 'cutoutD3',
+          pythonName: 'waste_chute',
         },
       },
     }
@@ -613,9 +613,9 @@ describe('consolidate single-channel', () => {
     } as ConsolidateArgs
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      trashBinEntities: {
         trashBinId: {
-          name: 'trashBin',
+          pythonName: 'trash_bin_1',
           id: 'trashBinId',
           location: 'cutoutA3',
         },
@@ -1151,9 +1151,9 @@ describe('consolidate single-channel', () => {
       } as ConsolidateArgs
       invariantContext = {
         ...invariantContext,
-        additionalEquipmentEntities: {
+        trashBinEntities: {
           trashBinId: {
-            name: 'trashBin',
+            pythonName: 'trash_bin_1',
             id: 'trashBinId',
             location: 'cutoutA3',
           },

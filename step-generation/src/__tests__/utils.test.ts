@@ -324,7 +324,10 @@ describe('makeInitialRobotState', () => {
               pythonName: 'mockPythonName',
             },
           },
-          additionalEquipmentEntities: {},
+          wasteChuteEntities: {},
+          trashBinEntities: {},
+          stagingAreaEntities: {},
+          hasGripperEntity: false,
           liquidEntities: {},
         },
         labwareLocations: {

@@ -100,16 +100,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   if (
     !args.destLabware ||
     (!invariantContext.labwareEntities[args.destLabware] &&
-      !invariantContext.additionalEquipmentEntities[args.destLabware])
+      !invariantContext.trashBinEntities[args.destLabware] &&
+      !invariantContext.wasteChuteEntities[args.destLabware])
   ) {
     return { errors: [errorCreators.equipmentDoesNotExist()] }
   }
 
   const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
   const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
-  )
+  const hasWasteChute =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
 
   if (
     hasWasteChute &&
@@ -121,7 +121,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   if (
     !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+    !(
+      invariantContext.wasteChuteEntities[args.dropTipLocation] &&
+      invariantContext.trashBinEntities[args.dropTipLocation]
+    )
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
@@ -162,10 +165,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
 
-  const dropTipEntity =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  const isWasteChute = dropTipEntity?.name === 'wasteChute'
-  const isTrashBin = dropTipEntity?.name === 'trashBin'
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   const commandCreators = flatMap(
     sourceWellChunks,
@@ -426,7 +429,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInWasteChute, {
             pipetteId: args.pipette,
-            wasteChuteId: dropTipEntity.id,
+            wasteChuteId:
+              invariantContext.wasteChuteEntities[args.dropTipLocation].id,
           }),
         ]
       }
@@ -434,7 +438,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         dropTipCommand = [
           curryCommandCreator(dropTipInTrash, {
             pipetteId: args.pipette,
-            trashLocation: dropTipEntity.location as CutoutId,
+            trashLocation: invariantContext.trashBinEntities[
+              args.dropTipLocation
+            ].location as CutoutId,
           }),
         ]
       }

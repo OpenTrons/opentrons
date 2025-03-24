@@ -87,7 +87,8 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const trashOrLabware = getTrashOrLabware(
     invariantContext.labwareEntities,
-    invariantContext.additionalEquipmentEntities,
+    invariantContext.wasteChuteEntities,
+    invariantContext.trashBinEntities,
     args.destLabware
   )
 
@@ -133,9 +134,8 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
   const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
-  )
+  const hasWasteChute =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
 
   if (
     hasWasteChute &&
@@ -148,14 +148,18 @@ export const transfer: CommandCreator<TransferArgs> = (
   if (
     !args.destLabware ||
     (!invariantContext.labwareEntities[args.destLabware] &&
-      !invariantContext.additionalEquipmentEntities[args.destLabware])
+      !invariantContext.wasteChuteEntities[args.destLabware] &&
+      !invariantContext.trashBinEntities[args.destLabware])
   ) {
     errors.push(errorCreators.equipmentDoesNotExist())
   }
 
   if (
     !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
+    !(
+      invariantContext.wasteChuteEntities[args.dropTipLocation] &&
+      invariantContext.trashBinEntities[args.dropTipLocation]
+    )
   ) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
@@ -166,10 +170,10 @@ export const transfer: CommandCreator<TransferArgs> = (
     }
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
 
-  const dropTipEntity =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  const isWasteChute = dropTipEntity?.name === 'wasteChute'
-  const isTrashBin = dropTipEntity?.name === 'trashBin'
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -521,7 +525,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             dropTipCommand = [
               curryCommandCreator(dropTipInWasteChute, {
                 pipetteId: args.pipette,
-                wasteChuteId: dropTipEntity.id,
+                wasteChuteId:
+                  invariantContext.wasteChuteEntities[args.dropTipLocation].id,
               }),
             ]
           }
@@ -529,7 +534,9 @@ export const transfer: CommandCreator<TransferArgs> = (
             dropTipCommand = [
               curryCommandCreator(dropTipInTrash, {
                 pipetteId: args.pipette,
-                trashLocation: dropTipEntity.location as CutoutId,
+                trashLocation: invariantContext.trashBinEntities[
+                  args.dropTipLocation
+                ].location as CutoutId,
               }),
             ]
           }

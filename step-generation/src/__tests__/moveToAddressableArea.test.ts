@@ -14,10 +14,9 @@ const mockCutout = 'cutoutA3' as CutoutId
 const mockTrashId = 'mockTrashId'
 let invariantContext: InvariantContext = {
   ...makeContext(),
-  additionalEquipmentEntities: {
+  trashBinEntities: {
     [mockTrashId]: {
       id: mockTrashId,
-      name: 'trashBin',
       pythonName: 'mock_trash_bin_1',
       location: mockCutout,
     },
@@ -58,10 +57,9 @@ describe('moveToAddressableArea', () => {
     const wasteChuteId = 'wasteChuteId'
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         [wasteChuteId]: {
           id: wasteChuteId,
-          name: 'wasteChute',
           pythonName: 'mock_waste_chute_1',
           location: WASTE_CHUTE_CUTOUT,
         },

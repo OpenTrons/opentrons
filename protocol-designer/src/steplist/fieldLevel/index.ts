@@ -46,6 +46,10 @@ import type {
   LabwareEntities,
   AdditionalEquipmentEntities,
   AdditionalEquipmentEntity,
+  WasteChuteEntities,
+  StagingAreaEntities,
+  WasteChuteEntity,
+  TrashBinEntity,
 } from '@opentrons/step-generation'
 import type { ValueMasker, ValueCaster } from './processing'
 import type { StepFieldName } from '../../form-types'
@@ -61,14 +65,18 @@ interface LabwareEntityWithTouchTip extends LabwareEntity {
   isTouchTipAllowed: boolean
 }
 
-interface AdditionalEquipmentEntityWithTouchTip
-  extends AdditionalEquipmentEntity {
+interface WasteChuteEntityWithTouchTip extends WasteChuteEntity {
+  isTouchTipAllowed: boolean
+}
+
+interface TrashBinEntityWithTouchTip extends TrashBinEntity {
   isTouchTipAllowed: boolean
 }
 
 type LabwareOrAdditionalEquipmentEntity =
   | LabwareEntityWithTouchTip
-  | AdditionalEquipmentEntityWithTouchTip
+  | WasteChuteEntityWithTouchTip
+  | TrashBinEntityWithTouchTip
 
 const getLabwareOrAdditionalEquipmentEntity = (
   state: InvariantContext,
@@ -83,9 +91,14 @@ const getLabwareOrAdditionalEquipmentEntity = (
       ...state.labwareEntities[id],
       isTouchTipAllowed: !labwareDisallowsTouchTip,
     }
-  } else if (state.additionalEquipmentEntities[id] != null) {
+  } else if (state.wasteChuteEntities[id] != null) {
     return {
-      ...state.additionalEquipmentEntities[id],
+      ...state.wasteChuteEntities[id],
+      isTouchTipAllowed: false,
+    }
+  } else if (state.trashBinEntities[id] != null) {
+    return {
+      ...state.trashBinEntities[id],
       isTouchTipAllowed: false,
     }
   } else return null
@@ -102,23 +115,20 @@ const getIsAdapterLocation = (
 }
 const getIsAdditionalEquipmentLocation = (
   newLocation: string,
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities,
+  stagingAreaEntities: StagingAreaEntities
 ): boolean => {
-  const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
-    aE => aE.name === 'wasteChute'
-  )
-  const stagingAreaCutoutIds = Object.values(additionalEquipmentEntities)
-    .filter(aE => aE.name === 'stagingArea')
-    ?.map(equipment => {
+  const stagingAreaCutoutIds = Object.values(stagingAreaEntities).map(
+    equipment => {
       return equipment.location ?? ''
-    })
+    }
+  )
   const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
     stagingAreaCutoutIds as CutoutId[]
   )
 
   const isNewLocationInWasteChute =
-    wasteChuteEntity?.name === 'wasteChute' &&
-    wasteChuteEntity?.location === newLocation
+    wasteChuteEntities[0]?.location === newLocation
 
   const isNewLocationInStagingArea =
     stagingAreaCutoutIds != null &&
@@ -132,8 +142,8 @@ const getLabwareLocation = (
   newLocationString: string
 ): LabwareLocation | null => {
   const isWasteChuteLocation =
-    Object.values(state.additionalEquipmentEntities).find(
-      aE => aE.location === newLocationString && aE.name === 'wasteChute'
+    Object.values(state.wasteChuteEntities).find(
+      aE => aE.location === newLocationString
     ) != null
 
   if (newLocationString === 'offDeck') {
@@ -148,7 +158,8 @@ const getLabwareLocation = (
   } else if (
     getIsAdditionalEquipmentLocation(
       newLocationString,
-      state.additionalEquipmentEntities
+      state.wasteChuteEntities,
+      state.stagingAreaEntities
     )
   ) {
     return {

@@ -63,7 +63,10 @@ describe('getIsSafePipetteMovement', () => {
         },
       },
       moduleEntities: {},
-      additionalEquipmentEntities: {},
+      trashBinEntities: {},
+      wasteChuteEntities: {},
+      stagingAreaEntities: {},
+      hasGripperEntity: false,
       liquidEntities: {},
       config: {
         OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
@@ -77,7 +80,12 @@ describe('getIsSafePipetteMovement', () => {
       },
       modules: {},
       tipState: { tipracks: {}, pipettes: {} },
-      liquidState: { pipettes: {}, labware: {}, additionalEquipment: {} },
+      liquidState: {
+        pipettes: {},
+        labware: {},
+        trashBins: {},
+        wasteChute: {},
+      },
     }
   })
 
@@ -96,9 +104,16 @@ describe('getIsSafePipetteMovement', () => {
         pipetteEntities: {},
         moduleEntities: {},
         liquidEntities: {},
-        additionalEquipmentEntities: {
-          trashBin: { name: 'trashBin', location: 'A3', id: 'trashBin' },
+        trashBinEntities: {
+          trashBin: {
+            pythonName: 'trash_bin_1',
+            location: 'A3',
+            id: 'trashBin',
+          },
         },
+        wasteChuteEntities: {},
+        stagingAreaEntities: {},
+        hasGripperEntity: false,
         config: {} as any,
       },
       'mockId',

@@ -6,6 +6,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   OT2_ROBOT_TYPE,
+  WASTE_CHUTE_CUTOUT,
   fixture96Plate,
   fixtureP1000SingleV2Specs,
   fixtureP300MultiV2Specs,
@@ -26,7 +27,6 @@ import {
 } from '../selectors/pythonFile'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  AdditionalEquipmentEntities,
   LabwareEntities,
   LabwareLiquidState,
   LiquidEntities,
@@ -447,6 +447,7 @@ const mockWasteChuteEntities: WasteChuteEntities = {
   [wasteChute]: {
     pythonName: 'waste_chute',
     id: wasteChute,
+    location: WASTE_CHUTE_CUTOUT,
   },
 }
 

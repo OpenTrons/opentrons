@@ -14,10 +14,9 @@ export const blowOutInTrash: CommandCreator<BlowOutInTrashParams> = (
   prevRobotState
 ) => {
   const { pipetteId, trashId, flowRate } = args
-  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
-  const trashEntity = additionalEquipmentEntities[trashId]
+  const { pipetteEntities, trashBinEntities } = invariantContext
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
-  const trashPythonName = trashEntity.pythonName
+  const trashPythonName = trashBinEntities[trashId].pythonName
 
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],

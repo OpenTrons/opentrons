@@ -191,7 +191,10 @@ beforeEach(() => {
     labwareEntities: {},
     moduleEntities: {},
     pipetteEntities: {},
-    additionalEquipmentEntities: {},
+    trashBinEntities: {},
+    wasteChuteEntities: {},
+    stagingAreaEntities: {},
+    hasGripperEntity: false,
     liquidEntities: {},
     config: DEFAULT_CONFIG,
   }

@@ -15,6 +15,8 @@ import type {
   ModuleEntities,
   AdditionalEquipmentEntities,
   AdditionalEquipmentName,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '../types'
 import { uuid } from '.'
 import { GRIPPER_LOCATION } from '../constants'
@@ -118,17 +120,26 @@ export function constructInvariantContextFromRunCommands(
         } else if (addressableAreaName.includes('movableTrash')) {
           location = addressableAreaName.split('movableTrash')[1]
         }
-        const additionalEquipmentEntities: AdditionalEquipmentEntities = {
-          ...acc.additionalEquipmentEntities,
+        const trashBinEntities: TrashBinEntities = {
+          ...acc.trashBinEntities,
           [id]: {
-            name,
+            pythonName: 'trash_bin_1',
+            id,
+            location,
+          },
+        }
+        const wasteChuteEntities: WasteChuteEntities = {
+          ...acc.wasteChuteEntities,
+          [id]: {
+            pythonName: 'waste_chute',
             id,
             location,
           },
         }
         return {
           ...acc,
-          additionalEquipmentEntities,
+          trashBinEntities,
+          wasteChuteEntities,
         }
       }
 
@@ -138,7 +149,10 @@ export function constructInvariantContextFromRunCommands(
       labwareEntities: {},
       moduleEntities: {},
       pipetteEntities: {},
-      additionalEquipmentEntities: {},
+      wasteChuteEntities: {},
+      trashBinEntities: {},
+      stagingAreaEntities: {},
+      hasGripperEntity: false,
       //  this util is used for the timeline scrubber. It grabs liquid info from analysis
       //  so this will not be wired up right now
       liquidEntities: {},

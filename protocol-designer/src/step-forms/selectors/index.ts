@@ -753,6 +753,7 @@ export const getInvariantContext: Selector<
         acc[entity.id] = {
           id: entity.id,
           pythonName: entity.pythonName,
+          location: entity.location,
         }
         return acc
       } else {

@@ -20,17 +20,24 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaAtomicPa
   prevRobotState
 ) => {
   const { pipetteId, fixtureId, offset } = args
-  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    pipetteEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteChannels = pipetteEntity.spec.channels
   const pipettePythonName = pipetteEntity.pythonName
-  const fixtureEntity = additionalEquipmentEntities[fixtureId]
+  const fixtureEntity =
+    trashBinEntities[fixtureId] != null
+      ? trashBinEntities[fixtureId]
+      : wasteChuteEntities[fixtureId]
   const fixturePythonName = fixtureEntity.pythonName
 
   let addressableAreaName: AddressableAreaName = getWasteChuteAddressableAreaNamePip(
     pipetteChannels
   )
-  if (fixtureEntity.name === 'trashBin') {
+  if (trashBinEntities[fixtureId] != null) {
     addressableAreaName = getTrashBinAddressableAreaName(
       fixtureEntity.location as CutoutId
     )

@@ -161,39 +161,26 @@ export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
 }
 
-export interface NormalizedWasteChuteById {
-  [wasteChuteId: string]: {
-    id: string
-    pythonName: string
-  }
+interface TrashEntity {
+  id: string
+  location: string
+  pythonName: string
 }
 
-export type WasteChuteEntity = NormalizedWasteChuteById[keyof NormalizedWasteChuteById]
+export type WasteChuteEntity = TrashEntity
 export interface WasteChuteEntities {
   [wasteChuteId: string]: WasteChuteEntity
 }
 
-export interface NormalizedTrashBinById {
-  [trashBinId: string]: {
-    id: string
-    location: string
-    pythonName: string
-  }
-}
-
-export type TrashBinEntity = NormalizedTrashBinById[keyof NormalizedTrashBinById]
+export type TrashBinEntity = TrashEntity
 export interface TrashBinEntities {
   [trashBinId: string]: TrashBinEntity
 }
 
-export interface NormalizedStagingAreaById {
-  [stagingAreaId: string]: {
-    id: string
-    location: string
-  }
+export type StagingAreaEntity = {
+  id: string
+  location: string
 }
-
-export type StagingAreaEntity = NormalizedStagingAreaById[keyof NormalizedStagingAreaById]
 export interface StagingAreaEntities {
   [stagingAreaId: string]: StagingAreaEntity
 }
@@ -621,9 +608,11 @@ export interface TimelineFrame {
         [well: string]: LocationLiquidState
       }
     }
-    additionalEquipment: {
-      /** for the waste chute and trash bin */
-      [additionalEquipmentId: string]: LocationLiquidState
+    trashBins: {
+      [trashBinId: string]: LocationLiquidState
+    }
+    wasteChute: {
+      [wasteChuteId: string]: LocationLiquidState
     }
   }
 }

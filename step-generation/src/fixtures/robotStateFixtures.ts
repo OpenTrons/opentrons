@@ -34,7 +34,7 @@ import type {
   TEMPERATURE_AT_TARGET,
 } from '../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AdditionalEquipmentEntities } from '../types'
+import type { AdditionalEquipmentEntities, TrashBinEntities } from '../types'
 import type {
   Config,
   InvariantContext,
@@ -137,11 +137,11 @@ export function makeContext(): InvariantContext {
     },
   }
   const moduleEntities: ModuleEntities = {}
-  const additionalEquipmentEntities: AdditionalEquipmentEntities = {
+  const trashBinEntities: TrashBinEntities = {
     [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
-      name: 'trashBin',
       location: 'cutoutA3',
+      pythonName: 'trash_bin_1',
     },
   }
   const pipetteEntities: PipetteEntities = {
@@ -191,7 +191,10 @@ export function makeContext(): InvariantContext {
     labwareEntities,
     moduleEntities,
     pipetteEntities,
-    additionalEquipmentEntities,
+    trashBinEntities,
+    wasteChuteEntities: {},
+    stagingAreaEntities: {},
+    hasGripperEntity: false,
     liquidEntities: {},
     config: DEFAULT_CONFIG,
   }

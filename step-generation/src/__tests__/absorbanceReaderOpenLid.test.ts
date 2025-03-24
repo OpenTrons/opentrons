@@ -31,13 +31,7 @@ describe('absorbanceReaderOpenLid', () => {
       model: ABSORBANCE_READER_V1,
       pythonName: 'mock_absorbance_plate_reader_1',
     }
-    invariantContext.additionalEquipmentEntities = {
-      gripperId: {
-        name: 'gripper',
-        id: 'gripperId',
-        location: GRIPPER_LOCATION,
-      },
-    }
+    invariantContext.hasGripperEntity = true
 
     robotState = getInitialRobotStateStandard(invariantContext)
     robotState.modules[moduleId] = {
@@ -88,7 +82,7 @@ describe('absorbanceReaderOpenLid', () => {
     })
   })
   it('creates returns error if no gripper', () => {
-    invariantContext.additionalEquipmentEntities = {}
+    invariantContext.hasGripperEntity = false
     const result = absorbanceReaderOpenLid(
       {
         moduleId,

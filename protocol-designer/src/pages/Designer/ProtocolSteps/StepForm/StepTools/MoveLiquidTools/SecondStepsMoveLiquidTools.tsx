@@ -27,7 +27,7 @@ import {
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
 import {
-  getAdditionalEquipmentEntities,
+  getInvariantContext,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
@@ -68,29 +68,27 @@ export const SecondStepsMoveLiquidTools = ({
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
   const labwares = useSelector(getLabwareEntities)
-  const additionalEquipmentEntities = useSelector(
-    getAdditionalEquipmentEntities
+  const { trashBinEntities, wasteChuteEntities } = useSelector(
+    getInvariantContext
   )
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
-      ? additionalEquipmentEntities[
-          String(propsForFields.dispense_labware.value)
-        ]?.name === 'wasteChute'
+      ? wasteChuteEntities[String(propsForFields.dispense_labware.value)] !=
+        null
       : false
   const isTrashBinSelected =
     propsForFields.dispense_labware?.value != null
-      ? additionalEquipmentEntities[
-          String(propsForFields.dispense_labware.value)
-        ]?.name === 'trashBin'
+      ? trashBinEntities[String(propsForFields.dispense_labware.value)] != null
       : false
   const destinationLabwareType =
     formData.dispense_labware != null
       ? getTrashOrLabware(
           labwares,
-          additionalEquipmentEntities,
+          trashBinEntities,
+          wasteChuteEntities,
           formData.dispense_labware as string
         )
       : null

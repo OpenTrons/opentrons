@@ -1932,10 +1932,10 @@ it('should return an error for the labware already being discarded in previous s
   const mockWasteChuteId = 'mockWasteChuteId'
   const wasteChuteInvariantContext = {
     ...invariantContext,
-    additionalEquipmentEntities: {
-      ...invariantContext.additionalEquipmentEntities,
+    wasteChuteEntities: {
+      ...invariantContext.wasteChuteEntities,
       mockWasteChuteId: {
-        name: 'wasteChute',
+        pythonName: 'waste_chute',
         id: mockWasteChuteId,
         location: WASTE_CHUTE_CUTOUT,
       },
