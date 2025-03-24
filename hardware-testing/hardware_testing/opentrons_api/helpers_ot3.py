@@ -640,8 +640,8 @@ async def move_tip_motor_relative_ot3(
     current_gear_pos = api._backend.gear_motor_position or 0.0
     target_pos = current_gear_pos + distance
 
-    if speed is not None and distance < 0:
-        speed *= -1
+    #if speed is not None and distance < 0:
+    #    speed *= -1
 
     _move_coro = api._backend.tip_action(current_gear_pos, [(target_pos, speed or 400)])
     if motor_current is None:
@@ -1114,8 +1114,14 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     """Get pipette serial number."""
     model = pipette.model
     volume = model.split("_")[0].replace("p", "")
-    volume = "1K" if volume == "1000" else volume
+    # volume = "1K" if volume == "1000" else volume
+    if volume == "1000":
+        volume = "1K"
+    elif volume == "200":
+        volume = "2H"
     channels = "S" if "single" in model else "M"
+    if "96" in model:
+        channels = "H"
     version = model.split("v")[-1].strip().replace(".", "")
     assert pipette.pipette_id, f"no pipette_id found for pipette: {pipette}"
     if "P" in pipette.pipette_id:
