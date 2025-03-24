@@ -7,6 +7,7 @@
   "__dev_internal__protocolTimeline": "Protocol Timeline",
   "__dev_internal__reactQueryDevtools": "Enable React Query Devtools",
   "__dev_internal__reactScan": "Enable React Scan",
+  "__dev_internal__quickTransferExportPython": "Enable Python Export for Quick Transfer",
   "add_folder_button": "Add labware source folder",
   "add_ip_button": "Add",
   "add_ip_error": "Enter an IP Address or Hostname",
