@@ -1,4 +1,4 @@
-"""DVT Flex Stacker with 2 stackers.
+"""DVT Flex Stacker with 4 or 2 stackers.
 
 This protocol is used to validate stacker store/dispense commands
 
@@ -7,7 +7,6 @@ This protocol is used to validate stacker store/dispense commands
 from opentrons.protocol_api import ParameterContext, ProtocolContext
 from opentrons.protocol_api.module_contexts import (
     FlexStackerContext,
-    # FlexStackerModule,
 )
 from datetime import datetime
 import time
@@ -121,7 +120,7 @@ def run(protocol: ProtocolContext) -> None:
         else:  
             globals()[f'f_stacker_{stacker_num}'].set_stored_labware(
                                                                     load_name=labware_name,
-                                                                    count=6,
+                                                                    count=labware_count,
                                                                     lid=tiprack_lid,
                                                                 )
     
@@ -140,6 +139,7 @@ def run(protocol: ProtocolContext) -> None:
                     labware_list = []
                     protocol.comment(f"Starting cycle: {cycle} for {labware_name}")
                     for lc in range(labware_count):
+                        protocol.comment(f"Starting cycle: {cycle} for {labware_name}")
                         if num_of_stackers == 4:
                             # ---------------------Retrieve labware Stacker A---------------------------------
                             lw = globals()[f'f_stacker_{1}'].retrieve()
@@ -168,37 +168,38 @@ def run(protocol: ProtocolContext) -> None:
                             record_test_data(test_data, cycle, SNs[1], "store", labware_name, lc, log_file, csvfile)
                             labware_list.append(lw)
 
-                    for _ in labware_list:
+                    for stored_lw in range(labware_count):
+                        protocol.comment(f"Starting cycle: {stored_lw} for {labware_name}")
                         if num_of_stackers == 4:
                             # go backwards
                             # ---------------------Store labware Stacker B---------------------------------
                             lw = globals()[f'f_stacker_{2}'].retrieve()
-                            record_test_data(test_data, cycle, SNs[1], "retrieve", labware_name, lc, log_file, csvfile)
+                            record_test_data(test_data, cycle, SNs[1], "retrieve", labware_name, stored_lw, log_file, csvfile)
                             protocol.move_labware(lw, globals()[f'f_stacker_{1}'], use_gripper=True)
                             # ---------------------Retrieve labware Stacker A---------------------------------
                             globals()[f'f_stacker_{1}'].store()
-                            record_test_data(test_data, cycle, SNs[0], "Store", labware_name, lc, log_file, csvfile)
-
+                            record_test_data(test_data, cycle, SNs[0], "Store", labware_name, stored_lw, log_file, csvfile)
                             # go backwards
                             # ---------------------Store labware Stacker D---------------------------------
                             lw = globals()[f'f_stacker_{4}'].retrieve()
-                            record_test_data(test_data, cycle, SNs[3], "retrieve", labware_name, lc, log_file, csvfile)
+                            record_test_data(test_data, cycle, SNs[3], "retrieve", labware_name, stored_lw, log_file, csvfile)
                             protocol.move_labware(lw, globals()[f'f_stacker_{3}'], use_gripper=True)
                             # ---------------------Store labware Stacker C---------------------------------
                             globals()[f'f_stacker_{3}'].store()
-                            record_test_data(test_data, cycle, SNs[2], "store", labware_name, lc, log_file, csvfile)
+                            record_test_data(test_data, cycle, SNs[2], "store", labware_name, stored_lw, log_file, csvfile)
 
                         elif num_of_stackers == 2:
                             # go backwards
                             # ---------------------Store labware Stacker B---------------------------------
                             lw = globals()[f'f_stacker_{2}'].retrieve()
-                            record_test_data(test_data, cycle, SNs[1], "retrieve", labware_name, lc, log_file, csvfile)
+                            record_test_data(test_data, cycle, SNs[1], "retrieve", labware_name, stored_lw, log_file, csvfile)
                             protocol.move_labware(lw, globals()[f'f_stacker_{1}'], use_gripper=True)
                             # ---------------------Retrieve labware Stacker A---------------------------------
-                            record_test_data(test_data, cycle, SNs[0], "store", labware_name, lc, log_file, csvfile)
+                            record_test_data(test_data, cycle, SNs[0], "store", labware_name, stored_lw, log_file, csvfile)
                             globals()[f'f_stacker_{1}'].store()
 
             except Exception as e:
                 test_data['Error'] = e
                 log_file.writerow(test_data)
                 csvfile.flush()
+                raise(e)
