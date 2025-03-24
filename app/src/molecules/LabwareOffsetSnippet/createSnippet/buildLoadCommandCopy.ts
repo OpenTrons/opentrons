@@ -183,8 +183,7 @@ function buildLoadCopy(
   return ''
 }
 
-// Returns the correct labware offset value depending on whether the labware offsets
-//  are OT-2 or Flex-specific data shapes.
+// Returns the correct labware offset value depending on the shape of the location.
 function findRelevantLabwareOffset(
   command: LoadLabwareRunTimeCommand,
   labwareDefUri: string,

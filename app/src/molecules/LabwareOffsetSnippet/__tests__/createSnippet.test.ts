@@ -145,7 +145,7 @@ const analysisCommands = protocolWithMagTempTC.commands.map(c => {
   return c
 })
 
-const juptyerPrefix =
+const jupyterPrefix =
   'import opentrons.execute\nprotocol = opentrons.execute.get_protocol_api("2.18")\n\n'
 const cliPrefix =
   'from opentrons import protocol_api\n\nmetadata = {\n    "apiLevel": "2.18"\n}\n\ndef run(protocol: protocol_api.ProtocolContext):'
@@ -168,7 +168,7 @@ describe('createSnippet', () => {
       robotType: OT2_ROBOT_TYPE,
     })
 
-    expect(resultingSnippet).toContain(juptyerPrefix)
+    expect(resultingSnippet).toContain(jupyterPrefix)
     expect(resultingSnippet).not.toContain(cliPrefix)
 
     expect(resultingSnippet).toContain(
@@ -248,7 +248,7 @@ describe('createSnippet', () => {
     expect(resultingSnippet).toContain(
       'labware_8 = protocol.load_labware("opentrons_96_tiprack_20ul", location="9")'
     )
-    expect(resultingSnippet).not.toContain(juptyerPrefix)
+    expect(resultingSnippet).not.toContain(jupyterPrefix)
     expect(resultingSnippet).toContain(cliPrefix)
     expect(resultingSnippet).toContain(tipRackLoadAndOffset)
     expect(resultingSnippet).toContain(tcPlateLoadAndOffset)
