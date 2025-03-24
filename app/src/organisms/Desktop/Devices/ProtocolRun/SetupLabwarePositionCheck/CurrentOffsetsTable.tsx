@@ -6,6 +6,7 @@ import pick from 'lodash/pick'
 import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   BORDERS,
@@ -22,7 +23,7 @@ import {
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
 import { OffsetVector } from '/app/molecules/OffsetVector'
-import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
@@ -121,7 +122,7 @@ export function CurrentOffsetsTable(
   )
 
   const JupyterSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="jupyter"
       labwareOffsets={currentOffsets.map(o =>
         pick(o, ['definitionUri', 'location', 'vector'])
@@ -129,10 +130,11 @@ export function CurrentOffsetsTable(
       commands={commands ?? []}
       labware={labware ?? []}
       modules={modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const CommandLineSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="cli"
       labwareOffsets={currentOffsets.map(o =>
         pick(o, ['definitionUri', 'location', 'vector'])
@@ -140,6 +142,7 @@ export function CurrentOffsetsTable(
       commands={commands ?? []}
       labware={labware ?? []}
       modules={modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   return (

@@ -19,9 +19,10 @@ import {
   ModalShell,
   getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
@@ -66,21 +67,23 @@ export function LegacyApplyHistoricOffsets(
     getIsLabwareOffsetCodeSnippetsOn
   )
   const JupyterSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="jupyter"
       labwareOffsets={offsetCandidates.map(o =>
         pick(o, ['definitionUri', 'vector', 'location'])
       )}
       {...{ labware, modules, commands }}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const CommandLineSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="cli"
       labwareOffsets={offsetCandidates.map(o =>
         pick(o, ['definitionUri', 'vector', 'location'])
       )}
       {...{ labware, modules, commands }}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const noOffsetData = offsetCandidates.length < 1
