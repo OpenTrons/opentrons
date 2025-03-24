@@ -120,6 +120,6 @@ export const generateRobotStateTimeline = (
     invariantContext,
     initialRobotState
   )
-  console.log('timeline', timeline)
+
   return timeline
 }
