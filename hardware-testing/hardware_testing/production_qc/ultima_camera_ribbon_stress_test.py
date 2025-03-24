@@ -441,15 +441,19 @@ async def _main(args: argparse.Namespace) -> None:
     end_loop = False
     # tasks_to_gather: List[asyncio.Task] = []
     api = await helpers_ot3.build_async_ot3_hardware_api(loop=asyncio.get_event_loop())
-    camera_port = scan_ports()
-    cam = await OmronMircoscanCamera.create(port = camera_port, loop=asyncio.get_event_loop())
+    if args.with_camera:
+        camera_port = scan_ports()
+        cam = await OmronMircoscanCamera.create(port = camera_port, loop=asyncio.get_event_loop())
     try:
         gantry_task = asyncio.create_task(run_gantry_motion(args, api))
-        omron_task = asyncio.create_task(camera_task(cam))
-        # tasks_to_gather.append(gantry_task)
-        # tasks_to_gather.append(omron_task)
-        results = await asyncio.gather(gantry_task, omron_task, return_exceptions=False)
-        print("Gantry Task Result: ", results)
+        if not args.with_camera:
+            await gantry_task
+        else:
+            omron_task = asyncio.create_task(camera_task(cam))
+            # tasks_to_gather.append(gantry_task)
+            # tasks_to_gather.append(omron_task)
+            results = await asyncio.gather(gantry_task, omron_task, return_exceptions=False)
+            print("Gantry Task Result: ", results)
     except Exception as e:
         print("Error: ", e)
         raise("Error: ", e)
@@ -461,6 +465,7 @@ if __name__ == "__main__":
     parser.add_argument("--cycles", type=int, default=1)
     parser.add_argument("--skip_bowtie", action="store_true")
     parser.add_argument("--no_input", action="store_true")
+    parser.add_argument("--with_camera", action="store_true")
 
     args = parser.parse_args()
     asyncio.run(_main(args))
