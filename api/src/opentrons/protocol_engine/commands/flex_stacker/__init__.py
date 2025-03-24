@@ -43,7 +43,7 @@ from .open_latch import (
     OpenLatch,
     OpenLatchCreate,
 )
-  
+
 from .prepare_shuttle import (
     PrepareShuttleCommandType,
     PrepareShuttleParams,
