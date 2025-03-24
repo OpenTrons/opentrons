@@ -169,6 +169,72 @@ export function updatePatchPathField(
   return patch
 }
 
+const fieldKeys = [
+  'airGap_checkbox',
+  'airGap_volume',
+  'delay_checkbox',
+  'delay_mmFromBottom',
+  'delay_seconds',
+  'flowRate',
+  'mix_checkbox',
+  'mix_times',
+  'mix_volume',
+  'mmFromBottom',
+  'position_reference',
+  'retract_delay_seconds',
+  'retract_mmFromBottom',
+  'retract_speed',
+  'retract_x_position',
+  'retract_y_position',
+  'retract_position_reference',
+  'submerge_delay_seconds',
+  'submerge_speed',
+  'submerge_mmFromBottom',
+  'submerge_x_position',
+  'submerge_y_position',
+  'submerge_position_reference',
+  'touchTip_checkbox',
+  'touchTip_mmFromTop',
+  'touchTip_speed',
+  'touchTip_mmFromEdge',
+  'wellOrder_first',
+  'wellOrder_second',
+  'wells_grouped',
+  'x_position',
+  'y_position',
+]
+const updatePatchResetSettings = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  const { id, stepType, ...stepData } = rawForm
+  const appliedPatch = { ...(stepData as FormPatch), ...patch }
+  const { resetSettings } = appliedPatch
+
+  const defaultFields = fieldKeys.map(field => `${resetSettings}_${field}`)
+
+  if (resetSettings === 'aspirate') {
+    return {
+      ...patch,
+      ...getDefaultFields(...defaultFields, 'resetSettings', 'preWetTip'),
+    }
+  } else if (resetSettings === 'dispense') {
+    return {
+      ...patch,
+      ...getDefaultFields(
+        ...defaultFields,
+        'resetSettings',
+        'preWetTip',
+        'blowout_checkbox',
+        'blowout_flowRate',
+        'blowout_location',
+        'blowout_z_offset'
+      ),
+    }
+  }
+  return patch
+}
+
 const updatePatchOnLabwareChange = (
   patch: FormPatch,
   rawForm: FormData,
@@ -730,5 +796,6 @@ export function dependentFieldsUpdateMoveLiquid(
       updatePatchOnTiprackChange(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchResetSettings(chainPatch, rawForm),
   ])
 }

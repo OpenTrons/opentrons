@@ -135,6 +135,7 @@ export function getDefaultsForStepType(
         pickUpTip_wellNames: undefined,
         pipette: null,
         preWetTip: false,
+        resetSettings: null,
         tipRack: null,
         volume: null,
       }

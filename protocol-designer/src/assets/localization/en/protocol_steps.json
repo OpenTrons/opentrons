@@ -86,6 +86,7 @@
   "protocol_timeline": "Protocol timeline",
   "rename": "Rename",
   "rename_error": "Oops! Your step name is too long.",
+  "reset_settings": "Reset {{tab}} settings",
   "retract": "Retract",
   "retract_speed": "Retract speed",
   "save_errors": "{{stepType}} has been saved with {{numErrors}} error(s)",

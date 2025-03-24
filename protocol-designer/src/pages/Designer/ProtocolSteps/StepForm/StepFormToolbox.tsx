@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Btn,
   COLORS,
+  DIRECTION_COLUMN,
   Flex,
   Icon,
   POSITION_RELATIVE,
@@ -13,6 +14,7 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  TertiaryButton,
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -371,28 +373,54 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         <div
           ref={toolsComponentRef}
           id="stepFormTools"
-          style={{ height: '100%' }}
+          style={{
+            height: '100',
+          }}
         >
-          <FormAlerts
-            focusedField={focusedField}
-            dirtyFields={dirtyFields}
-            showFormErrors={showFormErrors}
-            page={toolboxStep}
-          />
-          <ToolsComponent
-            {...{
-              formData,
-              propsForFields,
-              focusHandlers,
-              toolboxStep,
-              visibleFormErrors,
-              showFormErrors,
-              focusedField,
-              setShowFormErrors,
-              tab,
-              setTab,
-            }}
-          />
+          <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
+            <FormAlerts
+              focusedField={focusedField}
+              dirtyFields={dirtyFields}
+              showFormErrors={showFormErrors}
+              page={toolboxStep}
+            />
+            <ToolsComponent
+              {...{
+                formData,
+                propsForFields,
+                focusHandlers,
+                toolboxStep,
+                visibleFormErrors,
+                showFormErrors,
+                focusedField,
+                setShowFormErrors,
+                tab,
+                setTab,
+                handleScrollToTop,
+              }}
+            />
+            {toolboxStep === 2 &&
+            (formData.stepType === 'moveLiquid' ||
+              formData.stepType === 'mix') ? (
+              <Flex
+                
+                paddingBottom={SPACING.spacing40}
+                width="100"
+              >
+                <TertiaryButton
+                  onClick={() => {
+                    propsForFields.resetSettings.updateValue(tab)
+                    handleScrollToTop()
+                  }}
+                  buttonType="white"
+                >
+                  <StyledText desktopStyle="captionSemiBold">
+                    {t(`protocol_steps:reset_settings`, { tab })}
+                  </StyledText>
+                </TertiaryButton>
+              </Flex>
+            ) : null}
+          </Flex>
         </div>
       </Toolbox>
     </>
