@@ -35,7 +35,7 @@ def build_arg_parser():
     arg_parser.add_argument('-l', '--channels', choices=['1CH','8CH'], required=False, help='Sets the pipette number of channels', default='8CH')
     arg_parser.add_argument('-d', '--direction', choices=['front','rear'], required=False, help='Sets the pipette nozzles direction', default='front')
     arg_parser.add_argument('-p', '--pipette', choices=['P50','P1K'], required=False, help='Sets the pipette type', default='P1K')
-    arg_parser.add_argument('-i', '--tip_size', choices=['T50','T200','T1K'], required=False, help='Sets tip size', default='T1K')
+    arg_parser.add_argument('-i', '--tip_size', choices=['T20','T50','T200','T1K'], required=False, help='Sets tip size', default='T1K')
     arg_parser.add_argument('-n', '--tip_num', type=int, required=False, help='Sets the number of tips', default=8)
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=10)
     arg_parser.add_argument('-g', '--gauge_slot', type=str, required=False, help='Sets the gauge slot', default='D2')
@@ -128,6 +128,7 @@ class Eight_Channel_Partial_Pickup_Test:
             "T1K":95.7,
             "T200":58.35,
             "T50":57.9,
+            "T20":52.0,
         }
         if self.channels == "8CH":
             if self.direction == "front":
@@ -170,7 +171,9 @@ class Eight_Channel_Partial_Pickup_Test:
             data.append_data_to_file(test_name=self.test_name, run_id=self.test_date, file_name=self.nozzle_file, data=self.nozzle_header)
 
     async def pipette_setup(self):
-        if self.tip_size == "T50":
+        if self.tip_size == "T20":
+            self.max_volume = 20
+        elif self.tip_size == "T50":
             self.max_volume = 50
         elif self.tip_size == "T200":
             self.max_volume = 200
