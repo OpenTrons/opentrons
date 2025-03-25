@@ -460,7 +460,16 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         report_period_ms: Optional[int] = None,
         histogram_dump: Optional[bool] = None,
     ) -> None:
-        """Set the configuration of the TOF sensor."""
+        """Set the configuration of the TOF sensor.
+
+        :param sensor: The TOF sensor to configure.
+        :param spad_map_id: The pre-defined SPAD map which sets the fov and focus area (14 default).
+        :active_range: The operating mode Short-range high-accuracy (default) or long range.
+        :kilo_iterations: The Measurement iterations times 1024 (4000 default).
+        :report_period_ms: The reporting period before each measurement (500 default).
+        :histogram_dump: Enables/Disables histogram measurements (True default).
+        :return: None
+        """
         command = (
             GCODE.SET_TOF_CONFIGURATION.build_command()
             .add_element(sensor.name)
