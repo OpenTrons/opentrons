@@ -236,8 +236,8 @@ def _pipette_with_liquid_settings(  # noqa: C901
             clear_pipette_ul_per_mm(hw_api, hw_mount)  # type: ignore[arg-type]
         pipette.prepare_to_aspirate()
         pipette.move_to(well.bottom(retract_mm).move(channel_offset))
-        if not hw_api.is_simulator:
-            input("Press ENTER to continue...")
+        # if not hw_api.is_simulator:
+        #     input("Press ENTER to continue...")
         if liquid_class.aspirate.leading_air_gap > 0:
             pipette.aspirate(liquid_class.aspirate.leading_air_gap)
 
