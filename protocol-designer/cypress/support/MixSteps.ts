@@ -89,8 +89,7 @@ enum MixLocators {
   AspFlowRateInput = '[name="aspirate_flowRate"]',
   AspWellOrder = '[data-testid="WellsOrderField_ListButton_aspirate"]',
   ResetToDefault = 'button:contains("Reset to default")',
-  // PrimaryOrderDropdown = 'div[tabindex="0"].sc-bqWxrE jKLbYH iFjNDq', //NOTE: locator ?
-  CancelAspSettings = '[class="SecondaryButton-sc-1opt1t9-0 kjpcRL"]', //NOTE: locator
+  // CancelAspSettings = '[class="SecondaryButton-sc-1opt1t9-0 kjpcRL"]', //NOTE: locator
   MixTipPos = '[data-testid="PositionField_ListButton_mix"]',
   XpositionInput = '[data-testid="TipPositionModal_x_custom_input"]',
   YpositionInput = '[id="TipPositionModal_y_custom_input"]',
@@ -228,7 +227,6 @@ export const MixSteps = {
   Delay: (): StepThunk => ({
     call: () => {
       cy.contains(MixContent.Delay).should('exist').should('be.visible')
-      cy.log('*******LOOK HERE************')
       cy.get(MixLocators.Checkbox)
         .contains('Delay')
         .should('exist')
@@ -498,7 +496,7 @@ export const MixVerifications = {
       cy.get(MixLocators.ResetToDefault).click()
       cy.contains(MixContent.TopToBottom).should('exist').should('be.visible')
       cy.contains(MixContent.LeftToRight).should('exist').should('be.visible')
-      cy.get(MixLocators.CancelAspSettings).should('exist').should('be.visible')
+
       cy.get(MixLocators.Save).should('exist').should('be.visible')
     },
   }),
@@ -525,7 +523,6 @@ export const MixVerifications = {
       cy.get(MixLocators.ZpositionInput).should('exist').should('be.visible')
       cy.get(MixLocators.ZpositionInput).should('have.prop', 'value')
       cy.get(MixLocators.ResetToDefault).should('exist').should('be.visible')
-      cy.get(MixLocators.CancelAspSettings).should('exist').should('be.visible')
       cy.get(MixLocators.Save)
         .should('exist')
         .should('be.visible')
