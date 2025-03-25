@@ -31,7 +31,7 @@ import { useCsvFileQuery } from '@opentrons/react-api-client'
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { useDeckCalibrationData } from './hooks'
-import { LegacyOffsetVector } from '/app/molecules/OffsetVector'
+import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import type { LabwareOffset, RunData } from '@opentrons/api-client'
 
 interface HistoricalProtocolRunDrawerProps {

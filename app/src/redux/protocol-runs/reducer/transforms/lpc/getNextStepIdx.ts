@@ -1,8 +1,6 @@
-import {
-  LPC_STEPS,
-  ProceedStepAction,
-  StepInfo,
-} from '/app/redux/protocol-runs'
+import { LPC_STEPS } from '/app/redux/protocol-runs'
+
+import type { ProceedStepAction, StepInfo } from '/app/redux/protocol-runs'
 
 export function getNextStepIdx(
   action: ProceedStepAction,

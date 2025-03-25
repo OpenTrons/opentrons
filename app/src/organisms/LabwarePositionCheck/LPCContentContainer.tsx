@@ -23,7 +23,6 @@ import {
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
-// TODO(jh, 02-05-25): Move ChildNavigation to molecules.
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {

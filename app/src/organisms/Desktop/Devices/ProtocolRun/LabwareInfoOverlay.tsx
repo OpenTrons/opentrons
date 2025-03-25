@@ -17,7 +17,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LegacyOffsetVector } from '/app/molecules/OffsetVector'
+import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { useLabwareOffsetForLabware } from './useLabwareOffsetForLabware'

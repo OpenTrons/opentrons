@@ -73,7 +73,7 @@ export function useCompatibleAnalysis(
               if (res != null) {
                 const data = res.data
                 // The last analysis is the most recent.
-                setCompatibleAnalysisId(data[data.length - 1].id)
+                setCompatibleAnalysisId(data[data.length - 1].id as string)
               }
             },
           }

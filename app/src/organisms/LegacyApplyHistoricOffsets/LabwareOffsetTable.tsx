@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
 
-import { LegacyOffsetVector } from '/app/molecules/OffsetVector'
+import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { formatTimestamp } from '/app/transformations/runs'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
 
