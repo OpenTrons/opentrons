@@ -34,7 +34,7 @@ Tests = [
     Test(key="200", tiprack_loadname="opentrons_flex_96_tiprack_200ul", volume=276),
     Test(key="200_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", volume=89),
     Test(key="1000", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", volume=175),
-    Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", volume=1100),
+    Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", volume=600),
 ]
 
 
@@ -67,6 +67,7 @@ def run(ctx):
     # Using a 15 mL reservoir as source
     # 1 row, 12 columns
     # https://labware.opentrons.com/#/?loadName=nest_12_reservoir_15ml
+    # max distribute with 8 channel is 14000/8 = 1750
     source = ctx.load_labware("nest_12_reservoir_15ml", "B1", "source")
     WATER_SOURCE_WELL = "A1"
     ETHANOL_SOURCE_WELL = "A2"
@@ -74,9 +75,9 @@ def run(ctx):
     water = ctx.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
     ethanol = ctx.define_liquid(name="Volatile", description="80%% ethanol solution", display_color="#59c0f0")
     glycerol = ctx.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
-    source.wells_by_name()[WATER_SOURCE_WELL].load_liquid(liquid=water, volume=1000)
-    source.wells_by_name()[ETHANOL_SOURCE_WELL].load_liquid(liquid=ethanol, volume=1000)
-    source.wells_by_name()[GLYCEROL_SOURCE_WELL].load_liquid(liquid=glycerol, volume=1000)
+    source.wells_by_name()[WATER_SOURCE_WELL].load_liquid(liquid=water, volume=14000)
+    source.wells_by_name()[ETHANOL_SOURCE_WELL].load_liquid(liquid=ethanol, volume=14000)
+    source.wells_by_name()[GLYCEROL_SOURCE_WELL].load_liquid(liquid=glycerol, volume=14000)
 
     # Target
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep

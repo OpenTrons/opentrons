@@ -68,9 +68,9 @@ def run(ctx):
     water = ctx.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
     ethanol = ctx.define_liquid(name="Volatile", description="80%% ethanol solution", display_color="#59c0f0")
     glycerol = ctx.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
-    source.wells_by_name()[WATER_SOURCE_WELL].load_liquid(liquid=water, volume=1000)
-    source.wells_by_name()[ETHANOL_SOURCE_WELL].load_liquid(liquid=ethanol, volume=1000)
-    source.wells_by_name()[GLYCEROL_SOURCE_WELL].load_liquid(liquid=glycerol, volume=1000)
+    source.wells_by_name()[WATER_SOURCE_WELL].load_liquid(liquid=water, volume=14000)
+    source.wells_by_name()[ETHANOL_SOURCE_WELL].load_liquid(liquid=ethanol, volume=14000)
+    source.wells_by_name()[GLYCEROL_SOURCE_WELL].load_liquid(liquid=glycerol, volume=14000)
 
     # Target
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep

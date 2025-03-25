@@ -3874,7 +3874,7 @@
         "labwareId": "UUID",
         "liquidId": "UUID",
         "volumeByWell": {
-          "A1": 1000.0
+          "A1": 14000.0
         }
       },
       "result": {},
@@ -3892,7 +3892,7 @@
         "labwareId": "UUID",
         "liquidId": "UUID",
         "volumeByWell": {
-          "A2": 1000.0
+          "A2": 14000.0
         }
       },
       "result": {},
@@ -3910,7 +3910,7 @@
         "labwareId": "UUID",
         "liquidId": "UUID",
         "volumeByWell": {
-          "A3": 1000.0
+          "A3": 14000.0
         }
       },
       "result": {},
@@ -5707,6 +5707,68 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
+            "z": 1.9999999999999964
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 256.78,
+          "z": 33.4
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "configureForVolume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f015dc3dbfad4f04d662f8387f0748e2",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID",
+        "tipOverlapNotAfterVersion": "v3",
+        "volume": 138.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "prepareToAspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "7debcb43437ae48be6f25ab475054611",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "2e30984bf56b63a7bd9ac8c2c85c4538",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
             "z": 2.0000000000000036
           },
           "origin": "top",
@@ -5729,7 +5791,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "546b196f77d43474f4e1b17f45804253",
+      "key": "5f6fcb1dc85ce26b1c4ca3e2eebd28b6",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -5762,7 +5824,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cb4874488ffc759224eb1479b02152f9",
+      "key": "0e08e58010cb4720bf5bb20c74e941e3",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -5781,7 +5843,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3bd2db364947c1162e307910b23c0881",
+      "key": "d96248bf56c0216c0002fab72fb5c7a8",
       "notes": [],
       "params": {
         "seconds": 0.75
@@ -5795,7 +5857,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6c28b109c18418d8ed1795750ca53e6c",
+      "key": "ea3252fdd8249584fff3348e4f812551",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -5828,7 +5890,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "bba48e97b81f71b277b009504d45db2e",
+      "key": "17ccfdbc2c6d0adbdb2d93d85abcd92e",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -5847,7 +5909,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9340937721791ffec01b1f111357517f",
+      "key": "02229862f3c9749896d8a9d943eaf86b",
       "notes": [],
       "params": {
         "seconds": 0.75
@@ -5861,7 +5923,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "504fd052c5c26ce97882e62bff976cce",
+      "key": "b9550d3109062d5a4c5329ba10fe36ed",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -5893,7 +5955,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6ab8361986f8dcb27a847d2ac9d029a3",
+      "key": "c2bfc65ef622a13d674ffd1a9b6a1687",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -5913,7 +5975,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4e420a5940229901ebf9990faf2bf4dd",
+      "key": "dde6ffb3957e5f5f59c93e9981fa44ca",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -5946,7 +6008,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "2151f644020e1d6a6562546bd2632d4f",
+      "key": "611b2696dd7e8a89f1531e96a7efe2c4",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -5966,7 +6028,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e0e0bbae40796b2e0ea7462dfc658463",
+      "key": "f7cae142e2dce5b3b58525513e2fd0b6",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -5999,7 +6061,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "88cd46ab081e80052e14e62d30e1401e",
+      "key": "c7fc5c523a9cea5778614000fdf93a5b",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -6013,7 +6075,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "df9c29e0e2bd0dab9fde59949165547e",
+      "key": "b9463ecdd31391cf07039813a6864ab2",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -6032,7 +6094,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cacfa994df832bd76057623c54c50b1c",
+      "key": "a7b070970fc64d832efef0ccae8774f5",
       "notes": [],
       "params": {
         "seconds": 0.75
@@ -6046,7 +6108,89 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "dd9961769c3de2012143283482860302",
+      "key": "60b42bf2d4f68691f672dd00bf1d7bd3",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.9999999999999964
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A1"
+      },
+      "result": {
+        "position": {
+          "x": 14.38,
+          "y": 256.78,
+          "z": 33.4
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispenseInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "0d4593070492781851e5977fdb7f14ef",
+      "notes": [],
+      "params": {
+        "correctionVolume": 0.0,
+        "flowRate": 5.0,
+        "pipetteId": "UUID",
+        "pushOut": 0.0,
+        "volume": 5.0
+      },
+      "result": {
+        "volume": 5.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "configureForVolume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "d4194fee1cb3bcbd373a4bef90b52049",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID",
+        "tipOverlapNotAfterVersion": "v3",
+        "volume": 138.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "prepareToAspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "557226b628a9dcdf8a8aae6ac198d348",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4204783e0017a9743444d934134f4ac3",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -6074,31 +6218,11 @@
       "status": "succeeded"
     },
     {
-      "commandType": "dispenseInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "e3f6f15471930cf29b3b5524ea6eda1a",
-      "notes": [],
-      "params": {
-        "correctionVolume": 0.0,
-        "flowRate": 5.0,
-        "pipetteId": "UUID",
-        "pushOut": 0.0,
-        "volume": 5.0
-      },
-      "result": {
-        "volume": 5.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c09a9303dd24cdd96533bd69376976c5",
+      "key": "cd0916f0142469629adef677faba13bd",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -6131,7 +6255,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "528745f9787ea877bcc82473f6f59afc",
+      "key": "55fb9eec229e8f6c5e0f4e958276ca4c",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -6150,7 +6274,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f23e74563980717a32cd2eb1c4ce28a7",
+      "key": "ac8a9246bda5f70f3c936fb8f49a1f4c",
       "notes": [],
       "params": {
         "seconds": 0.75
@@ -6164,7 +6288,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b47627f998805ff479102c8dab8afa82",
+      "key": "eb45c20220e30687d8ede8fc08e123c3",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -6197,7 +6321,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "65616c3c00befb7c9a058f648a5f1dd9",
+      "key": "eb992587a5d2e86ac59c02b1c2148353",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -6216,7 +6340,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d5ef865cb5741282e5c16fcba121681e",
+      "key": "ed2b550041196bac95a092c9610fdbd7",
       "notes": [],
       "params": {
         "seconds": 0.75
@@ -6230,7 +6354,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "2d2025075478dba4697304909d4f11db",
+      "key": "b2990d33a8a3cd2e7514e075ac197915",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -6262,7 +6386,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "112185839dfafaf5222f2bf9d48424f4",
+      "key": "954037ca20c0c7c5c3bc38f7ad3f9bf5",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -6282,7 +6406,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d3cac92673c381339b5bc9aa02897487",
+      "key": "4a68674f31a4fd7f71a036f79e8f3dba",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -6315,7 +6439,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3c1794fc4a365a237c99e56ba5a0f28c",
+      "key": "4a80d70f7eb47d4d36478f7eb902da08",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -6335,7 +6459,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9fc205234b1e626a4fcfd5e7dac74791",
+      "key": "f478843a0d84a1579d2192834cc456fc",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -6368,7 +6492,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cd8f18546e363a3e04482e5c33728f67",
+      "key": "50ccae2e61487a77fa16e6b8070e91bf",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -6382,7 +6506,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "38ed4b0abc737a33f7c7730352173158",
+      "key": "5d59d0ff4fd5d565f62f302ca9dc9409",
       "notes": [],
       "params": {
         "correctionVolume": 0.0,
@@ -6401,7 +6525,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f28e6ba2ab3657ce181fd41c7355b2d5",
+      "key": "1b78f22a640a0cb4be8824e2e97d714d",
       "notes": [],
       "params": {
         "seconds": 0.75
@@ -6415,7 +6539,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "00e44539c0fd8e276e4073c4ddb7e357",
+      "key": "7726b2f40b3dcd508e0731361a0cd29b",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -6444,7 +6568,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "269a90f0ef8f7ff9032c74643cba0cab",
+      "key": "bcc6af4132139b572fbbcae69fc216d5",
       "notes": [],
       "params": {
         "homeAfter": false,
@@ -6459,7 +6583,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7bf193b849c61088c52102f7c6693308",
+      "key": "d3901b9feb6707e4a8e58c05c6f97807",
       "notes": [],
       "params": {
         "liquidClassRecord": {
@@ -6816,7 +6940,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "fe196511273f6fb86a662c2fdf1d1718",
+      "key": "89c87156ef7bcf878d7c15ab4e425401",
       "notes": [],
       "params": {
         "labwareIds": [
@@ -6840,7 +6964,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5e5740f0301c5b22204d860561036736",
+      "key": "0d4a282787d5d02ec53188369d90af23",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -6873,7 +6997,69 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "912be6922659082e050efdd87839f0d8",
+      "key": "e1ab133e9e91644ed35168624dadbe7c",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.9999999999999964
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 23.38,
+          "y": 256.78,
+          "z": 33.4
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "configureForVolume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "911ca5c039368ff7ef39fb10aa94562a",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID",
+        "tipOverlapNotAfterVersion": "v3",
+        "volume": 138.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "prepareToAspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4dcb1a644faa61e5eb85215f505cee19",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "3b37f2eaec82aa8263f6659cea11880b",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -6905,7 +7091,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "746d5a109c0bb45d9e4fc8935e2efcf5",
+      "key": "d072790664ae966769b4b1b7a41dcb82",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -6938,7 +7124,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3acf7a5300384c14a68339bc6cb8d945",
+      "key": "a3206f482df6d7c673a614f79cf5f7f1",
       "notes": [],
       "params": {
         "seconds": 0.0
@@ -6952,7 +7138,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "31bd6180977e972bdcfdf040ee18ac2a",
+      "key": "7259cbb5738561a80c57d2ed0ff954a1",
       "notes": [],
       "params": {
         "correctionVolume": -5.250666666666667,
@@ -6971,7 +7157,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b5df36c195341e84cdce9d9cd209970f",
+      "key": "f3f09d166e5ebaf2f1eda7a1aa6adc29",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -6985,7 +7171,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "14bd6d522a8993c950c4af58d91a7575",
+      "key": "6e1e9f0bc7f5c71788f58da5f80a8ec9",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7018,7 +7204,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "feb881bf0b4094fc04f7eb07f71834df",
+      "key": "05c06f4e0473869a769c797b668886de",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -7032,7 +7218,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4bf3525436fe8501f00b0a63f696fc41",
+      "key": "adba9e20943c6d2470ea50d7b900fd50",
       "notes": [],
       "params": {
         "correctionVolume": -1.5777777777777777,
@@ -7051,7 +7237,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "663ff76a19a379d75f94bcc18f540cd6",
+      "key": "30ae7926c185de3446d91f5427c439af",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7065,7 +7251,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "053785e543ea2547aca7f958432842e5",
+      "key": "d1b33e1c34fda195d554f92021555659",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -7097,7 +7283,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "41868e0d63ab8a3b590429fe965996bc",
+      "key": "5978593860f51890558873f8013a8060",
       "notes": [],
       "params": {
         "correctionVolume": -1.5777777777777777,
@@ -7117,7 +7303,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b6a477d00af5f47add0e7246c6c673b0",
+      "key": "0b1ab90deeb6ff5f73de77f8b0c5502e",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7131,7 +7317,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "84bc36f91500da9cdf8b1f59aee6229b",
+      "key": "a027fed0f5193a2f100f618fa0bb66b9",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7164,7 +7350,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7b2c1d25d92f018a5cc08926edbcde07",
+      "key": "1db1589d948037f2230be0a905411a01",
       "notes": [],
       "params": {
         "correctionVolume": -5.250666666666667,
@@ -7184,7 +7370,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4302299ddc7de868cd4769b599fae084",
+      "key": "2956c05117ca112ab9bb54edefd53b39",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7198,7 +7384,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "870397db6c395a9197a9a30d984b6c61",
+      "key": "b191ed4010141cf7e696691576999a9d",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7231,7 +7417,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d250329db12499fc871ce2856134b49b",
+      "key": "bc38c15551b248fb5e2b0e90cc3c547f",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -7245,7 +7431,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "96d0c2075171baf047d5b0f457181b1a",
+      "key": "2c1e809e6042054f4912171ef6e1d67e",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -7259,7 +7445,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "014c106a7cdade32c596d686964375d6",
+      "key": "a3b6be046fd3ed26ebb0585f8a2a2eeb",
       "notes": [],
       "params": {
         "correctionVolume": -1.5777777777777777,
@@ -7278,7 +7464,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f1762d2ebdeb314b3f44298dc0289735",
+      "key": "4dededb6653e0bceccd9dcdc64e1d84d",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7292,7 +7478,103 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "28e8f7c2ce9c472ea39c30d3dec57139",
+      "key": "4aeb4b18435cf55d2597038530a3ccf8",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.9999999999999964
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A2"
+      },
+      "result": {
+        "position": {
+          "x": 23.38,
+          "y": 256.78,
+          "z": 33.4
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispenseInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "e9a35bdcd6a25a658a85dfc21bfa738c",
+      "notes": [],
+      "params": {
+        "correctionVolume": -1.5777777777777777,
+        "flowRate": 10.0,
+        "pipetteId": "UUID",
+        "pushOut": 0.0,
+        "volume": 10.0
+      },
+      "result": {
+        "volume": 10.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "fe7b74504906b974ba14a63470ed55e3",
+      "notes": [],
+      "params": {
+        "seconds": 0.2
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "configureForVolume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "58c06160ca1413490b4418d1877cff22",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID",
+        "tipOverlapNotAfterVersion": "v3",
+        "volume": 138.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "prepareToAspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "6984665c7d72b5ae3b9583e66ed21f3e",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "25c1d3608b451b770c954d83ec1c135f",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -7320,45 +7602,11 @@
       "status": "succeeded"
     },
     {
-      "commandType": "dispenseInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "d0f512a98c92d4b118ec741f58ea1e09",
-      "notes": [],
-      "params": {
-        "correctionVolume": -1.5777777777777777,
-        "flowRate": 10.0,
-        "pipetteId": "UUID",
-        "pushOut": 0.0,
-        "volume": 10.0
-      },
-      "result": {
-        "volume": 10.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForDuration",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "662e04ce2a39f149ed54bd02b03c8331",
-      "notes": [],
-      "params": {
-        "seconds": 0.2
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
       "commandType": "moveToWell",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9ef41876d96d5e069decbe535d29b290",
+      "key": "9385f7e69f8ccc7d7b7d18cc1c122d5f",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7391,7 +7639,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1c179104a78f3b37edb3b396a442ec66",
+      "key": "e485f2597103509aaa56eb2cd27d5fb2",
       "notes": [],
       "params": {
         "seconds": 0.0
@@ -7405,7 +7653,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5e531931c312b05d13a4ab8541c9f626",
+      "key": "4178a7df8989138cbf9f960f502e3dd0",
       "notes": [],
       "params": {
         "correctionVolume": -5.250666666666667,
@@ -7424,7 +7672,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "138f4bc8777adaf0851c19d957ec9611",
+      "key": "89e298860650b3d970c6922de9195b99",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7438,7 +7686,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f44ac421a1e004606052bcc062944198",
+      "key": "c2c90df28df3a35c41cc6cfab54cf4c2",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7471,7 +7719,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "8d87f98073688c105b8a1458fc8e2e1e",
+      "key": "e321adf0f97830cca77f3b5e3ab81492",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -7485,7 +7733,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9f922db7dfe4a581522307efff9f9bf1",
+      "key": "a2afe0cf986103ffca0f0d44bd7e87c1",
       "notes": [],
       "params": {
         "correctionVolume": -1.5777777777777777,
@@ -7504,7 +7752,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "eeb729bf9eaa3f99bbcbfbfd9a2b6276",
+      "key": "418bb67cdb36a4709e64a8c2c9e5e27e",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7518,7 +7766,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c67e1514046ed2c03eaa199e6bd18fe1",
+      "key": "2735b1efd7b8ebf211224ae435dab362",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -7550,7 +7798,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d0492af03c2cefd87789083e74640eb3",
+      "key": "85959e16591936727a53d7f4e343ed22",
       "notes": [],
       "params": {
         "correctionVolume": -1.5777777777777777,
@@ -7570,7 +7818,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "8c3807b01fdad104cb4682435e104044",
+      "key": "fbd9cab5c0907d903fc07b6a0fc519df",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7584,7 +7832,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f92df790d2318e7ba86fa35e22c2aa72",
+      "key": "6333af00876f7e8a9e1e4c431ff02229",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7617,7 +7865,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "cacabe1a02554ee98e1a9f0e5f01fc46",
+      "key": "609aedcf59fb9a5e4dd8d260c4df60fc",
       "notes": [],
       "params": {
         "correctionVolume": -5.250666666666667,
@@ -7637,7 +7885,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "df8da7877fcd7f7cdf8605a5ac0205c3",
+      "key": "a283c302d44646e907e0ccf06b3ac935",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7651,7 +7899,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "6160e5a0a44c3bfa8cf3337293491dbd",
+      "key": "b0b313714de00876bb831708e139f6b7",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -7684,7 +7932,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "8f19000676d5e184789e615ae797ac71",
+      "key": "8cc5927ddf3292f939ca27d3928bd68c",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -7698,7 +7946,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "98adf6749807b96f939ca65313e7392b",
+      "key": "58c60ab1492bd3276c192a63ca252596",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -7712,7 +7960,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "93530193e001add062c434eed88f6a4a",
+      "key": "008ce3680155fe1a267f6a4a2c8d0e89",
       "notes": [],
       "params": {
         "correctionVolume": -1.5777777777777777,
@@ -7731,7 +7979,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d9da41642f4e2d8a34f32fc17da7c9e3",
+      "key": "53cbc9e2874e381f854720833ace1d8d",
       "notes": [],
       "params": {
         "seconds": 0.2
@@ -7745,7 +7993,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1ba95fd95ab530e5e688dd9a37e89c08",
+      "key": "76b6de79dc61f905db85330aeb998174",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -7774,7 +8022,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "9d73ae30e0fd7e1a30f1f2d0713c22f6",
+      "key": "0f87aeca2ce013f461a5c5d9f9dbd970",
       "notes": [],
       "params": {
         "homeAfter": false,
@@ -7789,7 +8037,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c5d62c7ad1bb3f92253c5222eb6eb3b4",
+      "key": "5fc4a30cc50c45c529b3c862eccfd711",
       "notes": [],
       "params": {
         "liquidClassRecord": {
@@ -8114,7 +8362,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7de5b90cab90db3b4236db9d2275d965",
+      "key": "8f637100d2d5a87dd3da2e21d4386021",
       "notes": [],
       "params": {
         "labwareIds": [
@@ -8138,7 +8386,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "790c2a69a3134dbe0d9b36a180a2e1a2",
+      "key": "2b58c4e4d6b4497838653bf752f8a2fb",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -8171,7 +8419,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "8ac5538aca64e31e6d0725156bf0cdcb",
+      "key": "916cf3a35ff020964f4043e73eaaf31f",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -8181,7 +8429,7 @@
           "offset": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.0000000000000036
+            "z": 1.9999999999999964
           },
           "origin": "top",
           "volumeOffset": 0.0
@@ -8192,240 +8440,25 @@
         "position": {
           "x": 32.38,
           "y": 256.78,
-          "z": 33.400000000000006
+          "z": 33.4
         }
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
     {
-      "commandType": "moveToWell",
+      "commandType": "configureForVolume",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "4ef79904de9c2497efd3fa8722198795",
+      "key": "183c206247aa3820e7e01d94f3afeb43",
       "notes": [],
       "params": {
-        "forceDirect": true,
-        "labwareId": "UUID",
         "pipetteId": "UUID",
-        "speed": 4.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -24.85
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A3"
-      },
-      "result": {
-        "position": {
-          "x": 32.38,
-          "y": 256.78,
-          "z": 6.55
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "aspirateInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "21fbb4e55160491f477c860df4f9553f",
-      "notes": [],
-      "params": {
-        "correctionVolume": -0.5933333333333333,
-        "flowRate": 138.0,
-        "pipetteId": "UUID",
+        "tipOverlapNotAfterVersion": "v3",
         "volume": 138.0
-      },
-      "result": {
-        "volume": 138.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForDuration",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "a9cdb4f259572243f88815564836beb1",
-      "notes": [],
-      "params": {
-        "seconds": 1.0
       },
       "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToWell",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "b3da87793aaded28257a5e0c5ff70a7a",
-      "notes": [],
-      "params": {
-        "forceDirect": true,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "speed": 4.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 2.0000000000000036
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A3"
-      },
-      "result": {
-        "position": {
-          "x": 32.38,
-          "y": 256.78,
-          "z": 33.400000000000006
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToWell",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "27657f0803445ab5f461bd180bf5fc1e",
-      "notes": [],
-      "params": {
-        "forceDirect": false,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 2.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A3"
-      },
-      "result": {
-        "position": {
-          "x": 196.3,
-          "y": 74.15,
-          "z": 43.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToWell",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "638556954efdb573e3882f3198e335e2",
-      "notes": [],
-      "params": {
-        "forceDirect": true,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "speed": 4.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 2.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A3"
-      },
-      "result": {
-        "position": {
-          "x": 196.3,
-          "y": 74.15,
-          "z": 43.0
-        }
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "dispenseInPlace",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "050131abac2b9815e9e449a454f90d75",
-      "notes": [],
-      "params": {
-        "correctionVolume": -0.5933333333333333,
-        "flowRate": 50.0,
-        "pipetteId": "UUID",
-        "pushOut": 20.0,
-        "volume": 138.0
-      },
-      "result": {
-        "volume": 138.0
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "waitForDuration",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "b52e71b1a07f57b2d41c463562c232ac",
-      "notes": [],
-      "params": {
-        "seconds": 0.5
-      },
-      "result": {},
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
-      "commandType": "moveToWell",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "ce311c1f87a9f1df07a475b3f3605520",
-      "notes": [],
-      "params": {
-        "forceDirect": true,
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "speed": 4.0,
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 2.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A3"
-      },
-      "result": {
-        "position": {
-          "x": 196.3,
-          "y": 74.15,
-          "z": 43.0
-        }
-      },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
@@ -8434,7 +8467,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "12956d071e535b663276da32760eb8a8",
+      "key": "407e81fa8244d70e6008164c84aaba9a",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -8448,7 +8481,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a02f510fcc2a197038376d0c17aa20af",
+      "key": "a3b7d033dfd021980a8e0be502c8f5c5",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -8480,7 +8513,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "20096ab66712b5adf641e8907f15936b",
+      "key": "b6bb46395ddd2aabebd9ca1603307fd4",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -8513,7 +8546,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "be559a6e7e3fb9931d62aed0d5e78e70",
+      "key": "924168056b7b4f22f0b7aeba4e6d88a7",
       "notes": [],
       "params": {
         "correctionVolume": -0.5933333333333333,
@@ -8532,7 +8565,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "35abf4e235cec6e2f79dfee212a9f83b",
+      "key": "f7c2df0ff5b89412ec19acd20928ce0b",
       "notes": [],
       "params": {
         "seconds": 1.0
@@ -8546,7 +8579,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7c36313b8d5530f85b89687fd9801ee6",
+      "key": "c2aa9e69313fec97fef1758c30911309",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -8579,7 +8612,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "a8146e42f03cd945d79cbf9e9aea2e12",
+      "key": "97b635ff0cdc34722066ce9e92a8cd6c",
       "notes": [],
       "params": {
         "forceDirect": false,
@@ -8611,7 +8644,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c10e2a708a51a3ad26b91cf51f00da2a",
+      "key": "43c752b357220c9857eed3ae7fad3a0f",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -8644,7 +8677,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "82d011a4e296aa9c7b8021281e0f6b36",
+      "key": "a7864d516210d51ae07fae8a0792bc35",
       "notes": [],
       "params": {
         "correctionVolume": -0.5933333333333333,
@@ -8664,7 +8697,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b92f75870b21cde4cd4e0f9b460b7ea0",
+      "key": "96ba190b95b5bc3ceeeabcd420e6f122",
       "notes": [],
       "params": {
         "seconds": 0.5
@@ -8678,7 +8711,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3f58887686243fa3fcbf632456d8bd64",
+      "key": "76cbf3528ffe74996be794cb113a7283",
       "notes": [],
       "params": {
         "forceDirect": true,
@@ -8711,7 +8744,346 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c9928fa29f6cc2c23afe042ad79d2275",
+      "key": "b6795adfb5c7f57f31423a24e0caa65a",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "c3ffbd8c8e0997056a3fccb66bb5877f",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.9999999999999964
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 32.38,
+          "y": 256.78,
+          "z": 33.4
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "configureForVolume",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "211cf14e78063795981784e16c0e0aa1",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID",
+        "tipOverlapNotAfterVersion": "v3",
+        "volume": 138.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "prepareToAspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "ac39b076bb70978e84fc0fda1d9a6908",
+      "notes": [],
+      "params": {
+        "pipetteId": "UUID"
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f0a7d99c4a7a0182e285bbebae24a0be",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 2.0000000000000036
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 32.38,
+          "y": 256.78,
+          "z": 33.400000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f0854f6b8802f9d0f0c333a06defd08e",
+      "notes": [],
+      "params": {
+        "forceDirect": true,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "speed": 4.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -24.85
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 32.38,
+          "y": 256.78,
+          "z": 6.55
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "aspirateInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "065dbd3e4e529333e0925bb182f3aaa4",
+      "notes": [],
+      "params": {
+        "correctionVolume": -0.5933333333333333,
+        "flowRate": 138.0,
+        "pipetteId": "UUID",
+        "volume": 138.0
+      },
+      "result": {
+        "volume": 138.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "771ef3bb33fed5adace1f6f092aa08ac",
+      "notes": [],
+      "params": {
+        "seconds": 1.0
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "74a19d46bbe836edcd6b90a721224a9f",
+      "notes": [],
+      "params": {
+        "forceDirect": true,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "speed": 4.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 2.0000000000000036
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 32.38,
+          "y": 256.78,
+          "z": 33.400000000000006
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "5a5d3ce33f181b7393761619caa6f6dc",
+      "notes": [],
+      "params": {
+        "forceDirect": false,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 2.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 196.3,
+          "y": 74.15,
+          "z": 43.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "f2025eae204ccead45a3e6d3990ad4cf",
+      "notes": [],
+      "params": {
+        "forceDirect": true,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "speed": 4.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 2.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 196.3,
+          "y": 74.15,
+          "z": 43.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "dispenseInPlace",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "b161b412e94a397af14562131d853c6c",
+      "notes": [],
+      "params": {
+        "correctionVolume": -0.5933333333333333,
+        "flowRate": 50.0,
+        "pipetteId": "UUID",
+        "pushOut": 20.0,
+        "volume": 138.0
+      },
+      "result": {
+        "volume": 138.0
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "waitForDuration",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "90ffef6073c2118a2391df222716f1e4",
+      "notes": [],
+      "params": {
+        "seconds": 0.5
+      },
+      "result": {},
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "moveToWell",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "4dc02f32dfc827c4728d92c9f1dd3152",
+      "notes": [],
+      "params": {
+        "forceDirect": true,
+        "labwareId": "UUID",
+        "pipetteId": "UUID",
+        "speed": 4.0,
+        "wellLocation": {
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 2.0
+          },
+          "origin": "top",
+          "volumeOffset": 0.0
+        },
+        "wellName": "A3"
+      },
+      "result": {
+        "position": {
+          "x": 196.3,
+          "y": 74.15,
+          "z": 43.0
+        }
+      },
+      "startedAt": "TIMESTAMP",
+      "status": "succeeded"
+    },
+    {
+      "commandType": "prepareToAspirate",
+      "completedAt": "TIMESTAMP",
+      "createdAt": "TIMESTAMP",
+      "id": "UUID",
+      "key": "088e8dec0cfbbeeaf5a4e7ceeca4ea4a",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -8725,7 +9097,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b38d569c0ba6e9d6be1dd83a6157bdc6",
+      "key": "8b3305feeaee1949711f2277d90267f5",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -8754,7 +9126,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5012de9a543344aa376a7bb96e322304",
+      "key": "30927163c48729171d691420d657df5b",
       "notes": [],
       "params": {
         "homeAfter": false,

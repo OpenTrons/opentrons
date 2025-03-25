@@ -47,11 +47,11 @@ def run(ctx):
 
     # Load liquids into source wells
     for well in WATER_SOURCE_WELLS + [WATER_SOURCE_WELL]:
-        source.wells_by_name()[well].load_liquid(liquid=water, volume=1500)
+        source.wells_by_name()[well].load_liquid(liquid=water, volume=14000)
     for well in ETHANOL_SOURCE_WELLS + [ETHANOL_SOURCE_WELL]:
-        source.wells_by_name()[well].load_liquid(liquid=ethanol, volume=1500)
+        source.wells_by_name()[well].load_liquid(liquid=ethanol, volume=14000)
     for well in GLYCEROL_SOURCE_WELLS + [GLYCEROL_SOURCE_WELL]:
-        source.wells_by_name()[well].load_liquid(liquid=glycerol, volume=1500)
+        source.wells_by_name()[well].load_liquid(liquid=glycerol, volume=14000)
 
     # Target
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep

@@ -22,11 +22,11 @@ class Test:
 
 Tests = [
     Test(key="50", tiprack_loadname="opentrons_flex_96_tiprack_50ul", volume=101),
-    Test(key="50_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", volume=101),
-    Test(key="200", tiprack_loadname="opentrons_flex_96_tiprack_200ul", volume=401),
-    Test(key="200_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", volume=601),
-    Test(key="1000", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", volume=2003),
-    Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", volume=2003),
+    Test(key="50_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", volume=40),
+    Test(key="200", tiprack_loadname="opentrons_flex_96_tiprack_200ul", volume=160),
+    Test(key="200_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", volume=404),
+    Test(key="1000", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", volume=1200),
+    Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", volume=777),
 ]
 
 
@@ -164,17 +164,19 @@ def run(ctx: protocol_api.ProtocolContext):
 
     # Liquids to transfer
     # https://labware.opentrons.com/#/?loadName=nest_1_reservoir_290ml
+    # each well has 290mL capacity - 290000μl capacity
     water_source_1 = ctx.load_labware("nest_1_reservoir_290ml", "B1", "water")
     water_source_2 = ctx.load_labware("nest_1_reservoir_290ml", "C1", "water")
     water_source_3 = ctx.load_labware("nest_1_reservoir_290ml", "D1", "water")
     SOURCE_WELL = "A1"  # These are single well reservoirs
     water = ctx.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
-    water_source_1.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=1000)
-    water_source_2.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=1000)
-    water_source_3.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=1000)
+    water_source_1.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=280000)
+    water_source_2.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=280000)
+    water_source_3.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=280000)
 
     # Target
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep
+    # each well has 2mL capacity - 2000μl capacity
     target = ctx.load_labware("nest_96_wellplate_2ml_deep", "D2")
     TARGET_WELL = "A1"  # Target A1 with 96 channel
 
@@ -182,14 +184,20 @@ def run(ctx: protocol_api.ProtocolContext):
     new_tip = "once"
     # new_tip = "always"
 
+    source = [
+        water_source_1.wells_by_name()[SOURCE_WELL],
+        water_source_2.wells_by_name()[SOURCE_WELL],
+        water_source_3.wells_by_name()[SOURCE_WELL],
+    ]
+
+    if "1000" in test.key:
+        # slice source to only the first 2 elements
+        source = source[:2]
+
     pipette_96.consolidate_liquid(
         liquid_class=water_class,
         volume=volume,
-        source=[
-            water_source_1.wells_by_name()[SOURCE_WELL],
-            water_source_2.wells_by_name()[SOURCE_WELL],
-            water_source_3.wells_by_name()[SOURCE_WELL],
-        ],
+        source=source,
         dest=target.wells_by_name()[TARGET_WELL],
         new_tip=new_tip,
         trash_location=waste_chute,
@@ -225,18 +233,24 @@ def run(ctx: protocol_api.ProtocolContext):
     ethanol_source_3 = ctx.load_labware("nest_1_reservoir_290ml", "D1", "ethanol")
     target = ctx.load_labware("nest_96_wellplate_2ml_deep", "D2")
     ethanol = ctx.define_liquid(name="Volatile", description="80%% ethanol solution", display_color="#59c0f0")
-    ethanol_source_1.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=1000)
-    ethanol_source_2.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=1000)
-    ethanol_source_3.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=1000)
+    ethanol_source_1.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=280000)
+    ethanol_source_2.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=280000)
+    ethanol_source_3.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=280000)
+
+    source = [
+        ethanol_source_1.wells_by_name()[SOURCE_WELL],
+        ethanol_source_2.wells_by_name()[SOURCE_WELL],
+        ethanol_source_3.wells_by_name()[SOURCE_WELL],
+    ]
+
+    if "1000" in test.key:
+        # slice source to only the first 2 elements
+        source = source[:2]
 
     pipette_96.consolidate_liquid(
         liquid_class=ethanol_class,
         volume=volume,
-        source=[
-            ethanol_source_1.wells_by_name()[SOURCE_WELL],
-            ethanol_source_2.wells_by_name()[SOURCE_WELL],
-            ethanol_source_3.wells_by_name()[SOURCE_WELL],
-        ],
+        source=source,
         dest=target.wells_by_name()[TARGET_WELL],
         new_tip=new_tip,
         trash_location=waste_chute,
@@ -255,9 +269,9 @@ def run(ctx: protocol_api.ProtocolContext):
     target = ctx.load_labware("nest_96_wellplate_2ml_deep", "D2")
     # These 4 need manual intervention
     glycerol = ctx.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
-    glycerol_source_1.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=1000)
-    glycerol_source_2.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=1000)
-    glycerol_source_3.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=1000)
+    glycerol_source_1.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=280000)
+    glycerol_source_2.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=280000)
+    glycerol_source_3.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=280000)
 
     # trash any tipracks that are missing tips
     for adapter in tiprack_adapters:
@@ -277,14 +291,20 @@ def run(ctx: protocol_api.ProtocolContext):
     fresh_tipracks = [adapter.child for adapter in tiprack_adapters]
     pipette_96.tip_racks = fresh_tipracks
 
+    source = [
+        glycerol_source_1.wells_by_name()[SOURCE_WELL],
+        glycerol_source_2.wells_by_name()[SOURCE_WELL],
+        glycerol_source_3.wells_by_name()[SOURCE_WELL],
+    ]
+
+    if "1000" in test.key:
+        # slice source to only the first 2 elements
+        source = source[:2]
+
     pipette_96.consolidate_liquid(
         liquid_class=glycerol_class,
         volume=volume,
-        source=[
-            glycerol_source_1.wells_by_name()[SOURCE_WELL],
-            glycerol_source_2.wells_by_name()[SOURCE_WELL],
-            glycerol_source_3.wells_by_name()[SOURCE_WELL],
-        ],
+        source=source,
         dest=target.wells_by_name()[TARGET_WELL],
         new_tip=new_tip,
         trash_location=waste_chute,

@@ -23,8 +23,9 @@ Tests = [
     Test(key="50_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", transfer_volume=101),
     Test(key="200", tiprack_loadname="opentrons_flex_96_tiprack_200ul", transfer_volume=401),
     Test(key="200_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", transfer_volume=601),
-    Test(key="1000", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", transfer_volume=2003),
-    Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", transfer_volume=2003),
+    # cannot go over 1000 because the destination may only hold 2000
+    Test(key="1000", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", transfer_volume=900),
+    Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", transfer_volume=444),
 ]
 
 
@@ -96,9 +97,9 @@ def run(protocol_context):
     water = protocol_context.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
     ethanol = protocol_context.define_liquid(name="Volatile", description="80%% ethanol solution", display_color="#59c0f0")
     glycerol = protocol_context.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
-    water_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=1000)
-    ethanol_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=1000)
-    glycerol_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=1000)
+    water_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=190000)
+    ethanol_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=280000)
+    glycerol_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=280000)
 
     # Target
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep

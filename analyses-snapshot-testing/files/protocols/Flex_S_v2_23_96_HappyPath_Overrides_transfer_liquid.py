@@ -18,6 +18,8 @@ class Test:
     transfer_volume: float
 
 
+# max volume
+#
 Tests = [
     Test(key="50", tiprack_loadname="opentrons_flex_96_tiprack_50ul", transfer_volume=22),
     Test(key="50_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", transfer_volume=22),
@@ -70,9 +72,9 @@ def run(protocol_context):
     water = protocol_context.define_liquid(name="Aqueous", description="H₂O", display_color="#738ee6")
     ethanol = protocol_context.define_liquid(name="Volatile", description="80%% ethanol solution", display_color="#59c0f0")
     glycerol = protocol_context.define_liquid(name="Viscous", description="50%% glycerol solution", display_color="#D4D4D4")
-    water_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=1000)
-    ethanol_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=1000)
-    glycerol_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=1000)
+    water_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=water, volume=190000)
+    ethanol_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=ethanol, volume=280000)
+    glycerol_source.wells_by_name()[SOURCE_WELL].load_liquid(liquid=glycerol, volume=280000)
 
     # Target
     # https://labware.opentrons.com/#/?loadName=nest_96_wellplate_2ml_deep

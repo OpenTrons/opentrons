@@ -125,6 +125,7 @@ class ProtocolsWithOverrides:
     )
 
     # Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid.py
+    # https://opentrons.atlassian.net/browse/AUTH-1619
     Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
         file_stem="Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid",
         file_extension="py",
@@ -136,7 +137,7 @@ class ProtocolsWithOverrides:
             "200",
             "200_filter",
             "1000",
-            "1000_filter",
+            # "1000_filter",
         ],
     )
 
