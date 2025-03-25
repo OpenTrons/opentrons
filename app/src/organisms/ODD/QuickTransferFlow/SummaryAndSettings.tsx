@@ -17,7 +17,6 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   ANALYTICS_QUICK_TRANSFER_TIME_TO_CREATE,
@@ -120,6 +119,7 @@ export function SummaryAndSettings(
 
   const handleClickRun = (): void => {
     const protocolFile = createQuickTransferFile(state, deckConfig)
+
     createProtocolAsync({
       files: [protocolFile],
       protocolKind: 'quick-transfer',

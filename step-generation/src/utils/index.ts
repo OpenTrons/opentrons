@@ -27,4 +27,5 @@ export * from './safePipetteMovements'
 export * from './createTimelineFromRunCommands'
 export * from './constructInvariantContextFromRunCommands'
 export * from './pythonFormat'
+export * from './generatePythonFileUtils'
 export const uuid: () => string = uuidv4
