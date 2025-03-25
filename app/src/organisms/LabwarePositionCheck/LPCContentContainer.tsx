@@ -23,7 +23,6 @@ import {
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
-// TODO(jh, 02-05-25): Move ChildNavigation to molecules.
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
@@ -181,7 +180,6 @@ function DesktopFooterContent({
   )
 }
 
-// TODO(jh, 03-11-25): Update the link/styling after Product/Design provide input.
 function NeedHelpLink(): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 

@@ -21,8 +21,8 @@ import {
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
-import { OffsetVector } from '/app/molecules/OffsetVector'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
+import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -57,14 +57,14 @@ const OffsetTableDatum = styled('td')`
   text-overflow: wrap;
 `
 
-interface CurrentOffsetsTableProps {
+interface LegacyCurrentOffsetsTableProps {
   currentOffsets: LabwareOffset[]
   commands: RunTimeCommand[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
 }
-export function CurrentOffsetsTable(
-  props: CurrentOffsetsTableProps
+export function LegacyCurrentOffsetsTable(
+  props: LegacyCurrentOffsetsTableProps
 ): JSX.Element {
   const { currentOffsets, commands, labware, modules } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
@@ -112,7 +112,7 @@ export function CurrentOffsetsTable(
                     ${BORDERS.borderRadius8} 0;
                 `}
               >
-                <OffsetVector {...offset.vector} />
+                <LegacyOffsetVector {...offset.vector} />
               </OffsetTableDatum>
             </OffsetTableRow>
           )
@@ -154,7 +154,7 @@ export function CurrentOffsetsTable(
         {i18n.format(t('applied_offset_data'), 'upperCase')}
       </LegacyStyledText>
       {isLabwareOffsetCodeSnippetsOn ? (
-        <LabwareOffsetTabs
+        <LegacyLabwareOffsetTabs
           TableComponent={TableComponent}
           JupyterComponent={JupyterSnippet}
           CommandLineComponent={CommandLineSnippet}

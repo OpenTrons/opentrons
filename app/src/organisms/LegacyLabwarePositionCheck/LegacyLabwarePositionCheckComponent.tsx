@@ -48,7 +48,7 @@ import type { RegisterPositionAction, WorkingOffset } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
-interface LabwarePositionCheckModalProps {
+interface LegacyLabwarePositionCheckModalProps {
   runId: string
   maintenanceRunId: string
   robotType: RobotType
@@ -61,8 +61,8 @@ interface LabwarePositionCheckModalProps {
   caughtError?: Error
 }
 
-export const LabwarePositionCheckComponent = (
-  props: LabwarePositionCheckModalProps
+export const LegacyLabwarePositionCheckComponent = (
+  props: LegacyLabwarePositionCheckModalProps
 ): JSX.Element | null => {
   const {
     mostRecentAnalysis,

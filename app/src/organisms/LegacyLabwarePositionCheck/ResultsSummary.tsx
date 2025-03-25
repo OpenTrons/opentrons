@@ -39,7 +39,7 @@ import {
   getIsOnDevice,
 } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
-import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
@@ -163,7 +163,7 @@ export const ResultsSummary = (
       <ScrollContainer flexDirection={DIRECTION_COLUMN} maxHeight="20rem">
         <Header>{t('new_labware_offset_data')}</Header>
         {isLabwareOffsetCodeSnippetsOn ? (
-          <LabwareOffsetTabs
+          <LegacyLabwareOffsetTabs
             TableComponent={TableComponent}
             JupyterComponent={JupyterSnippet}
             CommandLineComponent={CommandLineSnippet}

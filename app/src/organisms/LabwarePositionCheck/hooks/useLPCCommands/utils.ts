@@ -1,10 +1,6 @@
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import { splitLabwareDefURI } from '@opentrons/shared-data'
 
-interface URIDetails {
-  loadName: string
-  namespace: string
-  version: number
-}
+import type { RunTimeCommand } from '@opentrons/shared-data'
 
 export interface StackerLwDetails {
   labwareId: string
@@ -21,7 +17,7 @@ export function mapFlexStackerLabware(
     if (command.commandType === 'flexStacker/retrieve' && command.result) {
       // Primary labware case.
       if (command.result.labwareId) {
-        const { version, namespace, loadName } = splitLabwareDefUri(
+        const { version, namespace, loadName } = splitLabwareDefURI(
           command.result.primaryLabwareURI
         )
 
@@ -35,7 +31,7 @@ export function mapFlexStackerLabware(
 
       // Adapter labware case (if present).
       if (command.result.adapterId) {
-        const { version, namespace, loadName } = splitLabwareDefUri(
+        const { version, namespace, loadName } = splitLabwareDefURI(
           command.result.adapterLabwareURI
         )
 
@@ -49,25 +45,4 @@ export function mapFlexStackerLabware(
     }
     return acc
   }, [])
-}
-
-// TODO(jh, 03-14-25): This util should live in shared-data with getLabwareDefURI.
-
-function splitLabwareDefUri(uri: string): URIDetails {
-  const parts = uri.split('/')
-
-  if (parts.length !== 3) {
-    console.error(
-      `Error: Invalid URI format. Expected 3 parts, got ${parts.length}`
-    )
-    return { loadName: '', namespace: '', version: -1 }
-  } else {
-    const [namespace, loadName, versionStr] = parts
-
-    return {
-      namespace,
-      loadName,
-      version: Number(versionStr),
-    }
-  }
 }
