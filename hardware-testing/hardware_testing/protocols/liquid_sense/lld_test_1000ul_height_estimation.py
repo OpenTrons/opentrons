@@ -6,6 +6,7 @@ from os import listdir
 from os.path import isdir
 from typing import Optional, Tuple, List, Any, Dict
 
+from opentrons.types import Point
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
@@ -13,6 +14,12 @@ from opentrons.protocol_api import (
     InstrumentContext,
     Well,
     Liquid,
+)
+from opentrons.hardware_control.types import OT3Mount
+from opentrons.hardware_control.ot3_calibration import SLOT_CENTER
+from opentrons_shared_data.deck import (
+    Z_PREP_OFFSET,
+    get_calibration_square_position_in_slot,
 )
 from opentrons_shared_data.load import get_shared_data_root
 
@@ -22,19 +29,26 @@ requirements = {"robotType": "Flex", "apiLevel": "2.22"}
 SHAKER_RPM = 1100  # TODO: (sigler) double-check this again production script
 SHAKER_SECONDS = 30
 
+# hardcoded distances for when pressure-probing the calibration square
+PROBE_START_HEIGHT_ABOVE_EXPECTED_MM = 10.0
+PROBE_OVERSHOOT_BELOW_EXPECTED_MM = 5.0
+EXPECTED_PROBE_Z_POSITION_MM = 0.0  # NOTE: the calibration square in slot C2
+
+CALIBRATION_SLOT = SLOT_CENTER  # NOTE: also "B2"
+
 SLOTS = {
     "trash": "A3",
     "tips_1": "A1",
     "tips_2": "A2",
     "tips_3": "B1",
-    "tips_4": "B2",
-    "src_reservoir": "C2",
+    "src_reservoir": "B2",
     "test_labware": "D1",
     "dst_plate": "D2",
     "dst_plate_stack_start": "C1",  # FIXME: stack plates + lids
     "dst_plate_stack_end": "B3",  # FIXME: stack plates + lids
     "reader": "D3",
     "shaker": "C3",
+    "empty": "B2",  # NOTE: (sigler) use for tip-overlap calibration
 }
 
 P1000_MAX_PUSH_OUT_UL = 79.0
@@ -91,6 +105,41 @@ class TestTrial:
     destination_volumes: List[float]
 
 
+def calibrate_tip_overlap(ctx: ProtocolContext, pipette: InstrumentContext) -> None:
+    if ctx.is_simulating:
+        return
+    api = ctx._core.get_hardware()
+    pip_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+    deck_probe_position = Point(
+        *get_calibration_square_position_in_slot(slot=CALIBRATION_SLOT)
+    ) + Point(x=Z_PREP_OFFSET.x, y=Z_PREP_OFFSET.y, z=Z_PREP_OFFSET.z)
+
+    # RETRACT and move to above the deck slot
+    api.retract(pip_mount)
+    current_pos = api.gantry_position(pip_mount)
+    api.move_to(
+        pip_mount,
+        Point(x=deck_probe_position.x, y=deck_probe_position.y, z=current_pos.z),
+    )
+    api.move_to(
+        pip_mount, deck_probe_position + Point(z=PROBE_START_HEIGHT_ABOVE_EXPECTED_MM)
+    )
+
+    # PROBE
+    probed_deck_z = api.liquid_probe(
+        pip_mount,
+        PROBE_START_HEIGHT_ABOVE_EXPECTED_MM + PROBE_OVERSHOOT_BELOW_EXPECTED_MM,
+    )
+    api.retract(pip_mount)
+    tip_overlap_error_mm = probed_deck_z - EXPECTED_PROBE_Z_POSITION_MM
+
+    # MODIFY current tip length
+    old_tip_length = api.hardware_pipette[pip_mount.to_mount()].current_tip_length
+    new_tip_length = old_tip_length + tip_overlap_error_mm
+    api.remove_tip(pip_mount)
+    api.add_tip(pip_mount, tip_length=new_tip_length)
+
+
 def _binary_search_liquid_volume_at_height(
     well: Well, height: float, tolerance_mm: float = 0.1, max_iterations: int = 100
 ) -> float:
@@ -142,9 +191,8 @@ def _get_add_then_remove_volumes_for_test_well(
     mm_offset_well_top: float = 0.0,
 ) -> Tuple[float, float]:
     # Returns the volumes to ADD and REMOVE to/from a given test well.
-    # Use `mm_offset_min_vol_to_ending_height` to set a millimeter tolerance
-    # to how LOW the liquid height can be. If `0`, the ending height will
-    # be exactly
+    # Use `mm_offset_min_vol` to set a millimeter tolerance keep the tip from
+    # going below the "minimum LLD height" of this pipette+tip combo
     min_vol, max_vol = _get_nominal_volume_range_for_dynamic_tracking(
         well,
         pipette,
@@ -363,14 +411,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=-10.0,
         maximum=0.0,
     )
-    # factor of safety (defined in mm) to guarantee that the liquid height
-    # will NOT be too LOW, such that the pipette cannot reach the defined
-    # SUBMERGE depth
+    # factor of safety (defined in mm) to guarantee that the tip will not submerge
+    # BELOW the minimum LLD height of that pipette + tip combination.
     parameters.add_float(
         display_name="mm_offset_min_vol",
         variable_name="mm_offset_min_vol",
-        default=3.0,  # NOTE: minimum seems to be >=0.05 to pass simulation
-        minimum=0.0,
+        default=0.5,
+        minimum=0.1,  # NOTE: minimum seems to be >=0.05 to pass simulation
         maximum=100.0,
     )
     # NOTE: (sigler) this represents the deformation
@@ -554,6 +601,10 @@ def run(ctx: ProtocolContext) -> None:
             # REMOVE DYE FROM TEST-LABWARE
             print(f"removing {trial.ul_to_remove} uL")
             pipette.pick_up_tip()
+            # NOTE: (sigler) calibrating THIS tip, because the
+            #       position is critical to determine if our submerge
+            #       depths are reliable or not
+            calibrate_tip_overlap(ctx, pipette)
             if trial.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
                 # FIXME: remove this once positioning bug is fixed in PE
                 pipette.move_to(trial.test_well.top())
