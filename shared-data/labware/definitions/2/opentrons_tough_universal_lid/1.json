@@ -1,0 +1,81 @@
+{
+  "allowedRoles": ["labware", "lid"],
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": ["999-00261"],
+    "links": [
+      "https://opentrons.com/products/opentrons-tough-universal-lid-50-count/"
+    ]
+  },
+  "metadata": {
+    "displayName": "Opentrons Tough Universal Lid",
+    "displayCategory": "lid",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 8.8
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "isDeckSlotCompatible": false,
+    "loadName": "opentrons_tough_universal_lid"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "stackingOffsetWithLabware": {
+    "default": {
+      "x": 0,
+      "y": 0,
+      "z": 6.6
+    }
+  },
+  "stackLimit": 1,
+  "gripForce": 10,
+  "gripHeightFromLabwareBottom": 5.3,
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 3
+      }
+    },
+    "lidDisposalOffsets": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 5.0,
+        "z": 50.0
+      }
+    }
+  }
+}
