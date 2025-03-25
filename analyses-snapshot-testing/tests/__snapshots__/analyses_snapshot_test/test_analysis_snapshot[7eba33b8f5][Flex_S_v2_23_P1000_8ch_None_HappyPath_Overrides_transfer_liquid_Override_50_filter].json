@@ -3577,7 +3577,7 @@
           "slotName": "B1"
         },
         "namespace": "opentrons",
-        "version": 1
+        "version": 2
       },
       "result": {
         "definition": {
@@ -3623,6 +3623,34 @@
               ]
             }
           ],
+          "innerLabwareGeometry": {
+            "cuboidalWell": {
+              "sections": [
+                {
+                  "bottomHeight": 2.05,
+                  "bottomXDimension": 7.95,
+                  "bottomYDimension": 70.53,
+                  "shape": "cuboidal",
+                  "topHeight": 26.85,
+                  "topXDimension": 8.35,
+                  "topYDimension": 71.25,
+                  "xCount": 1,
+                  "yCount": 1
+                },
+                {
+                  "bottomHeight": 0.0,
+                  "bottomXDimension": 1.87,
+                  "bottomYDimension": 64.45,
+                  "shape": "cuboidal",
+                  "topHeight": 2.05,
+                  "topXDimension": 7.95,
+                  "topYDimension": 70.53,
+                  "xCount": 1,
+                  "yCount": 1
+                }
+              ]
+            }
+          },
           "metadata": {
             "displayCategory": "reservoir",
             "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -3681,10 +3709,11 @@
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
           "stackingOffsetWithModule": {},
-          "version": 1,
+          "version": 2,
           "wells": {
             "A1": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 14.38,
@@ -3695,6 +3724,7 @@
             },
             "A10": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 95.38,
@@ -3705,6 +3735,7 @@
             },
             "A11": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 104.38,
@@ -3715,6 +3746,7 @@
             },
             "A12": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 113.38,
@@ -3725,6 +3757,7 @@
             },
             "A2": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 23.38,
@@ -3735,6 +3768,7 @@
             },
             "A3": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 32.38,
@@ -3745,6 +3779,7 @@
             },
             "A4": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 41.38,
@@ -3755,6 +3790,7 @@
             },
             "A5": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 50.38,
@@ -3765,6 +3801,7 @@
             },
             "A6": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 59.38,
@@ -3775,6 +3812,7 @@
             },
             "A7": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 68.38,
@@ -3785,6 +3823,7 @@
             },
             "A8": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 77.38,
@@ -3795,6 +3834,7 @@
             },
             "A9": {
               "depth": 26.85,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 15000,
               "x": 86.38,
@@ -3890,7 +3930,7 @@
           "slotName": "D2"
         },
         "namespace": "opentrons",
-        "version": 2
+        "version": 3
       },
       "result": {
         "definition": {
@@ -3920,13 +3960,7 @@
           "gripperOffsets": {},
           "groups": [
             {
-              "brand": {
-                "brand": "NEST",
-                "brandId": []
-              },
               "metadata": {
-                "displayCategory": "wellPlate",
-                "displayName": "NEST 96 Deep Well Plate 2mL",
                 "wellBottomShape": "v"
               },
               "wells": [
@@ -4029,6 +4063,34 @@
               ]
             }
           ],
+          "innerLabwareGeometry": {
+            "cuboidalWell": {
+              "sections": [
+                {
+                  "bottomHeight": 1.67,
+                  "bottomXDimension": 7.4,
+                  "bottomYDimension": 7.4,
+                  "shape": "cuboidal",
+                  "topHeight": 38.05,
+                  "topXDimension": 8.2,
+                  "topYDimension": 8.2,
+                  "xCount": 1,
+                  "yCount": 1
+                },
+                {
+                  "bottomHeight": 0.0,
+                  "bottomXDimension": 2.63,
+                  "bottomYDimension": 2.63,
+                  "shape": "cuboidal",
+                  "topHeight": 1.67,
+                  "topXDimension": 7.4,
+                  "topYDimension": 7.4,
+                  "xCount": 1,
+                  "yCount": 1
+                }
+              ]
+            }
+          },
           "metadata": {
             "displayCategory": "wellPlate",
             "displayName": "NEST 96 Deep Well Plate 2mL",
@@ -4168,11 +4230,6 @@
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {
-            "evotips_flex_96_tiprack_adapter": {
-              "x": 0,
-              "y": 0,
-              "z": 102
-            },
             "opentrons_96_deep_well_adapter": {
               "x": 0,
               "y": 0,
@@ -4191,10 +4248,11 @@
               "z": 2.66
             }
           },
-          "version": 2,
+          "version": 3,
           "wells": {
             "A1": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 14.3,
@@ -4205,6 +4263,7 @@
             },
             "A10": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 95.3,
@@ -4215,6 +4274,7 @@
             },
             "A11": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 104.3,
@@ -4225,6 +4285,7 @@
             },
             "A12": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 113.3,
@@ -4235,6 +4296,7 @@
             },
             "A2": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 23.3,
@@ -4245,6 +4307,7 @@
             },
             "A3": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 32.3,
@@ -4255,6 +4318,7 @@
             },
             "A4": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 41.3,
@@ -4265,6 +4329,7 @@
             },
             "A5": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 50.3,
@@ -4275,6 +4340,7 @@
             },
             "A6": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 59.3,
@@ -4285,6 +4351,7 @@
             },
             "A7": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 68.3,
@@ -4295,6 +4362,7 @@
             },
             "A8": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 77.3,
@@ -4305,6 +4373,7 @@
             },
             "A9": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 86.3,
@@ -4315,6 +4384,7 @@
             },
             "B1": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 14.3,
@@ -4325,6 +4395,7 @@
             },
             "B10": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 95.3,
@@ -4335,6 +4406,7 @@
             },
             "B11": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 104.3,
@@ -4345,6 +4417,7 @@
             },
             "B12": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 113.3,
@@ -4355,6 +4428,7 @@
             },
             "B2": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 23.3,
@@ -4365,6 +4439,7 @@
             },
             "B3": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 32.3,
@@ -4375,6 +4450,7 @@
             },
             "B4": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 41.3,
@@ -4385,6 +4461,7 @@
             },
             "B5": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 50.3,
@@ -4395,6 +4472,7 @@
             },
             "B6": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 59.3,
@@ -4405,6 +4483,7 @@
             },
             "B7": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 68.3,
@@ -4415,6 +4494,7 @@
             },
             "B8": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 77.3,
@@ -4425,6 +4505,7 @@
             },
             "B9": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 86.3,
@@ -4435,6 +4516,7 @@
             },
             "C1": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 14.3,
@@ -4445,6 +4527,7 @@
             },
             "C10": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 95.3,
@@ -4455,6 +4538,7 @@
             },
             "C11": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 104.3,
@@ -4465,6 +4549,7 @@
             },
             "C12": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 113.3,
@@ -4475,6 +4560,7 @@
             },
             "C2": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 23.3,
@@ -4485,6 +4571,7 @@
             },
             "C3": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 32.3,
@@ -4495,6 +4582,7 @@
             },
             "C4": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 41.3,
@@ -4505,6 +4593,7 @@
             },
             "C5": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 50.3,
@@ -4515,6 +4604,7 @@
             },
             "C6": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 59.3,
@@ -4525,6 +4615,7 @@
             },
             "C7": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 68.3,
@@ -4535,6 +4626,7 @@
             },
             "C8": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 77.3,
@@ -4545,6 +4637,7 @@
             },
             "C9": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 86.3,
@@ -4555,6 +4648,7 @@
             },
             "D1": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 14.3,
@@ -4565,6 +4659,7 @@
             },
             "D10": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 95.3,
@@ -4575,6 +4670,7 @@
             },
             "D11": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 104.3,
@@ -4585,6 +4681,7 @@
             },
             "D12": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 113.3,
@@ -4595,6 +4692,7 @@
             },
             "D2": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 23.3,
@@ -4605,6 +4703,7 @@
             },
             "D3": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 32.3,
@@ -4615,6 +4714,7 @@
             },
             "D4": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 41.3,
@@ -4625,6 +4725,7 @@
             },
             "D5": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 50.3,
@@ -4635,6 +4736,7 @@
             },
             "D6": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 59.3,
@@ -4645,6 +4747,7 @@
             },
             "D7": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 68.3,
@@ -4655,6 +4758,7 @@
             },
             "D8": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 77.3,
@@ -4665,6 +4769,7 @@
             },
             "D9": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 86.3,
@@ -4675,6 +4780,7 @@
             },
             "E1": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 14.3,
@@ -4685,6 +4791,7 @@
             },
             "E10": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 95.3,
@@ -4695,6 +4802,7 @@
             },
             "E11": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 104.3,
@@ -4705,6 +4813,7 @@
             },
             "E12": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 113.3,
@@ -4715,6 +4824,7 @@
             },
             "E2": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 23.3,
@@ -4725,6 +4835,7 @@
             },
             "E3": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 32.3,
@@ -4735,6 +4846,7 @@
             },
             "E4": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 41.3,
@@ -4745,6 +4857,7 @@
             },
             "E5": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 50.3,
@@ -4755,6 +4868,7 @@
             },
             "E6": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 59.3,
@@ -4765,6 +4879,7 @@
             },
             "E7": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 68.3,
@@ -4775,6 +4890,7 @@
             },
             "E8": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 77.3,
@@ -4785,6 +4901,7 @@
             },
             "E9": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 86.3,
@@ -4795,6 +4912,7 @@
             },
             "F1": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 14.3,
@@ -4805,6 +4923,7 @@
             },
             "F10": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 95.3,
@@ -4815,6 +4934,7 @@
             },
             "F11": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 104.3,
@@ -4825,6 +4945,7 @@
             },
             "F12": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 113.3,
@@ -4835,6 +4956,7 @@
             },
             "F2": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 23.3,
@@ -4845,6 +4967,7 @@
             },
             "F3": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 32.3,
@@ -4855,6 +4978,7 @@
             },
             "F4": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 41.3,
@@ -4865,6 +4989,7 @@
             },
             "F5": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 50.3,
@@ -4875,6 +5000,7 @@
             },
             "F6": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 59.3,
@@ -4885,6 +5011,7 @@
             },
             "F7": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 68.3,
@@ -4895,6 +5022,7 @@
             },
             "F8": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 77.3,
@@ -4905,6 +5033,7 @@
             },
             "F9": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 86.3,
@@ -4915,6 +5044,7 @@
             },
             "G1": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 14.3,
@@ -4925,6 +5055,7 @@
             },
             "G10": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 95.3,
@@ -4935,6 +5066,7 @@
             },
             "G11": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 104.3,
@@ -4945,6 +5077,7 @@
             },
             "G12": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 113.3,
@@ -4955,6 +5088,7 @@
             },
             "G2": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 23.3,
@@ -4965,6 +5099,7 @@
             },
             "G3": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 32.3,
@@ -4975,6 +5110,7 @@
             },
             "G4": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 41.3,
@@ -4985,6 +5121,7 @@
             },
             "G5": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 50.3,
@@ -4995,6 +5132,7 @@
             },
             "G6": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 59.3,
@@ -5005,6 +5143,7 @@
             },
             "G7": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 68.3,
@@ -5015,6 +5154,7 @@
             },
             "G8": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 77.3,
@@ -5025,6 +5165,7 @@
             },
             "G9": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 86.3,
@@ -5035,6 +5176,7 @@
             },
             "H1": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 14.3,
@@ -5045,6 +5187,7 @@
             },
             "H10": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 95.3,
@@ -5055,6 +5198,7 @@
             },
             "H11": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 104.3,
@@ -5065,6 +5209,7 @@
             },
             "H12": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 113.3,
@@ -5075,6 +5220,7 @@
             },
             "H2": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 23.3,
@@ -5085,6 +5231,7 @@
             },
             "H3": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 32.3,
@@ -5095,6 +5242,7 @@
             },
             "H4": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 41.3,
@@ -5105,6 +5253,7 @@
             },
             "H5": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 50.3,
@@ -5115,6 +5264,7 @@
             },
             "H6": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 59.3,
@@ -5125,6 +5275,7 @@
             },
             "H7": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 68.3,
@@ -5135,6 +5286,7 @@
             },
             "H8": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 77.3,
@@ -5145,6 +5297,7 @@
             },
             "H9": {
               "depth": 38,
+              "geometryDefinitionId": "cuboidalWell",
               "shape": "rectangular",
               "totalLiquidVolume": 2000,
               "x": 86.3,
@@ -8689,7 +8842,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/nest_12_reservoir_15ml/1",
+      "definitionUri": "opentrons/nest_12_reservoir_15ml/2",
       "displayName": "source",
       "id": "UUID",
       "loadName": "nest_12_reservoir_15ml",
@@ -8698,7 +8851,7 @@
       }
     },
     {
-      "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",
+      "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/3",
       "id": "UUID",
       "loadName": "nest_96_wellplate_2ml_deep",
       "location": {
