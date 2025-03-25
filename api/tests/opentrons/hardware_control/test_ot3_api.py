@@ -1783,9 +1783,7 @@ async def test_plunger_ready_to_aspirate_after_dispense(
     assert ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate
 
     await ot3_hardware.aspirate(OT3Mount.LEFT, asp_vol)
-    await ot3_hardware.dispense(
-        OT3Mount.LEFT, disp_vol, push_out=push_out, is_full_dispense=disp_vol == asp_vol
-    )
+    await ot3_hardware.dispense(OT3Mount.LEFT, disp_vol, push_out=push_out)
     assert (
         ot3_hardware.hardware_pipettes[mount.to_mount()].ready_to_aspirate == is_ready
     )
@@ -1871,13 +1869,9 @@ async def test_dispense_while_tracking(
 
     if not tip_present:
         with pytest.raises(UnexpectedTipRemovalError):
-            await ot3_hardware.dispense_while_tracking(
-                mount, 8.0, 80.0, push_out=None, is_full_dispense=is_ready
-            )
+            await ot3_hardware.dispense_while_tracking(mount, 8.0, 80.0, push_out=None)
     else:
-        await ot3_hardware.dispense_while_tracking(
-            mount, 8.0, 80.0, push_out=None, is_full_dispense=True
-        )
+        await ot3_hardware.dispense_while_tracking(mount, 8.0, 80.0, push_out=None)
         if is_ready:
             # make sure the move planning math stays the same
             expected_target_pos = {

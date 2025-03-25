@@ -221,7 +221,6 @@ async def test_hw_dispense_in_place(
         volume=25,
         flow_rate=2.5,
         push_out=None,
-        is_full_dispense=True,
     )
 
     assert result == 25
@@ -235,7 +234,6 @@ async def test_hw_dispense_in_place(
             volume=25,
             push_out=None,
             correction_volume=0,
-            is_full_dispense=True,
         ),
         mock_hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=1.23, dispense=4.56, blow_out=7.89
@@ -280,7 +278,6 @@ async def test_hw_dispense_in_place_raises_invalid_push_out(
             volume=25,
             flow_rate=2.5,
             push_out=-7,
-            is_full_dispense=True,
         )
 
 
@@ -523,7 +520,6 @@ async def test_virtual_dispense_in_place(
         volume=3,
         flow_rate=5,
         push_out=None,
-        is_full_dispense=True,
     )
     assert result == 3
 
@@ -544,7 +540,6 @@ async def test_virtual_dispense_in_place_raises_invalid_push_out(
             volume=3,
             flow_rate=5,
             push_out=-7,
-            is_full_dispense=False,
         )
 
 
@@ -568,7 +563,6 @@ async def test_virtual_dispense_in_place_raises_invalid_volume(
             volume=3,
             flow_rate=5,
             push_out=7,
-            is_full_dispense=False,
         )
 
 
@@ -607,7 +601,7 @@ async def test_virtual_dispense_validate_tip_attached(
         TipNotAttachedError, match="Cannot perform dispense without a tip attached"
     ):
         await subject.dispense_in_place(
-            "pipette-id", volume=20, flow_rate=1, push_out=None, is_full_dispense=False
+            "pipette-id", volume=20, flow_rate=1, push_out=None
         )
 
 
@@ -740,7 +734,6 @@ async def test_dispense_volume_validation(
                 volume=ok_volume,
                 flow_rate=5,
                 push_out=7,
-                is_full_dispense=True,
             )
             == expected_adjusted_volume
         )
@@ -750,5 +743,4 @@ async def test_dispense_volume_validation(
                 volume=not_ok_volume,
                 flow_rate=5,
                 push_out=7,
-                is_full_dispense=True,
             )
