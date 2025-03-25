@@ -61,13 +61,13 @@ export function LeftColumnLabwareInfo({
     }
   }
 
-  const buildQuntity = (): string | undefined => {
+  const buildQuntity = (): string | null => {
     switch (step) {
       case MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY:
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.CONFIRM_RETRY:
         return labwareQuantity
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE:
-        return undefined
+        return null
       default:
         return labwareQuantity
     }
@@ -79,7 +79,7 @@ export function LeftColumnLabwareInfo({
       infoProps={{
         layout: layout,
         tagText: buildQuntity(),
-        subText: undefined, // where do we get the lid data from?
+        subText: null, // where do we get the lid data from?
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',

@@ -62,7 +62,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   failedLabwareNickname: string | null
   /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
-  labwareQuantity: string | undefined
+  labwareQuantity: string | null
 }
 
 /** Utils for labware relating to the failedCommand.
@@ -401,11 +401,15 @@ export function getRelevantWellName(
   failedPipetteInfo: UseFailedLabwareUtilsProps['failedPipetteInfo'],
   recentRelevantPickUpTipCmd: FailedCommandRelevantLabware
 ): string {
+  const commandTypesWithoutWells = [
+    'moveLabware',
+    'flexStacker/retrieve',
+    'flexStacker/store',
+  ]
   if (
     failedPipetteInfo == null ||
     recentRelevantPickUpTipCmd == null ||
-    recentRelevantPickUpTipCmd.commandType in
-      ['moveLabware', 'flexStacker/retrieve', 'flexStacker/store']
+    recentRelevantPickUpTipCmd.commandType in commandTypesWithoutWells
   ) {
     return ''
   }
