@@ -22,7 +22,7 @@ import {
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
-import { LegacyOffsetVector } from '/app/molecules/OffsetVector'
+import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
 import type { LabwareOffset } from '@opentrons/api-client'

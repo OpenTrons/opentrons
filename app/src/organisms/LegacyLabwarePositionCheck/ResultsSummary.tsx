@@ -39,7 +39,7 @@ import {
   getIsOnDevice,
 } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
-import { LegacyLabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 

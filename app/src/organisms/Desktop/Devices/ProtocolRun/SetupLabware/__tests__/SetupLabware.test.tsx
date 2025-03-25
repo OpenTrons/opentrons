@@ -7,7 +7,6 @@ import { useHoverTooltip } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { LegacyLabwarePositionCheck } from '/app/organisms/LegacyLabwarePositionCheck'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { SetupLabwareList } from '../SetupLabwareList'
@@ -66,9 +65,6 @@ describe('SetupLabware', () => {
       .calledWith(expect.anything())
       .thenReturn([])
 
-    vi.mocked(LegacyLabwarePositionCheck).mockReturnValue(
-      <div>mock Labware Position Check</div>
-    )
     when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
