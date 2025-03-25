@@ -21,7 +21,7 @@ import {
 } from '@opentrons/components'
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
-import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { LegacyOffsetVector } from '/app/molecules/OffsetVector'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
@@ -154,7 +154,7 @@ export function LegacyCurrentOffsetsTable(
         {i18n.format(t('applied_offset_data'), 'upperCase')}
       </LegacyStyledText>
       {isLabwareOffsetCodeSnippetsOn ? (
-        <LabwareOffsetTabs
+        <LegacyLabwareOffsetTabs
           TableComponent={TableComponent}
           JupyterComponent={JupyterSnippet}
           CommandLineComponent={CommandLineSnippet}

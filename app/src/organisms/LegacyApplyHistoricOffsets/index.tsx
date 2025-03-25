@@ -23,7 +23,7 @@ import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
-import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
 import { LabwareOffsetTable } from './LabwareOffsetTable'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 
@@ -164,7 +164,7 @@ export function LegacyApplyHistoricOffsets(
                 </ExternalLink>
                 {!noOffsetData ? (
                   isLabwareOffsetCodeSnippetsOn ? (
-                    <LabwareOffsetTabs
+                    <LegacyLabwareOffsetTabs
                       TableComponent={
                         <LabwareOffsetTable
                           offsetCandidates={offsetCandidates}
