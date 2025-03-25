@@ -26,6 +26,8 @@ class GCODE(str, Enum):
     GET_TOF_MEASUREMENT = "M226"
     ENABLE_TOF_SENSOR = "M224"
     MANAGE_TOF_MEASUREMENT = "M225"
+    SET_TOF_CONFIGURATION = "M227"
+    GET_TOF_CONFIGURATION = "M228"
     SET_LED = "M200"
     SET_SERIAL_NUMBER = "M996"
     SET_RUN_CURRENT = "M906"
@@ -266,6 +268,32 @@ class MeasurementKind(Enum):
     HISTOGRAM = 0
 
 
+class SpadMapID(Enum):
+    """The spad map id for the TOF sensor."""
+
+    SPAD_MAP_ID_1 = 1
+    # 3x3 macro 1 mode 33°x47° FoV off center
+    SPAD_MAP_ID_2 = 2
+    # 3x3 macro 2 mode 33°x47° FoV
+    SPAD_MAP_ID_3 = 3
+    # 3x3 wide mode 41°x52° FoV
+    SPAD_MAP_ID_6 = 6
+    # 3x3 mode 33°x32° FoV, checkerboard
+    SPAD_MAP_ID_11 = 11
+    # 3x3 mode 33°x32° FoV, inverted checkerboard
+    SPAD_MAP_ID_12 = 12
+    # User defined mode, single measurement mode
+    SPAD_MAP_ID_14 = 14
+
+
+class ActiveRange(Enum):
+    """The active range for the TOF sensor."""
+
+    NOT_SUPPORTED = 0
+    SHORT_RANGE = 0x6E
+    LONG_RANGE = 0x6F
+
+
 @dataclass
 class TOFMeasurement:
     """The start measurement data."""
@@ -301,3 +329,15 @@ class TOFDetection:
     sensor: TOFSensor
     zones: List[int]
     bins: list[int]
+
+
+@dataclass
+class TOFConfiguration:
+    """Stacker TOF configuration."""
+
+    sensor: TOFSensor
+    spad_map_id: SpadMapID
+    active_range: Optional[ActiveRange]
+    kilo_iterations: Optional[int]
+    report_period_ms: Optional[int]
+    histogram_dump: Optional[bool]

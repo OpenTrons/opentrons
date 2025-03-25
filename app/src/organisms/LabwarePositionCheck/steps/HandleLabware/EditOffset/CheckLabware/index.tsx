@@ -50,6 +50,7 @@ import type {
 } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 
 interface CheckLabwareProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void
@@ -176,6 +177,7 @@ interface CheckLabwareContentProps extends CheckLabwareProps {
 
 function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
+  const { makeSuccessSnackbar } = useLPCSnackbars(props.runId)
   const {
     contentHeader,
     sectionHeader,
@@ -189,6 +191,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
 
   const handleProceed = (): void => {
     handleAddConfirmedWorkingVector()
+    makeSuccessSnackbar()
   }
 
   return (

@@ -67,7 +67,7 @@ function getInvariantContextAndRobotState(
       tiprackDefURI: [tipRackDefURI],
       tiprackLabwareDef: [quickTransferState.tipRack],
       spec: quickTransferState.pipette,
-      pythonName: 'pipette_left',
+      pythonName: 'pipette',
     },
   }
   const pipetteLocations: RobotState['pipettes'] = {
@@ -77,6 +77,8 @@ function getInvariantContextAndRobotState(
   }
   const sourceLabwareURI = getLabwareDefURI(quickTransferState.source)
   const sourceLabwareId = `${uuid()}_${sourceLabwareURI}`
+  const pythonTrashBinName = 'trash_bin_1'
+  const pythonWasteChuteName = 'waste_chute'
 
   let labwareEntities: LabwareEntities = {}
   let labwareLocations: RobotState['labware'] = {}
@@ -166,6 +168,7 @@ function getInvariantContextAndRobotState(
         name: 'trashBin',
         id: trashId,
         location: trashLocation,
+        pythonName: pythonTrashBinName,
       },
     }
   }
@@ -187,6 +190,7 @@ function getInvariantContextAndRobotState(
           name: 'trashBin',
           id: trashId,
           location: trashLocation,
+          pythonName: pythonTrashBinName,
         },
       }
     }
@@ -205,6 +209,7 @@ function getInvariantContextAndRobotState(
         name: 'wasteChute',
         id: wasteChuteId,
         location: wasteChuteLocation,
+        pythonName: pythonWasteChuteName,
       },
     }
   }
@@ -226,6 +231,7 @@ function getInvariantContextAndRobotState(
           name: 'wasteChute',
           id: wasteChuteId,
           location: wasteChuteLocation,
+          pythonName: pythonWasteChuteName,
         },
       }
     }

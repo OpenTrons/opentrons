@@ -14,8 +14,8 @@ import {
   reduceCommandCreators,
   getTrashOrLabware,
   dispenseLocationHelper,
-  moveHelper,
   getHasWasteChute,
+  delayLocationHelper,
 } from '../../utils'
 import {
   aspirate,
@@ -23,7 +23,6 @@ import {
   delay,
   dispense,
   dropTip,
-  moveToWell,
   touchTip,
 } from '../atomic'
 import { airGapInWell } from './airGapInWell'
@@ -272,6 +271,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: aspirateXOffset,
                   yOffset: aspirateYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
           const mixBeforeAspirateCommands =
@@ -291,25 +291,17 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: aspirateXOffset,
                   yOffset: aspirateYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
           const delayAfterAspirateCommands =
             aspirateDelay != null
               ? [
-                  curryCommandCreator(moveToWell, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
-                    labwareId: args.sourceLabware,
-                    wellName: sourceWell,
-                    wellLocation: {
-                      origin: 'bottom',
-                      offset: {
-                        x: 0,
-                        y: 0,
-                        z: aspirateDelay.mmFromBottom,
-                      },
-                    },
-                  }),
-                  curryCommandCreator(delay, {
+                    destinationId: args.sourceLabware,
+                    well: sourceWell,
+                    zOffset: aspirateDelay.mmFromBottom,
                     seconds: aspirateDelay.seconds,
                   }),
                 ]
@@ -360,6 +352,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: dispenseXOffset,
                   yOffset: dispenseYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
 
@@ -463,13 +456,11 @@ export const transfer: CommandCreator<TransferArgs> = (
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [
-                  curryCommandCreator(moveHelper, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
                     destinationId: args.destLabware,
-                    well: destinationWell ?? undefined,
+                    well: destinationWell,
                     zOffset: dispenseDelay.mmFromBottom,
-                  }),
-                  curryCommandCreator(delay, {
                     seconds: dispenseDelay.seconds,
                   }),
                 ]

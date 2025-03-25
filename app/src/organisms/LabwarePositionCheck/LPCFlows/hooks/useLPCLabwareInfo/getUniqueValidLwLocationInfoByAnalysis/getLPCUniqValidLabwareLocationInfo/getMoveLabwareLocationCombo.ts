@@ -6,7 +6,7 @@ import {
   getLwModStackupDetails,
   getAddressableAreaNameFrom,
 } from './helpers'
-import { getLwOffsetLocSeqFrom } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useLPCLabwareInfo/utils'
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 
 import type {
   LoadedLabware,
@@ -33,7 +33,7 @@ export function getMoveLabwareLocationCombo(
       return null
     } else {
       const moduleId = getClosestBeneathModuleId(loqSeq)
-      const lwOffsetLocSeq = getLwOffsetLocSeqFrom(loqSeq, lw, modules)
+      const lwOffsetLocSeq = getLwOffsetLocSeqFromLocSeq(loqSeq, lw, modules)
       const definitionUri = getLabwareDefURIFrom(labwareId, lwURIsByLwId)
 
       return {
