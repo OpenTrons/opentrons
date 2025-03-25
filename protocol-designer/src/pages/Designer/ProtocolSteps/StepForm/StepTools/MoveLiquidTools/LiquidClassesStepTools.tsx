@@ -23,7 +23,7 @@ export const LiquidClassesStepTools = ({
   propsForFields,
   setShowFormErrors,
 }: LiquidClassesStepToolsProps): JSX.Element => {
-  const { t } = useTranslation(['liquids'])
+  const { t } = useTranslation('liquids')
   const liquids = useSelector(getLiquidEntities)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 

@@ -79,6 +79,9 @@ type StepFormMap = {
   [K in StepType]?: ComponentType<StepFormProps> | null
 }
 
+const TWO_STEPS = 2
+const THREE_STEPS = 3
+
 const STEP_FORM_MAP: StepFormMap = {
   mix: MixTools,
   pause: PauseTools,
@@ -270,7 +273,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     }
   }
 
-  const step = formData.stepType === 'moveLiquid' && enableLiquidClasses
+  const step =
+    (formData.stepType === 'moveLiquid' && enableLiquidClasses) ||
+    (formData.stepType === 'mix' && enableLiquidClasses)
   const handleContinue = (): void => {
     if (isMultiStepToolbox && toolboxStep < (step ? 2 : 1)) {
       if (!isErrorOnCurrentPage) {
@@ -304,7 +309,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
               {t('shared:part', {
                 current: toolboxStep + 1,
-                max: step ? 3 : 2,
+                max: step ? THREE_STEPS : TWO_STEPS,
               })}
             </StyledText>
           ) : null
