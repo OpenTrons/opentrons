@@ -22,7 +22,7 @@ import {
 
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
-import { OffsetVector } from '/app/molecules/OffsetVector'
+import { LegacyOffsetVector } from '/app/molecules/OffsetVector'
 import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -112,7 +112,7 @@ export function LegacyCurrentOffsetsTable(
                     ${BORDERS.borderRadius8} 0;
                 `}
               >
-                <OffsetVector {...offset.vector} />
+                <LegacyOffsetVector {...offset.vector} />
               </OffsetTableDatum>
             </OffsetTableRow>
           )
