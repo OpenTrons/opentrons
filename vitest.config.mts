@@ -12,10 +12,22 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       allowOnly: true,
-      exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**'],
+      exclude: [
+        ...configDefaults.exclude,
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/lib/**',
+      ],
       setupFiles: ['./setup-vitest.mts'],
       coverage: {
-        exclude: ['**/node_modules/**', '**/dist/**', '**/__tests__/**', 'protocol-designer/cypress/**/*', 'labware-library/cypress/**/*', ...configDefaults.exclude],
+        exclude: [
+          '**/node_modules/**',
+          '**/dist/**',
+          '**/__tests__/**',
+          'protocol-designer/cypress/**/*',
+          'labware-library/cypress/**/*',
+          ...configDefaults.exclude,
+        ],
         provider: 'v8',
         reporter: ['text', 'json', 'html', 'lcov'],
       },
