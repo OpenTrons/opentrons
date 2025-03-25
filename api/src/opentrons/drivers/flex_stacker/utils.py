@@ -3,6 +3,8 @@ from pathlib import Path
 from functools import lru_cache
 from typing import Dict, List, Union
 
+from opentrons_shared_data.load import load_shared_data
+
 
 NUMBER_OF_ZONES = 10
 NUMBER_OF_BINS = 128
@@ -31,10 +33,9 @@ def load_tof_baseline(path: Union[str, Path]) -> Dict[str, Dict[int, List[float]
     """Load the TOF sensor measurement baseline values."""
     baseline: Dict[str, Dict[int, List[float]]] = {}
     try:
-        with open(path, "r") as fd:
-            baseline = json.load(fd)
-            assert "X" in baseline
-            assert "Z" in baseline
+        baseline = json.loads(load_shared_data(f"module/{TOF_BASELINE_FILE}"))
+        assert "X" in baseline
+        assert "Z" in baseline
     except (FileNotFoundError, json.JSONDecodeError):
         pass
     return baseline
