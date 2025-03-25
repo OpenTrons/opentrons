@@ -89,23 +89,23 @@ enum MixLocators {
   AspFlowRateInput = '[name="aspirate_flowRate"]',
   AspWellOrder = '[data-testid="WellsOrderField_ListButton_aspirate"]',
   ResetToDefault = 'button:contains("Reset to default")',
-  PrimaryOrderDropdown = 'div[tabindex="0"].sc-bqWxrE jKLbYH iFjNDq',
-  CancelAspSettings = '[class="SecondaryButton-sc-1opt1t9-0 kjpcRL"]',
+  // PrimaryOrderDropdown = 'div[tabindex="0"].sc-bqWxrE jKLbYH iFjNDq', //NOTE: locator ?
+  CancelAspSettings = '[class="SecondaryButton-sc-1opt1t9-0 kjpcRL"]', //NOTE: locator
   MixTipPos = '[data-testid="PositionField_ListButton_mix"]',
   XpositionInput = '[data-testid="TipPositionModal_x_custom_input"]',
   YpositionInput = '[id="TipPositionModal_y_custom_input"]',
   ZpositionInput = '[id="TipPositionModal_z_custom_input"]',
   SwapView = 'button:contains("Swap view")',
-  Checkbox = '[class="Flex-sc-1qhp8l7-0 Checkbox___StyledFlex3-sc-1mvp7vt-0 gZwGCw btdgeU"]',
-  DelaySecondsInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]',
+  Checkbox = '[data-testid="ListButton_noActive"]',
+  DelaySecondsInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]', //NOTE: locator
   DispFlowRate = '[name="dispense_flowRate"]',
-  BlowoutLtnDropdown = '[class="Svg-sc-1lpozsw-0 Icon___StyledSvg-sc-1gt4gyz-0 csSXbR cJpxat"]',
+  BlowoutLtnDropdown = '[class="Svg-sc-1lpozsw-0 Icon___StyledSvg-sc-1gt4gyz-0 csSXbR cJpxat"]', //NOTE: locator
   BlowoutFlowRate = '[name="blowout_flowRate"]',
   BlowoutPos = '[id="TipPositionField_blowout_z_offset"]',
   BlowoutZPosition = '[data-testid="TipPositionModal_custom_input"]',
   PosFromBottom = '[id="TipPositionField_mix_touchTip_mmFromBottom"]',
   RenameBtn = 'button:contains("Rename")',
-  StepNameInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]',
+  StepNameInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]', //NOTE: locator
   // StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-1mhuse7-0 hpcyEZ"]',
   StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
@@ -228,10 +228,11 @@ export const MixSteps = {
   Delay: (): StepThunk => ({
     call: () => {
       cy.contains(MixContent.Delay).should('exist').should('be.visible')
+      cy.log('*******LOOK HERE************')
       cy.get(MixLocators.Checkbox)
+        .contains('Delay')
         .should('exist')
         .should('be.visible')
-        .eq(0)
         .click()
       cy.contains(MixContent.DelayDuration).should('exist').should('be.visible')
       cy.get(MixLocators.DelaySecondsInput)
@@ -271,9 +272,9 @@ export const MixSteps = {
     call: () => {
       cy.contains(MixContent.Blowout).should('exist').should('be.visible')
       cy.get(MixLocators.Checkbox)
+        .contains('Blowout')
         .should('exist')
         .should('be.visible')
-        .eq(0)
         .click()
       cy.contains(MixContent.ChooseOption).should('exist').should('be.visible')
       cy.get(MixLocators.BlowoutLtnDropdown)
@@ -324,9 +325,9 @@ export const MixSteps = {
   TouchTip: (): StepThunk => ({
     call: () => {
       cy.get(MixLocators.Checkbox)
+        .contains('Touch tip')
         .should('exist')
         .should('be.visible')
-        .eq(0)
         .click()
       cy.get(MixLocators.PosFromTop)
         .should('exist')
