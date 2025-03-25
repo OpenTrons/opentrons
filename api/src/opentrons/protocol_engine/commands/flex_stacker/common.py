@@ -13,3 +13,13 @@ class FlexStackerStallOrCollisionError(ErrorOccurrence):
 
     errorCode: str = ErrorCodes.FLEX_STACKER_STALL_OR_COLLISION_DETECTED.value.code
     detail: str = ErrorCodes.FLEX_STACKER_STALL_OR_COLLISION_DETECTED.value.detail
+
+
+class FlexStackerShuttleError(ErrorOccurrence):
+    """Returned when the Flex Stacker Shuttle is not in the correct location."""
+
+    isDefined: bool = True
+    errorType: Literal["flexStackerShuttleMissing"] = "flexStackerShuttleMissing"
+
+    errorCode: str = ErrorCodes.FLEX_STACKER_SHUTTLE_MISSING.value.code
+    detail: str = ErrorCodes.FLEX_STACKER_SHUTTLE_MISSING.value.detail

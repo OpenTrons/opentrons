@@ -769,16 +769,28 @@ class FlexStackerShuttleMissingError(RoboticsInteractionError):
     def __init__(
         self,
         serial: str,
+        expected_state: str,
+        shuttle_state: str,
         message: Optional[str] = None,
         detail: Optional[Dict[str, str]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FlexStackerStallError."""
-        self.serial = serial
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["expected_state"] = expected_state
+        checked_detail["shuttle_state"] = shuttle_state
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = (
+                "Flex Stacker shuttle not detected in state "
+                f"{expected_state}, found {shuttle_state}."
+            )
         super().__init__(
             ErrorCodes.FLEX_STACKER_SHUTTLE_MISSING,
-            message,
-            detail,
+            checked_message,
+            checked_detail,
             wrapping,
         )
 
