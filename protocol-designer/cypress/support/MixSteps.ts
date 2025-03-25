@@ -89,7 +89,6 @@ enum MixLocators {
   AspFlowRateInput = '[name="aspirate_flowRate"]',
   AspWellOrder = '[data-testid="WellsOrderField_ListButton_aspirate"]',
   ResetToDefault = 'button:contains("Reset to default")',
-  // CancelAspSettings = '[class="SecondaryButton-sc-1opt1t9-0 kjpcRL"]', //NOTE: locator
   MixTipPos = '[data-testid="PositionField_ListButton_mix"]',
   XpositionInput = '[data-testid="TipPositionModal_x_custom_input"]',
   YpositionInput = '[id="TipPositionModal_y_custom_input"]',
