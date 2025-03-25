@@ -25,7 +25,7 @@ from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
 )
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
-    _LocationCheckDescriptors,
+    LocationCheckDescriptors,
 )
 from opentrons.types import Location, Point
 
@@ -140,7 +140,7 @@ def test_submerge_without_lpd(
             location=Location(Point(x=2, y=4, z=7), labware=None),
             well_location=Location(Point(x=1, y=2, z=3), labware=None),
             well_core=source_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="submerge start",
                 pipetting_action="aspirate",
             ),
@@ -270,7 +270,7 @@ def test_submerge_raises_when_submerge_point_is_invalid(
             location=Location(Point(x=2, y=4, z=7), labware=None),
             well_location=Location(Point(x=1, y=2, z=3), labware=None),
             well_core=source_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="submerge start",
                 pipetting_action="aspirate",
             ),
@@ -657,7 +657,7 @@ def test_retract_after_aspiration(
             location=Location(Point(x=4, y=4, z=4), labware=None),
             well_location=Location(Point(x=1, y=1, z=1), labware=None),
             well_core=source_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="aspirate",
             ),
@@ -719,7 +719,7 @@ def test_post_aspirate_retract_raises_when_retract_point_is_invalid(
             location=Location(Point(x=4, y=4, z=4), labware=None),
             well_location=Location(Point(x=1, y=1, z=1), labware=None),
             well_core=source_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="aspirate",
             ),
@@ -1319,7 +1319,7 @@ def test_retract_after_dispense_raises_for_invalid_retract_point(
             location=Location(Point(12, 24, 36), labware=None),
             well_location=Location(Point(1, 1, 1), labware=None),
             well_core=dest_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
@@ -1392,7 +1392,7 @@ def test_multi_dispense_retract_after_dispense_without_conditioning_volume_or_bl
             location=Location(Point(3, 5, 4), labware=None),
             well_location=Location(Point(1, 1, 1), labware=None),
             well_core=dest_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
@@ -1500,7 +1500,7 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
             location=Location(Point(3, 5, 4), labware=None),
             well_location=Location(Point(1, 1, 1), labware=None),
             well_core=dest_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
@@ -1586,7 +1586,7 @@ def test_multi_dispense_retract_raises_for_invalid_retract_point(
             location=Location(Point(3, 5, 4), labware=None),
             well_location=Location(Point(1, 1, 1), labware=None),
             well_core=dest_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),

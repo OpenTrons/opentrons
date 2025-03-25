@@ -13,7 +13,7 @@ from opentrons.types import Location, Point
 from opentrons.protocol_api.core.engine import WellCore
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     raise_if_location_inside_liquid,
-    _LocationCheckDescriptors,
+    LocationCheckDescriptors,
 )
 
 
@@ -28,7 +28,7 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
         (
             Location(point=Point(4, 5, 6), labware=None),
             Location(point=Point(1, 1, 1), labware=None),
-            _LocationCheckDescriptors(
+            LocationCheckDescriptors(
                 location_type="submerge start",
                 pipetting_action="aspirate",
             ),
@@ -37,7 +37,7 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
         (
             Location(point=Point(4, 5, 6), labware=None),
             Location(point=Point(5, 6, 7), labware=None),
-            _LocationCheckDescriptors(
+            LocationCheckDescriptors(
                 location_type="submerge start",
                 pipetting_action="aspirate",
             ),
@@ -51,7 +51,7 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
         (
             Location(point=Point(4, 5, 6), labware=None),
             Location(point=Point(5, 6, 7), labware=None),
-            _LocationCheckDescriptors(
+            LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
@@ -68,7 +68,7 @@ def test_raise_only_if_pip_location_below_target(
     decoy: Decoy,
     pip_location: Location,
     well_location: Location,
-    location_descriptors: _LocationCheckDescriptors,
+    location_descriptors: LocationCheckDescriptors,
     expected_raise: ContextManager[Any],
 ) -> None:
     """It should raise appropriately based on heights of given location and target location."""
@@ -135,7 +135,7 @@ def test_raise_only_if_pip_location_inside_liquid(
     """It should raise an error if we have access to liquid height and pipette is in liquid."""
     well_location = Location(point=Point(1, 1, 1), labware=None)
     well_core = decoy.mock(cls=WellCore)
-    location_descriptors = _LocationCheckDescriptors(
+    location_descriptors = LocationCheckDescriptors(
         location_type="retract end",
         pipetting_action="aspirate",
     )
@@ -161,7 +161,7 @@ def test_log_warning_if_pip_location_cannot_be_validated(
     pip_location = Location(point=Point(1, 2, 3), labware=None)
     well_location = Location(point=Point(1, 1, 1), labware=None)
     well_core = decoy.mock(cls=WellCore)
-    location_descriptors = _LocationCheckDescriptors(
+    location_descriptors = LocationCheckDescriptors(
         location_type="retract end",
         pipetting_action="aspirate",
     )

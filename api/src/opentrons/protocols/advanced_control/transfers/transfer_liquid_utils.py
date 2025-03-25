@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class _LocationCheckDescriptors:
+class LocationCheckDescriptors:
     location_type: Literal["submerge start", "retract end"]
     pipetting_action: Literal["aspirate", "dispense"]
 
@@ -22,7 +22,7 @@ def raise_if_location_inside_liquid(
     location: Location,
     well_location: Location,
     well_core: WellCore,
-    location_check_descriptors: _LocationCheckDescriptors,
+    location_check_descriptors: LocationCheckDescriptors,
     logger: Logger,
 ) -> None:
     """Raise an error if the location in question would be inside the liquid.

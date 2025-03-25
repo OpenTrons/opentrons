@@ -25,7 +25,7 @@ from opentrons.protocol_api._liquid_properties import (
 from opentrons.protocol_engine.errors import TouchTipDisabledError
 from opentrons.types import Location, Point
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
-    _LocationCheckDescriptors,
+    LocationCheckDescriptors,
 )
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
@@ -180,11 +180,12 @@ class TransferComponentsExecutor:
             # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
             self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)  # type: ignore[arg-type]
             self._instrument.prepare_to_aspirate()
+
         tx_utils.raise_if_location_inside_liquid(
             location=submerge_start_location,
             well_location=self._target_location,
             well_core=self._target_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="submerge start",
                 pipetting_action=post_submerge_action,
             ),
@@ -346,7 +347,7 @@ class TransferComponentsExecutor:
             location=retract_location,
             well_location=self._target_location,
             well_core=self._target_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="aspirate",
             ),
@@ -444,7 +445,7 @@ class TransferComponentsExecutor:
             location=retract_location,
             well_location=self._target_location,
             well_core=self._target_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),
@@ -584,7 +585,7 @@ class TransferComponentsExecutor:
             location=retract_location,
             well_location=self._target_location,
             well_core=self._target_well,
-            location_check_descriptors=_LocationCheckDescriptors(
+            location_check_descriptors=LocationCheckDescriptors(
                 location_type="retract end",
                 pipetting_action="dispense",
             ),

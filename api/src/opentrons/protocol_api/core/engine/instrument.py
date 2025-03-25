@@ -1301,6 +1301,12 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 enable_lpd = (
                     self.get_liquid_presence_detection() and step_source != prev_src
                 )
+            elif new_tip == TransferTipPolicyV2.ONCE:
+                # Enable LPD only if:
+                # - LPD is globally enabled for this pipette
+                # - this is the first source well of the entire transfer, which means
+                #   that the current tip is unused
+                enable_lpd = self.get_liquid_presence_detection() and prev_src is None
             else:
                 enable_lpd = False
 
@@ -1791,6 +1797,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         air_gap=0,
                     )
                 ]
+            # TODO (spp, 2025-03-24): add LPD feature when 'per source' tip policy is added for consolidate_liquid
             with self.lpd_for_transfer(enable=False):
                 for step_num, (step_volume, step_source) in enumerate(
                     vol_aspirate_combo
