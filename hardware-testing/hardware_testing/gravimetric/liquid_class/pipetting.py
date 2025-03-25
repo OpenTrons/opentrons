@@ -131,31 +131,31 @@ def _retract(
     speed: float,
     z_discontinuity: float,
 ) -> None:
-    # change discontinuity per the liquid-class settings
-    hw_api = ctx._core.get_hardware()
-    if pipette.channels == 96:
-        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-            OT3AxisKind.Z
-        ] = z_discontinuity
-    else:
-        hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
-            OT3AxisKind.Z
-        ] = z_discontinuity
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
-    # retract out of the liquid (not out of the well)
+    # # change discontinuity per the liquid-class settings
+    # hw_api = ctx._core.get_hardware()
+    # if pipette.channels == 96:
+    #     hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+    #         OT3AxisKind.Z
+    #     ] = z_discontinuity
+    # else:
+    #     hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+    #         OT3AxisKind.Z
+    #     ] = z_discontinuity
+    # # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    # hw_api.set_gantry_load(hw_api.gantry_load)
+    # # retract out of the liquid (not out of the well)
     pipette.move_to(well.bottom(mm_above_well_bottom).move(channel_offset), speed=speed)
     # reset discontinuity back to default
-    if pipette.channels == 96:
-        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
-            OT3AxisKind.Z
-        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
-    else:
-        hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
-            OT3AxisKind.Z
-        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
-    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
-    hw_api.set_gantry_load(hw_api.gantry_load)
+    # if pipette.channels == 96:
+    #     hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+    #         OT3AxisKind.Z
+    #     ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
+    # else:
+    #     hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+    #         OT3AxisKind.Z
+    #     ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
+    # # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    # hw_api.set_gantry_load(hw_api.gantry_load)
 
 
 def _pipette_with_liquid_settings(  # noqa: C901
