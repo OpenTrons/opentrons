@@ -346,9 +346,6 @@ def _run_trial(
         )
     _PREV_TRIAL_GRAMS = m_data_init
 
-    if not trial.ctx.is_simulating():
-        input("Press ENTER to continue...")
-
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         trial.ctx,
