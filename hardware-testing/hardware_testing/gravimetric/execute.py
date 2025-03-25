@@ -547,6 +547,8 @@ def _run_trial(
         # FIXME: This assumes whatever is in the pipette from last trial is air (not liquid),
         #        and so this would break any sort of multi-dispense testing
         assumed_air_gap = trial.pipette.current_volume
+        if not resources.ctx.is_simulating():
+            input("Press ENTER to continue...")
         tip_contents = trial.pipette._core.aspirate_liquid_class(
             volume=trial.volume,
             source=(Location(Point(), trial.well), trial.well._core),
@@ -814,8 +816,7 @@ def _get_liquid_height(
 def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noqa: C901
     """Run."""
     new_liquid_class = None
-    if not resources.ctx.is_simulating():
-        input("Press ENTER to continue...")
+
     if not cfg.use_old_method:
         lc_name = SupportedLiquid.from_string(cfg.liquid).name_with_dilution(
             cfg.dilution
