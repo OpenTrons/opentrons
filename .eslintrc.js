@@ -56,6 +56,7 @@ module.exports = {
               'useCurrentMaintenanceRun',
               'useDeckConfigurationQuery',
               'useAllCommandsAsPreSerializedList',
+              'useSearchLabwareOffsets',
             ],
             message:
               'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',

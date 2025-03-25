@@ -1,10 +1,12 @@
 from typing import List, Optional, Protocol
 
 from .types import (
+    ActiveRange,
     LEDPattern,
     LimitSwitchStatus,
     MeasurementKind,
     MoveResult,
+    SpadMapID,
     StackerAxis,
     PlatformStatus,
     Direction,
@@ -12,6 +14,7 @@ from .types import (
     StackerInfo,
     LEDColor,
     StallGuardParams,
+    TOFConfiguration,
     TOFMeasurement,
     TOFMeasurementResult,
     TOFSensor,
@@ -38,33 +41,33 @@ class AbstractFlexStackerDriver(Protocol):
         """Get Device Info."""
         ...
 
-    async def set_serial_number(self, sn: str) -> bool:
+    async def set_serial_number(self, sn: str) -> None:
         """Set Serial Number."""
         ...
 
-    async def enable_motors(self, axis: List[StackerAxis]) -> bool:
+    async def enable_motors(self, axis: List[StackerAxis]) -> None:
         """Enables the axis motor if present, disables it otherwise."""
         ...
 
-    async def stop_motors(self) -> bool:
+    async def stop_motors(self) -> None:
         """Stop all motor movement."""
         ...
 
-    async def set_run_current(self, axis: StackerAxis, current: float) -> bool:
+    async def set_run_current(self, axis: StackerAxis, current: float) -> None:
         """Set axis peak run current in amps."""
         ...
 
-    async def set_ihold_current(self, axis: StackerAxis, current: float) -> bool:
+    async def set_ihold_current(self, axis: StackerAxis, current: float) -> None:
         """Set axis hold current in amps."""
         ...
 
     async def set_stallguard_threshold(
         self, axis: StackerAxis, enable: bool, threshold: int
-    ) -> bool:
+    ) -> None:
         """Enables and sets the stallguard threshold for the given axis motor."""
         ...
 
-    async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> bool:
+    async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> None:
         """Enable or disable the TOF sensor."""
         ...
 
@@ -81,9 +84,34 @@ class AbstractFlexStackerDriver(Protocol):
         """Get the full histogram measurement from the TOF sensor."""
         ...
 
+    async def set_tof_configuration(
+        self,
+        sensor: TOFSensor,
+        spad_map_id: SpadMapID,
+        active_range: Optional[ActiveRange] = None,
+        kilo_iterations: Optional[int] = None,
+        report_period_ms: Optional[int] = None,
+        histogram_dump: Optional[bool] = None,
+    ) -> None:
+        """Set the configuration of the TOF sensor.
+
+        :param sensor: The TOF sensor to configure.
+        :param spad_map_id: The pre-defined SPAD map which sets the fov and focus area (14 default).
+        :active_range: The operating mode Short-range high-accuracy (default) or long range.
+        :kilo_iterations: The Measurement iterations times 1024 (4000 default).
+        :report_period_ms: The reporting period before each measurement (500 default).
+        :histogram_dump: Enables/Disables histogram measurements (True default).
+        :return: None
+        """
+        ...
+
+    async def get_tof_configuration(self, sensor: TOFSensor) -> TOFConfiguration:
+        """Get the configuration of the TOF sensor."""
+        ...
+
     async def set_motor_driver_register(
         self, axis: StackerAxis, reg: int, value: int
-    ) -> bool:
+    ) -> None:
         """Set the register of the given motor axis driver to the given value."""
         ...
 
@@ -93,7 +121,7 @@ class AbstractFlexStackerDriver(Protocol):
 
     async def set_tof_driver_register(
         self, sensor: TOFSensor, reg: int, value: int
-    ) -> bool:
+    ) -> None:
         """Set the register of the given tof sensor driver to the given value."""
         ...
 
@@ -173,7 +201,7 @@ class AbstractFlexStackerDriver(Protocol):
         pattern: Optional[LEDPattern] = None,
         duration: Optional[int] = None,
         reps: Optional[int] = None,
-    ) -> bool:
+    ) -> None:
         """Set LED Status bar color and pattern."""
         ...
 

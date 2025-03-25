@@ -3068,7 +3068,7 @@
       "description": "Parameters for mix.",
       "properties": {
         "repetitions": {
-          "description": "Number of mixing repetitions.",
+          "description": "Number of mixing repetitions. 0 is valid, but no mixing will occur.",
           "minimum": 0,
           "title": "Repetitions",
           "type": "integer"
@@ -3076,9 +3076,11 @@
         "volume": {
           "anyOf": [
             {
+              "exclusiveMinimum": 0,
               "type": "integer"
             },
             {
+              "exclusiveMinimum": 0.0,
               "type": "number"
             }
           ],
@@ -4128,6 +4130,53 @@
       "enum": ["well-bottom", "well-top", "well-center", "liquid-meniscus"],
       "title": "PositionReference",
       "type": "string"
+    },
+    "PrepareShuttleCreate": {
+      "description": "A request to execute a Flex Stacker PrepareShuttle command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/prepareShuttle",
+          "default": "flexStacker/prepareShuttle",
+          "enum": ["flexStacker/prepareShuttle"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/PrepareShuttleParams"
+        }
+      },
+      "required": ["params"],
+      "title": "PrepareShuttleCreate",
+      "type": "object"
+    },
+    "PrepareShuttleParams": {
+      "description": "The parameters for a PrepareShuttle command.",
+      "properties": {
+        "ignoreLatch": {
+          "default": false,
+          "description": "Ignore the latch state of the shuttle",
+          "title": "Ignorelatch",
+          "type": "boolean"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "PrepareShuttleParams",
+      "type": "object"
     },
     "PrepareToAspirateCreate": {
       "description": "Prepare for aspirate command creation request model.",
@@ -6582,6 +6631,7 @@
       "evotipUnsealPipette": "#/$defs/EvotipUnsealPipetteCreate",
       "flexStacker/empty": "#/$defs/EmptyCreate",
       "flexStacker/fill": "#/$defs/FillCreate",
+      "flexStacker/prepareShuttle": "#/$defs/PrepareShuttleCreate",
       "flexStacker/retrieve": "#/$defs/RetrieveCreate",
       "flexStacker/setStoredLabware": "#/$defs/SetStoredLabwareCreate",
       "flexStacker/store": "#/$defs/StoreCreate",
@@ -6885,6 +6935,9 @@
     },
     {
       "$ref": "#/$defs/EmptyCreate"
+    },
+    {
+      "$ref": "#/$defs/PrepareShuttleCreate"
     },
     {
       "$ref": "#/$defs/CalibrateGripperCreate"

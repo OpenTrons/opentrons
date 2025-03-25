@@ -402,11 +402,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             {toolboxStep === 2 &&
             (formData.stepType === 'moveLiquid' ||
               formData.stepType === 'mix') ? (
-              <Flex
-                
-                paddingBottom={SPACING.spacing40}
-                width="100"
-              >
+              <Flex paddingBottom={SPACING.spacing40} width="100">
                 <TertiaryButton
                   onClick={() => {
                     propsForFields.resetSettings.updateValue(tab)

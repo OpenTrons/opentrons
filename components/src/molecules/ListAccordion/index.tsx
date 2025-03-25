@@ -7,6 +7,7 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
+  CURSOR_POINTER,
 } from '../../styles'
 import { SPACING, RESPONSIVENESS } from '../../ui-style-constants'
 import { COLORS } from '../../helix-design-system'
@@ -138,6 +139,7 @@ const HEADER_CONTAINER_STYLE = css`
   width: 100%;
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
   gap: ${SPACING.spacing24};
+  cursor: ${CURSOR_POINTER};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     gap: ${SPACING.spacing40};

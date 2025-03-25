@@ -6,8 +6,8 @@ import {
   DISPLAY_GRID,
   Flex,
   FLEX_MAX_CONTENT,
-  JUSTIFY_END,
   JUSTIFY_FLEX_START,
+  JUSTIFY_START,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -74,7 +74,7 @@ const LABEL_CONTAINER_STYLE = css`
 `
 
 const TAG_CONTAINER_STYLE = css`
-  justify-self: ${JUSTIFY_END};
+  justify-self: ${JUSTIFY_START};
 
   @media (max-width: 450px) {
     justify-self: ${JUSTIFY_FLEX_START};

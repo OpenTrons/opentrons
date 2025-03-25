@@ -271,6 +271,7 @@ class InstrumentContext(publisher.CommandPublisher):
             and self.liquid_presence_detection
             and self._core.nozzle_configuration_valid_for_lld()
             and self._core.get_current_volume() == 0
+            and self._core.get_has_clean_tip()
         ):
             self._raise_if_pressure_not_supported_by_pipette()
             self.require_liquid_presence(well=well)
@@ -365,7 +366,10 @@ class InstrumentContext(publisher.CommandPublisher):
         :param push_out: Continue past the plunger bottom to help ensure all liquid
                          leaves the tip. Measured in µL. The default value is ``None``.
 
-                         See :ref:`push-out-dispense` for details.
+                         When not specified or set to ``None``, the plunger moves by a non-zero default amount.
+
+
+                         For a table of default values, see :ref:`push-out-dispense`.
         :type push_out: float
 
         :returns: This instance.

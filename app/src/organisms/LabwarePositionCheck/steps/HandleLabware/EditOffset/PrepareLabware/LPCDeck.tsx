@@ -81,7 +81,13 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   }
 
   const buildLabwareOnDeck = (): LabwareOnDeck[] => [
-    { labwareLocation: offsetLocationDetails, definition: labwareDef },
+    {
+      labwareLocation: {
+        ...offsetLocationDetails,
+        slotName: offsetLocationDetails.addressableAreaName,
+      },
+      definition: labwareDef,
+    },
   ]
 
   return (
