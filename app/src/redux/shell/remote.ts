@@ -103,7 +103,10 @@ export function appShellListener({
     } else {
       callbackStore[hostname] = callbackStore[hostname] ?? {}
       callbackStore[hostname][topic] ??= []
-      callbackStore[hostname][topic].push(callback)
+
+      if (!callbackStore[hostname][topic].includes(callback)) {
+        callbackStore[hostname][topic].push(callback)
+      }
     }
   })
 
