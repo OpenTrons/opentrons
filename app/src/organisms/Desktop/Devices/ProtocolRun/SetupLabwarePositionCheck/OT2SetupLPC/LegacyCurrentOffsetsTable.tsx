@@ -57,14 +57,14 @@ const OffsetTableDatum = styled('td')`
   text-overflow: wrap;
 `
 
-interface CurrentOffsetsTableProps {
+interface LegacyCurrentOffsetsTableProps {
   currentOffsets: LabwareOffset[]
   commands: RunTimeCommand[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
 }
-export function CurrentOffsetsTable(
-  props: CurrentOffsetsTableProps
+export function LegacyCurrentOffsetsTable(
+  props: LegacyCurrentOffsetsTableProps
 ): JSX.Element {
   const { currentOffsets, commands, labware, modules } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
