@@ -346,7 +346,7 @@ def _run_trial(
         )
     _PREV_TRIAL_GRAMS = m_data_init
 
-    if not resources.ctx.is_simulating():
+    if not trial.ctx.is_simulating():
         input("Press ENTER to continue...")
 
     # RUN ASPIRATE
