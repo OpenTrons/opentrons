@@ -86,7 +86,7 @@ export function RecoveryDoorOpen({
     }
   }
 
-  const buildTitletext = (): string => {
+  const buildTitleText = (): string => {
     switch (recoveryMap.route) {
       case RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
         return t('close_robot_and_stacker_door')
