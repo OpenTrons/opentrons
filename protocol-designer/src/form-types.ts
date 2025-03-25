@@ -367,6 +367,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
   times?: number | null
+  liquidClass?: string | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {

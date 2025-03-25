@@ -1225,6 +1225,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         liquidClassesSupported: { isIndeterminate: false },
+        liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -1317,6 +1321,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         liquidClassesSupported: { isIndeterminate: false },
+        liquidClass: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
