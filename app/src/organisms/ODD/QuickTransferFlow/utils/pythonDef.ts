@@ -76,7 +76,7 @@ export function quickTransferStepCommands(
   )
 }
 
-export function pythonCommands(
+export function pythonDef(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration
 ): string {

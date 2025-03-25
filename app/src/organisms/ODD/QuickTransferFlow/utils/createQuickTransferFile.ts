@@ -9,7 +9,7 @@ import {
   pythonRequirements,
 } from '@opentrons/step-generation'
 import { generateQuickTransferArgs } from './'
-import { pythonCommands } from './pythonCommands'
+import { pythonDef } from './pythonDef'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
@@ -288,7 +288,7 @@ export function createQuickTransferPythonFile(
       pythonImports(),
       pythonMetadata(fileMetadata),
       pythonRequirements(FLEX_ROBOT_TYPE),
-      pythonCommands(quickTransferState, deckConfig),
+      pythonDef(quickTransferState, deckConfig),
     ]
       .filter(section => section)
       .join('\n\n') + '\n'
