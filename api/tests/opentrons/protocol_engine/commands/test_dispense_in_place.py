@@ -84,7 +84,6 @@ async def test_dispense_in_place_implementation(
             volume=123,
             flow_rate=456,
             push_out=None,
-            is_full_dispense=False,
             correction_volume=0,
         )
     ).then_return(42)
@@ -183,7 +182,6 @@ async def test_dispense_in_place_is_ready_response(
             volume=dispense_volume,
             flow_rate=456,
             push_out=push_out,
-            is_full_dispense=dispense_volume == asp_volume,
             correction_volume=0,
         )
     ).then_return(dispense_volume)
@@ -280,7 +278,6 @@ async def test_overpressure_error(
             volume=50,
             flow_rate=1.23,
             push_out=10,
-            is_full_dispense=False,
             correction_volume=0,
         ),
     ).then_raise(PipetteOverpressureError())

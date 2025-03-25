@@ -73,7 +73,6 @@ class PipettingHandler(TypingProtocol):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
-        is_full_dispense: bool = False,
     ) -> float:
         """Set flow-rate and dispense while tracking."""
 
@@ -83,7 +82,6 @@ class PipettingHandler(TypingProtocol):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
-        is_full_dispense: bool,
         correction_volume: float = 0.0,
     ) -> float:
         """Set flow-rate and dispense."""
@@ -218,7 +216,6 @@ class HardwarePipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
-        is_full_dispense: bool = False,
     ) -> float:
         """Set flow-rate and dispense.
 
@@ -278,7 +275,6 @@ class HardwarePipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
-        is_full_dispense: bool,
         correction_volume: float = 0.0,
     ) -> float:
         """Dispense liquid without moving the pipette."""
@@ -294,7 +290,6 @@ class HardwarePipettingHandler(PipettingHandler):
                 volume=adjusted_volume,
                 push_out=push_out,
                 correction_volume=correction_volume,
-                is_full_dispense=is_full_dispense,
             )
 
         return adjusted_volume
@@ -416,7 +411,6 @@ class VirtualPipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
-        is_full_dispense: bool,
         correction_volume: float = 0.0,
     ) -> float:
         """Virtually dispense (no-op)."""
@@ -482,7 +476,6 @@ class VirtualPipettingHandler(PipettingHandler):
         volume: float,
         flow_rate: float,
         push_out: Optional[float],
-        is_full_dispense: bool = False,
     ) -> float:
         """Virtually dispense (no-op)."""
         # TODO (tz, 8-23-23): add a check for push_out not larger that the max volume allowed when working on this https://opentrons.atlassian.net/browse/RSS-329

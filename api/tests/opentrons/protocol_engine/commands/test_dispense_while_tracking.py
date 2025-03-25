@@ -110,7 +110,6 @@ async def test_dispense_while_tracking_implementation(
             push_out=None,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,
-            is_full_dispense=True,
         )
     ).then_return(42)
     decoy.when(state_view.pipettes.get_aspirated_volume("pipette-id-abc")).then_return(
@@ -274,7 +273,6 @@ async def test_overpressure_error(
             push_out=10,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,
-            is_full_dispense=True,
         ),
     ).then_raise(PipetteOverpressureError())
 
