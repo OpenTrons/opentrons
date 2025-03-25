@@ -452,9 +452,11 @@ class OT3API(
             checked_config = config
 
         backend = await OT3Simulator.build(
-            {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
-            if attached_instruments
-            else {},
+            (
+                {OT3Mount.from_mount(k): v for k, v in attached_instruments.items()}
+                if attached_instruments
+                else {}
+            ),
             checked_modules,
             checked_config,
             checked_loop,
@@ -3135,6 +3137,6 @@ class OT3API(
         self,
         mount: Union[top_types.Mount, OT3Mount],
     ) -> None:
-        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
+        """Tell a pipette to increase its evo-tip-dispense-count in eeprom."""
         realmount = OT3Mount.from_mount(mount)
         await self._backend.increase_evo_disp_count(realmount)
