@@ -306,11 +306,12 @@ export function getFailedLabwareQuantity(
   errorKind: ErrorKind
 ): string | undefined {
   if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
+    const failedCommandIndex = runCommands?.data.findIndex(
+      x => x.id === recentRelevantFailedLabwareCmd?.id
+    )
     const commandsBeforefailedCmd = runCommands?.data.slice(
       0,
-      runCommands?.data.findIndex(
-        x => x.id === recentRelevantFailedLabwareCmd?.id
-      )
+      (failedCommandIndex ?? 0)
     )
     const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
       cmd => cmd.commandType === 'flexStacker/setStoredLabware'
@@ -318,13 +319,11 @@ export function getFailedLabwareQuantity(
     const setStoredLabwareLastIndex = commandsBeforefailedCmd?.findLastIndex(
       cmd => cmd.commandType === 'flexStacker/setStoredLabware'
     )
-    const firstIndexOfSetStoredLabware = commandsBeforefailedCmd
-      ?.slice(0, setStoredLabwareLastIndex)
-      .findLastIndex(cmd => cmd.commandType === 'flexStacker/setStoredLabware')
     const itemsToCheck = commandsBeforefailedCmd?.slice(
-      firstIndexOfSetStoredLabware,
-      setStoredLabwareLastIndex
+      setStoredLabwareLastIndex ?? 0,
+      (failedCommandIndex ?? -1) > -1  ? failedCommandIndex : 0,
     )
+
     let total = 0
     if ('initialCount' in (setStoredLabwareLast?.params ?? {})) {
       total = setStoredLabwareLast?.params.initialCount ?? 0

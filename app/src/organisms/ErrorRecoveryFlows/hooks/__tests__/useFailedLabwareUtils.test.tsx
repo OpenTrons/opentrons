@@ -7,12 +7,14 @@ import {
   getRelevantWellName,
   getRelevantFailedLabwareCmdFrom,
   useRelevantFailedLwLocations,
+  getFailedLabwareQuantity,
 } from '../useFailedLabwareUtils'
 import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
 
 import type { ComponentProps } from 'react'
 import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
 import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
+import { RunCommandSummary } from '@opentrons/api-client'
 
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {
@@ -173,6 +175,93 @@ describe('getRelevantFailedLabwareCmdFrom', () => {
     expect(result).toBeNull()
   })
 })
+
+describe('getFailedLabwareQuantity', () => {
+  const failedCommand = {
+    id: 'failed-command-id',
+    error: {
+      errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
+    },
+    params: {
+      moduleId: 'module-id'
+    },
+  } as any
+
+  it('should return the quantity for STALL_WHILE_STACKING error kind', () => {
+    const failedRetriveCommand = {
+      ...failedCommand,
+      commandType: 'flexStacker/retrive',
+      error: {
+        isDefined: true,
+        errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
+      },
+    }
+
+    const runCommands = {
+      data: [
+        {
+          id: 'set-stored-labware-1',
+          commandType: 'flexStacker/setStoredLabware',
+          params: {
+            initialCount: 2
+          },
+        } as any,
+        {
+          id: 'retrive-id-1',
+          commandType: 'flexStacker/retrieve',
+          params: {
+            moduleId: 'module-id'
+          }
+        } as any,
+        {
+          id: 'retrive-id-2',
+          commandType: 'flexStacker/retrieve',
+          params: {
+            moduleId: 'module-id'
+          }
+        } as any,
+        {
+          id: 'set-stored-labware',
+          commandType: 'flexStacker/setStoredLabware',
+          params: {
+            initialCount: 5
+          },
+        } as any,
+        {
+          id: 'retrive-id',
+          commandType: 'flexStacker/retrieve',
+          params: {
+            moduleId: 'module-id'
+          }
+        } as any,
+        {...failedRetriveCommand}
+      ] as RunCommandSummary[],
+      meta: {
+        totalLength: 10,
+        pageLength: 1
+      },
+      links: {}
+    }
+    console.log("runCommands: ", runCommands)
+    
+    const result = getFailedLabwareQuantity(runCommands, failedRetriveCommand, ERROR_KINDS.STALL_WHILE_STACKING)
+    expect(result).toEqual("Quantity: 4")
+  })
+
+  // it('should return null for unhandled error kinds', () => {
+  //   const result = getFailedLabwareQuantity({
+  //     failedCommand: {
+  //       byRunRecord: {
+  //         ...failedCommand,
+  //         error: { errorType: 'SOME_UNHANDLED_ERROR' },
+  //       },
+  //     } as any,
+  //   })
+  //   console.log('result: ', result)
+  //   expect(result).toBeNull()
+  // })
+})
+
 
 const TestWrapper = (props: GetRelevantLwLocationsParams) => {
   const displayLocation = useRelevantFailedLwLocations(props)
