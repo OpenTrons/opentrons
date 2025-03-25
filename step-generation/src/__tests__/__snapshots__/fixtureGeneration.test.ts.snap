@@ -844,7 +844,7 @@ exports[`snapshot tests > makeContext 1`] = `
   "config": {
     "OT_PD_DISABLE_MODULE_RESTRICTIONS": false,
   },
-  "hasGripperEntity": false,
+  "gripperEntities": {},
   "labwareEntities": {
     "destPlateId": {
       "def": {

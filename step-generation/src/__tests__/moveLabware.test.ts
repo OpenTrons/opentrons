@@ -42,7 +42,11 @@ describe('moveLabware', () => {
         },
       },
       wasteChuteEntities: {},
-      hasGripperEntity: true,
+      gripperEntities: {
+        mockGripperId: {
+          id: 'mockGripperId',
+        },
+      },
       stagingAreaEntities: {
         mockStagingAreaId: {
           id: mockStagingAreaId,
@@ -403,7 +407,11 @@ describe('moveLabware', () => {
 
     invariantContext = {
       ...invariantContext,
-      hasGripperEntity: true,
+      gripperEntities: {
+        mockGripperId: {
+          id: 'mockGripperId',
+        },
+      },
       labwareEntities: {
         [SOURCE_LABWARE]: {
           id: 'labwareid',
@@ -636,7 +644,7 @@ describe('moveLabware', () => {
   it('should return an error when trying to move with gripper when there is no gripper', () => {
     invariantContext = {
       ...invariantContext,
-      hasGripperEntity: false,
+      gripperEntities: {},
     } as InvariantContext
 
     const params = {

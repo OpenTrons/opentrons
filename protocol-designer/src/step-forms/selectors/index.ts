@@ -44,6 +44,7 @@ import type {
   AdditionalEquipmentEntity,
   TrashBinEntities,
   WasteChuteEntities,
+  GripperEntities,
 } from '@opentrons/step-generation'
 import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -760,19 +761,29 @@ export const getInvariantContext: Selector<
         return acc
       }
     }, {})
+    const gripperEntities = Object.values(additionalEquipmentEntities).reduce(
+      (acc: GripperEntities, entity: AdditionalEquipmentEntity) => {
+        if (entity.name === 'gripper') {
+          acc[entity.id] = {
+            id: entity.id,
+          }
+          return acc
+        } else {
+          return acc
+        }
+      },
+      {}
+    )
 
     return {
       labwareEntities,
       moduleEntities,
       pipetteEntities,
       liquidEntities,
-      hasGripperEntity:
-        Object.values(additionalEquipmentEntities).find(
-          ae => ae.name === 'gripper'
-        ) != null,
       trashBinEntities,
       wasteChuteEntities,
       stagingAreaEntities,
+      gripperEntities,
       config: {
         OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
         OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),

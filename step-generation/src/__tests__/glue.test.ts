@@ -194,7 +194,7 @@ beforeEach(() => {
     trashBinEntities: {},
     wasteChuteEntities: {},
     stagingAreaEntities: {},
-    hasGripperEntity: false,
+    gripperEntities: {},
     liquidEntities: {},
     config: DEFAULT_CONFIG,
   }

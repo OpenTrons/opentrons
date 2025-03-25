@@ -40,12 +40,13 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   const { labwareId, strategy, newLocation } = args
   const useGripper = strategy === 'usingGripper'
   const {
-    hasGripperEntity,
+    gripperEntities,
     trashBinEntities,
     wasteChuteEntities,
     labwareEntities,
     moduleEntities,
   } = invariantContext
+  const hasGripperEntity = Object.keys(gripperEntities).length > 0
   const hasWasteChute = Object.values(wasteChuteEntities).length > 0
   const tiprackHasTip =
     prevRobotState.tipState != null

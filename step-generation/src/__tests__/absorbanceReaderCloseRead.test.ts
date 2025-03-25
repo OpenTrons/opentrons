@@ -45,7 +45,11 @@ describe('absorbanceReaderCloseRead compound command creator', () => {
           pythonName: 'mock_absorbance_plate_reader_1',
         },
       },
-      hasGripperEntity: true,
+      gripperEntities: {
+        mockGripperId: {
+          id: 'mockGripperId',
+        },
+      },
     }
     const state = getInitialRobotStateStandard(invariantContext)
 

@@ -7,11 +7,12 @@ import type { CommandCreator, CommandCreatorError } from '../../types'
 export const absorbanceReaderCloseLid: CommandCreator<
   AbsorbanceReaderCloseLidCreateCommand['params']
 > = (args, invariantContext, prevRobotState) => {
-  const { hasGripperEntity, moduleEntities } = invariantContext
+  const { gripperEntities, moduleEntities } = invariantContext
   const absorbanceReaderState = absorbanceReaderStateGetter(
     prevRobotState,
     args.moduleId
   )
+  const hasGripperEntity = Object.keys(gripperEntities).length > 0
   const errors: CommandCreatorError[] = []
   if (args.moduleId == null || absorbanceReaderState == null) {
     errors.push(errorCreators.missingModuleError())

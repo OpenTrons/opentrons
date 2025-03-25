@@ -239,7 +239,7 @@ function getInvariantContextAndRobotState(
     wasteChuteEntities,
     trashBinEntities,
     stagingAreaEntities: {},
-    hasGripperEntity: false,
+    gripperEntities: {},
     liquidEntities: {},
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }

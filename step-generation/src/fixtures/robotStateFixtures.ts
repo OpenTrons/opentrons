@@ -194,7 +194,7 @@ export function makeContext(): InvariantContext {
     trashBinEntities,
     wasteChuteEntities: {},
     stagingAreaEntities: {},
-    hasGripperEntity: false,
+    gripperEntities: {},
     liquidEntities: {},
     config: DEFAULT_CONFIG,
   }

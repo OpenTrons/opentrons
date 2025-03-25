@@ -150,7 +150,7 @@ export function constructInvariantContextFromRunCommands(
       //  this util is used for the timeline scrubber. It grabs staging area info from
       //  command analysis. Also, it does not visualize the gripper right now
       stagingAreaEntities: {},
-      hasGripperEntity: false,
+      gripperEntities: {},
       //  this util is used for the timeline scrubber. It grabs liquid info from analysis
       //  so this will not be wired up right now
       liquidEntities: {},

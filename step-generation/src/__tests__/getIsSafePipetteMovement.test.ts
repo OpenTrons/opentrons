@@ -66,7 +66,7 @@ describe('getIsSafePipetteMovement', () => {
       trashBinEntities: {},
       wasteChuteEntities: {},
       stagingAreaEntities: {},
-      hasGripperEntity: false,
+      gripperEntities: {},
       liquidEntities: {},
       config: {
         OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
@@ -113,7 +113,7 @@ describe('getIsSafePipetteMovement', () => {
         },
         wasteChuteEntities: {},
         stagingAreaEntities: {},
-        hasGripperEntity: false,
+        gripperEntities: {},
         config: {} as any,
       },
       'mockId',

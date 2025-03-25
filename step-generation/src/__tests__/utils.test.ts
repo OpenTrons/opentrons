@@ -327,7 +327,7 @@ describe('makeInitialRobotState', () => {
           wasteChuteEntities: {},
           trashBinEntities: {},
           stagingAreaEntities: {},
-          hasGripperEntity: false,
+          gripperEntities: {},
           liquidEntities: {},
         },
         labwareLocations: {

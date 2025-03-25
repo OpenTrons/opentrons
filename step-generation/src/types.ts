@@ -185,6 +185,13 @@ export interface StagingAreaEntities {
   [stagingAreaId: string]: StagingAreaEntity
 }
 
+export interface GripperEntity {
+  id: string
+}
+export interface GripperEntities {
+  [gripperId: string]: GripperEntity
+}
+
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
@@ -569,7 +576,7 @@ export interface InvariantContext {
   wasteChuteEntities: WasteChuteEntities
   trashBinEntities: TrashBinEntities
   stagingAreaEntities: StagingAreaEntities
-  hasGripperEntity: boolean
+  gripperEntities: GripperEntities
   liquidEntities: LiquidEntities
   config: Config
 }
