@@ -354,11 +354,11 @@ async def _main() -> None:
         save_config_(path+cal_fn, deck_slot)
     # Start recording pick up tip overlaps    
     with open(file_name, 'w', newline='') as pu_csvfile:
-        test_details = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        test_details = csv.writer(pu_csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         test_details.writerow({'test details'})
         test_details.writerow({pipette_model})
         test_details.writerow({'96H Pick up Tip Testing-Default Settings'})
-        log_file = csv.DictWriter(csvfile, dial_data)
+        log_file = csv.DictWriter(pu_csvfile, dial_data)
         log_file.writeheader()
         try:
             x_offset = 0, y_offset = 0
@@ -388,7 +388,7 @@ async def _main() -> None:
                             d_str += str(m) + ','
                             dial_data[f'Column_{noz_count}'] = m
                         log_file.writerow(dial_data)
-                        csvfile.flush()
+                        pu_csvfile.flush()
                         d_str = d_str[:-1] + '\n'
                         print(f"{d_str}")
                         # Reset Measurements list
