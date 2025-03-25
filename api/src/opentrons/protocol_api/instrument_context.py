@@ -718,7 +718,7 @@ class InstrumentContext(publisher.CommandPublisher):
             raise TypeError(f"location should be a Well, but it is {location}")
 
         if mm_from_edge and radius != 1.0:
-            raise ValueError(f"radius must be set to 1.0 if mm_from_edge is specified")
+            raise ValueError("radius must be set to 1.0 if mm_from_edge is specified")
 
         if "touchTipDisabled" in parent_labware.quirks:
             _log.info(f"Ignoring touch tip on labware {well}")
