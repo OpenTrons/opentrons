@@ -91,11 +91,6 @@ export function useFailedLabwareUtils({
     [failedCommandByRunRecord?.key, runCommands?.meta.totalLength]
   )
 
-  console.log(
-    'recentRelevantFailedLabwareCmd: ',
-    recentRelevantFailedLabwareCmd
-  )
-
   const tipSelectionUtils = useTipSelectionUtils(recentRelevantFailedLabwareCmd)
 
   const failedLabwareDetails = useMemo(
@@ -304,14 +299,14 @@ export function getFailedLabwareQuantity(
   runCommands: CommandsData | undefined,
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
-): string | undefined {
+): string | null {
   if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
     )
     const commandsBeforefailedCmd = runCommands?.data.slice(
       0,
-      (failedCommandIndex ?? 0)
+      failedCommandIndex ?? 0
     )
     const setStoredLabwareLast = commandsBeforefailedCmd?.findLast(
       cmd => cmd.commandType === 'flexStacker/setStoredLabware'
@@ -321,12 +316,11 @@ export function getFailedLabwareQuantity(
     )
     const itemsToCheck = commandsBeforefailedCmd?.slice(
       setStoredLabwareLastIndex ?? 0,
-      (failedCommandIndex ?? -1) > -1  ? failedCommandIndex : 0,
+      (failedCommandIndex ?? -1) > -1 ? failedCommandIndex : 0
     )
 
-    let total = 0
     if ('initialCount' in (setStoredLabwareLast?.params ?? {})) {
-      total = setStoredLabwareLast?.params.initialCount ?? 0
+      const total = setStoredLabwareLast?.params.initialCount ?? 0
       const retreiveCmds =
         itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/retrieve')
           .length ?? 0
@@ -338,7 +332,7 @@ export function getFailedLabwareQuantity(
     return 'Quantity: 0'
     }
   }
-  return undefined
+  return null
 }
 
 // Get the name of the relevant labware relevant to the failed command, if any.

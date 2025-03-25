@@ -183,7 +183,7 @@ describe('getFailedLabwareQuantity', () => {
       errorType: DEFINED_ERROR_TYPES.STACKER_STALL,
     },
     params: {
-      moduleId: 'module-id'
+      moduleId: 'module-id',
     },
   } as any
 
@@ -203,49 +203,53 @@ describe('getFailedLabwareQuantity', () => {
           id: 'set-stored-labware-1',
           commandType: 'flexStacker/setStoredLabware',
           params: {
-            initialCount: 2
+            initialCount: 2,
           },
         } as any,
         {
           id: 'retrive-id-1',
           commandType: 'flexStacker/retrieve',
           params: {
-            moduleId: 'module-id'
-          }
+            moduleId: 'module-id',
+          },
         } as any,
         {
           id: 'retrive-id-2',
           commandType: 'flexStacker/retrieve',
           params: {
-            moduleId: 'module-id'
-          }
+            moduleId: 'module-id',
+          },
         } as any,
         {
           id: 'set-stored-labware',
           commandType: 'flexStacker/setStoredLabware',
           params: {
-            initialCount: 5
+            initialCount: 5,
           },
         } as any,
         {
           id: 'retrive-id',
           commandType: 'flexStacker/retrieve',
           params: {
-            moduleId: 'module-id'
-          }
+            moduleId: 'module-id',
+          },
         } as any,
-        {...failedRetriveCommand}
+        { ...failedRetriveCommand },
       ] as RunCommandSummary[],
       meta: {
         totalLength: 10,
-        pageLength: 1
+        pageLength: 1,
       },
-      links: {}
+      links: {},
     }
-    console.log("runCommands: ", runCommands)
-    
-    const result = getFailedLabwareQuantity(runCommands, failedRetriveCommand, ERROR_KINDS.STALL_WHILE_STACKING)
-    expect(result).toEqual("Quantity: 4")
+    console.log('runCommands: ', runCommands)
+
+    const result = getFailedLabwareQuantity(
+      runCommands,
+      failedRetriveCommand,
+      ERROR_KINDS.STALL_WHILE_STACKING
+    )
+    expect(result).toEqual('Quantity: 4')
   })
 
   // it('should return null for unhandled error kinds', () => {
@@ -261,7 +265,6 @@ describe('getFailedLabwareQuantity', () => {
   //   expect(result).toBeNull()
   // })
 })
-
 
 const TestWrapper = (props: GetRelevantLwLocationsParams) => {
   const displayLocation = useRelevantFailedLwLocations(props)
