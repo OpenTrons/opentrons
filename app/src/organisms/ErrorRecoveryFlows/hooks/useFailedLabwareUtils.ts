@@ -334,7 +334,9 @@ export function getFailedLabwareQuantity(
         itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/store')
           .length ?? 0
       return 'Quantity: ' + (total - retreiveCmds + storeCmds)
-    } else return 'Quantity: 0'
+    } else {
+    return 'Quantity: 0'
+    }
   }
   return undefined
 }
