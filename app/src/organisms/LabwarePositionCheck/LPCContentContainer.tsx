@@ -181,7 +181,6 @@ function DesktopFooterContent({
   )
 }
 
-// TODO(jh, 03-11-25): Update the link/styling after Product/Design provide input.
 function NeedHelpLink(): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 

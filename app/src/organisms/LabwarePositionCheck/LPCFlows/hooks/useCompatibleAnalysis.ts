@@ -17,8 +17,6 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
-// TODO(jh, 03-17-25): Add testing here.
-
 // TODO(jh, 03-14-25): Remove this adapter logic and Mixpanel event once analytics
 //  indicate that users no longer run old analyses.
 
