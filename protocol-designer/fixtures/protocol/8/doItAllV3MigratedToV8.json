@@ -267,6 +267,7 @@
           "dropTip_location": "2088a082-31af-4993-bb1f-10f9a5842305:trashBin",
           "labware": "1e610d40-75c7-11ea-b42f-4b64e50f43e5:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1",
           "liquidClassesSupported": false,
+          "liquidClass": null,
           "mix_mmFromBottom": 0.5,
           "mix_touchTip_checkbox": true,
           "mix_touchTip_mmFromTop": -3,
