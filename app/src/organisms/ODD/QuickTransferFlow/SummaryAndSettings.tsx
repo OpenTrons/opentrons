@@ -35,6 +35,7 @@ import { quickTransferSummaryReducer } from './reducers'
 import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
+import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 interface SummaryAndSettingsProps {
   exitButtonProps: ComponentProps<typeof SmallButton>
@@ -134,8 +135,29 @@ export function SummaryAndSettings(
     })
   }
 
+  const handleClickDownloadPython = (): void => {
+    const protocolFile = createQuickTransferPythonFile(state, deckConfig)
+    const blob = new Blob([protocolFile], { type: 'text/x-python' })
+
+    const url = URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'quickTransfer.py'
+    document.body.appendChild(a)
+    a.click()
+
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    navigate('/quick-transfer')
+  }
+
   return showSaveOrRunModal ? (
-    <SaveOrRunModal onSave={handleClickSave} onRun={handleClickRun} />
+    <SaveOrRunModal
+      onSave={handleClickSave}
+      onRun={handleClickRun}
+      onDownloadPython={handleClickDownloadPython}
+    />
   ) : (
     <Flex>
       <ChildNavigation

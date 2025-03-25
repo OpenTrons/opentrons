@@ -33,7 +33,7 @@ import type {
   ModuleEntities,
   PipetteEntities,
   TimelineFrame,
-} from '@opentrons/step-generation'
+} from '../types'
 
 describe('pythonMetadata', () => {
   it('should generate metadata section', () => {

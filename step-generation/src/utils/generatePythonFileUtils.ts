@@ -159,7 +159,10 @@ export function getLoadLabware(
     .map(labware => {
       const { id, def, pythonName } = labware
       const { metadata, parameters, namespace, version } = def
-      const hasNickname = labwareNicknamesById[id] !== metadata.displayName
+      const hasNickname =
+        labwareNicknamesById[id] != null
+          ? labwareNicknamesById[id] !== metadata.displayName
+          : false
       const labwareSlot = labwareRobotState[id].slot
       const onModule = moduleEntities[labwareSlot] != null
       const onAdapter = allLabwareEntities[labwareSlot] != null

@@ -1,3 +1,4 @@
+import upperCase from 'lodash/upperCase'
 import {
   consolidate,
   distribute,
@@ -7,24 +8,32 @@ import {
   getLoadTrashBins,
   getLoadWasteChute,
   indentPyLines,
-  InvariantContext,
   PROTOCOL_CONTEXT_NAME,
   transfer,
 } from '@opentrons/step-generation'
 import { generateQuickTransferArgs } from './generateQuickTransferArgs'
 import type {
   CommandCreatorResult,
+  InvariantContext,
   TimelineFrame,
 } from '@opentrons/step-generation'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { QuickTransferSummaryState } from '../types'
 import type { MoveLiquidStepArgs } from './generateQuickTransferArgs'
 
-export function quickTransferStepCommands(
-  stepArgs: MoveLiquidStepArgs,
-  invariantContext: InvariantContext,
+interface QuickTransferStepCommandsProps {
+  stepArgs: MoveLiquidStepArgs
+  invariantContext: InvariantContext
   initialRobotState: TimelineFrame
+}
+
+export function quickTransferStepCommands(
+  props: QuickTransferStepCommandsProps
 ): string {
+  const { stepArgs, invariantContext, initialRobotState } = props
+  const { additionalEquipmentEntities, pipetteEntities } = invariantContext
+  const trashEntity = Object.values(additionalEquipmentEntities)[0]
+  const pipettePythonName = Object.values(pipetteEntities)[0].pythonName
   let nonLoadCommandCreator: CommandCreatorResult | null = null
   if (stepArgs?.commandCreatorFnName === 'transfer') {
     nonLoadCommandCreator = transfer(
@@ -51,7 +60,20 @@ export function quickTransferStepCommands(
       ? nonLoadCommandCreator.python ?? []
       : []
 
-  return `# ${stepArgs?.commandCreatorFnName} STEPS\n\n` + nonLoadCommands
+  let finalDropTipCommand = ''
+
+  if (trashEntity.name === 'trashBin') {
+    finalDropTipCommand = `${pipettePythonName}.drop_tip()`
+  } else if (trashEntity.name === 'wasteChute') {
+    finalDropTipCommand = `${pipettePythonName}.drop_tip(${trashEntity.pythonName})`
+  }
+
+  return (
+    `# ${upperCase(stepArgs?.commandCreatorFnName)} STEP\n\n` +
+    nonLoadCommands +
+    `\n` +
+    finalDropTipCommand
+  )
 }
 
 export function pythonCommands(
@@ -78,7 +100,11 @@ export function pythonCommands(
       getLoadTrashBins(additionalEquipmentEntities),
       getLoadWasteChute(additionalEquipmentEntities),
     ],
-    quickTransferStepCommands(stepArgs, invariantContext, initialRobotState),
+    quickTransferStepCommands({
+      stepArgs,
+      invariantContext,
+      initialRobotState,
+    }),
   ]
   const functionBody =
     sections
