@@ -763,6 +763,26 @@ class HepaUVFailedError(RoboticsInteractionError):
         super().__init__(ErrorCodes.HEPA_UV_FAILED, message, detail, wrapping)
 
 
+class FlexStackerShuttleMissingError(RoboticsInteractionError):
+    """An error indicating the Flex Stacker shuttle cannot be detected."""
+
+    def __init__(
+        self,
+        serial: str,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        self.serial = serial
+        super().__init__(
+            ErrorCodes.FLEX_STACKER_SHUTTLE_MISSING,
+            message,
+            detail,
+            wrapping,
+        )
+
+
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
     """An error indicating that a firmware update is required."""
 
