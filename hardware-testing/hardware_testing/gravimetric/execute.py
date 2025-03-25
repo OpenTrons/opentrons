@@ -346,6 +346,9 @@ def _run_trial(
         )
     _PREV_TRIAL_GRAMS = m_data_init
 
+    if not resources.ctx.is_simulating():
+        input("Press ENTER to continue...")
+
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         trial.ctx,
@@ -576,9 +579,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:  # noq
         [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
     )
     channels_to_test = _get_test_channels(cfg)
-
-    if not resources.ctx.is_simulating():
-        input("Press ENTER to continue...")
 
     for channel in channels_to_test:
         # initialize the global tip counter, per each channel that will be tested
