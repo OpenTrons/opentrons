@@ -548,8 +548,7 @@ def _run_trial(
         #        and so this would break any sort of multi-dispense testing
         assumed_air_gap = trial.pipette.current_volume
 
-        liq_height = trial.liquid_tracker.get_liquid_height(trial.well)
-        z_pause = liq_height + transfer_properties.aspirate.submerge.offset.z
+        z_pause = transfer_properties.aspirate.submerge.offset.z
         trial.pipette.move_to(trial.well.bottom(z=z_pause))
         if not trial.ctx.is_simulating():
             input("Press ENTER to continue...")
