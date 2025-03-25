@@ -9,7 +9,7 @@ type LeftColumnLabwareInfoProps = RecoveryContentProps & {
   type: ComponentProps<typeof InterventionContent>['infoProps']['type']
   layout: ComponentProps<typeof InterventionContent>['infoProps']['layout']
   /* Renders a warning InlineNotification if provided. */
-  bannerText?: string
+  bannerText?: string | null
 }
 // TODO(jh, 06-12-24): EXEC-500 & EXEC-501.
 // The left column component adjacent to RecoveryDeckMap/TipSelection.
@@ -73,13 +73,15 @@ export function LeftColumnLabwareInfo({
     }
   }
 
+
+  // build info props
   return (
     <InterventionContent
       headline={title}
       infoProps={{
         layout: layout,
         tagText: buildQuntity(),
-        subText: null, // where do we get the lid data from?
+        subText: undefined, // where do we get the lid data from?
         type,
         labwareName: failedLabwareName ?? '',
         labwareNickname: failedLabwareNickname ?? '',

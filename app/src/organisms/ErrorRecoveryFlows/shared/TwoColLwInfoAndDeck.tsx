@@ -92,7 +92,7 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
-  const buildBannerText = (): string  => {
+  const buildBannerText = (): string | null => {
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
       case MANUAL_REPLACE_AND_RETRY.ROUTE:
@@ -108,7 +108,7 @@ export function TwoColLwInfoAndDeck(
         return t('make_sure_loaded_correct_number_of_labware_stacker')
       case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
         if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE) {
-          return undefined
+          return null
         } else {
           return t('make_sure_loaded_correct_number_of_labware_stacker')
         }

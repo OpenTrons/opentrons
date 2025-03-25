@@ -62,6 +62,7 @@ export type UseFailedLabwareUtilsResult = UseTipSelectionUtilsResult & {
   failedLabwareNickname: string | null
   /* Details relating to the labware location. */
   failedLabwareLocations: RelevantFailedLabwareLocations
+  /* Details relating to the labware quantity in the stacker. */
   labwareQuantity: string | null
 }
 
@@ -316,10 +317,10 @@ export function getFailedLabwareQuantity(
     )
     const itemsToCheck = commandsBeforefailedCmd?.slice(
       setStoredLabwareLastIndex ?? 0,
-      (failedCommandIndex ?? -1) > -1 ? failedCommandIndex : 0
+      failedCommandIndex ?? 0
     )
 
-    if ('initialCount' in (setStoredLabwareLast?.params ?? {})) {
+    if (setStoredLabwareLast != null && 'initialCount' in setStoredLabwareLast.params) {
       const total = setStoredLabwareLast?.params.initialCount ?? 0
       const retreiveCmds =
         itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/retrieve')
@@ -401,15 +402,10 @@ export function getRelevantWellName(
   failedPipetteInfo: UseFailedLabwareUtilsProps['failedPipetteInfo'],
   recentRelevantPickUpTipCmd: FailedCommandRelevantLabware
 ): string {
-  const commandTypesWithoutWells = [
-    'moveLabware',
-    'flexStacker/retrieve',
-    'flexStacker/store',
-  ]
   if (
     failedPipetteInfo == null ||
     recentRelevantPickUpTipCmd == null ||
-    recentRelevantPickUpTipCmd.commandType in commandTypesWithoutWells
+    !('wellName' in recentRelevantPickUpTipCmd.params)
   ) {
     return ''
   }

@@ -251,6 +251,16 @@ describe('getFailedLabwareQuantity', () => {
     expect(result).toEqual('Quantity: 4')
   })
 
+  // it('should return 0 if there is no commands in list', () => {
+  //   const emptyRunCommands = {}
+  //   const result = getFailedLabwareQuantity(
+  //     emptyRunCommands,
+  //     failedRetriveCommand,
+  //     ERROR_KINDS.STALL_WHILE_STACKING
+  //   )
+  //   expect(result).toEqual('Quantity: 0')
+  // })
+
   it('should return null for unhandled error kinds', () => {
     const failedMoveLabwareCommand = {
       ...failedCommand,
@@ -264,7 +274,8 @@ describe('getFailedLabwareQuantity', () => {
     const result = getFailedLabwareQuantity(
       runCommands,
       failedMoveLabwareCommand,
-      ERROR_KINDS.GRIPPER_ERROR)
+      ERROR_KINDS.GRIPPER_ERROR
+    )
     console.log('result: ', result)
     expect(result).toBeNull()
   })

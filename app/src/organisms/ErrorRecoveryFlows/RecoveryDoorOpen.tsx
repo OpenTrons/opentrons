@@ -124,7 +124,7 @@ export function RecoveryDoorOpen({
             desktopStyle="headingSmallBold"
             oddStyle="level3HeaderBold"
           >
-            {buildTitletext()}
+            {buildTitleText()}
           </StyledText>
           <StyledText
             desktopStyle="bodyDefaultRegular"
