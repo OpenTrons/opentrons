@@ -120,9 +120,17 @@ def labware_detected(
     diff = defaultdict(list)
     if sensor == TOFSensor.Z:
         for zone in zones:
+            if zone not in [1]:
+                continue
             raw_data = histogram[zone]
             baseline_data = baseline[zone]
             for bin in bins:
+                if bin not in range(50, 60):
+                    continue
+                # We need to ignore raw photon count below 10000 on the X as
+                # it becomes inconsistent to detect labware on the home position.
+                if raw_data[bin] < 10000:
+                    continue
                 delta = raw_data[bin] - baseline_data[bin]
                 if delta > 0:
                     print(

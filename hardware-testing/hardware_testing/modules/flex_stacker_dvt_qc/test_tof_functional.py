@@ -134,3 +134,4 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     await test_tof_sensors_labware_detection(
         stacker, report, section, TOFSensor.Z, "tiprack"
     )
+    ui.get_user_ready("Please remove all labware from the stacker.")
