@@ -74,7 +74,6 @@ const callbackStore: CallbackStore = {}
 interface AppShellListener {
   hostname: string
   notifyTopic: NotifyTopic
-  /* The callback MUST be memoized so it's identity is stable between calls from the same location. */
   callback: (data: NotifyResponseData) => void
   isDismounting?: boolean
 }
@@ -104,11 +103,7 @@ export function appShellListener({
     } else {
       callbackStore[hostname] = callbackStore[hostname] ?? {}
       callbackStore[hostname][topic] ??= []
-
-      // Assumes callback is memoized.
-      if (!callbackStore[hostname][topic].includes(callback)) {
-        callbackStore[hostname][topic].push(callback)
-      }
+      callbackStore[hostname][topic].push(callback)
     }
   })
 
