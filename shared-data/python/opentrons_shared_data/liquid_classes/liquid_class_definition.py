@@ -173,7 +173,7 @@ class BlowoutParams(BaseModel):
     location: BlowoutLocation = Field(
         ..., description="Location well or trash entity for blow out."
     )
-    flowRate: _NonNegativeNumber = Field(
+    flowRate: _GreaterThanZeroNumber = Field(
         ..., description="Flow rate for blow out, in microliters per second."
     )
 
@@ -181,7 +181,7 @@ class BlowoutParams(BaseModel):
 class BlowoutProperties(BaseModel):
     """Blowout properties."""
 
-    enable: bool = Field(..., description="Whether blow-out is enabled.")
+    enable: StrictBool = Field(..., description="Whether blow-out is enabled.")
     params: BlowoutParams | SkipJsonSchema[None] = Field(
         None,
         description="Parameters for the blowout function.",
