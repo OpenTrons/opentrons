@@ -20,7 +20,7 @@ from typing import Any, List
 import anyio
 
 # Import the internal async analysis function and the _Output class.
-from opentrons.cli.analyze import _analyze, _Output
+from opentrons.cli.analyze import _analyze, _Output  # type: ignore[import-not-found]
 
 # Imports for pretty printing with Rich.
 from rich import print as rprint
@@ -43,7 +43,7 @@ class AnalysisResult:
     logs: str = ""
 
 
-def run_analyze_in_thread(files, rtp_values, rtp_files, check):
+def run_analyze_in_thread(files: List[Path], rtp_values: str, rtp_files: str, check: bool) -> tuple[int, dict[str, Any], str]:
     """
     Run _analyze in its own event loop in this thread.
     This helper creates its own BytesIO stream for JSON output, traps any print output,
@@ -97,7 +97,7 @@ async def run_analysis(
 
     try:
         # Run the analysis in a separate thread and enforce a timeout.
-        async with anyio.fail_after(ANALYSIS_TIMEOUT):
+        async with anyio.fail_after(ANALYSIS_TIMEOUT):  # type: ignore
             exit_code, result_json, log_output = await anyio.to_thread.run_sync(run_analyze_in_thread, files, rtp_values, rtp_files, check)
     except TimeoutError:
         result_json = {"error": f"Analysis timed out after {ANALYSIS_TIMEOUT} seconds"}
@@ -109,7 +109,7 @@ async def run_analysis(
     return AnalysisResult(protocol_file=protocol_file, result=result_json, logs=log_output)
 
 
-async def main():  # noqa: C901
+async def main() -> None:  # noqa: C901
     current_dir = Path(__file__).parent
     protocol_files = [
         file
@@ -132,7 +132,7 @@ async def main():  # noqa: C901
     with Progress() as progress:
         task_id = progress.add_task("[cyan]Processing protocols...", total=len(protocol_files))
 
-        async def run_and_collect(file: Path):
+        async def run_and_collect(file: Path) -> None:
             try:
                 result = await run_analysis(file)
             except Exception as e:

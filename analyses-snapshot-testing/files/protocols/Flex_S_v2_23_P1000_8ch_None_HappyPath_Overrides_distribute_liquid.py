@@ -1,11 +1,11 @@
 # I am going to get added to in the test runner
 # uncomment to test
 
-# These pass
+# These pass - they all move volumes greater than tip capacity
 # key = "50_filter"
 # key = "200"
 # key = "1000_filter"
-
+# https://opentrons.atlassian.net/browse/AUTH-1602
 # RuntimeError: Distribute liquid uses a disposal volume but location for disposing of the disposal volume cannot be found when blowout is disabled. Specify a blowout location and enable blowout when using a disposal volume.
 # the volume of these is all under the tip capacity
 # key = "1000"
