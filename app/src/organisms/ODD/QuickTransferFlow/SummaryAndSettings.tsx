@@ -25,17 +25,18 @@ import {
 } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useFeatureFlag } from '/app/redux/config'
 import { Overview } from './Overview'
 import { TipManagement } from './TipManagement'
 import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { SaveOrRunModal } from './SaveOrRunModal'
+import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
 
 import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
-import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 interface SummaryAndSettingsProps {
   exitButtonProps: ComponentProps<typeof SmallButton>
@@ -53,6 +54,7 @@ export function SummaryAndSettings(
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
+  const enableExportPython = useFeatureFlag('quickTransferExportPython')
 
   const displayCategory: string[] = [
     'overview',
@@ -99,11 +101,18 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFile = createQuickTransferFile(
+    const protocolFileJSON = createQuickTransferFile(
       state,
       deckConfig,
       protocolName
     )
+    const protocolFilePy = createQuickTransferPythonFile(
+      state,
+      deckConfig,
+      protocolName
+    )
+    const protocolFile = enableExportPython ? protocolFilePy : protocolFileJSON
+
     createProtocolAsync({
       files: [protocolFile],
       protocolKind: 'quick-transfer',
@@ -119,7 +128,9 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFile = createQuickTransferFile(state, deckConfig)
+    const protocolFileJSON = createQuickTransferFile(state, deckConfig)
+    const protocolFilePy = createQuickTransferPythonFile(state, deckConfig)
+    const protocolFile = enableExportPython ? protocolFilePy : protocolFileJSON
 
     createProtocolAsync({
       files: [protocolFile],
@@ -135,29 +146,8 @@ export function SummaryAndSettings(
     })
   }
 
-  const handleClickDownloadPython = (): void => {
-    const protocolFile = createQuickTransferPythonFile(state, deckConfig)
-    const blob = new Blob([protocolFile], { type: 'text/x-python' })
-
-    const url = URL.createObjectURL(blob)
-
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'quickTransfer.py'
-    document.body.appendChild(a)
-    a.click()
-
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-    navigate('/quick-transfer')
-  }
-
   return showSaveOrRunModal ? (
-    <SaveOrRunModal
-      onSave={handleClickSave}
-      onRun={handleClickRun}
-      onDownloadPython={handleClickDownloadPython}
-    />
+    <SaveOrRunModal onSave={handleClickSave} onRun={handleClickRun} />
   ) : (
     <Flex>
       <ChildNavigation
