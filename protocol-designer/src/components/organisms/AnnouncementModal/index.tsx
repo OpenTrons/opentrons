@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -18,8 +19,8 @@ import {
   getLocalStorageItem,
   localStorageAnnouncementKey,
 } from '../../../persist'
-import { useAnnouncements } from './announcements'
 import { RELEASE_NOTES_URL } from '../KnowledgeLink'
+import { useAnnouncements } from './announcements'
 
 interface AnnouncementModalProps {
   isViewReleaseNotes?: boolean
@@ -65,7 +66,7 @@ export const AnnouncementModal = (
               justifyContent={JUSTIFY_END}
               paddingX={SPACING.spacing24}
               paddingBottom={SPACING.spacing24}
-              alignItems="center"
+              alignItems={ALIGN_CENTER}
               gridGap={SPACING.spacing8}
             >
               <Link
@@ -73,7 +74,7 @@ export const AnnouncementModal = (
                 href={RELEASE_NOTES_URL}
                 css={TYPOGRAPHY.linkPSemiBold}
               >
-                <Flex alignItems="center" gridGap={SPACING.spacing8}>
+                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                   <StyledText>{t('view_full_release_notes')}</StyledText>
                   <Icon
                     size={SPACING.spacing8}
