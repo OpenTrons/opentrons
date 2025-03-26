@@ -365,9 +365,9 @@ class CanNetworkInfo:
             device_info_cache = _parse_can_device_info_response(message, arbitration_id)
             if not device_info_cache:
                 return
-            nodes[NodeId(device_info_cache.target).application_for()] = (
-                device_info_cache
-            )
+            nodes[
+                NodeId(device_info_cache.target).application_for()
+            ] = device_info_cache
             if expected_nodes and expected_nodes.issubset(
                 {node.application_for() for node in nodes}
             ):
@@ -528,7 +528,6 @@ async def log_motor_usage_data(
                 data_value = m.usage_value
                 log.info(f"    {data_name}: {data_value}")
             nodes.remove(node)
-            print(f"got usage from {node} with {nodes} remaining")
             if len(nodes) == 0:
                 event.set()
 

@@ -131,7 +131,6 @@ async def can_messenger(decoy: Decoy) -> can_bus.CanMessenger:
     def _add(
         listener: Callable[[MessageDefinition, ArbitrationId], None], _: Any
     ) -> None:
-        print(f"got listener, current is {listeners}")
         listeners.append(listener)
 
     decoy.when(
@@ -141,7 +140,6 @@ async def can_messenger(decoy: Decoy) -> can_bus.CanMessenger:
     ).then_do(_add)
 
     async def _send_response(node_id: NodeId, message: MessageDefinition) -> None:
-        print(f"got request sending response to {listeners}")
         for listener in listeners:
             listener(
                 GetMotorUsageResponse(
