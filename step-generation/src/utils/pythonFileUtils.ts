@@ -12,7 +12,6 @@ import {
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
 import type {
-  AdditionalEquipmentEntities,
   LabwareEntities,
   LabwareLiquidState,
   LiquidEntities,
