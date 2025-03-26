@@ -206,7 +206,9 @@
           "stepName": "transfer things",
           "stepDetails": "yeah notes",
           "id": "e7d36200-92a5-11e9-ac62-1b173f839d9e",
-          "dispense_touchTip_mmfromTop": null
+          "dispense_touchTip_mmfromTop": null,
+          "pushOut_checkbox": false,
+          "pushOut_volume": 0
         },
         "18113c80-92a6-11e9-ac62-1b173f839d9e": {
           "aspirate_delay_checkbox": false,

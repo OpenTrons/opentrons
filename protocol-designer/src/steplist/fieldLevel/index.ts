@@ -442,6 +442,10 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     maskValue: composeMaskers(trimDecimals(1)),
     castValue: numberOrNull,
   },
+  pushOut_volume: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: numberOrNull,
+  },
 }
 const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
   // profile step fields
