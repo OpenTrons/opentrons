@@ -14,7 +14,10 @@ from .pipetting_common import (
     TipPhysicallyAttachedError,
 )
 from .movement_common import StallOrCollisionError
-from .flex_stacker.common import FlexStackerStallOrCollisionError
+from .flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+)
 
 from . import absorbance_reader
 from . import flex_stacker
@@ -920,6 +923,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[GripperMovementError],
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
+    DefinedErrorData[FlexStackerShuttleError],
 ]
 
 
