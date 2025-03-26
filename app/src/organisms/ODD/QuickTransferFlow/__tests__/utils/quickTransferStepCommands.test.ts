@@ -1,11 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { quickTransferStepCommands } from '../../utils/pythonDef'
 import {
-  ConsolidateArgs,
-  DistributeArgs,
-  TransferArgs,
-} from '@opentrons/step-generation'
-import {
   fixture96Plate,
   fixtureP1000SingleV2Specs,
   fixtureTiprack1000ul,
@@ -13,6 +8,9 @@ import {
 import type {
   InvariantContext,
   TimelineFrame,
+  ConsolidateArgs,
+  DistributeArgs,
+  TransferArgs,
 } from '@opentrons/step-generation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
