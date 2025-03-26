@@ -315,14 +315,6 @@ interface LoadLidStackParams {
   quantity: number
 }
 
-interface StackerRetriveParams {
-  moduleId: string
-  labwareId?: string
-  displayName?: string
-  adapterId?: string
-  lidId?: string
-}
-
 interface LoadLidStackResult {
   stackLabwareId: string
   labwareIds: string[]
