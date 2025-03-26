@@ -1,15 +1,18 @@
 """Utilities for managing the CANbus network on the OT3."""
+
 import asyncio
 from dataclasses import dataclass
 from itertools import chain
 import logging
-from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple
+from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple, List
 from .types import PCBARevision
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     FirmwareTarget,
     USBTarget,
+    MessageId,
+    MotorUsageValueType,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
@@ -17,6 +20,8 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest as CanDeviceInfoRequest,
+    GetMotorUsageResponse,
+    GetMotorUsageRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoResponse as CanDeviceInfoResponse,
@@ -502,3 +507,35 @@ def _parse_can_device_info_response(
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")
     return None
+
+
+async def log_motor_usage_data(
+    can_messenger: CanMessenger, nodes: List[NodeId]
+) -> None:
+    """Broadcasts a message to get motor usage request and waits for a list of expected nodes."""
+    event = asyncio.Event()
+
+    def _filter(arb_id: ArbitrationId) -> bool:
+        return MessageId(arb_id.parts.message_id) == MessageId.get_motor_usage_response
+
+    def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
+        if isinstance(message, GetMotorUsageResponse):
+            usage_elements = message.payload.usage_elements
+            node = arb_id.parts.originating_node_id
+            log.info(f"Usage from {node}: ")
+            for m in usage_elements:
+                data_name = MotorUsageValueType(m.key).name
+                data_value = m.usage_value
+                log.info(f"    {data_name}: {data_value}")
+            nodes.remove(node)
+            if len(nodes) == 0:
+                event.set()
+
+    can_messenger.add_listener(_listener, _filter)
+    await can_messenger.send(node_id=NodeId.broadcast, message=GetMotorUsageRequest())
+    try:
+        await asyncio.wait_for(event.wait(), 1.0)
+    except TimeoutError:
+        log.error(f"Receiving usage data failed with {nodes} remaining")
+    finally:
+        can_messenger.remove_listener(_listener)
