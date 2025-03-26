@@ -83,7 +83,7 @@ Creating the dummy protocol requires you to:
     2. Define a ``run()`` function.
     3. Load all of your labware in their initial locations.
     4. Load your smallest capacity pipette and specify its ``tip_racks``.
-    5. Call ``pick_up_tip()``. Labware Position Check can't run if you don't pick up a tip.
+    5. Call ``pick_up_tip()``. Labware Position Check can't run on the OT-2 if you don't pick up a tip.
     
 For example, the following dummy protocol will use a P300 Single-Channel GEN2 pipette to enable Labware Position Check for an OT-2 tip rack, NEST reservoir, and NEST flat well plate.
 
@@ -99,7 +99,7 @@ For example, the following dummy protocol will use a P300 Single-Channel GEN2 pi
          p300.pick_up_tip() 
          p300.return_tip()
 
-After importing this protocol to the Opentrons App, run Labware Position Check to get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware.
+Import your protocol in the Opentrons App. In run setup, click **Labware offsets** to run Labware Position Check and get the x, y, and z offsets for the tip rack and labware. When complete, you can click **Get Labware Offset Data** to view automatically generated code that uses :py:meth:`.set_offset` to apply the offsets to each piece of labware.
 
 .. code-block:: python
 	
@@ -123,7 +123,7 @@ This automatically generated code uses generic names for the loaded labware. If 
 
 Once you've executed this code in Jupyter Notebook, all subsequent positional calculations for this reservoir in slot 2 will be adjusted 0.1 mm to the right, 0.2 mm to the back, and 0.3 mm up.
 
-Keep in mind that ``set_offset()`` commands will override any labware offsets set by running Labware Position Check in the Opentrons App. And you should follow the behavior of Labware Position Check, i.e., *do not* reuse offset measurements unless they apply to the *same labware type* in the *same deck slot* on the *same robot*.
+Keep in mind that ``set_offset()`` commands will override any labware offsets set by running Labware Position Check in the Opentrons App. In Flex protocols, you should only  reuse labware offset measurements when they apply to the *same labware type* used across the Flex deck. On the OT-2, use Labware Position Check to create and reuse labware offsets **only** for the *same labware type* in the *same deck slot* on the *same robot*.
 
 .. warning::
 
@@ -136,7 +136,7 @@ Labware Offset Behavior
 
 How the API applies labware offsets varies depending on the API level of your protocol. This section describes the latest behavior. For details on how offsets work in earlier API versions, see the API reference entry for :py:meth:`.set_offset`.
 
-In the latest API version, offsets apply to labware type–location combinations. For example,  if you use ``set_offset()`` on a tip rack, use all the tips, and replace the rack with a fresh one of the same type in the same location, the offsets will apply to the fresh tip rack::
+In the latest API version, labware offsets can apply to the same labware when used in different on-deck locations on the Flex. For example,  if you use ``set_offset()`` on a tip rack, use all the tips, and replace the rack with a fresh one of the same type in any deck location on the Flex, the offsets will apply to the fresh tip rack::
 
     tiprack = protocol.load_labware(
         load_name="opentrons_flex_96_tiprack_1000ul", location="D3"
@@ -150,10 +150,10 @@ In the latest API version, offsets apply to labware type–location combinations
         labware=tiprack, new_location=protocol_api.OFF_DECK
     )  # tiprack has no offset while off-deck
     protocol.move_labware(
-        labware=tiprack2, new_location="D3"
+        labware=tiprack2, new_location="B3"
     )  # tiprack2 now has offset 0.1, 0.1, 0.1
     
-Because offsets apply to combinations of labware type and location, if you want an offset to apply to a piece of labware as it moves around the deck, call ``set_offset()`` again after each movement::
+In OT-2 protocols, only reuse labware offsets with the same labware type and location combination. If you want an offset to apply to a piece of labware as it moves around the OT-2 deck, call ``set_offset()`` again after each movement::
 
     plate = protocol.load_labware(
         load_name="corning_96_wellplate_360ul_flat", location="D2"

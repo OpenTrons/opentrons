@@ -773,11 +773,14 @@ class Labware:
                 you must either use ``set_offset()`` on all of them or none of them.
             * - 2.14–2.17
               - ``set_offset()`` is not available, and the API raises an error.
-            * - 2.18 and newer
+            * - 2.18-2.22
               -
                 - Offsets apply to any labware of the same type, in the same on-deck location.
                 - Offsets can't be set on labware that is currently off-deck.
                 - Offsets do not follow a labware instance when using :py:meth:`.move_labware`.
+            * - 2.23 and newer
+              -
+                - Offsets can apply to any labware of the same type, in any Flex on-deck location.
 
         .. note::
 
