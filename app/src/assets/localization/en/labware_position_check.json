@@ -54,7 +54,7 @@
   "exit": "Exit",
   "exit_screen_confirm_exit": "Exit and discard all labware offsets",
   "exit_screen_go_back": "Go back to labware position check",
-  "exit_screen_subtitle": "If you exit now, all labware offsets will be discarded. This cannot be undone.",
+  "exit_screen_subtitle": "If you exit now, only the labware offsets you've confirmed will be applied to this run.",
   "exit_screen_title": "Exit before completing Labware Position Check?",
   "failed_to_save_final_position": "Failed to save final position",
   "get_labware_offset_data": "Get Labware Offset Data",
