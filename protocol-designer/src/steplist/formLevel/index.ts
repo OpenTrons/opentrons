@@ -114,7 +114,7 @@ interface StepFormDataMap {
   comment: HydratedCommentFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
-  getErrors?: (
+  getErrors: (
     arg: StepFormDataMap[K],
     moduleEntities: ModuleEntities
   ) => FormError[]
@@ -237,26 +237,97 @@ export const getFormErrors = (
   formData: HydratedFormData,
   moduleEntities: ModuleEntities
 ): FormError[] => {
-  //  manualIntervention is the starting deck state step
+  //  manualIntervention is the initial starting deck state step
   if (stepType === 'manualIntervention') {
     return []
   }
 
-  const formErrorGetter =
-    stepFormHelperMap[stepType] != null
-      ? stepFormHelperMap[stepType].getErrors
-      : null
+  switch (stepType) {
+    case 'absorbanceReader':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedAbsorbanceReaderFormData,
+        moduleEntities
+      )
+    case 'heaterShaker':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedHeaterShakerFormData,
+        moduleEntities
+      )
 
-  const errors =
-    formErrorGetter != null ? formErrorGetter(formData, moduleEntities) : []
-  return errors
+    case 'magnet':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedMagnetFormData,
+        moduleEntities
+      )
+
+    case 'mix':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedMixFormData,
+        moduleEntities
+      )
+
+    case 'moveLabware':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedMoveLabwareFormData,
+        moduleEntities
+      )
+
+    case 'moveLiquid':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedMoveLiquidFormData,
+        moduleEntities
+      )
+
+    case 'pause':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedPauseFormData,
+        moduleEntities
+      )
+
+    case 'temperature':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedTemperatureFormData,
+        moduleEntities
+      )
+
+    case 'thermocycler':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedThermocyclerFormData,
+        moduleEntities
+      )
+
+    case 'comment':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedCommentFormData,
+        moduleEntities
+      )
+  }
 }
 
 export const getFormWarnings = (
   stepType: StepType,
   formData: HydratedFormData
 ): FormWarning[] => {
-  const formWarningGetter = stepFormHelperMap[stepType]?.getWarnings
-  const warnings = formWarningGetter != null ? formWarningGetter(formData) : []
-  return warnings
+  //  manualIntervention is the initial starting deck state step
+  if (stepType === 'manualIntervention') {
+    return []
+  }
+
+  switch (stepType) {
+    case 'mix':
+      return stepFormHelperMap[stepType].getWarnings != null
+        ? stepFormHelperMap[stepType].getWarnings(
+            formData as HydratedMixFormData
+          )
+        : []
+    case 'moveLiquid':
+      return stepFormHelperMap[stepType].getWarnings != null
+        ? stepFormHelperMap[stepType].getWarnings(
+            formData as HydratedMoveLiquidFormData
+          )
+        : []
+    default:
+      //  NOTE: if a new form has warnings, we need to wire it up!
+      return []
+  }
 }

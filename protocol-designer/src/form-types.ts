@@ -260,6 +260,8 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   pipette: PipetteEntity
   tipRack: string
   volume: number
+  pushOut_volume: number | null
+  pushOut_checkbox: boolean
   aspirate_airGap_volume?: number | null
   aspirate_delay_mmFromBottom?: number | null
   aspirate_delay_seconds?: number | null
@@ -318,8 +320,6 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   pickUpTip_wellNames?: string[] | null
   preWetTip?: boolean | null
   liquidClass?: string | null
-  pushOut_volume: number | null
-  pushOut_checkbox: boolean
 }
 
 export interface HydratedMoveLabwareFormData extends AnnotationFields {
