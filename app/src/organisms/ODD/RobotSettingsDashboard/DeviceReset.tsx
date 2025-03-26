@@ -82,20 +82,26 @@ function buildResetRequest(
   displayedState: DisplayedResetOptionState
 ): ResetConfigRequest {
   return {
-    // Returned keys need to follow the server's HTTP API.
-    pipetteOffsetCalibrations: displayedState.pipetteOffsetCalibrations,
-    gripperOffsetCalibrations: displayedState.gripperOffsetCalibrations,
-    moduleCalibration: displayedState.moduleCalibration,
-    // If the user selected every visible option, implicitly select certain additional options.
-    ...(isEveryOptionSelected(displayedState)
-      ? {
-          authorizedKeys: true,
-          onDeviceDisplay: true,
-          deckConfiguration: true,
-          // todo(mm, 2025-03-27): This omits bootScripts because that's what the older
-          // code did, but it's unclear if that's intentional.
-        }
-      : {}),
+    resetLabwareOffsets: displayedState.labwareOffsets,
+
+    settingsResets: {
+      // These keys need to follow the server's HTTP API.
+      pipetteOffsetCalibrations: displayedState.pipetteOffsetCalibrations,
+      gripperOffsetCalibrations: displayedState.gripperOffsetCalibrations,
+      moduleCalibration: displayedState.moduleCalibration,
+      // If the user selected every visible option, implicitly select certain additional options.
+      ...(isEveryOptionSelected(displayedState)
+        ? {
+            authorizedKeys: true,
+            onDeviceDisplay: true,
+            deckConfiguration: true,
+            // todo(mm, 2025-03-27): This omits bootScripts because that's what the older
+            // code did, but it's unclear if that's intentional. For comparison, when the
+            // desktop app does this, it currently enables every option that the server
+            // advertises.
+          }
+        : {}),
+    },
   }
 }
 
