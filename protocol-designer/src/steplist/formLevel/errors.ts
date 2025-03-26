@@ -582,14 +582,13 @@ export const pauseForTimeOrUntilTold = (
   }
 }
 export const wellRatioMoveLiquid = (
-  fields: HydratedFormData
+  fields: HydratedMoveLiquidFormData
 ): FormError | null => {
-  if (!('aspirate_wells' in fields) || !('dispense_wells' in fields)) {
-    return null
-  }
   const { aspirate_wells, dispense_wells, dispense_labware } = fields
   const dispenseLabware =
-    'name' in dispense_labware ? dispense_labware.name ?? null : null
+    dispense_labware != null && 'name' in dispense_labware
+      ? dispense_labware.name ?? null
+      : null
   const isDispensingIntoTrash =
     dispenseLabware != null
       ? dispenseLabware === 'wasteChute' || dispenseLabware === 'trashBin'
@@ -1085,7 +1084,10 @@ export const dispenseTouchTipMmFromEdgeOutOfRange = (
   if (dispense_touchTip_checkbox == null) {
     return null
   }
-  const labwareDef = 'def' in dispense_labware ? dispense_labware.def : null
+  const labwareDef =
+    dispense_labware != null && 'def' in dispense_labware
+      ? dispense_labware.def
+      : null
   if (labwareDef == null) {
     return null
   }
