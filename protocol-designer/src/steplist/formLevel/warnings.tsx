@@ -1,11 +1,11 @@
 import { getWellTotalVolume } from '@opentrons/shared-data'
-import type { FormError } from './errors'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import {
+import type {
   HydratedFormData,
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
 } from '../../form-types'
+import type { FormError } from './errors'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 /*******************
  ** Warning Messages **
@@ -207,11 +207,11 @@ export const minDispenseAirGapVolume: (
  ********************/
 
 type ComposeWarnings = <T extends HydratedFormData>(
-  ...warningCheckers: ((fields: T) => FormWarning | null)[]
+  ...warningCheckers: Array<(fields: T) => FormWarning | null>
 ) => (arg: T) => FormWarning[]
 
 export const composeWarnings: ComposeWarnings = <T extends HydratedFormData>(
-  ...warningCheckers: ((fields: T) => FormWarning | null)[]
+  ...warningCheckers: Array<(fields: T) => FormWarning | null>
 ) => (formData: T) =>
   warningCheckers.reduce<FormWarning[]>((acc, checker) => {
     const possibleWarning = checker(formData)

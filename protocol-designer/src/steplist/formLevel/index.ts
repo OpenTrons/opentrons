@@ -73,6 +73,7 @@ import {
 import type { FormWarning, FormWarningType } from './warnings'
 import type {
   HydratedAbsorbanceReaderFormData,
+  HydratedCommentFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
@@ -100,7 +101,7 @@ export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
 
-type StepFormDataMap = {
+interface StepFormDataMap {
   absorbanceReader: HydratedAbsorbanceReaderFormData
   heaterShaker: HydratedHeaterShakerFormData
   mix: HydratedMixFormData
@@ -110,6 +111,7 @@ type StepFormDataMap = {
   magnet: HydratedMagnetFormData
   temperature: HydratedTemperatureFormData
   thermocycler: HydratedThermocyclerFormData
+  comment: HydratedCommentFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors?: (
@@ -119,7 +121,7 @@ interface FormHelpers<K extends keyof StepFormDataMap> {
   getWarnings?: (arg: StepFormDataMap[K]) => FormWarning[] // Changed to match step type
 }
 const stepFormHelperMap: {
-  [K in keyof StepFormDataMap]?: FormHelpers<K>
+  [K in keyof StepFormDataMap]: FormHelpers<K>
 } = {
   absorbanceReader: {
     getErrors: composeErrors(
@@ -225,16 +227,28 @@ const stepFormHelperMap: {
       lidTemperatureHoldRequired
     ),
   },
+  comment: {
+    getErrors: composeErrors(),
+  },
 }
+
 export const getFormErrors = (
   stepType: StepType,
   formData: HydratedFormData,
   moduleEntities: ModuleEntities
 ): FormError[] => {
-  //  @ts-expect-error
-  const formErrorGetter = stepFormHelperMap[stepType]?.getErrors
+  //  manualIntervention is the starting deck state step
+  if (stepType === 'manualIntervention') {
+    return []
+  }
 
-  const errors = formErrorGetter != null ? formErrorGetter(formData) : []
+  const formErrorGetter =
+    stepFormHelperMap[stepType] != null
+      ? stepFormHelperMap[stepType].getErrors
+      : null
+
+  const errors =
+    formErrorGetter != null ? formErrorGetter(formData, moduleEntities) : []
   return errors
 }
 
@@ -242,7 +256,6 @@ export const getFormWarnings = (
   stepType: StepType,
   formData: HydratedFormData
 ): FormWarning[] => {
-  //  @ts-expect-error
   const formWarningGetter = stepFormHelperMap[stepType]?.getWarnings
   const warnings = formWarningGetter != null ? formWarningGetter(formData) : []
   return warnings

@@ -950,8 +950,8 @@ export const wavelengthRequired = (
     0,
     mode === 'single' ? 1 : wavelengths.length
   )
-  //  @ts-expect-error
-  return wavelengthsToCheck?.some((wavelength: string[]) => !wavelength) &&
+
+  return wavelengthsToCheck?.some(wavelength => !wavelength) &&
     absorbanceReaderFormType === ABSORBANCE_READER_INITIALIZE
     ? WAVELENGTH_REQUIRED
     : null
@@ -1155,17 +1155,15 @@ export const getIsOutOfRange = (
  **     Helpers    **
  ********************/
 type ComposeErrors = <T extends HydratedFormData>(
-  ...errorCheckers: ((
-    fields: T,
-    moduleEntities?: ModuleEntities
-  ) => FormError | null)[]
+  ...errorCheckers: Array<
+    (fields: T, moduleEntities?: ModuleEntities) => FormError | null
+  >
 ) => (arg: T, moduleEntities?: ModuleEntities) => FormError[]
 
 export const composeErrors: ComposeErrors = <T extends HydratedFormData>(
-  ...errorCheckers: ((
-    fields: T,
-    moduleEntities?: ModuleEntities
-  ) => FormError | null)[]
+  ...errorCheckers: Array<
+    (fields: T, moduleEntities?: ModuleEntities) => FormError | null
+  >
 ) => (formData: T, moduleEntities?: ModuleEntities) =>
   errorCheckers
     .map(checker => checker(formData, moduleEntities))
