@@ -8,6 +8,7 @@ import type {
   HydratedPauseFormData,
   HydratedTemperatureFormData,
   HydratedThermocyclerFormData,
+  LabwareEntityWithTouchTip,
 } from '../../../../form-types'
 
 describe('form casting', () => {
@@ -40,7 +41,7 @@ describe('form casting', () => {
       dispense_delay_mmFromBottom: 0.5,
       dispense_delay_seconds: 1,
       dispense_flowRate: null,
-      dispense_labware: {} as LabwareEntity,
+      dispense_labware: {} as LabwareEntityWithTouchTip,
       dispense_mix_checkbox: false,
       dispense_mix_times: 0,
       dispense_mix_volume: 0,
@@ -87,7 +88,7 @@ describe('form casting', () => {
       stepName: 'mix',
       stepDetails: '',
       changeTip: 'always',
-      labware: {} as LabwareEntity,
+      labware: {} as LabwareEntityWithTouchTip,
       mix_wellOrder_first: 't2b',
       mix_wellOrder_second: 'l2r',
       blowout_checkbox: false,

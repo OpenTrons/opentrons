@@ -14,7 +14,6 @@ import type {
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
-  AdditionalEquipmentEntity,
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
@@ -233,7 +232,7 @@ export type BlankForm = AnnotationFields & {
   id: StepIdType
 }
 
-interface LabwareEntityWithTouchTip extends LabwareEntity {
+export interface LabwareEntityWithTouchTip extends LabwareEntity {
   isTouchTipAllowed: boolean
 }
 
