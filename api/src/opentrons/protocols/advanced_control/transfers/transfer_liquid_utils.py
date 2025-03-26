@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import Literal, Sequence, List, Optional, TYPE_CHECKING
 from dataclasses import dataclass
 
-from opentrons.protocol_api.labware import Well, Labware  # TODO these might need to be type checked
 from opentrons.protocol_engine.errors import LiquidHeightUnknownError
 from opentrons.protocol_engine.state._well_math import (
     wells_covered_by_pipette_configuration,
@@ -15,6 +14,7 @@ if TYPE_CHECKING:
     from logging import Logger
     from opentrons.types import Location
     from opentrons.protocol_api.core.engine import WellCore
+    from opentrons.protocol_api.labware import Well
 
 
 @dataclass
@@ -76,8 +76,12 @@ def group_wells_for_multi_channel_transfer(
     configuration = nozzle_map.configuration
     active_nozzles = nozzle_map.tip_count
 
-    if ((configuration == NozzleConfigurationType.COLUMN or
-        configuration == NozzleConfigurationType.FULL) and active_nozzles == 8
+    if (
+        (
+            configuration == NozzleConfigurationType.COLUMN
+            or configuration == NozzleConfigurationType.FULL
+        )
+        and active_nozzles == 8
     ) or (configuration == NozzleConfigurationType.ROW and active_nozzles == 12):
         return _group_wells_for_columns_or_rows(list(targets), nozzle_map)
     elif active_nozzles == 96:
@@ -86,9 +90,11 @@ def group_wells_for_multi_channel_transfer(
         raise ValueError("Unsupported tip configuration for well grouping")
 
 
-def _group_wells_for_columns_or_rows(
+def _group_wells_for_columns_or_rows(  # noqa: C901
     targets: List[Well], nozzle_map: NozzleMapInterface
 ) -> List[Well]:
+    from opentrons.protocol_api.labware import Labware
+
     grouped_wells = []
     active_column_or_row: List[str] = []
     secondary_384_column_or_row: List[str] = []
@@ -97,7 +103,17 @@ def _group_wells_for_columns_or_rows(
     # We are assuming the wells are ordered A1, B1, C1... A2, B2, C2..., for columns and
     # A1, A2, A3... B1, B2, B3 for rows. So if the active nozzle is on H row/12 column,
     # reverse the list so the correct primary nozzle is chosen
-    reverse_lookup = nozzle_map.starting_nozzle == "H12" or (nozzle_map.configuration == NozzleConfigurationType.COLUMN and nozzle_map.starting_nozzle == "H1") or (nozzle_map.configuration == NozzleConfigurationType.ROW and nozzle_map.starting_nozzle == "A12")
+    reverse_lookup = (
+        nozzle_map.starting_nozzle == "H12"
+        or (
+            nozzle_map.configuration == NozzleConfigurationType.COLUMN
+            and nozzle_map.starting_nozzle == "H1"
+        )
+        or (
+            nozzle_map.configuration == NozzleConfigurationType.ROW
+            and nozzle_map.starting_nozzle == "A12"
+        )
+    )
     if reverse_lookup:
         targets.reverse()
 
@@ -125,7 +141,7 @@ def _group_wells_for_columns_or_rows(
                 if not secondary_384_column_or_row:
                     secondary_384_column_or_row = list(
                         wells_covered_by_pipette_configuration(
-                            nozzle_map,
+                            nozzle_map,  # type: ignore[arg-type]
                             well.well_name,
                             labware_wells_by_column=[
                                 [labware_well.well_name for labware_well in column]
@@ -151,7 +167,10 @@ def _group_wells_for_columns_or_rows(
         # in the secondary one. For a 96 well plate this will never be True, since creating this list requires
         # the format to be 384
         elif secondary_384_column_or_row:
-            if well.well_name in secondary_384_column_or_row and well.parent == active_labware:
+            if (
+                well.well_name in secondary_384_column_or_row
+                and well.parent == active_labware
+            ):
                 secondary_384_column_or_row.remove(well.well_name)
             else:
                 raise ValueError(
@@ -162,7 +181,7 @@ def _group_wells_for_columns_or_rows(
         else:
             active_column_or_row = list(
                 wells_covered_by_pipette_configuration(
-                    nozzle_map,
+                    nozzle_map,  # type: ignore[arg-type]
                     well.well_name,
                     labware_wells_by_column=[
                         [labware_well.well_name for labware_well in column]
@@ -175,7 +194,10 @@ def _group_wells_for_columns_or_rows(
             active_labware = well.parent
 
     if active_column_or_row or secondary_384_column_or_row:
-        raise ValueError("Could not target all wells provided without aspirating from other wells.")
+        raise ValueError(
+            "Could not target all wells provided without aspirating from other wells. "
+            f"Remaining wells: {active_column_or_row + secondary_384_column_or_row}"
+        )
 
     # If we reversed the lookup of wells, reverse the grouped wells we will return
     if reverse_lookup:
@@ -191,6 +213,8 @@ def _group_wells_by_labware(target_wells: List[Well]) -> List[List[Well]]:
     labware 1, followed by a well from labware 2, followed by more wells from labware 1,
     there will be three lists returned in the outer list
     """
+    from opentrons.protocol_api.labware import Labware
+
     wells_by_labware: List[List[Well]] = []
     active_labware: Optional[Labware] = None
     active_wells: List[Well] = []
@@ -229,11 +253,14 @@ def _group_wells_for_full_96(targets: List[Well]) -> List[Well]:
                 "Ensure there are 96 or a multiple of 96 wells given."
             )
 
-        for well in well_group:
-            well_name = well.well_name
-            if well.well_name == 'A1':
-                grouped_wells.append(well)
-            elif labware_format == "384Standard" and well_name in {'B1, A2, B2'}:
-                grouped_wells.append(well)
+        if labware_format == "96Standard":
+            target_wells = [well for well in well_group if well.well_name == "A1"]
+        else:
+            target_wells = [
+                well
+                for well in well_group
+                if well.well_name in {"A1", "B1", "A2", "B2"}
+            ]
+        grouped_wells.extend(target_wells)
 
     return grouped_wells
