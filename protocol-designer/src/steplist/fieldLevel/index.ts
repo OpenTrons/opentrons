@@ -40,17 +40,17 @@ import {
 } from '../../constants'
 import { getStagingAreaAddressableAreas } from '../../utils'
 import type {
-  LabwareEntity,
   PipetteEntity,
   InvariantContext,
   LabwareEntities,
   WasteChuteEntities,
   StagingAreaEntities,
-  WasteChuteEntity,
-  TrashBinEntity,
 } from '@opentrons/step-generation'
 import type { ValueMasker, ValueCaster } from './processing'
-import type { StepFieldName } from '../../form-types'
+import type {
+  LabwareOrAdditionalEquipmentEntity,
+  StepFieldName,
+} from '../../form-types'
 import type {
   AddressableAreaName,
   CutoutId,
@@ -58,23 +58,6 @@ import type {
 } from '@opentrons/shared-data'
 
 export type { StepFieldName }
-
-interface LabwareEntityWithTouchTip extends LabwareEntity {
-  isTouchTipAllowed: boolean
-}
-
-interface WasteChuteEntityWithTouchTip extends WasteChuteEntity {
-  isTouchTipAllowed: boolean
-}
-
-interface TrashBinEntityWithTouchTip extends TrashBinEntity {
-  isTouchTipAllowed: boolean
-}
-
-type LabwareOrAdditionalEquipmentEntity =
-  | LabwareEntityWithTouchTip
-  | WasteChuteEntityWithTouchTip
-  | TrashBinEntityWithTouchTip
 
 const getLabwareOrAdditionalEquipmentEntity = (
   state: InvariantContext,
@@ -93,11 +76,13 @@ const getLabwareOrAdditionalEquipmentEntity = (
     return {
       ...state.wasteChuteEntities[id],
       isTouchTipAllowed: false,
+      name: 'wasteChute',
     }
   } else if (state.trashBinEntities[id] != null) {
     return {
       ...state.trashBinEntities[id],
       isTouchTipAllowed: false,
+      name: 'trashBin',
     }
   } else return null
 }
