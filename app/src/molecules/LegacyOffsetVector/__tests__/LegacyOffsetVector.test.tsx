@@ -4,16 +4,16 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { SPACING, TYPOGRAPHY } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { OffsetVector } from '../'
+import { LegacyOffsetVector } from '../'
 
 import type { ComponentProps } from 'react'
 
-const render = (props: ComponentProps<typeof OffsetVector>) => {
-  return renderWithProviders(<OffsetVector {...props} />)[0]
+const render = (props: ComponentProps<typeof LegacyOffsetVector>) => {
+  return renderWithProviders(<LegacyOffsetVector {...props} />)[0]
 }
 
 describe('OffsetVector', () => {
-  let props: ComponentProps<typeof OffsetVector>
+  let props: ComponentProps<typeof LegacyOffsetVector>
 
   beforeEach(() => {
     props = {

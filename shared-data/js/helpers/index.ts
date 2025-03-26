@@ -64,6 +64,30 @@ export const constructLabwareDefURI = (
   version: string
 ): string => `${namespace}/${loadName}/${version}`
 
+export interface URIDetails {
+  loadName: string
+  namespace: string
+  version: number
+}
+export const splitLabwareDefURI = (uri: string): URIDetails => {
+  const parts = uri.split('/')
+
+  if (parts.length !== 3) {
+    console.error(
+      `Error: Invalid URI format. Expected 3 parts, got ${parts.length}`
+    )
+    return { loadName: '', namespace: '', version: -1 }
+  } else {
+    const [namespace, loadName, versionStr] = parts
+
+    return {
+      namespace,
+      loadName,
+      version: Number(versionStr),
+    }
+  }
+}
+
 // Load names of "retired" labware
 // TODO(mc, 2019-12-3): how should this correspond to LABWAREV2_DO_NOT_LIST?
 // see shared-data/js/getLabware.js

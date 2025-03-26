@@ -14,18 +14,18 @@ import type { StyleProps } from '@opentrons/components'
 
 type TabOptions = 'table' | 'jupyter' | 'cli'
 
-export interface LabwareOffsetTabsProps extends StyleProps {
+export interface LegacyLabwareOffsetTabsProps extends StyleProps {
   TableComponent: JSX.Element
   JupyterComponent: JSX.Element
   CommandLineComponent: JSX.Element
 }
 
-export function LabwareOffsetTabs({
+export function LegacyLabwareOffsetTabs({
   TableComponent,
   JupyterComponent,
   CommandLineComponent,
   ...styleProps
-}: LabwareOffsetTabsProps): JSX.Element {
+}: LegacyLabwareOffsetTabsProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const [currentTab, setCurrentTab] = useState<TabOptions>('table')
 

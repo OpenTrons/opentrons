@@ -19,7 +19,7 @@ import {
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { CurrentOffsetsTable } from './CurrentOffsetsTable'
+import { LegacyCurrentOffsetsTable } from './LegacyCurrentOffsetsTable'
 import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import {
   useNotifyRunQuery,
@@ -29,7 +29,7 @@ import {
 import { useRobotType } from '/app/redux-resources/robots'
 import { useLPCFlows, LPCFlows } from '/app/organisms/LabwarePositionCheck'
 
-import type { SetupLabwarePositionCheckProps } from '.'
+import type { SetupLabwarePositionCheckProps } from '..'
 import type { LabwareOffset } from '@opentrons/api-client'
 
 export function OT2SetupLPC(
@@ -95,7 +95,7 @@ export function OT2SetupLPC(
       gridGap={SPACING.spacing16}
     >
       {nonIdentityOffsets.length > 0 ? (
-        <CurrentOffsetsTable
+        <LegacyCurrentOffsetsTable
           currentOffsets={nonIdentityOffsets}
           commands={protocolData?.commands ?? []}
           labware={protocolData?.labware ?? []}

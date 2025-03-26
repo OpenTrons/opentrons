@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import { useLogger } from '../../logger'
-import { LabwarePositionCheckComponent } from './LabwarePositionCheckComponent'
+import { LegacyLabwarePositionCheckComponent } from './LegacyLabwarePositionCheckComponent'
 import { FatalErrorModal } from './FatalErrorModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { useSelector } from 'react-redux'
@@ -46,7 +46,7 @@ export const LegacyLabwarePositionCheck = (
       onClose={props.onCloseClick}
       isOnDevice={isOnDevice}
     >
-      <LabwarePositionCheckComponent {...props} />
+      <LegacyLabwarePositionCheckComponent {...props} />
     </ErrorBoundary>
   )
 }

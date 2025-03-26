@@ -54,6 +54,11 @@ export const LABWAREV2_DO_NOT_LIST = [
   // temporarily blocking 20 uL Flex tip racks until they launch
   'opentrons_flex_96_tiprack_20ul',
   'opentrons_flex_96_filtertiprack_20ul',
+  // temporarily blocking tough labware until geometry and collateral is finalized
+  'opentrons_tough_1_reservoir_300ml',
+  'opentrons_tough_4_reservoir_72ml',
+  'opentrons_tough_12_reservoir_22ml',
+  'opentrons_tough_universal_lid',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // or the adapter/labware combos since we migrated to splitting them up
@@ -80,6 +85,11 @@ export const PD_DO_NOT_LIST = [
   // temporarily blocking 20 uL Flex tip racks until they launch
   'opentrons_flex_96_tiprack_20ul',
   'opentrons_flex_96_filtertiprack_20ul',
+  // temporarily blocking tough labware until geometry and collateral is finalized
+  'opentrons_tough_1_reservoir_300ml',
+  'opentrons_tough_4_reservoir_72ml',
+  'opentrons_tough_12_reservoir_22ml',
+  'opentrons_tough_universal_lid',
 ]
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
