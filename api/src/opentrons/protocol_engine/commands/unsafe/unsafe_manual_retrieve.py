@@ -1,7 +1,7 @@
 """Command models to manually retrieve a labware from a Flex Stacker in an unsafe situation."""
 
 from __future__ import annotations
-from typing import Literal, TYPE_CHECKING, Any, Union
+from typing import Literal, TYPE_CHECKING, Any, Union, Optional
 from typing_extensions import Type
 
 from pydantic import BaseModel, Field
@@ -26,8 +26,12 @@ from ...state import update_types
 from ...types import (
     ModuleLocation,
     LabwareLocationSequence,
+    LabwareLocation,
+    LoadedLabware,
 )
 from opentrons.hardware_control.modules.types import PlatformState
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from ..flex_stacker.retrieve import RetrieveResult
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
@@ -74,7 +78,7 @@ class UnsafeManualRetrieveParams(BaseModel):
     )
 
 
-class UnsafeManualRetrieveResult(BaseModel):
+class UnsafeManualRetrieveResult(RetrieveResult):
     """Result data from a labware retrieval command."""
 
     labwareId: str = Field(
@@ -157,62 +161,95 @@ class UnsafeManualRetrieveImpl(
             lid_id=params.lidId,
         )
 
+        # Dictionaries for state updates and location sequencing
+        definitions_by_id: dict[str, LabwareDefinition] = {}
+        definitions_by_id[
+            loaded_labware_pool.primary_labware.id
+        ] = stacker_state.pool_primary_definition
+        offset_ids_by_id: dict[str, Optional[str]] = {}
+        display_names_by_id: dict[str, str | None] = {}
+        new_locations_by_id: dict[str, LabwareLocation] = {}
+        labware_by_id: dict[str, LoadedLabware] = {}
+
+        for loaded_labware in (
+            loaded_labware_pool.primary_labware,
+            loaded_labware_pool.adapter_labware,
+            loaded_labware_pool.lid_labware,
+        ):
+            if loaded_labware:
+                offset_ids_by_id[loaded_labware.id] = loaded_labware.offsetId
+                display_names_by_id[loaded_labware.id] = loaded_labware.displayName
+                new_locations_by_id[loaded_labware.id] = loaded_labware.location
+                labware_by_id[loaded_labware.id] = loaded_labware
+        if loaded_labware_pool.adapter_labware:
+            definitions_by_id[
+                loaded_labware_pool.adapter_labware.id
+            ] = stacker_state.pool_adapter_definition
+        if loaded_labware_pool.lid_labware:
+            definitions_by_id[
+                loaded_labware_pool.lid_labware.id
+            ] = stacker_state.pool_lid_definition
+
         # Get the labware dimensions for the labware being retrieved,
         # which is the first one in the hopper labware id list
         primary_location_sequence = (
             self._state_view.geometry.get_predicted_location_sequence(
-                loaded_labware_pool.new_locations_by_id[loaded_labware_pool.primary_id],
-                loaded_labware_pool.labware_by_id,
+                new_locations_by_id[loaded_labware_pool.primary_labware.id],
+                labware_by_id,
             )
         )
         adapter_location_sequence = (
             self._state_view.geometry.get_predicted_location_sequence(
-                loaded_labware_pool.new_locations_by_id[loaded_labware_pool.adapter_id],
-                loaded_labware_pool.labware_by_id,
+                new_locations_by_id[loaded_labware_pool.adapter_labware.id],
+                labware_by_id,
             )
-            if loaded_labware_pool.adapter_id is not None
+            if loaded_labware_pool.adapter_labware is not None
             else None
         )
         lid_location_sequence = (
             self._state_view.geometry.get_predicted_location_sequence(
-                loaded_labware_pool.new_locations_by_id[loaded_labware_pool.lid_id],
-                loaded_labware_pool.labware_by_id,
+                new_locations_by_id[loaded_labware_pool.lid_labware.id],
+                labware_by_id,
             )
-            if loaded_labware_pool.lid_id is not None
+            if loaded_labware_pool.lid_labware is not None
             else None
         )
 
         state_update.set_batch_loaded_labware(
-            definitions_by_id=loaded_labware_pool.definitions_by_id,
-            display_names_by_id=loaded_labware_pool.display_names_by_id,
-            offset_ids_by_id=loaded_labware_pool.offset_ids_by_id,
-            new_locations_by_id=loaded_labware_pool.new_locations_by_id,
+            definitions_by_id=definitions_by_id,
+            display_names_by_id=display_names_by_id,
+            offset_ids_by_id=offset_ids_by_id,
+            new_locations_by_id=new_locations_by_id,
         )
         state_update.update_flex_stacker_labware_pool_count(
             module_id=params.moduleId, count=stacker_state.pool_count - 1
         )
 
-        if loaded_labware_pool.lid_id is not None:
+        if loaded_labware_pool.lid_labware is not None:
             state_update.set_lids(
-                parent_labware_ids=[loaded_labware_pool.primary_id],
-                lid_ids=[loaded_labware_pool.lid_id],
+                parent_labware_ids=[loaded_labware_pool.primary_labware.id],
+                lid_ids=[loaded_labware_pool.lid_labware.id],
             )
 
         return (
             UnsafeManualRetrieveResult(
-                labwareId=loaded_labware_pool.primary_id,
-                adapterId=loaded_labware_pool.adapter_id
-                if loaded_labware_pool.adapter_id is not None
+                labwareId=loaded_labware_pool.primary_labware.id,
+                adapterId=loaded_labware_pool.adapter_labware.id
+                if loaded_labware_pool.adapter_labware is not None
                 else None,
-                lidId=loaded_labware_pool.lid_id
-                if loaded_labware_pool.lid_id is not None
+                lidId=loaded_labware_pool.lid_labware.id
+                if loaded_labware_pool.lid_labware is not None
                 else None,
                 primaryLocationSequence=primary_location_sequence,
                 adapterLocationSequence=adapter_location_sequence,
                 lidLocationSequence=lid_location_sequence,
-                primaryLabwareURI=loaded_labware_pool.primary_uri,
-                adapterLabwareURI=loaded_labware_pool.adapter_uri,
-                lidLabwareURI=loaded_labware_pool.lid_uri,
+                primaryLabwareURI=loaded_labware_pool.primary_labware.definitionUri,
+                adapterLabwareURI=loaded_labware_pool.adapter_labware.definitionUri
+                if loaded_labware_pool.adapter_labware is not None
+                else None,
+                lidLabwareURI=loaded_labware_pool.lid_labware.definitionUri
+                if loaded_labware_pool.lid_labware is not None
+                else None,
             ),
             state_update,
         )
