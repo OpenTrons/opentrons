@@ -151,3 +151,59 @@ describe('well selection should update', () => {
     })
   })
 })
+
+describe('reset apsirate or dispense form fields', () => {
+  const form = {
+    path: 'single',
+    aspirate_wells: ['A1'],
+    dispense_wells: ['B2'],
+    volume: '2',
+    pipette: 'pipetteId',
+    disposalVolume_checkbox: true,
+    disposalVolume_volume: '1.1',
+    aspirate_delay_checkbox: true,
+    aspirate_delay_seconds: '10',
+    blowout_checkbox: true,
+    blowout_flowRate: '3',
+    blowout_location: 'trashBin',
+    blowout_z_offset: '1',
+  }
+  it('when resetSettings is null, do not change the fields', () => {
+    const result = handleFormHelper({ resetSettings: null }, form)
+    expect(result).toEqual({ resetSettings: null })
+  })
+  it('when resetSettings is changed to aspirate, clear aspirate form fields', () => {
+    const result = handleFormHelper({ resetSettings: 'aspirate' }, form)
+    expect(result).toEqual({
+      resetSettings: null,
+      aspirate_delay_checkbox: false,
+      aspirate_delay_seconds: '1',
+      aspirate_flowRate: null,
+      mix_mmFromBottom: 1,
+      mix_wellOrder_first: 't2b',
+      mix_wellOrder_second: 'l2r',
+      mix_x_position: 0,
+      mix_y_position: 0,
+    })
+  })
+  it('when resetSettings is changed to dispense, clear dispense form fields', () => {
+    const result = handleFormHelper({ resetSettings: 'dispense' }, form)
+    expect(result).toEqual({
+      resetSettings: null,
+      blowout_checkbox: false,
+      blowout_flowRate: null,
+      blowout_location: null,
+      blowout_z_offset: 0,
+      dispense_delay_checkbox: false,
+      dispense_delay_seconds: '1',
+      dispense_flowRate: null,
+      mix_mmFromBottom: 1,
+      mix_touchTip_checkbox: false,
+      mix_touchTip_mmFromTop: null,
+      mix_wellOrder_first: 't2b',
+      mix_wellOrder_second: 'l2r',
+      mix_x_position: 0,
+      mix_y_position: 0,
+    })
+  })
+})

@@ -692,3 +692,104 @@ describe('air gap > dispense volume', () => {
     })
   })
 })
+
+describe('reset apsirate or dispense form fields', () => {
+  const form = {
+    path: 'single',
+    aspirate_wells: ['A1'],
+    dispense_wells: ['B2'],
+    volume: '2',
+    pipette: 'pipetteId',
+    disposalVolume_checkbox: true,
+    disposalVolume_volume: '1.1',
+    aspirate_delay_checkbox: true,
+    aspirate_delay_seconds: '10',
+    dispense_airGap_checkbox: true,
+    dispense_airGap_volume: '3',
+  }
+  it('when resetSettings is null, do not change the fields', () => {
+    const result = handleFormHelper({ resetSettings: null }, form)
+    expect(result).toEqual({ resetSettings: null })
+  })
+  it('when resetSettings is changed to aspirate, clear aspirate form fields', () => {
+    const result = handleFormHelper({ resetSettings: 'aspirate' }, form)
+    expect(result).toEqual({
+      resetSettings: null,
+      aspirate_airGap_checkbox: false,
+      aspirate_airGap_volume: null,
+      aspirate_delay_checkbox: false,
+      aspirate_delay_mmFromBottom: null,
+      aspirate_delay_seconds: '1',
+      aspirate_flowRate: null,
+      aspirate_mix_checkbox: false,
+      aspirate_mix_times: null,
+      aspirate_mix_volume: null,
+      aspirate_mmFromBottom: null,
+      aspirate_position_reference: null,
+      aspirate_retract_delay_seconds: null,
+      aspirate_retract_mmFromBottom: null,
+      aspirate_retract_position_reference: null,
+      aspirate_retract_speed: null,
+      aspirate_retract_x_position: 0,
+      aspirate_retract_y_position: 0,
+      aspirate_submerge_delay_seconds: null,
+      aspirate_submerge_mmFromBottom: null,
+      aspirate_submerge_position_reference: null,
+      aspirate_submerge_speed: null,
+      aspirate_submerge_x_position: 0,
+      aspirate_submerge_y_position: 0,
+      aspirate_touchTip_checkbox: false,
+      aspirate_touchTip_mmFromEdge: null,
+      aspirate_touchTip_mmFromTop: null,
+      aspirate_touchTip_speed: null,
+      aspirate_wellOrder_first: 't2b',
+      aspirate_wellOrder_second: 'l2r',
+      aspirate_x_position: 0,
+      aspirate_y_position: 0,
+      preWetTip: false,
+    })
+  })
+  it('when resetSettings is changed to dispense, clear dispense form fields', () => {
+    const result = handleFormHelper({ resetSettings: 'dispense' }, form)
+    expect(result).toEqual({
+      blowout_checkbox: false,
+      blowout_flowRate: null,
+      blowout_location: null,
+      blowout_z_offset: 0,
+      dispense_airGap_checkbox: false,
+      dispense_airGap_volume: null,
+      dispense_delay_checkbox: false,
+      dispense_delay_mmFromBottom: null,
+      dispense_delay_seconds: '1',
+      dispense_flowRate: null,
+      dispense_mix_checkbox: false,
+      dispense_mix_times: null,
+      dispense_mix_volume: null,
+      dispense_mmFromBottom: null,
+      dispense_position_reference: null,
+      dispense_retract_delay_seconds: null,
+      dispense_retract_mmFromBottom: null,
+      dispense_retract_position_reference: null,
+      dispense_retract_speed: null,
+      dispense_retract_x_position: 0,
+      dispense_retract_y_position: 0,
+      dispense_submerge_delay_seconds: null,
+      dispense_submerge_mmFromBottom: null,
+      dispense_submerge_position_reference: null,
+      dispense_submerge_speed: null,
+      dispense_submerge_x_position: 0,
+      dispense_submerge_y_position: 0,
+      dispense_touchTip_checkbox: false,
+      dispense_touchTip_mmFromEdge: null,
+      dispense_touchTip_mmFromTop: null,
+      dispense_touchTip_speed: null,
+      dispense_wellOrder_first: 't2b',
+      dispense_wellOrder_second: 'l2r',
+      dispense_x_position: 0,
+      dispense_y_position: 0,
+      pushOut_checkbox: null,
+      pushOut_volume: null,
+      resetSettings: null,
+    })
+  })
+})

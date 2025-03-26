@@ -199,7 +199,6 @@ const fieldKeys = [
   'touchTip_mmFromEdge',
   'wellOrder_first',
   'wellOrder_second',
-  'wells_grouped',
   'x_position',
   'y_position',
 ]
@@ -224,7 +223,6 @@ const updatePatchResetSettings = (
       ...getDefaultFields(
         ...defaultFields,
         'resetSettings',
-        'preWetTip',
         'blowout_checkbox',
         'blowout_flowRate',
         'blowout_location',

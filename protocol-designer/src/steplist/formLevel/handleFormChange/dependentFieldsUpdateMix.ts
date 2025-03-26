@@ -181,12 +181,7 @@ const updatePatchOnNozzleChange = (
   return patch
 }
 
-const fieldKeys = [
-  'delay_checkbox',
-  'delay_seconds',
-  'flowRate',
-  'wells_grouped',
-]
+const fieldKeys = ['delay_checkbox', 'delay_seconds', 'flowRate']
 const mixFieldKeys = [
   'resetSettings',
   'mix_mmFromBottom',
