@@ -17,6 +17,7 @@ import { useUnmatchedModulesForProtocol } from '../useUnmatchedModulesForProtoco
 import { useRunCalibrationStatus } from '../useRunCalibrationStatus'
 import { useMostRecentCompletedAnalysis } from '../useMostRecentCompletedAnalysis'
 import { useRunHasStarted } from '../useRunHasStarted'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Store } from 'redux'
@@ -28,6 +29,7 @@ vi.mock('../useRunCalibrationStatus')
 vi.mock('../useMostRecentCompletedAnalysis')
 vi.mock('../useRunHasStarted')
 vi.mock('/app/resources/analysis')
+vi.mock('/app/redux-resources/robots')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
@@ -64,6 +66,7 @@ describe('useLPCDisabledReason', () => {
     vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue(
       _uncastedSimpleV6Protocol.labwareDefinitions as {}
     )
+    vi.mocked(useIsFlex).mockReturnValue(false)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -255,7 +258,7 @@ describe('useLPCDisabledReason', () => {
     )
     expect(result.current).toStrictEqual('Protocol must load a tip rack')
   })
-  it('renders disabled reason if no tipracks in protocols', () => {
+  it('renders disabled reason if no tipracks in protocols and the robot is an OT-2', () => {
     vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({})
 
     const { result } = renderHook(
@@ -265,6 +268,16 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual(
       'Labware Position Check requires that the protocol loads a tip rack'
     )
+  })
+  it('does not render a disabled reason if no tipracks are in the protocol and the robot is a Flex', () => {
+    vi.mocked(getLoadedLabwareDefinitionsByUri).mockReturnValue({})
+    vi.mocked(useIsFlex).mockReturnValue(true)
+
+    const { result } = renderHook(
+      () => useLPCDisabledReason({ robotName: 'flexie', runId: RUN_ID_1 }),
+      { wrapper }
+    )
+    expect(result.current).toBeNull()
   })
   it('renders disabled reason if no tips are being used in the protocols for odd', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
@@ -282,7 +295,7 @@ describe('useLPCDisabledReason', () => {
     )
     expect(result.current).toStrictEqual('Protocol must pick up a tip')
   })
-  it('renders disabled reason if no tips are being used in the protocols', () => {
+  it('renders disabled reason if no tips are being used in the protocols and the robot is OT-2', () => {
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       ...simpleV6Protocol,
       commands: {},
@@ -294,6 +307,18 @@ describe('useLPCDisabledReason', () => {
     expect(result.current).toStrictEqual(
       'Labware Position Check requires that the protocol has at least one pipette that picks up a tip'
     )
+  })
+  it('does not render a disable reason if no tips are being used in the protocols and the robot is Flex', () => {
+    vi.mocked(useIsFlex).mockReturnValue(true)
+    vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
+      ...simpleV6Protocol,
+      commands: {},
+    } as any)
+    const { result } = renderHook(
+      () => useLPCDisabledReason({ robotName: 'flexie', runId: RUN_ID_1 }),
+      { wrapper }
+    )
+    expect(result.current).toBeNull()
   })
   it('renders disabled reason as null if only runId is present', () => {
     const { result } = renderHook(

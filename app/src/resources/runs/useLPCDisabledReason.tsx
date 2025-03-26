@@ -7,6 +7,7 @@ import { useMostRecentCompletedAnalysis } from './useMostRecentCompletedAnalysis
 import { useRunCalibrationStatus } from './useRunCalibrationStatus'
 import { useRunHasStarted } from './useRunHasStarted'
 import { useUnmatchedModulesForProtocol } from './useUnmatchedModulesForProtocol'
+import { useIsFlex } from '/app/redux-resources/robots'
 
 interface LPCDisabledReasonProps {
   runId: string
@@ -34,6 +35,7 @@ export function useLPCDisabledReason(
   const isCalibrationComplete =
     robotName != null ? complete : !hasMissingCalForOdd
   const { missingModuleIds } = unmatchedModuleResults
+  const isFlex = useIsFlex(robotName ?? '')
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
@@ -97,13 +99,13 @@ export function useLPCDisabledReason(
         ? 'labware_position_check_not_available_empty_protocol'
         : 'must_have_labware_and_pip'
     )
-  } else if (!tipRackLoadedInProtocol) {
+  } else if (!tipRackLoadedInProtocol && !isFlex) {
     lpcDisabledReason = t(
       robotName != null
         ? 'lpc_disabled_no_tipracks_loaded'
         : 'no_tiprack_loaded'
     )
-  } else if (!tipsArePickedUp) {
+  } else if (!tipsArePickedUp && !isFlex) {
     lpcDisabledReason = t(
       robotName != null ? 'lpc_disabled_no_tipracks_used' : 'no_tiprack_used'
     )

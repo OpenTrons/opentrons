@@ -85,7 +85,11 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   return (
     <Box css={BOX_STYLE}>
       <Flex css={HEADER_CONTAINER_STYLE}>
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          gap={SPACING.spacing8}
+        >
           <StyledText
             desktopStyle="bodyLargeSemiBold"
             oddStyle="bodyTextSemiBold"
