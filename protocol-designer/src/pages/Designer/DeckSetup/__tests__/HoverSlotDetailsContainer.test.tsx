@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { screen } from '@testing-library/react'
-import { OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { SlotDetailsContainer } from '../../../../components/organisms'
@@ -30,7 +30,7 @@ describe('HoverSlotDetailsContainer', () => {
   it('should render the slot details container for slot A1', () => {
     render(props)
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
-      'left: -20%'
+      'left: 0%'
     )
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
       'right: auto'
@@ -48,7 +48,7 @@ describe('HoverSlotDetailsContainer', () => {
       'left: auto'
     )
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
-      'right: -20%'
+      'right: 0%'
     )
   })
 
@@ -59,7 +59,7 @@ describe('HoverSlotDetailsContainer', () => {
     }
     render(props)
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
-      'left: -15%'
+      'left: 0%'
     )
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
       'right: auto'
@@ -77,7 +77,7 @@ describe('HoverSlotDetailsContainer', () => {
       'left: auto'
     )
     expect(screen.getByTestId('hover-slot-details-container')).toHaveStyle(
-      'right: -15%'
+      'right: 0%'
     )
   })
 })

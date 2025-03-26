@@ -65,11 +65,11 @@ interface DeckSetupDetailsProps extends DeckSetupTabType {
   activeDeckSetup: InitialDeckSetup
   addEquipment: (slotId: string) => void
   deckDef: DeckDefinition
-  hover: string | null
-  hoveredFixture: Fixture | null
-  hoveredLabware: string | null
-  hoveredModule: ModuleModel | null
-  setHover: Dispatch<SetStateAction<string | null>>
+  hover?: string | null
+  hoveredFixture?: Fixture | null
+  hoveredLabware?: string | null
+  hoveredModule?: ModuleModel | null
+  setHover?: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
   stagingAreaCutoutIds: CutoutId[]
   selectedZoomInSlot?: DeckSlotId
@@ -80,13 +80,13 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     activeDeckSetup,
     addEquipment,
     deckDef,
-    hover,
-    hoveredFixture,
+    hover = null,
+    hoveredFixture = null,
     hoveredLabware: hoveredLabwareFromProp,
-    hoveredModule,
+    hoveredModule = null,
     selectedZoomInSlot,
     tab,
-    setHover,
+    setHover = () => {},
     showGen1MultichannelCollisionWarnings,
     stagingAreaCutoutIds,
   } = props
@@ -548,7 +548,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         deckDef={deckDef}
         robotType={robotType}
         hoveredFixture={hoveredFixture}
-        hoveredLabware={hoveredLabwareFromProp}
+        hoveredLabware={hoveredLabwareFromProp ?? null}
         hoveredModule={hoveredModule}
         slotPosition={slotPosition}
       />
@@ -559,7 +559,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         deckDef={deckDef}
         robotType={robotType}
         hoveredFixture={hoveredFixture}
-        hoveredLabware={hoveredLabwareFromProp}
+        hoveredLabware={hoveredLabwareFromProp ?? null}
         hoveredModule={hoveredModule}
       />
 

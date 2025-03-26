@@ -7,10 +7,10 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { selectors } from '../../../labware-ingred/selectors'
 import { getDesignerTab, getFileMetadata } from '../../../file-data/selectors'
 import { generateNewProtocol } from '../../../labware-ingred/actions'
-import { DeckSetupContainer } from '../DeckSetup'
 import { Designer } from '../index'
 import { LiquidsOverflowMenu } from '../LiquidsOverflowMenu'
 import { ProtocolSteps } from '../ProtocolSteps'
+import { ProtocolStartingDeck } from '../../../components/organisms/ProtocolStartingDeck'
 
 import type { NavigateFunction } from 'react-router-dom'
 
@@ -24,6 +24,7 @@ vi.mock('../LiquidsOverflowMenu')
 vi.mock('../DeckSetup')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../top-selectors/labware-locations')
+vi.mock('../../../components/organisms/ProtocolStartingDeck')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -60,9 +61,6 @@ describe('Designer', () => {
       labware: {},
       pipettes: {},
     })
-    vi.mocked(DeckSetupContainer).mockReturnValue(
-      <div>mock DeckSetupContainer</div>
-    )
     vi.mocked(LiquidsOverflowMenu).mockReturnValue(
       <div>mock LiquidsOverflowMenu</div>
     )
@@ -70,15 +68,17 @@ describe('Designer', () => {
       slot: null,
       cutout: null,
     })
+    vi.mocked(ProtocolStartingDeck).mockReturnValue(
+      <div>mock ProtocolStartingDeck</div>
+    )
   })
 
   it('renders deck setup container and nav buttons', () => {
     render()
-    screen.getByText('mock DeckSetupContainer')
     screen.getByText('mockProtocolName')
     screen.getByText('Edit protocol')
     screen.getByText('Protocol steps')
-    screen.getByText('Protocol starting deck')
+    screen.getByText('mock ProtocolStartingDeck')
     screen.getByTestId('water-drop')
     fireEvent.click(screen.getByRole('button', { name: 'Done' }))
     expect(mockNavigate).toHaveBeenCalledWith('/overview')

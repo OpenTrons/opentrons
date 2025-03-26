@@ -7,7 +7,7 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { DECK_CONTROLS_STYLE } from '../DeckSetup/constants'
+import { DECK_CONTROLS_STYLE } from '../../../pages/Designer/DeckSetup/constants'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -15,10 +15,11 @@ import type {
   DeckSlotId,
   Dimensions,
 } from '@opentrons/shared-data'
-import type { DeckSetupTabType } from '../types'
+import type { DeckSetupTabType } from '../../../pages/Designer/types'
 
 interface OffDeckControlsProps extends DeckSetupTabType {
   hover: string | null
+  tab: 'startingDeck' | 'protocolSteps'
   setHover: Dispatch<SetStateAction<string | null>>
   slotBoundingBox: Dimensions
   labwareId: string

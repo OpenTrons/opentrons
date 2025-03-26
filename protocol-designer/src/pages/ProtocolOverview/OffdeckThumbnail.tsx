@@ -8,6 +8,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
+  JUSTIFY_FLEX_START,
   LabwareRender,
   OVERFLOW_SCROLL,
   RobotWorkSpace,
@@ -52,6 +53,7 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
       }
       flexDirection={DIRECTION_COLUMN}
       borderRadius={BORDERS.borderRadius8}
+      gridGap={SPACING.spacing40}
     >
       {offDeckLabware.length === 0 ? (
         <Flex
@@ -73,7 +75,6 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
             width="100%"
             paddingTop={SPACING.spacing16}
             color={COLORS.grey60}
-            marginBottom={SPACING.spacing40}
           >
             <StyledText desktopStyle="bodyDefaultSemiBold">
               {i18n.format(t('off_deck_labware'), 'upperCase')}
@@ -81,47 +82,57 @@ export function OffDeckThumbnail(props: OffDeckThumbnailProps): JSX.Element {
           </Flex>
 
           <Flex
-            flexWrap={WRAP}
-            gridGap={SPACING.spacing16}
-            paddingX={SPACING.spacing16}
+            justifyContent={JUSTIFY_CENTER}
+            width="100%"
+            height="100%"
+            padding={`0 ${SPACING.spacing40} ${SPACING.spacing16}`}
             overflowY={OVERFLOW_SCROLL}
           >
-            {offDeckLabware.map(lw => {
-              const wellContents = allWellContentsForActiveItem
-                ? allWellContentsForActiveItem[lw.id]
-                : null
-              const definition = lw.def
-              const { dimensions } = definition
-              return (
-                <Flex flexDirection={DIRECTION_COLUMN} key={lw.id}>
-                  <RobotWorkSpace
-                    key={lw.id}
-                    viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
-                    width="6.875rem"
-                    height="3.75rem"
-                  >
-                    {() => (
-                      <>
-                        <LabwareRender
-                          definition={definition}
-                          wellFill={wellFillFromWellContents(
-                            wellContents,
-                            liquidDisplayColors
-                          )}
-                        />
-                        <SlotHover
-                          robotType={robotType}
-                          hover={hover}
-                          setHover={setHover}
-                          slotPosition={[0, 0, 0]}
-                          slotId={lw.id}
-                        />
-                      </>
-                    )}
-                  </RobotWorkSpace>
-                </Flex>
-              )
-            })}
+            <Flex
+              id="labware-container"
+              gridGap={SPACING.spacing24}
+              flexWrap={WRAP}
+              justifyContent={JUSTIFY_FLEX_START}
+              alignItems={ALIGN_CENTER}
+              width="32rem"
+            >
+              {offDeckLabware.map(lw => {
+                const wellContents = allWellContentsForActiveItem
+                  ? allWellContentsForActiveItem[lw.id]
+                  : null
+                const definition = lw.def
+                const { dimensions } = definition
+                return (
+                  <Flex flexDirection={DIRECTION_COLUMN} key={lw.id}>
+                    <RobotWorkSpace
+                      key={lw.id}
+                      viewBox={`${definition.cornerOffsetFromSlot.x} ${definition.cornerOffsetFromSlot.y} ${dimensions.xDimension} ${dimensions.yDimension}`}
+                      width="6.875rem"
+                      height="3.75rem"
+                    >
+                      {() => (
+                        <>
+                          <LabwareRender
+                            definition={definition}
+                            wellFill={wellFillFromWellContents(
+                              wellContents,
+                              liquidDisplayColors
+                            )}
+                          />
+                          <SlotHover
+                            robotType={robotType}
+                            hover={hover}
+                            setHover={setHover}
+                            slotPosition={[0, 0, 0]}
+                            slotId={lw.id}
+                          />
+                        </>
+                      )}
+                    </RobotWorkSpace>
+                  </Flex>
+                )
+              })}
+            </Flex>
           </Flex>
         </>
       )}
