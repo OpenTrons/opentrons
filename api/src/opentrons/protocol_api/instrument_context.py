@@ -1536,6 +1536,7 @@ class InstrumentContext(publisher.CommandPublisher):
             tip_policy=new_tip,
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
+            nozzle_map=self._core.get_nozzle_map(),
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -1601,6 +1602,7 @@ class InstrumentContext(publisher.CommandPublisher):
             tip_policy=new_tip,
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
+            nozzle_map=self._core.get_nozzle_map(),
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -1662,6 +1664,7 @@ class InstrumentContext(publisher.CommandPublisher):
             tip_policy=new_tip,
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
+            nozzle_map=self._core.get_nozzle_map(),
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container

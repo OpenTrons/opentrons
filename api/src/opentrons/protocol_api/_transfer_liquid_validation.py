@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Union, Sequence, Optional
 
-from opentrons.types import Location
+from opentrons.types import Location, NozzleMapInterface
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
@@ -29,6 +29,8 @@ def verify_and_normalize_transfer_args(
     tip_policy: TransferTipPolicyV2Type,
     last_tip_picked_up_from: Optional[Well],
     tip_racks: List[Labware],
+    nozzle_map: NozzleMapInterface,
+    target_all_wells: bool,
     current_volume: float,
     trash_location: Union[Location, Well, Labware, TrashBin, WasteChute],
 ) -> TransferInfo:
