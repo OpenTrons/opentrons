@@ -315,14 +315,12 @@ export const getFormWarnings = (
 
   switch (stepType) {
     case 'mix':
-      return stepFormHelperMap[stepType].getWarnings != null
-        ? stepFormHelperMap[stepType].getWarnings(
-            formData as HydratedMixFormData
-          )
+      return stepFormHelperMap.mix.getWarnings != null
+        ? stepFormHelperMap.mix.getWarnings(formData as HydratedMixFormData)
         : []
     case 'moveLiquid':
-      return stepFormHelperMap[stepType].getWarnings != null
-        ? stepFormHelperMap[stepType].getWarnings(
+      return stepFormHelperMap.moveLiquid.getWarnings != null
+        ? stepFormHelperMap.moveLiquid.getWarnings(
             formData as HydratedMoveLiquidFormData
           )
         : []
