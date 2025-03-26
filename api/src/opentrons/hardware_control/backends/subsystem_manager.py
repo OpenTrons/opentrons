@@ -1,6 +1,7 @@
 """
 Coordinate subsystem detection and updates.
 """
+
 import asyncio
 from contextlib import contextmanager, ExitStack
 from dataclasses import dataclass
@@ -414,7 +415,7 @@ class SubsystemManager:
             self._present_tools = await self._tool_detector.resolve(to_resolve, 10.0)
             log.info(f"Present tools are now {self._present_tools}")
             await network.log_motor_usage_data(
-                self._can_messenger, base_can_nodes + [t for t in tool_nodes]
+                self._can_messenger, list(set(base_can_nodes + [t for t in tool_nodes]))
             )
             async with self._tool_task_condition:
                 self._tool_task_state = True
