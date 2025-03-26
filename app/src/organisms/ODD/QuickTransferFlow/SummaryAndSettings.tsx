@@ -101,17 +101,9 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFileJSON = createQuickTransferFile(
-      state,
-      deckConfig,
-      protocolName
-    )
-    const protocolFilePy = createQuickTransferPythonFile(
-      state,
-      deckConfig,
-      protocolName
-    )
-    const protocolFile = enableExportPython ? protocolFilePy : protocolFileJSON
+    const protocolFile = enableExportPython
+      ? createQuickTransferPythonFile(state, deckConfig, protocolName)
+      : createQuickTransferFile(state, deckConfig, protocolName)
 
     createProtocolAsync({
       files: [protocolFile],
@@ -128,9 +120,9 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFileJSON = createQuickTransferFile(state, deckConfig)
-    const protocolFilePy = createQuickTransferPythonFile(state, deckConfig)
-    const protocolFile = enableExportPython ? protocolFilePy : protocolFileJSON
+    const protocolFile = enableExportPython
+      ? createQuickTransferPythonFile(state, deckConfig)
+      : createQuickTransferFile(state, deckConfig)
 
     createProtocolAsync({
       files: [protocolFile],
