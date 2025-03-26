@@ -181,6 +181,55 @@ const updatePatchOnNozzleChange = (
   return patch
 }
 
+const fieldKeys = [
+  'delay_checkbox',
+  'delay_seconds',
+  'flowRate',
+  'wells_grouped',
+]
+const mixFieldKeys = [
+  'resetSettings',
+  'mix_mmFromBottom',
+  'mix_x_position',
+  'mix_y_position',
+  'mix_wellOrder_first',
+  'mix_wellOrder_second',
+]
+const updatePatchResetSettings = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  const { id, stepType, ...stepData } = rawForm
+  const appliedPatch = { ...(stepData as FormPatch), ...patch }
+  const { resetSettings } = appliedPatch
+
+  const defaultFields = fieldKeys.map(field => `${resetSettings}_${field}`)
+
+  if (resetSettings === 'aspirate') {
+    return {
+      ...patch,
+      ...getDefaultFields(...defaultFields, ...mixFieldKeys),
+    }
+  } else if (resetSettings === 'dispense') {
+    return {
+      ...patch,
+      ...getDefaultFields(
+        ...defaultFields,
+        ...mixFieldKeys,
+        'blowout_checkbox',
+        'blowout_flowRate',
+        'blowout_location',
+        'blowout_z_offset',
+        'pushOut_checkbox',
+        'pushOut_volume',
+        'mix_touchTip_checkbox',
+        'mix_touchTip_mmFromTop'
+      ),
+    }
+  }
+  return patch
+}
+
 export function dependentFieldsUpdateMix(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -207,5 +256,6 @@ export function dependentFieldsUpdateMix(
     chainPatch => updatePatchOnTiprackChange(chainPatch, rawForm),
     chainPatch =>
       updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchResetSettings(chainPatch, rawForm),
   ])
 }

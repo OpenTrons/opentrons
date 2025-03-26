@@ -769,6 +769,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        resetSettings: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -1097,7 +1101,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: undefined,
           isIndeterminate: false,
         },
-        liquidClassesSupported: { isIndeterminate: false },
+        liquidClassesSupported: { isIndeterminate: false, value: undefined },
         liquidClass: {
           isIndeterminate: false,
           value: undefined,
@@ -1147,6 +1151,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: undefined,
         },
         dispense_retract_position_reference: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        resetSettings: {
           isIndeterminate: false,
           value: undefined,
         },
@@ -1225,6 +1233,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         liquidClassesSupported: { isIndeterminate: false },
+        resetSettings: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })
@@ -1317,6 +1329,10 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
         },
         liquidClassesSupported: { isIndeterminate: false },
+        resetSettings: {
+          isIndeterminate: false,
+          value: undefined,
+        },
       })
     })
   })

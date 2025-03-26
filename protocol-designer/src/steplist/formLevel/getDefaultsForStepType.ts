@@ -43,6 +43,7 @@ export function getDefaultsForStepType(
         pickUpTip_location: undefined,
         pickUpTip_wellNames: undefined,
         pipette: null,
+        resetSettings: null,
         times: null,
         tipRack: null,
         volume: undefined,

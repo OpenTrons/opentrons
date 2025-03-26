@@ -105,6 +105,7 @@ describe('getDefaultsForStepType', () => {
         blowout_z_offset: 0,
         liquidClassesSupported: true,
         liquidClass: null,
+        resetSettings: null,
       })
     })
   })
@@ -141,6 +142,7 @@ describe('getDefaultsForStepType', () => {
         mix_y_position: 0,
         blowout_z_offset: 0,
         liquidClassesSupported: true,
+        resetSettings: null,
       })
     })
   })

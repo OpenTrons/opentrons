@@ -287,6 +287,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     }
   }
 
+  console.log(propsForFields)
   return (
     <>
       {isRename ? (
@@ -399,9 +400,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
                 handleScrollToTop,
               }}
             />
-            {toolboxStep === 2 &&
-            (formData.stepType === 'moveLiquid' ||
-              formData.stepType === 'mix') ? (
+            {(toolboxStep === 2 && formData.stepType === 'moveLiquid') ||
+            (toolboxStep === 1 && formData.stepType === 'mix') ? (
               <Flex paddingBottom={SPACING.spacing40} width="100">
                 <TertiaryButton
                   onClick={() => {

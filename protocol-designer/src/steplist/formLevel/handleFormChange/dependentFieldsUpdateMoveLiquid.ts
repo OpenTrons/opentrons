@@ -228,7 +228,9 @@ const updatePatchResetSettings = (
         'blowout_checkbox',
         'blowout_flowRate',
         'blowout_location',
-        'blowout_z_offset'
+        'blowout_z_offset',
+        'pushOut_checkbox',
+        'pushOut_volume'
       ),
     }
   }
