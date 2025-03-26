@@ -100,14 +100,14 @@ def get_tiprack_partial_nominal(pipette: Literal[200, 1000]) -> Point:
 
 
 async def aspirate_and_wait(
-    api: OT3API, reservoir: Point, pipette: Literal[200, 1000], seconds: int = 30
+    api: OT3API, reservoir: Point, volume: int, seconds: int = 30
 ) -> Tuple[bool, float]:
     """Aspirate and wait."""
     await helpers_ot3.move_to_arched_ot3(api, OT3Mount.LEFT, reservoir)
     await api.move_to(
         OT3Mount.LEFT, reservoir + Point(z=DEPTH_INTO_RESERVOIR_FOR_ASPIRATE)
     )
-    await api.aspirate(OT3Mount.LEFT, pipette)
+    await api.aspirate(OT3Mount.LEFT, volume)
     await api.move_to(OT3Mount.LEFT, reservoir + Point(z=HOVER_HEIGHT_MM))
 
     start_time = time()
@@ -221,7 +221,7 @@ async def run(
     result, duration = await aspirate_and_wait(
         api,
         reservoir_a1_actual,
-        pipette=pipette,
+        volume=pipette,
         seconds=NUM_SECONDS_TO_WAIT,
     )
     report(section, "droplets-96-tips", [duration, CSVResult.from_bool(result)])

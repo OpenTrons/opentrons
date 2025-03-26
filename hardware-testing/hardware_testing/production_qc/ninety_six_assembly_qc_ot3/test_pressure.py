@@ -45,6 +45,7 @@ THRESHOLDS = {
 
 PROBE_POSITIONS = [InstrumentProbeType.PRIMARY, InstrumentProbeType.SECONDARY]
 
+
 def _get_test_tag(probe: InstrumentProbeType, reading: str) -> str:
     assert reading in PRESSURE_READINGS, f"{reading} not in PRESSURE_READINGS"
     return f"{probe.name.lower()}-{reading}"
