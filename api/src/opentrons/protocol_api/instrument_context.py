@@ -1523,6 +1523,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
+        visit_every_well: bool = False,
     ) -> InstrumentContext:
         """Transfer liquid from source to dest using the specified liquid class properties.
 
@@ -1537,6 +1538,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
+            target_all_wells=visit_every_well,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -1584,6 +1586,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
+        visit_every_well: bool = False,
     ) -> InstrumentContext:
         """
         Distribute liquid from a single source to multiple destinations
@@ -1603,6 +1606,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
+            target_all_wells=visit_every_well,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
@@ -1645,6 +1649,7 @@ class InstrumentContext(publisher.CommandPublisher):
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
         return_tip: bool = False,
+        visit_every_well: bool = False,
     ) -> InstrumentContext:
         """
         Consolidate liquid from multiple sources to a single destination
@@ -1665,6 +1670,7 @@ class InstrumentContext(publisher.CommandPublisher):
             last_tip_picked_up_from=self._last_tip_picked_up_from,
             tip_racks=self._tip_racks,
             nozzle_map=self._core.get_nozzle_map(),
+            target_all_wells=visit_every_well,
             current_volume=self.current_volume,
             trash_location=(
                 trash_location if trash_location is not None else self.trash_container
