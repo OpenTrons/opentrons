@@ -229,7 +229,6 @@ export const MixSteps = {
         .should('be.visible')
         .click()
       cy.contains(MixContent.DelayDuration).should('exist').should('be.visible')
-      cy.log('*********LOOK HERE************')
       cy.get(MixLocators.Checkbox)
         .find('[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]' )
         .should('exist')
