@@ -7,27 +7,36 @@ import {
   FLEX_STACKER_MODULE_V1,
   TRASH_BIN_FIXTURE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
-import { getLabwareLocation } from './getLabwareLocation'
+import {
+  getLabwareLocation,
+  getLabwareLocationFromSequence,
+} from './getLabwareLocation'
 
 import type { TFunction } from 'i18next'
-
-import type { AddressableAreaName } from '@opentrons/shared-data'
 import type {
   LocationFullParams,
   LocationSlotOnlyParams,
 } from './getLabwareLocation'
+import type {
+  AddressableAreaName,
+  LabwareLocation,
+  LabwareLocationSequence,
+} from '@opentrons/shared-data'
 
-export interface DisplayLocationSlotOnlyParams extends LocationSlotOnlyParams {
+export interface DisplayLocationSlotOnlyParams
+  extends Omit<LocationSlotOnlyParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  location?: LabwareLocation | LabwareLocationSequence | null
 }
-
-export interface DisplayLocationFullParams extends LocationFullParams {
+export interface DisplayLocationFullParams
+  extends Omit<LocationFullParams, 'location'> {
   t: TFunction
   isOnDevice?: boolean
+  location?: LabwareLocation | LabwareLocationSequence | null
 }
-
 export type DisplayLocationParams =
   | DisplayLocationSlotOnlyParams
   | DisplayLocationFullParams
@@ -38,17 +47,33 @@ export type DisplayLocationParams =
 export function getLabwareDisplayLocation(
   params: DisplayLocationParams
 ): string {
-  const { t, isOnDevice = false } = params
-  const locationResult = getLabwareLocation(params)
-
+  const { t, isOnDevice = false, location } = params
+  const locationResult = Array.isArray(location)
+    ? getLabwareLocationFromSequence({
+        ...params,
+        locationSequence: location,
+      })
+    : getLabwareLocation({
+        ...params,
+        location: location ?? null,
+      })
   if (locationResult == null) {
     return ''
   }
 
-  const { slotName, moduleModel, adapterName } = locationResult
+  const { slotName: initialSlotName, moduleModel, adapterName } = locationResult
+  const slotName =
+    moduleModel === THERMOCYCLER_MODULE_V1 ||
+    moduleModel === THERMOCYCLER_MODULE_V2
+      ? 'A1+B1'
+      : initialSlotName
 
   if (slotName === 'offDeck' || slotName === 'systemLocation') {
     return t('off_deck')
+  } else if (slotName === 'systemLocation') {
+    // returning system location for slot name which we'll use to swap out
+    // run log copy, this should never reach the user
+    return slotName
   }
   // Simple slot location
   else if (moduleModel == null && adapterName == null) {
@@ -117,7 +142,10 @@ function handleSpecialSlotNames(
 ): { odd: string; desktop: string } {
   if (WASTE_CHUTE_ADDRESSABLE_AREAS.includes(slotName as AddressableAreaName)) {
     return { odd: t('waste_chute'), desktop: t('waste_chute') }
-  } else if (slotName === TRASH_BIN_FIXTURE) {
+  } else if (
+    slotName === TRASH_BIN_FIXTURE ||
+    MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(slotName as AddressableAreaName)
+  ) {
     return { odd: t('trash_bin'), desktop: t('trash_bin') }
   } else {
     return {

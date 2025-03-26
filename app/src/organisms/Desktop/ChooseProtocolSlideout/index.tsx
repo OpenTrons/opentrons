@@ -41,7 +41,7 @@ import {
   ApiHostProvider,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
-import { sortRuntimeParameters } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, sortRuntimeParameters } from '@opentrons/shared-data'
 
 import { useLogger } from '/app/logger'
 import { OPENTRONS_USB } from '/app/redux/discovery'
@@ -61,6 +61,7 @@ import {
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
 import { getAnalysisStatus } from '/app/organisms/Desktop/ProtocolsLanding/utils'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import type { MouseEventHandler } from 'react'
 import type { DropdownOption } from '@opentrons/components'
@@ -68,7 +69,6 @@ import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { Robot } from '/app/redux/discovery/types'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 import type { State } from '/app/redux/types'
-import { useFeatureFlag } from '/app/redux/config'
 
 export const CARD_OUTLINE_BORDER_STYLE = css`
   border-style: ${BORDERS.styleSolid};
@@ -106,8 +106,8 @@ export function ChooseProtocolSlideoutComponent(
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
-
-  const isNewLPC = useFeatureFlag('lpcRedesign')
+  const robotType = useRobotType(name)
+  const isFlex = robotType === FLEX_ROBOT_TYPE
 
   const [
     selectedProtocol,
@@ -156,6 +156,7 @@ export function ChooseProtocolSlideoutComponent(
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     (!missingAnalysisData ? selectedProtocol?.mostRecentAnalysis : null) ??
       null,
+    isFlex,
     robot.ip
   )
 
@@ -655,7 +656,7 @@ export function ChooseProtocolSlideoutComponent(
           }
         >
           {currentPage === 1
-            ? !isNewLPC && (
+            ? !isFlex && (
                 <LegacyApplyHistoricOffsets
                   offsetCandidates={offsetCandidates}
                   shouldApplyOffsets={shouldApplyOffsets}

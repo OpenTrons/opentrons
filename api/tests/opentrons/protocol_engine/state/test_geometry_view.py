@@ -18,7 +18,7 @@ from opentrons.protocol_engine.state.update_types import (
 )
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5, CutoutFixture
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.pipette import pipette_definition
@@ -45,7 +45,6 @@ from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware import load_definition as load_labware_definition
-
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
@@ -89,6 +88,9 @@ from opentrons.protocol_engine.types import (
     OnCutoutFixtureLocationSequenceComponent,
     InStackerHopperLocation,
     PotentialCutoutFixture,
+    AddressableArea,
+    AreaType,
+    AddressableOffsetVector,
 )
 from opentrons.protocol_engine.commands import (
     CommandStatus,
@@ -133,6 +135,7 @@ from opentrons_shared_data.robot.types import (
     paddingOffset,
     mountOffset,
 )
+
 
 from .command_fixtures import (
     create_comment_command,
@@ -2580,28 +2583,88 @@ def test_get_slot_item(
     decoy: Decoy,
     mock_labware_view: LabwareView,
     mock_module_view: ModuleView,
+    ot3_standard_deck_def: DeckDefinitionV5,
     subject: GeometryView,
 ) -> None:
     """It should get items in certain slots."""
     labware = LoadedLabware.model_construct(id="cool-labware")  # type: ignore[call-arg]
     module = LoadedModule.model_construct(id="cool-module")  # type: ignore[call-arg]
+    chute_fixture = CutoutFixture(
+        id="wasteChuteRightAdapterNoCover",
+        mayMountTo=["cutoutD3"],
+        providesAddressableAreas={
+            "cutoutD3": [
+                "1ChannelWasteChute",
+                "8ChannelWasteChute",
+                "96ChannelWasteChute",
+                "gripperWasteChute",
+            ]
+        },
+        displayName="Waste Chute Adapter for 96 Channel Pipette or Gripper",
+        fixtureGroup={},
+        expectOpentronsModuleSerialNumber=False,
+        height=124.5,
+    )
+    chute_area = AddressableArea(
+        area_name="1ChannelWasteChute",
+        area_type=AreaType.WASTE_CHUTE,
+        base_slot=DeckSlotName.SLOT_D3,
+        display_name="",
+        bounding_box=Dimensions(x=0, y=0, z=0),
+        position=AddressableOffsetVector(x=0, y=0, z=0),
+        compatible_module_types=[],
+    )
+    subject._addressable_areas = AddressableAreaView(
+        state=AddressableAreaState(
+            loaded_addressable_areas_by_name={
+                "1ChannelWasteChute": chute_area,
+            },
+            potential_cutout_fixtures_by_cutout_id={
+                "cutoutD3": {
+                    PotentialCutoutFixture(
+                        cutout_id="cutoutD3",
+                        cutout_fixture_id="cool_chute",
+                        provided_addressable_areas=frozenset({chute_area.area_name}),
+                    )
+                },
+                "cutoutC3": {
+                    PotentialCutoutFixture(
+                        cutout_id="cutoutC3",
+                        cutout_fixture_id="cool_trash",
+                        provided_addressable_areas=frozenset({chute_area.area_name}),
+                    )
+                },
+            },
+            deck_definition=ot3_standard_deck_def,
+            deck_configuration=[
+                ("cutoutC1", "singleLeftSlot", None),
+                ("cutoutD1", "singleLeftSlot", None),
+                ("cutoutD2", "singleCenterSlot", None),
+                ("cutoutD3", "wasteChuteRightAdapterNoCover", None),
+            ],
+            robot_type=subject._addressable_areas._state.robot_type,
+            use_simulated_deck_config=subject._addressable_areas._state.use_simulated_deck_config,
+            robot_definition=subject._addressable_areas._state.robot_definition,
+        )
+    )
 
-    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
-    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(labware)
-    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(None)
+    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_D1)).then_return(None)
+    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_D2)).then_return(labware)
+    decoy.when(mock_labware_view.get_by_slot(DeckSlotName.SLOT_C1)).then_return(None)
 
-    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_1)).then_return(None)
-    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_2)).then_return(None)
-    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_3)).then_return(module)
+    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_D1)).then_return(module)
+    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_D2)).then_return(None)
+    decoy.when(mock_module_view.get_by_slot(DeckSlotName.SLOT_C1)).then_return(None)
 
     assert (
         subject.get_slot_item(
-            DeckSlotName.SLOT_1,
+            DeckSlotName.SLOT_C1,
         )
         is None
     )
-    assert subject.get_slot_item(DeckSlotName.SLOT_2) == labware
-    assert subject.get_slot_item(DeckSlotName.SLOT_3) == module
+    assert subject.get_slot_item(DeckSlotName.SLOT_D2) == labware
+    assert subject.get_slot_item(DeckSlotName.SLOT_D1) == module
+    assert subject.get_slot_item(DeckSlotName.SLOT_D3) == chute_fixture
 
 
 def test_get_slot_item_that_is_overflowed_module(
@@ -3606,7 +3669,7 @@ def test_get_well_height_at_volume(
     """Test getting the well height at a given volume."""
 
     def _get_labware_def() -> LabwareDefinition:
-        def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
+        def_dir = str(get_shared_data_root()) + f"/labware/definitions/2/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
         _labware_def = labware_definition_type_adapter.validate_python(
@@ -3615,9 +3678,7 @@ def test_get_well_height_at_volume(
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert (
-        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
-    )
+    assert labware_def.innerLabwareGeometry is not None
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -3674,7 +3735,7 @@ def test_get_well_volume_at_height(
     """Test getting the volume at a given height."""
 
     def _get_labware_def() -> LabwareDefinition:
-        def_dir = str(get_shared_data_root()) + f"/labware/definitions/3/{labware_id}"
+        def_dir = str(get_shared_data_root()) + f"/labware/definitions/2/{labware_id}"
         version_str = max([str(version) for version in listdir(def_dir)])
         def_path = path.join(def_dir, version_str)
         _labware_def = labware_definition_type_adapter.validate_python(
@@ -3683,9 +3744,7 @@ def test_get_well_volume_at_height(
         return _labware_def
 
     labware_def = _get_labware_def()
-    assert (
-        labware_def.schemaVersion == 3 and labware_def.innerLabwareGeometry is not None
-    )
+    assert labware_def.innerLabwareGeometry is not None
     well_geometry = labware_def.innerLabwareGeometry.get(well_name)
     assert well_geometry is not None
     well_definition = [
@@ -4061,7 +4120,7 @@ def test_get_predicted_location_sequence_with_pending_labware(
             [
                 labware_definition_type_adapter.validate_python(
                     load_labware_definition(
-                        "opentrons_flex_tiprack_lid", version=1, schema=3
+                        "opentrons_flex_tiprack_lid", version=1, schema=2
                     )
                 ),
                 labware_definition_type_adapter.validate_python(

@@ -2,13 +2,8 @@
 
 from dataclasses import dataclass
 from typing import Optional, overload, List
-from typing_extensions import assert_type
 
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    LabwareDefinition2,
-    LabwareDefinition3,
-)
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -441,7 +436,7 @@ class EquipmentHandler:
             definition=attached_module.definition,
         )
 
-    async def load_lids(  # noqa: C901
+    async def load_lids(
         self,
         load_name: str,
         namespace: str,
@@ -489,15 +484,11 @@ class EquipmentHandler:
                 f"Requested quantity {quantity} is greater than the stack limit of {stack_limit} provided by definition for {load_name}."
             )
 
-        if isinstance(definition, LabwareDefinition2):
-            is_deck_slot_compatible = True
-        else:
-            assert_type(definition, LabwareDefinition3)
-            is_deck_slot_compatible = (
-                True
-                if definition.parameters.isDeckSlotCompatible is None
-                else definition.parameters.isDeckSlotCompatible
-            )
+        is_deck_slot_compatible = (
+            True
+            if definition.parameters.isDeckSlotCompatible is None
+            else definition.parameters.isDeckSlotCompatible
+        )
 
         if isinstance(location, DeckSlotLocation) and not is_deck_slot_compatible:
             raise ValueError(

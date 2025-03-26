@@ -12,13 +12,13 @@ import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtu
 import { LPCLabwareList } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/LPCLabwareList'
 import { getIsOnDevice } from '/app/redux/config'
 import {
-  selectAllLabwareInfo,
   selectIsDefaultOffsetAbsent,
-  selectCountLocationSpecificOffsetsForLw,
   selectStepInfo,
   setSelectedLabwareUri,
-  selectIsDefaultOffsetMissing,
+  selectIsNecessaryDefaultOffsetMissing,
   proceedEditOffsetSubstep,
+  selectAllLabwareInfoAndDefaultStatusSorted,
+  selectTotalOrMissingOffsetRequiredCountForLwCopy,
 } from '/app/redux/protocol-runs'
 
 import type { ComponentProps } from 'react'
@@ -39,13 +39,15 @@ vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
 vi.mock('/app/redux/config')
 
 vi.mock('/app/redux/protocol-runs', () => ({
-  selectAllLabwareInfo: vi.fn(),
+  selectAllLabwareInfoAndDefaultStatusSorted: vi.fn(),
   selectIsDefaultOffsetAbsent: vi.fn(),
-  selectIsDefaultOffsetMissing: vi.fn(),
+  selectIsNecessaryDefaultOffsetMissing: vi.fn(),
   selectCountLocationSpecificOffsetsForLw: vi.fn(),
   selectStepInfo: vi.fn(),
   setSelectedLabwareUri: vi.fn(),
   proceedEditOffsetSubstep: vi.fn(),
+  selectCountNonHardcodedLocationSpecificOffsetsForLw: vi.fn(),
+  selectTotalOrMissingOffsetRequiredCountForLwCopy: vi.fn(),
 }))
 
 const render = (props: ComponentProps<typeof LPCLabwareList>) => {
@@ -105,26 +107,28 @@ describe('LPCLabwareList', () => {
     ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
 
     vi.mocked(
-      selectAllLabwareInfo
-    ).mockImplementation((runId: string) => (state: any) => mockLabwareInfo)
-
-    vi.mocked(
       selectIsDefaultOffsetAbsent
     ).mockImplementation((runId: string, uri: string) => (state: any) =>
       uri === 'labware-uri-1'
     )
 
     vi.mocked(
-      selectIsDefaultOffsetMissing
+      selectIsNecessaryDefaultOffsetMissing
     ).mockImplementation((runId: string, uri: string) => (state: any) =>
       uri === 'labware-uri-1'
     )
 
-    vi.mocked(
-      selectCountLocationSpecificOffsetsForLw
-    ).mockImplementation((runId: string, uri: string) => (state: any) =>
-      uri === 'labware-uri-2' ? 2 : 1
+    vi.mocked(selectAllLabwareInfoAndDefaultStatusSorted).mockImplementation(
+      (runId: string) => () =>
+        [
+          { uri: 'mock-uri-1', info: { displayName: 'Labware 1' } },
+          { uri: 'mock-uri-2', info: { displayName: 'Labware 2' } },
+        ] as any
     )
+
+    vi.mocked(
+      selectTotalOrMissingOffsetRequiredCountForLwCopy
+    ).mockImplementation((runId: string) => () => 'all good')
   })
 
   it('passes correct header props to LPCContentContainer for desktop', () => {
@@ -163,52 +167,11 @@ describe('LPCLabwareList', () => {
       selectIsDefaultOffsetAbsent
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
     vi.mocked(
-      selectIsDefaultOffsetMissing
+      selectIsNecessaryDefaultOffsetMissing
     ).mockImplementation((runId: any, uri: any) => (state: any) => false)
-    vi.mocked(
-      selectCountLocationSpecificOffsetsForLw
-    ).mockImplementation((runId: any, uri: any) => (state: any) => 1)
 
     render(props)
 
     screen.getByText('Labware 1')
-  })
-
-  it('shows "one missing offset" message when default offset is absent', () => {
-    render(props)
-
-    screen.getByText('Labware 1')
-    screen.getByText('1 missing offset')
-  })
-
-  it('shows multiple offsets message correctly', () => {
-    vi.mocked(
-      selectIsDefaultOffsetAbsent
-    ).mockImplementation((runId: any, uri: any) => (state: any) => false)
-    vi.mocked(
-      selectIsDefaultOffsetMissing
-    ).mockImplementation((runId: any, uri: any) => (state: any) => false)
-
-    render(props)
-
-    screen.getByText('Labware 2')
-    screen.getByText('2 offsets')
-  })
-
-  it('shows multiple missing offsets message correctly', () => {
-    vi.mocked(
-      selectIsDefaultOffsetAbsent
-    ).mockImplementation((runId: any, uri: any) => (state: any) => true)
-    vi.mocked(
-      selectIsDefaultOffsetMissing
-    ).mockImplementation((runId: any, uri: any) => (state: any) => true)
-    vi.mocked(
-      selectCountLocationSpecificOffsetsForLw
-    ).mockImplementation((runId: any, uri: any) => (state: any) => 3)
-
-    render(props)
-
-    screen.getByText('Labware 2')
-    expect(screen.getAllByText('3 missing offsets')[0]).toBeInTheDocument()
   })
 })

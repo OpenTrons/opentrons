@@ -1,50 +1,104 @@
 import { useMemo } from 'react'
 
-import { getUniqueLabwareLocationComboInfo } from './getUniqueLabwareLocationComboInfo'
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+
+import { getUniqueValidLwLocationInfoByAnalysis } from './getUniqueValidLwLocationInfoByAnalysis'
 import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
+import { getLPCSearchParams } from './getLPCSearchParams'
+import { useNotifySearchLabwareOffsets } from '/app/resources/labware_offsets'
+import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
 
-import type { LabwareOffset } from '@opentrons/api-client'
+import type { LabwareOffset, StoredLabwareOffset } from '@opentrons/api-client'
+import type { RobotType } from '@opentrons/shared-data'
 import type { LPCLabwareInfo } from '/app/redux/protocol-runs'
-import type { GetUniqueLocationComboInfoParams } from './getUniqueLabwareLocationComboInfo'
+import type { GetUniqueValidLwLocationInfoByAnalysisParams } from './getUniqueValidLwLocationInfoByAnalysis'
 
-export type UseLPCLabwareInfoProps = GetUniqueLocationComboInfoParams & {
-  currentOffsets: LabwareOffset[]
+const REFETCH_OFFSET_SEARCH_MS = 5000
+
+export type UseLPCLabwareInfoProps = GetUniqueValidLwLocationInfoByAnalysisParams & {
+  runId: string | null
+  robotType: RobotType
 }
 
-// TODO(jh, 01-22-25): This interface will change substantially the switch to /labwareOffsets.
+export interface UseLPCLabwareInfoResult {
+  labwareInfo: LPCLabwareInfo
+  storedOffsets: StoredLabwareOffset[] | undefined
+  legacyOffsets: LabwareOffset[]
+}
 
-// Structures LPC-able labware info for injection into LPC flows.
-export function useLPCLabwareInfo({
-  currentOffsets,
+// Prepare LPC-able labware info for injection into LPC flows, querying for
+// existing offsets in the process. Only relevant network requests and utilities
+// are invoked depending on the robot type.
+export function useLPCLabwareInfo(
+  props: UseLPCLabwareInfoProps
+): UseLPCLabwareInfoResult {
+  const { legacyOffsets } = useOT2LPCLabwareInfo(props)
+  const { labwareInfo, storedOffsets } = useFlexLPCLabwareInfo(props)
+
+  return { storedOffsets, labwareInfo, legacyOffsets }
+}
+
+function useFlexLPCLabwareInfo({
   labwareDefs,
   protocolData,
-}: UseLPCLabwareInfoProps): LPCLabwareInfo {
-  // Analysis-derived data is the source of truth, because we must account for labware that has offsets AND account for labware
-  // that does not have offsets. This will change with the LPC HTTP API refactors.
-  const lwURIs = getLabwareURIsFromAnalysis(protocolData)
+  robotType,
+  runId,
+}: UseLPCLabwareInfoProps): Pick<
+  UseLPCLabwareInfoResult,
+  'labwareInfo' | 'storedOffsets'
+> {
+  const runStatus = useRunStatus(runId ?? null)
+
   const lwLocationCombos = useMemo(
     () =>
-      getUniqueLabwareLocationComboInfo({
+      getUniqueValidLwLocationInfoByAnalysis({
+        labwareDefs,
+        protocolData,
+        robotType,
+      }),
+    [labwareDefs?.length, protocolData?.commands.length, robotType]
+  )
+
+  const searchLwOffsetsParams = useMemo(
+    () => getLPCSearchParams(lwLocationCombos),
+    [lwLocationCombos.length]
+  )
+
+  const { data: lwOffsetsData } = useNotifySearchLabwareOffsets(
+    searchLwOffsetsParams,
+    {
+      enabled:
+        searchLwOffsetsParams.filters.length > 0 &&
+        robotType === FLEX_ROBOT_TYPE &&
+        runStatus === RUN_STATUS_IDLE,
+      refetchInterval: REFETCH_OFFSET_SEARCH_MS,
+    }
+  )
+  const storedOffsets = lwOffsetsData?.data
+
+  const labwareInfo = useMemo(
+    () =>
+      getLPCLabwareInfoFrom({
+        currentOffsets: storedOffsets,
+        lwLocInfo: lwLocationCombos,
         labwareDefs,
         protocolData,
       }),
-    [labwareDefs != null, protocolData != null]
+    [storedOffsets, labwareDefs, lwLocationCombos, protocolData]
   )
 
-  return useMemo(
-    () =>
-      getLPCLabwareInfoFrom({
-        lwURIs,
-        currentOffsets,
-        lwLocationCombos,
-        labwareDefs,
-      }),
-    [lwURIs.length, currentOffsets.length, lwLocationCombos.length]
-  )
+  return { labwareInfo, storedOffsets }
 }
 
-function getLabwareURIsFromAnalysis(
-  analysis: UseLPCLabwareInfoProps['protocolData']
-): string[] {
-  return analysis?.labware.map(lwInfo => lwInfo.definitionUri) ?? []
+function useOT2LPCLabwareInfo({
+  runId,
+  robotType,
+}: UseLPCLabwareInfoProps): Pick<UseLPCLabwareInfoResult, 'legacyOffsets'> {
+  const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
+    enabled: robotType === OT2_ROBOT_TYPE,
+  })
+  const legacyOffsets = runRecord?.data?.labwareOffsets ?? []
+
+  return { legacyOffsets }
 }

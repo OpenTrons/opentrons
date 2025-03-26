@@ -184,7 +184,7 @@ class SetStoredLabware(
 class SetStoredLabwareCreate(BaseCommandCreate[SetStoredLabwareParams]):
     """A request to execute a Flex Stacker SetStoredLabware command."""
 
-    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredlabware"
+    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredLabware"
     params: SetStoredLabwareParams
 
     _CommandCls: Type[SetStoredLabware] = SetStoredLabware

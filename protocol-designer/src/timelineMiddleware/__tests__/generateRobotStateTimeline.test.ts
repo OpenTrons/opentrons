@@ -208,16 +208,14 @@ mockPythonName.drop_tip()
       // Step c:
       `
 mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
+mockPythonName.flow_rate.aspirate = 3.78
+mockPythonName.flow_rate.dispense = 3.78
+mockPythonName.mix(...)
 mockPythonName.drop_tip()
 mockPythonName.pick_up_tip(location=mockPythonName)
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
-mockPythonName.aspirate(...)
-mockPythonName.dispense(...)
+mockPythonName.flow_rate.aspirate = 3.78
+mockPythonName.flow_rate.dispense = 3.78
+mockPythonName.mix(...)
 mockPythonName.drop_tip()
 `.trim(),
     ])

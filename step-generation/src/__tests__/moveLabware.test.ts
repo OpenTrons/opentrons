@@ -322,6 +322,43 @@ describe('moveLabware', () => {
       type: 'LABWARE_ON_ANOTHER_ENTITY',
     })
   })
+  it('should return an error for trying to move the labware to an occupied module', () => {
+    const state = getInitialRobotStateStandard(invariantContext)
+    const HEATER_SHAKER_ID = 'heaterShakerId'
+    const HEATER_SHAKER_SLOT = 'A1'
+
+    robotState = {
+      ...state,
+      modules: {
+        ...state.modules,
+        [HEATER_SHAKER_ID]: {
+          slot: HEATER_SHAKER_SLOT,
+          moduleState: {
+            type: HEATERSHAKER_MODULE_TYPE,
+            latchOpen: true,
+            targetSpeed: null,
+          },
+        } as any,
+      },
+      labware: {
+        ...state.labware,
+        mockLabwareId: {
+          slot: HEATER_SHAKER_ID,
+        },
+      },
+    }
+    const params = {
+      labwareId: SOURCE_LABWARE,
+      strategy: 'usingGripper',
+      newLocation: { moduleId: HEATER_SHAKER_ID },
+    } as MoveLabwareParams
+
+    const result = moveLabware(params, invariantContext, robotState)
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'LABWARE_ON_ANOTHER_ENTITY',
+    })
+  })
   it('should return an error for the labware already being discarded in previous step', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,

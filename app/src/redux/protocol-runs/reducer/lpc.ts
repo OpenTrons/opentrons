@@ -1,74 +1,64 @@
 import {
-  PROCEED_STEP,
-  SET_SELECTED_LABWARE,
-  SET_INITIAL_POSITION,
-  SET_FINAL_POSITION,
-  FINISH_LPC,
-  START_LPC,
-  GO_BACK_LAST_STEP,
-  SET_SELECTED_LABWARE_URI,
+  APPLIED_OFFSETS_TO_RUN,
   APPLY_WORKING_OFFSETS,
-  LPC_STEPS,
-  PROCEED_HANDLE_LW_SUBSTEP,
-  GO_BACK_HANDLE_LW_SUBSTEP,
-  RESET_OFFSET_TO_DEFAULT,
   CLEAR_WORKING_OFFSETS,
+  FINISH_LPC,
+  GO_BACK_HANDLE_LW_SUBSTEP,
+  GO_BACK_LAST_STEP,
+  LPC_STEPS,
+  OFFSETS_CONFLICT,
+  OFFSETS_FROM_DATABASE,
+  OFFSETS_FROM_RUN_RECORD,
+  PROCEED_HANDLE_LW_SUBSTEP,
+  PROCEED_STEP,
+  RESET_OFFSET_TO_DEFAULT,
+  SET_FINAL_POSITION,
+  SET_INITIAL_POSITION,
+  SET_SELECTED_LABWARE,
+  SET_SELECTED_LABWARE_URI,
+  SOURCE_OFFSETS_FROM_DATABASE,
+  SOURCE_OFFSETS_FROM_RUN,
+  UPDATE_CONFLICT_TIMESTAMP,
+  UPDATE_LPC,
 } from '../constants'
 import {
-  updateOffsetsForURI,
-  proceedToNextHandleLwSubstep,
+  clearAllWorkingOffsets,
+  getNextStepIdx,
   goBackToPreviousHandleLwSubstep,
+  handleApplyWorkingOffsets,
+  proceedToNextHandleLwSubstep,
+  updateLPCLabwareInfoFrom,
+  updateOffsetsForURI,
 } from './transforms'
 
 import type {
+  LPCLabwareInfo,
   LPCWizardAction,
   LPCWizardState,
+  OffsetSources,
   SelectedLwOverview,
 } from '../types'
 
-// TODO(jh, 03-10-25): Move some of these reducer case transformations to dedicated transform fns for clarity.
 // TODO(jh, 01-17-25): A lot of this state should live above the LPC slice, in the general protocolRuns slice instead.
 //  We should make selectors for that state, too!
 export function LPCReducer(
   state: LPCWizardState | undefined,
   action: LPCWizardAction
 ): LPCWizardState | undefined {
-  if (action.type === START_LPC) {
+  if (action.type === UPDATE_LPC) {
     return action.payload.state
   } else if (state == null) {
     return undefined
   } else {
     switch (action.type) {
       case PROCEED_STEP: {
-        const {
-          currentStepIndex,
-          lastStepIndices,
-          totalStepCount,
-        } = state.steps
-        const { toStep } = action.payload
-
-        const newStepIdx = (): number => {
-          if (toStep == null) {
-            return currentStepIndex + 1 < totalStepCount
-              ? currentStepIndex + 1
-              : currentStepIndex
-          } else {
-            const newIdx = LPC_STEPS.findIndex(step => step === toStep)
-
-            if (newIdx === -1) {
-              console.error(`Unexpected routing to step: ${toStep}`)
-              return 0
-            } else {
-              return newIdx
-            }
-          }
-        }
+        const { currentStepIndex, lastStepIndices } = state.steps
 
         return {
           ...state,
           steps: {
             ...state.steps,
-            currentStepIndex: newStepIdx(),
+            currentStepIndex: getNextStepIdx(action, state.steps),
             lastStepIndices: [...(lastStepIndices ?? []), currentStepIndex],
           },
         }
@@ -139,8 +129,7 @@ export function LPCReducer(
       case SET_INITIAL_POSITION:
       case SET_FINAL_POSITION:
       case CLEAR_WORKING_OFFSETS:
-      case RESET_OFFSET_TO_DEFAULT:
-      case APPLY_WORKING_OFFSETS: {
+      case RESET_OFFSET_TO_DEFAULT: {
         const lwUri = action.payload.labwareUri
         const updatedLwDetails = updateOffsetsForURI(state, action)
 
@@ -158,10 +147,114 @@ export function LPCReducer(
           },
         }
       }
-      // TODO(jh, 03-12-25): Revisit whether we need to set the store back to undefined, and
-      // if we can avoid having an `undefined` store at any point in the store's lifecycle.
+
+      case APPLY_WORKING_OFFSETS: {
+        const updatedLabware = handleApplyWorkingOffsets(state, action)
+
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            labware: {
+              ...updatedLabware,
+            },
+          },
+        }
+      }
+
       case FINISH_LPC:
-        return undefined
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            selectedLabware: null,
+            labware: clearAllWorkingOffsets(state.labwareInfo.labware),
+          },
+          maintenanceRunId: null,
+          steps: {
+            currentStepIndex: 0,
+            totalStepCount: LPC_STEPS.length,
+            all: LPC_STEPS,
+            lastStepIndices: null,
+            currentSubstep: null,
+          },
+        }
+
+      case APPLIED_OFFSETS_TO_RUN: {
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            areOffsetsApplied: true,
+          },
+        }
+      }
+
+      case SOURCE_OFFSETS_FROM_RUN: {
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            labware: updateLPCLabwareInfoFrom(
+              state.labwareInfo.initialRunRecordOffsets,
+              state.labwareInfo.labware
+            ),
+            sourcedOffsets: OFFSETS_FROM_RUN_RECORD,
+          },
+        }
+      }
+
+      case SOURCE_OFFSETS_FROM_DATABASE: {
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            sourcedOffsets: OFFSETS_FROM_DATABASE,
+          },
+        }
+      }
+
+      case UPDATE_CONFLICT_TIMESTAMP: {
+        const { info } = action.payload
+
+        const noDbOffsets =
+          state.labwareInfo.initialDatabaseOffsets.length === 0
+
+        const offsetSource = (): OffsetSources => {
+          if (info.timestamp == null) {
+            if (noDbOffsets) {
+              return OFFSETS_FROM_RUN_RECORD
+            } else {
+              return OFFSETS_FROM_DATABASE
+            }
+          } else {
+            return OFFSETS_CONFLICT
+          }
+        }
+
+        const updatedLw = (): LPCLabwareInfo['labware'] => {
+          switch (offsetSource()) {
+            case OFFSETS_FROM_RUN_RECORD: {
+              return updateLPCLabwareInfoFrom(
+                state.labwareInfo.initialRunRecordOffsets,
+                state.labwareInfo.labware
+              )
+            }
+            default:
+              return state.labwareInfo.labware
+          }
+        }
+
+        return {
+          ...state,
+          labwareInfo: {
+            ...state.labwareInfo,
+            conflictTimestampInfo: info,
+            sourcedOffsets: offsetSource(),
+            labware: updatedLw(),
+          },
+        }
+      }
 
       default:
         return state

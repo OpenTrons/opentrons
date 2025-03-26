@@ -15,6 +15,7 @@ import {
 
 import {
   OFFSET_KIND_DEFAULT,
+  selectSelectedLwAdapterDef,
   selectSelectedLwDef,
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
@@ -29,7 +30,8 @@ import type {
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
-/** On the LPC deck, the only visible labware should be the labware with an actively edited offset.
+/** On the LPC deck, the only visible labware should be the labware with an actively edited offset (the topmost)
+ * and the labware immediately beneath the topmost labware.
  * Modules are always visible if they are not in the actively utilized deck slot.
  * If modules are in the actively utilized deck slot:
  *  If LPCing the default offset, ensure the module is always cleared.
@@ -45,38 +47,62 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   const labwareDef = useSelector(
     selectSelectedLwDef(runId)
   ) as LabwareDefinition2
+  const adapterLwDef = useSelector(selectSelectedLwAdapterDef(runId))
 
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
-  const { moduleModel, kind: offsetKind } = offsetLocationDetails
+  const { closestBeneathModuleModel, kind: offsetKind } = offsetLocationDetails
 
   const buildModulesOnDeck = (): ModuleOnDeck[] => {
     const allModulesOnDeck = protocolData.modules.map(mod => {
       return {
         moduleModel: mod.model,
         moduleLocation: mod.location,
-        nestedLabwareDef: moduleModel != null ? labwareDef : null,
+        nestedLabwareDef: closestBeneathModuleModel != null ? labwareDef : null,
         innerProps:
-          moduleModel != null &&
-          getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE
+          closestBeneathModuleModel != null &&
+          getModuleType(closestBeneathModuleModel) === THERMOCYCLER_MODULE_TYPE
             ? { lidMotorState: 'open' }
             : {},
       }
     })
 
-    if (offsetKind === OFFSET_KIND_DEFAULT || moduleModel == null) {
+    if (
+      offsetKind === OFFSET_KIND_DEFAULT ||
+      closestBeneathModuleModel == null
+    ) {
       return allModulesOnDeck.filter(
         moduleOnDeck =>
           moduleOnDeck.moduleLocation.slotName !==
-          offsetLocationDetails.slotName
+          offsetLocationDetails.addressableAreaName
       )
     } else {
       return allModulesOnDeck
     }
   }
 
-  const buildLabwareOnDeck = (): LabwareOnDeck[] => [
-    { labwareLocation: offsetLocationDetails, definition: labwareDef },
-  ]
+  const buildLabwareOnDeck = (): LabwareOnDeck[] => {
+    const lpcLabwareOnDeck = {
+      labwareLocation: {
+        ...offsetLocationDetails,
+        slotName: offsetLocationDetails.addressableAreaName,
+      },
+      definition: labwareDef,
+    }
+    const adapterLwOnDeck =
+      adapterLwDef != null
+        ? {
+            labwareLocation: {
+              ...offsetLocationDetails,
+              slotName: offsetLocationDetails.addressableAreaName,
+            },
+            definition: adapterLwDef,
+          }
+        : null
+
+    return adapterLwOnDeck != null
+      ? [adapterLwOnDeck, lpcLabwareOnDeck]
+      : [lpcLabwareOnDeck]
+  }
 
   return (
     <Flex css={DECK_CONTAINER_STYLE}>

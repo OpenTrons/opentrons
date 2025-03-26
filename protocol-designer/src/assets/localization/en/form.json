@@ -235,6 +235,13 @@
       "preWetTip": {
         "label": "pre-wet tip"
       },
+      "pushOut": {
+        "pushOut_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Push out volume"
+        },
+        "title": "Push out"
+      },
       "setTemperature": {
         "options": {
           "false": "Deactivate module",
@@ -317,6 +324,10 @@
       },
       "touchTip_speed": {
         "label": "Touch tip speed"
+      },
+      "touchTip_mmFromEdge": {
+        "caption": "Valid range between {{min}} - {{max}}mm",
+        "label": "Distance from edge"
       },
       "useGripper": {
         "label": "use gripper",

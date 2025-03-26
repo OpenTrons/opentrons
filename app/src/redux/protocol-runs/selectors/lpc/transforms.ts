@@ -1,6 +1,11 @@
 import isEqual from 'lodash/isEqual'
 
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  getLabwareDefURI,
+  THERMOCYCLER_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
+import { getLabwareDisplayLocation } from '@opentrons/components'
 
 import {
   OFFSET_KIND_DEFAULT,
@@ -17,11 +22,38 @@ import type {
   LocationSpecificOffsetDetails,
   LPCLabwareInfo,
   LocationSpecificOffsetLocationDetails,
-  DefaultOffsetLocationDetails,
   WorkingOffset,
   LPCOffsetKind,
   DefaultOffsetDetails,
+  OffsetLocationDetails,
 } from '/app/redux/protocol-runs'
+import type { TFunction } from 'i18next'
+
+export const getFlexSlotNameOnly = (
+  details: OffsetLocationDetails | null,
+  protocolData: CompletedProtocolAnalysis | null,
+  t: TFunction
+): string => {
+  if (protocolData == null || details == null) {
+    return ''
+  }
+
+  const { addressableAreaName } = details
+
+  // TODO(jh, 03-21-25): The util should have a means of returning "slot" itself.
+  return addressableAreaName === THERMOCYCLER_ADDRESSABLE_AREA
+    ? 'A1+B1'
+    : getLabwareDisplayLocation({
+        t,
+        loadedModules: protocolData.modules,
+        loadedLabwares: protocolData.labware,
+        robotType: FLEX_ROBOT_TYPE,
+        location: {
+          addressableAreaName,
+        },
+        detailLevel: 'slot-only',
+      }).slice(-2) // ex, "C1" instead of "Slot C1"
+}
 
 export interface GetLabwareDefsForLPCParams {
   labwareId: string
@@ -97,56 +129,69 @@ export const getLocationSpecificOffsetDetailsForAllLabware = (
 ): LocationSpecificOffsetDetails[] => {
   const labware = state?.protocolRuns[runId]?.lpc?.labwareInfo.labware ?? {}
 
-  return Object(labware).values(
+  return Object.values(labware).flatMap(
     (details: LwGeometryDetails) => details.locationSpecificOffsetDetails
   )
 }
 
-type LabwareURI = string
+export const getDefaultOffsetDetailsForAllLabware = (
+  runId: string,
+  state: State
+): DefaultOffsetDetails[] => {
+  const labware = state?.protocolRuns[runId]?.lpc?.labwareInfo.labware ?? {}
 
-export interface MisingDefaultOffsets {
-  [uri: LabwareURI]: DefaultOffsetLocationDetails
+  return Object.values(labware).map(
+    (details: LwGeometryDetails) => details.defaultOffsetDetails
+  )
 }
+
+export const getIsDefaultOffsetAbsent = (info: LwGeometryDetails): boolean => {
+  return (
+    info?.defaultOffsetDetails?.existingOffset == null &&
+    info?.defaultOffsetDetails?.workingOffset?.confirmedVector == null
+  )
+}
+
 export interface MissingLocationSpecificOffsets {
-  [uri: LabwareURI]: LocationSpecificOffsetLocationDetails[]
+  [uri: string]: LocationSpecificOffsetLocationDetails[]
 }
 
 export interface MissingOffsets {
-  defaultOffsets: MisingDefaultOffsets
   locationSpecificOffsets: MissingLocationSpecificOffsets
+  totalCount: number
 }
 
-// Derive missing offsets for every labware by checking to see if an "existing offset" value
-// does not exist. Note: only offsets persisted on the robot-server are "not missing."
-export const getMissingOffsets = (
+// Derive missing location-specific offsets for every labware by checking to see if an
+// "existing offset" value  does not exist.
+// Note: only offsets persisted on the robot-server are "not missing."
+// Hardcoded offsets are not missing.
+export const getMissingLSOffsets = (
   labware: LPCLabwareInfo['labware'] | undefined
 ): MissingOffsets => {
   const missingOffsets: MissingOffsets = {
-    defaultOffsets: {},
     locationSpecificOffsets: {},
+    totalCount: 0,
   }
 
   if (labware != null) {
-    // Location specific missing offsets.
     Object.entries(labware).forEach(([uri, lwDetails]) => {
-      lwDetails.locationSpecificOffsetDetails.forEach(detail => {
-        const locationDetails = detail.locationDetails
+      if (lwDetails.defaultOffsetDetails.existingOffset?.vector == null) {
+        lwDetails.locationSpecificOffsetDetails.forEach(detail => {
+          const locationDetails = detail.locationDetails
+          const isHardcoded = detail.locationDetails.hardCodedOffsetId != null
 
-        if (detail.existingOffset == null) {
-          missingOffsets.locationSpecificOffsets[uri] =
-            missingOffsets.locationSpecificOffsets[uri] != null
-              ? [
-                  ...missingOffsets.locationSpecificOffsets[uri],
-                  locationDetails,
-                ]
-              : [locationDetails]
-        }
-      })
+          if (detail.existingOffset == null && !isHardcoded) {
+            missingOffsets.totalCount += 1
 
-      // Default missing offsets.
-      if (lwDetails.defaultOffsetDetails.existingOffset == null) {
-        missingOffsets.defaultOffsets[uri] =
-          lwDetails.defaultOffsetDetails.locationDetails
+            missingOffsets.locationSpecificOffsets[uri] =
+              missingOffsets.locationSpecificOffsets[uri] != null
+                ? [
+                    ...missingOffsets.locationSpecificOffsets[uri],
+                    locationDetails,
+                  ]
+                : [locationDetails]
+          }
+        })
       }
     })
   }
@@ -206,4 +251,107 @@ export function getWorkingOffsetsByUri(
   }
 
   return workingOffsetsByUri
+}
+
+// "Missing" means the existing offset is not present (the offsets are persisted on the server).
+export function getAreAnyLocationSpecificOffsetsMissing(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): boolean {
+  return (
+    lsDetails?.some(detail => detail.existingOffset?.vector == null) ?? false
+  )
+}
+
+export function getAreAllOffsetsHardCoded(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): boolean {
+  return (
+    lsDetails?.every(
+      detail => detail.locationDetails.hardCodedOffsetId != null
+    ) ?? false
+  )
+}
+
+export function getCountHardCodedOffsets(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): number {
+  return lsDetails != null
+    ? lsDetails.filter(
+        detail => detail.locationDetails.hardCodedOffsetId != null
+      ).length
+    : 0
+}
+
+export function getTotalCountLocationSpecificOffsets(
+  labware: LPCLabwareInfo['labware'] | undefined
+): number {
+  if (labware == null) {
+    return 0
+  }
+
+  let count = 0
+
+  Object.values(labware).forEach(lw => {
+    count += lw.locationSpecificOffsetDetails.length
+  })
+
+  return count
+}
+
+export function getTotalCountNonHardCodedLocationSpecificOffsets(
+  labware: LPCLabwareInfo['labware'] | undefined
+): number {
+  if (labware == null) {
+    return 0
+  }
+
+  let count = 0
+
+  Object.values(labware).forEach(lw => {
+    lw.locationSpecificOffsetDetails.forEach(lsDetail => {
+      if (lsDetail.locationDetails.hardCodedOffsetId == null) {
+        count += 1
+      }
+    })
+  })
+
+  return count
+}
+
+export function getCountMissingLSOffsetsWithoutDefault(
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): number {
+  return lsDetails != null
+    ? lsDetails.filter(detail => detail.existingOffset?.vector == null).length
+    : 0
+}
+
+export function getIsNecessaryDefaultOffsetMissing(
+  defaultDetails: DefaultOffsetDetails | undefined,
+  lsDetails: LocationSpecificOffsetDetails[] | undefined
+): boolean {
+  if (!getAreAnyLocationSpecificOffsetsMissing(lsDetails)) {
+    return false
+  } else if (getAreAllOffsetsHardCoded(lsDetails)) {
+    return false
+  } else {
+    return defaultDetails?.existingOffset == null
+  }
+}
+
+export function getIsAnyNecessaryDefaultOffsetMissing(
+  labware: LPCLabwareInfo['labware'] | undefined
+): boolean {
+  if (labware == null) {
+    return false
+  }
+
+  return Object.values(labware).some(details => {
+    const {
+      defaultOffsetDetails: defaultDetails,
+      locationSpecificOffsetDetails: lsDetails,
+    } = details
+
+    return getIsNecessaryDefaultOffsetMissing(defaultDetails, lsDetails)
+  })
 }

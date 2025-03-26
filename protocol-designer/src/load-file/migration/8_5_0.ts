@@ -1,6 +1,8 @@
 import floor from 'lodash/floor'
+import { getPipetteSpecsV2 } from '@opentrons/shared-data'
 import { PROTOCOL_DESIGNER_SOURCE } from '../../constants'
 import { swatchColors } from '../../components/organisms/DefineLiquidsModal/swatchColors'
+import { getDefaultPushOutVolume } from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 import { getAdditionalEquipmentLocationUpdate } from './utils/getAdditionalEquipmentLocationUpdate'
 import { getEquipmentLoadInfoFromCommands } from './utils/getEquipmentLoadInfoFromCommands'
@@ -22,15 +24,10 @@ export const migrateFile = (
     liquids,
     robot,
   } = appData
-
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const savedStepForms = designerApplication.data
-    ?.savedStepForms as DesignerApplicationData['savedStepForms']
-
-  const ingredients = designerApplication.data.ingredients
-
+  const { savedStepForms, ingredients } = designerApplication.data
   const migratedIngredients: Ingredients = Object.entries(
     ingredients
   ).reduce<Ingredients>((acc, [id, ingredient]) => {
@@ -47,6 +44,10 @@ export const migrateFile = (
   const loadLabwareCommands = commands.filter(
     (command): command is LoadLabwareCreateCommand =>
       command.commandType === 'loadLabware'
+  )
+  const equipmentLoadInfoFromCommands = getEquipmentLoadInfoFromCommands(
+    commands,
+    labwareDefinitions
   )
 
   const savedStepsWithUpdatedMoveLiquidFields = Object.values(
@@ -74,6 +75,20 @@ export const migrateFile = (
         dispense_labware as string,
         'dispense'
       )
+      const tipRackDef = labwareDefinitions[form.tipRack]
+      const pipetteName =
+        equipmentLoadInfoFromCommands.pipettes?.[form.pipette]?.pipetteName ??
+        null
+      const pipetteSpecs =
+        pipetteName != null ? getPipetteSpecsV2(pipetteName) : null
+      const defaultPushOutVolume =
+        pipetteSpecs == null
+          ? null
+          : getDefaultPushOutVolume(
+              Number(form.volume),
+              pipetteSpecs,
+              tipRackDef
+            )
 
       return {
         ...acc,
@@ -108,8 +123,25 @@ export const migrateFile = (
           dispense_submerge_speed: null,
           aspirate_touchTip_speed: null,
           dispense_touchTip_speed: null,
+          aspirate_touchTip_mmFromEdge: 0, // this field and the following were previously not configurable and defaulted to 0mm
+          dispense_touchTip_mmFromEdge: 0,
+          aspirate_position_reference: null,
+          aspirate_retract_position_reference: null,
+          aspirate_submerge_mmFromBottom: null,
+          aspirate_submerge_x_position: null,
+          aspirate_submerge_y_position: null,
+          aspirate_submerge_position_reference: null,
+          dispense_position_reference: null,
+          dispense_retract_position_reference: null,
+          dispense_submerge_mmFromBottom: null,
+          dispense_submerge_x_position: null,
+          dispense_submerge_y_position: null,
+          dispense_submerge_position_reference: null,
           liquidClassesSupported: liquidClassesSupported ?? false,
           liquidClass: null,
+          pushOut_checkbox:
+            defaultPushOutVolume != null && defaultPushOutVolume > 0,
+          pushOut_volume: defaultPushOutVolume,
         },
       }
     }
@@ -173,10 +205,6 @@ export const migrateFile = (
       return acc
     },
     {}
-  )
-  const equipmentLoadInfoFromCommands = getEquipmentLoadInfoFromCommands(
-    commands,
-    labwareDefinitions
   )
   return {
     ...appData,

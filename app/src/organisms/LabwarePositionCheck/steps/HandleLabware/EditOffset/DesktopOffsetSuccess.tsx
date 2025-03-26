@@ -6,14 +6,16 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  getLabwareDisplayLocation,
+  NO_WRAP,
   SPACING,
   StyledText,
+  TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, getModuleDisplayName } from '@opentrons/shared-data'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
+  getFlexSlotNameOnly,
   selectSelectedLwDisplayName,
   selectSelectedLwFlowType,
   selectSelectedLwOverview,
@@ -22,7 +24,7 @@ import {
 
 import SuccessIcon from '/app/assets/images/icon_success.png'
 
-import type { DisplayLocationParams } from '@opentrons/components'
+import type { TFunction } from 'i18next'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type { State } from '/app/redux/types'
 import type {
@@ -50,26 +52,18 @@ export function DesktopOffsetSuccess(
   const selectedLwInfo = useSelector(
     selectSelectedLwOverview(props.runId)
   ) as SelectedLwOverview
-  const moduleModel = selectedLwInfo.offsetLocationDetails?.moduleModel
+  const moduleModel =
+    selectedLwInfo.offsetLocationDetails?.closestBeneathModuleModel
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
   const labwareDisplayName = useSelector(
     selectSelectedLwDisplayName(props.runId)
   )
 
-  const buildDisplayParams = (): Omit<
-    DisplayLocationParams,
-    'detailLevel'
-  > => ({
-    t: commandTextT,
-    loadedModules: protocolData.modules,
-    loadedLabwares: protocolData.labware,
-    robotType: FLEX_ROBOT_TYPE,
-    location: offsetLocationDetails,
-  })
-  const slotOnlyDisplayLocation = getLabwareDisplayLocation({
-    detailLevel: 'slot-only',
-    ...buildDisplayParams(),
-  })
+  const slotOnlyDisplayLocation = getFlexSlotNameOnly(
+    offsetLocationDetails,
+    protocolData,
+    commandTextT as TFunction
+  )
 
   const bodyText = (): string => {
     switch (flowType) {
@@ -123,6 +117,8 @@ const CONTENT_CONTAINER = css`
   align-items: ${ALIGN_CENTER};
   padding: ${SPACING.spacing40};
   gap: ${SPACING.spacing24};
+  text-align: ${TEXT_ALIGN_CENTER};
+  text-wrap: ${NO_WRAP};
 `
 
 const IMAGE_STYLE = css`

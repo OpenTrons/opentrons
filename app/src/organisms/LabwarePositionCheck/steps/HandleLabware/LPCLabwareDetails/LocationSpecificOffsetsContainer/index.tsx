@@ -6,57 +6,36 @@ import {
   Flex,
   StyledText,
   SPACING,
-  getLabwareDisplayLocation,
   DIRECTION_COLUMN,
   ListTable,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { selectSelectedLwLocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
+import {
+  selectSelectedLwOverview,
+  selectSortedLSOffsetDetailsWithCopy,
+} from '/app/redux/protocol-runs'
 import { LabwareLocationItem } from './LabwareLocationItem'
 import { OffsetTableHeaders } from './OffsetTableHeaders'
 
-import type { State } from '/app/redux/types'
+import type { TFunction } from 'i18next'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type { LPCWizardState } from '/app/redux/protocol-runs'
+import type { SelectedLwOverview } from '/app/redux/protocol-runs'
 
 export function LocationSpecificOffsetsContainer(
   props: LPCWizardContentProps
 ): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const { t: commandTextT } = useTranslation('protocol_command_text')
-
-  const locationSpecificOffsetDetails = useSelector(
-    selectSelectedLwLocationSpecificOffsetDetails(props.runId)
-  )
-  const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[props.runId]?.lpc as LPCWizardState
-  )
-
-  const detailsWithSlotCopy = locationSpecificOffsetDetails.map(offset => {
-    const slotCopy = getLabwareDisplayLocation({
-      t: commandTextT,
-      loadedModules: protocolData.modules,
-      loadedLabwares: protocolData.labware,
-      robotType: FLEX_ROBOT_TYPE,
-      location: {
-        slotName: offset.locationDetails.slotName,
-      },
-      detailLevel: 'slot-only',
-    }).slice(-2) // ex, "C1" instead of "Slot C1"
-
-    return {
-      ...offset,
-      slotCopy,
-    }
-  })
-
-  // Sort the array alphanumerically by slotCopy
-  const sortedDetailsBySlot = [...detailsWithSlotCopy].sort((a, b) =>
-    a.slotCopy.localeCompare(b.slotCopy, 'en', {
-      numeric: true,
-    })
+  const { uri } = useSelector(
+    selectSelectedLwOverview(props.runId)
+  ) as SelectedLwOverview
+  const sortedDetailsBySlot = useSelector(
+    selectSortedLSOffsetDetailsWithCopy(
+      props.runId,
+      uri,
+      commandTextT as TFunction
+    )
   )
 
   return (
@@ -75,7 +54,7 @@ export function LocationSpecificOffsetsContainer(
 
             return (
               <LabwareLocationItem
-                key={`${offset.locationDetails.slotName}${offset.locationDetails.moduleId}${offset.locationDetails.adapterId}`}
+                key={`${offset.locationDetails.addressableAreaName}${offset.locationDetails.closestBeneathModuleId}${offset.locationDetails.closestBeneathAdapterId}`}
                 {...props}
                 locationSpecificOffsetDetails={details}
                 slotCopy={slotCopy}
