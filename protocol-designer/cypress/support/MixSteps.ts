@@ -101,7 +101,7 @@ enum MixLocators {
   BlowoutZPosition = '[data-testid="TipPositionModal_custom_input"]',
   PosFromBottom = '[id="TipPositionField_mix_touchTip_mmFromBottom"]',
   RenameBtn = 'button:contains("Rename")',
-  StepNameInput = '[tabindex="0"]', //NOTE: locator
+  StepNameInput = 'div[tabindex="0"]',
   StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
 }
@@ -273,7 +273,7 @@ export const MixSteps = {
         .should('be.visible')
         .click()
       cy.contains(MixContent.ChooseOption).should('exist').should('be.visible')
-        .closest('[tabindex="0"]')
+        .closest('div[tabindex="0"]')
         .should('exist')
         .should('be.visible')
         .click()
