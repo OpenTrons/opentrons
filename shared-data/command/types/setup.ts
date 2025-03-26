@@ -325,21 +325,6 @@ interface LoadLidStackResult {
   locationSequences?: LabwareLocationSequence[]
 }
 
-interface StackerRetriveResult {
-  labwareId: string
-  adapterId: string
-  lidId: string
-  stackLabwareId: string
-  labwareIds: string[]
-  definition: LabwareDefinition2
-  location: LabwareLocation
-  adapterLabwareURI: string
-  definitionUri: string
-  primaryLabwareURI: string
-  stackLocationSequence?: LabwareLocationSequence
-  locationSequences?: LabwareLocationSequence[]
-}
-
 interface LoadLidParams {
   location: LabwareLocation
   loadName: string
