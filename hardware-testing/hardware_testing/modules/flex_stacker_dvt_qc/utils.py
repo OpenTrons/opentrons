@@ -125,7 +125,7 @@ def labware_detected(
             raw_data = histogram[zone]
             baseline_data = baseline[zone]
             for bin in bins:
-                if bin not in range(50, 60):
+                if bin not in range(50, 56):
                     continue
                 # We need to ignore raw photon count below 10000 on the X as
                 # it becomes inconsistent to detect labware on the home position.
