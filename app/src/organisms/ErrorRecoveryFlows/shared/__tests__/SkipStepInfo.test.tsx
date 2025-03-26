@@ -103,7 +103,7 @@ describe('SkipStepInfo', () => {
 
     screen.getByText('Skip to next step')
     screen.getByText(
-      'The robot will not attempt to move the labware again. The run will continue from the next step.'
+      'Take any necessary actions to prepare the robot to continue the run from the next step.'
     )
     screen.getByText('Close the robot door before proceeding.')
   })
