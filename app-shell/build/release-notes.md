@@ -8,6 +8,26 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons App Changes in 8.4.0
+
+Welcome to the v8.4.0 release of the Opentrons App! This release includes updates to labware offsets on the Flex, as well as other new features, improvements, and bug fixes.
+
+### New Features
+
+- Run Flex protocols with updated liquid handling commands, optimized for liquid class properties like viscosity.
+- During a protocol, use the Flex gripper to remove lids from new tip boxes on the deck.
+- Run protocols with stacked Opentrons Tough auto-sealing lids.
+
+### Improvements
+
+- Apply default labware offsets to the same labware across your Flex deck. Click **Labware offsets** when setting up a protocol in the Opentrons App to view, apply, and create labware offsets.
+- Improvements to error recovery allow you to resume your Flex protocol when the door is opened or a second error occurs.
+
+### Bug Fixes
+
+- During error recovery, select only a single column of pipette tips to resume the protocol.
+- An error is raised if the Absorbance Plate Reader fails to initialize before reading a plate inside the module.
+
 ## Opentrons App Changes in 8.3.1
 
 The 8.3.1 hotfix release includes a small fix to allow all robots to properly reboot after an upgrade to v8.3.0.
