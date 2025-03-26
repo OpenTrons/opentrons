@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
-import { css } from 'styled-components'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   DIRECTION_COLUMN,
@@ -13,7 +12,7 @@ import {
 import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
-import { LiquidDetailCard } from '/app/organisms/LiquidsLabwareDetailsModal'
+import { LiquidDetailCard } from '/app/organisms/LiquidDetailCard'
 import {
   getLiquidsByIdForLabware,
   getDisabledWellFillFromLabwareId,
@@ -145,7 +144,7 @@ export const LabwareLiquidsDetailModal = (
       modalSize="large"
       onOutsideClick={closeModal}
       header={{
-        title: labwareDisplayName,
+        title: title,
         hasExitIcon: true,
         onClick: closeModal,
       }}

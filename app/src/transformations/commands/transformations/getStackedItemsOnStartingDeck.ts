@@ -2,7 +2,6 @@ import {
   getLabwareDefURI,
   getAllDefinitions,
   getCutoutDisplayName,
-  OnCutoutFixtureLocationSequenceComponent,
   THERMOCYCLER_MODULE_V2,
   getSlotFromAddressableAreaName,
 } from '@opentrons/shared-data'
@@ -20,6 +19,7 @@ import type {
   LoadedModule,
   LoadLidParams,
   OnAddressableAreaLocationSequenceComponent,
+  OnCutoutFixtureLocationSequenceComponent,
 } from '@opentrons/shared-data'
 import type { LabwareByLiquidId } from '@opentrons/components'
 
@@ -95,7 +95,7 @@ export function getStackedItemsOnStartingDeck(
         command.result != null
       ) {
         const offDeckArray = Object.keys(acc).includes('offDeck')
-          ? acc['offDeck']
+          ? acc.offDeck
           : []
         if (command.commandType === 'loadLabware') {
           const offDeckItem: LabwareInStack = {
@@ -132,7 +132,7 @@ export function getStackedItemsOnStartingDeck(
             offDeckArray.push(offDeckItem)
           })
         }
-        return { ...acc, ['offDeck']: offDeckArray }
+        return { ...acc, offDeck: offDeckArray }
       } else if (
         command.commandType === 'loadLabware' &&
         command.result?.locationSequence != null
@@ -288,7 +288,10 @@ export function getLabwareLiquidRenderInfoFromStack(
         (lw.lidDisplayName == null ||
           lw.lidDisplayName === stackItem.lidDisplayName)
     )
-    if (matchingLabwareIndex != -1 && matchingLabwareIndex === acc.length - 1) {
+    if (
+      matchingLabwareIndex !== -1 &&
+      matchingLabwareIndex === acc.length - 1
+    ) {
       acc[matchingLabwareIndex].quantity += 1
       acc[matchingLabwareIndex].liquids += liquidCount
     } else {

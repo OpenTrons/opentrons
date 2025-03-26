@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   DeckInfoLabel,
@@ -26,7 +25,7 @@ import { getAllDefinitions } from '@opentrons/shared-data'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
+import type { LabwareByLiquidId } from '@opentrons/components'
 import type { StackItem, LabwareInStack } from '/app/transformations/commands'
 
 const LabwareThumbnail = styled.svg`
@@ -109,12 +108,14 @@ export function SetupLabwareStackView({
           alignItems={ALIGN_CENTER}
         >
           <ODDBackButton onClick={onClickBack} />
-          <StyledText
-            oddStyle="level2HeaderBold"
-            marginRight={SPACING.spacing16}
-          >
-            {t('labware_in')}
-          </StyledText>
+          {slotName !== 'offDeck' ? (
+            <StyledText
+              oddStyle="level2HeaderBold"
+              marginRight={SPACING.spacing16}
+            >
+              {t('labware_in')}
+            </StyledText>
+          ) : null}
           <DeckInfoLabel
             deckLabel={
               slotName === 'offDeck'
@@ -149,6 +150,7 @@ export function SetupLabwareStackView({
               {t('top_of_slot')}
             </StyledText>
             {labwareInStack.map((labware, index) => {
+              const isSelected = selectedLabware.labwareId === labware.labwareId
               const label = (
                 <Flex
                   gridGap={SPACING.spacing16}
@@ -156,7 +158,7 @@ export function SetupLabwareStackView({
                   css={RADIO_BUTTON}
                 >
                   <Tag
-                    type="default"
+                    type={isSelected ? 'onColor' : 'default'}
                     text={(labwareInStack.length - index).toString()}
                   />
                   <StyledText oddStyle="bodyTextRegular" wordBreak="keep-all">
@@ -169,10 +171,11 @@ export function SetupLabwareStackView({
               )
               return (
                 <RadioButton
+                  key={index}
                   radioButtonType="small"
                   buttonLabel={label}
                   buttonValue={index}
-                  isSelected={selectedLabware.labwareId === labware.labwareId}
+                  isSelected={isSelected}
                   maxLines={2}
                   onChange={() => {
                     setSelectedLabware(labware)

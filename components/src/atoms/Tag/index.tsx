@@ -8,7 +8,7 @@ import { StyledText } from '../StyledText'
 
 import type { IconName } from '../../icons'
 
-export type TagType = 'default' | 'interactive' | 'branded'
+export type TagType = 'default' | 'interactive' | 'branded' | 'onColor'
 
 export interface TagProps {
   /** Tag content */
@@ -39,6 +39,10 @@ const TAG_PROPS_BY_TYPE: Record<
   branded: {
     backgroundColor: COLORS.blue50,
     color: COLORS.white,
+  },
+  onColor: {
+    backgroundColor: COLORS.white,
+    color: COLORS.black90,
   },
 }
 

@@ -28,7 +28,6 @@ import {
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
-  getModuleDisplayName,
   getModuleType,
   getAllDefinitions,
   HEATERSHAKER_MODULE_TYPE,
@@ -60,23 +59,19 @@ import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTyp
 
 const LabwareRow = styled.div`
   display: ${DISPLAY_GRID};
+  cursor: pointer;
   grid-template-columns: 90px 12fr;
   background-color: ${COLORS.grey20};
   border-radius: ${BORDERS.borderRadius4};
   padding: ${SPACING.spacing12} ${SPACING.spacing16} ${SPACING.spacing12};
 `
-
-interface LabwareLiquidRenderInfo extends LabwareInStack {
-  quantity: number
-  liquids: number
-}
-
 interface LabwareListItemProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
   isFlex: boolean
   slotName: string
   stackedItems: StackItem[]
+  onClick: () => void
   labwareByLiquidId?: LabwareByLiquidId
   showLabwareSVG?: boolean
 }
@@ -92,6 +87,7 @@ export function LabwareListItem(
     isFlex,
     labwareByLiquidId,
     showLabwareSVG,
+    onClick,
   } = props
   const moduleInStack = stackedItems.find(
     (item): item is ModuleInStack => 'moduleModel' in item
@@ -123,7 +119,6 @@ export function LabwareListItem(
     slotInfo = i18n.format(t('off_deck'), 'upperCase')
   }
 
-  let moduleDisplayName: string | null = null
   let moduleType: ModuleType | null = null
   let secureLabwareInstructions: JSX.Element | null = null
   let isCorrectHeaterShakerAttached: boolean = false
@@ -134,7 +129,6 @@ export function LabwareListItem(
 
   if (moduleInStack != null) {
     moduleType = getModuleType(moduleInStack.moduleModel)
-    moduleDisplayName = getModuleDisplayName(moduleInStack.moduleModel)
 
     const moduleTypeNeedsAttention = extraAttentionModules.find(
       extraAttentionModType => extraAttentionModType === moduleType
@@ -241,7 +235,7 @@ export function LabwareListItem(
   }
 
   return (
-    <LabwareRow>
+    <LabwareRow onClick={onClick}>
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing2}

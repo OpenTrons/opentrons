@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   getLabwareInfoByLiquidId,
@@ -14,8 +15,10 @@ import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
+import type { StackItem } from '/app/transformations/commands'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
+import { SlotDetailModal } from './SlotDetailModal'
 
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
@@ -33,7 +36,10 @@ export function SetupLabwareList(
     isFlex,
   } = props
   const { t } = useTranslation('protocol_setup')
-
+  const [selectedStack, setSelectedStack] = useState<{
+    slotName: string
+    stack: StackItem[]
+  } | null>(null)
   const startingDeck = getStackedItemsOnStartingDeck(
     protocolAnalysis?.commands ?? [],
     protocolAnalysis?.labware ?? [],
@@ -46,54 +52,73 @@ export function SetupLabwareList(
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key]) => key !== 'offDeck')
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
-    ? startingDeck['offDeck']
+    ? startingDeck.offDeck
     : null
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      marginBottom={SPACING.spacing16}
-    >
+    <>
       <Flex
-        gridGap={SPACING.spacing16}
-        paddingLeft={SPACING.spacing16}
-        paddingTop={SPACING.spacing20}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
       >
-        <StyledText
-          width="6.25rem"
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
+        <Flex
+          gridGap={SPACING.spacing16}
+          paddingLeft={SPACING.spacing16}
+          paddingTop={SPACING.spacing20}
         >
-          {t('location')}
-        </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {t('labware_name')}
-        </StyledText>
-      </Flex>
-      {sortedStartingDeckEntries.map(([key, value]) => {
-        return (
+          <StyledText
+            width="6.25rem"
+            desktopStyle="bodyDefaultRegular"
+            color={COLORS.grey60}
+          >
+            {t('location')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+            {t('labware_name')}
+          </StyledText>
+        </Flex>
+        {sortedStartingDeckEntries.map(([key, value]) => {
+          return (
+            <LabwareListItem
+              key={key}
+              attachedModuleInfo={attachedModuleInfo}
+              extraAttentionModules={extraAttentionModules}
+              isFlex={isFlex}
+              slotName={key}
+              stackedItems={value}
+              labwareByLiquidId={labwareByLiquidId}
+              onClick={() => {
+                setSelectedStack({ slotName: key, stack: value })
+              }}
+            />
+          )
+        })}
+        {offDeckItems?.forEach((item, index) => (
           <LabwareListItem
-            key={key}
+            key={index}
             attachedModuleInfo={attachedModuleInfo}
             extraAttentionModules={extraAttentionModules}
+            slotName={'offDeck'}
+            stackedItems={[item]}
             isFlex={isFlex}
-            slotName={key}
-            stackedItems={value}
-            labwareByLiquidId={labwareByLiquidId}
+            onClick={() => {
+              setSelectedStack({ slotName: 'offDeck', stack: [item] })
+            }}
           />
-        )
-      })}
-      {offDeckItems?.forEach((item, index) => (
-        <LabwareListItem
-          key={index}
-          attachedModuleInfo={attachedModuleInfo}
-          extraAttentionModules={extraAttentionModules}
-          slotName={'offDeck'}
-          stackedItems={[item]}
-          isFlex={isFlex}
+        ))}
+      </Flex>
+      {selectedStack != null && protocolAnalysis != null ? (
+        <SlotDetailModal
+          stackedItems={selectedStack.stack}
+          slotName={selectedStack.slotName}
+          labwareByLiquidId={labwareByLiquidId}
+          mostRecentAnalysis={protocolAnalysis}
+          closeModal={() => {
+            setSelectedStack(null)
+          }}
         />
-      ))}
-    </Flex>
+      ) : null}
+    </>
   )
 }

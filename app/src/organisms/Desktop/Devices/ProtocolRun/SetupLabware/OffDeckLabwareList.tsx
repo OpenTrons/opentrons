@@ -1,16 +1,21 @@
 import { useTranslation } from 'react-i18next'
 import { SPACING, TYPOGRAPHY, LegacyStyledText } from '@opentrons/components'
 import { LabwareListItem } from './LabwareListItem'
+
+import type { Dispatch, SetStateAction } from 'react'
 import type { StackItem } from '/app/transformations/commands'
 
 interface OffDeckLabwareListProps {
   labwareItems: StackItem[]
   isFlex: boolean
+  setSelectedStack: Dispatch<
+    SetStateAction<{ slotName: string; stack: StackItem[] } | null>
+  >
 }
 export function OffDeckLabwareList(
   props: OffDeckLabwareListProps
 ): JSX.Element | null {
-  const { labwareItems, isFlex } = props
+  const { labwareItems, isFlex, setSelectedStack } = props
   const { t } = useTranslation('protocol_setup')
   if (labwareItems.length < 1) return null
   return (
@@ -32,6 +37,9 @@ export function OffDeckLabwareList(
           slotName="offDeck"
           isFlex={isFlex}
           showLabwareSVG
+          onClick={() => {
+            setSelectedStack({ slotName: 'offDeck', stack: [labwareItem] })
+          }}
         />
       ))}
     </>

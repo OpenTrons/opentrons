@@ -83,7 +83,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
   )
     .filter(
       ([key, value]) =>
-        key != 'offDeck' &&
+        key !== 'offDeck' &&
         !value.some(
           (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
         )

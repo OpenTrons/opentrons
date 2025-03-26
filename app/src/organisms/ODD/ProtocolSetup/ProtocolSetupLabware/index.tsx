@@ -104,7 +104,7 @@ export function ProtocolSetupLabware({
     .sort((a, b) => a[0].localeCompare(b[0]))
     .filter(([key]) => key !== 'offDeck')
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
-    ? startingDeck['offDeck']
+    ? startingDeck.offDeck
     : null
 
   const moduleQuery = useModulesQuery({
@@ -126,7 +126,9 @@ export function ProtocolSetupLabware({
     <>
       {selectedLabwareStack != null && mostRecentAnalysis != null ? (
         <SetupLabwareStackView
-          onClickBack={() => setSelectedLabwareStack(null)}
+          onClickBack={() => {
+            setSelectedLabwareStack(null)
+          }}
           slotName={selectedLabwareStack[0]}
           labwareByLiquidId={labwareByLiquidId}
           stackedItems={selectedLabwareStack[1]}
@@ -428,7 +430,9 @@ function RowLabware({
       justifyContent={JUSTIFY_CENTER}
       backgroundColor={COLORS.grey35}
       gridGap={SPACING.spacing32}
-      onClick={() => onClick([slotName, labwareInStack])}
+      onClick={() => {
+        onClick([slotName, labwareInStack])
+      }}
     >
       <Flex gridGap={SPACING.spacing4} width="7.6875rem">
         {location}
