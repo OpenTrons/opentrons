@@ -180,6 +180,23 @@ def test_raise_on_error(
         subject.raise_on_error(response, "fake request")
 
 
+def test_raise_on_error_no_raise_on_keyword_in_body(
+    subject: SerialKind,
+) -> None:
+    """It should not raise when there is a keyword in the response body."""
+    request = "M226 Z"
+    # This response contains `eRR` which tricks the system into thinking there is an
+    # error, we fixed this by making sure the request and response gcodes match.
+    response = "M226 Z I:12 D:gW2ACQuAAAAAAAAAAAAAAAAAAAABAQAAAAAAAAAAAAAAAAAAAAAAAA"
+    "AAAAAAAAAAAAAAAAAAAACPbxeRRikcFhINCQYFBAICAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    subject.raise_on_error(response, request)
+
+    # This should still raise
+    with pytest.raises(expected_exception=ErrorResponse, match="error"):
+        subject.raise_on_error("error", request)
+
+
 def test_get_error_codes_lowercase(
     subject: SerialKind,
 ) -> None:

@@ -258,6 +258,15 @@ class SerialConnection:
         Raises: SerialException
         """
         lower = response.lower()
+        res_gcode = response.split()[0]
+        req_gcode = request.split()[0]
+
+        # Make sure this is not just a normal response that happens to contain the
+        # `err` or `alarm` keyword in the message body by checking the gcode values
+        # for both the request and response. If the gcodes are the same then this
+        # is not an error response.
+        if res_gcode == req_gcode:
+            return
 
         if self._alarm_keyword in lower:
             raise AlarmResponse(port=self._port, response=response)
