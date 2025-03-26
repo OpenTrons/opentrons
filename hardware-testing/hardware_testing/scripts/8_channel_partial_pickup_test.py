@@ -499,9 +499,11 @@ class Eight_Channel_Partial_Pickup_Test:
         """Update pick-up-tip current."""
         pipette = _get_pipette_from_mount(api, mount)
         # pipette.get_pick_up_configuration_for_tip_count(tip_count).current_by_tip_count.update({tip_count: current})
-        for i in range(8):
-            pipette.get_pick_up_configuration_for_tip_count(i+1).current_by_tip_count.update({(i+1): current})
-
+        if tip_count > 1:
+            for i in range(8):
+                pipette.get_pick_up_configuration_for_tip_count(i+1).current_by_tip_count.update({(i+1): current})
+            else:
+                pipette.get_pick_up_configuration_for_tip_count(tip_count).current_by_tip_count.update({tip_count: current})
     async def _update_pick_up_distance(
         self, api: OT3API, mount: OT3Mount, tip_count, distance
     ) -> None:
