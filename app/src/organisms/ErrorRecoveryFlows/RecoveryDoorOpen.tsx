@@ -46,7 +46,6 @@ export function RecoveryDoorOpen({
     proceedToRouteAndStep,
     handleMotionRouting,
   } = routeUpdateActions
-  console.log('recoveryMap: ', recoveryMap)
   const { t } = useTranslation('error_recovery')
 
   const handleHomeAllAndRoute = (

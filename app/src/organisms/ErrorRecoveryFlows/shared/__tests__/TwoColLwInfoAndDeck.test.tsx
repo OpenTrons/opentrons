@@ -151,7 +151,7 @@ describe('TwoColLwInfoAndDeck', () => {
       expect.objectContaining({
         title: 'Load labware into labware shuttle',
         type: 'location',
-        bannerText: undefined,
+        bannerText: null,
       }),
       expect.anything()
     )

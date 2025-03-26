@@ -3,11 +3,7 @@ import {
   RUN_STATUS_AWAITING_RECOVERY_PAUSED,
 } from '@opentrons/api-client'
 
-import {
-  GRIPPER_MOVE_STEPS,
-  RECOVERY_MAP_METADATA,
-  RECOVERY_MAP,
-} from '../constants'
+import { GRIPPER_MOVE_STEPS, RECOVERY_MAP_METADATA } from '../constants'
 
 import type { RunStatus } from '@opentrons/api-client'
 import type { ErrorRecoveryFlowsProps } from '../index'

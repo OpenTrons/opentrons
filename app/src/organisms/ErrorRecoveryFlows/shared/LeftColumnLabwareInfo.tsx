@@ -73,7 +73,6 @@ export function LeftColumnLabwareInfo({
     }
   }
 
-
   // build info props
   return (
     <InterventionContent

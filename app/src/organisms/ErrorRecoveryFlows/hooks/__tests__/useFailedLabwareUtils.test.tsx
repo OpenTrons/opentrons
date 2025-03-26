@@ -3,6 +3,10 @@ import { screen, renderHook } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+
+import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
+import type { RunCommandSummary } from '@opentrons/api-client'
+
 import {
   getRelevantWellName,
   getRelevantFailedLabwareCmdFrom,
@@ -13,8 +17,6 @@ import { DEFINED_ERROR_TYPES, ERROR_KINDS } from '../../constants'
 
 import type { ComponentProps } from 'react'
 import type { GetRelevantLwLocationsParams } from '../useFailedLabwareUtils'
-import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
-import { RunCommandSummary } from '@opentrons/api-client'
 
 describe('getRelevantWellName', () => {
   const failedPipetteInfo = {
@@ -251,15 +253,31 @@ describe('getFailedLabwareQuantity', () => {
     expect(result).toEqual('Quantity: 4')
   })
 
-  // it('should return 0 if there is no commands in list', () => {
-  //   const emptyRunCommands = {}
-  //   const result = getFailedLabwareQuantity(
-  //     emptyRunCommands,
-  //     failedRetriveCommand,
-  //     ERROR_KINDS.STALL_WHILE_STACKING
-  //   )
-  //   expect(result).toEqual('Quantity: 0')
-  // })
+  it('should return 0 if there is no commands in list', () => {
+    const emptyRunCommands = {
+      data: [{ ...failedRetriveCommand }] as RunCommandSummary[],
+      meta: {
+        totalLength: 10,
+        pageLength: 1,
+      },
+      links: {},
+    }
+    const result = getFailedLabwareQuantity(
+      emptyRunCommands,
+      failedRetriveCommand,
+      ERROR_KINDS.STALL_WHILE_STACKING
+    )
+    expect(result).toEqual('Quantity: 0')
+  })
+
+  it('should return null if there is no runCommands', () => {
+    const result = getFailedLabwareQuantity(
+      undefined,
+      failedRetriveCommand,
+      ERROR_KINDS.STALL_WHILE_STACKING
+    )
+    expect(result).toBeNull()
+  })
 
   it('should return null for unhandled error kinds', () => {
     const failedMoveLabwareCommand = {

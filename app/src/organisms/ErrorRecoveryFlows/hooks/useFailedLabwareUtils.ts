@@ -139,24 +139,14 @@ export function useFailedLabwareUtils({
   }
 }
 
-type StackerFailedCommandRelevantLabware = Omit<
-  StackerRetriveRunTimeCommand,
-  'result'
->
-
 type FailedCommandRelevantLabware =
   | Omit<AspirateRunTimeCommand, 'result'>
   | Omit<DispenseRunTimeCommand, 'result'>
   | Omit<LiquidProbeRunTimeCommand, 'result'>
   | Omit<PickUpTipRunTimeCommand, 'result'>
   | Omit<MoveLabwareRunTimeCommand, 'result'>
-  | StackerFailedCommandRelevantLabware
+  | Omit<StackerRetriveRunTimeCommand, 'result'>
   | null
-
-type FailedCommandRelevantLabwarewithoutStacker = Exclude<
-  FailedCommandRelevantLabware,
-  StackerFailedCommandRelevantLabware
->
 
 interface RelevantFailedLabwareCmd {
   failedCommand: FailedCommandBySource | null
@@ -301,7 +291,7 @@ export function getFailedLabwareQuantity(
   recentRelevantFailedLabwareCmd: FailedCommandRelevantLabware,
   errorKind: ErrorKind
 ): string | null {
-  if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING) {
+  if (errorKind === ERROR_KINDS.STALL_WHILE_STACKING && runCommands != null) {
     const failedCommandIndex = runCommands?.data.findIndex(
       x => x.id === recentRelevantFailedLabwareCmd?.id
     )
@@ -320,7 +310,10 @@ export function getFailedLabwareQuantity(
       failedCommandIndex ?? 0
     )
 
-    if (setStoredLabwareLast != null && 'initialCount' in setStoredLabwareLast.params) {
+    if (
+      setStoredLabwareLast != null &&
+      'initialCount' in setStoredLabwareLast.params
+    ) {
       const total = setStoredLabwareLast?.params.initialCount ?? 0
       const retreiveCmds =
         itemsToCheck?.filter(cmd => cmd.commandType === 'flexStacker/retrieve')
@@ -330,7 +323,7 @@ export function getFailedLabwareQuantity(
           .length ?? 0
       return 'Quantity: ' + (total - retreiveCmds + storeCmds)
     } else {
-    return 'Quantity: 0'
+      return 'Quantity: 0'
     }
   }
   return null
@@ -468,8 +461,6 @@ export function useRelevantFailedLwLocations({
       location = failedLabware?.location ?? null
       break
   }
-
-  const currLoc = failedLabware?.location // ? failedLabware["location"] : failedLabware.
 
   const displayNameCurrentLoc = getLabwareDisplayLocation({
     ...BASE_DISPLAY_PARAMS,
