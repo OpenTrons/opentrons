@@ -75,7 +75,7 @@ export enum SetupLocators {
   LiquidNameInput = 'input[name="displayName"]',
   ModalShellArea = 'div[aria-label="ModalShell_ModalArea"]',
   SaveButton = 'button[type="submit"]',
-  LiquidsDropdown = 'div[tabindex="0"].sc-ksBlkl',
+  LiquidsDropdown = 'div[tabindex="0"].sc-ksBlkl', //NOTE: locator
   Div = 'div',
   Button = 'button',
   TempdeckTempInput = 'input[name="targetTemperature"]',
@@ -86,8 +86,8 @@ export enum SetupLocators {
   button = 'button',
   svg = 'svg',
   exist = 'exist',
-  StepOptionsTestIDThreeDots = 'button.Btn-sc-o3dtr1-0.OverflowBtn___StyledBtn-sc-1mslfxo-0',
-  AspirateCheckbox = 'div.Checkbox___StyledFlex3-sc-1mvp7vt-0.gZwGCw.btdgeU',
+  StepOptionsTestIDThreeDots = 'button.Btn-sc-o3dtr1-0.OverflowBtn___StyledBtn-sc-1mslfxo-0', //NOTE: locator
+  AspirateCheckbox = 'div.Checkbox___StyledFlex3-sc-1mvp7vt-0.gZwGCw.btdgeU', //NOTE: locator
 }
 
 export const RegexSetupContent = {
@@ -347,7 +347,7 @@ export const SetupSteps = {
   ChoseDeckSlotC2Labware: (): StepThunk => ({
     call: () => {
       chooseDeckSlot('C2')
-        .find('.Box-sc-8ozbhb-0.kIDovv')
+        .find('.Box-sc-8ozbhb-0.kIDovv') //NOTE: ??
         .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
@@ -411,7 +411,7 @@ export const SetupSteps = {
   ChoseDeckSlotWithLabware: (deckslot: string): StepThunk => ({
     call: () => {
       chooseDeckSlot(deckslot)
-        .find('.Box-sc-8ozbhb-0.kIDovv')
+        .find('.Box-sc-8ozbhb-0.kIDovv') //NOTE: ??
         .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
@@ -510,7 +510,8 @@ export const SetupSteps = {
    */
   LiquidDropdown: (): StepThunk => ({
     call: () => {
-      cy.get(SetupLocators.LiquidsDropdown).should('be.visible').click()
+      cy.get(SetupLocators.LiquidsDropdown)
+        .should('be.visible').click()
     },
   }),
 
@@ -676,7 +677,7 @@ export const SetupSteps = {
   PrewetAspirate: (): StepThunk => ({
     call: () => {
       cy.contains('Pre-wet tip')
-        .closest('div.Flex-sc-1qhp8l7-0.fJriNr')
+        .closest('div.Flex-sc-1qhp8l7-0.fJriNr') //NOTE: locator
         .find(SetupLocators.AspirateCheckbox)
         .click()
     },
@@ -769,7 +770,7 @@ export const SetupSteps = {
   BlowoutTransferDestination: (): StepThunk => ({
     call: () => {
       cy.contains('Blowout')
-        .closest('div.Flex-sc-1qhp8l7-0.ckuVEF')
+        .closest('div.Flex-sc-1qhp8l7-0.ckuVEF') //NOTE: ?
         .find('button[type="button"]')
         .click()
       cy.contains('Choose option').click()
