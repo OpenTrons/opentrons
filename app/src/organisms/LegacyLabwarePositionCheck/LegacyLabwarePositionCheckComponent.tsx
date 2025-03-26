@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer } from 'react'
+import { useState, useEffect, useReducer, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import isEqual from 'lodash/isEqual'
 import { useSelector } from 'react-redux'
@@ -9,7 +9,13 @@ import {
   useAddLabwareOffsetToRunMutation,
   useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
-import { FIXED_TRASH_ID, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FIXED_TRASH_ID,
+  FLEX_ROBOT_TYPE,
+  getVectorDifference,
+  getVectorSum,
+  IDENTITY_VECTOR,
+} from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 // import { useTrackEvent } from '/app/redux/analytics'
@@ -30,6 +36,7 @@ import {
   useNotifyCurrentMaintenanceRun,
 } from '/app/resources/maintenance_runs'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
+import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 
 import type {
   CompletedProtocolAnalysis,
@@ -42,6 +49,7 @@ import type {
   LegacyLabwareOffsetCreateData,
   LabwareOffset,
   CommandData,
+  LegacyLabwareOffsetLocation,
 } from '@opentrons/api-client'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
@@ -184,6 +192,78 @@ export const LegacyLabwarePositionCheckComponent = (
     },
     { workingOffsets: [], tipPickUpOffset: null }
   )
+
+  const allWorkingOffsets = useMemo(() => {
+    return workingOffsets.reduce<LegacyLabwareOffsetCreateData[]>(
+      (acc, { initialPosition, finalPosition, labwareId, location }) => {
+        const definitionUri =
+          protocolData?.labware.find(l => l.id === labwareId)?.definitionUri ??
+          null
+        if (
+          finalPosition == null ||
+          initialPosition == null ||
+          definitionUri == null
+        ) {
+          return acc
+        }
+
+        const existingOffset =
+          getCurrentOffsetForLabwareInLocation(
+            existingOffsets,
+            definitionUri,
+            location
+          )?.vector ?? IDENTITY_VECTOR
+        const vector = getVectorSum(
+          existingOffset,
+          getVectorDifference(finalPosition, initialPosition)
+        )
+        return [...acc, { definitionUri, location, vector }]
+      },
+      []
+    )
+  }, [workingOffsets, protocolData, existingOffsets])
+
+  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
+  const calculateAndApplyOffset = (
+    initialPosition: Coordinates | null,
+    finalPosition: Coordinates | null,
+    labwareId: string,
+    location: LegacyLabwareOffsetLocation
+  ): Promise<void> => {
+    if (initialPosition != null && finalPosition != null) {
+      const definitionUri = protocolData?.labware.find(l => l.id === labwareId)
+        ?.definitionUri
+
+      if (definitionUri) {
+        const existingOffset =
+          getCurrentOffsetForLabwareInLocation(
+            existingOffsets,
+            definitionUri,
+            location
+          )?.vector ?? IDENTITY_VECTOR
+
+        const vectorDiff = getVectorDifference(finalPosition, initialPosition)
+        const newOffset = getVectorSum(existingOffset, vectorDiff)
+
+        setIsApplyingOffsets(true)
+        return createLabwareOffset({
+          runId,
+          data: { definitionUri, location, vector: newOffset },
+        })
+          .then(() => {
+            setIsApplyingOffsets(false)
+          })
+          .catch((e: Error) => {
+            setFatalError(`error applying labware offsets: ${e.message}`)
+            setIsApplyingOffsets(false)
+            return Promise.reject(e)
+          })
+      }
+    }
+
+    return Promise.resolve()
+  }
+
   const [isExiting, setIsExiting] = useState(false)
   const {
     createMaintenanceCommand: createSilentCommand,
@@ -193,7 +273,6 @@ export const LegacyLabwarePositionCheckComponent = (
     isCommandMutationLoading: isCommandChainLoading,
   } = useChainMaintenanceCommands()
 
-  const { createLabwareOffset } = useAddLabwareOffsetToRunMutation()
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
@@ -259,6 +338,7 @@ export const LegacyLabwarePositionCheckComponent = (
   )
   const totalStepCount = LPCSteps.length - 1
   const currentStep = LPCSteps?.[currentStepIndex]
+
   if (currentStep == null) return null
 
   const protocolHasModules = protocolData.modules.length > 0
@@ -297,6 +377,7 @@ export const LegacyLabwarePositionCheckComponent = (
     continuePastCommandFailure: boolean
   ): Promise<CommandData[]> =>
     chainRunCommands(maintenanceRunId, commands, continuePastCommandFailure)
+
   const movementStepProps = {
     proceed,
     protocolData,
@@ -308,21 +389,6 @@ export const LegacyLabwarePositionCheckComponent = (
     workingOffsets,
     existingOffsets,
     robotType,
-  }
-
-  const handleApplyOffsets = (
-    offsets: LegacyLabwareOffsetCreateData[]
-  ): void => {
-    setIsApplyingOffsets(true)
-    Promise.all(offsets.map(data => createLabwareOffset({ runId, data })))
-      .then(() => {
-        onCloseClick()
-        setIsApplyingOffsets(false)
-      })
-      .catch((e: Error) => {
-        setFatalError(`error applying labware offsets: ${e.message}`)
-        setIsApplyingOffsets(false)
-      })
   }
 
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
@@ -365,6 +431,8 @@ export const LegacyLabwarePositionCheckComponent = (
         {...currentStep}
         {...movementStepProps}
         shouldUseMetalProbe={shouldUseMetalProbe}
+        isApplyingOffsets={isApplyingOffsets}
+        calculateAndApplyOffset={calculateAndApplyOffset}
       />
     )
   } else if (currentStep.section === 'ATTACH_PROBE') {
@@ -384,6 +452,9 @@ export const LegacyLabwarePositionCheckComponent = (
         {...movementStepProps}
         protocolHasModules={protocolHasModules}
         currentStepIndex={currentStepIndex}
+        isApplyingOffsets={isApplyingOffsets}
+        onSkip={proceed}
+        calculateAndApplyOffset={calculateAndApplyOffset}
       />
     )
   } else if (currentStep.section === 'RETURN_TIP') {
@@ -392,6 +463,7 @@ export const LegacyLabwarePositionCheckComponent = (
         {...currentStep}
         {...movementStepProps}
         {...{ tipPickUpOffset }}
+        onSkip={proceed}
       />
     )
   } else if (currentStep.section === 'RESULTS_SUMMARY') {
@@ -399,11 +471,11 @@ export const LegacyLabwarePositionCheckComponent = (
       <ResultsSummary
         {...currentStep}
         protocolData={protocolData}
+        allAppliedOffsets={allWorkingOffsets}
+        onCloseClick={onCloseClick}
         {...{
           workingOffsets,
           existingOffsets,
-          handleApplyOffsets,
-          isApplyingOffsets,
           isDeletingMaintenanceRun,
         }}
       />

@@ -21,6 +21,8 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
   THERMOCYCLER_MODULE_TYPE,
+  getVectorDifference,
+  getVectorSum,
 } from '@opentrons/shared-data'
 import { useSelector } from 'react-redux'
 import { getLabwareDef } from './utils/labware'
@@ -30,13 +32,17 @@ import { getIsOnDevice } from '/app/redux/config'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type { Dispatch } from 'react'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  LabwareOffset,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
   CreateCommand,
   LabwareLocation,
   MoveLabwareCreateCommand,
   RobotType,
+  Coordinates,
 } from '@opentrons/shared-data'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type {
@@ -55,6 +61,13 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   proceed: () => void
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   setFatalError: (errorMessage: string) => void
+  isApplyingOffsets: boolean
+  calculateAndApplyOffset: (
+    initialPosition: Coordinates | null,
+    finalPosition: Coordinates | null,
+    labwareId: string,
+    location: LegacyLabwareOffsetLocation
+  ) => Promise<void>
   registerPosition: Dispatch<RegisterPositionAction>
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
@@ -63,6 +76,7 @@ interface CheckItemProps extends Omit<CheckLabwareStep, 'section'> {
   robotType: RobotType
   shouldUseMetalProbe: boolean
 }
+
 export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
   const {
     labwareId,
@@ -80,7 +94,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
     existingOffsets,
     setFatalError,
     robotType,
+    isApplyingOffsets,
     shouldUseMetalProbe,
+    calculateAndApplyOffset,
   } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
@@ -355,7 +371,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           },
         ]
 
-  const handleConfirmPosition = (): void => {
+  const handleConfirmPositionAndApply = (): void => {
     const heaterShakerPrepCommands: CreateCommand[] =
       moduleId != null &&
       moduleType != null &&
@@ -403,10 +419,21 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
             location,
             position,
           })
-          proceed()
+          return calculateAndApplyOffset(
+            initialPosition ?? null,
+            position,
+            labwareId,
+            location
+          )
         } else {
           setFatalError('CheckItem failed to save final position with message')
+          return Promise.reject(
+            new Error('CheckItem failed to save final position with message')
+          )
         }
+      })
+      .then(() => {
+        proceed()
       })
       .catch((e: Error) => {
         setFatalError(
@@ -414,6 +441,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         )
       })
   }
+
   const handleGoBack = (): void => {
     chainRunCommands(
       [
@@ -479,7 +507,8 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
-          handleConfirmPosition={handleConfirmPosition}
+          handleConfirmPositionAndApply={handleConfirmPositionAndApply}
+          isApplyingOffsets={isApplyingOffsets}
           handleGoBack={handleGoBack}
           handleJog={handleJog}
           initialPosition={initialPosition}

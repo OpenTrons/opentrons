@@ -9,6 +9,7 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
@@ -53,7 +54,8 @@ const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
 
 interface JogToWellProps {
-  handleConfirmPosition: () => void
+  handleConfirmPositionAndApply: () => void
+  isApplyingOffsets: boolean
   handleGoBack: () => void
   handleJog: Jog
   pipetteName: PipetteName
@@ -71,7 +73,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     body,
     pipetteName,
     labwareDef,
-    handleConfirmPosition,
+    handleConfirmPositionAndApply,
+    isApplyingOffsets,
     handleGoBack,
     handleJog,
     initialPosition,
@@ -198,7 +201,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
             />
             <SmallButton
               buttonText={t('shared:confirm_position')}
-              onClick={handleConfirmPosition}
+              onClick={handleConfirmPositionAndApply}
             />
           </Flex>
           {showFullJogControls
@@ -259,11 +262,27 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
           >
             <NeedHelpLink href={LPC_HELP_LINK_URL} />
             <Flex gridGap={SPACING.spacing8}>
-              <SecondaryButton onClick={handleGoBack}>
+              <SecondaryButton
+                onClick={handleGoBack}
+                disabled={isApplyingOffsets}
+              >
                 {t('shared:go_back')}
               </SecondaryButton>
-              <PrimaryButton onClick={handleConfirmPosition}>
-                {t('shared:confirm_position')}
+              <PrimaryButton
+                onClick={handleConfirmPositionAndApply}
+                disabled={isApplyingOffsets}
+              >
+                <Flex>
+                  {isApplyingOffsets ? (
+                    <Icon
+                      size="1rem"
+                      spin
+                      name="ot-spinner"
+                      marginRight={SPACING.spacing8}
+                    />
+                  ) : null}
+                  {t('shared:confirm_position')}
+                </Flex>
               </PrimaryButton>
             </Flex>
           </Flex>

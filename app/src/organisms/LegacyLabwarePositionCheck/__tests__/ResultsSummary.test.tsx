@@ -13,6 +13,7 @@ import {
 } from '../__fixtures__'
 
 import type { ComponentProps } from 'react'
+import type { Mock } from 'vitest'
 
 vi.mock('/app/redux/config')
 
@@ -24,16 +25,19 @@ const render = (props: ComponentProps<typeof ResultsSummary>) => {
 
 describe('ResultsSummary', () => {
   let props: ComponentProps<typeof ResultsSummary>
+  let mockOnCloseClick: Mock
 
   beforeEach(() => {
+    mockOnCloseClick = vi.fn()
+
     props = {
       section: SECTIONS.RESULTS_SUMMARY,
       protocolData: mockCompletedAnalysis,
       workingOffsets: mockWorkingOffsets,
       existingOffsets: mockExistingOffsets,
-      isApplyingOffsets: false,
       isDeletingMaintenanceRun: false,
-      handleApplyOffsets: vi.fn(),
+      allAppliedOffsets: [],
+      onCloseClick: mockOnCloseClick,
     }
   })
   afterEach(() => {
@@ -42,32 +46,24 @@ describe('ResultsSummary', () => {
   it('renders correct copy', () => {
     render(props)
     screen.getByText('New labware offset data')
-    screen.getByRole('button', { name: 'Apply offsets' })
+    screen.getByRole('button', { name: 'Finish' })
     screen.getByRole('link', { name: 'Need help?' })
     screen.getByRole('columnheader', { name: 'location' })
     screen.getByRole('columnheader', { name: 'labware' })
     screen.getByRole('columnheader', { name: 'labware offset data' })
   })
-  it('calls handle apply offsets function when button is clicked', () => {
+  it('calls on close function when button is clicked', () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Apply offsets' }))
-    expect(props.handleApplyOffsets).toHaveBeenCalled()
-  })
-  it('does disables the CTA to apply offsets when offsets are already being applied', () => {
-    props.isApplyingOffsets = true
-    render(props)
-    const button = screen.getByRole('button', { name: 'Apply offsets' })
-    expect(button).toBeDisabled()
-    fireEvent.click(button)
-    expect(props.handleApplyOffsets).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
+    expect(mockOnCloseClick).toHaveBeenCalled()
   })
   it('does disables the CTA to apply offsets when the maintenance run is being deleted', () => {
     props.isDeletingMaintenanceRun = true
     render(props)
-    const button = screen.getByRole('button', { name: 'Apply offsets' })
+    const button = screen.getByRole('button', { name: 'Finish' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
-    expect(props.handleApplyOffsets).not.toHaveBeenCalled()
+    expect(mockOnCloseClick).not.toHaveBeenCalled()
   })
   it('renders a row per offset to apply', () => {
     render(props)
