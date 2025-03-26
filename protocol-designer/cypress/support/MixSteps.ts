@@ -95,16 +95,13 @@ enum MixLocators {
   ZpositionInput = '[id="TipPositionModal_z_custom_input"]',
   SwapView = 'button:contains("Swap view")',
   Checkbox = '[data-testid="ListButton_noActive"]',
-  DelaySecondsInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]', //NOTE: locator
   DispFlowRate = '[name="dispense_flowRate"]',
-  BlowoutLtnDropdown = '[class="Svg-sc-1lpozsw-0 Icon___StyledSvg-sc-1gt4gyz-0 csSXbR cJpxat"]', //NOTE: locator
   BlowoutFlowRate = '[name="blowout_flowRate"]',
   BlowoutPos = '[id="TipPositionField_blowout_z_offset"]',
   BlowoutZPosition = '[data-testid="TipPositionModal_custom_input"]',
   PosFromBottom = '[id="TipPositionField_mix_touchTip_mmFromBottom"]',
   RenameBtn = 'button:contains("Rename")',
-  StepNameInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]', //NOTE: locator
-  // StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-1mhuse7-0 hpcyEZ"]',
+  StepNameInput = '[tabindex="0"]', //NOTE: locator
   StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
 }
@@ -232,12 +229,14 @@ export const MixSteps = {
         .should('be.visible')
         .click()
       cy.contains(MixContent.DelayDuration).should('exist').should('be.visible')
-      cy.get(MixLocators.DelaySecondsInput)
+      cy.log('*********LOOK HERE************')
+      cy.get(MixLocators.Checkbox)
+        .find('[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]' )
         .should('exist')
         .should('be.visible')
         .should('have.prop', 'value')
-      cy.get(MixLocators.DelaySecondsInput)
-        .eq(1)
+      cy.get(MixLocators.Checkbox)
+        .find('[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]')
         .type('{selectAll}{backspace}5')
     },
   }),
@@ -274,7 +273,7 @@ export const MixSteps = {
         .should('be.visible')
         .click()
       cy.contains(MixContent.ChooseOption).should('exist').should('be.visible')
-      cy.get(MixLocators.BlowoutLtnDropdown)
+        .closest('[tabindex="0"]')
         .should('exist')
         .should('be.visible')
         .click()
@@ -379,10 +378,12 @@ export const MixSteps = {
       cy.get(MixLocators.RenameBtn).should('exist').should('be.visible').click()
       cy.contains(MixContent.NameStep).should('exist').should('be.visible')
       cy.contains(MixContent.StepName).should('exist').should('be.visible')
-      cy.get(MixLocators.StepNameInput).should('have.value', 'Mix')
+      cy.get(MixLocators.StepNameInput)
+        .find('[type="text"]')
+        .should('have.value', 'Mix')
       cy.contains(MixContent.StepNotes).should('exist').should('be.visible')
       cy.get(MixLocators.StepNameInput)
-        .first()
+        .find('[type="text"]')
         .type('{selectAll}{backspace}Cypress Mix Test')
       cy.get(MixLocators.StepNotesInput).type(
         'This is testing cypress automation in PD'
