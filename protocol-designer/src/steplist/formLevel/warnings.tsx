@@ -1,6 +1,11 @@
 import { getWellTotalVolume } from '@opentrons/shared-data'
 import type { FormError } from './errors'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  HydratedFormData,
+  HydratedMixFormData,
+  HydratedMoveLiquidFormData,
+} from '../../form-types'
 
 /*******************
  ** Warning Messages **
@@ -61,16 +66,12 @@ const mixTipPositionedLowInTube = (): FormWarning => ({
   dependentFields: ['labware'],
 })
 
-export type WarningChecker = (val: unknown) => FormWarning | null
-
 /*******************
  ** Warning Checkers **
  ********************/
-// TODO: real HydratedFormData type
-export type HydratedFormData = any
 
 export const tipPositionInTube = (
-  fields: HydratedFormData
+  fields: HydratedMoveLiquidFormData
 ): FormWarning | null => {
   const {
     aspirate_labware,
@@ -103,7 +104,7 @@ export const tipPositionInTube = (
 }
 
 export const mixTipPositionInTube = (
-  fields: HydratedFormData
+  fields: HydratedMixFormData
 ): FormWarning | null => {
   const { labware, mix_mmFromBottom } = fields
   let isTubeRack: boolean = false
@@ -115,7 +116,7 @@ export const mixTipPositionInTube = (
     : null
 }
 export const belowPipetteMinimumVolume = (
-  fields: HydratedFormData
+  fields: HydratedMixFormData | HydratedMoveLiquidFormData
 ): FormWarning | null => {
   const { pipette, volume } = fields
   if (!(pipette && pipette.spec)) return null
@@ -130,24 +131,22 @@ export const belowPipetteMinimumVolume = (
 }
 
 export const maxDispenseWellVolume = (
-  fields: HydratedFormData
+  fields: HydratedMoveLiquidFormData
 ): FormWarning | null => {
   const { dispense_labware, dispense_wells, volume } = fields
   if (!dispense_labware || !dispense_wells) return null
   const hasExceeded = dispense_wells.some((well: string) => {
     const maximum =
-      'name' in dispense_labware &&
-      (dispense_labware.name === 'wasteChute' ||
-        dispense_labware.name === 'trashBin')
-        ? Infinity // some randomly selected high number since waste chute is huge
-        : getWellTotalVolume(dispense_labware.def as LabwareDefinition2, well)
+      'def' in dispense_labware
+        ? getWellTotalVolume(dispense_labware.def as LabwareDefinition2, well)
+        : Infinity
     return maximum && volume > maximum
   })
   return hasExceeded ? overMaxWellVolumeWarning() : null
 }
 
 export const minDisposalVolume = (
-  fields: HydratedFormData
+  fields: HydratedMoveLiquidFormData
 ): FormWarning | null => {
   const {
     disposalVolume_checkbox,
@@ -173,7 +172,7 @@ export const minDisposalVolume = (
 export const _minAirGapVolume = (
   checkboxField: 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox',
   volumeField: 'aspirate_airGap_volume' | 'dispense_airGap_volume'
-) => (fields: HydratedFormData): FormWarning | null => {
+) => (fields: HydratedMoveLiquidFormData): FormWarning | null => {
   const checkboxValue = fields[checkboxField]
   const volumeValue = fields[volumeField]
   const { pipette } = fields
@@ -190,14 +189,14 @@ export const _minAirGapVolume = (
 }
 
 export const minAspirateAirGapVolume: (
-  fields: HydratedFormData
+  fields: HydratedMoveLiquidFormData
 ) => FormWarning | null = _minAirGapVolume(
   'aspirate_airGap_checkbox',
   'aspirate_airGap_volume'
 )
 
 export const minDispenseAirGapVolume: (
-  fields: HydratedFormData
+  fields: HydratedMoveLiquidFormData
 ) => FormWarning | null = _minAirGapVolume(
   'dispense_airGap_checkbox',
   'dispense_airGap_volume'
@@ -207,12 +206,13 @@ export const minDispenseAirGapVolume: (
  **     Helpers    **
  ********************/
 
-type ComposeWarnings = (
-  ...warningCheckers: WarningChecker[]
-) => (formData: unknown) => FormWarning[]
-export const composeWarnings: ComposeWarnings = (
-  ...warningCheckers: WarningChecker[]
-) => formData =>
+type ComposeWarnings = <T extends HydratedFormData>(
+  ...warningCheckers: ((fields: T) => FormWarning | null)[]
+) => (arg: T) => FormWarning[]
+
+export const composeWarnings: ComposeWarnings = <T extends HydratedFormData>(
+  ...warningCheckers: ((fields: T) => FormWarning | null)[]
+) => (formData: T) =>
   warningCheckers.reduce<FormWarning[]>((acc, checker) => {
     const possibleWarning = checker(formData)
     return possibleWarning ? [...acc, possibleWarning] : acc

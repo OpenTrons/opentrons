@@ -71,7 +71,19 @@ import {
 } from './warnings'
 
 import type { FormWarning, FormWarningType } from './warnings'
-import type { HydratedFormData, StepType } from '../../form-types'
+import type {
+  HydratedAbsorbanceReaderFormData,
+  HydratedFormData,
+  HydratedHeaterShakerFormData,
+  HydratedMagnetFormData,
+  HydratedMixFormData,
+  HydratedMoveLabwareFormData,
+  HydratedMoveLiquidFormData,
+  HydratedPauseFormData,
+  HydratedTemperatureFormData,
+  HydratedThermocyclerFormData,
+  StepType,
+} from '../../form-types'
 import type { FormError } from './errors'
 import type { ModuleEntities } from '@opentrons/step-generation'
 export { handleFormChange } from './handleFormChange'
@@ -87,14 +99,28 @@ export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
 export type { FormError, FormWarning, FormWarningType }
-interface FormHelpers {
+
+type StepFormDataMap = {
+  absorbanceReader: HydratedAbsorbanceReaderFormData
+  heaterShaker: HydratedHeaterShakerFormData
+  mix: HydratedMixFormData
+  pause: HydratedPauseFormData
+  moveLabware: HydratedMoveLabwareFormData
+  moveLiquid: HydratedMoveLiquidFormData
+  magnet: HydratedMagnetFormData
+  temperature: HydratedTemperatureFormData
+  thermocycler: HydratedThermocyclerFormData
+}
+interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors?: (
-    arg: HydratedFormData,
+    arg: StepFormDataMap[K],
     moduleEntities: ModuleEntities
   ) => FormError[]
-  getWarnings?: (arg: unknown) => FormWarning[]
+  getWarnings?: (arg: StepFormDataMap[K]) => FormWarning[] // Changed to match step type
 }
-const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
+const stepFormHelperMap: {
+  [K in keyof StepFormDataMap]?: FormHelpers<K>
+} = {
   absorbanceReader: {
     getErrors: composeErrors(
       wavelengthRequired,
@@ -205,15 +231,19 @@ export const getFormErrors = (
   formData: HydratedFormData,
   moduleEntities: ModuleEntities
 ): FormError[] => {
+  //  @ts-expect-error
   const formErrorGetter = stepFormHelperMap[stepType]?.getErrors
-  return formErrorGetter ? formErrorGetter(formData, moduleEntities) : []
+
+  const errors = formErrorGetter != null ? formErrorGetter(formData) : []
+  return errors
 }
+
 export const getFormWarnings = (
   stepType: StepType,
-  formData: unknown
+  formData: HydratedFormData
 ): FormWarning[] => {
-  const formWarningGetter =
-    stepFormHelperMap[stepType] && stepFormHelperMap[stepType]?.getWarnings
+  //  @ts-expect-error
+  const formWarningGetter = stepFormHelperMap[stepType]?.getWarnings
   const warnings = formWarningGetter != null ? formWarningGetter(formData) : []
   return warnings
 }

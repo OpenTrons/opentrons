@@ -70,6 +70,8 @@ describe('form casting', () => {
       dispense_submerge_x_position: 1,
       dispense_submerge_y_position: -1,
       dispense_position_reference: 'well-bottom',
+      pushOut_volume: null,
+      pushOut_checkbox: false,
     }
     expect(_castForm(input)).toEqual({
       ...input,

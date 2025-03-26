@@ -190,7 +190,7 @@ export interface ChangeTipFields {
   changeTip?: ChangeTipOptions
 }
 export type HydratedPauseFormData = AnnotationFields & {
-  stepType: 'pause'
+  stepType: Extract<StepType, 'pause'>
   id: StepIdType
   pauseAction?:
     | typeof PAUSE_UNTIL_RESUME
@@ -233,7 +233,7 @@ export type BlankForm = AnnotationFields & {
 
 export interface HydratedMoveLiquidFormData extends AnnotationFields {
   id: string
-  stepType: 'moveLiquid'
+  stepType: Extract<StepType, 'moveLiquid'>
   aspirate_airGap_checkbox: boolean
   aspirate_delay_checkbox: boolean
   aspirate_labware: LabwareEntity
@@ -318,11 +318,13 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   pickUpTip_wellNames?: string[] | null
   preWetTip?: boolean | null
   liquidClass?: string | null
+  pushOut_volume: number | null
+  pushOut_checkbox: boolean
 }
 
 export interface HydratedMoveLabwareFormData extends AnnotationFields {
   id: string
-  stepType: 'moveLabware'
+  stepType: Extract<StepType, 'moveLabware'>
   labware: LabwareEntity
   newLocation: LabwareLocation
   useGripper: boolean
@@ -330,7 +332,7 @@ export interface HydratedMoveLabwareFormData extends AnnotationFields {
 
 export interface HydratedCommentFormData extends AnnotationFields {
   id: string
-  stepType: 'comment'
+  stepType: Extract<StepType, 'comment'>
   message: string
 }
 
@@ -348,7 +350,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_wellOrder_second: WellOrderOption
   nozzles: NozzleConfigurationStyle | null
   pipette: PipetteEntity
-  stepType: 'mix'
+  stepType: Extract<StepType, 'mix'>
   tipRack: string
   volume: number
   wells: string[]
@@ -375,13 +377,13 @@ export type HydratedMagnetFormData = AnnotationFields & {
   magnetAction: MagnetAction
   moduleId: string
   stepDetails: string | null
-  stepType: 'magnet'
+  stepType: Extract<StepType, 'magnet'>
 }
 export interface HydratedTemperatureFormData extends AnnotationFields {
   id: string
   moduleId: string | null
   setTemperature: 'true' | 'false'
-  stepType: 'temperature'
+  stepType: Extract<StepType, 'temperature'>
   targetTemperature: string | null
 }
 export interface HydratedHeaterShakerFormData extends AnnotationFields {
@@ -392,14 +394,14 @@ export interface HydratedHeaterShakerFormData extends AnnotationFields {
   moduleId: string
   setHeaterShakerTemperature: boolean
   setShake: boolean
-  stepType: 'heaterShaker'
+  stepType: Extract<StepType, 'heaterShaker'>
   targetHeaterShakerTemperature: string | null
   targetSpeed: string | null
 }
 
 export interface HydratedThermocyclerFormData extends AnnotationFields {
   id: string
-  stepType: 'thermocycler'
+  stepType: Extract<StepType, 'thermocycler'>
   blockIsActive: boolean
   blockIsActiveHold: boolean
   blockTargetTemp: string | null
@@ -424,7 +426,7 @@ export type AbsorbanceReaderFormType =
   | typeof ABSORBANCE_READER_LID
 
 export interface HydratedAbsorbanceReaderFormData extends AnnotationFields {
-  stepType: 'absorbanceReader'
+  stepType: Extract<StepType, 'absorbanceReader'>
   id: string
   absorbanceReaderFormType: AbsorbanceReaderFormType | null
   fileName: string | null
