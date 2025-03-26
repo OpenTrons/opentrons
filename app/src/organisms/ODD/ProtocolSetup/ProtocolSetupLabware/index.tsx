@@ -10,6 +10,7 @@ import {
   Box,
   Chip,
   Tag,
+  ListItem,
   COLORS,
   DeckInfoLabel,
   StyledText,
@@ -46,14 +47,13 @@ import {
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { LabwareMapView } from './LabwareMapView'
+import { SetupLabwareStackView } from './SetupLabwareStackView'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-  LabwareDefinition2,
-  LabwareLocation,
 } from '@opentrons/shared-data'
 import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
@@ -83,17 +83,8 @@ export function ProtocolSetupLabware({
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const [showMapView, setShowMapView] = useState<boolean>(true)
-  const [
-    showLabwareDetailsModal,
-    setShowLabwareDetailsModal,
-  ] = useState<boolean>(false)
-  const [selectedLabware, setSelectedLabware] = useState<
-    | (LabwareDefinition2 & {
-        location: LabwareLocation
-        nickName: string | null
-        id: string
-      })
-    | null
+  const [selectedLabwareStack, setSelectedLabwareStack] = useState<
+    [string, StackItem[]] | null
   >(null)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -131,153 +122,106 @@ export function ProtocolSetupLabware({
     deckConfig
   )
 
-  // const handleLabwareClick = (
-  //   labwareDef: LabwareDefinition2,
-  //   labwareId: string
-  // ): void => {
-  //   const foundLabware = mostRecentAnalysis?.labware.find(
-  //     labware => labware.id === labwareId
-  //   )
-  //   if (foundLabware != null) {
-  //     const nickName = onDeckItems.find(
-  //       item => item.labwareId === foundLabware.id
-  //     )?.nickName
-
-  //     const location = onDeckItems.find(
-  //       item => item.labwareId === foundLabware.id
-  //     )?.initialLocation
-  //     if (location != null) {
-  //       setSelectedLabware({
-  //         ...labwareDef,
-  //         location,
-  //         nickName: nickName ?? null,
-  //         id: labwareId,
-  //       })
-  //       setShowLabwareDetailsModal(true)
-  //     } else {
-  //       console.warn('no initial labware location found')
-  //     }
-  //   }
-  // }
-  // const selectedLabwareIsStacked = mostRecentAnalysis?.commands.some(
-  //   command =>
-  //     command.commandType === 'loadLabware' &&
-  //     command.result?.labwareId === selectedLabware?.id &&
-  //     typeof command.params.location === 'object' &&
-  //     ('moduleId' in command.params.location ||
-  //       'labwareId' in command.params.location)
-  // )
-
   return (
     <>
-      {/* {showLabwareDetailsModal &&
-      !selectedLabwareIsStacked &&
-      selectedLabware != null ? (
-        <SingleLabwareModal
-          selectedLabware={selectedLabware}
-          onOutsideClick={() => {
-            setShowLabwareDetailsModal(false)
-            setSelectedLabware(null)
-          }}
+      {selectedLabwareStack != null && mostRecentAnalysis != null ? (
+        <SetupLabwareStackView
+          onClickBack={() => setSelectedLabwareStack(null)}
+          slotName={selectedLabwareStack[0]}
+          labwareByLiquidId={labwareByLiquidId}
+          stackedItems={selectedLabwareStack[1]}
           mostRecentAnalysis={mostRecentAnalysis}
         />
-      ) : null} */}
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-      >
-        <ODDBackButton
-          label={t('labware_liquids_setup_step_title')}
-          onClick={() => {
-            setSetupScreen('prepare to run')
-          }}
-        />
-        {isConfirmed ? (
-          <Chip
-            background
-            iconName="ot-check"
-            text={t('placements_confirmed')}
-            type="success"
-          />
-        ) : (
-          <SmallButton
-            buttonText={t('confirm_placements')}
+      ) : (
+        <>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <ODDBackButton
+              label={t('labware_liquids_setup_step_title')}
+              onClick={() => {
+                setSetupScreen('prepare to run')
+              }}
+            />
+            {isConfirmed ? (
+              <Chip
+                background
+                iconName="ot-check"
+                text={t('placements_confirmed')}
+                type="success"
+              />
+            ) : (
+              <SmallButton
+                buttonText={t('confirm_placements')}
+                onClick={() => {
+                  setIsConfirmed(true)
+                  setSetupScreen('prepare to run')
+                }}
+                buttonCategory="rounded"
+              />
+            )}
+          </Flex>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            marginTop={SPACING.spacing32}
+          >
+            {showMapView ? (
+              <LabwareMapView
+                mostRecentAnalysis={mostRecentAnalysis}
+                attachedProtocolModuleMatches={attachedProtocolModuleMatches}
+                startingDeck={startingDeck}
+                labwareByLiquidId={labwareByLiquidId}
+                handleLabwareClick={setSelectedLabwareStack}
+              />
+            ) : (
+              <>
+                <Flex gridGap={SPACING.spacing8} color={COLORS.grey60}>
+                  <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
+                    <StyledText oddStyle="bodyTextSemiBold">
+                      {t('location')}
+                    </StyledText>
+                  </Flex>
+                  <Flex>
+                    <StyledText oddStyle="bodyTextSemiBold">
+                      {t('labware_name')}
+                    </StyledText>
+                  </Flex>
+                </Flex>
+                {sortedStartingDeckEntries.map(([key, value], index) => (
+                  <RowLabware
+                    key={index}
+                    attachedProtocolModules={attachedProtocolModuleMatches}
+                    refetchModules={moduleQuery.refetch}
+                    slotName={key}
+                    stackedItems={value}
+                    labwareByLiquidId={labwareByLiquidId}
+                    onClick={setSelectedLabwareStack}
+                  />
+                ))}
+                {offDeckItems?.forEach((item, index) => (
+                  <RowLabware
+                    key={index}
+                    attachedProtocolModules={attachedProtocolModuleMatches}
+                    refetchModules={moduleQuery.refetch}
+                    slotName={'offDeck'}
+                    stackedItems={[item]}
+                    labwareByLiquidId={labwareByLiquidId}
+                    onClick={setSelectedLabwareStack}
+                  />
+                ))}
+              </>
+            )}
+          </Flex>
+          <FloatingActionButton
+            buttonText={showMapView ? t('list_view') : t('map_view')}
             onClick={() => {
-              setIsConfirmed(true)
-              setSetupScreen('prepare to run')
-            }}
-            buttonCategory="rounded"
-          />
-        )}
-      </Flex>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing8}
-        marginTop={SPACING.spacing32}
-      >
-        {showMapView ? (
-          <LabwareMapView
-            mostRecentAnalysis={mostRecentAnalysis}
-            attachedProtocolModuleMatches={attachedProtocolModuleMatches}
-            handleLabwareClick={() => null}
-            startingDeck={startingDeck}
-            labwareByLiquidId={labwareByLiquidId}
-          />
-        ) : (
-          <>
-            <Flex gridGap={SPACING.spacing8} color={COLORS.grey60}>
-              <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
-                <StyledText oddStyle="bodyTextSemiBold">
-                  {t('location')}
-                </StyledText>
-              </Flex>
-              <Flex>
-                <StyledText oddStyle="bodyTextSemiBold">
-                  {t('labware_name')}
-                </StyledText>
-              </Flex>
-            </Flex>
-            {sortedStartingDeckEntries.map(([key, value], index) => (
-              <RowLabware
-                key={index}
-                attachedProtocolModules={attachedProtocolModuleMatches}
-                refetchModules={moduleQuery.refetch}
-                slotName={key}
-                stackedItems={value}
-                labwareByLiquidId={labwareByLiquidId}
-              />
-            ))}
-            {offDeckItems?.forEach((item, index) => (
-              <RowLabware
-                key={index}
-                attachedProtocolModules={attachedProtocolModuleMatches}
-                refetchModules={moduleQuery.refetch}
-                slotName={'offDeck'}
-                stackedItems={[item]}
-                labwareByLiquidId={labwareByLiquidId}
-              />
-            ))}
-          </>
-        )}
-        {/* {showLabwareDetailsModal &&
-        selectedLabware != null &&
-        selectedLabwareIsStacked ? (
-          <LabwareStackModal
-            labwareIdTop={selectedLabware?.id}
-            commands={mostRecentAnalysis?.commands ?? null}
-            closeModal={() => {
-              setSelectedLabware(null)
-              setShowLabwareDetailsModal(false)
+              setShowMapView(mapView => !mapView)
             }}
           />
-        ) : null} */}
-      </Flex>
-      <FloatingActionButton
-        buttonText={showMapView ? t('list_view') : t('map_view')}
-        onClick={() => {
-          setShowMapView(mapView => !mapView)
-        }}
-      />
+        </>
+      )}
     </>
   )
 }
@@ -424,7 +368,8 @@ interface RowLabwareProps {
   refetchModules: UseQueryResult<Modules>['refetch']
   slotName: string
   stackedItems: StackItem[]
-  labwareByLiquidId?: LabwareByLiquidId
+  onClick: Dispatch<SetStateAction<[string, StackItem[]] | null>>
+  labwareByLiquidId: LabwareByLiquidId
 }
 
 function RowLabware({
@@ -432,6 +377,7 @@ function RowLabware({
   refetchModules,
   slotName,
   stackedItems,
+  onClick,
   labwareByLiquidId,
 }: RowLabwareProps): JSX.Element | null {
   const moduleInStack = stackedItems.find(
@@ -476,13 +422,13 @@ function RowLabware({
     />
   )
   return (
-    <Flex
+    <ListItem
+      type="default"
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
       backgroundColor={COLORS.grey35}
-      borderRadius={BORDERS.borderRadius8}
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing32}
+      onClick={() => onClick([slotName, labwareInStack])}
     >
       <Flex gridGap={SPACING.spacing4} width="7.6875rem">
         {location}
@@ -496,7 +442,6 @@ function RowLabware({
         {isStacked ? <DeckInfoLabel iconName="stacked" /> : null}
       </Flex>
       <Flex
-        alignSelf={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         flexDirection={DIRECTION_ROW}
         width="75%"
@@ -564,6 +509,6 @@ function RowLabware({
         ) : null}
       </Flex>
       <Icon name="more" size={SPACING.spacing40} />
-    </Flex>
+    </ListItem>
   )
 }

@@ -38,7 +38,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getLiquidsByIdForLabware } from '/app/transformations/analysis'
 import { getLabwareLiquidRenderInfoFromStack } from '/app/transformations/commands'
 import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
@@ -50,6 +49,7 @@ import type {
   ModuleType,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '@opentrons/components'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type {
   StackItem,
@@ -57,7 +57,6 @@ import type {
   LabwareInStack,
 } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
 
 const LabwareRow = styled.div`
   display: ${DISPLAY_GRID};

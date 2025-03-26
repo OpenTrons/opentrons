@@ -274,7 +274,7 @@ export function getStackedItemsOnStartingDeck(
 
 export function getLabwareLiquidRenderInfoFromStack(
   labwareInStack: LabwareInStack[],
-  labwareByLiquidId: LabwareByLiquidId
+  labwareByLiquidId?: LabwareByLiquidId
 ): LabwareLiquidRenderInfo[] {
   return labwareInStack.reduce<LabwareLiquidRenderInfo[]>((acc, stackItem) => {
     const liquidInfo =

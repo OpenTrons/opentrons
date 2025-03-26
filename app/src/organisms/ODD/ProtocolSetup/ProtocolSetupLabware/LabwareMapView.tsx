@@ -8,26 +8,20 @@ import {
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
+import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type { LabwareByLiquidId } from '@opentrons/components/src/hardware-sim/ProtocolDeck/types'
-import type {
-  CompletedProtocolAnalysis,
-  DeckDefinition,
-  LabwareDefinition2,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 import type {
   StackedItemsOnDeck,
   ModuleInStack,
+  StackItem,
 } from '/app/transformations/commands'
 
 interface LabwareMapViewProps {
   attachedProtocolModuleMatches: AttachedProtocolModuleMatch[]
-  handleLabwareClick: (
-    labwareDef: LabwareDefinition2,
-    labwareId: string
-  ) => void
+  handleLabwareClick: Dispatch<SetStateAction<[string, StackItem[]] | null>>
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   startingDeck: StackedItemsOnDeck
   labwareByLiquidId: LabwareByLiquidId
@@ -42,7 +36,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
     labwareByLiquidId,
   } = props
   const deckConfig = getSimplestDeckConfigForProtocol(mostRecentAnalysis)
-
+  const allDefinitions = getAllDefinitions()
   const modulesOnDeck = attachedProtocolModuleMatches.map(module => {
     const { moduleDef, slotName } = module
     const stackOnModule = Object.entries(startingDeck).find(([key, value]) =>
@@ -54,7 +48,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
     const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
     const topLabwareDefinition =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
-        ? getAllDefinitions()[topLabwareInfo.definitionUri]
+        ? allDefinitions[topLabwareInfo.definitionUri]
         : null
     const topLabwareId =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -76,7 +70,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       nestedLabwareDef: topLabwareDefinition,
       nestedLabwareWellFill: wellFill,
       onLabwareClick: () => {
-        null
+        handleLabwareClick([slotName, stackOnModule ?? []])
       },
       highlightLabware: true,
       moduleChildren: null,
@@ -98,7 +92,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       const topLabwareInfo = stackedItems[0]
       const topLabwareDefinition =
         topLabwareInfo != null && 'labwareId' in topLabwareInfo
-          ? getAllDefinitions()[topLabwareInfo.definitionUri]
+          ? allDefinitions[topLabwareInfo.definitionUri]
           : null
       const topLabwareId =
         topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -116,7 +110,7 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
             labwareLocation: { slotName },
             definition: topLabwareDefinition,
             onLabwareClick: () => {
-              handleLabwareClick(topLabwareDefinition, topLabwareId)
+              handleLabwareClick([slotName, stackedItems])
             },
             wellFill: wellFill,
             highlight: true,
