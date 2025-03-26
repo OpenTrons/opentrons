@@ -289,7 +289,7 @@ async def _main() -> None:
             test_details = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             test_details.writerow({'test details'})
             test_details.writerow({pipette_model})
-            test_details.writerow({'96H Pick up Tip Testing-Default Settings'})
+            test_details.writerow({'96H Nozzle Flatness Testing'})
             log_file = csv.DictWriter(csvfile, dial_data)
             log_file.writeheader()
             # Iterate each nozzle onto the dial indicator to measure the flatness
