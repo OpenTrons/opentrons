@@ -278,7 +278,8 @@
           "id": "f9a294f1-f42b-4cae-893a-592405349d56",
           "dispense_touchTip_mmfromTop": null,
           "pushOut_checkbox": true,
-          "pushOut_volume": 7
+          "pushOut_volume": 7,
+          "resetSettings": null
         },
         "5fdb9a12-fab4-42fd-886f-40af107b15d6": {
           "aspirate_delay_checkbox": false,
@@ -311,7 +312,8 @@
           "stepType": "mix",
           "stepName": "mix",
           "stepDetails": "",
-          "id": "5fdb9a12-fab4-42fd-886f-40af107b15d6"
+          "id": "5fdb9a12-fab4-42fd-886f-40af107b15d6",
+          "resetSettings": null
         },
         "3901f6f9-cecd-4d2a-8d85-40d85f9f8b4f": {
           "labware": "fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",

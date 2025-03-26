@@ -141,7 +141,8 @@
           "dispense_touchTip_mmfromTop": null,
           "id": "83a095fa-b649-4105-99d4-177f1a3f363a",
           "pushOut_checkbox": true,
-          "pushOut_volume": 7
+          "pushOut_volume": 7,
+          "resetSettings": null
         },
         "f5ea3139-1585-4848-9d5f-832eb88c99ca": {
           "aspirate_airGap_checkbox": false,
@@ -233,7 +234,8 @@
           "dispense_touchTip_mmfromTop": null,
           "id": "f5ea3139-1585-4848-9d5f-832eb88c99ca",
           "pushOut_checkbox": true,
-          "pushOut_volume": 7
+          "pushOut_volume": 7,
+          "resetSettings": null
         }
       },
       "orderedStepIds": [

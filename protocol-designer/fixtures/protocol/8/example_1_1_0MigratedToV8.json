@@ -208,7 +208,8 @@
           "id": "e7d36200-92a5-11e9-ac62-1b173f839d9e",
           "dispense_touchTip_mmfromTop": null,
           "pushOut_checkbox": false,
-          "pushOut_volume": 0
+          "pushOut_volume": 0,
+          "resetSettings": null
         },
         "18113c80-92a6-11e9-ac62-1b173f839d9e": {
           "aspirate_delay_checkbox": false,
@@ -241,7 +242,8 @@
           "stepType": "mix",
           "stepName": "mix",
           "stepDetails": "",
-          "id": "18113c80-92a6-11e9-ac62-1b173f839d9e"
+          "id": "18113c80-92a6-11e9-ac62-1b173f839d9e",
+          "resetSettings": null
         },
         "2e622080-92a6-11e9-ac62-1b173f839d9e": {
           "moduleId": null,
