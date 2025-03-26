@@ -21,7 +21,7 @@ import type {
   DispenseRunTimeCommand,
   LiquidProbeRunTimeCommand,
   MoveLabwareRunTimeCommand,
-  StackerRetriveRunTimeCommand,
+  FlexStackerRetrieveRunTimeCommand,
   LabwareLocation,
   LoadedModule,
 } from '@opentrons/shared-data'
@@ -145,7 +145,7 @@ type FailedCommandRelevantLabware =
   | Omit<LiquidProbeRunTimeCommand, 'result'>
   | Omit<PickUpTipRunTimeCommand, 'result'>
   | Omit<MoveLabwareRunTimeCommand, 'result'>
-  | Omit<StackerRetriveRunTimeCommand, 'result'>
+  | Omit<FlexStackerRetrieveRunTimeCommand, 'result'>
   | null
 
 interface RelevantFailedLabwareCmd {
@@ -172,7 +172,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.GRIPPER_ERROR:
       return failedCommandByRunRecord as MoveLabwareRunTimeCommand
     case ERROR_KINDS.STALL_WHILE_STACKING:
-      return failedCommandByRunRecord as StackerRetriveRunTimeCommand
+      return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
         `useFailedLabwareUtils: No labware associated with error kind ${errorKind}. Handle case explicitly.`
