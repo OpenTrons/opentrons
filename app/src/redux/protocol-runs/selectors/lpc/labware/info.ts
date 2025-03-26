@@ -182,6 +182,38 @@ export const selectSelectedLwDef = (
     }
   )
 
+export const selectSelectedLwAdapterDef = (
+  runId: string
+): Selector<State, LabwareDefinition2 | null> =>
+  createSelector(
+    (state: State) =>
+      state.protocolRuns[runId]?.lpc?.labwareInfo.selectedLabware,
+    (state: State) => state.protocolRuns[runId]?.lpc?.labwareDefs,
+    (state: State) => state.protocolRuns[runId]?.lpc?.protocolData.labware,
+    (selectedLabware, labwareDefs, loadedLabware) => {
+      const {
+        closestBeneathAdapterId,
+      } = selectedLabware?.offsetLocationDetails ?? {
+        closestBeneathAdapterId: null,
+      }
+
+      if (
+        selectedLabware == null ||
+        labwareDefs == null ||
+        loadedLabware == null ||
+        closestBeneathAdapterId == null
+      ) {
+        return null
+      } else {
+        return getItemLabwareDef({
+          labwareId: closestBeneathAdapterId,
+          labwareDefs,
+          loadedLabware,
+        })
+      }
+    }
+  )
+
 export const selectConflictTimestampInfo = (
   runId: string
 ): Selector<State, ConflictTimestampInfo> =>

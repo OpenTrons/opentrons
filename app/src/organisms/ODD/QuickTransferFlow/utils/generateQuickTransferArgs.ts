@@ -33,7 +33,11 @@ import type {
   WasteChuteEntities,
 } from '@opentrons/step-generation'
 
-type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
+export type MoveLiquidStepArgs =
+  | ConsolidateArgs
+  | DistributeArgs
+  | TransferArgs
+  | null
 
 const uuid: () => string = uuidv1
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'

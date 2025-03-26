@@ -1092,13 +1092,7 @@
   "groups": [
     {
       "metadata": {
-        "displayName": "NEST 96 Deep Well Plate 2mL",
-        "displayCategory": "wellPlate",
         "wellBottomShape": "v"
-      },
-      "brand": {
-        "brand": "NEST",
-        "brandId": []
       },
       "wells": [
         "A1",

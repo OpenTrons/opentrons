@@ -121,8 +121,6 @@ export function useLPCFlows({
     createLabwareDefinition,
   } = useCreateMaintenanceRunLabwareDefinitionMutation()
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
-  // TODO(jh, 01-14-25): There's no external error handing if LPC fails this series of POST requests.
-  // If the server doesn't absorb this functionality for the redesign, add error handling.
   useRunLoadedLabwareDefinitions(runId ?? null, {
     onSuccess: res => {
       void Promise.all(

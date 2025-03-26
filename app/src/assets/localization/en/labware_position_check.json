@@ -8,6 +8,7 @@
   "adjust": "Adjust",
   "adjust_applied_location_offset": "Adjust applied location offset",
   "adjust_default_labware_offset": "Adjust default labware offset",
+  "align_to_top_of_labware": "Align to the top of labware",
   "all_modules_and_labware_from_protocol": "All modules and all labware used in the protocol {{protocol_name}}",
   "applied_location_offset_added": "Applied location offset added",
   "applied_location_offset_adjusted": "Applied location offset adjusted",

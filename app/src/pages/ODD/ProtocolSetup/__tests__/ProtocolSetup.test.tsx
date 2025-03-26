@@ -41,7 +41,6 @@ import {
   getUnmatchedModulesForProtocol,
   getIncompleteInstrumentCount,
 } from '/app/organisms/ODD/ProtocolSetup'
-import { useLaunchLegacyLPC } from '/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
 import {
@@ -315,12 +314,6 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith()
       .thenReturn({ data: { data: [] } } as any)
-    when(vi.mocked(useLaunchLegacyLPC))
-      .calledWith(RUN_ID, FLEX_ROBOT_TYPE, PROTOCOL_NAME)
-      .thenReturn({
-        launchLegacyLPC: mockLaunchLPC,
-        LegacyLPCWizard: <div>mock LPC Wizard</div>,
-      })
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
     vi.mocked(useDoorQuery).mockReturnValue({ data: mockDoorStatus } as any)
     vi.mocked(useModulesQuery).mockReturnValue({

@@ -27,7 +27,7 @@ describe('ShowLabwareOffsetSnippets', () => {
     render()
     screen.getByText('Show Labware Offset data code snippets')
     screen.getByText(
-      'Only for users who need to apply labware offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
+      'Only for users who need to apply labware offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup after configuring all required offsets.'
     )
     screen.getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
   })
