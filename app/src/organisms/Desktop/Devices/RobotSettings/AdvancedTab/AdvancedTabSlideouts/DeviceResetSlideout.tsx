@@ -62,7 +62,10 @@ export function DeviceResetSlideout({
   const doTrackEvent = useTrackEvent()
   const robot = useRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
-  const [resetOptions, setResetOptions] = useState<ResetConfigRequest>({})
+  const [resetOptions, setResetOptions] = useState<ResetConfigRequest>({
+    resetLabwareOffsets: false,
+    postSettingsResetOptions: {},
+  })
   const runsQueryResponse = useNotifyAllRunsQuery()
   const isFlex = useIsFlex(robotName)
 
