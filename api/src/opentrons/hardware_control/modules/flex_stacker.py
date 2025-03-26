@@ -39,6 +39,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
+    FlexStackerShuttleLabwareDetectionFailedError,
 )
 
 log = logging.getLogger(__name__)
@@ -447,6 +448,11 @@ class FlexStacker(mod_abc.AbstractModule):
             raise FlexStackerShuttleMissingError(
                 self.device_info["serial"], expected, self.platform_state
             )
+
+    async def verify_shuttle_labware_presence(self, direction: Direction, lawbare_expected: bool) -> None:
+        """Check whether or not a labware is detected on the shuttle."""
+        await self._driver.det
+
 
 
 class FlexStackerReader(Reader):

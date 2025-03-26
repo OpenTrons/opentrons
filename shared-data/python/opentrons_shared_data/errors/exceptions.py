@@ -795,6 +795,35 @@ class FlexStackerShuttleMissingError(RoboticsInteractionError):
         )
 
 
+class FlexStackerShuttleLabwareDetectionFailedError(RoboticsInteractionError):
+    """An error occurred during Flex Stacker shuttle labware detection."""
+
+    def __init__(
+        self,
+        serial: str,
+        shuttle_state: str,
+        labware_expected: bool,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["shuttle_state"] = shuttle_state
+        checked_detail["labware_expected"] = labware_expected
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = f"Flex Stacker shuttle labware {'not' if labware_expected else ''} detected in state {shuttle_state}"
+        super().__init__(
+            ErrorCodes.FLEX_STACKER_SHUTTLE_LABWARE_DETECTION_FAILED,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
+
+
 class FirmwareUpdateRequiredError(RoboticsInteractionError):
     """An error indicating that a firmware update is required."""
 

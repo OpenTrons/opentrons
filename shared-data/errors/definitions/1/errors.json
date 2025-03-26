@@ -214,6 +214,10 @@
       "detail": "Flex Stacker Shuttle Missing",
       "category": "roboticsInteractionError"
     },
+    "3021": {
+      "detail": "Flex Stacker Shuttle Labware Detection Failed",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
