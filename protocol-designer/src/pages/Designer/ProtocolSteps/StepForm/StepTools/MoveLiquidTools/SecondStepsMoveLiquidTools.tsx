@@ -275,20 +275,9 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.mix.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_mix_checkbox`].value}
-          isChecked={propsForFields[`${tab}_mix_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_mix_checkbox`].updateValue
-          }
-          tooltipText={
-            tab === 'dispense'
-              ? dispenseMixDisabledTooltipText
-              : propsForFields.aspirate_mix_checkbox.tooltipContent
-          }
-          disabled={
-            tab === 'dispense'
-              ? isDestinationTrash || formData.path === 'multiDispense'
-              : formData.path === 'multiAspirate'
+          fieldProps={propsForFields[`${tab}_mix_checkbox`]}
+          tooltipOverride={
+            tab === 'dispense' ? dispenseMixDisabledTooltipText : null
           }
         >
           {formData[`${tab}_mix_checkbox`] === true ? (
@@ -328,10 +317,7 @@ export const SecondStepsMoveLiquidTools = ({
               t('form:step_edit_form.field.pushOut.title'),
               'capitalize'
             )}
-            checkboxValue={propsForFields.pushOut_checkbox.value}
-            isChecked={propsForFields.pushOut_checkbox.value === true}
-            checkboxUpdateValue={propsForFields.pushOut_checkbox.updateValue}
-            tooltipText={propsForFields.pushOut_checkbox.tooltipContent}
+            fieldProps={propsForFields.pushOut_checkbox}
           >
             {formData.pushOut_checkbox === true ? (
               <InputStepFormField
@@ -359,12 +345,7 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.delay.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
-          isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_delay_checkbox`].updateValue
-          }
-          tooltipText={propsForFields[`${tab}_delay_checkbox`].tooltipContent}
+          fieldProps={propsForFields[`${tab}_delay_checkbox`]}
         >
           {formData[`${tab}_delay_checkbox`] === true ? (
             <Flex
@@ -392,14 +373,7 @@ export const SecondStepsMoveLiquidTools = ({
               t('form:step_edit_form.field.blowout.label'),
               'capitalize'
             )}
-            checkboxValue={propsForFields.blowout_checkbox.value}
-            isChecked={propsForFields.blowout_checkbox.value === true}
-            checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
-            tooltipText={propsForFields.blowout_checkbox.tooltipContent}
-            disabled={
-              formData.path === 'multiDispense' &&
-              formData.disposalVolume_checkbox
-            }
+            fieldProps={propsForFields.blowout_checkbox}
           >
             {formData.blowout_checkbox === true ? (
               <Flex
@@ -439,15 +413,7 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.touchTip.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_touchTip_checkbox`].value}
-          isChecked={propsForFields[`${tab}_touchTip_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_touchTip_checkbox`].updateValue
-          }
-          tooltipText={
-            propsForFields[`${tab}_touchTip_checkbox`].tooltipContent
-          }
-          disabled={propsForFields[`${tab}_touchTip_checkbox`].disabled}
+          fieldProps={propsForFields[`${tab}_touchTip_checkbox`]}
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
@@ -503,12 +469,7 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.airGap.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_airGap_checkbox`].value}
-          isChecked={propsForFields[`${tab}_airGap_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_airGap_checkbox`].updateValue
-          }
-          tooltipText={propsForFields[`${tab}_airGap_checkbox`].tooltipContent}
+          fieldProps={propsForFields[`${tab}_airGap_checkbox`]}
         >
           {formData[`${tab}_airGap_checkbox`] === true ? (
             <InputStepFormField
