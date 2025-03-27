@@ -2,7 +2,10 @@
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
-    "brandId": ["999-00254"]
+    "brandId": ["999-00254"],
+    "links": [
+      "https://opentrons.com/products/opentrons-flex-evotip-adapter-set/"
+    ]
   },
   "metadata": {
     "displayName": "Opentrons Flex Evotip Short Adapter",

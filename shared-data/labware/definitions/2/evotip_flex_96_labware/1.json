@@ -15,7 +15,10 @@
   ],
   "brand": {
     "brand": "opentrons",
-    "brandId": ["999-00254"]
+    "brandId": ["999-00254"],
+    "links": [
+      "https://opentrons.com/products/opentrons-flex-evotip-adapter-set/"
+    ]
   },
   "metadata": {
     "displayName": "Evotip Labware in Opentrons Flex Top Adapter",
