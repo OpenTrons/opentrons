@@ -84,7 +84,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.modulesRequireRunAppUpdate.body2'}
+              i18nKey="announcements.modulesRequireRunAppUpdate.body2"
               components={{ bold: <strong /> }}
               values={{ app: APP }}
             />
@@ -114,7 +114,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.thermocyclerSupport.body2'}
+              i18nKey="announcements.thermocyclerSupport.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -132,7 +132,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.airGapDelaySettings.body2'}
+              i18nKey="announcements.airGapDelaySettings.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -161,7 +161,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.batchEditTransfer.body4'}
+              i18nKey="announcements.batchEditTransfer.body4"
               components={{ strong: <strong /> }}
             />
           </p>
@@ -188,7 +188,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.heaterShakerSupport.body2'}
+              i18nKey="announcements.heaterShakerSupport.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -218,7 +218,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.thermocyclerGen2Support.body2'}
+              i18nKey="announcements.thermocyclerGen2Support.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -255,7 +255,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.liquidColorEnhancements.body2'}
+              i18nKey="announcements.liquidColorEnhancements.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -287,7 +287,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.flexSupport.body2'}
+              i18nKey="announcements.flexSupport.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -313,7 +313,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.deckConfigAnd96Channel.body2'}
+              i18nKey="announcements.deckConfigAnd96Channel.body2"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />
@@ -337,7 +337,7 @@ export const useAnnouncements = (): Announcement[] => {
             <li>
               <Trans
                 t={t}
-                i18nKey={'announcements.customParamsAndMultiTipAndModule.body3'}
+                i18nKey="announcements.customParamsAndMultiTipAndModule.body3"
                 components={{ i: <em /> }}
               />
             </li>
@@ -347,7 +347,7 @@ export const useAnnouncements = (): Announcement[] => {
           <p>
             <Trans
               t={t}
-              i18nKey={'announcements.customParamsAndMultiTipAndModule.body6'}
+              i18nKey="announcements.customParamsAndMultiTipAndModule.body6"
               components={{ strong: <strong /> }}
               values={{ app: APP }}
             />

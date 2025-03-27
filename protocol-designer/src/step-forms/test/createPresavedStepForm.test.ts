@@ -271,6 +271,7 @@ describe('createPresavedStepForm', () => {
         tipRack: null,
         blowout_flowRate: null,
         liquidClassesSupported: true,
+        liquidClass: null,
       })
     })
   })

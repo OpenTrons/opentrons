@@ -225,6 +225,7 @@
           "dropTip_location": "b7445d51-0002-47a7-adee-2746539ccf9f:trashBin",
           "labware": "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well:opentrons/usascientific_96_wellplate_2.4ml_deep/2",
           "liquidClassesSupported": false,
+          "liquidClass": null,
           "mix_mmFromBottom": 0.5,
           "mix_touchTip_checkbox": true,
           "mix_touchTip_mmFromTop": -10.8,
