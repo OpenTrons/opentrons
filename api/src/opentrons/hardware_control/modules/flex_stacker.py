@@ -39,6 +39,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
+    FlexStackerShuttleLabwareDetectionFailedError,
 )
 
 log = logging.getLogger(__name__)
@@ -375,6 +376,8 @@ class FlexStacker(mod_abc.AbstractModule):
         # Move platform along the Z then X axis
         offset = labware_height / 2 + OFFSET_MD
         await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, offset)
+
+        await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
         await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
         return True
 
@@ -446,6 +449,19 @@ class FlexStacker(mod_abc.AbstractModule):
         if self.platform_state != expected:
             raise FlexStackerShuttleMissingError(
                 self.device_info["serial"], expected, self.platform_state
+            )
+
+    async def verify_shuttle_labware_presence(
+        self, direction: Direction, lawbare_expected: bool
+    ) -> None:
+        """Check whether or not a labware is detected on the shuttle."""
+        # TODO: implement this function using tof sensor data
+        result = lawbare_expected
+        if lawbare_expected != result:
+            raise FlexStackerShuttleLabwareDetectionFailedError(
+                self.device_info["serial"],
+                shuttle_state=self.platform_state,
+                labware_expected=lawbare_expected,
             )
 
 
