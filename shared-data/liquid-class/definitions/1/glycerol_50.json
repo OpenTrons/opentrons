@@ -3796,7 +3796,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 7.0
+                  "flowRate": 40.0
                 }
               },
               "touchTip": {
@@ -4030,7 +4030,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 7.0
+                  "flowRate": 40.0
                 }
               },
               "touchTip": {
