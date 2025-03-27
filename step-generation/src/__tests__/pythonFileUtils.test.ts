@@ -207,7 +207,7 @@ adapter_1 = magnetic_block_1.load_adapter(
 )
 adapter_2 = protocol.load_adapter(
     "fixture_flex_96_tiprack_adapter",
-    "B2",
+    location="B2",
     namespace="fixture",
     version=1,
 )`.trimStart()

@@ -127,7 +127,7 @@ export function getLoadAdapters(
         `${formatPyStr(parameters.loadName)}`,
         ...(!onModule
           ? [
-              `${formatPyStr(
+              `location=${formatPyStr(
                 adapterSlot === 'offDeck' ? OFF_DECK : adapterSlot
               )}`,
             ]
