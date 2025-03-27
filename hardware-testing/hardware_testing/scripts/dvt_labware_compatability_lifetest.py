@@ -41,7 +41,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Target Labware",
         variable_name="labware_name",
         description="The labware that will be stored/dispensed.",
-        default="opentrons_flex_96_tiprack_1000ul",
+        default="nest_96_wellplate_2ml_deep",
         choices=[
             {
                 "display_name": "Opentrons 96 Tipack 50ul",
@@ -87,7 +87,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
     parameters.add_str(
-        display_name="number of stackers",
+        display_name="Number of Stackers",
         variable_name="stackers_mounted",
         description="choose the stackers that is on the deck.",
         default="D4 C4 B4 A4",
@@ -98,7 +98,6 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-tiprack_lid = "opentrons_flex_tiprack_lid"
 
 
 def record_test_data(
@@ -124,6 +123,27 @@ def run(protocol: ProtocolContext) -> None:
     test_cycles = protocol.params.test_cycles
     stackers_mounted = protocol.params.stackers_mounted
     deck_slots_for_stackers = stackers_mounted.split()
+    
+    setup_dict = {2: {"armadillo_96_wellplate_200ul_pcr_full_skirt": 0,
+                      "nest_96_wellplate_200ul_flat": 0,
+                      "nest_96_wellplate_2ml_deep": 16,
+                      "opentrons_flex_96_tiprack_50ul": 6,
+                      "opentrons_flex_96_tiprack_200ul": 6,
+                      "opentrons_flex_96_tiprack_200ul": 6,
+                      },
+                  4: {"armadillo_96_wellplate_200ul_pcr_full_skirt": 0,
+                      "nest_96_wellplate_200ul_flat": 0,
+                      "nest_96_wellplate_2ml_deep": 16,
+                      "opentrons_flex_96_tiprack_50ul": {6,4},
+                      "opentrons_flex_96_tiprack_200ul": {6,4},
+                      "opentrons_flex_96_tiprack_200ul": {6,4},
+                      }} 
+    
+    # define lid
+    if "tiprack" in labware_name:
+        tiprack_lid = "opentrons_flex_tiprack_lid"
+    else:
+        tiprack_lid = None
 
     # ======================= Stacker Setup ======================
     stacker_num = 0
@@ -166,6 +186,7 @@ def run(protocol: ProtocolContext) -> None:
                     for lc in range(labware_count):
                         protocol.comment(f"Starting cycle: {cycle} for {labware_name}")
                         if num_of_stackers == 4:
+                            protocol.pause(f"Load {labware_name} in stacker {deck_slots_for_stackers[0]} AND {deck_slots_for_stackers[2]}")
                             # ---------------------Retrieve labware Stacker A---------------------------------
                             lw = globals()[f"f_stacker_{1}"].retrieve()
                             record_test_data(
@@ -225,6 +246,7 @@ def run(protocol: ProtocolContext) -> None:
 
                         elif num_of_stackers == 2:
                             # ---------------------Retrieve labware Stacker A---------------------------------
+                            protocol.pause(f"Load {labware_name} in stacker {deck_slots_for_stackers[0]}")
                             lw = globals()[f"f_stacker_{1}"].retrieve()
                             record_test_data(
                                 test_data,
