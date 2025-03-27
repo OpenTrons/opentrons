@@ -44,7 +44,7 @@ async def _main(cfg: TestConfig) -> None:
 
     if not cfg.simulate:
         print("Stopping the robot server")
-        check_output(["systemctl", "stop", "opentrons-robot-server"], shell=True)
+        check_output(["systemctl stop opentrons-robot-server"], shell=True)
         # Perform initial checks before starting tests
         # 1. estop should not be pressed
         # 2. platform should be removed
@@ -82,8 +82,9 @@ async def _main(cfg: TestConfig) -> None:
     # Restart the robot server
     if not cfg.simulate:
         print("Starting the robot server")
-        check_output(["systemctl", "restart", "opentrons-robot-server", "&"], shell=True)
-
+        check_output(
+            ["systemctl restart opentrons-robot-server &"], shell=True
+        )
 
 
 if __name__ == "__main__":

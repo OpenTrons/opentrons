@@ -1,7 +1,7 @@
 """Utility functions for the Flex Stacker EVT QC module."""
 from collections import defaultdict
 import statistics
-from typing import Dict, List
+from typing import Any, Dict, List
 from opentrons.drivers.flex_stacker.driver import TOFSensor
 from opentrons.drivers.flex_stacker.utils import NUMBER_OF_BINS, NUMBER_OF_ZONES
 from hardware_testing.data import ui
@@ -12,6 +12,12 @@ from hardware_testing.data.csv_report import (
 
 from .driver import FlexStackerInterface as FlexStacker
 from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
+
+
+TOF_DETECTION_CONFIG: Dict[TOFSensor, Dict[str, Any]] = {
+    TOFSensor.X: {"zones": [5, 6, 7], "bins": list(range(10, 20)), "threshold": 20000},
+    TOFSensor.Z: {"zones": [1], "bins": list(range(50, 56)), "threshold": 20000},
+}
 
 
 async def test_limit_switches_per_direction(
@@ -115,47 +121,23 @@ def labware_detected(
     zones: List[int],
 ) -> Dict[int, List[int]]:
     """Detect labware by subtracting baseline from histogram."""
-    print(f"Detect labware: {sensor}")
     baseline: Dict[int, List[float]] = STACKER_TOF_BASELINE[sensor]
     diff = defaultdict(list)
-    if sensor == TOFSensor.Z:
-        for zone in zones:
-            if zone not in [1]:
+    config = TOF_DETECTION_CONFIG[sensor]
+    for zone in zones:
+        if zone not in config["zones"]:
+            continue
+        raw_data = histogram[zone]
+        baseline_data = baseline[zone]
+        for bin in bins:
+            if bin not in config["bins"]:
                 continue
-            raw_data = histogram[zone]
-            baseline_data = baseline[zone]
-            for bin in bins:
-                if bin not in range(50, 56):
-                    continue
-                # We need to ignore raw photon count below 10000 on the X as
-                # it becomes inconsistent to detect labware on the home position.
-                if raw_data[bin] < 10000:
-                    continue
-                delta = raw_data[bin] - baseline_data[bin]
-                if delta > 0:
-                    print(
-                        f"detected: zn: {zone} bn: {bin} count: {raw_data[bin]} dt: {delta}"
-                    )
-                    diff[zone].append(delta)
-    elif sensor == TOFSensor.X:
-        for zone in zones:
-            # We only care about these zones because the X sensor is angled and
-            # most of the zones are always detecting obsticles.
-            if zone not in [5, 6, 7]:
+            if raw_data[bin] < config["threshold"]:
                 continue
-            raw_data = histogram[zone]
-            baseline_data = baseline[zone]
-            for bin in bins:
-                if bin not in range(10, 20):
-                    continue
-                # We need to ignore raw photon count below 10000 on the X as
-                # it becomes inconsistent to detect labware on the home position.
-                if raw_data[bin] < 10000:
-                    continue
-                delta = raw_data[bin] - baseline_data[bin]
-                if delta > 0:
-                    print(
-                        f"detected: zn: {zone} bn: {bin} count: {raw_data[bin]} dt: {delta}"
-                    )
-                    diff[zone].append(delta)
+            delta = raw_data[bin] - baseline_data[bin]
+            if delta > 0:
+                print(
+                    f"detected: zn: {zone} bn: {bin} count: {raw_data[bin]} dt: {delta}"
+                )
+                diff[zone].append(delta)
     return dict(diff)  # type: ignore
