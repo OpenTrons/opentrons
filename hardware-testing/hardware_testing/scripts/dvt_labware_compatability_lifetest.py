@@ -187,7 +187,6 @@ def run(protocol: ProtocolContext) -> None:
                     for lc in range(labware_count):
                         protocol.comment(f"Starting cycle: {cycle} for {labware_name}")
                         if num_of_stackers == 4:
-                            protocol.pause(f"Load {labware_name} in stacker {deck_slots_for_stackers[0]} AND {deck_slots_for_stackers[2]}")
                             # ---------------------Retrieve labware Stacker A---------------------------------
                             lw = globals()[f"f_stacker_{1}"].retrieve()
                             record_test_data(
@@ -247,7 +246,6 @@ def run(protocol: ProtocolContext) -> None:
 
                         elif num_of_stackers == 2:
                             # ---------------------Retrieve labware Stacker A---------------------------------
-                            protocol.pause(f"Load {labware_name} in stacker {deck_slots_for_stackers[0]}")
                             lw = globals()[f"f_stacker_{1}"].retrieve()
                             record_test_data(
                                 test_data,
