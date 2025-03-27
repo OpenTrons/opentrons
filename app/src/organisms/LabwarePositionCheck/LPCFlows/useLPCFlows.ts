@@ -4,7 +4,6 @@ import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
-  useRunLoadedLabwareDefinitions,
 } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -124,26 +123,26 @@ export function useLPCFlows({
     deleteMaintenanceRun,
     isLoading: isClosing,
   } = useDeleteMaintenanceRunMutation()
-  useRunLoadedLabwareDefinitions(runId ?? null, {
-    onSuccess: res => {
+
+  // After the maintenance run is created, add labware defs to the maintenance run.
+  useEffect(() => {
+    if (maintenanceRunId != null) {
       void Promise.all(
-        res.data.map(def => {
-          if ('schemaVersion' in def) {
-            return createLabwareDefinition({
-              maintenanceRunId: maintenanceRunId as string,
-              labwareDef: def,
-            })
-          }
+        labwareDefs.map(def => {
+          return createLabwareDefinition({
+            maintenanceRunId,
+            labwareDef: def,
+          })
         })
-      ).then(() => {
-        setHasCreatedLPCRun(true)
-      })
-    },
-    onSettled: () => {
-      setIsLaunching(false)
-    },
-    enabled: maintenanceRunId != null,
-  })
+      )
+        .then(() => {
+          setHasCreatedLPCRun(true)
+        })
+        .finally(() => {
+          setIsLaunching(false)
+        })
+    }
+  }, [maintenanceRunId])
 
   const launchLPC = (): Promise<void> => {
     // Avoid accidentally creating several maintenance runs if a request is ongoing.

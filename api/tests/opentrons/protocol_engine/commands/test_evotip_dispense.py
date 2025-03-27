@@ -142,3 +142,4 @@ async def test_evotip_dispense_implementation(
             ),
         ),
     )
+    decoy.verify(await pipetting.increase_evo_disp_count("pipette-id-abc123"), times=1)

@@ -260,3 +260,7 @@ class LiquidHandler(
         max_z_dist : maximum depth to probe for liquid
         """
         ...
+
+    async def increase_evo_disp_count(self, mount: MountArgType) -> None:
+        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
+        ...
