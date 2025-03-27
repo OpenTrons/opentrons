@@ -113,11 +113,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
-  if (
-    !args.dropTipLocation ||
-    (invariantContext.wasteChuteEntities[args.dropTipLocation] == null &&
-      invariantContext.trashBinEntities[args.dropTipLocation] == null)
-  ) {
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 

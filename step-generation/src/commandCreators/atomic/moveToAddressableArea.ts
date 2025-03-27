@@ -29,9 +29,7 @@ export const moveToAddressableArea: CommandCreator<MoveToAddressableAreaAtomicPa
   const pipetteChannels = pipetteEntity.spec.channels
   const pipettePythonName = pipetteEntity.pythonName
   const fixtureEntity =
-    trashBinEntities[fixtureId] != null
-      ? trashBinEntities[fixtureId]
-      : wasteChuteEntities[fixtureId]
+    trashBinEntities[fixtureId] ?? wasteChuteEntities[fixtureId]
   const fixturePythonName = fixtureEntity.pythonName
 
   let addressableAreaName: AddressableAreaName = getWasteChuteAddressableAreaNamePip(

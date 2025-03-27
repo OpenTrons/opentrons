@@ -116,11 +116,12 @@ export const distribute: CommandCreator<DistributeArgs> = (
     errors.push(errorCreators.labwareDiscarded())
   }
 
-  if (
-    !args.dropTipLocation ||
-    (invariantContext.wasteChuteEntities[args.dropTipLocation] == null &&
-      invariantContext.trashBinEntities[args.dropTipLocation] == null)
-  ) {
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
+
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
@@ -165,11 +166,6 @@ export const distribute: CommandCreator<DistributeArgs> = (
     (maxVolume - disposalVolume) / args.volume
   )
   const { pipette } = args
-
-  const isWasteChute =
-    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
-  const isTrashBin =
-    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol

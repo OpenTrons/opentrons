@@ -117,11 +117,12 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     return { errors: [errorCreators.labwareDiscarded()] }
   }
 
-  if (
-    !args.dropTipLocation ||
-    (invariantContext.wasteChuteEntities[args.dropTipLocation] == null &&
-      invariantContext.trashBinEntities[args.dropTipLocation] == null)
-  ) {
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
+
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
@@ -160,11 +161,6 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const destinationWell = args.destWell
 
   const sourceWellChunks = chunk(args.sourceWells, maxWellsPerChunk)
-
-  const isWasteChute =
-    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
-  const isTrashBin =
-    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   const commandCreators = flatMap(
     sourceWellChunks,

@@ -135,6 +135,11 @@ export const transfer: CommandCreator<TransferArgs> = (
   const hasWasteChute =
     Object.keys(invariantContext.wasteChuteEntities).length > 0
 
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
+
   if (
     hasWasteChute &&
     (initialDestLabwareSlot === GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA ||
@@ -152,11 +157,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     errors.push(errorCreators.equipmentDoesNotExist())
   }
 
-  if (
-    !args.dropTipLocation ||
-    (invariantContext.wasteChuteEntities[args.dropTipLocation] == null &&
-      invariantContext.trashBinEntities[args.dropTipLocation] == null)
-  ) {
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
@@ -165,11 +166,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       errors,
     }
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
-
-  const isWasteChute =
-    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
-  const isTrashBin =
-    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
