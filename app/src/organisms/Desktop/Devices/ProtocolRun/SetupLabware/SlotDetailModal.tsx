@@ -44,6 +44,7 @@ interface SlotDetailModalProps {
   stackedItems: StackItem[]
   labwareByLiquidId: LabwareByLiquidId
   mostRecentAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
+  isFlex?: boolean
 }
 
 const LabwareThumbnail = styled.svg`
@@ -60,6 +61,7 @@ export const SlotDetailModal = (
     stackedItems,
     labwareByLiquidId,
     mostRecentAnalysis: protocolData,
+    isFlex,
   } = props
   const { t, i18n } = useTranslation('protocol_setup')
   const labwareDefinitions = getAllDefinitions()
@@ -132,20 +134,23 @@ export const SlotDetailModal = (
       }
     />
   )
+  const slotDisplayName =
+    slotName === 'offDeck'
+      ? i18n.format(t('protocol_command_text:off_deck'), 'upperCase')
+      : slotName
   const modalTitle = (
     <Flex alignItems={ALIGN_CENTER}>
-      {slotName !== 'offDeck' ? (
-        <StyledText oddStyle="level2HeaderBold" marginRight={SPACING.spacing16}>
-          {t('labware_in')}
-        </StyledText>
-      ) : null}
-      <DeckInfoLabel
-        deckLabel={
-          slotName === 'offDeck'
-            ? i18n.format(t('protocol_command_text:off_deck'), 'upperCase')
-            : slotName
-        }
-      />
+      <StyledText
+        desktopStyle="bodyLargeSemiBold"
+        marginRight={SPACING.spacing4}
+      >
+        {t('labware_in')}
+      </StyledText>
+      {isFlex ? (
+        <DeckInfoLabel deckLabel={slotDisplayName} />
+      ) : (
+        <StyledText>{slotDisplayName}</StyledText>
+      )}
     </Flex>
   )
   const stackedTag = (
@@ -191,6 +196,7 @@ export const SlotDetailModal = (
             gridGap={SPACING.spacing16}
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
+            width={isVariedStack ? '' : '100%'}
           >
             <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_CENTER}>
               <StyledText

@@ -30,8 +30,6 @@ import {
   getAllDefinitions,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
-  TC_MODULE_LOCATION_OT2,
-  TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
@@ -40,6 +38,7 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 import { SecureLabwareModal } from './SecureLabwareModal'
 
+import type { MouseEvent } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
@@ -127,9 +126,6 @@ export function LabwareListItem(
     switch (moduleTypeNeedsAttention) {
       case MAGNETIC_MODULE_TYPE:
       case THERMOCYCLER_MODULE_TYPE:
-        if (moduleType === THERMOCYCLER_MODULE_TYPE) {
-          slotInfo = isFlex ? TC_MODULE_LOCATION_OT3 : TC_MODULE_LOCATION_OT2
-        }
         if (moduleInStack.moduleModel !== THERMOCYCLER_MODULE_V2) {
           secureLabwareInstructions = (
             <Btn
@@ -140,7 +136,8 @@ export function LabwareListItem(
                   color: ${COLORS.black90};
                 }
               `}
-              onClick={() => {
+              onClick={(e: MouseEvent) => {
+                e.stopPropagation()
                 setSecureLabwareModalType(moduleType)
               }}
             >
@@ -201,7 +198,8 @@ export function LabwareListItem(
         }
     }
   }
-  const toggleLatch = (): void => {
+  const toggleLatch = (e: MouseEvent): void => {
+    e.stopPropagation()
     setIsLatchLoading(true)
     createLiveCommand({
       command: latchCommand,
@@ -322,6 +320,7 @@ export function LabwareListItem(
           flexDirection={DIRECTION_ROW}
           gridGap={SPACING.spacing24}
           align={ALIGN_FLEX_END}
+          marginLeft={SPACING.spacing24}
         >
           {secureLabwareInstructions ?? null}
           {isHeaterShakerInProtocol ? (

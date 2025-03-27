@@ -61,14 +61,18 @@ export function SetupLabwareMap({
   const deckDef = getDeckDefFromRobotType(robotType)
   const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
-
   const modulesOnDeck = protocolModulesInfo.map(module => {
-    const stackOnModule = Object.entries(startingDeck).find(([key, value]) =>
+    const slotAndStackOnModule = Object.entries(
+      startingDeck
+    ).find(([key, value]) =>
       value.some(
         (stackItem): stackItem is ModuleInStack =>
           'moduleId' in stackItem && stackItem.moduleId === module.moduleId
       )
-    )?.[1]
+    )
+    const slotName = slotAndStackOnModule?.[0]
+    const stackOnModule = slotAndStackOnModule?.[1]
+
     const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
     const topLabwareDefinition =
       topLabwareInfo != null && 'labwareId' in topLabwareInfo
@@ -85,7 +89,7 @@ export function SetupLabwareMap({
 
     const isLabwareStacked = stackOnModule != null && stackOnModule.length > 2
     const wellFill = getWellFillFromLabwareId(
-      topLabwareId ?? '',
+      topLabwareId,
       protocolAnalysis.liquids,
       labwareByLiquidId
     )
@@ -108,7 +112,7 @@ export function SetupLabwareMap({
           onClick={() => {
             if (stackOnModule != null) {
               setSelectedStack({
-                slotName: module.slotName,
+                slotName: slotName ?? module.slotName,
                 stack: stackOnModule,
               })
             }
@@ -237,6 +241,7 @@ export function SetupLabwareMap({
           closeModal={() => {
             setSelectedStack(null)
           }}
+          isFlex={robotType === FLEX_ROBOT_TYPE}
         />
       ) : null}
     </Flex>

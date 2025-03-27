@@ -54,8 +54,6 @@ export function SetupLabwareList(
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
     ? startingDeck.offDeck
     : null
-  console.log(startingDeck)
-  console.log('OFF DECK', offDeckItems)
 
   return (
     <>
@@ -119,6 +117,7 @@ export function SetupLabwareList(
           closeModal={() => {
             setSelectedStack(null)
           }}
+          isFlex={isFlex}
         />
       ) : null}
     </>

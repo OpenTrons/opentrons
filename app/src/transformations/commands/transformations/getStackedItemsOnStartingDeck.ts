@@ -2,6 +2,9 @@ import {
   getLabwareDefURI,
   getAllDefinitions,
   getCutoutDisplayName,
+  TC_MODULE_LOCATION_OT2,
+  TC_MODULE_LOCATION_OT3,
+  THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
   getSlotFromAddressableAreaName,
 } from '@opentrons/shared-data'
@@ -85,7 +88,7 @@ export function getStackedItemsOnStartingDeck(
       | LoadLidStackRunTimeCommand =>
       ['loadLabware', 'loadLidStack'].includes(command.commandType)
     )
-    .reverse()
+    .toReversed()
     .reduce<StackedItemsOnDeck>((acc, command) => {
       let stackFromCommand: StackItem[] = []
       let location = ''
@@ -210,9 +213,14 @@ export function getStackedItemsOnStartingDeck(
                 moduleId: sequenceItem.moduleId,
                 moduleModel: module.model,
               }
-              // change location for ot2 thermocycler also
-              if (module.model === THERMOCYCLER_MODULE_V2) {
-                location = 'A1+B1'
+              if (
+                module.model === THERMOCYCLER_MODULE_V2 ||
+                module.model === THERMOCYCLER_MODULE_V1
+              ) {
+                location =
+                  module.location.slotName === '7'
+                    ? TC_MODULE_LOCATION_OT2
+                    : TC_MODULE_LOCATION_OT3
               }
               sequenceAcc.push(moduleStackItem)
             }
@@ -237,7 +245,7 @@ export function getStackedItemsOnStartingDeck(
           return acc
         }
         const lidsArray: LabwareInStack[] = command.result.labwareIds
-          .reverse()
+          .toReversed()
           .map(lidId => {
             return {
               labwareId: lidId,
