@@ -9,7 +9,7 @@ from opentrons.protocol_api.module_contexts import (
     FlexStackerContext,
 )
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 import os
 import csv
 
@@ -25,7 +25,7 @@ requirements = {
     "apiLevel": "2.23",
 }
 
-test_data = {
+test_data: Dict[str, Optional[Any]] = {
     "Cycles": None,
     "Stacker SN": None,
     "State": None,
@@ -99,14 +99,22 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def record_test_data(
-    test_data, cycle, SNs, state, labware_name, plate_num, log_file, csvfile
-):
+    test_data: Dict[str, Optional[Any]],
+    cycle: int,
+    SNs: str,
+    state: str,
+    labware_name: str,
+    plate_num: int,
+    log_file: Any,
+    csvfile: Any,
+) -> None:
+    """Records test data."""
     test_data["Cycles"] = cycle
     test_data["Stacker SN"] = SNs
     test_data["State"] = state
     test_data["labware"] = labware_name
     test_data["plate_num"] = plate_num
-    test_data["Error"]: Optional[str] = None
+    test_data["Error"] = None
     log_file.writerow(test_data)
     csvfile.flush()
 
@@ -122,25 +130,6 @@ def run(protocol: ProtocolContext) -> None:
     stackers_mounted = protocol.params.stackers_mounted  # type: ignore[attr-defined]
     deck_slots_for_stackers = stackers_mounted.split()
 
-    setup_dict = {
-        2: {
-            "armadillo_96_wellplate_200ul_pcr_full_skirt": 0,
-            "nest_96_wellplate_200ul_flat": 0,
-            "nest_96_wellplate_2ml_deep": 16,
-            "opentrons_flex_96_tiprack_50ul": 6,
-            "opentrons_flex_96_tiprack_200ul": 6,
-            "opentrons_flex_96_tiprack_200ul": 6,
-        },
-        4: {
-            "armadillo_96_wellplate_200ul_pcr_full_skirt": 0,
-            "nest_96_wellplate_200ul_flat": 0,
-            "nest_96_wellplate_2ml_deep": 16,
-            "opentrons_flex_96_tiprack_50ul": {6, 4},
-            "opentrons_flex_96_tiprack_200ul": {6, 4},
-            "opentrons_flex_96_tiprack_200ul": {6, 4},
-        },
-    }
-
     # define lid
     if "tiprack" in labware_name:
         tiprack_lid = "opentrons_flex_tiprack_lid"
@@ -148,16 +137,16 @@ def run(protocol: ProtocolContext) -> None:
         tiprack_lid = None
 
     # ======================= Stacker Setup ======================
-    stacker_num = 0
+    s_num = 0
     SNs = []
     num_of_stackers = len(deck_slots_for_stackers)
     for d in deck_slots_for_stackers:
-        stacker_num += 1
-        globals()[f"f_stacker_{stacker_num}"]: FlexStackerContext = protocol.load_module(  # type: ignore
+        s_num += 1
+        globals()[f"f_stacker_{s_num}"]: FlexStackerContext = protocol.load_module(  # type: ignore
             "flexStackerModuleV1", d
         )
-        if stacker_num % 2 == 0:
-            globals()[f"f_stacker_{stacker_num}"].set_stored_labware(
+        if s_num % 2 == 0:
+            globals()[f"f_stacker_{s_num}"].set_stored_labware(
                 load_name=labware_name,
                 count=0,  # always zero so we can store the labware
                 lid=tiprack_lid
@@ -165,7 +154,7 @@ def run(protocol: ProtocolContext) -> None:
                 else None,
             )
         else:
-            globals()[f"f_stacker_{stacker_num}"].set_stored_labware(
+            globals()[f"f_stacker_{s_num}"].set_stored_labware(
                 load_name=labware_name,
                 count=labware_count,
                 lid=tiprack_lid
@@ -173,8 +162,9 @@ def run(protocol: ProtocolContext) -> None:
                 else None,
             )
 
-        SNs.append(globals()[f"f_stacker_{stacker_num}"]._core.get_serial_number())
-    f_name = f'{directory}/labware_compatablitiy_lifetime_test_{datetime.now().strftime("%m_%d_%y_%H_%M")}.csv'
+        SNs.append(globals()[f"f_stacker_{s_num}"]._core.get_serial_number())
+    folder_name = "labware_compatibility_lifetime_test_"
+    f_name = f'{directory}/{folder_name}{datetime.now().strftime("%m_%d_%y_%H_%M")}.csv'
     # ======================= RETRIEVE/STORE TIPRACKS ======================
     if not protocol.is_simulating():
         with open(f_name, "w", newline="") as csvfile:
@@ -192,7 +182,7 @@ def run(protocol: ProtocolContext) -> None:
                     for lc in range(labware_count):
                         protocol.comment(f"Starting cycle: {cycle} for {labware_name}")
                         if num_of_stackers == 4:
-                            # ---------------------Retrieve labware Stacker A---------------------------------
+                            # ---------------------Retrieve labware Stacker A
                             lw = globals()[f"f_stacker_{1}"].retrieve()
                             record_test_data(
                                 test_data,
@@ -207,7 +197,7 @@ def run(protocol: ProtocolContext) -> None:
                             protocol.move_labware(
                                 lw, globals()[f"f_stacker_{2}"], use_gripper=True
                             )
-                            # ---------------------Store labware Stacker B---------------------------------
+                            # ---------------------Store labware Stacker B
                             globals()[f"f_stacker_{2}"].store()
                             record_test_data(
                                 test_data,
@@ -220,7 +210,7 @@ def run(protocol: ProtocolContext) -> None:
                                 csvfile,
                             )
                             labware_list.append(lw)
-                            # ---------------------Retrieve labware Stacker C---------------------------------
+                            # ---------------------Retrieve labware Stacker C
                             lw = globals()[f"f_stacker_{3}"].retrieve()
                             record_test_data(
                                 test_data,
@@ -235,7 +225,7 @@ def run(protocol: ProtocolContext) -> None:
                             protocol.move_labware(
                                 lw, globals()[f"f_stacker_{4}"], use_gripper=True
                             )
-                            # ---------------------Store labware Stacker D---------------------------------
+                            # ---------------------Store labware Stacker D
                             globals()[f"f_stacker_{4}"].store()
                             record_test_data(
                                 test_data,
@@ -250,7 +240,7 @@ def run(protocol: ProtocolContext) -> None:
                             labware_list.append(lw)
 
                         elif num_of_stackers == 2:
-                            # ---------------------Retrieve labware Stacker A---------------------------------
+                            # ---------------------Retrieve labware Stacker A
                             lw = globals()[f"f_stacker_{1}"].retrieve()
                             record_test_data(
                                 test_data,
@@ -265,7 +255,7 @@ def run(protocol: ProtocolContext) -> None:
                             protocol.move_labware(
                                 lw, globals()[f"f_stacker_{2}"], use_gripper=True
                             )
-                            # ---------------------Store labware Stacker B---------------------------------
+                            # ---------------------Store labware Stacker B
                             globals()[f"f_stacker_{2}"].store()
                             record_test_data(
                                 test_data,
@@ -285,7 +275,7 @@ def run(protocol: ProtocolContext) -> None:
                         )
                         if num_of_stackers == 4:
                             # go backwards
-                            # ---------------------Store labware Stacker B---------------------------------
+                            # ---------------------Store labware Stacker B
                             lw = globals()[f"f_stacker_{2}"].retrieve()
                             record_test_data(
                                 test_data,
@@ -300,7 +290,7 @@ def run(protocol: ProtocolContext) -> None:
                             protocol.move_labware(
                                 lw, globals()[f"f_stacker_{1}"], use_gripper=True
                             )
-                            # ---------------------Retrieve labware Stacker A---------------------------------
+                            # ---------------------Retrieve labware Stacker A
                             globals()[f"f_stacker_{1}"].store()
                             record_test_data(
                                 test_data,
@@ -313,7 +303,7 @@ def run(protocol: ProtocolContext) -> None:
                                 csvfile,
                             )
                             # go backwards
-                            # ---------------------Store labware Stacker D---------------------------------
+                            # ---------------------Store labware Stacker D
                             lw = globals()[f"f_stacker_{4}"].retrieve()
                             record_test_data(
                                 test_data,
@@ -328,7 +318,7 @@ def run(protocol: ProtocolContext) -> None:
                             protocol.move_labware(
                                 lw, globals()[f"f_stacker_{3}"], use_gripper=True
                             )
-                            # ---------------------Store labware Stacker C---------------------------------
+                            # ---------------------Store labware Stacker C
                             globals()[f"f_stacker_{3}"].store()
                             record_test_data(
                                 test_data,
@@ -343,7 +333,7 @@ def run(protocol: ProtocolContext) -> None:
 
                         elif num_of_stackers == 2:
                             # go backwards
-                            # ---------------------Store labware Stacker B---------------------------------
+                            # ---------------------Store labware Stacker B
                             lw = globals()[f"f_stacker_{2}"].retrieve()
                             record_test_data(
                                 test_data,
@@ -358,7 +348,7 @@ def run(protocol: ProtocolContext) -> None:
                             protocol.move_labware(
                                 lw, globals()[f"f_stacker_{1}"], use_gripper=True
                             )
-                            # ---------------------Retrieve labware Stacker A---------------------------------
+                            # ---------------------Retrieve labware Stacker A
                             record_test_data(
                                 test_data,
                                 cycle,
