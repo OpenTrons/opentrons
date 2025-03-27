@@ -9,7 +9,7 @@ from opentrons.protocol_api.module_contexts import (
     FlexStackerContext,
 )
 from datetime import datetime
-import time
+from typing import Optional
 import os
 import csv
 
@@ -32,7 +32,7 @@ test_data = {
     "labware": None,
     "plate_num": None,
     "Error": None,
-} 
+}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -62,7 +62,6 @@ def add_parameters(parameters: ParameterContext) -> None:
             {
                 "display_name": "NEST 96 Deep Well Plates",
                 "value": "nest_96_wellplate_2ml_deep",
-    
             },
             {
                 "display_name": "NEST 96 Flat Bottom Plates",
@@ -99,8 +98,6 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
-
-
 def record_test_data(
     test_data, cycle, SNs, state, labware_name, plate_num, log_file, csvfile
 ):
@@ -109,7 +106,7 @@ def record_test_data(
     test_data["State"] = state
     test_data["labware"] = labware_name
     test_data["plate_num"] = plate_num
-    test_data["error"] = None
+    test_data["Error"]: Optional[str] = None
     log_file.writerow(test_data)
     csvfile.flush()
 
@@ -119,27 +116,31 @@ def run(protocol: ProtocolContext) -> None:
     directory = f'/data/dvt_stacker_lifetime_{datetime.now().strftime("%m_%d_%y")}'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    labware_name = protocol.params.labware_name
-    labware_count = protocol.params.labware_count
-    test_cycles = protocol.params.test_cycles
-    stackers_mounted = protocol.params.stackers_mounted
+    labware_name = protocol.params.labware_name  # type: ignore[attr-defined]
+    labware_count = protocol.params.labware_count  # type: ignore[attr-defined]
+    test_cycles = protocol.params.test_cycles  # type: ignore[attr-defined]
+    stackers_mounted = protocol.params.stackers_mounted  # type: ignore[attr-defined]
     deck_slots_for_stackers = stackers_mounted.split()
-    
-    setup_dict = {2: {"armadillo_96_wellplate_200ul_pcr_full_skirt": 0,
-                      "nest_96_wellplate_200ul_flat": 0,
-                      "nest_96_wellplate_2ml_deep": 16,
-                      "opentrons_flex_96_tiprack_50ul": 6,
-                      "opentrons_flex_96_tiprack_200ul": 6,
-                      "opentrons_flex_96_tiprack_200ul": 6,
-                      },
-                  4: {"armadillo_96_wellplate_200ul_pcr_full_skirt": 0,
-                      "nest_96_wellplate_200ul_flat": 0,
-                      "nest_96_wellplate_2ml_deep": 16,
-                      "opentrons_flex_96_tiprack_50ul": {6,4},
-                      "opentrons_flex_96_tiprack_200ul": {6,4},
-                      "opentrons_flex_96_tiprack_200ul": {6,4},
-                      }} 
-    
+
+    setup_dict = {
+        2: {
+            "armadillo_96_wellplate_200ul_pcr_full_skirt": 0,
+            "nest_96_wellplate_200ul_flat": 0,
+            "nest_96_wellplate_2ml_deep": 16,
+            "opentrons_flex_96_tiprack_50ul": 6,
+            "opentrons_flex_96_tiprack_200ul": 6,
+            "opentrons_flex_96_tiprack_200ul": 6,
+        },
+        4: {
+            "armadillo_96_wellplate_200ul_pcr_full_skirt": 0,
+            "nest_96_wellplate_200ul_flat": 0,
+            "nest_96_wellplate_2ml_deep": 16,
+            "opentrons_flex_96_tiprack_50ul": {6, 4},
+            "opentrons_flex_96_tiprack_200ul": {6, 4},
+            "opentrons_flex_96_tiprack_200ul": {6, 4},
+        },
+    }
+
     # define lid
     if "tiprack" in labware_name:
         tiprack_lid = "opentrons_flex_tiprack_lid"
@@ -159,13 +160,17 @@ def run(protocol: ProtocolContext) -> None:
             globals()[f"f_stacker_{stacker_num}"].set_stored_labware(
                 load_name=labware_name,
                 count=0,  # always zero so we can store the labware
-                lid=tiprack_lid if "opentrons_flex_96_tiprack" in labware_name else None, 
+                lid=tiprack_lid
+                if "opentrons_flex_96_tiprack" in labware_name
+                else None,
             )
         else:
             globals()[f"f_stacker_{stacker_num}"].set_stored_labware(
                 load_name=labware_name,
                 count=labware_count,
-                lid=tiprack_lid if "opentrons_flex_96_tiprack" in labware_name else None,
+                lid=tiprack_lid
+                if "opentrons_flex_96_tiprack" in labware_name
+                else None,
             )
 
         SNs.append(globals()[f"f_stacker_{stacker_num}"]._core.get_serial_number())
