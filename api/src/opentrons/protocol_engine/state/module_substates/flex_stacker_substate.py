@@ -26,6 +26,7 @@ class FlexStackerSubState:
     pool_lid_definition: LabwareDefinition | None
     pool_count: int
     max_pool_count: int
+    pool_overlap: float
 
     def new_from_state_change(
         self, update: FlexStackerStateUpdate
@@ -35,11 +36,13 @@ class FlexStackerSubState:
         pool_adapter_definition = self.pool_adapter_definition
         pool_lid_definition = self.pool_lid_definition
         max_pool_count = self.max_pool_count
+        pool_overlap = self.pool_overlap
         if update.pool_constraint != NO_CHANGE:
             max_pool_count = update.pool_constraint.max_pool_count
             pool_primary_definition = update.pool_constraint.primary_definition
             pool_adapter_definition = update.pool_constraint.adapter_definition
             pool_lid_definition = update.pool_constraint.lid_definition
+            pool_overlap = update.pool_constraint.pool_overlap
 
         pool_count = self.pool_count
         if update.pool_count != NO_CHANGE:
@@ -52,6 +55,7 @@ class FlexStackerSubState:
             pool_lid_definition=pool_lid_definition,
             pool_count=pool_count,
             max_pool_count=max_pool_count,
+            pool_overlap=pool_overlap,
         )
 
     def get_pool_definition_ordered_list(self) -> list[LabwareDefinition] | None:
