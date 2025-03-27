@@ -1,14 +1,18 @@
 """Universal photometric test."""
 import os
+from typing import Tuple
 
 from opentrons import protocol_api
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 from opentrons_shared_data.load import get_shared_data_root
+from ..gravimetric.liquid_class import defaults
 
 metadata = {"protocolName": "96ch Universal Photometric Protocol"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 DYE_RESERVOIR_DEAD_VOLUME = 10000  # 10k uL
+
+TIPRACK_LOCATIONS = ["D1", "C1", "C2", "C3", "B1"]
 
 
 def add_parameters(parameters: protocol_api.ParameterContext) -> None:
@@ -42,17 +46,37 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         variable_name="cycles",
         default=5,
         minimum=1,
-        maximum=50,
+        maximum=100,
         description="Set number of cycles",
     )
 
     parameters.add_float(
-        display_name="target volume min/max",
+        display_name="target volume",
         variable_name="target_volume",
-        default=1,
+        default=5,
         minimum=0,
         maximum=1000,
         description="Set target aspirate volume.",
+    )
+
+    parameters.add_bool(
+        variable_name="lld",
+        display_name="enable lld",
+        description=("Use LLD to detect liquid height."),
+        default=True,
+    )
+    parameters.add_int(
+        variable_name="number_of_tipracks",
+        display_name="Number of tipracks",
+        description="Choose 1 or 5 tipracks to load at the start.",
+        default=1,
+    )
+
+    parameters.add_bool(
+        variable_name="use_pip_motion_defaults",
+        display_name="Use pipette motion defaults",
+        description="Use default values for pipette motion.",
+        default=True,
     )
 
     parameters.add_float(
@@ -162,13 +186,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         description="Set uL of Dye in the Reservoir.",
     )
 
-    parameters.add_bool(
-        variable_name="lld",
-        display_name="enable lld",
-        description=("Use LLD to detect liquid height."),
-        default=False,
-    )
-
     parameters.add_float(
         display_name="submerged delay time",
         variable_name="submerged_delay_time",
@@ -208,6 +225,7 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
             {"display_name": "None", "value": "none"},
         ],
         default="corning_96_wellplate_360ul_flat",
+        # note: add new plate here
     )
 
 
@@ -285,16 +303,25 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ctx.load_trash_bin("A3")
 
     # tips
-    tips = ctx.load_labware(
-        f"opentrons_flex_96_tiprack_{ctx.params.tip_type}uL",  # type: ignore [attr-defined]
-        location="D1",
-        adapter="opentrons_flex_96_tiprack_adapter",
-    )
+    tipracks = [
+        ctx.load_labware(
+            f"opentrons_flex_96_tiprack_{ctx.params.tip_type}uL",  # type: ignore [attr-defined]
+            location=deck_slot,
+            adapter="opentrons_flex_96_tiprack_adapter",
+        )
+        for deck_slot in TIPRACK_LOCATIONS
+    ]
+
+    def _get_tiprack(trial_number: int) -> protocol_api.Labware:
+        if ctx.params.number_of_tipracks == 1:  # type: ignore [attr-defined]
+            return tipracks[0]
+        return tipracks[trial_number]
+
     # pipette
     pip = ctx.load_instrument(
         f"flex_96channel_{ctx.params.model_type}",  # type: ignore [attr-defined]
         "left",
-        tip_racks=[tips],
+        tip_racks=tipracks,
     )
 
     # dye source
@@ -366,14 +393,47 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 retrying = True
         return src_liquid_height
 
-    # Set aspirate, dispense, and blow out flow rates
-    pip.flow_rate.aspirate = ctx.params.asp_flow_rate  # type: ignore [attr-defined]
-    pip.flow_rate.dispense = ctx.params.disp_flow_rate  # type: ignore [attr-defined]
-    pip.flow_rate.blow_out = ctx.params.blowout_flow_rate  # type: ignore [attr-defined]
+    def _set_pipettte_motion_settings() -> Tuple[float, float, float, float, float]:
+        if ctx.params.use_pip_motion_defaults:  # type: ignore [attr-defined]
+            aspirate_submerge_speed = 50
+            dispense_submerge_speed = 50
+            aspirate_exit_speed = 50
+            dispense_exit_speed = 50
+            liquid_class = defaults.get_liquid_class(
+                pipette=ctx.params.model_type,  # type: ignore [attr-defined]
+                channels=96,
+                tip=ctx.params.tip_type,  # type: ignore [attr-defined]
+                volume=ctx.params.target_volume,  # type: ignore [attr-defined]
+            )
+            pip.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
+            pip.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
+            set_push_out = liquid_class.dispense.blow_out_submerged
+        else:
+            set_push_out = ctx.params.push_out  # type: ignore [attr-defined]
+            pip.flow_rate.aspirate = ctx.params.asp_flow_rate  # type: ignore [attr-defined]
+            pip.flow_rate.dispense = ctx.params.disp_flow_rate  # type: ignore [attr-defined]
+            pip.flow_rate.blow_out = ctx.params.blowout_flow_rate  # type: ignore [attr-defined]
+            aspirate_submerge_speed = ctx.params.asp_submerge_speed  # type: ignore [attr-defined]
+            dispense_submerge_speed = ctx.params.disp_submerge_speed  # type: ignore [attr-defined]
+        return (
+            aspirate_submerge_speed,
+            aspirate_exit_speed,
+            dispense_submerge_speed,
+            dispense_exit_speed,
+            set_push_out,
+        )
 
+    (
+        aspirate_submerge_speed,
+        aspirate_exit_speed,
+        dispense_submerge_speed,
+        dispense_exit_speed,
+        set_push_out,
+    ) = _set_pipettte_motion_settings()
     current_src_volume = ctx.params.dye_volume  # type: ignore [attr-defined]
     current_plate_volume = 0
     for i in range(ctx.params.cycles):  # type: ignore [attr-defined]
+        tips = _get_tiprack(i)
         pip.pick_up_tip(tips["A1"])
 
         if i == 0:
@@ -399,7 +459,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         # Move to aspirate position at aspirate submerge speed
         pip.move_to(
             location=dye_source["A1"].bottom(aspirate_pos),
-            speed=ctx.params.asp_submerge_speed,  # type: ignore [attr-defined]
+            speed=aspirate_submerge_speed,
         )
         # Submerged delay time
         ctx.delay(seconds=ctx.params.submerged_delay_time)  # type: ignore [attr-defined]
@@ -418,7 +478,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         # Exit liquid from aspirate position at aspirate exit speed
         pip.move_to(
             location=dye_source["A1"].top(),
-            speed=ctx.params.asp_exit_speed,  # type: ignore [attr-defined]
+            speed=aspirate_exit_speed,
         )
         # Retract pipette
         pip._retract()
@@ -441,19 +501,19 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         # Move to dispense position at dispense submerge speed
         pip.move_to(
             location=plate["A1"].bottom(dispense_pos),
-            speed=ctx.params.disp_submerge_speed,  # type: ignore [attr-defined]
+            speed=dispense_submerge_speed,
         )
         # Dispense
         pip.dispense(
             volume=ctx.params.target_volume,  # type: ignore [attr-defined]
             location=None,
-            push_out=ctx.params.push_out,  # type: ignore [attr-defined]
+            push_out=set_push_out,  # type: ignore [attr-defined]
         )
         current_plate_volume += ctx.params.target_volume  # type: ignore [attr-defined]
         # Exit liquid from dispense position at dispense exit speed
         pip.move_to(
             location=plate["A1"].top(),
-            speed=ctx.params.disp_exit_speed,  # type: ignore [attr-defined]
+            speed=dispense_exit_speed,
         )
         # Perform blow out
         pip.blow_out()
