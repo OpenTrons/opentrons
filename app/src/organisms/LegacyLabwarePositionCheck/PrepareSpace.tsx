@@ -143,7 +143,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
           <Flex gap={SPACING.spacing8}>
-            {section === 'CHECK_LABWARE' && (
+            {section !== 'PICK_UP_TIP' && section !== 'RETURN_TIP' && (
               <SecondaryButton onClick={onSkip}>{t('skip')}</SecondaryButton>
             )}
             <PrimaryButton onClick={props.confirmPlacement}>
