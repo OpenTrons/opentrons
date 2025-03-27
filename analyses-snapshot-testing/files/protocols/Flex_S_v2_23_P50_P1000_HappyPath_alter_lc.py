@@ -110,15 +110,49 @@ def run(ctx: protocol_api.ProtocolContext):
     ]
 
     def alter_config(config):
-        config.aspirate.mix.enabled = True
-        config.aspirate.pre_wet = True
-        config.aspirate.retract.touch_tip.enabled = False
+
         config.aspirate.position_reference = "well-top"
-        config.aspirate.offset = (0, 0, -0.1)
-        config.multi_dispense.retract.touch_tip.enabled = True
-        config.multi_dispense.retract.blowout.location = "destination"
-        # config.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
-        # config.multi_dispense.retract.blowout.enabled = True
+        config.aspirate.offset = (-0.01, -0.03, -0.04)
+        config.aspirate.pre_wet = False
+        config.aspirate.mix.enabled = False
+        config.aspirate.mix.repetitions = 33
+        config.aspirate.mix.volume = 51
+        config.aspirate.delay.enabled = False
+        config.aspirate.delay.duration = 2.3
+
+        # config.aspirate.submerge.position_reference = "well-bottom"
+        # config.aspirate.submerge.offset = (.03, .1, 0)
+        # config.aspirate.submerge.speed = 123
+        # config.aspirate.submerge.delay.enabled = False
+        # config.aspirate.submerge.delay.duration = 5.1
+
+        # config.aspirate.retract.position_reference = "well-center"
+        # config.aspirate.retract.offset = (0, .1, 0)
+        # config.aspirate.retract.speed = 987
+        # config.aspirate.retract.touch_tip.z_offset = 2.34
+        # config.aspirate.retract.touch_tip.mm_to_edge = 4.56
+        # config.aspirate.retract.touch_tip.speed = 501
+        # config.aspirate.retract.delay.enabled = False
+        # config.aspirate.retract.delay.duration = 0.5
+
+        # Single dispense
+        # config.single_dispense.submerge.offset = (3, -2, 1)
+        # config.single_dispense.retract.touch_tip.enabled = False
+        # config.single_dispense.retract.blowout.enabled = False
+        # config.single_dispense.retract.blowout.location = "destination"
+        # config.single_dispense.retract.blowout.flow_rate = 3.21
+
+        # Multi dispense
+        # config.multi_dispense.submerge.offset = (.01, .01, .01)
+        # config.multi_dispense.submerge.speed = 111
+        # config.multi_dispense.submerge.delay.enabled = False
+        # config.multi_dispense.retract.position_reference = "well-top"
+        # config.multi_dispense.retract.offset = (-.1, -.1, -.1)
+        # config.multi_dispense.retract.touch_tip.enabled = False
+        # config.multi_dispense.retract.blowout.location = "destination"
+        # config.multi_dispense.retract.blowout.flow_rate = 3.21
+        # config.multi_dispense.delay.enabled = False
+        # config.multi_dispense.delay.duration = 25.25
 
     for config in configs:
         alter_config(config)

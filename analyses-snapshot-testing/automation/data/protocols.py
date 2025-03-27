@@ -1067,3 +1067,12 @@ class Protocols:
         file_extension="py",
         robot="Flex",
     )
+
+
+# analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P50_8ch_None_HappyPath_transfer_all3_exceeds.py
+
+Flex_S_v2_23_P50_8ch_None_HappyPath_transfer_all3_exceeds: Protocol = Protocol(
+    file_stem="Flex_S_v2_23_P50_8ch_None_HappyPath_transfer_all3_exceeds",
+    file_extension="py",
+    robot="Flex",
+)

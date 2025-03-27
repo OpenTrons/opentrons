@@ -1,5 +1,5 @@
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
-metadata = {"protocolName": "P50 8ch transfer, distribute, consolidate, _liquid"}
+metadata = {"protocolName": "P50 8ch volume exceeds tip volume - transfer, distribute, consolidate, _liquid"}
 
 
 def run(ctx):
@@ -57,7 +57,7 @@ def run(ctx):
     # Transfer with regular tips
 
     pipette_8ch_50 = ctx.load_instrument("flex_8channel_50", "left", tip_racks=tipracks)
-    volume = 37.5
+    volume = 77
     new_tip = "once"
     # new_tip = "always"
 
@@ -118,7 +118,7 @@ def run(ctx):
     )
 
     # Consolidate with regular tips
-    volume = 23
+    volume = 75
     pipette_8ch_50.consolidate_liquid(
         liquid_class=water_class,
         volume=volume,
@@ -149,7 +149,7 @@ def run(ctx):
     # Now with filter tips !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     pipette_8ch_50.tip_racks = filter_tipracks
-    volume = 33.3
+    volume = 66
     new_tip = "once"
     # new_tip = "always"
 
@@ -210,7 +210,7 @@ def run(ctx):
     )
 
     # Consolidate with filter tips
-    volume = 40.5
+    volume = 100
     pipette_8ch_50.consolidate_liquid(
         liquid_class=water_class,
         volume=volume,

@@ -5,7 +5,12 @@
 # key = "200"
 # key = "200_filter"
 # key = "1000"
-# key = "1000_filter"
+# key = "1000_filter" - https://opentrons.atlassian.net/browse/AUTH-1619
+# new 3/26/2025
+# key = "50_under"
+# key = "50_filter_under"
+# key = "200_under"
+# key = "200_filter_under"
 # protocol.override_variable_name = key
 
 from dataclasses import dataclass
@@ -20,9 +25,13 @@ class Test:
 
 Tests = [
     Test(key="50", tiprack_loadname="opentrons_flex_96_tiprack_50ul", transfer_volume=101),
+    Test(key="50_under", tiprack_loadname="opentrons_flex_96_tiprack_50ul", transfer_volume=41.3),
     Test(key="50_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", transfer_volume=101),
+    Test(key="50_filter_under", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", transfer_volume=41.3),
     Test(key="200", tiprack_loadname="opentrons_flex_96_tiprack_200ul", transfer_volume=401),
+    Test(key="200_under", tiprack_loadname="opentrons_flex_96_tiprack_200ul", transfer_volume=99.4),
     Test(key="200_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", transfer_volume=601),
+    Test(key="200_filter_under", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", transfer_volume=199),
     # cannot go over 1000 because the destination may only hold 2000
     Test(key="1000", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", transfer_volume=900),
     Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", transfer_volume=444),

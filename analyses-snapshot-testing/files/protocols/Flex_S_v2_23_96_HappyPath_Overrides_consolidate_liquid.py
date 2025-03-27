@@ -3,11 +3,17 @@ from opentrons import protocol_api
 # I am going to get added to in the test runner
 # uncomment to test
 # key = "50"
+# key = "50_under"
 # key = "50_filter"
+# key = "50_filter_exceeds"
 # key = "200"
+# key = "200_exceeds"
 # key = "200_filter"
+# key = "200_filter_under"
 # key = "1000"
+# key = "1000_under"
 # key = "1000_filter"
+# key = "1000_filter_exceeds"
 # protocol.override_variable_name = key
 
 from dataclasses import dataclass
@@ -22,11 +28,17 @@ class Test:
 
 Tests = [
     Test(key="50", tiprack_loadname="opentrons_flex_96_tiprack_50ul", volume=101),
+    Test(key="50_under", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", volume=40),
     Test(key="50_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", volume=40),
+    Test(key="50_filter_exceeds", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", volume=150),
     Test(key="200", tiprack_loadname="opentrons_flex_96_tiprack_200ul", volume=160),
+    Test(key="200_exceeds", tiprack_loadname="opentrons_flex_96_tiprack_200ul", volume=233),
     Test(key="200_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", volume=404),
+    Test(key="200_filter_under", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", volume=95),
     Test(key="1000", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", volume=1200),
+    Test(key="1000_under", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", volume=498),
     Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", volume=777),
+    Test(key="1000_filter_exceeds", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", volume=1111),
 ]
 
 

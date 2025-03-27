@@ -6,6 +6,13 @@
 # key = "200_filter"
 # key = "1000"
 # key = "1000_filter"
+# # new 3/26/2025
+# key = "50_exceeds"
+# key = "50_filter_exceeds"
+# key = "200_exceeds"
+# key = "200_filter_exceeds"
+# key = "1000_exceeds"
+# key = "1000_filter_exceeds"
 # protocol.override_variable_name = key
 
 from dataclasses import dataclass
@@ -22,11 +29,17 @@ class Test:
 #
 Tests = [
     Test(key="50", tiprack_loadname="opentrons_flex_96_tiprack_50ul", transfer_volume=22),
+    Test(key="50_exceeds", tiprack_loadname="opentrons_flex_96_tiprack_50ul", transfer_volume=77.77),
     Test(key="50_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", transfer_volume=22),
+    Test(key="50_filter_exceeds", tiprack_loadname="opentrons_flex_96_filtertiprack_50ul", transfer_volume=91),
     Test(key="200", tiprack_loadname="opentrons_flex_96_tiprack_200ul", transfer_volume=111),
+    Test(key="200_exceeds", tiprack_loadname="opentrons_flex_96_tiprack_200ul", transfer_volume=303.33),
     Test(key="200_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", transfer_volume=89),
+    Test(key="200_filter_exceeds", tiprack_loadname="opentrons_flex_96_filtertiprack_200ul", transfer_volume=222),
     Test(key="1000", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", transfer_volume=175),
+    Test(key="1000_exceeds", tiprack_loadname="opentrons_flex_96_tiprack_1000ul", transfer_volume=1020),
     Test(key="1000_filter", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", transfer_volume=633),
+    Test(key="1000_filter_exceeds", tiprack_loadname="opentrons_flex_96_filtertiprack_1000ul", transfer_volume=1200),
 ]
 
 
@@ -56,8 +69,11 @@ def run(protocol_context):
     tiprack_1 = protocol_context.load_labware(test.tiprack_loadname, "A1", adapter="opentrons_flex_96_tiprack_adapter")
     tiprack_2 = protocol_context.load_labware(test.tiprack_loadname, "A2", adapter="opentrons_flex_96_tiprack_adapter")
     tiprack_3 = protocol_context.load_labware(test.tiprack_loadname, "B2", adapter="opentrons_flex_96_tiprack_adapter")
+    tiprack_4 = protocol_context.load_labware(test.tiprack_loadname, "C2", adapter="opentrons_flex_96_tiprack_adapter")
+    tiprack_5 = protocol_context.load_labware(test.tiprack_loadname, "B3", adapter="opentrons_flex_96_tiprack_adapter")
+    tiprack_6 = protocol_context.load_labware(test.tiprack_loadname, "C3", adapter="opentrons_flex_96_tiprack_adapter")
 
-    tip_racks = [tiprack_1, tiprack_2, tiprack_3]
+    tip_racks = [tiprack_1, tiprack_2, tiprack_3, tiprack_4, tiprack_5, tiprack_6]
     trash = protocol_context.load_trash_bin("A3")
     pipette_96 = protocol_context.load_instrument("flex_96channel_1000", "right", tip_racks=tip_racks)
 
