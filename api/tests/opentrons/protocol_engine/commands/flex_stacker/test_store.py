@@ -2,14 +2,16 @@
 
 from datetime import datetime
 from unittest.mock import sentinel
+from typing import Type, Union
 
 import pytest
 from decoy import Decoy, matchers
 
 from opentrons.drivers.flex_stacker.types import StackerAxis
-from opentrons.hardware_control.modules import FlexStacker
+from opentrons.hardware_control.modules import FlexStacker, PlatformState
 from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 
@@ -41,7 +43,10 @@ from opentrons.protocol_engine.errors import (
 )
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors.exceptions import FlexStackerStallError
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+)
 
 
 @pytest.fixture
@@ -144,6 +149,23 @@ async def test_store_raises_if_not_configured(
         await subject.execute(data)
 
 
+@pytest.mark.parametrize(
+    "shared_data_error,protocol_engine_error",
+    [
+        (
+            FlexStackerStallError(serial="123", axis=StackerAxis.Z),
+            FlexStackerStallOrCollisionError,
+        ),
+        (
+            FlexStackerShuttleMissingError(
+                serial="123",
+                expected_state=PlatformState.EXTENDED,
+                shuttle_state=PlatformState.UNKNOWN,
+            ),
+            FlexStackerShuttleError,
+        ),
+    ],
+)
 async def test_store_raises_if_stall(
     decoy: Decoy,
     equipment: EquipmentHandler,
@@ -153,6 +175,10 @@ async def test_store_raises_if_stall(
     stacker_id: FlexStackerId,
     flex_50uL_tiprack: LabwareDefinition,
     stacker_hardware: FlexStacker,
+    shared_data_error: Exception,
+    protocol_engine_error: Type[
+        Union[FlexStackerStallOrCollisionError, FlexStackerShuttleError]
+    ],
 ) -> None:
     """It should raise a stall error."""
     data = flex_stacker.StoreParams(moduleId=stacker_id)
@@ -210,13 +236,13 @@ async def test_store_raises_if_stall(
     decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
 
     decoy.when(await stacker_hardware.store_labware(labware_height=4)).then_raise(
-        FlexStackerStallError(serial="123", axis=StackerAxis.Z)
+        shared_data_error
     )
 
     result = await subject.execute(data)
 
     assert result == DefinedErrorData(
-        public=FlexStackerStallOrCollisionError.model_construct(
+        public=protocol_engine_error.model_construct(
             id=error_id,
             createdAt=error_timestamp,
             wrappedErrors=[matchers.Anything()],

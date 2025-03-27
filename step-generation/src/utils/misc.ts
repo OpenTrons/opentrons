@@ -6,7 +6,6 @@ import {
   getIsTiprack,
   getLabwareDefURI,
   getWellNamePerMultiTip,
-  WASTE_CHUTE_CUTOUT,
   ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   NINETY_SIX_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -14,9 +13,9 @@ import {
   OT2_ROBOT_TYPE,
   FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { ZERO_OFFSET } from '../constants'
 import { reduceCommandCreators } from './index'
 import {
+  delay,
   dispense,
   moveToAddressableArea,
   moveToWell,
@@ -30,6 +29,7 @@ import {
   blowOutInWasteChute,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
+import { ZERO_OFFSET } from '../constants'
 import { blowOutInWell } from '../commandCreators/atomic/blowOutInWell'
 import { curryCommandCreator } from './curryCommandCreator'
 import type {
@@ -43,8 +43,6 @@ import type {
   CutoutId,
 } from '@opentrons/shared-data'
 import type {
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentEntity,
   CommandCreator,
   CurriedCommandCreator,
   InvariantContext,
@@ -54,6 +52,10 @@ import type {
   PipetteEntity,
   RobotState,
   SourceAndDest,
+  TrashBinEntities,
+  TrashBinEntity,
+  WasteChuteEntities,
+  WasteChuteEntity,
 } from '../types'
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
@@ -143,16 +145,15 @@ export function getTrashBinAddressableAreaName(
 
 export function getTrashOrLabware(
   labwareEntities: LabwareEntities,
-  additionalEquipmentEntities: AdditionalEquipmentEntities,
+  wasteChuteEntities: WasteChuteEntities,
+  trashBinEntities: TrashBinEntities,
   destinationId: string
 ): trashOrLabware {
   if (labwareEntities[destinationId] != null) {
     return 'labware'
-  } else if (
-    additionalEquipmentEntities[destinationId]?.name === 'wasteChute'
-  ) {
+  } else if (wasteChuteEntities[destinationId] != null) {
     return 'wasteChute'
-  } else if (additionalEquipmentEntities[destinationId]?.name === 'trashBin') {
+  } else if (trashBinEntities[destinationId] != null) {
     return 'trashBin'
   } else {
     console.error(
@@ -317,7 +318,7 @@ export function getWellsForTips(
 // Set blowout location depending on the 'blowoutLocation' arg: set it to
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
-export const blowoutUtil = (args: {
+export const blowoutLocationHelper = (args: {
   pipette: BlowoutParams['pipetteId']
   sourceLabwareId: string
   sourceWell: BlowoutParams['wellName']
@@ -340,12 +341,18 @@ export const blowoutUtil = (args: {
     invariantContext,
   } = args
   if (!blowoutLocation) return []
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
     destLabwareId
   )
+
   let labware: LabwareEntity | null = null
   let well: string | null = null
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
@@ -383,16 +390,14 @@ export const blowoutUtil = (args: {
       curryCommandCreator(blowOutInWasteChute, {
         pipetteId: pipette,
         flowRate,
+        wasteChuteId: Object.keys(wasteChuteEntities)[0] as string,
       }),
     ]
   } else {
-    const trashBin = Object.values(additionalEquipmentEntities).find(
-      ae => ae.name === 'trashBin'
-    )
     return [
       curryCommandCreator(blowOutInTrash, {
         pipetteId: pipette,
-        trashId: trashBin?.id as string,
+        trashId: Object.keys(trashBinEntities)[0] as string,
         flowRate,
       }),
     ]
@@ -404,7 +409,8 @@ export function createEmptyLiquidState(
   const {
     labwareEntities,
     pipetteEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
   } = invariantContext
   return {
     pipettes: reduce(
@@ -422,17 +428,17 @@ export function createEmptyLiquidState(
       },
       {}
     ),
-    additionalEquipment: reduce(
-      additionalEquipmentEntities,
-      (acc, additionalEquipment: AdditionalEquipmentEntity, id: string) => {
-        if (
-          additionalEquipment.name === 'wasteChute' ||
-          additionalEquipment.name === 'trashBin'
-        ) {
-          return { ...acc, [id]: {} }
-        } else {
-          return acc
-        }
+    trashBins: reduce(
+      trashBinEntities,
+      (acc, trashBin: TrashBinEntity, id: string) => {
+        return { ...acc, [id]: {} }
+      },
+      {}
+    ),
+    wasteChute: reduce(
+      wasteChuteEntities,
+      (acc, wasteChute: WasteChuteEntity, id: string) => {
+        return { ...acc, [id]: {} }
       },
       {}
     ),
@@ -520,16 +526,6 @@ export function makeInitialRobotState(args: {
   }
 }
 
-export const getHasWasteChute = (
-  additionalEquipmentEntities: AdditionalEquipmentEntities
-): boolean => {
-  return Object.values(additionalEquipmentEntities).some(
-    additionalEquipmentEntity =>
-      additionalEquipmentEntity.location === WASTE_CHUTE_CUTOUT &&
-      additionalEquipmentEntity.name === 'wasteChute'
-  )
-}
-
 export const getTiprackHasTips = (
   tipState: RobotState['tipState'],
   labwareId: string
@@ -582,10 +578,15 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     tipRack,
     nozzles,
   } = args
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
     destinationId
   )
 
@@ -620,7 +621,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
-        wasteChuteId: additionalEquipmentEntities[destinationId].id,
+        wasteChuteId: wasteChuteEntities[destinationId].id,
       }),
     ]
   } else {
@@ -629,7 +630,7 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
         pipetteId,
         volume,
         flowRate,
-        trashId: additionalEquipmentEntities[destinationId].id,
+        trashId: trashBinEntities[destinationId].id,
       }),
     ]
   }
@@ -650,10 +651,15 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   prevRobotState
 ) => {
   const { destinationId, pipetteId, zOffset, well } = args
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    labwareEntities,
+    wasteChuteEntities,
+    trashBinEntities,
+  } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
     destinationId
   )
 
@@ -671,25 +677,18 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
-    const pipetteChannels =
-      invariantContext.pipetteEntities[pipetteId].spec.channels
     commands = [
       curryCommandCreator(moveToAddressableArea, {
         pipetteId,
-        addressableAreaName: getWasteChuteAddressableAreaNamePip(
-          pipetteChannels
-        ),
+        fixtureId: wasteChuteEntities[destinationId].id,
         offset: { x: 0, y: 0, z: 0 },
       }),
     ]
   } else {
-    const addressableAreaName = getTrashBinAddressableAreaName(
-      additionalEquipmentEntities[destinationId].location as CutoutId
-    )
     commands = [
       curryCommandCreator(moveToAddressableArea, {
         pipetteId,
-        addressableAreaName,
+        fixtureId: trashBinEntities[destinationId].id,
         offset: ZERO_OFFSET,
       }),
     ]
@@ -698,19 +697,18 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-interface AirGapArgs {
+interface AirGapLocationArgs {
   //  destinationId is either labware or addressableAreaName for waste chute
   destinationId: string
   destWell: string | null
   flowRate: number
-  offsetFromBottomMm: number
   pipetteId: string
   volume: number
   blowOutLocation?: string | null
   sourceId?: string
   sourceWell?: string
 }
-export const airGapHelper: CommandCreator<AirGapArgs> = (
+export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -720,16 +718,20 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     destinationId,
     destWell,
     flowRate,
-    offsetFromBottomMm,
     pipetteId,
     sourceId,
     sourceWell,
     volume,
   } = args
-  const { labwareEntities, additionalEquipmentEntities } = invariantContext
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
     destinationId
   )
 
@@ -748,11 +750,11 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
     commands = [
       curryCommandCreator(airGapInWell, {
         flowRate,
-        offsetFromBottomMm,
         pipetteId,
         labwareId: dispenseAirGapLabware,
         wellName: dispenseAirGapWell,
         volume,
+        type: 'dispense',
       }),
     ]
   } else if (trashOrLabware === 'wasteChute') {
@@ -761,7 +763,7 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
         pipetteId,
         volume,
         flowRate,
-        invariantContext,
+        wasteChuteId: wasteChuteEntities[destinationId].id,
       }),
     ]
   } else {
@@ -770,8 +772,77 @@ export const airGapHelper: CommandCreator<AirGapArgs> = (
         pipetteId,
         volume,
         flowRate,
-        trashLocation: additionalEquipmentEntities[destinationId]
-          .location as CutoutId,
+        trashId: trashBinEntities[destinationId].id,
+      }),
+    ]
+  }
+
+  return reduceCommandCreators(commands, invariantContext, prevRobotState)
+}
+
+interface DelayLocationHelperArgs {
+  pipetteId: string
+  destinationId: string
+  well: string | null
+  zOffset: number
+  seconds: number
+}
+
+export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
+) => {
+  const { pipetteId, destinationId, well, zOffset, seconds } = args
+  const {
+    labwareEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+  } = invariantContext
+  const trashOrLabware = getTrashOrLabware(
+    labwareEntities,
+    wasteChuteEntities,
+    trashBinEntities,
+    destinationId
+  )
+
+  let commands: CurriedCommandCreator[] = []
+
+  if (well != null && trashOrLabware === 'labware') {
+    commands = [
+      curryCommandCreator(moveToWell, {
+        pipetteId: pipetteId,
+        labwareId: destinationId,
+        wellName: well,
+        wellLocation: {
+          origin: 'bottom',
+          offset: { x: 0, y: 0, z: zOffset },
+        },
+      }),
+      curryCommandCreator(delay, {
+        seconds: seconds,
+      }),
+    ]
+  } else if (trashOrLabware === 'wasteChute') {
+    commands = [
+      curryCommandCreator(moveToAddressableArea, {
+        pipetteId,
+        fixtureId: destinationId,
+        offset: ZERO_OFFSET,
+      }),
+      curryCommandCreator(delay, {
+        seconds: seconds,
+      }),
+    ]
+  } else {
+    commands = [
+      curryCommandCreator(moveToAddressableArea, {
+        pipetteId,
+        fixtureId: destinationId,
+        offset: ZERO_OFFSET,
+      }),
+      curryCommandCreator(delay, {
+        seconds: seconds,
       }),
     ]
   }

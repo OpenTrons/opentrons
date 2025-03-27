@@ -17,7 +17,6 @@ exports[`makeInitialRobotState > matches snapshot 1`] = `
     },
   },
   "liquidState": {
-    "additionalEquipment": {},
     "labware": {
       "fixedTrash": {
         "A1": {},
@@ -332,6 +331,8 @@ exports[`makeInitialRobotState > matches snapshot 1`] = `
         "7": {},
       },
     },
+    "trashBins": {},
+    "wasteChute": {},
   },
   "modules": {
     "someTempModuleId": {

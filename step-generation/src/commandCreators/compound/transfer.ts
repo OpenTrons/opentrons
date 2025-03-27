@@ -1,34 +1,31 @@
 import assert from 'assert'
 import zip from 'lodash/zip'
 import {
-  getWellDepth,
   LOW_VOLUME_PIPETTES,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
-import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import { dropTipInTrash } from './dropTipInTrash'
 import {
-  blowoutUtil,
+  blowoutLocationHelper,
   curryCommandCreator,
-  airGapHelper,
+  airGapLocationHelper,
   reduceCommandCreators,
   getTrashOrLabware,
   dispenseLocationHelper,
-  moveHelper,
-  getHasWasteChute,
+  delayLocationHelper,
 } from '../../utils'
 import {
-  airGapInPlace,
   aspirate,
   configureForVolume,
   delay,
   dispense,
   dropTip,
-  moveToWell,
   touchTip,
 } from '../atomic'
+import { airGapInWell } from './airGapInWell'
+import { dropTipInWasteChute } from './dropTipInWasteChute'
 import { mixUtil } from './mix'
 import { replaceTip } from './replaceTip'
 import type { CutoutId } from '@opentrons/shared-data'
@@ -38,7 +35,7 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
-import { dropTipInWasteChute } from './dropTipInWasteChute'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 
 export const transfer: CommandCreator<TransferArgs> = (
   args,
@@ -88,7 +85,8 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const trashOrLabware = getTrashOrLabware(
     invariantContext.labwareEntities,
-    invariantContext.additionalEquipmentEntities,
+    invariantContext.wasteChuteEntities,
+    invariantContext.trashBinEntities,
     args.destLabware
   )
 
@@ -134,9 +132,13 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const initialDestLabwareSlot = prevRobotState.labware[destLabware]?.slot
   const initialSourceLabwareSlot = prevRobotState.labware[sourceLabware]?.slot
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
-  )
+  const hasWasteChute =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
+
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   if (
     hasWasteChute &&
@@ -149,15 +151,13 @@ export const transfer: CommandCreator<TransferArgs> = (
   if (
     !args.destLabware ||
     (!invariantContext.labwareEntities[args.destLabware] &&
-      !invariantContext.additionalEquipmentEntities[args.destLabware])
+      !invariantContext.wasteChuteEntities[args.destLabware] &&
+      !invariantContext.trashBinEntities[args.destLabware])
   ) {
     errors.push(errorCreators.equipmentDoesNotExist())
   }
 
-  if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  ) {
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
@@ -166,11 +166,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       errors,
     }
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
-
-  const dropTipEntity =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  const isWasteChute = dropTipEntity?.name === 'wasteChute'
-  const isTrashBin = dropTipEntity?.name === 'trashBin'
 
   const aspirateAirGapVolume = args.aspirateAirGapVolume || 0
   const dispenseAirGapVolume = args.dispenseAirGapVolume || 0
@@ -213,19 +208,6 @@ export const transfer: CommandCreator<TransferArgs> = (
       pairIdx: number
     ): CurriedCommandCreator[] => {
       const [sourceWell, destinationWell] = wellPair
-      const sourceLabwareDef =
-        invariantContext.labwareEntities[args.sourceLabware].def
-      const destLabwareDef =
-        trashOrLabware === 'labware'
-          ? invariantContext.labwareEntities[args.destLabware].def
-          : null
-      const wellDepth =
-        destinationWell != null && destLabwareDef != null
-          ? getWellDepth(destLabwareDef, destinationWell)
-          : 0
-      const airGapOffsetSourceWell =
-        getWellDepth(sourceLabwareDef, sourceWell) + AIR_GAP_OFFSET_FROM_TOP
-      const airGapOffsetDestWell = wellDepth + AIR_GAP_OFFSET_FROM_TOP
       const commands = subTransferVolumes.reduce(
         (
           innerAcc: CurriedCommandCreator[],
@@ -286,6 +268,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: aspirateXOffset,
                   yOffset: aspirateYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
           const mixBeforeAspirateCommands =
@@ -305,25 +288,17 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: aspirateXOffset,
                   yOffset: aspirateYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
           const delayAfterAspirateCommands =
             aspirateDelay != null
               ? [
-                  curryCommandCreator(moveToWell, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
-                    labwareId: args.sourceLabware,
-                    wellName: sourceWell,
-                    wellLocation: {
-                      origin: 'bottom',
-                      offset: {
-                        x: 0,
-                        y: 0,
-                        z: aspirateDelay.mmFromBottom,
-                      },
-                    },
-                  }),
-                  curryCommandCreator(delay, {
+                    destinationId: args.sourceLabware,
+                    well: sourceWell,
+                    zOffset: aspirateDelay.mmFromBottom,
                     seconds: aspirateDelay.seconds,
                   }),
                 ]
@@ -374,29 +349,20 @@ export const transfer: CommandCreator<TransferArgs> = (
                   xOffset: dispenseXOffset,
                   yOffset: dispenseYOffset,
                   nozzles: args.nozzles,
+                  invariantContext,
                 })
               : []
 
           const airGapAfterAspirateCommands =
             aspirateAirGapVolume && destinationWell != null
               ? [
-                  curryCommandCreator(moveToWell, {
+                  curryCommandCreator(airGapInWell, {
                     pipetteId: args.pipette,
                     labwareId: args.sourceLabware,
                     wellName: sourceWell,
-                    wellLocation: {
-                      origin: 'bottom',
-                      offset: {
-                        z: airGapOffsetSourceWell,
-                        x: 0,
-                        y: 0,
-                      },
-                    },
-                  }),
-                  curryCommandCreator(airGapInPlace, {
-                    pipetteId: args.pipette,
                     volume: aspirateAirGapVolume,
                     flowRate: aspirateFlowRateUlSec,
+                    type: 'aspirate',
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -412,9 +378,9 @@ export const transfer: CommandCreator<TransferArgs> = (
                     wellName: destinationWell,
                     flowRate: dispenseFlowRateUlSec,
                     wellLocation: {
-                      origin: 'bottom',
+                      origin: 'top',
                       offset: {
-                        z: airGapOffsetDestWell,
+                        z: AIR_GAP_OFFSET_FROM_TOP,
                         x: 0,
                         y: 0,
                       },
@@ -487,19 +453,17 @@ export const transfer: CommandCreator<TransferArgs> = (
           const delayAfterDispenseCommands =
             dispenseDelay != null
               ? [
-                  curryCommandCreator(moveHelper, {
+                  curryCommandCreator(delayLocationHelper, {
                     pipetteId: args.pipette,
                     destinationId: args.destLabware,
-                    well: destinationWell ?? undefined,
+                    well: destinationWell,
                     zOffset: dispenseDelay.mmFromBottom,
-                  }),
-                  curryCommandCreator(delay, {
                     seconds: dispenseDelay.seconds,
                   }),
                 ]
               : []
 
-          const blowoutCommand = blowoutUtil({
+          const blowoutCommand = blowoutLocationHelper({
             pipette: args.pipette,
             sourceLabwareId: args.sourceLabware,
             sourceWell: sourceWell,
@@ -514,7 +478,7 @@ export const transfer: CommandCreator<TransferArgs> = (
           const airGapAfterDispenseCommands =
             dispenseAirGapVolume && !willReuseTip
               ? [
-                  curryCommandCreator(airGapHelper, {
+                  curryCommandCreator(airGapLocationHelper, {
                     sourceWell,
                     blowOutLocation: args.blowoutLocation,
                     sourceId: args.sourceLabware,
@@ -523,7 +487,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                     destinationId: args.destLabware,
                     destWell: destinationWell,
                     flowRate: aspirateFlowRateUlSec,
-                    offsetFromBottomMm: airGapOffsetDestWell,
+                    offsetFromTopMm: AIR_GAP_OFFSET_FROM_TOP,
                   }),
                   ...(aspirateDelay != null
                     ? [
@@ -545,7 +509,8 @@ export const transfer: CommandCreator<TransferArgs> = (
             dropTipCommand = [
               curryCommandCreator(dropTipInWasteChute, {
                 pipetteId: args.pipette,
-                wasteChuteId: dropTipEntity.id,
+                wasteChuteId:
+                  invariantContext.wasteChuteEntities[args.dropTipLocation].id,
               }),
             ]
           }
@@ -553,7 +518,9 @@ export const transfer: CommandCreator<TransferArgs> = (
             dropTipCommand = [
               curryCommandCreator(dropTipInTrash, {
                 pipetteId: args.pipette,
-                trashLocation: dropTipEntity.location as CutoutId,
+                trashLocation: invariantContext.trashBinEntities[
+                  args.dropTipLocation
+                ].location as CutoutId,
               }),
             ]
           }

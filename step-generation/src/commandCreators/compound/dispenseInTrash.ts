@@ -1,5 +1,4 @@
 import {
-  getTrashBinAddressableAreaName,
   reduceCommandCreators,
   indentPyLines,
   curryWithoutPython,
@@ -7,7 +6,6 @@ import {
 import { ZERO_OFFSET } from '../../constants'
 import { dispenseInPlace, moveToAddressableArea } from '../atomic'
 import type { CurriedCommandCreator, CommandCreator } from '../../types'
-import type { CutoutId } from '@opentrons/shared-data'
 
 interface DispenseInTrashParams {
   pipetteId: string
@@ -21,11 +19,8 @@ export const dispenseInTrash: CommandCreator<DispenseInTrashParams> = (
   prevRobotState
 ) => {
   const { pipetteId, trashId, flowRate, volume } = args
-  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
-  const trashEntity = additionalEquipmentEntities[trashId]
-  const addressableAreaName = getTrashBinAddressableAreaName(
-    trashEntity.location as CutoutId
-  )
+  const { pipetteEntities, trashBinEntities } = invariantContext
+  const trashEntity = trashBinEntities[trashId]
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
   const trashPythonName = trashEntity.pythonName
   const pythonArgs = [
@@ -46,7 +41,7 @@ export const dispenseInTrash: CommandCreator<DispenseInTrashParams> = (
   const commandCreators = [
     curryWithoutPython(moveToAddressableArea, {
       pipetteId,
-      addressableAreaName,
+      fixtureId: trashId,
       offset: ZERO_OFFSET,
     }),
     curryWithoutPython(dispenseInPlace, {

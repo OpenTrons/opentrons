@@ -10,7 +10,17 @@ import type { CutoutId } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 const mockCutout: CutoutId = 'cutoutA3'
-const invariantContext: InvariantContext = makeContext()
+const mockTrashId = 'mockTrashId'
+const invariantContext: InvariantContext = {
+  ...makeContext(),
+  trashBinEntities: {
+    [mockTrashId]: {
+      id: mockTrashId,
+      pythonName: 'mock_trash_bin_1',
+      location: mockCutout,
+    },
+  },
+}
 const prevRobotState: RobotState = getInitialRobotStateStandard(
   invariantContext
 )
@@ -22,7 +32,7 @@ describe('airGapInTrash', () => {
         pipetteId: DEFAULT_PIPETTE,
         volume: 10,
         flowRate: 10,
-        trashLocation: mockCutout,
+        trashId: mockTrashId,
       },
       invariantContext,
       prevRobotState

@@ -12,8 +12,9 @@ import {
   getStateAndContextTempTCModules,
   SOURCE_LABWARE,
   TIPRACK_1,
+  DEST_LABWARE,
 } from '../fixtures'
-import { DEST_LABWARE, GRIPPER_LOCATION, moveLabware } from '..'
+import { moveLabware } from '../commandCreators/atomic'
 
 import type {
   LabwareDefinition2,
@@ -22,7 +23,6 @@ import type {
 import type { InvariantContext, RobotState } from '../types'
 
 const mockWasteChuteId = 'mockWasteChuteId'
-const mockGripperId = 'mockGripperId'
 const mockTrashBinId = 'mockTrashBinId'
 const mockStagingAreaId = 'mockStagingAreaId'
 describe('moveLabware', () => {
@@ -34,20 +34,21 @@ describe('moveLabware', () => {
 
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        mockGripperId: {
-          name: 'gripper',
-          id: mockGripperId,
-          location: GRIPPER_LOCATION,
-        },
+      trashBinEntities: {
         mockTrashBinId: {
-          name: 'trashBin',
           id: mockTrashBinId,
           pythonName: 'mock_trash_bin_1',
           location: 'cutoutA3',
         },
+      },
+      wasteChuteEntities: {},
+      gripperEntities: {
+        mockGripperId: {
+          id: 'mockGripperId',
+        },
+      },
+      stagingAreaEntities: {
         mockStagingAreaId: {
-          name: 'stagingArea',
           id: mockStagingAreaId,
           location: 'A4',
         },
@@ -83,9 +84,8 @@ describe('moveLabware', () => {
   it('should return a moveLabware command moving to a trash bin for an ot-2', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      trashBinEntities: {
         mockTrashBinId: {
-          name: 'trashBin',
           id: mockTrashBinId,
           pythonName: 'mock_trash_bin_1',
           location: 'cutout12',
@@ -362,10 +362,10 @@ describe('moveLabware', () => {
   it('should return an error for the labware already being discarded in previous step', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
+      wasteChuteEntities: {
+        ...invariantContext.wasteChuteEntities,
         mockWasteChuteId: {
-          name: 'wasteChute',
+          pythonName: 'waste_chute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
         },
@@ -407,11 +407,9 @@ describe('moveLabware', () => {
 
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      gripperEntities: {
         mockGripperId: {
-          name: 'gripper',
-          id: mockGripperId,
-          location: GRIPPER_LOCATION,
+          id: 'mockGripperId',
         },
       },
       labwareEntities: {
@@ -562,10 +560,8 @@ describe('moveLabware', () => {
   it('should return a warning for if you try to move a tiprack with tips into the waste chute', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
+      wasteChuteEntities: {
         mockWasteChuteId: {
-          name: 'wasteChute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
           pythonName: 'waste_chute',
@@ -608,10 +604,8 @@ describe('moveLabware', () => {
   it('should return a warning for if you try to move a labware with liquids into the waste chute', () => {
     const wasteChuteInvariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
+      wasteChuteEntities: {
         mockWasteChuteId: {
-          name: 'wasteChute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
           pythonName: 'waste_chute',
@@ -650,7 +644,7 @@ describe('moveLabware', () => {
   it('should return an error when trying to move with gripper when there is no gripper', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {},
+      gripperEntities: {},
     } as InvariantContext
 
     const params = {
@@ -668,10 +662,9 @@ describe('moveLabware', () => {
   it('should return an error when trying to move into the waste chute when useGripper is not selected', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
-        ...invariantContext.additionalEquipmentEntities,
+      wasteChuteEntities: {
         mockWasteChuteId: {
-          name: 'wasteChute',
+          pythonName: 'wate_chute',
           id: mockWasteChuteId,
           location: WASTE_CHUTE_CUTOUT,
         },

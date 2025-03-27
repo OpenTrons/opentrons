@@ -10,7 +10,6 @@ import {
 } from '../robotStateSelectors'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 import { getErrorResult, getSuccessResult } from '../fixtures/commandFixtures'
-import { GRIPPER_LOCATION } from '../constants'
 
 import type {
   AbsorbanceReaderInitializeArgs,
@@ -25,7 +24,6 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
   let absorbanceReaderCloseInitializeArgs: AbsorbanceReaderInitializeArgs
   const ABSORBANCE_READER_MODULE_ID = 'absorbanceReaderModuleId'
   const ABSORBANCE_READER_MODULE_SLOT = 'D3'
-  const GRIPPER_ID = 'gripperId'
   let robotState: RobotState
   let invariantContext: InvariantContext
   beforeEach(() => {
@@ -47,11 +45,9 @@ describe('absorbanceReaderCloseInitialize compound command creator', () => {
           pythonName: 'mock_absorbance_plate_reader_1',
         },
       },
-      additionalEquipmentEntities: {
-        [GRIPPER_ID]: {
-          id: GRIPPER_ID,
-          name: 'gripper',
-          location: GRIPPER_LOCATION,
+      gripperEntities: {
+        gripperId: {
+          id: 'gripperId',
         },
       },
     }

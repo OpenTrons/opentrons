@@ -57,7 +57,6 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
     }
   }
 
-  // TODO(jh, 03-14-25): Add a save state spinner.
   const onHeaderSave = (): void => {
     if (doWorkingOffsetsExist && !isSavingWorkingOffsetsLoading) {
       void saveWorkingOffsets().then(updatedOffsetData => {

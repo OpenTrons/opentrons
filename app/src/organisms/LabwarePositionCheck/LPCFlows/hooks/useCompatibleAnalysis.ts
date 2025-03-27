@@ -1,20 +1,20 @@
-import type {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisSummary,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import {
-  ANALYTICS_LPC_ANALYSIS_KIND,
-  useTrackEvent,
-} from '/app/redux/analytics'
 import { useEffect, useRef, useState } from 'react'
+
 import {
   useCreateProtocolAnalysisMutation,
   useProtocolAnalysisAsDocumentQuery,
 } from '@opentrons/react-api-client'
-import { useNotifyRunQuery } from '/app/resources/runs'
 
-// TODO(jh, 03-17-25): Add testing here.
+import {
+  ANALYTICS_LPC_ANALYSIS_KIND,
+  useTrackEvent,
+} from '/app/redux/analytics'
+
+import type { Run } from '@opentrons/api-client'
+import type {
+  CompletedProtocolAnalysis,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 // TODO(jh, 03-14-25): Remove this adapter logic and Mixpanel event once analytics
 //  indicate that users no longer run old analyses.
@@ -22,8 +22,10 @@ import { useNotifyRunQuery } from '/app/resources/runs'
 // If analysis is incompatible with LPC, force reanalysis and use that fresh analysis,
 // otherwise, use the current analysis.
 export function useCompatibleAnalysis(
-  runId: string,
-  mostRecentAnalysis: CompletedProtocolAnalysis | null
+  runId: string | null,
+  runRecord: Run | undefined,
+  mostRecentAnalysis: CompletedProtocolAnalysis | null,
+  isFlex: boolean
 ): CompletedProtocolAnalysis | null {
   const [
     compatibleAnalysis,
@@ -35,7 +37,7 @@ export function useCompatibleAnalysis(
   const hasProcessedAnalysis = useRef(false)
 
   const trackEvent = useTrackEvent()
-  const protocolId = useNotifyRunQuery(runId).data?.data.protocolId ?? ''
+  const protocolId = runRecord?.data.protocolId ?? ''
   const { createProtocolAnalysis } = useCreateProtocolAnalysisMutation(
     protocolId
   )
@@ -43,7 +45,7 @@ export function useCompatibleAnalysis(
     protocolId,
     compatibleAnalysisId,
     {
-      enabled: compatibleAnalysisId != null,
+      enabled: isFlex && compatibleAnalysisId != null,
       staleTime: Infinity,
     }
   )
@@ -57,7 +59,7 @@ export function useCompatibleAnalysis(
   )
 
   useEffect(() => {
-    if (mostRecentAnalysis != null && !hasProcessedAnalysis.current) {
+    if (isFlex && mostRecentAnalysis != null && !hasProcessedAnalysis.current) {
       hasProcessedAnalysis.current = true
 
       if (!isLocSeqAnalysisType) {
@@ -69,10 +71,9 @@ export function useCompatibleAnalysis(
           {
             onSuccess: res => {
               if (res != null) {
-                // @ts-expect-error TODO(jh, 03-17-25): Something is wrong with the typing here.
-                const data = res.data as ProtocolAnalysisSummary[]
+                const data = res.data
                 // The last analysis is the most recent.
-                setCompatibleAnalysisId(data[data.length - 1].id)
+                setCompatibleAnalysisId(data[data.length - 1].id as string)
               }
             },
           }

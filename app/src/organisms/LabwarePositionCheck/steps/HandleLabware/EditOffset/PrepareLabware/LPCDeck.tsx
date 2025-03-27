@@ -15,6 +15,7 @@ import {
 
 import {
   OFFSET_KIND_DEFAULT,
+  selectSelectedLwAdapterDef,
   selectSelectedLwDef,
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
@@ -29,10 +30,8 @@ import type {
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
-// TODO(jh, 03-14-25): Current designs/behavior do not include rendering the
-//  adapter beneath the labware if present, but let's add this!
-
-/** On the LPC deck, the only visible labware should be the labware with an actively edited offset.
+/** On the LPC deck, the only visible labware should be the labware with an actively edited offset (the topmost)
+ * and the labware immediately beneath the topmost labware.
  * Modules are always visible if they are not in the actively utilized deck slot.
  * If modules are in the actively utilized deck slot:
  *  If LPCing the default offset, ensure the module is always cleared.
@@ -48,6 +47,7 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
   const labwareDef = useSelector(
     selectSelectedLwDef(runId)
   ) as LabwareDefinition2
+  const adapterLwDef = useSelector(selectSelectedLwAdapterDef(runId))
 
   const offsetLocationDetails = selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
   const { closestBeneathModuleModel, kind: offsetKind } = offsetLocationDetails
@@ -80,9 +80,29 @@ export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
     }
   }
 
-  const buildLabwareOnDeck = (): LabwareOnDeck[] => [
-    { labwareLocation: offsetLocationDetails, definition: labwareDef },
-  ]
+  const buildLabwareOnDeck = (): LabwareOnDeck[] => {
+    const lpcLabwareOnDeck = {
+      labwareLocation: {
+        ...offsetLocationDetails,
+        slotName: offsetLocationDetails.addressableAreaName,
+      },
+      definition: labwareDef,
+    }
+    const adapterLwOnDeck =
+      adapterLwDef != null
+        ? {
+            labwareLocation: {
+              ...offsetLocationDetails,
+              slotName: offsetLocationDetails.addressableAreaName,
+            },
+            definition: adapterLwDef,
+          }
+        : null
+
+    return adapterLwOnDeck != null
+      ? [adapterLwOnDeck, lpcLabwareOnDeck]
+      : [lpcLabwareOnDeck]
+  }
 
   return (
     <Flex css={DECK_CONTAINER_STYLE}>

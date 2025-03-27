@@ -696,7 +696,7 @@ class MoveScheduler:
         seconds_moving = self._durations[group_id - self._start_at_index]
         PROFILE_LOG.info(f"ExecuteMoveGroupRequest\tduration-moving\t{seconds_moving}")
         expected_time = max(3.0, seconds_moving * 1.1)
-        full_timeout = max(5.0, seconds_moving * 2)
+        full_timeout = max(10.0, seconds_moving * 2)
         start_time = time.time()
         try:
             # The staged timeout handles some times when a move takes a liiiittle extra

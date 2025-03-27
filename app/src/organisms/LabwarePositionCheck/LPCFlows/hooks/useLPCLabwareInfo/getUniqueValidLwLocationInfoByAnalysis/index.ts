@@ -1,6 +1,7 @@
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getLPCUniqValidLabwareLocationInfo } from './getLPCUniqValidLabwareLocationInfo'
+import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
 
 import type {
   CompletedProtocolAnalysis,
@@ -20,9 +21,11 @@ export function getUniqueValidLwLocationInfoByAnalysis({
   robotType,
 }: GetUniqueValidLwLocationInfoByAnalysisParams & {
   robotType: RobotType
-  runId: string
 }): LabwareLocationInfo[] {
-  if (protocolData == null || labwareDefs == null) {
+  // If there's no pipette, there's nothing to LPC.
+  const activePipetteId = getActivePipetteId(protocolData?.pipettes ?? [])
+
+  if (protocolData == null || labwareDefs == null || activePipetteId == null) {
     return []
   } else if (robotType !== FLEX_ROBOT_TYPE) {
     return []
