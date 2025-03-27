@@ -182,7 +182,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 25.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -405,7 +409,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 25.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -633,7 +641,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 25.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -856,7 +868,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 25.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1083,7 +1099,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1305,7 +1325,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1523,7 +1547,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1741,7 +1769,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -1959,7 +1991,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 250.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2177,7 +2213,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 250.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2404,7 +2444,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2626,7 +2670,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -2844,7 +2892,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3062,7 +3114,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3280,7 +3336,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 250.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3498,7 +3558,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 250.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3729,7 +3793,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 7.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -3959,7 +4027,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 7.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4181,7 +4253,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4399,7 +4475,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 50.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4618,7 +4698,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 250.0
+                }
               },
               "touchTip": {
                 "enable": false,
@@ -4837,7 +4921,11 @@
               "speed": 4,
               "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "location": "trash",
+                  "flowRate": 250.0
+                }
               },
               "touchTip": {
                 "enable": false,
