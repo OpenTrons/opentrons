@@ -153,7 +153,7 @@ export const ResultsSummary = (
             onClick={onCloseClick}
             disabled={isSubmittingAndClosing}
           >
-            <Flex>
+            <Flex alignItems={ALIGN_CENTER}>
               {isSubmittingAndClosing ? (
                 <Icon
                   size="1rem"
