@@ -119,7 +119,10 @@ export function useLPCFlows({
   const {
     createLabwareDefinition,
   } = useCreateMaintenanceRunLabwareDefinitionMutation()
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const {
+    deleteMaintenanceRun,
+    isLoading: isClosing,
+  } = useDeleteMaintenanceRunMutation()
 
   // After the maintenance run is created, add labware defs to the maintenance run.
   useEffect(() => {
@@ -192,6 +195,7 @@ export function useLPCFlows({
         showLPC,
         lpcProps: {
           onCloseClick: handleCloseLPC,
+          isClosing,
           runId,
           robotType,
           deckConfig,

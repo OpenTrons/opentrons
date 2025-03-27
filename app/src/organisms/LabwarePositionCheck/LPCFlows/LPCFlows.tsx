@@ -16,6 +16,7 @@ export interface LegacySupportLPCFlowsProps extends LPCFlowsProps {
 
 export interface LPCFlowsProps {
   onCloseClick: () => void
+  isClosing: boolean
   runId: string
   robotType: RobotType
   deckConfig: DeckConfiguration

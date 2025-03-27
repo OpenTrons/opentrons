@@ -15,6 +15,7 @@ import {
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
+  Icon,
 } from '@opentrons/components'
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
@@ -80,7 +81,7 @@ export function OT2SetupLPC(
     placement: TOOLTIP_LEFT,
   })
 
-  const { launchLPC, lpcProps, showLPC } = useLPCFlows({
+  const { launchLPC, lpcProps, showLPC, isLaunchingLPC } = useLPCFlows({
     runId,
     robotType,
     protocolName,
@@ -142,9 +143,19 @@ export function OT2SetupLPC(
           onClick={launchLPC}
           id="LabwareSetup_checkLabwarePositionsButton"
           {...runLPCTargetProps}
-          disabled={lpcDisabledReason !== null}
+          disabled={lpcDisabledReason !== null || isLaunchingLPC}
         >
-          {t('run_labware_position_check')}
+          <Flex alignItems={ALIGN_CENTER}>
+            {isLaunchingLPC && (
+              <Icon
+                size="1rem"
+                spin
+                name="ot-spinner"
+                marginRight={SPACING.spacing8}
+              />
+            )}
+            {t('run_labware_position_check')}
+          </Flex>
         </PrimaryButton>
         {lpcDisabledReason !== null ? (
           <Tooltip tooltipProps={runLPCTooltipProps}>
