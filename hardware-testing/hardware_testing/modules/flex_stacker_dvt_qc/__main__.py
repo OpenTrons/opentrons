@@ -7,9 +7,9 @@ if "OT_SYSTEM_VERSION" not in environ:
 
 import argparse
 import asyncio
+import subprocess
 from pathlib import Path
 from typing import Tuple
-from subprocess import check_output
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
@@ -44,7 +44,7 @@ async def _main(cfg: TestConfig) -> None:
 
     if not cfg.simulate:
         print("Stopping the robot server")
-        check_output(["systemctl stop opentrons-robot-server"], shell=True)
+        subprocess.run(["systemctl stop opentrons-robot-server"], shell=True)
         # Perform initial checks before starting tests
         # 1. estop should not be pressed
         # 2. platform should be removed
@@ -82,7 +82,7 @@ async def _main(cfg: TestConfig) -> None:
     # Restart the robot server
     if not cfg.simulate:
         print("Starting the robot server")
-        check_output(
+        subprocess.run(
             ["systemctl restart opentrons-robot-server &"], shell=True
         )
 
