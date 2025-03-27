@@ -58,15 +58,17 @@ export function DeviceResetModal({
   const triggerReset = (): void => {
     if (resetOptions != null) {
       if (isFlex) {
-        const totalOptionsSelected = Object.values(resetOptions).filter(
-          selected => selected === true
-        ).length
+        // todo(mm, 2025-03-27): This logic for auto-selecting the onDeviceDisplay reset
+        // option will not work if we add a new server-side option to
+        // `GET /settings/reset/options` but leave it out of the UI.
+        // (onDeviceDisplay will never be selected then.) We probably want to base
+        // `isEveryOptionSelected` on what the UI actually lets the user select, not
+        // what the server theoretically accepts.
 
-        const isEveryOptionSelected =
-          totalOptionsSelected > 0 &&
-          totalOptionsSelected ===
-            // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-            serverResetOptions.filter(o => o.id !== 'onDeviceDisplay').length
+        const isEveryOptionSelected = serverResetOptions
+          .filter(o => o.id !== 'onDeviceDisplay') // filtering out ODD setting because this gets implicitly cleared if all settings are selected
+          .map(serverOption => resetOptions?.[serverOption.id] ?? false)
+          .every(value => value)
 
         if (isEveryOptionSelected) {
           resetOptions = {
