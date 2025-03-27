@@ -125,6 +125,7 @@ async def test_manual_retrieve_raises_when_empty(
         pool_lid_definition=None,
         pool_count=0,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -166,6 +167,7 @@ async def test_manual_retrieve_primary_only(
         pool_lid_definition=None,
         pool_count=1,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -270,6 +272,7 @@ async def test_manual_retrieve_primary_and_lid(
         pool_lid_definition=tiprack_lid_def,
         pool_count=1,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -410,6 +413,7 @@ async def test_manual_retrieve_primary_and_adapter(
         pool_lid_definition=None,
         pool_count=1,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -564,6 +568,7 @@ async def test_manual_retrieve_primary_adapter_and_lid(
         pool_lid_definition=tiprack_lid_def,
         pool_count=1,
         max_pool_count=5,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
@@ -729,6 +734,7 @@ async def test_manual_retrieve_fails_due_to_platform_state(
         pool_lid_definition=None,
         pool_count=1,
         max_pool_count=999,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
