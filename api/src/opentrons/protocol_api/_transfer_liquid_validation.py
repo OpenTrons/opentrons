@@ -3,8 +3,8 @@ from typing import List, Union, Sequence, Optional
 
 from opentrons.types import Location, NozzleMapInterface
 from opentrons.protocols.api_support import instrument
-from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
-    group_wells_for_multi_channel_transfer,
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as tx_liquid_utils,
 )
 from opentrons.protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
@@ -40,10 +40,10 @@ def verify_and_normalize_transfer_args(
     flat_sources_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(source)
     flat_dests_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(dest)
     if not target_all_wells and nozzle_map.tip_count > 1:
-        flat_sources_list = group_wells_for_multi_channel_transfer(
+        flat_sources_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
             flat_sources_list, nozzle_map
         )
-        flat_dests_list = group_wells_for_multi_channel_transfer(
+        flat_dests_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
             flat_dests_list, nozzle_map
         )
     for well in flat_sources_list + flat_dests_list:
