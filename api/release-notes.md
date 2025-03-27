@@ -13,18 +13,18 @@ Welcome to the v8.4.0 release of the Opentrons robot software! This release incl
 
 ### New Features
 
-- Use new ``transfer_liquid``, ``distribute_liquid``, and ``consolidate_liquid`` commands only on the Flex to optimize liquid handling based on Opentrons-verified liquid classes. 
-- Stack multiple Opentrons Tough auto-sealing lids on the deck. 
-- Move Opentrons Tough auto-sealing lids or remove tip rack lids with the Flex gripper. 
+- Use new ``transfer_liquid``, ``distribute_liquid``, and ``consolidate_liquid`` commands on Flex to optimize liquid handling based on Opentrons-verified liquid classes. 
+- Stack multiple Opentrons Tough Auto-Sealing Lids on the deck. 
+- Move Opentrons Tough Auto-Sealing Lids or remove tip rack lids with the Flex Gripper. 
 - Aspirate or dispense in a well based on the liquid meniscus. 
 
 ### Improvements
 
-- Improvements to ``return_tip`` change the pipette position to correctly drop and return attached tips to the tip rack. 
+- Improved tip drop motions for Flex 1- and 8-channel pipettes correctly drop and return attached tips to the tip rack. 
 
 ### Bug Fixes
 
-- An error is raised if the Absorbance Plate Reader fails to initialize before reading a plate inside the module. 
+- The API raises an error if the Absorbance Plate Reader fails to initialize before reading a plate inside the module. 
 
 ## Opentrons Robot Software Changes in 8.3.1
 

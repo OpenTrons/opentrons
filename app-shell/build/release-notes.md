@@ -15,8 +15,8 @@ Welcome to the v8.4.0 release of the Opentrons App! This release includes update
 ### New Features
 
 - Run Flex protocols with updated liquid handling commands, optimized for liquid class properties like viscosity.
-- During a protocol, use the Flex gripper to remove lids from new tip boxes on the deck.
-- Run protocols with stacked Opentrons Tough auto-sealing lids.
+- During a protocol, use the Flex Gripper to remove lids from new tip racks on the deck.
+- Run protocols with stacked Opentrons Tough Auto-Sealing Lids.
 
 ### Improvements
 
@@ -25,8 +25,7 @@ Welcome to the v8.4.0 release of the Opentrons App! This release includes update
 
 ### Bug Fixes
 
-- During error recovery, select only a single column of pipette tips to resume the protocol.
-- An error is raised if the Absorbance Plate Reader fails to initialize before reading a plate inside the module.
+- Error recovery no longer lets you select more tips than the pipette can pick up at once.
 
 ## Opentrons App Changes in 8.3.1
 
