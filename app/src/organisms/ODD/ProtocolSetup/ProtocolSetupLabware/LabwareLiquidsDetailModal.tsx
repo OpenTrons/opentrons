@@ -1,18 +1,16 @@
-import { useRef, useState, useEffect } from 'react'
-import styled, { css } from 'styled-components'
+import { useState } from 'react'
+import styled from 'styled-components'
 
 import {
-  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
   SPACING,
-  Tag,
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
 import { OddModal } from '/app/molecules/OddModal'
-import { LiquidDetailCard } from '/app/organisms/LiquidDetailCard'
+import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
 import {
   getLiquidsByIdForLabware,
   getDisabledWellFillFromLabwareId,
@@ -32,7 +30,6 @@ interface LabwareLiquidsDetailModalProps {
   closeModal: () => void
   labwareByLiquidId: LabwareByLiquidId
   labwareDefinition: LabwareDefinition2
-  liquidId?: string
   stackPosition?: number
 }
 
@@ -46,7 +43,6 @@ export const LabwareLiquidsDetailModal = (
   props: LabwareLiquidsDetailModalProps
 ): JSX.Element | null => {
   const {
-    liquidId,
     labwareId,
     closeModal,
     labwareByLiquidId,
@@ -55,49 +51,36 @@ export const LabwareLiquidsDetailModal = (
     stackPosition,
     mostRecentAnalysis,
   } = props
-  const currentLiquidRef = useRef<HTMLDivElement>(null)
   const commands = mostRecentAnalysis.commands ?? []
   const liquids = parseLiquidsInLoadOrder(
     mostRecentAnalysis?.liquids != null ? mostRecentAnalysis?.liquids : [],
     commands
   )
   const labwareInfo = getLiquidsByIdForLabware(labwareId, labwareByLiquidId)
-  const labwareWellOrdering = labwareDefinition.ordering
   const filteredLiquidsInLoadOrder = liquids.filter(liquid => {
     return Object.keys(labwareInfo).some(key => key === liquid.id)
   })
-  const [selectedValue, setSelectedValue] = useState<typeof liquidId>(
-    liquidId ?? filteredLiquidsInLoadOrder[0].id
+  const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
+    filteredLiquidsInLoadOrder[0].id
   )
 
   const wellFill = getDisabledWellFillFromLabwareId(
     labwareId,
     liquids,
     labwareByLiquidId,
-    selectedValue
+    selectedLiquidId
   )
 
-  const scrollToCurrentItem = (): void => {
-    currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-  useEffect(() => {
-    scrollToCurrentItem()
-  }, [])
-  const HIDE_SCROLLBAR = css`
-    ::-webkit-scrollbar {
-      display: none;
-    }
-  `
   const liquidIds = filteredLiquidsInLoadOrder.map(liquid => liquid.id)
-  const disabledLiquidIds = liquidIds.filter(id => id !== selectedValue)
+  const disabledLiquidIds = liquidIds.filter(id => id !== selectedLiquidId)
   const labwareRender = (
     <LabwareRender
       definition={labwareDefinition}
       wellFill={wellFill}
       wellLabelOption="SHOW_LABEL_INSIDE"
       highlightedWells={
-        selectedValue != null
-          ? getWellGroupForLiquidId(labwareInfo, selectedValue)
+        selectedLiquidId != null
+          ? getWellGroupForLiquidId(labwareInfo, selectedLiquidId)
           : {}
       }
       disabledWells={getDisabledWellGroupForLiquidId(
@@ -106,45 +89,14 @@ export const LabwareLiquidsDetailModal = (
       )}
     />
   )
-  const liquidCard = filteredLiquidsInLoadOrder.map(liquid => {
-    const labwareInfoEntry = Object.entries(labwareInfo).find(
-      entry => entry[0] === liquid.id
-    )
-    return (
-      labwareInfoEntry != null && (
-        <Flex
-          width="100%"
-          key={liquid.id}
-          ref={selectedValue === liquid.id ? currentLiquidRef : undefined}
-        >
-          <LiquidDetailCard
-            {...liquid}
-            liquidId={liquid.id}
-            volumeByWell={labwareInfoEntry[1][0].volumeByWell}
-            labwareWellOrdering={labwareWellOrdering}
-            setSelectedValue={setSelectedValue}
-            selectedValue={selectedValue}
-          />
-        </Flex>
-      )
-    )
-  })
-  let title: JSX.Element | string = labwareDisplayName
-  if (stackPosition != null) {
-    title = (
-      <>
-        <Tag type="default" text={stackPosition.toString()} />
-        {labwareDisplayName}
-      </>
-    )
-  }
 
   return (
     <OddModal
       modalSize="large"
       onOutsideClick={closeModal}
       header={{
-        title: title,
+        title: labwareDisplayName,
+        tagText: stackPosition != null ? stackPosition.toString() : undefined,
         hasExitIcon: true,
         onClick: closeModal,
       }}
@@ -157,16 +109,13 @@ export const LabwareLiquidsDetailModal = (
             {labwareRender}
           </LabwareThumbnail>
         </Flex>
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          height="23.70375rem"
-          css={HIDE_SCROLLBAR}
-          minWidth="10.313rem"
-          overflowY="scroll"
-          gridGap={SPACING.spacing16}
-        >
-          {liquidCard}
-        </Flex>
+        <LiquidCardList
+          liquidsInLoadOrder={filteredLiquidsInLoadOrder}
+          liquidsByIdForLabware={labwareByLiquidId}
+          selectedLiquidId={selectedLiquidId}
+          setSelectedLiquidId={setSelectedLiquidId}
+          selectedLabwareDefinition={labwareDefinition}
+        />
       </Flex>
     </OddModal>
   )

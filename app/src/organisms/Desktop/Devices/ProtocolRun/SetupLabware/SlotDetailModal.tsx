@@ -1,10 +1,9 @@
-import { useRef, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import {
   Box,
   getWellFillFromLabwareId,
-  truncateString,
   COLORS,
   DIRECTION_COLUMN,
   ALIGN_CENTER,
@@ -15,7 +14,6 @@ import {
   DeckInfoLabel,
   Tag,
   StyledText,
-  RadioButton,
   TYPOGRAPHY,
   Modal,
   JUSTIFY_CENTER,
@@ -25,19 +23,17 @@ import {
   parseLiquidsInLoadOrder,
 } from '@opentrons/shared-data'
 
-import { LiquidDetailCard } from '/app/organisms/LiquidDetailCard'
+import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
+import { LabwareStackButtonGroup } from '/app/molecules/LabwareStackButtonGroup'
 import {
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
   getDisabledWellGroupForLiquidId,
 } from '/app/transformations/analysis'
 
-import type { Dispatch, SetStateAction } from 'react'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
-  LabwareDefinition2,
-  ParsedLiquid,
 } from '@opentrons/shared-data'
 import type { LabwareByLiquidId } from '@opentrons/components/'
 import type { StackItem, LabwareInStack } from '/app/transformations/commands'
@@ -49,16 +45,7 @@ interface SlotDetailModalProps {
   labwareByLiquidId: LabwareByLiquidId
   mostRecentAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 }
-const MAX_CHARS_FOR_DISPLAY_NAME = 30
 
-const HIDE_SCROLLBAR = css`
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`
-const WORD_BREAK = css`
-  word-break: keep-all;
-`
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
   flex-shrink: 0;
@@ -191,66 +178,16 @@ export const SlotDetailModal = (
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           {isVariedStack ? (
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
+            <LabwareStackButtonGroup
+              labwareInStack={labwareInStack}
+              selectedLabware={selectedLabware}
+              setSelectedLabware={setSelectedLabware}
               height="26rem"
-              css={HIDE_SCROLLBAR}
-              overflowY="scroll"
-              minWidth="11.688rem"
-              maxWidth="11.688rem"
-              gridGap={SPACING.spacing8}
-            >
-              <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                {t('top_of_slot')}
-              </StyledText>
-              {labwareInStack.map((labware, index) => {
-                const isSelected =
-                  selectedLabware.labwareId === labware.labwareId
-                const label = (
-                  <Flex
-                    gridGap={SPACING.spacing16}
-                    alignItems={ALIGN_CENTER}
-                    css={WORD_BREAK}
-                  >
-                    <Tag
-                      type={isSelected ? 'onColor' : 'default'}
-                      text={(labwareInStack.length - index).toString()}
-                    />
-                    <StyledText
-                      desktopStyle="bodyDefaultRegular"
-                      wordBreak="keep-all"
-                    >
-                      {truncateString(
-                        labware.displayName,
-                        MAX_CHARS_FOR_DISPLAY_NAME
-                      )}
-                    </StyledText>
-                  </Flex>
-                )
-                return (
-                  <RadioButton
-                    key={index}
-                    radioButtonType="small"
-                    buttonLabel={label}
-                    buttonValue={index}
-                    isSelected={isSelected}
-                    maxLines={2}
-                    onChange={() => {
-                      setSelectedLabware(labware)
-                    }}
-                    largeDesktopBorderRadius
-                  />
-                )
-              })}
-              <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
-                {t('bottom_of_slot')}
-              </StyledText>
-            </Flex>
+            />
           ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            width="100%"
-            maxHeight="27rem"
+            height="26rem"
             gridGap={SPACING.spacing16}
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
@@ -293,66 +230,5 @@ export const SlotDetailModal = (
         </Flex>
       </Box>
     </Modal>
-  )
-}
-
-interface LiquidCardListProps {
-  selectedLabwareDefinition: LabwareDefinition2
-  selectedLiquidId: string
-  setSelectedLiquidId: Dispatch<SetStateAction<string | undefined>>
-  liquidsInLoadOrder: ParsedLiquid[]
-  liquidsByIdForLabware: LabwareByLiquidId
-}
-
-export const LiquidCardList = (props: LiquidCardListProps): JSX.Element => {
-  const {
-    selectedLabwareDefinition,
-    selectedLiquidId,
-    setSelectedLiquidId,
-    liquidsInLoadOrder,
-    liquidsByIdForLabware,
-  } = props
-  const currentLiquidRef = useRef<HTMLDivElement>(null)
-
-  const scrollToCurrentItem = (): void => {
-    currentLiquidRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-  useEffect(() => {
-    scrollToCurrentItem()
-  }, [])
-  const liquidCardList = liquidsInLoadOrder.map(liquid => {
-    const labwareInfoEntry = Object.entries(liquidsByIdForLabware).find(
-      entry => entry[0] === liquid.id
-    )
-    return (
-      labwareInfoEntry != null && (
-        <Flex
-          key={liquid.id}
-          ref={selectedLiquidId === liquid.id ? currentLiquidRef : undefined}
-        >
-          <LiquidDetailCard
-            {...liquid}
-            liquidId={liquid.id}
-            volumeByWell={labwareInfoEntry[1][0].volumeByWell}
-            labwareWellOrdering={selectedLabwareDefinition.ordering}
-            setSelectedValue={setSelectedLiquidId}
-            selectedValue={selectedLiquidId}
-          />
-        </Flex>
-      )
-    )
-  })
-
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      height="26rem"
-      overflowY="auto"
-      css={HIDE_SCROLLBAR}
-      minWidth="10.313rem"
-      gridGap={SPACING.spacing8}
-    >
-      {liquidCardList}
-    </Flex>
   )
 }

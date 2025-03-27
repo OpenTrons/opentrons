@@ -4,6 +4,7 @@ import {
   COLORS,
   DIRECTION_ROW,
   Flex,
+  Tag,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
@@ -18,6 +19,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
     hasExitIcon,
     iconName,
     iconColor,
+    tagText,
     onClick,
     ...styleProps
   } = props
@@ -44,6 +46,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
             alignSelf={ALIGN_CENTER}
           />
         ) : null}
+        {tagText != null ? <Tag type="default" text={tagText} /> : null}
         <LegacyStyledText
           fontWeight={TYPOGRAPHY.fontWeightBold}
           fontSize={TYPOGRAPHY.fontSize28}

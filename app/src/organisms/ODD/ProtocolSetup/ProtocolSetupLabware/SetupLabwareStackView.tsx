@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import {
   DeckInfoLabel,
   Tag,
   StyledText,
-  RadioButton,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -23,6 +22,7 @@ import {
 import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { LabwareStackButtonGroup } from '/app/molecules/LabwareStackButtonGroup'
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareByLiquidId } from '@opentrons/components'
@@ -32,14 +32,6 @@ const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
   width: 34rem;
   flex-shrink: 0;
-`
-const HIDE_SCROLLBAR = css`
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`
-const RADIO_BUTTON = css`
-  word-break: keep-all;
 `
 
 const MAX_CHARS_FOR_DISPLAY_NAME = 44
@@ -76,6 +68,10 @@ export function SetupLabwareStackView({
     false
   )
   const [selectedLabware, setSelectedLabware] = useState(labwareInStack[0])
+  const selectedLabwareStackPosition =
+    labwareInStack.length -
+    labwareInStack.findIndex(lw => lw.labwareId === selectedLabware.labwareId)
+
   const wellFill = getWellFillFromLabwareId(
     selectedLabware.labwareId,
     mostRecentAnalysis?.liquids ?? [],
@@ -96,6 +92,9 @@ export function SetupLabwareStackView({
           closeModal={() => {
             setShowLiquidDetailsModal(false)
           }}
+          stackPosition={
+            isVariedStack ? selectedLabwareStackPosition : undefined
+          }
         />
       ) : null}
       <Flex
@@ -108,14 +107,12 @@ export function SetupLabwareStackView({
           alignItems={ALIGN_CENTER}
         >
           <ODDBackButton onClick={onClickBack} />
-          {slotName !== 'offDeck' ? (
-            <StyledText
-              oddStyle="level2HeaderBold"
-              marginRight={SPACING.spacing16}
-            >
-              {t('labware_in')}
-            </StyledText>
-          ) : null}
+          <StyledText
+            oddStyle="level2HeaderBold"
+            marginRight={SPACING.spacing16}
+          >
+            {t('labware_in')}
+          </StyledText>
           <DeckInfoLabel
             deckLabel={
               slotName === 'offDeck'
@@ -138,55 +135,11 @@ export function SetupLabwareStackView({
         gridGap={SPACING.spacing40}
       >
         {isVariedStack ? (
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            height="27rem"
-            css={HIDE_SCROLLBAR}
-            overflowY="scroll"
-            width="350px"
-            gridGap={SPACING.spacing8}
-          >
-            <StyledText oddStyle="smallBodyTextRegular" color={COLORS.grey60}>
-              {t('top_of_slot')}
-            </StyledText>
-            {labwareInStack.map((labware, index) => {
-              const isSelected = selectedLabware.labwareId === labware.labwareId
-              const label = (
-                <Flex
-                  gridGap={SPACING.spacing16}
-                  alignItems={ALIGN_CENTER}
-                  css={RADIO_BUTTON}
-                >
-                  <Tag
-                    type={isSelected ? 'onColor' : 'default'}
-                    text={(labwareInStack.length - index).toString()}
-                  />
-                  <StyledText oddStyle="bodyTextRegular" wordBreak="keep-all">
-                    {truncateString(
-                      labware.displayName,
-                      MAX_CHARS_FOR_DISPLAY_NAME
-                    )}
-                  </StyledText>
-                </Flex>
-              )
-              return (
-                <RadioButton
-                  key={index}
-                  radioButtonType="small"
-                  buttonLabel={label}
-                  buttonValue={index}
-                  isSelected={isSelected}
-                  maxLines={2}
-                  onChange={() => {
-                    setSelectedLabware(labware)
-                  }}
-                />
-              )
-            })}
-            <StyledText oddStyle="smallBodyTextRegular" color={COLORS.grey60}>
-              {t('bottom_of_slot')}
-            </StyledText>
-          </Flex>
+          <LabwareStackButtonGroup
+            labwareInStack={labwareInStack}
+            selectedLabware={selectedLabware}
+            setSelectedLabware={setSelectedLabware}
+          />
         ) : null}
         <Flex
           flexDirection={DIRECTION_COLUMN}
