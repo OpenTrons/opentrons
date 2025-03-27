@@ -24,7 +24,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { LiquidCardList } from '/app/molecules/LiquidDetailCard'
-import { LabwareStackButtonGroup } from '/app/molecules/LabwareStackButtonGroup'
+import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import {
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
@@ -178,7 +178,7 @@ export const SlotDetailModal = (
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
           {isVariedStack ? (
-            <LabwareStackButtonGroup
+            <LabwareStackContents
               labwareInStack={labwareInStack}
               selectedLabware={selectedLabware}
               setSelectedLabware={setSelectedLabware}

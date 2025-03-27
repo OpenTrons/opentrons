@@ -2,12 +2,10 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import {
-  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
   StyledText,
-  Tag,
   RadioButton,
   truncateString,
   SPACING,
@@ -24,21 +22,18 @@ const HIDE_SCROLLBAR = css`
     display: none;
   }
 `
-const RADIO_BUTTON = css`
-  word-break: keep-all;
-`
 
 const MAX_CHARS_FOR_DISPLAY_NAME_ODD = 44
 const MAX_CHARS_FOR_DISPLAY_NAME_DESKTOP = 30
 
-interface LabwareStackButtonGroupProps extends StyleProps {
+interface LabwareStackContentsProps extends StyleProps {
   labwareInStack: LabwareInStack[]
   selectedLabware: LabwareInStack
   setSelectedLabware: Dispatch<SetStateAction<LabwareInStack>>
 }
 
-export function LabwareStackButtonGroup(
-  props: LabwareStackButtonGroupProps
+export function LabwareStackContents(
+  props: LabwareStackContentsProps
 ): JSX.Element {
   const { labwareInStack, selectedLabware, setSelectedLabware } = props
   const isOnDevice = useSelector(getIsOnDevice)
@@ -65,32 +60,14 @@ export function LabwareStackButtonGroup(
       </StyledText>
       {labwareInStack.map((labware, index) => {
         const isSelected = selectedLabware.labwareId === labware.labwareId
-        const label = (
-          <Flex
-            gridGap={SPACING.spacing16}
-            alignItems={ALIGN_CENTER}
-            css={RADIO_BUTTON}
-          >
-            <Tag
-              type={isSelected ? 'onColor' : 'default'}
-              text={(labwareInStack.length - index).toString()}
-            />
-            <StyledText
-              oddStyle="bodyTextRegular"
-              desktopStyle="bodyDefaultRegular"
-              wordBreak="keep-all"
-            >
-              {truncateString(labware.displayName, MAX_CHARS)}
-            </StyledText>
-          </Flex>
-        )
         return (
           <RadioButton
             key={index}
             radioButtonType="small"
-            buttonLabel={label}
+            buttonLabel={truncateString(labware.displayName, MAX_CHARS)}
             buttonValue={index}
             isSelected={isSelected}
+            tagText={(labwareInStack.length - index).toString()}
             maxLines={2}
             onChange={() => {
               setSelectedLabware(labware)

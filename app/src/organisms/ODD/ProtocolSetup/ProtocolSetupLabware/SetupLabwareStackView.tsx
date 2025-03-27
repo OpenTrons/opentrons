@@ -22,7 +22,7 @@ import {
 import { getAllDefinitions } from '@opentrons/shared-data'
 
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
-import { LabwareStackButtonGroup } from '/app/molecules/LabwareStackButtonGroup'
+import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { LabwareByLiquidId } from '@opentrons/components'
@@ -135,7 +135,7 @@ export function SetupLabwareStackView({
         gridGap={SPACING.spacing40}
       >
         {isVariedStack ? (
-          <LabwareStackButtonGroup
+          <LabwareStackContents
             labwareInStack={labwareInStack}
             selectedLabware={selectedLabware}
             setSelectedLabware={setSelectedLabware}
