@@ -1,15 +1,9 @@
 """Test Flex Stacker unsafe manual retrieve command implementation."""
 
-from datetime import datetime
-
 import pytest
-from decoy import Decoy, matchers
+from decoy import Decoy
 
-from opentrons.drivers.flex_stacker.types import StackerAxis
 from opentrons.hardware_control.modules import FlexStacker
-from opentrons.protocol_engine.commands.flex_stacker.common import (
-    FlexStackerStallOrCollisionError,
-)
 from opentrons.protocol_engine.resources import ModelUtils
 
 from opentrons.protocol_engine.state.state import StateView
@@ -26,7 +20,7 @@ from opentrons.protocol_engine.state.module_substates import (
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import unsafe
-from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.unsafe.unsafe_manual_retrieve import (
     UnsafeManualRetrieveImpl,
 )
@@ -717,7 +711,6 @@ async def test_manual_retrieve_fails_due_to_platform_state(
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should raise a CannotPerformModuleAction error."""
-
     data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
     loaded_labware = LoadedLabware(
         id="labware-id",
@@ -768,4 +761,4 @@ async def test_manual_retrieve_fails_due_to_platform_state(
         CannotPerformModuleAction,
         match="Cannot manually retrieve a labware from Flex Stacker if the carriage is not in gripper position.",
     ):
-        result = await subject.execute(data)
+        await subject.execute(data)
