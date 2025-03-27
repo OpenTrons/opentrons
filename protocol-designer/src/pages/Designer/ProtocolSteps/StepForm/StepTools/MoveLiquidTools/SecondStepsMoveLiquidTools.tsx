@@ -285,11 +285,7 @@ export const SecondStepsMoveLiquidTools = ({
               ? dispenseMixDisabledTooltipText
               : propsForFields.aspirate_mix_checkbox.tooltipContent
           }
-          disabled={
-            tab === 'dispense'
-              ? isDestinationTrash || formData.path === 'multiDispense'
-              : formData.path === 'multiAspirate'
-          }
+          disabled={propsForFields[`${tab}_mix_checkbox`].disabled}
         >
           {formData[`${tab}_mix_checkbox`] === true ? (
             <Flex
@@ -396,10 +392,7 @@ export const SecondStepsMoveLiquidTools = ({
             isChecked={propsForFields.blowout_checkbox.value === true}
             checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
             tooltipText={propsForFields.blowout_checkbox.tooltipContent}
-            disabled={
-              formData.path === 'multiDispense' &&
-              formData.disposalVolume_checkbox
-            }
+            disabled={propsForFields.blowout_checkbox.disabled}
           >
             {formData.blowout_checkbox === true ? (
               <Flex
