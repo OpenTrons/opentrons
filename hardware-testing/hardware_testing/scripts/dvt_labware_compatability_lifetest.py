@@ -32,7 +32,7 @@ test_data = {
     "labware": None,
     "plate_num": None,
     "Error": None,
-}
+} 
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -62,6 +62,7 @@ def add_parameters(parameters: ParameterContext) -> None:
             {
                 "display_name": "NEST 96 Deep Well Plates",
                 "value": "nest_96_wellplate_2ml_deep",
+    
             },
             {
                 "display_name": "NEST 96 Flat Bottom Plates",
@@ -158,13 +159,13 @@ def run(protocol: ProtocolContext) -> None:
             globals()[f"f_stacker_{stacker_num}"].set_stored_labware(
                 load_name=labware_name,
                 count=0,  # always zero so we can store the labware
-                lid=tiprack_lid,
+                lid=tiprack_lid if "opentrons_flex_96_tiprack" in labware_name else None, 
             )
         else:
             globals()[f"f_stacker_{stacker_num}"].set_stored_labware(
                 load_name=labware_name,
                 count=labware_count,
-                lid=tiprack_lid,
+                lid=tiprack_lid if "opentrons_flex_96_tiprack" in labware_name else None,
             )
 
         SNs.append(globals()[f"f_stacker_{stacker_num}"]._core.get_serial_number())
