@@ -21,8 +21,6 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   IDENTITY_VECTOR,
   THERMOCYCLER_MODULE_TYPE,
-  getVectorDifference,
-  getVectorSum,
 } from '@opentrons/shared-data'
 import { useSelector } from 'react-redux'
 import { getLabwareDef } from './utils/labware'

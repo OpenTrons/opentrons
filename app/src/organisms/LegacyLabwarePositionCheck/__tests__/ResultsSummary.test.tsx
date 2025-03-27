@@ -5,7 +5,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { ResultsSummary } from '../ResultsSummary'
 import { SECTIONS } from '../constants'
-import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import {
   mockCompletedAnalysis,
   mockExistingOffsets,
