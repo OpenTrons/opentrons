@@ -17,9 +17,11 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const mockInvariantContext: InvariantContext = {
   moduleEntities: {},
   liquidEntities: {},
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {},
+  stagingAreaEntities: {},
+  gripperEntities: {},
+  trashBinEntities: {
     mockTrashBin: {
-      name: 'trashBin',
       id: 'mockTrashBin',
       location: 'cutoutA3',
       pythonName: 'mock_trash_bin_1',
@@ -100,9 +102,10 @@ const mockRobotState: TimelineFrame = {
         A1: {},
       },
     },
-    additionalEquipment: {
+    trashBins: {
       mockTrashBin: {},
     },
+    wasteChute: {},
   },
 }
 

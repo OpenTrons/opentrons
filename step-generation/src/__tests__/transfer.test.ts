@@ -110,9 +110,9 @@ describe('pick up tip if no tip on pipette', () => {
   it('...once, drop tip in waste chute', () => {
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         wasteChuteId: {
-          name: 'wasteChute',
+          pythonName: 'waste_chute',
           id: 'wasteChuteId',
           location: 'cutoutD3',
         },
@@ -241,15 +241,15 @@ test('single transfer: 1 source & 1 dest with waste chute', () => {
 
   invariantContext = {
     ...invariantContext,
-    additionalEquipmentEntities: {
+    wasteChuteEntities: {
       mockWasteChuteId: {
-        name: 'wasteChute',
+        pythonName: 'waste_chute',
         id: mockWasteChuteId,
         location: WASTE_CHUTE_CUTOUT,
       },
     },
   }
-  robotStateWithTip.liquidState.additionalEquipment.mockWasteChuteId = {
+  robotStateWithTip.liquidState.wasteChute.mockWasteChuteId = {
     '0': { volume: 200 },
   }
   robotStateWithTip.liquidState.labware.sourcePlateId.A1 = {

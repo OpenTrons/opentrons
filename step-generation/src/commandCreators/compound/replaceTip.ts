@@ -98,10 +98,10 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const labwareDef =
     invariantContext.labwareEntities[nextTiprack.tiprackId]?.def
 
-  const dropTipEntity =
-    invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  const isWasteChute = dropTipEntity?.name === 'wasteChute'
-  const isTrashBin = dropTipEntity?.name === 'trashBin'
+  const isWasteChute =
+    invariantContext.wasteChuteEntities[args.dropTipLocation] != null
+  const isTrashBin =
+    invariantContext.trashBinEntities[args.dropTipLocation] != null
 
   if (!labwareDef) {
     return {
@@ -113,10 +113,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
-  if (
-    !args.dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[args.dropTipLocation]
-  ) {
+  if (!args.dropTipLocation || (!isWasteChute && !isTrashBin)) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }
 
@@ -211,7 +208,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     commandCreators = [
       curryCommandCreator(dropTipInWasteChute, {
         pipetteId: args.pipette,
-        wasteChuteId: dropTipEntity.id,
+        wasteChuteId:
+          invariantContext.wasteChuteEntities[args.dropTipLocation].id,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {
@@ -226,7 +224,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     commandCreators = [
       curryCommandCreator(dropTipInTrash, {
         pipetteId: pipette,
-        trashLocation: dropTipEntity.location as CutoutId,
+        trashLocation: invariantContext.trashBinEntities[args.dropTipLocation]
+          .location as CutoutId,
       }),
       ...configureNozzleLayoutCommand,
       curryCommandCreator(pickUpTip, {

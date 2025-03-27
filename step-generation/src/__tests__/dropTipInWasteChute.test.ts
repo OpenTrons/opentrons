@@ -11,9 +11,8 @@ const mockWasteChuteId = 'mockWasteChuteId'
 
 const invariantContext: InvariantContext = {
   ...makeContext(),
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {
     [mockWasteChuteId]: {
-      name: 'wasteChute' as const,
       location: WASTE_CHUTE_CUTOUT,
       id: mockWasteChuteId,
       pythonName: 'mock_waste_chute_1',

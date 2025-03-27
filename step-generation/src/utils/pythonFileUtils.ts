@@ -12,7 +12,6 @@ import {
   PROTOCOL_CONTEXT_NAME,
 } from './pythonFormat'
 import type {
-  AdditionalEquipmentEntities,
   LabwareEntities,
   LabwareLiquidState,
   LiquidEntities,
@@ -20,6 +19,8 @@ import type {
   PipetteEntities,
   Timeline,
   TimelineFrame,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '../types'
 import type {
   CutoutId,
@@ -291,11 +292,8 @@ export function getLoadLiquids(
   return pythonLoadLiquids ? `# Load Liquids:\n${pythonLoadLiquids}` : ''
 }
 
-export function getLoadTrashBins(
-  additionalEquipmentEntities: AdditionalEquipmentEntities
-): string {
-  const pythonLoadTrashBins = Object.values(additionalEquipmentEntities)
-    .filter(ae => ae.name === 'trashBin')
+export function getLoadTrashBins(trashBinEntities: TrashBinEntities): string {
+  const pythonLoadTrashBins = Object.values(trashBinEntities)
     ?.map(trashBin => {
       const location = formatPyStr(
         getCutoutDisplayName(trashBin.location as CutoutId)
@@ -308,14 +306,12 @@ export function getLoadTrashBins(
 }
 
 export function getLoadWasteChute(
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities
 ): string {
-  const pythonLoadWasteChute = Object.values(additionalEquipmentEntities)
-    .filter(ae => ae.name === 'wasteChute')
-    ?.map(
-      wasteChute =>
-        `${wasteChute.pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_waste_chute()`
-    )
+  const pythonLoadWasteChute = Object.values(wasteChuteEntities)?.map(
+    wasteChute =>
+      `${wasteChute.pythonName} = ${PROTOCOL_CONTEXT_NAME}.load_waste_chute()`
+  )
 
   return pythonLoadWasteChute.length > 0
     ? `# Load Waste Chute:\n${pythonLoadWasteChute}`

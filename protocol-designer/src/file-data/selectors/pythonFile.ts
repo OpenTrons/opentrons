@@ -34,7 +34,8 @@ export function pythonDefRun(
     labwareEntities,
     pipetteEntities,
     liquidEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
   } = invariantContext
   const { modules, labware, pipettes } = robotState
   const sections: string[] = [
@@ -49,8 +50,8 @@ export function pythonDefRun(
     getLoadPipettes(pipetteEntities, labwareEntities, pipettes),
     ...(robotType === FLEX_ROBOT_TYPE
       ? [
-          getLoadTrashBins(additionalEquipmentEntities),
-          getLoadWasteChute(additionalEquipmentEntities),
+          getLoadTrashBins(trashBinEntities),
+          getLoadWasteChute(wasteChuteEntities),
         ]
       : []),
     getDefineLiquids(liquidEntities),

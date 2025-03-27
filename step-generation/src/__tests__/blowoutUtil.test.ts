@@ -76,11 +76,11 @@ describe('blowoutLocationHelper', () => {
     const wasteChuteId = 'wasteChuteId'
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         [wasteChuteId]: {
           id: wasteChuteId,
-          name: 'wasteChute',
           location: 'cutoutD3',
+          pythonName: 'mockPythonName',
         },
       },
     }

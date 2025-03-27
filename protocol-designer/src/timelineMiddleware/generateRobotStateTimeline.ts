@@ -67,11 +67,10 @@ export const generateRobotStateTimeline = (
           'changeTip' in nextStepArgsForPipette &&
           nextStepArgsForPipette.changeTip === 'never'
 
-        const dropTipEntity =
-          invariantContext.additionalEquipmentEntities[dropTipLocation]
-        const isWasteChute = dropTipEntity?.name === 'wasteChute'
-        const isTrashBin = dropTipEntity?.name === 'trashBin'
-
+        const isWasteChute =
+          invariantContext.wasteChuteEntities[dropTipLocation] != null
+        const isTrashBin =
+          invariantContext.trashBinEntities[dropTipLocation] != null
         let dropTipCommands = [
           curryCommandCreator(dropTip, {
             pipette: pipetteId,
@@ -82,12 +81,15 @@ export const generateRobotStateTimeline = (
           dropTipCommands = [
             curryCommandCreator(dropTipInWasteChute, {
               pipetteId,
-              wasteChuteId: dropTipEntity.id,
+              wasteChuteId:
+                invariantContext.wasteChuteEntities[dropTipLocation].id,
             }),
           ]
         }
+
         if (isTrashBin) {
-          const trashLocation = dropTipEntity.location
+          const trashLocation =
+            invariantContext.trashBinEntities[dropTipLocation].location
           dropTipCommands = [
             curryCommandCreator(dropTipInTrash, {
               pipetteId,
@@ -95,6 +97,7 @@ export const generateRobotStateTimeline = (
             }),
           ]
         }
+
         if (!willReuseTip) {
           return [
             ...acc,
@@ -117,5 +120,6 @@ export const generateRobotStateTimeline = (
     invariantContext,
     initialRobotState
   )
+
   return timeline
 }
