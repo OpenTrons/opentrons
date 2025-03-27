@@ -70,6 +70,8 @@ export function LPCSetupFlexBtns({
       return t('add_missing_labware_offsets')
     } else if (offsetsConfirmed) {
       return t('offsets_already_applied')
+    } else if (lpcDisabledReason != null) {
+      return lpcDisabledReason
     } else if (!anyOffsetsToLpc) {
       return t('no_offsets_found')
     } else {
