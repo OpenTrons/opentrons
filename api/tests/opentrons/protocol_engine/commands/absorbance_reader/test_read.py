@@ -1,4 +1,5 @@
 """Test absorbance reader initilize command."""
+
 import math
 from typing import Dict, List, Optional
 import pytest
@@ -39,7 +40,7 @@ def _get_absorbance_map(data: Optional[List[float]] = None) -> Dict[str, float]:
         col = (i % 12) + 1  # Convert index to column (1-12)
         well_key = f"{row}{col}"
         # Truncate the value to the third decimal place
-        well_map[well_key] = math.floor(value * 1000) / 1000
+        well_map[well_key] = max(math.floor(value * 1000) / 1000, 0)
     return well_map
 
 
@@ -134,7 +135,7 @@ async def test_convert_absorbance_reader_data_points() -> None:
     assert converted["A1"] == 0.0
     assert converted["A2"] == 1.348
     assert converted["E1"] == 0.11
-    assert converted["H11"] == -0.001
+    assert converted["H11"] == 0.0  # tests the clamp-to-0 behaviora
     assert converted["H12"] == 0.248  # the data is flipped, so arr[0] == H12
 
     # Test invalid data len 1
