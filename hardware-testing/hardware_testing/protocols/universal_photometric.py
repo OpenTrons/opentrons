@@ -8,6 +8,8 @@ from opentrons_shared_data.load import get_shared_data_root
 metadata = {"protocolName": "96ch Universal Photometric Protocol"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
+DYE_RESERVOIR_DEAD_VOLUME = 10000  # 10k uL
+
 
 def add_parameters(parameters: protocol_api.ParameterContext) -> None:
     """Add test parameters."""
@@ -232,7 +234,7 @@ def _get_height_after_liquid_handling(
             labware_id=labware_id,
             well_name=well_name,
             initial_height=height_before,
-            volume=volume * 96,
+            volume=volume,
         )
     except InvalidLiquidHeightFound:
         raise ValueError(f"called with height before = {height_before} vol = {volume}")
@@ -321,6 +323,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         location="D3",
         version=plate_labware_version,
     )
+    diluent = ctx.define_liquid(
+        name="Diluent",
+        description="Food Coloring",
+        display_color="#FE0000",
+    )
+    diluent_volume = plate.max_volume - ctx.params.target_volume  # type: ignore [attr-defined]
+    dye_source["A1"].load_liquid(diluent, diluent_volume)  # type: ignore [attr-defined]
 
     def _validate_dye_liquid_height() -> float:
 
@@ -328,7 +337,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         retrying = False
         nonlocal dye_source
         while not liquid_height_valid:
-            # liquid probe and make sure there is enough volume for all 5 trials
+            # liquid probe and make sure there is enough volume for all trials
             if ctx.params.lld or retrying:  # type: ignore [attr-defined]
                 # if this detects no liquid, the protocol will exit
                 # if it detects liquid that is lower than expected, it will let you
@@ -344,7 +353,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 96
                 * ctx.params.cycles  # type: ignore [attr-defined]
                 * ctx.params.target_volume  # type: ignore [attr-defined]
-            )
+            ) + DYE_RESERVOIR_DEAD_VOLUME
             # note: want to acct for needed dead volume here
             if actual_starting_dye_volume > needed_starting_dye_volume:
                 liquid_height_valid = True
@@ -377,7 +386,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             _get_height_after_liquid_handling(
                 labware=dye_source,
                 height_before=source_liquid_height,
-                volume=-ctx.params.target_volume,  # type: ignore [attr-defined]
+                volume=-(ctx.params.target_volume * 96),  # type: ignore [attr-defined]
             )
             - ctx.params.asp_sub_depth  # type: ignore [attr-defined]
         )
@@ -416,10 +425,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         # Pause after aspiration
         if ctx.params.pause_after_asp:  # type: ignore [attr-defined]
             ctx.pause("Visually inspect for dropouts.")
-
+        plate_starting_liquid_height = max(
+            _get_well_height_at_volume(labware=plate, volume=diluent_volume), 0.1
+        )
         dispense_pos = _get_height_after_liquid_handling(
             labware=plate,
-            height_before=1,  # note: this is due to a real bug in frustum_helpers I gotta fix
+            height_before=plate_starting_liquid_height,
             volume=ctx.params.target_volume,  # type: ignore [attr-defined]
         )
         # note: would probably be good to add a needed dead volume in this comparison
