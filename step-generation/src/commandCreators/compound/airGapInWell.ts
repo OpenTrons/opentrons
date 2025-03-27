@@ -1,8 +1,4 @@
-import {
-  curryCommandCreator,
-  curryWithoutPython,
-  reduceCommandCreators,
-} from '../../utils'
+import { curryWithoutPython, reduceCommandCreators } from '../../utils'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import { airGapInPlace, moveToWell, prepareToAspirate } from '../atomic'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
