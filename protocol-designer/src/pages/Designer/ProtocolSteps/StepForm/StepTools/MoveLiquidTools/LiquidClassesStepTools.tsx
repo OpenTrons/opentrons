@@ -8,25 +8,51 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { getSortedLiquidClassDefs } from '@opentrons/shared-data'
+import {
+  getDisabledLiquidClasses,
+  getSortedLiquidClassDefs,
+  isFlexPipette,
+} from '@opentrons/shared-data'
+import { selectors as stepFormSelectors } from '../../../../../../step-forms'
 import { getLiquidEntities } from '../../../../../../step-forms/selectors'
 import { getLiquidClassDisplayName } from '../../../../../../liquid-defs/utils'
-
+import { getFlexNameConversion } from '../../../../../../file-data/selectors/utils'
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { LiquidClassesOption } from '@opentrons/shared-data'
 import type { FieldPropsByName } from '../../types'
+import type { FormData } from '../../../../../../form-types'
 
 interface LiquidClassesStepToolsProps {
   propsForFields: FieldPropsByName
+  formData: FormData
   setShowFormErrors?: Dispatch<SetStateAction<boolean>>
 }
 export const LiquidClassesStepTools = ({
   propsForFields,
+  formData,
   setShowFormErrors,
 }: LiquidClassesStepToolsProps): JSX.Element => {
   const { t } = useTranslation(['liquids'])
   const liquids = useSelector(getLiquidEntities)
+  const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
+  const pipetteName = pipetteEntities[formData.pipette]?.name
+  const pipetteSpec = pipetteEntities[formData.pipette]?.spec
+  const pipetteModel =
+    isFlexPipette(pipetteName) === true
+      ? getFlexNameConversion(pipetteSpec)
+      : pipetteName
 
+  const { volume, tipRack, pipette, path } = formData
+  const disabledLiquidClasses = getDisabledLiquidClasses(
+    {
+      volume,
+      tipRack,
+      pipette,
+      path,
+    },
+    pipetteModel
+  )
   const liquidClassToLiquidsMap: Record<string, string[]> = {}
   Object.values(liquids).forEach(({ displayName, liquidClass }) => {
     if (liquidClass !== undefined) {
@@ -118,6 +144,7 @@ export const LiquidClassesStepTools = ({
                 align: 'vertical',
               }}
               largeDesktopBorderRadius
+              disabled={disabledLiquidClasses?.has(name as LiquidClassesOption)}
             />
           )
         })}

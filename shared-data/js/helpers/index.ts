@@ -1,6 +1,9 @@
 import uniq from 'lodash/uniq'
 
-import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
+import {
+  MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME,
+  OPENTRONS_LABWARE_NAMESPACE,
+} from '../constants'
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
 import type {
@@ -8,6 +11,7 @@ import type {
   LabwareDefinition2,
   LabwareDefinition3,
   LiquidClass,
+  LiquidClassesOption,
   ModuleModel,
   RobotType,
   ThermalAdapterName,
@@ -453,4 +457,65 @@ export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
       valueA.displayName.localeCompare(valueB.displayName)
     )
   )
+}
+
+export const getIncompatibleLiquidClasses = (
+  pipetteModel: string,
+  additionalFilter?: (p: any) => boolean | null
+): LiquidClassesOption[] => {
+  const liquidClassDefs = getAllLiquidClassDefs()
+
+  return Object.values(liquidClassDefs)
+    .filter(
+      liquidClass =>
+        !liquidClass.byPipette?.some(
+          p =>
+            p.pipetteModel === pipetteModel &&
+            (additionalFilter != null ? additionalFilter(p) : true)
+        )
+    )
+    .map(liquidClass => liquidClass.displayName)
+}
+
+export interface ValuesForLiquidClasses {
+  path?: string | null
+  volume?: number | null
+  tipRack?: string | null
+  pipette?: string | null
+}
+export const getDisabledLiquidClasses = (
+  values: ValuesForLiquidClasses,
+  pipetteModel: string
+): Set<LiquidClassesOption> | null => {
+  const { volume, tipRack, pipette, path } = values
+  if (pipette == null) return null
+  const disabledLiquidClasses = new Set<LiquidClassesOption>()
+
+  if (volume != null && volume <= MIN_LIQUID_CLASSES_COMPATIBLE_VOLUME) {
+    disabledLiquidClasses.add('Aqueous')
+    disabledLiquidClasses.add('Viscous')
+    disabledLiquidClasses.add('Volatile')
+  }
+
+  const incompatibleLiquidClasses = [
+    ...getIncompatibleLiquidClasses(pipetteModel),
+    ...getIncompatibleLiquidClasses(pipetteModel, p =>
+      p.byTipType.some((t: { tiprack: string }) => t.tiprack === tipRack)
+    ),
+  ]
+
+  if (path === 'multiDispense') {
+    incompatibleLiquidClasses.push(
+      ...getIncompatibleLiquidClasses(pipetteModel, p =>
+        p.byTipType.some(
+          (t: { tiprack: string; multiDispense?: any }) =>
+            t.tiprack === tipRack && t.multiDispense !== undefined
+        )
+      )
+    )
+  }
+
+  incompatibleLiquidClasses.forEach(cls => disabledLiquidClasses.add(cls))
+
+  return disabledLiquidClasses.size > 0 ? disabledLiquidClasses : null
 }

@@ -40,6 +40,7 @@ import type { PipetteName } from './pipettes'
 import type { CommandAnnotation } from '../commandAnnotation/types'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
+export type LiquidClassesOption = 'Aqueous' | 'Viscous' | 'Volatile'
 
 export interface RobotDefinition {
   displayName: string
@@ -810,7 +811,7 @@ interface ByPipetteSetting {
 }
 export interface LiquidClass {
   liquidClassName: string
-  displayName: string
+  displayName: LiquidClassesOption
   description: string
   schemaVersion: number
   namespace: string

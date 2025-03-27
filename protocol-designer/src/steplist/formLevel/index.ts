@@ -68,6 +68,9 @@ import {
   minDispenseAirGapVolume,
   mixTipPositionInTube,
   tipPositionInTube,
+  lowVolumeTransfer,
+  incompatiblePipetteTiprack,
+  incompatiblePipettePath,
 } from './warnings'
 
 import type { FormWarning, FormWarningType } from './warnings'
@@ -174,7 +177,10 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       minDisposalVolume,
       minAspirateAirGapVolume,
       minDispenseAirGapVolume,
-      tipPositionInTube
+      tipPositionInTube,
+      lowVolumeTransfer,
+      incompatiblePipetteTiprack,
+      incompatiblePipettePath
     ),
   },
   magnet: {

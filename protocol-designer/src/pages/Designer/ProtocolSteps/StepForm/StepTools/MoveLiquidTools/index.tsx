@@ -32,6 +32,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         {enableLiquidClasses ? (
           <LiquidClassesStepTools
             propsForFields={propsForFields}
+            formData={formData}
             setShowFormErrors={setShowFormErrors}
           />
         ) : (
