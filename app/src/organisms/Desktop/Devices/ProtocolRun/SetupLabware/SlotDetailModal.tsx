@@ -187,7 +187,7 @@ export const SlotDetailModal = (
           ) : null}
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            height="26rem"
+            height="24rem"
             gridGap={SPACING.spacing16}
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}

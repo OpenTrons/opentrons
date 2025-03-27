@@ -54,6 +54,8 @@ export function SetupLabwareList(
   const offDeckItems = Object.keys(startingDeck).includes('offDeck')
     ? startingDeck.offDeck
     : null
+  console.log(startingDeck)
+  console.log('OFF DECK', offDeckItems)
 
   return (
     <>
@@ -94,7 +96,7 @@ export function SetupLabwareList(
             />
           )
         })}
-        {offDeckItems?.forEach((item, index) => (
+        {offDeckItems?.map((item, index) => (
           <LabwareListItem
             key={index}
             attachedModuleInfo={attachedModuleInfo}

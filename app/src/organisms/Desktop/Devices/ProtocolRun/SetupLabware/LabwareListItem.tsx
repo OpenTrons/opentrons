@@ -232,13 +232,13 @@ export function LabwareListItem(
         width="6.25rem"
       >
         {isFlex ? (
-          <DeckInfoLabel deckLabel={slotName} />
+          <DeckInfoLabel deckLabel={slotInfo} />
         ) : (
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
-            data-testid={`slot_info_${slotName}`}
+            data-testid={`slot_info_${slotInfo}`}
           >
-            {slotName}
+            {slotInfo}
           </StyledText>
         )}
         {moduleType != null ? (
@@ -260,7 +260,7 @@ export function LabwareListItem(
           <>
             {labwareLiquidRenderInfo.map((labware, index) => (
               <>
-                <Flex>
+                <Flex gridGap={SPACING.spacing24} alignItems={ALIGN_CENTER}>
                   {showLabwareSVG ? (
                     <StandaloneLabware
                       definition={getAllDefinitions()[labware.definitionUri]}
