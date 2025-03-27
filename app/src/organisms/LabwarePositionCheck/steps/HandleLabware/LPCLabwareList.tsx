@@ -41,8 +41,8 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
   const dispatch = useDispatch()
   const [selectedUri, setSelectedUri] = useState('')
 
-  const handlePrimaryOnClick = (): void => {
-    dispatch(setSelectedLabwareUri(props.runId, selectedUri))
+  const handlePrimaryOnClick = (uri: string): void => {
+    dispatch(setSelectedLabwareUri(props.runId, uri))
     dispatch(proceedEditOffsetSubstep(props.runId))
   }
 
@@ -56,7 +56,12 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
         onClickButton: props.commandUtils.headerCommands.handleNavToDetachProbe,
       }
     } else {
-      return { buttonText: t('continue'), onClickButton: handlePrimaryOnClick }
+      return {
+        buttonText: t('continue'),
+        onClickButton: () => {
+          handlePrimaryOnClick(selectedUri)
+        },
+      }
     }
   }
 
@@ -80,7 +85,7 @@ export function LPCLabwareList(props: LPCWizardContentProps): JSX.Element {
 interface LPCLabwareListContentProps extends LPCWizardContentProps {
   selectedUri: string
   setSelectedUri: (uri: string) => void
-  handlePrimaryOnClickOdd: () => void
+  handlePrimaryOnClickOdd: (uri: string) => void
 }
 
 function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
@@ -89,10 +94,13 @@ function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
   const labwareInfo = useSelector(
     selectAllLabwareInfoAndDefaultStatusSorted(runId)
   )
+  const isOnDevice = useSelector(getIsOnDevice)
 
   // On the initial render, select the first uri from the list of labware (for desktop app purposes).
   useLayoutEffect(() => {
-    props.setSelectedUri(labwareInfo[0].uri)
+    if (!isOnDevice) {
+      props.setSelectedUri(labwareInfo[0].uri)
+    }
   }, [])
 
   return (
@@ -114,7 +122,12 @@ function LPCLabwareListContent(props: LPCLabwareListContentProps): JSX.Element {
         </thead>
       </Flex>
       {labwareInfo.map(({ uri, info }) => (
-        <LabwareItem key={`labware_${uri}`} uri={uri} info={info} {...props} />
+        <LabwareItem
+          key={`labware_${uri}${Math.random()}`}
+          uri={uri}
+          info={info}
+          {...props}
+        />
       ))}
       {/* Accommodate scrolling on the ODD. */}
       <Flex css={ODD_SCROLL_BUFFER} />
@@ -147,7 +160,9 @@ function LabwareItem({
   return isOnDevice ? (
     <ListButton
       type={isNecessaryDefaultOffsetMissing ? 'notConnected' : 'noActive'}
-      onClick={handlePrimaryOnClickOdd}
+      onClick={() => {
+        handlePrimaryOnClickOdd(uri)
+      }}
       width="100%"
     >
       <Flex css={CONTENT_CONTAINER_STYLE}>
