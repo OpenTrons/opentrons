@@ -244,7 +244,7 @@ async def calibrate_tiprack(api: OT3API, mount: OT3Mount):
 
 async def _main() -> None:
     today = datetime.date.today()
-    directory = f'/data/96H_pick_up_tip_{datetime.now().strftime("%m_%d_%y")}'
+    directory = f'/data/96H_pick_up_tip_{datetime.datetime.now().strftime("%m_%d_%y")}'
     if not os.path.exists(directory):
         os.makedirs(directory)
     hw_api = await build_async_ot3_hardware_api(
@@ -361,7 +361,7 @@ async def _main() -> None:
         log_file = csv.DictWriter(pu_csvfile, dial_data)
         log_file.writeheader()
         try:
-            x_offset = 0, y_offset = 0
+            x_offset, y_offset = 0, 0
             while True:
                 measurements = []
                 cp = CriticalPoint.TIP
@@ -453,7 +453,7 @@ if __name__ == "__main__":
     else:
         with open(path + cal_fn, 'r') as openfile:
             deck_slot = json.load(openfile)
-    tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9}
+    tip_length = {"T1K": 95.6, "T200": 58.35, "T50": 57.9, "T20": 52.0}
     tip_overlap = 10.5
     if args.mount == "left":
         mount = OT3Mount.LEFT
