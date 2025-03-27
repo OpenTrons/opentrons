@@ -44,11 +44,6 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_ot3_96_tiprack_1000ul',
   'opentrons_ot3_96_tiprack_50ul',
   'opentrons_flex_lid_absorbance_plate_reader_module',
-  // temporarily blocking evotips until it is out of beta
-  'evotips_flex_96_tiprack_adapter',
-  'evotips_opentrons_96_labware',
-  'evotips_tiprack_adapter',
-  'evotips_reservoir_adapter',
   // temporarily blocking tiprack lids until stacker launches
   'opentrons_flex_tiprack_lid',
   // temporarily blocking 20 uL Flex tip racks until they launch
@@ -75,11 +70,11 @@ export const PD_DO_NOT_LIST = [
   //  temporarily blocking TC lid adapter and deck riser until it is supported in PD
   'opentrons_tough_pcr_auto_sealing_lid',
   'opentrons_flex_deck_riser',
-  //  temporarily blocking evotips until it is supported in PD
-  'evotips_flex_96_tiprack_adapter',
-  'evotips_opentrons_96_labware',
-  'evotips_tiprack_adapter',
-  'evotips_reservoir_adapter',
+  // evotip is not supported in PD
+  'evotip_flex_96_tiprack_adapter',
+  'evotip_flex_96_labware',
+  'evotip_flex_tall_adapter',
+  'evotip_flex_short_adapter',
   // temporarily blocking tiprack lids until stacker launches
   'opentrons_flex_tiprack_lid',
   // temporarily blocking 20 uL Flex tip racks until they launch
