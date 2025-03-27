@@ -136,7 +136,7 @@ export const ResultsSummary = (
       {isOnDevice ? (
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
+          buttonText={i18n.format(t('complete'), 'capitalize')}
           iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
           iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
           onClick={onCloseClick}
@@ -149,7 +149,10 @@ export const ResultsSummary = (
           alignItems={ALIGN_CENTER}
         >
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
-          <PrimaryButton onClick={onCloseClick}>
+          <PrimaryButton
+            onClick={onCloseClick}
+            disabled={isSubmittingAndClosing}
+          >
             <Flex>
               {isSubmittingAndClosing ? (
                 <Icon
@@ -160,7 +163,7 @@ export const ResultsSummary = (
                 />
               ) : null}
               <LegacyStyledText>
-                {i18n.format(t('apply_offsets'), 'capitalize')}
+                {i18n.format(t('complete'), 'capitalize')}
               </LegacyStyledText>
             </Flex>
           </PrimaryButton>

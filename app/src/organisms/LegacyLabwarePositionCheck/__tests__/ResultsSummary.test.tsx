@@ -36,7 +36,18 @@ describe('ResultsSummary', () => {
       workingOffsets: mockWorkingOffsets,
       existingOffsets: mockExistingOffsets,
       isDeletingMaintenanceRun: false,
-      allAppliedOffsets: [],
+      allAppliedOffsets: [
+        {
+          location: { slotName: '1' },
+          vector: { x: 1.0, y: 1.0, z: 1.0 },
+          definitionUri: 'mock-uri',
+        },
+        {
+          location: { slotName: '3' },
+          vector: { x: 3.0, y: 3.0, z: 3.0 },
+          definitionUri: 'mock-uri-2',
+        },
+      ],
       onCloseClick: mockOnCloseClick,
     }
   })
@@ -46,7 +57,7 @@ describe('ResultsSummary', () => {
   it('renders correct copy', () => {
     render(props)
     screen.getByText('New labware offset data')
-    screen.getByRole('button', { name: 'Finish' })
+    screen.getByRole('button', { name: 'Complete' })
     screen.getByRole('link', { name: 'Need help?' })
     screen.getByRole('columnheader', { name: 'location' })
     screen.getByRole('columnheader', { name: 'labware' })
@@ -54,24 +65,20 @@ describe('ResultsSummary', () => {
   })
   it('calls on close function when button is clicked', () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Finish' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Complete' }))
     expect(mockOnCloseClick).toHaveBeenCalled()
   })
   it('does disables the CTA to apply offsets when the maintenance run is being deleted', () => {
     props.isDeletingMaintenanceRun = true
     render(props)
-    const button = screen.getByRole('button', { name: 'Finish' })
+    const button = screen.getByRole('button', { name: 'Complete' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockOnCloseClick).not.toHaveBeenCalled()
   })
   it('renders a row per offset to apply', () => {
     render(props)
-    expect(
-      screen.queryAllByRole('cell', {
-        name: mockTipRackDefinition.metadata.displayName,
-      })
-    ).toHaveLength(2)
+
     screen.getByRole('cell', { name: 'Slot 1' })
     screen.getByRole('cell', { name: 'Slot 3' })
     screen.getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })

@@ -31,6 +31,7 @@
   "clear_deck_all_lw_leave_modules": "Clear all deck slots of labware, leaving modules in place",
   "cli_ssh": "Command Line Interface (SSH)",
   "close_and_apply_offset_data": "Close and apply labware offset data",
+  "complete": "Complete",
   "confirm": "Confirm",
   "confirm_detached": "Confirm removal",
   "confirm_go_back_without_saving": "Are you sure you want to go back to the the labware list without saving?",
