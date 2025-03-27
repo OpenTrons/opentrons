@@ -4,18 +4,16 @@ import styled, { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
-  BORDERS,
   Btn,
   Tag,
   COLORS,
   DeckInfoLabel,
+  ListButton,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
-  DISPLAY_GRID,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
   MODULE_ICON_NAME_BY_TYPE,
@@ -57,14 +55,6 @@ import type {
 } from '/app/transformations/commands'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
-const LabwareRow = styled.div`
-  display: ${DISPLAY_GRID};
-  cursor: pointer;
-  grid-template-columns: 90px 12fr;
-  background-color: ${COLORS.grey20};
-  border-radius: ${BORDERS.borderRadius4};
-  padding: ${SPACING.spacing12} ${SPACING.spacing16} ${SPACING.spacing12};
-`
 interface LabwareListItemProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
@@ -235,7 +225,7 @@ export function LabwareListItem(
   }
 
   return (
-    <LabwareRow onClick={onClick}>
+    <ListButton onClick={onClick} type="noActive" gridGap={SPACING.spacing24}>
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing2}
@@ -260,12 +250,11 @@ export function LabwareListItem(
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing24}
+        width="100%"
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing12}
-          marginLeft={SPACING.spacing24}
           width="100%"
         >
           <>
@@ -279,9 +268,7 @@ export function LabwareListItem(
                   ) : null}
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
-                    justifyContent={JUSTIFY_CENTER}
-                    marginLeft={SPACING.spacing8}
-                    marginRight={SPACING.spacing24}
+                    gridGap={SPACING.spacing4}
                   >
                     <StyledText desktopStyle="bodyDefaultSemiBold">
                       {labware.displayName}
@@ -294,10 +281,10 @@ export function LabwareListItem(
                         {labware.lidDisplayName}
                       </StyledText>
                     ) : null}
-                    {labware.quantity > 1 || labware.liquids != null ? (
+                    {labware.quantity > 1 || labware.liquids > 0 ? (
                       <Flex
                         flexDirection={DIRECTION_ROW}
-                        paddingTop={SPACING.spacing4}
+                        gridGap={SPACING.spacing4}
                       >
                         {labware.quantity > 1 ? (
                           <Tag
@@ -366,8 +353,12 @@ export function LabwareListItem(
               </Flex>
             </Flex>
           ) : null}
-          <Icon name="more" size={SPACING.spacing24} />
         </Flex>
+        <Icon
+          name="more"
+          size={SPACING.spacing24}
+          marginLeft={SPACING.spacing24}
+        />
       </Flex>
       {secureLabwareModalType != null && (
         <SecureLabwareModal
@@ -377,7 +368,7 @@ export function LabwareListItem(
           }}
         />
       )}
-    </LabwareRow>
+    </ListButton>
   )
 }
 

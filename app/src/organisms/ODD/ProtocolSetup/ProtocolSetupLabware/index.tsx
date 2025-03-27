@@ -10,7 +10,7 @@ import {
   Box,
   Chip,
   Tag,
-  ListItem,
+  ListButton,
   COLORS,
   DeckInfoLabel,
   StyledText,
@@ -424,10 +424,9 @@ function RowLabware({
     />
   )
   return (
-    <ListItem
-      type="default"
+    <ListButton
+      type="noActive"
       alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
       backgroundColor={COLORS.grey35}
       gridGap={SPACING.spacing32}
       onClick={() => {
@@ -513,6 +512,6 @@ function RowLabware({
         ) : null}
       </Flex>
       <Icon name="more" size={SPACING.spacing40} />
-    </ListItem>
+    </ListButton>
   )
 }
