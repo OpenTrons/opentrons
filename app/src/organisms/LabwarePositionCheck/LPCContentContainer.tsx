@@ -23,7 +23,6 @@ import {
 } from '@opentrons/components'
 
 import { StepMeter } from '/app/atoms/StepMeter'
-// TODO(jh, 02-05-25): Move ChildNavigation to molecules.
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
@@ -35,6 +34,7 @@ import {
 import { WizardHeader } from '/app/molecules/WizardHeader'
 import { getModalPortalEl } from '/app/App/portal'
 import { getIsOnDevice } from '/app/redux/config'
+import { LPC_HREF } from '/app/local-resources/offsets'
 
 import type { ReactNode } from 'react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
@@ -180,10 +180,6 @@ function DesktopFooterContent({
   )
 }
 
-const LPC_HREF =
-  'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
-
-// TODO(jh, 03-11-25): Update the link/styling after Product/Design provide input.
 function NeedHelpLink(): JSX.Element {
   const { t } = useTranslation('labware_position_check')
 

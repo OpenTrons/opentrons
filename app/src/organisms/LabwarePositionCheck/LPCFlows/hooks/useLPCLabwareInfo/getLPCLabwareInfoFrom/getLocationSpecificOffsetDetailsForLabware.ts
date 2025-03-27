@@ -2,7 +2,7 @@ import isEqual from 'lodash/isEqual'
 
 import { OFFSET_KIND_LOCATION_SPECIFIC } from '/app/redux/protocol-runs'
 import { ANY_LOCATION } from '@opentrons/api-client'
-import { getLwOffsetLocSeqFrom } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useLPCLabwareInfo/utils'
+import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 
 import type { LabwareOffsetLocationSequence } from '@opentrons/api-client'
 import type {
@@ -25,7 +25,7 @@ export function getLocationSpecificOffsetDetailsForLabware({
       const { definitionUri, lwOffsetLocSeq, ...restInfo } = comboInfo
 
       const existingOffset =
-        currentOffsets.find(
+        currentOffsets?.find(
           offset =>
             uri === offset.definitionUri &&
             isEqual(offset.locationSequence, comboInfo.lwOffsetLocSeq)
@@ -120,7 +120,7 @@ function getHardcodedOffsetLocSeqFor(
 
   const loqSeq = matchingCommand.result?.locationSequence ?? []
 
-  return getLwOffsetLocSeqFrom(loqSeq, labware, modules)
+  return getLwOffsetLocSeqFromLocSeq(loqSeq, labware, modules)
 }
 
 // Given the labware uri and offset location sequence, returns the associated

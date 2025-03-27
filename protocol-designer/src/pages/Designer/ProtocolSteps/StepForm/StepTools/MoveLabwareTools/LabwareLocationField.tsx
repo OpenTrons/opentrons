@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { getHasWasteChute } from '@opentrons/step-generation'
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 import { getAdditionalEquipmentEntities } from '../../../../../../step-forms/selectors'
 import {
@@ -38,7 +37,12 @@ export function LabwareLocationField(
     )
   }
 
-  if (!useGripper && getHasWasteChute(additionalEquipmentEntities)) {
+  if (
+    !useGripper &&
+    Object.values(additionalEquipmentEntities).find(
+      ae => ae.name === 'wasteChute'
+    ) != null
+  ) {
     unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
       option => option.value !== WASTE_CHUTE_CUTOUT
     )

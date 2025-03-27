@@ -19,8 +19,8 @@ export const dispenseInTrash: CommandCreator<DispenseInTrashParams> = (
   prevRobotState
 ) => {
   const { pipetteId, trashId, flowRate, volume } = args
-  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
-  const trashEntity = additionalEquipmentEntities[trashId]
+  const { pipetteEntities, trashBinEntities } = invariantContext
+  const trashEntity = trashBinEntities[trashId]
   const pipettePythonName = pipetteEntities[pipetteId].pythonName
   const trashPythonName = trashEntity.pythonName
   const pythonArgs = [

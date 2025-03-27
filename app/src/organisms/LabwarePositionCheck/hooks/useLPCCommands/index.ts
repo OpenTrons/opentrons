@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import { useApplyLPCOffsets } from './useApplyLPCOffsets'
 import { useHandleJog } from './useHandleJog'
 import { useHandleClose } from './useHandleClose'
 import { useChainMaintenanceCommands } from '/app/resources/maintenance_runs'
@@ -18,7 +17,6 @@ import type { CommandData } from '@opentrons/api-client'
 import type { UseProbeCommandsResult } from './useHandleProbeCommands'
 import type { UseHandleConditionalCleanupResult } from './useHandleClose'
 import type { UseHandleJogResult } from './useHandleJog'
-import type { UseApplyLPCOffsetsResult } from './useApplyLPCOffsets'
 import type { UseHandleStartLPCResult } from './useHandleStartLPC'
 import type { UseHandlePrepModulesResult } from './useHandlePrepModules'
 import type { UseHandleConfirmPlacementResult } from './useHandleConfirmLwModulePlacement'
@@ -31,8 +29,7 @@ import { fullHomeCommands } from '/app/organisms/LabwarePositionCheck/hooks/useL
 
 export interface UseLPCCommandsProps extends LPCWizardFlexProps {}
 
-export type UseLPCCommandsResult = UseApplyLPCOffsetsResult &
-  UseHandleJogResult &
+export type UseLPCCommandsResult = UseHandleJogResult &
   UseHandleConditionalCleanupResult &
   UseProbeCommandsResult &
   UseHandleStartLPCResult &
@@ -47,8 +44,6 @@ export type UseLPCCommandsResult = UseApplyLPCOffsetsResult &
     toggleRobotMoving: (isMoving: boolean) => Promise<void>
     home: () => Promise<void>
   }
-
-// TODO(jh, 03-14-25): Add testing here!
 
 // Consolidates all command handlers and handler state for injection into LPC.
 export function useLPCCommands(
@@ -79,7 +74,6 @@ export function useLPCCommands(
       }
     })
 
-  const applyLPCOffsetsUtils = useApplyLPCOffsets({ ...props, setErrorMessage })
   const applyWorkingOffsets = useSaveWorkingOffsets({ ...props })
   const handleJogUtils = useHandleJog({
     ...props,
@@ -121,7 +115,6 @@ export function useLPCCommands(
       }),
     home: () =>
       chainLPCCommands(fullHomeCommands(), false).then(() => Promise.resolve()),
-    ...applyLPCOffsetsUtils,
     ...applyWorkingOffsets,
     ...handleJogUtils,
     ...handleConditionalCleanupUtils,

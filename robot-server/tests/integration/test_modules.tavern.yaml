@@ -265,6 +265,46 @@ stages:
             hardwareRevision: !anystr
             hasAvailableUpdate: !anybool
             compatibleWithRobot: true
+            moduleType: flexStackerModuleType
+            moduleModel: flexStackerModuleV1
+            usbPort:
+              port: !anyint
+              hub: !anybool
+              portGroup: !anystr
+              path: !anystr
+            data:
+              status: !anystr
+              latchState: !anystr
+              platformState: !anystr
+              hopperDoorState: !anystr
+              axisStateX: !anystr
+              axisStateZ: !anystr
+          - id: !anystr
+            serialNumber: !anystr
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
+            moduleType: flexStackerModuleType
+            moduleModel: flexStackerModuleV1
+            usbPort:
+              port: !anyint
+              hub: !anybool
+              portGroup: !anystr
+              path: !anystr
+            data:
+              status: !anystr
+              latchState: !anystr
+              platformState: !anystr
+              hopperDoorState: !anystr
+              axisStateX: !anystr
+              axisStateZ: !anystr
+          - id: !anystr
+            serialNumber: !anystr
+            firmwareVersion: !anystr
+            hardwareRevision: !anystr
+            hasAvailableUpdate: !anybool
+            compatibleWithRobot: true
             moduleType: temperatureModuleType
             moduleModel: temperatureModuleV2
             usbPort:

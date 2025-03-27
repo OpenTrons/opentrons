@@ -131,7 +131,7 @@ export const MixSteps = {
   SelectLabware: (): StepThunk => ({
     call: () => {
       cy.contains(MixContent.ChooseOption).should('be.visible').click()
-      cy.contains(MixContent.Reservoir).should('be.visible').click()
+      cy.contains(MixContent.WellPlate).should('be.visible').click()
     },
   }),
 
@@ -212,10 +212,10 @@ export const MixSteps = {
         .should('be.visible')
       cy.get(MixLocators.MixTipPos).click()
       cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}2')
-      cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}3')
+      cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.ZpositionInput).type('{selectAll}{backspace}4')
       cy.get(MixLocators.ResetToDefault).click()
-      cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}3')
+      cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.ZpositionInput).type('{selectAll}{backspace}5')
       cy.contains(MixContent.Cancel).should('exist').should('be.visible')

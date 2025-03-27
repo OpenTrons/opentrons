@@ -57,9 +57,6 @@ export function Navigation(): JSX.Element | null {
         <StyledText desktopStyle="bodyLargeSemiBold" color={COLORS.purple50}>
           {t('protocol_designer')}
         </StyledText>
-        <StyledText desktopStyle="captionRegular" color={COLORS.grey50}>
-          {t('version', { version: process.env.OT_PD_VERSION })}
-        </StyledText>
       </Flex>
       <Flex gridGap={SPACING.spacing40} alignItems={ALIGN_CENTER}>
         {location.pathname === '/createNew' ? null : (

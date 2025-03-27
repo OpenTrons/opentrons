@@ -95,17 +95,7 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
     'B4',
   ]),
 
-  // These height mismatches are legitimate. The zDimension should match the taller side.
-  'opentrons_calibrationblock_short_side_left/1.json': new Set(['A1']),
-  'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
-
-  // this labware has a lip
-  'evotips_opentrons_96_labware/2.json': standard96WellNames,
-
-  // These height mismatches need to be investigated. See Jira RSS-202.
-  // Each one should either be explained here or marked as a known bug.
-  'nest_1_reservoir_195ml/1.json': new Set(['A1']),
-  'nest_1_reservoir_195ml/2.json': new Set(['A1']),
+  // This is probably legitimate. Heterogeneous tubes.
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip/1.json': new Set(
     [
       'A3',
@@ -134,9 +124,24 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
       'D8',
     ]
   ),
+
+  // These height mismatches are legitimate. The zDimension should match the taller side.
+  'opentrons_calibrationblock_short_side_left/1.json': new Set(['A1']),
+  'opentrons_calibrationblock_short_side_right/1.json': new Set(['A2']),
+
+  // this labware has a lip
+  'evotips_opentrons_96_labware/2.json': standard96WellNames,
+
+  // Presumably a bug. Fixed in v3 of this labware.
+  'nest_1_reservoir_195ml/1.json': new Set(['A1']),
+  'nest_1_reservoir_195ml/2.json': new Set(['A1']),
+
+  // These were probably bugs, but it's moot now, since these adapter+wellplate
+  // combo-definitions have been superseded by proper labware stacking.
   'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat/1.json': standard96WellNames,
   'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt/1.json': standard96WellNames,
   'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat/1.json': standard384WellNames,
+
   // This batch may have incompletely-updated geometry from recent work related to
   // liquid level detection and meniscus-relative pipetting. Probably, the wells were
   // updated but not the overall labware dimensions. This needs to be investigated and fixed.
@@ -193,6 +198,21 @@ const expectGroupsFollowConvention = (
   })
 
   test(`${filename} should not specify certain fields in 'groups' if it is a reservoir or wellPlate`, () => {
+    // Certain fields in `groups` are intended to supplement labware-level information,
+    // e.g. an Opentrons-brand tube rack might hold a group of Eppendorf-brand tubes.
+    //
+    // Those fields don't make sense on reservoirs or well plates, because the wells are
+    // an inherent part of the labware. The information should just be specified in the
+    // labware-level brand and metadata.
+
+    if (
+      labwareDef.parameters.loadName === 'nest_96_wellplate_2ml_deep' &&
+      (labwareDef.version === 1 || labwareDef.version === 2)
+    ) {
+      // Bug in v1 and v2 of this labware, fixed in v3.
+      return
+    }
+
     const { displayCategory } = labwareDef.metadata
     const noGroupsMetadataAllowed =
       displayCategory === 'reservoir' || displayCategory === 'wellPlate'
@@ -374,10 +394,7 @@ describe('test schemas of all opentrons definitions', () => {
       expect(labwareDef.namespace).toEqual('opentrons')
     })
 
-    if (labwareDef.parameters.loadName !== 'nest_96_wellplate_2ml_deep') {
-      // TODO(IL, 2020-06-22): make nest_96_wellplate_2ml_deep confirm to groups convention
-      expectGroupsFollowConvention(labwareDef, labwarePath)
-    }
+    expectGroupsFollowConvention(labwareDef, labwarePath)
   })
 })
 

@@ -25,6 +25,8 @@ export function useErrorName(errorKind: ErrorKind): string {
       return t('gripper_error')
     case ERROR_KINDS.STALL_OR_COLLISION:
       return t('stall_or_collision_error')
+    case ERROR_KINDS.STALL_WHILE_STACKING:
+      return t('stacker_stall_or_collision_error')
     default:
       return t('error')
   }

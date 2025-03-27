@@ -129,4 +129,4 @@ export const getMouseClickKeyInfo = (
   return { isShiftKeyPressed, isMetaKeyPressed }
 }
 
-const getUserOS = (): string | undefined => new UAParser().getOS().name
+export const getUserOS = (): string | undefined => new UAParser().getOS().name

@@ -23,10 +23,9 @@ const mockPipEntities: PipetteEntities = {
 const invariantContext: InvariantContext = {
   ...makeContext(),
   pipetteEntities: mockPipEntities,
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {
     [mockWasteChuteId]: {
       id: mockWasteChuteId,
-      name: 'wasteChute',
       pythonName: 'mock_waste_chute_1',
       location: mockWasteChuteId,
     },

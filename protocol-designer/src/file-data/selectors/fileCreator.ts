@@ -10,7 +10,11 @@ import {
   OT2_STANDARD_MODEL,
   FLEX_STANDARD_DECKID,
 } from '@opentrons/shared-data'
-
+import {
+  pythonImports,
+  pythonMetadata,
+  pythonRequirements,
+} from '@opentrons/step-generation'
 import { selectors as dismissSelectors } from '../../dismiss'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
@@ -26,12 +30,7 @@ import {
   getModulesLoadInfo,
   getPipettesLoadInfo,
 } from './utils'
-import {
-  pythonDefRun,
-  pythonImports,
-  pythonMetadata,
-  pythonRequirements,
-} from './pythonFile'
+import { pythonDefRun } from './pythonFile'
 
 import type { SecondOrderCommandAnnotation } from '@opentrons/shared-data/commandAnnotation/types'
 import type {

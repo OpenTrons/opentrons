@@ -15,7 +15,7 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
 ) => {
   const offset = ZERO_OFFSET
   const { pipetteId, wasteChuteId } = args
-  const { pipetteEntities, additionalEquipmentEntities } = invariantContext
+  const { pipetteEntities, wasteChuteEntities } = invariantContext
 
   let commandCreators: CurriedCommandCreator[] = []
 
@@ -24,8 +24,7 @@ export const dropTipInWasteChute: CommandCreator<DropTipInWasteChuteArgs> = (
     commandCreators = []
   } else {
     const pipettePythonName = pipetteEntities[pipetteId].pythonName
-    const wasteChutePythonName =
-      additionalEquipmentEntities[wasteChuteId].pythonName
+    const wasteChutePythonName = wasteChuteEntities[wasteChuteId].pythonName
     const pythonCommandCreator: CurriedCommandCreator = () => ({
       commands: [],
       python: `${pipettePythonName}.drop_tip(${wasteChutePythonName})`,

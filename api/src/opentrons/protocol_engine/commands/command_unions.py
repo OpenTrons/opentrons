@@ -14,7 +14,10 @@ from .pipetting_common import (
     TipPhysicallyAttachedError,
 )
 from .movement_common import StallOrCollisionError
-from .flex_stacker.common import FlexStackerStallOrCollisionError
+from .flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+)
 
 from . import absorbance_reader
 from . import flex_stacker
@@ -482,6 +485,9 @@ Command = Annotated[
         flex_stacker.SetStoredLabware,
         flex_stacker.Fill,
         flex_stacker.Empty,
+        flex_stacker.CloseLatch,
+        flex_stacker.OpenLatch,
+        flex_stacker.PrepareShuttle,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -581,6 +587,9 @@ CommandParams = Union[
     flex_stacker.SetStoredLabwareParams,
     flex_stacker.FillParams,
     flex_stacker.EmptyParams,
+    flex_stacker.CloseLatchParams,
+    flex_stacker.OpenLatchParams,
+    flex_stacker.PrepareShuttleParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -678,6 +687,9 @@ CommandType = Union[
     flex_stacker.SetStoredLabwareCommandType,
     flex_stacker.FillCommandType,
     flex_stacker.EmptyCommandType,
+    flex_stacker.CloseLatchCommandType,
+    flex_stacker.OpenLatchCommandType,
+    flex_stacker.PrepareShuttleCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -776,6 +788,9 @@ CommandCreate = Annotated[
         flex_stacker.SetStoredLabwareCreate,
         flex_stacker.FillCreate,
         flex_stacker.EmptyCreate,
+        flex_stacker.CloseLatchCreate,
+        flex_stacker.OpenLatchCreate,
+        flex_stacker.PrepareShuttleCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -882,6 +897,9 @@ CommandResult = Union[
     flex_stacker.SetStoredLabwareResult,
     flex_stacker.FillResult,
     flex_stacker.EmptyResult,
+    flex_stacker.CloseLatchResult,
+    flex_stacker.OpenLatchResult,
+    flex_stacker.PrepareShuttleResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
@@ -910,6 +928,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[GripperMovementError],
     DefinedErrorData[StallOrCollisionError],
     DefinedErrorData[FlexStackerStallOrCollisionError],
+    DefinedErrorData[FlexStackerShuttleError],
 ]
 
 

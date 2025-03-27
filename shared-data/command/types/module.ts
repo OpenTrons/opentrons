@@ -427,6 +427,10 @@ export interface FlexStackerRetrieveCreateCommand
   commandType: 'flexStacker/retrieve'
   params: {
     moduleId: string
+    labwareId?: string
+    displayName?: string
+    adapterId?: string
+    lidId?: string
   }
 }
 
