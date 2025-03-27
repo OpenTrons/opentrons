@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 
 import {
-  getAdditionalEquipment,
+  getGripperEntities,
   getInitialDeckSetup,
   getPipetteEntities,
 } from '../../../step-forms/selectors'
@@ -43,16 +43,14 @@ export function EditInstrumentsModal(
   const robotType = useSelector(getRobotType)
   const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const additionalEquipment = useSelector(getAdditionalEquipment)
+  const gripperEntities = useSelector(getGripperEntities)
   const pipetteEntities = useSelector(getPipetteEntities)
   const { pipettes, labware } = initialDeckSetup
   const pipettesOnDeck = Object.values(pipettes)
   const has96Channel = getHas96Channel(pipetteEntities)
   const leftPipette = pipettesOnDeck.find(pipette => pipette.mount === 'left')
   const rightPipette = pipettesOnDeck.find(pipette => pipette.mount === 'right')
-  const gripper = Object.values(additionalEquipment).find(
-    ae => ae.name === 'gripper'
-  )
+  const gripper = Object.values(gripperEntities)[0]
   const {
     page,
     mount,

@@ -18,6 +18,7 @@ import { getLabwareLatestSlotFromCurrentStepIndex } from './utils'
 import type {
   LabwareEntity,
   AdditionalEquipmentEntity,
+  TrashBinEntity,
 } from '@opentrons/step-generation'
 import type { DropdownOption } from '@opentrons/components'
 import type { RobotType } from '@opentrons/shared-data'
@@ -83,14 +84,16 @@ export const getMoveLabwareOptions: Selector<DropdownOption[]> = createSelector(
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getSavedStepForms,
-  stepFormSelectors.getAdditionalEquipmentEntities,
+  stepFormSelectors.getTrashBinEntities,
+  stepFormSelectors.getWasteChuteEntities,
   stepFormSelectors.getUnsavedForm,
   (
     labwareEntities,
     nicknamesById,
     initialDeckSetup,
     savedStepForms,
-    additionalEquipmentEntities,
+    trashBinEntities,
+    wasteChuteEntities,
     unsavedForm
   ) => {
     const savedFormKeys = Object.keys(savedStepForms)
@@ -102,12 +105,8 @@ export const getMoveLabwareOptions: Selector<DropdownOption[]> = createSelector(
         ? savedFormKeys.slice(0, previouslySavedFormDataIndex)
         : savedFormKeys
 
-    const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'wasteChute'
-    )?.location
-    const trashBinLocation = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'trashBin'
-    )?.location
+    const wasteChuteLocation = Object.values(wasteChuteEntities)[0]?.location
+    const trashBinLocation = Object.values(trashBinEntities)[0]?.location
     const robotType =
       trashBinLocation === 'cutout12' ? OT2_ROBOT_TYPE : FLEX_ROBOT_TYPE
 
@@ -163,14 +162,16 @@ export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getSavedStepForms,
-  stepFormSelectors.getAdditionalEquipmentEntities,
+  stepFormSelectors.getTrashBinEntities,
+  stepFormSelectors.getWasteChuteEntities,
   stepFormSelectors.getUnsavedForm,
   (
     labwareEntities,
     nicknamesById,
     initialDeckSetup,
     savedStepForms,
-    additionalEquipmentEntities,
+    trashBinEntities,
+    wasteChuteEntities,
     unsavedForm
   ) => {
     const savedFormKeys = Object.keys(savedStepForms)
@@ -182,12 +183,8 @@ export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
         ? savedFormKeys.slice(0, previouslySavedFormDataIndex)
         : savedFormKeys
 
-    const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'wasteChute'
-    )?.location
-    const trashBinLocation = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'trashBin'
-    )?.location
+    const wasteChuteLocation = Object.values(wasteChuteEntities)[0]?.location
+    const trashBinLocation = Object.values(trashBinEntities)[0]?.location
     const robotType =
       trashBinLocation === 'cutout12' ? OT2_ROBOT_TYPE : FLEX_ROBOT_TYPE
 
@@ -237,11 +234,9 @@ export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
 
 /** Returns waste chute option */
 export const getWasteChuteOption: Selector<DropdownOption | null> = createSelector(
-  stepFormSelectors.getAdditionalEquipmentEntities,
-  additionalEquipmentEntities => {
-    const wasteChuteEntity = Object.values(additionalEquipmentEntities).find(
-      aE => aE.name === 'wasteChute'
-    )
+  stepFormSelectors.getWasteChuteEntities,
+  wasteChuteEntities => {
+    const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
     const wasteChuteOption: DropdownOption | null =
       wasteChuteEntity != null
         ? {
@@ -256,24 +251,21 @@ export const getWasteChuteOption: Selector<DropdownOption | null> = createSelect
 
 /** Returns options for disposal (e.g. trash) */
 export const getDisposalOptions = createSelector(
-  stepFormSelectors.getAdditionalEquipment,
+  stepFormSelectors.getTrashBinEntities,
   getWasteChuteOption,
-  (additionalEquipment, wasteChuteOption) => {
+  (trashBinEntities, wasteChuteOption) => {
     const trashBins = reduce(
-      additionalEquipment,
+      trashBinEntities,
       (
         acc: DropdownOption[],
-        additionalEquipment: AdditionalEquipmentEntity
-      ): DropdownOption[] =>
-        additionalEquipment.name === 'trashBin'
-          ? [
-              ...acc,
-              {
-                name: TRASH_BIN_DISPLAY_NAME,
-                value: additionalEquipment.id ?? '',
-              },
-            ]
-          : acc,
+        trashBinEntity: TrashBinEntity
+      ): DropdownOption[] => [
+        ...acc,
+        {
+          name: TRASH_BIN_DISPLAY_NAME,
+          value: trashBinEntity.id ?? '',
+        },
+      ],
       []
     )
 

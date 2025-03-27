@@ -319,9 +319,8 @@ export function getNextAvailableModuleSlot(
     ? MAGNETIC_BLOCK_MODULE_SLOTS
     : FLEX_MODULE_SLOTS
   ).find(slot => {
-    const cutoutIds = Object.values(initialDeckSetup.additionalEquipmentOnDeck)
-      .filter(ae => ae.name === 'stagingArea')
-      .map(ae => ae.location as CutoutId)
+    const cutoutIds = Object.values(initialDeckSetup.stagingAreas)
+    .map(ae => ae.location as CutoutId)
     const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
       cutoutIds
     )

@@ -33,7 +33,11 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
-  _getAdditionalEquipmentEntitiesRootState,
+  _getStagingAreaEntities,
+  _getStagingAreaEntitiesRootState,
+  _getGripperEntitiesRootState,
+  _getWasteChuteEntitiesRootState,
+  _getTrashBinEntitiesRootState,
 } from '../selectors'
 import {
   createPresavedStepForm,
@@ -44,8 +48,11 @@ import {
 import type { Reducer } from 'redux'
 import type { Action as ReduxActionsAction } from 'redux-actions'
 import type {
-  NormalizedAdditionalEquipmentById,
+  GripperEntities,
   NormalizedPipetteById,
+  StagingAreaEntities,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { RootState as LabwareDefsRootState } from '../../labware-defs'
@@ -150,9 +157,9 @@ export const unsavedForm = (
         orderedStepIds: rootState.orderedStepIds,
         initialDeckSetup: _getInitialDeckSetupRootState(rootState),
         robotStateTimeline: action.meta.robotStateTimeline,
-        additionalEquipmentEntities: _getAdditionalEquipmentEntitiesRootState(
-          rootState
-        ),
+        gripperEntities: _getGripperEntitiesRootState(rootState),
+        wasteChuteEntities: _getWasteChuteEntitiesRootState(rootState),
+        trashBinEntities: _getTrashBinEntitiesRootState(rootState),
       })
     }
 
@@ -1219,13 +1226,182 @@ export const pipetteInvariantProperties: Reducer<
 
 const initialAdditionalEquipmentState = {}
 
-export const additionalEquipmentInvariantProperties = handleActions<NormalizedAdditionalEquipmentById>(
+export const gripperInvariantProperties = handleActions<GripperEntities>(
   {
     //  @ts-expect-error
-    LOAD_FILE: (
-      state,
-      action: LoadFileAction
-    ): NormalizedAdditionalEquipmentById => {
+    LOAD_FILE: (state, action: LoadFileAction): GripperEntities => {
+      const { file } = action.payload
+      const savedStepForms = file.designerApplication?.data?.savedStepForms
+      const initialDeckSetup: AdditionalEquipmentLocationUpdate = savedStepForms?.[
+        INITIAL_DECK_SETUP_STEP_ID
+      ] as any
+      const { gripperLocationUpdate } = initialDeckSetup
+
+      let gripper
+      if (Object.keys(gripperLocationUpdate).length > 0) {
+        const id = Object.keys(gripperLocationUpdate)[0]
+        gripper = {
+          [id]: {
+            id,
+          },
+        }
+      }
+
+      return {
+        ...state,
+        ...gripper,
+      }
+    },
+    //  @ts-expect-error
+    TOGGLE_IS_GRIPPER_REQUIRED: (
+      state: GripperEntities,
+      action: ToggleIsGripperRequiredAction
+    ): GripperEntities => {
+      let updatedEquipment = { ...state }
+      const id = action.payload.id
+      const gripperKey = Object.keys(updatedEquipment).find(
+        key => updatedEquipment[key].id === key
+      )
+
+      if (gripperKey != null) {
+        updatedEquipment = omit(updatedEquipment, [gripperKey])
+      } else {
+        updatedEquipment = {
+          ...updatedEquipment,
+          [id]: {
+            id,
+          },
+        }
+      }
+      return updatedEquipment
+    },
+  },
+  {}
+)
+export const wasteChuteInvariantProperties = handleActions<WasteChuteEntities>(
+  {
+    //  @ts-expect-error
+    LOAD_FILE: (state, action: LoadFileAction): WasteChuteEntities => {
+      const { file } = action.payload
+      const savedStepForms = file.designerApplication?.data?.savedStepForms
+      const initialDeckSetup: AdditionalEquipmentLocationUpdate = savedStepForms?.[
+        INITIAL_DECK_SETUP_STEP_ID
+      ] as any
+      const { wasteChuteLocationUpdate } = initialDeckSetup
+      let wasteChute
+      if (Object.keys(wasteChuteLocationUpdate).length > 0) {
+        const id = Object.keys(wasteChuteLocationUpdate)[0]
+        wasteChute = {
+          [id]: {
+            id,
+            location: Object.values(wasteChuteLocationUpdate)[0],
+            pythonName: getAdditionalEquipmentPythonName('wasteChute', 1),
+          },
+        }
+      }
+      return {
+        ...state,
+        ...wasteChute,
+      }
+    },
+    //  @ts-expect-error
+    CREATE_DECK_FIXTURE: (
+      state: WasteChuteEntities,
+      action: CreateDeckFixtureAction
+    ): WasteChuteEntities => {
+      const { location, id } = action.payload
+      const typeCount = Object.values(state).filter(aE => aE.id === id).length
+      return {
+        ...state,
+        [id]: {
+          id,
+          location,
+          pythonName: getAdditionalEquipmentPythonName(
+            'wasteChute',
+            typeCount + 1,
+            location
+          ),
+        },
+      }
+    },
+    //  @ts-expect-error
+    DELETE_DECK_FIXTURE: (
+      state: WasteChuteEntities,
+      action: DeleteDeckFixtureAction
+    ): WasteChuteEntities => omit(state, action.payload.id),
+    DEFAULT: (): WasteChuteEntities => ({}),
+  },
+  {}
+)
+export const trashBinInvariantProperties = handleActions<TrashBinEntities>(
+  {
+    //  @ts-expect-error
+    LOAD_FILE: (state, action: LoadFileAction): TrashBinEntities => {
+      const { file } = action.payload
+      const savedStepForms = file.designerApplication?.data?.savedStepForms
+      const initialDeckSetup: AdditionalEquipmentLocationUpdate = savedStepForms?.[
+        INITIAL_DECK_SETUP_STEP_ID
+      ] as any
+      const { trashBinLocationUpdate } = initialDeckSetup
+
+      let trashBin
+      if (Object.keys(trashBinLocationUpdate).length > 0) {
+        trashBin = Object.entries(trashBinLocationUpdate).reduce(
+          (acc, [id, location], index) => ({
+            ...acc,
+            [id]: {
+              name: 'trashBin' as const,
+              id,
+              location,
+              pythonName: getAdditionalEquipmentPythonName(
+                'trashBin',
+                index + 1,
+                location
+              ),
+            },
+          }),
+          {}
+        )
+      }
+      return {
+        ...state,
+        ...trashBin,
+      }
+    },
+    //  @ts-expect-error
+    CREATE_DECK_FIXTURE: (
+      state: TrashBinEntities,
+      action: CreateDeckFixtureAction
+    ): TrashBinEntities => {
+      const { location, id } = action.payload
+      const typeCount = Object.values(state).filter(aE => aE.id === id).length
+
+      return {
+        ...state,
+        [id]: {
+          id,
+          location,
+          pythonName: getAdditionalEquipmentPythonName(
+            'trashBin',
+            typeCount + 1,
+            location
+          ),
+        },
+      }
+    },
+    //  @ts-expect-error
+    DELETE_DECK_FIXTURE: (
+      state: TrashBinEntities,
+      action: DeleteDeckFixtureAction
+    ): TrashBinEntities => omit(state, action.payload.id),
+    DEFAULT: (): TrashBinEntities => ({}),
+  },
+  {}
+)
+export const stagingAreaInvariantProperties = handleActions<StagingAreaEntities>(
+  {
+    //  @ts-expect-error
+    LOAD_FILE: (state, action: LoadFileAction): StagingAreaEntities => {
       const { file } = action.payload
       const savedStepForms = file.designerApplication?.data?.savedStepForms
       const initialDeckSetup: AdditionalEquipmentLocationUpdate = savedStepForms?.[
@@ -1304,58 +1480,25 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       }
     },
     //  @ts-expect-error
-    TOGGLE_IS_GRIPPER_REQUIRED: (
-      state: NormalizedAdditionalEquipmentById,
-      action: ToggleIsGripperRequiredAction
-    ): NormalizedAdditionalEquipmentById => {
-      let updatedEquipment = { ...state }
-      const id = action.payload.id
-      const gripperKey = Object.keys(updatedEquipment).find(
-        key => updatedEquipment[key].name === 'gripper'
-      )
-
-      if (gripperKey != null) {
-        updatedEquipment = omit(updatedEquipment, [gripperKey])
-      } else {
-        updatedEquipment = {
-          ...updatedEquipment,
-          [id]: {
-            name: 'gripper' as const,
-            id,
-            location: GRIPPER_LOCATION,
-          },
-        }
-      }
-      return updatedEquipment
-    },
-    //  @ts-expect-error
     CREATE_DECK_FIXTURE: (
-      state: NormalizedAdditionalEquipmentById,
+      state: StagingAreaEntities,
       action: CreateDeckFixtureAction
-    ): NormalizedAdditionalEquipmentById => {
-      const { location, id, name } = action.payload
-      const typeCount = Object.values(state).filter(aE => aE.name === name)
-        .length
-
+    ): StagingAreaEntities => {
+      const { location, id } = action.payload
       return {
         ...state,
         [id]: {
-          name,
           id,
           location,
-          pythonName:
-            name === 'stagingArea'
-              ? undefined
-              : getAdditionalEquipmentPythonName(name, typeCount + 1, location),
         },
       }
     },
     //  @ts-expect-error
     DELETE_DECK_FIXTURE: (
-      state: NormalizedAdditionalEquipmentById,
+      state: StagingAreaEntities,
       action: DeleteDeckFixtureAction
-    ): NormalizedAdditionalEquipmentById => omit(state, action.payload.id),
-    DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
+    ): StagingAreaEntities => omit(state, action.payload.id),
+    DEFAULT: (): StagingAreaEntities => ({}),
   },
   initialAdditionalEquipmentState
 )
@@ -1540,7 +1683,10 @@ export interface RootState {
   labwareInvariantProperties: NormalizedLabwareById
   pipetteInvariantProperties: NormalizedPipetteById
   moduleInvariantProperties: ModuleEntities
-  additionalEquipmentInvariantProperties: NormalizedAdditionalEquipmentById
+  wasteChuteInvariantProperties: WasteChuteEntities
+  gripperInvariantProperties: GripperEntities
+  trashBinInvariantProperties: TrashBinEntities
+  stagingAreaInvariantProperties: StagingAreaEntities
   presavedStepForm: PresavedStepFormState
   savedStepForms: SavedStepFormState
   unsavedForm: FormState
@@ -1566,9 +1712,21 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
       prevStateFallback.moduleInvariantProperties,
       action
     ),
-    additionalEquipmentInvariantProperties: additionalEquipmentInvariantProperties(
-      prevStateFallback.additionalEquipmentInvariantProperties,
-      action as ReduxActionsAction<NormalizedAdditionalEquipmentById>
+    wasteChuteInvariantProperties: wasteChuteInvariantProperties(
+      prevStateFallback.wasteChuteInvariantProperties,
+      action as ReduxActionsAction<WasteChuteEntities>
+    ),
+    trashBinInvariantProperties: trashBinInvariantProperties(
+      prevStateFallback.trashBinInvariantProperties,
+      action as ReduxActionsAction<TrashBinEntities>
+    ),
+    gripperInvariantProperties: gripperInvariantProperties(
+      prevStateFallback.gripperInvariantProperties,
+      action as ReduxActionsAction<GripperEntities>
+    ),
+    stagingAreaInvariantProperties: stagingAreaInvariantProperties(
+      prevStateFallback.stagingAreaInvariantProperties,
+      action as ReduxActionsAction<StagingAreaEntities>
     ),
     labwareDefs: labwareDefsRootReducer(
       prevStateFallback.labwareDefs,

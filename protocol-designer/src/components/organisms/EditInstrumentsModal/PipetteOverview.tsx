@@ -29,7 +29,7 @@ import { getSectionsFromPipetteName } from './utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { LINK_BUTTON_STYLE } from '../../atoms'
 
-import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type { GripperEntity } from '@opentrons/step-generation'
 import type { RobotType } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -37,13 +37,7 @@ import type {
 } from '../../../step-forms'
 import type { ThunkDispatch } from '../../../types'
 import type { PipetteConfig } from './usePipetteConfig'
-import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
-
-interface Gripper {
-  name: AdditionalEquipmentName
-  id: string
-  location?: string
-}
+import { getGripperEntities } from '../../../step-forms/selectors'
 
 interface PipetteOverviewProps {
   has96Channel: boolean
@@ -53,7 +47,7 @@ interface PipetteOverviewProps {
   pipetteConfig: PipetteConfig
   leftPipette?: PipetteOnDeck
   rightPipette?: PipetteOnDeck
-  gripper?: Gripper
+  gripper?: GripperEntity
 }
 
 export function PipetteOverview({
@@ -68,12 +62,8 @@ export function PipetteOverview({
 }: PipetteOverviewProps): JSX.Element {
   const { t } = useTranslation(['create_new_protocol', 'protocol_overview'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const additionalEquipmentEntities = useSelector(
-    getAdditionalEquipmentEntities
-  )
-  const gripperId = Object.values(additionalEquipmentEntities).find(
-    ae => ae.name === 'gripper'
-  )?.id
+  const gripperEntities = useSelector(getGripperEntities)
+  const gripperId = Object.values(gripperEntities)[0]?.id
 
   const swapPipetteUpdate = mapValues(pipettes, pipette => {
     if (!pipette.mount) return pipette.mount

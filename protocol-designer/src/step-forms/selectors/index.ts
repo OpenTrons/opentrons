@@ -198,31 +198,77 @@ export const _getPipetteEntitiesRootState: (
       initialDeckSetupStepForm.pipetteLocationUpdate as Record<string, string>
     )
 )
-
-// Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
-export const _getAdditionalEquipmentEntitiesRootState: (
-  arg: RootState
-) => AdditionalEquipmentEntities = rs =>
-  rs.additionalEquipmentInvariantProperties
-export const getAdditionalEquipmentEntities: Selector<
-  BaseState,
-  AdditionalEquipmentEntities
-> = createSelector(rootSelector, _getAdditionalEquipmentEntitiesRootState)
-
 export const getPipetteEntities: Selector<
   BaseState,
   PipetteEntities
 > = createSelector(rootSelector, _getPipetteEntitiesRootState)
 
-export const _getAdditionalEquipmentRootState: (
+// Special version of `getWasteChuteEntities` selector for use in step-forms reducers
+export const _getWasteChuteEntities: (
   arg: RootState
-) => NormalizedAdditionalEquipmentById = rs =>
-  rs.additionalEquipmentInvariantProperties
-
-export const getAdditionalEquipment: Selector<
+) => WasteChuteEntities = rs => rs.wasteChuteInvariantProperties
+export const getWasteChuteEntities: Selector<
   BaseState,
-  NormalizedAdditionalEquipmentById
-> = createSelector(rootSelector, _getAdditionalEquipmentRootState)
+  WasteChuteEntities
+> = createSelector(rootSelector, _getWasteChuteEntities)
+
+export const _getWasteChuteEntitiesRootState: (
+  arg: RootState
+) => WasteChuteEntities = rs => rs.wasteChuteInvariantProperties
+
+export const getWasteChuteEntity: Selector<
+  BaseState,
+  WasteChuteEntities
+> = createSelector(rootSelector, _getWasteChuteEntitiesRootState)
+
+export const _getTrashBinEntities: (arg: RootState) => TrashBinEntities = rs =>
+  rs.trashBinInvariantProperties
+export const getTrashBinEntities: Selector<
+  BaseState,
+  TrashBinEntities
+> = createSelector(rootSelector, _getTrashBinEntities)
+
+export const _getTrashBinEntitiesRootState: (
+  arg: RootState
+) => TrashBinEntities = rs => rs.trashBinInvariantProperties
+
+export const getTrashBinEntity: Selector<
+  BaseState,
+  TrashBinEntities
+> = createSelector(rootSelector, _getTrashBinEntitiesRootState)
+
+export const _getGripperEntities: (arg: RootState) => GripperEntities = rs =>
+  rs.gripperInvariantProperties
+export const getGripperEntities: Selector<
+  BaseState,
+  GripperEntities
+> = createSelector(rootSelector, _getGripperEntities)
+
+export const _getGripperEntitiesRootState: (
+  arg: RootState
+) => GripperEntities = rs => rs.gripperInvariantProperties
+
+export const getGripperEntity: Selector<
+  BaseState,
+  GripperEntities
+> = createSelector(rootSelector, _getGripperEntitiesRootState)
+
+export const _getStagingAreaEntities: (
+  arg: RootState
+) => StagingAreaEntities = rs => rs.stagingAreaInvariantProperties
+export const getStagingAreaEntities: Selector<
+  BaseState,
+  StagingAreaEntities
+> = createSelector(rootSelector, _getStagingAreaEntities)
+
+export const _getStagingAreaEntitiesRootState: (
+  arg: RootState
+) => StagingAreaEntities = rs => rs.stagingAreaInvariantProperties
+
+export const getStagingAreaEntity: Selector<
+  BaseState,
+  StagingAreaEntities
+> = createSelector(rootSelector, _getStagingAreaEntitiesRootState)
 
 export const getInitialDeckSetupStepForm: Selector<
   BaseState,
@@ -263,7 +309,9 @@ const _getInitialDeckSetup = (
   labwareEntities: LabwareEntities,
   pipetteEntities: PipetteEntities,
   moduleEntities: ModuleEntities,
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities,
+  stagingAreaEntities: StagingAreaEntities,
+  trashBinEntities: TrashBinEntities
 ): InitialDeckSetup => {
   console.assert(
     initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
@@ -276,17 +324,6 @@ const _getInitialDeckSetup = (
     (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
   const pipetteLocations =
     (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
-
-  // filtering only the additionalEquipmentEntities that are rendered on the deck
-  // which for now is wasteChute, trashBin, and stagingArea
-  const additionalEquipmentEntitiesOnDeck = Object.values(
-    additionalEquipmentEntities
-  ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
-    if (ae.name !== 'gripper') {
-      aeEntities[ae.id] = ae
-    }
-    return aeEntities
-  }, {})
 
   return {
     labware: mapValues<Record<DeckSlot, string>, LabwareOnDeck>(
@@ -368,7 +405,9 @@ const _getInitialDeckSetup = (
         return { mount, ...pipetteEntities[pipetteId] }
       }
     ),
-    additionalEquipmentOnDeck: additionalEquipmentEntitiesOnDeck,
+    wasteChutes: wasteChuteEntities,
+    stagingAreas: stagingAreaEntities,
+    trashBins: trashBinEntities,
   }
 }
 
@@ -380,7 +419,9 @@ export const getInitialDeckSetup: Selector<
   getLabwareEntities,
   getPipetteEntities,
   getModuleEntities,
-  getAdditionalEquipment,
+  getWasteChuteEntities,
+  getStagingAreaEntities,
+  getTrashBinEntities,
   _getInitialDeckSetup
 )
 // Special version of `getLabwareEntities` selector for use in step-forms reducers
@@ -391,7 +432,9 @@ export const _getInitialDeckSetupRootState: (
   _getLabwareEntitiesRootState,
   _getPipetteEntitiesRootState,
   _getModuleEntitiesRootState,
-  _getAdditionalEquipmentRootState,
+  _getWasteChuteEntities,
+  _getStagingAreaEntities,
+  _getTrashBinEntities,
   _getInitialDeckSetup
 )
 export const getPermittedTipracks: Selector<
@@ -710,7 +753,10 @@ export const getInvariantContext: Selector<
   getModuleEntities,
   getPipetteEntities,
   getLiquidEntities,
-  getAdditionalEquipmentEntities,
+  getStagingAreaEntities,
+  getTrashBinEntities,
+  getGripperEntities,
+  getWasteChuteEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
   (
@@ -718,63 +764,13 @@ export const getInvariantContext: Selector<
     moduleEntities,
     pipetteEntities,
     liquidEntities,
-    additionalEquipmentEntities,
+    stagingAreaEntities,
+    trashBinEntities,
+    gripperEntities,
+    wasteChuteEntities,
     disableModuleRestrictions,
     allowAllTipracks
   ) => {
-    const stagingAreaEntities = Object.values(
-      additionalEquipmentEntities
-    ).reduce((acc: StagingAreaEntities, entity: AdditionalEquipmentEntity) => {
-      if (entity.name === 'stagingArea') {
-        acc[entity.id] = { id: entity.id, location: entity.location }
-        return acc
-      } else {
-        return acc
-      }
-    }, {})
-    const trashBinEntities = Object.values(additionalEquipmentEntities).reduce(
-      (acc: TrashBinEntities, entity: AdditionalEquipmentEntity) => {
-        if (entity.name === 'trashBin' && entity.pythonName != null) {
-          acc[entity.id] = {
-            id: entity.id,
-            location: entity.location,
-            pythonName: entity.pythonName,
-          }
-          return acc
-        } else {
-          return acc
-        }
-      },
-      {}
-    )
-    const wasteChuteEntities = Object.values(
-      additionalEquipmentEntities
-    ).reduce((acc: WasteChuteEntities, entity: AdditionalEquipmentEntity) => {
-      if (entity.name === 'wasteChute' && entity.pythonName != null) {
-        acc[entity.id] = {
-          id: entity.id,
-          pythonName: entity.pythonName,
-          location: entity.location,
-        }
-        return acc
-      } else {
-        return acc
-      }
-    }, {})
-    const gripperEntities = Object.values(additionalEquipmentEntities).reduce(
-      (acc: GripperEntities, entity: AdditionalEquipmentEntity) => {
-        if (entity.name === 'gripper') {
-          acc[entity.id] = {
-            id: entity.id,
-          }
-          return acc
-        } else {
-          return acc
-        }
-      },
-      {}
-    )
-
     return {
       labwareEntities,
       moduleEntities,

@@ -35,7 +35,9 @@ export function SlotDetailsContainer(
   const {
     modules: deckSetupModules,
     labware: deckSetupLabwares,
-    additionalEquipmentOnDeck,
+    trashBins,
+    stagingAreas,
+    wasteChutes,
   } = deckSetup
 
   const offDeckLabwareNickName =
@@ -50,12 +52,14 @@ export function SlotDetailsContainer(
   const nestedLabwareOnSlot = Object.values(deckSetupLabwares).find(
     lw => lw.slot === labwareOnSlot?.id
   )
-  const fixturesOnSlot = Object.values(additionalEquipmentOnDeck).filter(
-    ae => ae.location?.split('cutout')[1] === slot
-  )
-  const fixtureDisplayNames: string[] = fixturesOnSlot.map(fixture =>
-    t(`${fixture.name}`)
-  )
+
+  const trashBinDisplayNames: string[] =
+    Object.values(trashBins).length > 0 ? [t('trashBin')] : []
+  const wasteChuteDisplayNames: string[] =
+    Object.values(wasteChutes).length > 0 ? [t('wasteChute')] : []
+  const stagingAreaDisplayNames: string[] =
+    Object.values(stagingAreas).length > 0 ? [t('stagingArea')] : []
+
   const moduleDisplayName =
     moduleOnSlot != null ? getModuleDisplayName(moduleOnSlot.model) : null
 
@@ -105,7 +109,11 @@ export function SlotDetailsContainer(
       modules={moduleDisplayName != null ? [moduleDisplayName] : []}
       labwares={labwares}
       adapters={adapters}
-      fixtures={fixtureDisplayNames}
+      fixtures={[
+        ...trashBinDisplayNames,
+        ...wasteChuteDisplayNames,
+        ...stagingAreaDisplayNames,
+      ]}
       liquids={liquidNamesOnLabware}
     />
   )

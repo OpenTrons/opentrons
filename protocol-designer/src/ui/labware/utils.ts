@@ -45,12 +45,9 @@ export function getLabwareLatestSlotFromCurrentStepIndex(
   robotType: RobotType,
   filteredSavedStepFormIds: string[]
 ): string | null {
-  const { modules, labware, additionalEquipmentOnDeck } = initialDeckSetup
+  const { modules, labware, wasteChutes } = initialDeckSetup
   const initialSlot = labware[labwareId]?.slot
-  const hasWasteChute =
-    Object.values(additionalEquipmentOnDeck).find(
-      ae => ae.name === 'wasteChute'
-    ) != null
+  const hasWasteChute = Object.values(wasteChutes).length > 0
 
   //  latest moveLabware step related to labwareId at given index
   const moveLabwareStepId = filteredSavedStepFormIds

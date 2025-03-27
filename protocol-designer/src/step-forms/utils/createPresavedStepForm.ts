@@ -28,6 +28,9 @@ import type {
   Timeline,
   AdditionalEquipmentEntities,
   AbsorbanceReaderState,
+  GripperEntities,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '@opentrons/step-generation'
 import type { FormData, StepType, StepIdType } from '../../form-types'
 import type { InitialDeckSetup } from '../types'
@@ -48,7 +51,9 @@ export interface CreatePresavedStepFormArgs {
   orderedStepIds: OrderedStepIdsState
   initialDeckSetup: InitialDeckSetup
   robotStateTimeline: Timeline
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  gripperEntities: GripperEntities
+  trashBinEntities: TrashBinEntities
+  wasteChuteEntities: WasteChuteEntities
 }
 type FormUpdater = (arg0: FormData) => FormPatch | null
 
@@ -120,22 +125,31 @@ const _patchDefaultNozzle = (args: {
 }
 
 const _patchDefaultDropTipLocation = (args: {
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  trashBinEntities: TrashBinEntities
+  wasteChuteEntities: WasteChuteEntities
   labwareEntities: LabwareEntities
   pipetteEntities: PipetteEntities
 }): FormUpdater => formData => {
-  const { additionalEquipmentEntities, labwareEntities, pipetteEntities } = args
-  const trashBin = Object.values(additionalEquipmentEntities).find(
-    aE => aE.name === 'trashBin'
-  )
-  const wasteChute = Object.values(additionalEquipmentEntities).find(
-    aE => aE.name === 'wasteChute'
-  )
+  const {
+    trashBinEntities,
+    wasteChuteEntities,
+    labwareEntities,
+    pipetteEntities,
+  } = args
+  const firstTrashBinEntity =
+    Object.values(trashBinEntities).length > 0
+      ? Object.values(trashBinEntities)[0]
+      : null
+  const firstWasteChuteEntity =
+    Object.values(wasteChuteEntities).length > 0
+      ? Object.values(wasteChuteEntities)[0]
+      : null
+
   let defaultDropTipId = null
-  if (wasteChute != null) {
-    defaultDropTipId = wasteChute.id
-  } else if (trashBin != null) {
-    defaultDropTipId = trashBin.id
+  if (firstWasteChuteEntity != null) {
+    defaultDropTipId = firstWasteChuteEntity.id
+  } else if (firstTrashBinEntity != null) {
+    defaultDropTipId = firstTrashBinEntity.id
   }
   const formHasDropTipField = formData && 'dropTip_location' in formData
 
@@ -406,14 +420,12 @@ const _patchThermocyclerFields = (args: {
 }
 
 const _patchMoveLabwareFields = (args: {
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  gripperEntities: GripperEntities
   stepType: StepType
 }): FormUpdater => () => {
-  const { additionalEquipmentEntities, stepType } = args
+  const { gripperEntities, stepType } = args
   const isMoveLabware = stepType === 'moveLabware'
-  const hasGripper = Object.values(additionalEquipmentEntities).some(
-    ({ name }) => name === 'gripper'
-  )
+  const hasGripper = Object.keys(gripperEntities).length > 0
   if (isMoveLabware && hasGripper) {
     return { useGripper: true }
   }
@@ -429,7 +441,9 @@ export const createPresavedStepForm = ({
   stepId,
   stepType,
   robotStateTimeline,
-  additionalEquipmentEntities,
+  gripperEntities,
+  trashBinEntities,
+  wasteChuteEntities,
 }: CreatePresavedStepFormArgs): FormData => {
   const formData = createBlankForm({
     stepId,
@@ -444,7 +458,8 @@ export const createPresavedStepForm = ({
   const updateDefaultDropTip = _patchDefaultDropTipLocation({
     labwareEntities,
     pipetteEntities,
-    additionalEquipmentEntities,
+    trashBinEntities,
+    wasteChuteEntities,
   })
 
   const updateDefaultLabwareLocations = _patchDefaultLabwareLocations({
@@ -497,7 +512,7 @@ export const createPresavedStepForm = ({
   })
 
   const updateMoveLabwareFields = _patchMoveLabwareFields({
-    additionalEquipmentEntities,
+    gripperEntities,
     stepType,
   })
 
