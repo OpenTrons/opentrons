@@ -1577,7 +1577,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self,
         liquid_class: LiquidClass,
         volume: float,
-        source: labware.Well,
+        source: Union[labware.Well, Sequence[labware.Well]],
         dest: Union[
             labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
         ],
@@ -1596,9 +1596,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :meta private:
         """
-        if not isinstance(source, labware.Well):
-            raise ValueError(f"Source should be a single Well but received {source}.")
-
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
@@ -1612,15 +1609,24 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        if len(transfer_args.sources_list) != 1:
+            raise ValueError(
+                f"Source should be a single well (or resolve to a single transfer for multi-channel) "
+                f"but received {transfer_args.sources_list}."
+            )
         if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
             raise RuntimeError(
                 'Tip transfer policy "per source" incompatible with distribute.'
             )
 
+        verified_source = transfer_args.sources_list[0]
         self._core.distribute_liquid(
             liquid_class=liquid_class,
             volume=volume,
-            source=(types.Location(types.Point(), labware=source), source._core),
+            source=(
+                types.Location(types.Point(), labware=verified_source),
+                verified_source._core,
+            ),
             dest=[
                 (types.Location(types.Point(), labware=well), well._core)
                 for well in transfer_args.destinations_list
@@ -1643,7 +1649,7 @@ class InstrumentContext(publisher.CommandPublisher):
         source: Union[
             labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
         ],
-        dest: labware.Well,
+        dest: Union[labware.Well, Sequence[labware.Well]],
         new_tip: TransferTipPolicyV2Type = "once",
         trash_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
@@ -1659,10 +1665,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :meta private:
         """
-        if not isinstance(dest, labware.Well):
-            raise ValueError(
-                f"Destination should be a single Well but received {dest}."
-            )
         transfer_args = verify_and_normalize_transfer_args(
             source=source,
             dest=dest,
@@ -1676,11 +1678,17 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location if trash_location is not None else self.trash_container
             ),
         )
+        if len(transfer_args.destinations_list) != 1:
+            raise ValueError(
+                f"Destination should be a single well (or resolve to a single transfer for multi-channel) "
+                f"but received {transfer_args.destinations_list}."
+            )
         if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
             raise RuntimeError(
                 'Tip transfer policy "per source" incompatible with consolidate.'
             )
 
+        verified_dest = transfer_args.destinations_list[0]
         self._core.consolidate_liquid(
             liquid_class=liquid_class,
             volume=volume,
@@ -1688,7 +1696,10 @@ class InstrumentContext(publisher.CommandPublisher):
                 (types.Location(types.Point(), labware=well), well._core)
                 for well in transfer_args.sources_list
             ],
-            dest=(types.Location(types.Point(), labware=dest), dest._core),
+            dest=(
+                types.Location(types.Point(), labware=verified_dest),
+                verified_dest._core,
+            ),
             new_tip=transfer_args.tip_policy,
             tip_racks=[
                 (types.Location(types.Point(), labware=rack), rack._core)

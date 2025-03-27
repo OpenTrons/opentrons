@@ -2048,40 +2048,10 @@ def test_transfer_liquid_delegates_to_engine_core(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-def test_distribute_liquid_raises_for_invalid_locations(
-    decoy: Decoy,
-    mock_protocol_core: ProtocolCore,
-    subject: InstrumentContext,
-    robot_type: RobotType,
-    minimal_liquid_class_def2: LiquidClassSchemaV1,
-) -> None:
-    """It should raise errors if source or destination is invalid."""
-    test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
-    mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
-    decoy.when(
-        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([[mock_well]])
-    ).then_raise(ValueError("Oh no"))
-    with pytest.raises(ValueError):
-        subject.distribute_liquid(
-            liquid_class=test_liq_class,
-            volume=10,
-            source=mock_well,
-            dest=[[mock_well]],
-        )
-    with pytest.raises(ValueError, match="Source should be a single Well"):
-        subject.distribute_liquid(
-            liquid_class=test_liq_class,
-            volume=10,
-            source="abc",  # type: ignore
-            dest=[mock_well],
-        )
-
-
-@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_distribute_liquid_raises_if_more_than_one_source(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2089,10 +2059,32 @@ def test_distribute_liquid_raises_if_more_than_one_source(
     """It should raise error if source is more than one well."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
-    with pytest.raises(ValueError, match="Source should be a single Well"):
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [mock_well, mock_well]
+        )
+    ).then_return([mock_well, mock_well])
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([mock_well])
+    ).then_return([mock_well])
+    decoy.when(mock_validation.ensure_new_tip_policy("once")).then_return(
+        TransferTipPolicyV2.ONCE
+    )
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(
+        mock_validation.ensure_valid_trash_location_for_transfer_v2(trash_location)
+    ).then_return(trash_location)
+    with pytest.raises(ValueError, match="Source should be a single well"):
         subject.distribute_liquid(
-            liquid_class=test_liq_class, volume=10, source=[mock_well, mock_well], dest=[mock_well]  # type: ignore
+            liquid_class=test_liq_class,
+            volume=10,
+            source=[mock_well, mock_well],
+            dest=[mock_well],
+            trash_location=trash_location,
         )
 
 
@@ -2349,40 +2341,10 @@ def test_distribute_liquid_delegates_to_engine_core(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-def test_consolidate_liquid_raises_for_invalid_locations(
-    decoy: Decoy,
-    mock_protocol_core: ProtocolCore,
-    subject: InstrumentContext,
-    robot_type: RobotType,
-    minimal_liquid_class_def2: LiquidClassSchemaV1,
-) -> None:
-    """It should raise errors if source or destination is invalid."""
-    test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
-    mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
-    decoy.when(
-        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2([[mock_well]])
-    ).then_raise(ValueError("Oh no"))
-    with pytest.raises(ValueError):
-        subject.consolidate_liquid(
-            liquid_class=test_liq_class,
-            volume=10,
-            source=[[mock_well]],
-            dest=mock_well,
-        )
-    with pytest.raises(ValueError, match="Destination should be a single Well"):
-        subject.consolidate_liquid(
-            liquid_class=test_liq_class,
-            volume=10,
-            source=[mock_well],
-            dest="abc",  # type: ignore
-        )
-
-
-@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 def test_consolidate_liquid_raises_if_more_than_one_destination(
     decoy: Decoy,
     mock_protocol_core: ProtocolCore,
+    mock_instrument_core: InstrumentCore,
     subject: InstrumentContext,
     robot_type: RobotType,
     minimal_liquid_class_def2: LiquidClassSchemaV1,
@@ -2390,13 +2352,29 @@ def test_consolidate_liquid_raises_if_more_than_one_destination(
     """It should raise error if destination is more than one well."""
     test_liq_class = LiquidClass.create(minimal_liquid_class_def2)
     mock_well = decoy.mock(cls=Well)
-    decoy.when(mock_protocol_core.robot_type).then_return(robot_type)
-    with pytest.raises(ValueError, match="Destination should be a single Well"):
+    trash_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    mock_nozzle_map = decoy.mock(cls=NozzleMapInterface)
+    decoy.when(mock_nozzle_map.tip_count).then_return(1)
+    decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
+    decoy.when(
+        mock_validation.ensure_valid_flat_wells_list_for_transfer_v2(
+            [mock_well, mock_well]
+        )
+    ).then_return([mock_well, mock_well])
+    decoy.when(mock_validation.ensure_new_tip_policy("once")).then_return(
+        TransferTipPolicyV2.ONCE
+    )
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(
+        mock_validation.ensure_valid_trash_location_for_transfer_v2(trash_location)
+    ).then_return(trash_location)
+    with pytest.raises(ValueError, match="Destination should be a single well"):
         subject.consolidate_liquid(
             liquid_class=test_liq_class,
             volume=10,
             source=[mock_well, mock_well],
-            dest=[mock_well, mock_well],  # type: ignore
+            dest=[mock_well, mock_well],
+            trash_location=trash_location,
         )
 
 
