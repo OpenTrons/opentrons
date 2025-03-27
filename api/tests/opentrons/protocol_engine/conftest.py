@@ -203,7 +203,7 @@ def tiprack_lid_def() -> LabwareDefinition:
 def auto_sealing_lid_def() -> LabwareDefinition:
     """Get the definition of the opentrons tough auto sealing lid."""
     return labware_definition_type_adapter.validate_python(
-        load_definition("opentrons_tough_pcr_auto_sealing_lid", 2, schema=3)
+        load_definition("opentrons_tough_pcr_auto_sealing_lid", 2, schema=2)
     )
 
 
