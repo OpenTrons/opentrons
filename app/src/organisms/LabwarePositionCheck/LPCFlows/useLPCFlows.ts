@@ -120,7 +120,10 @@ export function useLPCFlows({
   const {
     createLabwareDefinition,
   } = useCreateMaintenanceRunLabwareDefinitionMutation()
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const {
+    deleteMaintenanceRun,
+    isLoading: isClosing,
+  } = useDeleteMaintenanceRunMutation()
   useRunLoadedLabwareDefinitions(runId ?? null, {
     onSuccess: res => {
       void Promise.all(
@@ -193,6 +196,7 @@ export function useLPCFlows({
         showLPC,
         lpcProps: {
           onCloseClick: handleCloseLPC,
+          isClosing,
           runId,
           robotType,
           deckConfig,

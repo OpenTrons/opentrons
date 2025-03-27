@@ -64,8 +64,8 @@ interface LegacyLabwarePositionCheckModalProps {
   existingOffsets: LabwareOffset[]
   onCloseClick: () => unknown
   protocolName: string
+  isDeletingMaintenanceRun: boolean
   setMaintenanceRunId?: (id: string | null) => void
-  isDeletingMaintenanceRun?: boolean
   caughtError?: Error
 }
 
