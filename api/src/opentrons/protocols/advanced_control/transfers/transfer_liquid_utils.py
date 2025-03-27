@@ -73,6 +73,13 @@ def group_wells_for_multi_channel_transfer(
     targets: Sequence[Well],
     nozzle_map: NozzleMapInterface,
 ) -> List[Well]:
+    """Takes a list of wells and a nozzle map and returns a list of target wells to address every well given
+
+    This currently only supports 8-tip columns, 12-tip rows and full 96-channel configurations,
+    and only is used for 96 and 384 well plates. This assumes the wells are being given in a
+    contiguous order (or every other for 384), and will raise if a well is found that does not overlap
+    with the first target well given for a sequence, or if not all wells are given for that sequence.
+    """
     configuration = nozzle_map.configuration
     active_nozzles = nozzle_map.tip_count
 
@@ -93,6 +100,7 @@ def group_wells_for_multi_channel_transfer(
 def _group_wells_for_columns_or_rows(  # noqa: C901
     targets: List[Well], nozzle_map: NozzleMapInterface
 ) -> List[Well]:
+    """Groups wells together for a column or row configuration and returns a reduced list of target wells."""
     from opentrons.protocol_api.labware import Labware
 
     grouped_wells = []
@@ -118,13 +126,13 @@ def _group_wells_for_columns_or_rows(  # noqa: C901
         targets.reverse()
 
     for well in targets:
-        # If the labware is not a 96 or 384 well plate, don't even bother trying to chunk it
+        # If the labware is not a 96 or 384 well plate, don't group it and move on to the next well
         labware_format = well.parent.parameters["format"]
         if labware_format != "96Standard" and labware_format != "384Standard":
             grouped_wells.append(well)
             continue
 
-        # If we have an active column or row already, check if the well is in that
+        # If we have an active column or row already, check if the well is in that list
         if active_column_or_row:
             if well.parent != active_labware:
                 raise ValueError(
@@ -177,7 +185,7 @@ def _group_wells_for_columns_or_rows(  # noqa: C901
                     "Could not resolve wells provided to pipette's nozzle configuration. "
                     "Please ensure wells are ordered to match pipette's nozzle layout."
                 )
-        # We have no active columns/rows so start a new one and chunk that well
+        # We have no active columns/rows so start a new one and add that well to the grouped wells
         else:
             active_column_or_row = list(
                 wells_covered_by_pipette_configuration(
@@ -234,6 +242,10 @@ def _group_wells_by_labware(target_wells: List[Well]) -> List[List[Well]]:
 
 
 def _group_wells_for_full_96(targets: List[Well]) -> List[Well]:
+    """Groups wells together for a full 96-channel configuration and returns a reduced list of target wells.
+
+    This will only ever return wells A1 for a 96 well plate, or wells A1, B1, A2, and/or B2 for a 384 well plate.
+    """
     if not targets:
         return []
 
