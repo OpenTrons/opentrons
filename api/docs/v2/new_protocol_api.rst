@@ -48,6 +48,8 @@ Wells and Liquids
 
 .. autoclass:: opentrons.protocol_api.Liquid
 
+.. autoclass:: opentrons.protocol_api.LiquidClass
+
 .. _protocol-api-modules:
 
 Modules
