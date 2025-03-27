@@ -328,7 +328,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         description="Food Coloring",
         display_color="#FE0000",
     )
-    diluent_volume = plate.max_volume - ctx.params.target_volume  # type: ignore [attr-defined]
+    diluent_volume = 200 - ctx.params.target_volume  # type: ignore [attr-defined]
     dye_source["A1"].load_liquid(diluent, diluent_volume)  # type: ignore [attr-defined]
 
     def _validate_dye_liquid_height() -> float:
@@ -424,15 +424,10 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         pip._retract()
         # Pause after aspiration
         if ctx.params.pause_after_asp:  # type: ignore [attr-defined]
-            ctx.pause("Visually inspect for dropouts.")
-        plate_starting_liquid_height = max(
-            _get_well_height_at_volume(labware=plate, volume=diluent_volume), 0.1
-        )
-        dispense_pos = _get_height_after_liquid_handling(
-            labware=plate,
-            height_before=plate_starting_liquid_height,
-            volume=ctx.params.target_volume,  # type: ignore [attr-defined]
-        )
+            ctx.pause("Inspect for dropouts.")
+        # we'll always end up with 200 uL after dispensing
+        dispense_pos = _get_well_height_at_volume(labware=plate, volume=200)
+
         # note: would probably be good to add a needed dead volume in this comparison
         dispense_submerge_depth = ctx.params.disp_sub_depth  # type: ignore [attr-defined]
         if dispense_submerge_depth >= dispense_pos:  # type: ignore [attr-defined]
@@ -467,4 +462,4 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         # Retract pipette
         pip._retract()
         # Pause protocol
-        ctx.pause()
+        ctx.pause("Replace tips and dispense plate.")
