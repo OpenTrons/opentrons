@@ -14,7 +14,7 @@ import os
 import csv
 
 metadata = {
-    "protocolName": "Flex Stacker Labware Dispense/Store.",
+    "protocolName": "Flex Stacker Labware Compatibility Lifetime Test.",
     "author": "Opentrons <protocols@opentrons.com>",
     "description": "This protocol dispenses labware from one stacker and into"
     "another stacker, the second stacker then stores it, and the actions are"
