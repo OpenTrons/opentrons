@@ -178,11 +178,11 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
                 display_names_by_id[loaded_labware.id] = loaded_labware.displayName
                 new_locations_by_id[loaded_labware.id] = loaded_labware.location
                 labware_by_id[loaded_labware.id] = loaded_labware
-        if loaded_labware_pool.adapter_labware:
+        if loaded_labware_pool.adapter_labware and stacker_state.pool_adapter_definition is not None:
             definitions_by_id[
                 loaded_labware_pool.adapter_labware.id
             ] = stacker_state.pool_adapter_definition
-        if loaded_labware_pool.lid_labware:
+        if loaded_labware_pool.lid_labware and stacker_state.pool_lid_definition is not None:
             definitions_by_id[
                 loaded_labware_pool.lid_labware.id
             ] = stacker_state.pool_lid_definition
