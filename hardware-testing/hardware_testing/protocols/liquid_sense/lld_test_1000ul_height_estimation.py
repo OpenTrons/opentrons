@@ -141,7 +141,7 @@ class TestTrial:
 
 
 def calibrate_tip_overlap(ctx: ProtocolContext, pipette: InstrumentContext) -> None:
-    if ctx.is_simulating:
+    if ctx.is_simulating():
         return
     api = ctx._core.get_hardware()
     pip_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
