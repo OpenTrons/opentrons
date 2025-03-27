@@ -90,8 +90,13 @@ _settings_reset_options = {
     # This option is defined here only as a convenience for robot-server.
     # Find a way to split things up and define this in robot-server instead.
     ResetOptionId.runs_history: CommonResetOption(
-        name="Clear Runs History",
-        description="Erase this device's stored history of protocols and runs.",
+        name="Clear Robot Server Data",
+        description=(
+            "Erase everything stored by the robot server. This is *not* everything stored"
+            " on the robot. It currently includes runs, protocols, labware offsets, and more,"
+            " and the exact list may change over time. This is exposed for troubleshooting"
+            " and system recovery. The name `runsHistory` is a misnomer, for historical reasons."
+        ),
     ),
     ResetOptionId.on_device_display: CommonResetOption(
         name="On-Device Display Configuration",
