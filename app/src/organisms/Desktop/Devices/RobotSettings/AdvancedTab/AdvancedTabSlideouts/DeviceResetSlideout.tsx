@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import snakeCase from 'lodash/snakeCase'
+import cloneDeep from 'lodash/cloneDeep'
 
 import {
   ALIGN_CENTER,
@@ -65,7 +65,10 @@ export function DeviceResetSlideout({
   const doTrackEvent = useTrackEvent()
   const robot = useRobot(robotName)
   const dispatch = useDispatch<Dispatch>()
-  const [resetOptions, setResetOptions] = useState<ResetConfigRequest>({})
+  const [
+    displayedOptions,
+    setDisplayedOptions,
+  ] = useState<DisplayedResetOptionState>(ALL_DESELECTED)
   const runsQueryResponse = useNotifyAllRunsQuery()
   const isFlex = useIsFlex(robotName)
 
@@ -73,37 +76,13 @@ export function DeviceResetSlideout({
   const deckCalibrationData = useDeckCalibrationData(robotName)
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const tipLengthCalibrations = useTipLengthCalibrations()
-  const options = useSelector((state: State) =>
+  const serverOptions = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
   )
   // Check length>0 to cope with the current behavior of getResetConfigOptions.
   // Perhaps it should return null instead of [] if we don't have options loaded yet.
-  const areOptionsLoaded = options != null && Object.keys(options).length > 0
-
-  const ot2CalibrationOptions =
-    options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
-  const flexCalibrationOptions =
-    options != null
-      ? options.filter(
-          opt =>
-            opt.id === 'pipetteOffsetCalibrations' ||
-            opt.id === 'gripperOffsetCalibrations' ||
-            opt.id === 'moduleCalibration'
-        )
-      : []
-
-  const calibrationOptions = isFlex
-    ? flexCalibrationOptions
-    : ot2CalibrationOptions
-
-  const bootScriptOption =
-    options != null ? options.filter(opt => opt.id.includes('bootScript')) : []
-  const runHistoryOption =
-    options != null ? options.filter(opt => opt.id.includes('runsHistory')) : []
-  const sshKeyOption =
-    options != null
-      ? options.filter(opt => opt.id.includes('authorizedKeys'))
-      : []
+  const areServerOptionsLoaded =
+    serverOptions != null && Object.keys(serverOptions).length > 0
 
   useEffect(() => {
     dispatch(fetchResetConfigOptions(robotName))
@@ -143,22 +122,10 @@ export function DeviceResetSlideout({
     const reachable = robot?.status !== UNREACHABLE
     updateResetStatus(
       reachable,
-      buildResetRequest(resetOptions, options, isFlex)
+      buildResetRequest(displayedOptions, serverOptions, isFlex)
     )
     onCloseClick()
   }
-
-  const totalOptionsSelected = Object.values(resetOptions).filter(
-    selected => selected === true
-  ).length
-
-  // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-  const allOptionsWithoutODD =
-    options != null ? options.filter(o => o.id !== 'onDeviceDisplay') : []
-
-  const isEveryOptionSelected =
-    totalOptionsSelected > 0 &&
-    totalOptionsSelected === allOptionsWithoutODD.length
 
   return (
     <Slideout
@@ -168,9 +135,9 @@ export function DeviceResetSlideout({
       footer={
         <PrimaryButton
           disabled={
-            !(Object.values(resetOptions).find(val => val) ?? false) ||
+            !isAnyOptionSelected(displayedOptions, isFlex) ||
             // handleClearData assumes options are loaded.
-            !areOptionsLoaded
+            !areServerOptionsLoaded
           }
           onClick={handleClearData}
           width="100%"
@@ -213,21 +180,17 @@ export function DeviceResetSlideout({
                 </LegacyStyledText>
                 <CheckboxField
                   onChange={() => {
-                    setResetOptions(
-                      isEveryOptionSelected
-                        ? {}
-                        : allOptionsWithoutODD.reduce((acc, val) => {
-                            return {
-                              ...acc,
-                              [val.id]: true,
-                            }
-                          }, {})
+                    setDisplayedOptions(
+                      isEveryOptionSelected(displayedOptions, isFlex)
+                        ? ALL_DESELECTED
+                        : ALL_SELECTED
                     )
                   }}
-                  value={isEveryOptionSelected}
+                  value={isEveryOptionSelected(displayedOptions, isFlex)}
                   label={t(`select_all_settings`)}
                   isIndeterminate={
-                    !isEveryOptionSelected && totalOptionsSelected > 0
+                    !isEveryOptionSelected(displayedOptions, isFlex) &&
+                    isAnyOptionSelected(displayedOptions, isFlex)
                   }
                 />
               </Flex>
@@ -269,31 +232,74 @@ export function DeviceResetSlideout({
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={-SPACING.spacing4}
               >
-                {calibrationOptions.map(opt => {
-                  let calibrationName = ''
-                  if (opt.id === 'pipetteOffsetCalibrations') {
-                    calibrationName = isFlex
-                      ? t('clear_option_pipette_calibrations')
-                      : t(`clear_option_${snakeCase(opt.id)}`)
-                  } else {
-                    calibrationName = t(`clear_option_${snakeCase(opt.id)}`)
-                  }
-                  return (
-                    calibrationName !== '' && (
-                      <CheckboxField
-                        key={opt.id}
-                        onChange={() => {
-                          setResetOptions({
-                            ...resetOptions,
-                            [opt.id]: !(resetOptions[opt.id] ?? false),
-                          })
-                        }}
-                        value={resetOptions[opt.id]}
-                        label={calibrationName}
-                      />
-                    )
-                  )
-                })}
+                {isFlex ? (
+                  <>
+                    <CheckboxField
+                      onChange={() => {
+                        const options = cloneDeep(displayedOptions)
+                        options.common.pipetteOffsetCalibrations = !options
+                          .common.pipetteOffsetCalibrations
+                        setDisplayedOptions(options)
+                      }}
+                      value={displayedOptions.common.pipetteOffsetCalibrations}
+                      // Server option "pipette offset calibrations" branded "pipette calibrations" on Flex.
+                      label={t('clear_option_pipette_calibrations')}
+                    />
+                    <CheckboxField
+                      onChange={() => {
+                        const options = cloneDeep(displayedOptions)
+                        options.flexOnly.gripperCalibrations = !options.flexOnly
+                          .gripperCalibrations
+                        setDisplayedOptions(options)
+                      }}
+                      value={displayedOptions.flexOnly.gripperCalibrations}
+                      label={t('clear_option_gripper_offset_calibrations')}
+                    />
+                    <CheckboxField
+                      onChange={() => {
+                        const options = cloneDeep(displayedOptions)
+                        options.flexOnly.moduleCalibrations = !options.flexOnly
+                          .moduleCalibrations
+                        setDisplayedOptions(options)
+                      }}
+                      value={displayedOptions.flexOnly.moduleCalibrations}
+                      label={t('clear_option_module_calibration')}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <CheckboxField
+                      onChange={() => {
+                        const options = cloneDeep(displayedOptions)
+                        options.ot2Only.deckCalibration = !options.ot2Only
+                          .deckCalibration
+                        setDisplayedOptions(options)
+                      }}
+                      value={displayedOptions.ot2Only.deckCalibration}
+                      label={t('clear_option_deck_calibration')}
+                    />
+                    <CheckboxField
+                      onChange={() => {
+                        const options = cloneDeep(displayedOptions)
+                        options.ot2Only.tipLengthCalibrations = !options.ot2Only
+                          .tipLengthCalibrations
+                        setDisplayedOptions(options)
+                      }}
+                      value={displayedOptions.ot2Only.tipLengthCalibrations}
+                      label={t('clear_option_tip_length_calibrations')}
+                    />
+                    <CheckboxField
+                      onChange={() => {
+                        const options = cloneDeep(displayedOptions)
+                        options.common.pipetteOffsetCalibrations = !options
+                          .common.pipetteOffsetCalibrations
+                        setDisplayedOptions(options)
+                      }}
+                      value={displayedOptions.common.pipetteOffsetCalibrations}
+                      label={t('clear_option_pipette_offset_calibrations')}
+                    />
+                  </>
+                )}
               </Flex>
             </Box>
             <Box>
@@ -313,19 +319,15 @@ export function DeviceResetSlideout({
                   {t('download')}
                 </Link>
               </Flex>
-              {runHistoryOption.map(opt => (
-                <CheckboxField
-                  key={opt.id}
-                  onChange={() => {
-                    setResetOptions({
-                      ...resetOptions,
-                      [opt.id]: !(resetOptions[opt.id] ?? false),
-                    })
-                  }}
-                  value={resetOptions[opt.id]}
-                  label={t(`clear_option_${snakeCase(opt.id)}`)}
-                />
-              ))}
+              <CheckboxField
+                onChange={() => {
+                  const options = cloneDeep(displayedOptions)
+                  options.common.runsHistory = !options.common.runsHistory
+                  setDisplayedOptions(options)
+                }}
+                value={displayedOptions.common.runsHistory}
+                label={t('clear_option_runs_history')}
+              />
             </Box>
             <Box>
               <LegacyStyledText
@@ -335,19 +337,15 @@ export function DeviceResetSlideout({
               >
                 {t('boot_scripts')}
               </LegacyStyledText>
-              {bootScriptOption.map(opt => (
-                <CheckboxField
-                  key={opt.id}
-                  onChange={() => {
-                    setResetOptions({
-                      ...resetOptions,
-                      [opt.id]: !(resetOptions[opt.id] ?? false),
-                    })
-                  }}
-                  value={resetOptions[opt.id]}
-                  label={t(`clear_option_${snakeCase(opt.id)}`)}
-                />
-              ))}
+              <CheckboxField
+                onChange={() => {
+                  const options = cloneDeep(displayedOptions)
+                  options.common.bootScripts = !options.common.bootScripts
+                  setDisplayedOptions(options)
+                }}
+                value={displayedOptions.common.bootScripts}
+                label={t('clear_option_boot_scripts')}
+              />
             </Box>
             <Box>
               <LegacyStyledText
@@ -357,19 +355,15 @@ export function DeviceResetSlideout({
               >
                 {t('ssh_public_keys')}
               </LegacyStyledText>
-              {sshKeyOption.map(opt => (
-                <CheckboxField
-                  key={opt.id}
-                  onChange={() => {
-                    setResetOptions({
-                      ...resetOptions,
-                      [opt.id]: !(resetOptions[opt.id] ?? false),
-                    })
-                  }}
-                  value={resetOptions[opt.id]}
-                  label={t(`clear_option_${snakeCase(opt.id)}`)}
-                />
-              ))}
+              <CheckboxField
+                onChange={() => {
+                  const options = cloneDeep(displayedOptions)
+                  options.common.authorizedKeys = !options.common.authorizedKeys
+                  setDisplayedOptions(options)
+                }}
+                value={displayedOptions.common.authorizedKeys}
+                label={t('clear_option_authorized_keys')}
+              />
             </Box>
           </Flex>
         </Flex>
@@ -378,35 +372,123 @@ export function DeviceResetSlideout({
   )
 }
 
+// Keys in this object do not need to map to the server's HTTP API.
+//
+// This is `{ot2Only: ..., flexOnly: ...}`` instead of `OT2Only | FlexOnly`` to be
+// defensive against the robot type changing
+interface DisplayedResetOptionState {
+  common: {
+    runsHistory: boolean
+    bootScripts: boolean
+    authorizedKeys: boolean
+    pipetteOffsetCalibrations: boolean
+  }
+  ot2Only: {
+    deckCalibration: boolean
+    tipLengthCalibrations: boolean
+  }
+  flexOnly: {
+    gripperCalibrations: boolean
+    moduleCalibrations: boolean
+  }
+}
+
+const ALL_DESELECTED: DisplayedResetOptionState = {
+  common: {
+    runsHistory: false,
+    bootScripts: false,
+    authorizedKeys: false,
+    pipetteOffsetCalibrations: false,
+  },
+  ot2Only: {
+    deckCalibration: false,
+    tipLengthCalibrations: false,
+  },
+  flexOnly: {
+    gripperCalibrations: false,
+    moduleCalibrations: false,
+  },
+}
+
+const ALL_SELECTED: DisplayedResetOptionState = {
+  common: {
+    runsHistory: true,
+    bootScripts: true,
+    authorizedKeys: true,
+    pipetteOffsetCalibrations: true,
+  },
+  ot2Only: {
+    deckCalibration: true,
+    tipLengthCalibrations: true,
+  },
+  flexOnly: {
+    gripperCalibrations: true,
+    moduleCalibrations: true,
+  },
+}
+
+function isAnyOptionSelected(
+  displayedState: DisplayedResetOptionState,
+  isFlex: boolean
+): boolean {
+  const common = Object.values(displayedState.common)
+  const robotSpecific = Object.values(
+    isFlex ? displayedState.flexOnly : displayedState.ot2Only
+  )
+  return [...common, ...robotSpecific].some(value => value)
+}
+
+function isEveryOptionSelected(
+  displayedState: DisplayedResetOptionState,
+  isFlex: boolean
+): boolean {
+  const common = Object.values(displayedState.common)
+  const robotSpecific = Object.values(
+    isFlex ? displayedState.flexOnly : displayedState.ot2Only
+  )
+  return [...common, ...robotSpecific].every(value => value)
+}
+
 function buildResetRequest(
-  displayedState: ResetConfigRequest,
+  displayedState: DisplayedResetOptionState,
   serverResetOptions: ResetConfigOption[],
   isFlex: boolean
 ): ResetConfigRequest {
-  let requestToReturn = {
-    ...displayedState,
+  let requestToReturn: ResetConfigRequest = {
+    // Keys in this object need to follow the server's HTTP API.
+
+    bootScripts: displayedState.common.bootScripts,
+    runsHistory: displayedState.common.runsHistory,
+    authorizedKeys: displayedState.common.authorizedKeys,
+    pipetteOffsetCalibrations: displayedState.common.pipetteOffsetCalibrations,
+
+    deckCalibration: displayedState.ot2Only.deckCalibration,
+    tipLengthCalibrations: displayedState.ot2Only.tipLengthCalibrations,
+
+    gripperOffsetCalibrations: displayedState.flexOnly.gripperCalibrations,
+    moduleCalibration: displayedState.flexOnly.moduleCalibrations,
   }
 
   if (isFlex) {
-    // todo(mm, 2025-03-27): This logic for auto-selecting the onDeviceDisplay reset
-    // option will not work if we add a new server-side option to
-    // `GET /settings/reset/options` but leave it out of the UI.
-    // (onDeviceDisplay will never be selected then.) We probably want to base
-    // `isEveryOptionSelected` on what the UI actually lets the user select, not
-    // what the server theoretically accepts.
-
-    const isEveryOptionSelected = serverResetOptions
-      .filter(o => o.id !== 'onDeviceDisplay') // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-      .map(serverOption => requestToReturn?.[serverOption.id] ?? false)
-      .every(value => value)
-
-    if (isEveryOptionSelected) {
-      requestToReturn = {
-        ...requestToReturn,
-        onDeviceDisplay: true,
-      }
+    // If the user selected every option in the UI, implicitly also select any options
+    // that the server advertises but that we don't show in the UI. Notably, this
+    // includes onDeviceDisplay.
+    if (isEveryOptionSelected(displayedState, isFlex)) {
+      requestToReturn = Object.fromEntries(
+        serverResetOptions.map(o => [o.id, true])
+      )
     }
   }
+
+  // If the server is older than this app, we might send it options that it doesn't
+  // understand, which it could choke on. Filter to send only the options that the
+  // server advertises.
+  const serverResetOptionIds = serverResetOptions.map(o => o.id)
+  requestToReturn = Object.fromEntries(
+    Object.entries(requestToReturn).filter(([k, _v]) =>
+      serverResetOptionIds.includes(k)
+    )
+  )
 
   return requestToReturn
 }
