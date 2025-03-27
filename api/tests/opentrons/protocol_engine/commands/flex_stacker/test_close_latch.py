@@ -46,6 +46,7 @@ async def test_close_latch_command(
         pool_lid_definition=None,
         pool_count=0,
         max_pool_count=0,
+        pool_overlap=0,
     )
     decoy.when(
         state_view.modules.get_flex_stacker_substate(module_id=stacker_id)
