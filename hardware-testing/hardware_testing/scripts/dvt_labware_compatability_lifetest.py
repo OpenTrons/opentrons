@@ -56,8 +56,8 @@ def add_parameters(parameters: ParameterContext) -> None:
                 "value": "opentrons_flex_96_tiprack_1000ul",
             },
             {
-                "display_name": "Armadillo Plates",
-                "value": "armadillo_96_wellplate_200ul_pcr_full_skirt",
+                "display_name": "NEST PCR Plates",
+                "value": "nest_96_wellplate_100ul_pcr_full_skirt",
             },
             {
                 "display_name": "NEST 96 Deep Well Plates",
