@@ -94,6 +94,41 @@ class AspirateMode(Enum):
     MENISCUS_LLD = "meniscus-lld"
 
 
+# ASPIRATE-MODES are PRE-CONFIGURED by SOURCE-WELL
+M = AspirateMode.MENISCUS
+M_LLD = AspirateMode.MENISCUS_LLD
+ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[AspirateMode]]] = {
+    6: {
+        "A": [M_LLD, M, M_LLD],
+        "B": [M, M_LLD, M],
+    },
+    12: {
+        "A": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+    },
+    15: {
+        "A": [M_LLD, M, M_LLD, M, M_LLD],
+        "B": [M, M_LLD, M, M_LLD, M],
+        "C": [M_LLD, M, M_LLD, M, M_LLD],
+    },
+    24: {
+        "A": [M_LLD, M, M_LLD, M, M_LLD, M],
+        "B": [M_LLD, M, M_LLD, M, M_LLD, M],
+        "C": [M_LLD, M, M_LLD, M, M_LLD, M],
+        "D": [M_LLD, M, M_LLD, M, M_LLD, M],
+    },
+    96: {
+        "A": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+        "B": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+        "C": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+        "D": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+        "E": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+        "F": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+        "G": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+        "H": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+    },
+}
+
+
 @dataclass
 class TestTrial:
     mode: AspirateMode
@@ -254,36 +289,6 @@ def _get_multi_dispense_volumes(volume_in_tip: float) -> List[float]:
             raise ValueError(f"can only dispense HV at 200-250 ul ({vols_as_str})")
 
     return disp_vols
-
-
-def _get_aspirate_mode_for_well(well: Well) -> AspirateMode:
-    # if given a labware and well in that labware, what strategy to use?
-    well_row = well.well_name[0]
-    well_column = int(well.well_name[1:])
-    num_wells_in_labware = len(well.parent.wells())
-    if num_wells_in_labware == 1:  # just the 2x different 1-well reservoirs
-        raise NotImplementedError(
-            "haven't yet implemented testing 1-well reservoir with 96ch"
-        )
-    elif num_wells_in_labware == 12:  # just the 12-row reservoir
-        if well_row % 2 == 1:
-            return AspirateMode.MENISCUS_LLD
-        else:
-            return AspirateMode.MENISCUS
-    elif num_wells_in_labware == 15:  # just the 15ml tube-rack
-        if well_column % 2 == 1:
-            return (
-                AspirateMode.MENISCUS_LLD if well_row in "AC" else AspirateMode.MENISCUS
-            )
-        else:
-            return (
-                AspirateMode.MENISCUS_LLD if well_row in "B" else AspirateMode.MENISCUS
-            )
-    else:
-        # DEFAULT: assign a strategy to an entire ROW of the plate
-        return (
-            AspirateMode.MENISCUS_LLD if well_row in "ACEG" else AspirateMode.MENISCUS
-        )
 
 
 def _load_labware(
@@ -510,12 +515,15 @@ def run(ctx: ProtocolContext) -> None:
     }
     for dst_plate in dst_plates:
         remaining_dst_wells = dst_plate.wells()
+        num_wells_in_labware = len(remaining_dst_wells)
         for test_well in test_labware.wells():
             # stop testing once the destination plate is full
             if not remaining_dst_wells:
                 break
             # gather all variables needed for testing this well
-            mode = _get_aspirate_mode_for_well(test_well)
+            well_row = test_well.well_name[0]
+            well_column = int(test_well.well_name[1:]) - 1  # zero indexed
+            mode = ASPIRATE_MODE_BY_WELL[num_wells_in_labware][well_row][well_column]
             submerge_mm = submerge_mm_by_mode[mode]
             ul_to_add, ul_to_remove = _get_add_then_remove_volumes_for_test_well(
                 test_well,
@@ -555,7 +563,7 @@ def run(ctx: ProtocolContext) -> None:
     # DETECT LIQUID
     # NOTE: pipette should already have tip attached
     # FIXME: remove this once positioning bug is fixed in PE
-    pipette.move_to(dye_src_well.top())
+    # pipette.move_to(dye_src_well.top())
     pipette.require_liquid_presence(dye_src_well)
     if not ctx.is_simulating():
         assert dye_src_well.current_liquid_volume() >= min_dye_required_in_reservoir, (
@@ -579,7 +587,7 @@ def run(ctx: ProtocolContext) -> None:
                 if not pipette.has_tip:
                     pipette.pick_up_tip()
                 # FIXME: remove this once positioning bug is fixed in PE
-                pipette.move_to(dye_src_well.top())
+                # pipette.move_to(dye_src_well.top())
                 pipette.prepare_to_aspirate()
                 pipette.aspirate(
                     volume=min(remaining_ul, pipette.max_volume),
@@ -588,7 +596,7 @@ def run(ctx: ProtocolContext) -> None:
                     ),
                 )
                 # FIXME: remove this once positioning bug is fixed in PE
-                pipette.move_to(trial.test_well.top())
+                # pipette.move_to(trial.test_well.top())
                 pipette.dispense(
                     volume=pipette.current_volume,
                     location=trial.test_well.meniscus(
@@ -607,10 +615,10 @@ def run(ctx: ProtocolContext) -> None:
             calibrate_tip_overlap(ctx, pipette)
             if trial.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
                 # FIXME: remove this once positioning bug is fixed in PE
-                pipette.move_to(trial.test_well.top())
+                # pipette.move_to(trial.test_well.top())
                 pipette.require_liquid_presence(trial.test_well)
             # FIXME: remove this once positioning bug is fixed in PE
-            pipette.move_to(trial.test_well.top())
+            # pipette.move_to(trial.test_well.top())
             pipette.prepare_to_aspirate()
             pipette.aspirate(
                 volume=trial.ul_to_remove,
@@ -623,12 +631,13 @@ def run(ctx: ProtocolContext) -> None:
             for w, v in zip(trial.destination_wells, trial.destination_volumes):
                 push_out = 0 if v < pipette.current_volume else P1000_MAX_PUSH_OUT_UL
                 # FIXME: remove this once positioning bug is fixed in PE
-                pipette.move_to(w.top())
+                # pipette.move_to(w.top())
                 pipette.dispense(
                     volume=v,
                     location=w.meniscus(target="dynamic", z=DISPENSE_MM_FROM_MENISCUS),
                     push_out=push_out,
                 )
+                pipette.touch_tip(w)
             pipette.drop_tip()
 
         # MOVE PLATE TO SHAKER & SHAKE
