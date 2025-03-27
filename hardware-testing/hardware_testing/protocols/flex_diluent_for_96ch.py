@@ -2,7 +2,12 @@
 from math import pi
 from typing import List, Optional, Dict, Tuple
 
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware
+from opentrons.protocol_api import (
+    ProtocolContext,
+    InstrumentContext,
+    Labware,
+    ParameterContext,
+)
 
 ##############################################
 #                EDIT - START                #
@@ -20,7 +25,6 @@ LIQUID_NAME = "Diluent"
 LIQUID_DESCRIPTION = "Artel MVS Diluent"
 LIQUID_COLOR = "#0000FF"
 
-TARGET_VOLUME = 195
 TARGET_PUSH_OUT = 15
 TARGET_SOURCES = [
     {
@@ -55,6 +59,16 @@ MIN_VOL_SRC = {
     "nest_12_reservoir_15ml": 3000,
     "nest_1_reservoir_195ml": 30000,
 }
+
+
+def add_parameters(parameters: ParameterContext) -> None:
+    """Build the runtime parameters."""
+    parameters.add_float(
+        display_name="Target volume of diluent",
+        variable_name="target_volume",
+        default=195,
+        description="How much diluent to put in each well",
+    )
 
 
 class _LiquidHeightInFlatBottomWell:
@@ -160,7 +174,7 @@ def _assign_starting_volumes(
     )
     for test in TARGET_SOURCES:
         src_ul_per_trial = _start_volumes_per_trial(
-            TARGET_VOLUME,
+            ctx.params.target_volume,  # type: ignore[attr-defined]
             reservoir.load_name,
             pipette.channels,
             len(test["destinations"]),
@@ -222,12 +236,12 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument("flex_8channel_1000", "left", tip_racks=[tips])
     _assign_starting_volumes(ctx, pipette, reservoir)
     for i in range(12):
-        pipette.configure_for_volume(TARGET_VOLUME)
+        pipette.configure_for_volume(ctx.params.target_volume)  # type: ignore[attr-defined]
         pipette.pick_up_tip()
         for test in TARGET_SOURCES:
             _transfer(
                 ctx,
-                TARGET_VOLUME,
+                ctx.params.target_volume,  # type: ignore[attr-defined]
                 pipette,
                 reservoir,
                 plate,
