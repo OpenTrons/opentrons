@@ -1,5 +1,4 @@
-import { useState, useEffect, Fragment } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
@@ -18,14 +17,9 @@ import {
 import { MediumButton, SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import {
-  getResetConfigOptions,
-  fetchResetConfigOptions,
-  resetConfig,
-} from '/app/redux/robot-admin'
+import { resetConfig } from '/app/redux/robot-admin'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
-import type { Dispatch, State } from '/app/redux/types'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
 import type { SetSettingOption } from './types'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
@@ -47,6 +41,62 @@ const OptionLabel = styled.label<LabelProps>`
     isSelected === true ? COLORS.blue50 : COLORS.blue35};
 `
 
+/**
+ * Selected/unselected state for each reset option we want to display,
+ * which is a subset of all the options supported by the server.
+ *
+ * At the time of writing, this deliberately excludes:
+ * - onDeviceDisplay (because we select/deselect it implicitly)
+ * - bootScripts (because product doesn't want this exposed to ODD users)
+ * - deckConfiguration
+ */
+interface DisplayedResetOptionState extends Record<string, boolean> {
+  pipetteOffsetCalibrations: boolean
+  gripperOffsetCalibrations: boolean
+  moduleCalibration: boolean
+  runsHistory: boolean
+}
+
+const targetOptionsOrder: Array<keyof DisplayedResetOptionState> = [
+  'pipetteOffsetCalibrations',
+  'gripperOffsetCalibrations',
+  'moduleCalibration',
+  'runsHistory',
+]
+
+function isEveryOptionSelected(
+  displayedState: DisplayedResetOptionState
+): boolean {
+  return Object.values(displayedState).every(value => value)
+}
+
+function isAnyOptionSelected(
+  displayedState: DisplayedResetOptionState
+): boolean {
+  return Object.values(displayedState).some(value => value)
+}
+
+function buildResetRequest(
+  displayedState: DisplayedResetOptionState
+): ResetConfigRequest {
+  return {
+    // Returned keys need to follow the server's HTTP API.
+    pipetteOffsetCalibrations: displayedState.pipetteOffsetCalibrations,
+    gripperOffsetCalibrations: displayedState.gripperOffsetCalibrations,
+    moduleCalibration: displayedState.moduleCalibration,
+    // If the user selected every visible option, implicitly select certain additional options.
+    ...(isEveryOptionSelected(displayedState)
+      ? {
+          authorizedKeys: true,
+          onDeviceDisplay: true,
+          deckConfiguration: true,
+          // todo(mm, 2025-03-27): This omits bootScripts because that's what the older
+          // code did, but it's unclear if that's intentional.
+        }
+      : {}),
+  }
+}
+
 interface DeviceResetProps {
   robotName: string
   setCurrentOption: SetSettingOption
@@ -57,50 +107,16 @@ export function DeviceReset({
   setCurrentOption,
 }: DeviceResetProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [resetOptions, setResetOptions] = useState<ResetConfigRequest>({})
-  const options = useSelector((state: State) =>
-    getResetConfigOptions(state, robotName)
-  )
+  const [resetOptions, setResetOptions] = useState<DisplayedResetOptionState>({
+    pipetteOffsetCalibrations: false,
+    gripperOffsetCalibrations: false,
+    moduleCalibration: false,
+    runsHistory: false,
+  })
   const [dispatchRequest] = useDispatchApiRequest()
 
-  const targetOptionsOrder = [
-    'pipetteOffsetCalibrations',
-    'gripperOffsetCalibrations',
-    'moduleCalibration',
-    'runsHistory',
-  ]
-
-  const availableOptions = options
-    // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-    // filtering out boot scripts since product doesn't want this exposed to ODD users
-    .filter(
-      ({ id }) =>
-        !['onDeviceDisplay', 'bootScripts', 'deckConfiguration'].includes(id)
-    )
-    .sort(
-      (a, b) =>
-        targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
-    )
-  const dispatch = useDispatch<Dispatch>()
-
-  const availableOptionsToDisplay = availableOptions.filter(
-    ({ id }) => !['authorizedKeys'].includes(id)
-  )
-
-  const isEveryOptionSelected = (obj: ResetConfigRequest): boolean => {
-    for (const key of targetOptionsOrder) {
-      if (obj != null && !obj[key]) {
-        return false
-      }
-    }
-    return true
-  }
-
   const handleClick = (): void => {
-    if (resetOptions != null) {
-      const { ...serverResetOptions } = resetOptions
-      dispatchRequest(resetConfig(robotName, serverResetOptions))
-    }
+    dispatchRequest(resetConfig(robotName, buildResetRequest(resetOptions)))
   }
 
   const {
@@ -110,7 +126,7 @@ export function DeviceReset({
   } = useConditionalConfirm(handleClick, true)
 
   const renderText = (
-    optionId: string
+    optionId: keyof DisplayedResetOptionState
   ): { optionText: string; subText?: string } => {
     let optionText = ''
     let subText
@@ -141,41 +157,6 @@ export function DeviceReset({
       subText,
     }
   }
-  useEffect(() => {
-    dispatch(fetchResetConfigOptions(robotName))
-  }, [dispatch, robotName])
-
-  useEffect(() => {
-    if (
-      isEveryOptionSelected(resetOptions) &&
-      (!resetOptions.authorizedKeys ||
-        !resetOptions.onDeviceDisplay ||
-        !resetOptions.deckConfiguration)
-    ) {
-      setResetOptions({
-        ...resetOptions,
-        authorizedKeys: true,
-        onDeviceDisplay: true,
-        deckConfiguration: true,
-      })
-    }
-  }, [resetOptions])
-
-  useEffect(() => {
-    if (
-      !isEveryOptionSelected(resetOptions) &&
-      resetOptions.authorizedKeys &&
-      resetOptions.onDeviceDisplay &&
-      resetOptions.deckConfiguration
-    ) {
-      setResetOptions({
-        ...resetOptions,
-        authorizedKeys: false,
-        onDeviceDisplay: false,
-        deckConfiguration: false,
-      })
-    }
-  }, [resetOptions])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -202,24 +183,25 @@ export function DeviceReset({
         marginTop="7.75rem"
       >
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          {availableOptionsToDisplay.map(option => {
-            const { optionText, subText } = renderText(option.id)
+          {targetOptionsOrder.map(optionId => {
+            const isOptionSelected = resetOptions[optionId]
+            const { optionText, subText } = renderText(optionId)
             return (
-              <Fragment key={option.id}>
+              <Fragment key={optionId}>
                 <OptionButton
-                  id={option.id}
+                  id={optionId as string} // cast because optionId is a key type
                   type="checkbox"
-                  value={option.id}
+                  value={optionId}
                   onChange={() => {
                     setResetOptions({
                       ...resetOptions,
-                      [option.id]: !(resetOptions[option.id] ?? false),
+                      [optionId]: !isOptionSelected,
                     })
                   }}
                 />
                 <OptionLabel
-                  htmlFor={option.id}
-                  isSelected={resetOptions[option.id]}
+                  htmlFor={optionId as string}
+                  isSelected={isOptionSelected}
                 >
                   <Flex flexDirection={DIRECTION_COLUMN}>
                     <LegacyStyledText
@@ -231,11 +213,7 @@ export function DeviceReset({
                     {subText != null ? (
                       <LegacyStyledText
                         as="p"
-                        color={
-                          resetOptions[option.id] ?? false
-                            ? COLORS.white
-                            : COLORS.grey60
-                        }
+                        color={isOptionSelected ? COLORS.white : COLORS.grey60}
                       >
                         {subText}
                       </LegacyStyledText>
@@ -252,28 +230,25 @@ export function DeviceReset({
             value="clearAllStoredData"
             onChange={() => {
               setResetOptions(
-                (resetOptions.authorizedKeys ?? false) &&
-                  (resetOptions.onDeviceDisplay ?? false)
-                  ? {}
-                  : availableOptions.reduce(
-                      (acc, val) => {
-                        return {
-                          ...acc,
-                          [val.id]: true,
-                        }
-                      },
-                      { authorizedKeys: true, onDeviceDisplay: true }
-                    )
+                isEveryOptionSelected(resetOptions)
+                  ? {
+                      pipetteOffsetCalibrations: false,
+                      gripperOffsetCalibrations: false,
+                      moduleCalibration: false,
+                      runsHistory: false,
+                    }
+                  : {
+                      pipetteOffsetCalibrations: true,
+                      gripperOffsetCalibrations: true,
+                      moduleCalibration: true,
+                      runsHistory: true,
+                    }
               )
             }}
           />
           <OptionLabel
             htmlFor="clearAllStoredData"
-            isSelected={
-              ((resetOptions.authorizedKeys ?? false) &&
-                (resetOptions.onDeviceDisplay ?? false)) ||
-              isEveryOptionSelected(resetOptions)
-            }
+            isSelected={isEveryOptionSelected(resetOptions)}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
               <LegacyStyledText
@@ -285,8 +260,6 @@ export function DeviceReset({
               <LegacyStyledText
                 as="p"
                 color={
-                  ((resetOptions.authorizedKeys ?? false) &&
-                    (resetOptions.onDeviceDisplay ?? false)) ||
                   isEveryOptionSelected(resetOptions)
                     ? COLORS.white
                     : COLORS.grey60
@@ -301,14 +274,7 @@ export function DeviceReset({
           data-testid="DeviceReset_clear_data_button"
           buttonText={t('clear_data_and_restart_robot')}
           buttonType="alert"
-          disabled={
-            Object.keys(resetOptions).length === 0 ||
-            availableOptions.every(
-              option =>
-                resetOptions[option.id] === false ||
-                resetOptions[option.id] === undefined
-            )
-          }
+          disabled={!isAnyOptionSelected(resetOptions)}
           onClick={confirmClearData}
         />
       </Flex>
