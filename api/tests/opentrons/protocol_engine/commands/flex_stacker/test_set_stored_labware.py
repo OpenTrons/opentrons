@@ -50,6 +50,7 @@ def subject(state_view: StateView, equipment: EquipmentHandler) -> SetStoredLabw
             ),
             FlexStackerPoolConstraint(
                 max_pool_count=10,
+                pool_overlap=0,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=sentinel.adapter_definition,
@@ -61,6 +62,7 @@ def subject(state_view: StateView, equipment: EquipmentHandler) -> SetStoredLabw
             None,
             FlexStackerPoolConstraint(
                 max_pool_count=10,
+                pool_overlap=0,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=None,
@@ -74,6 +76,7 @@ def subject(state_view: StateView, equipment: EquipmentHandler) -> SetStoredLabw
             ),
             FlexStackerPoolConstraint(
                 max_pool_count=10,
+                pool_overlap=0,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=sentinel.lid_definition,
                 adapter_definition=None,
@@ -87,6 +90,7 @@ def subject(state_view: StateView, equipment: EquipmentHandler) -> SetStoredLabw
             None,
             FlexStackerPoolConstraint(
                 max_pool_count=10,
+                pool_overlap=0,
                 primary_definition=sentinel.primary_definition,
                 lid_definition=None,
                 adapter_definition=sentinel.adapter_definition,
@@ -135,6 +139,7 @@ async def test_set_stored_labware_happypath(
             pool_lid_definition=None,
             pool_count=0,
             max_pool_count=0,
+            pool_overlap=0,
         )
     )
     decoy.when(
@@ -247,6 +252,7 @@ async def test_set_stored_labware_requires_empty_hopper(
             pool_lid_definition=None,
             pool_count=2,
             max_pool_count=6,
+            pool_overlap=0,
         )
     )
     with pytest.raises(FlexStackerNotLogicallyEmptyError):
@@ -294,6 +300,7 @@ async def test_set_stored_labware_limits_count(
             pool_lid_definition=None,
             pool_count=0,
             max_pool_count=0,
+            pool_overlap=0,
         )
     )
     decoy.when(
@@ -335,6 +342,7 @@ async def test_set_stored_labware_limits_count(
                 module_id=module_id,
                 pool_constraint=FlexStackerPoolConstraint(
                     max_pool_count=6,
+                    pool_overlap=0,
                     primary_definition=flex_50uL_tiprack,
                     lid_definition=None,
                     adapter_definition=None,

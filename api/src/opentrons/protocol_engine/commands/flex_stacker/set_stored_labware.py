@@ -163,7 +163,12 @@ class SetStoredLabwareImpl(
         state_update = (
             update_types.StateUpdate()
             .update_flex_stacker_labware_pool_definition(
-                params.moduleId, max_pool_count, labware_def, adapter_def, lid_def
+                params.moduleId,
+                max_pool_count,
+                overlap.z,
+                labware_def,
+                adapter_def,
+                lid_def,
             )
             .update_flex_stacker_labware_pool_count(params.moduleId, count)
         )
