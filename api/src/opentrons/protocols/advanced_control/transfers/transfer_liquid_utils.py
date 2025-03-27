@@ -203,8 +203,8 @@ def _group_wells_for_columns_or_rows(  # noqa: C901
 
     if active_column_or_row or secondary_384_column_or_row:
         raise ValueError(
-            "Could not target all wells provided without aspirating from other wells. "
-            f"Remaining wells: {active_column_or_row + secondary_384_column_or_row}"
+            "Could not target all wells provided without aspirating or dispensing from other wells. "
+            f"Other wells that would be targeted: {active_column_or_row + secondary_384_column_or_row}"
         )
 
     # If we reversed the lookup of wells, reverse the grouped wells we will return
@@ -258,6 +258,7 @@ def _group_wells_for_full_96(targets: List[Well]) -> List[Well]:
         if labware_format != "96Standard" and labware_format != "384Standard":
             grouped_wells.extend(well_group)
             continue
+
         # Check set as well to make sure there's also 96 (or a multiple of) unique wells
         if len(targets) % 96 != 0 or len(set(targets)) % 96 != 0:
             raise ValueError(
