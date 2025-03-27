@@ -5,7 +5,6 @@ from typing import Tuple
 from opentrons import protocol_api
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 from opentrons_shared_data.load import get_shared_data_root
-from ..gravimetric.liquid_class import defaults
 
 metadata = {"protocolName": "96ch Universal Photometric Protocol"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
@@ -70,6 +69,10 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         display_name="Number of tipracks",
         description="Choose 1 or 5 tipracks to load at the start.",
         default=1,
+        choices=[
+            {"display_name": "1", "value": 1},
+            {"display_name": "5", "value": 5},
+        ],
     )
 
     parameters.add_bool(
@@ -222,10 +225,13 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
                 "display_name": "Corning 96 360uL flat",
                 "value": "corning_96_wellplate_360ul_flat",
             },
+            {
+                "display_name": "Nest 96 100uL pcr",
+                "value": "nest_96_wellplate_100ul_pcr_full_skirt",
+            },
             {"display_name": "None", "value": "none"},
         ],
         default="corning_96_wellplate_360ul_flat",
-        # note: add new plate here
     )
 
 
@@ -301,7 +307,6 @@ def _get_current_liquid_height(labware: protocol_api.Labware) -> float:
 def run(ctx: protocol_api.ProtocolContext) -> None:
     """Run."""
     ctx.load_trash_bin("A3")
-
     # tips
     tipracks = [
         ctx.load_labware(
@@ -399,15 +404,24 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             dispense_submerge_speed = 50
             aspirate_exit_speed = 50
             dispense_exit_speed = 50
-            liquid_class = defaults.get_liquid_class(
-                pipette=ctx.params.model_type,  # type: ignore [attr-defined]
-                channels=96,
-                tip=ctx.params.tip_type,  # type: ignore [attr-defined]
-                volume=ctx.params.target_volume,  # type: ignore [attr-defined]
-            )
-            pip.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
-            pip.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
-            set_push_out = liquid_class.dispense.blow_out_submerged
+            if not ctx.is_simulating:
+                from hardware_testing.gravimetric.liquid_class.defaults import (
+                    get_liquid_class,
+                )
+
+                liquid_class = get_liquid_class(
+                    pipette=ctx.params.model_type,  # type: ignore [attr-defined]
+                    channels=96,
+                    tip=ctx.params.tip_type,  # type: ignore [attr-defined]
+                    volume=ctx.params.target_volume,  # type: ignore [attr-defined]
+                )
+                pip.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
+                pip.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
+                set_push_out = liquid_class.dispense.blow_out_submerged
+            else:  # if simulating
+                pip.flow_rate.aspirate = ctx.params.asp_flow_rate  # type: ignore [attr-defined]
+                pip.flow_rate.dispense = ctx.params.disp_flow_rate  # type: ignore [attr-defined]
+                set_push_out = ctx.params.push_out  # type: ignore [attr-defined]
         else:
             set_push_out = ctx.params.push_out  # type: ignore [attr-defined]
             pip.flow_rate.aspirate = ctx.params.asp_flow_rate  # type: ignore [attr-defined]
