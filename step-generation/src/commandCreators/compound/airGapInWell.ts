@@ -1,4 +1,8 @@
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import {
+  curryCommandCreator,
+  curryWithoutPython,
+  reduceCommandCreators,
+} from '../../utils'
 import { AIR_GAP_OFFSET_FROM_TOP } from '../../constants'
 import { airGapInPlace, moveToWell, prepareToAspirate } from '../atomic'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
@@ -20,18 +24,25 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
   prevRobotState
 ) => {
   const { labwareId, wellName, flowRate, pipetteId, volume, type } = args
+  const pipettePythonName =
+    invariantContext.pipetteEntities[pipetteId].pythonName
 
   const prepareToAspirateCommand =
     type === 'aspirate'
       ? []
       : [
-          curryCommandCreator(prepareToAspirate, {
+          curryWithoutPython(prepareToAspirate, {
             pipetteId,
           }),
         ]
 
-  const commandCreators: CurriedCommandCreator[] = [
-    curryCommandCreator(moveToWell, {
+  const pythonCommandCreator: CurriedCommandCreator = () => ({
+    commands: [],
+    python: `${pipettePythonName}.air_gap(volume=${volume}, height=${AIR_GAP_OFFSET_FROM_TOP})`,
+  })
+
+  const commandCreators = [
+    curryWithoutPython(moveToWell, {
       pipetteId,
       labwareId,
       wellName,
@@ -45,11 +56,12 @@ export const airGapInWell: CommandCreator<AirGapInWellArgs> = (
       },
     }),
     ...prepareToAspirateCommand,
-    curryCommandCreator(airGapInPlace, {
+    curryWithoutPython(airGapInPlace, {
       pipetteId,
       volume,
       flowRate,
     }),
+    pythonCommandCreator,
   ]
 
   return reduceCommandCreators(
