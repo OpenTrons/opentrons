@@ -15,6 +15,7 @@ from opentrons.protocol_api import (
     Well,
     Liquid,
 )
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.hardware_control.ot3_calibration import SLOT_CENTER
 from opentrons_shared_data.deck import (
@@ -143,7 +144,7 @@ class TestTrial:
 def calibrate_tip_overlap(ctx: ProtocolContext, pipette: InstrumentContext) -> None:
     if ctx.is_simulating():
         return
-    api = ctx._core.get_hardware()
+    api: SyncHardwareAPI = ctx._core.get_hardware()
     pip_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
     deck_probe_position = Point(
         *get_calibration_square_position_in_slot(slot=CALIBRATION_SLOT)
@@ -166,10 +167,10 @@ def calibrate_tip_overlap(ctx: ProtocolContext, pipette: InstrumentContext) -> N
         PROBE_START_HEIGHT_ABOVE_EXPECTED_MM + PROBE_OVERSHOOT_BELOW_EXPECTED_MM,
     )
     api.retract(pip_mount)
-    tip_overlap_error_mm = probed_deck_z - EXPECTED_PROBE_Z_POSITION_MM
 
     # MODIFY current tip length
-    old_tip_length = api.hardware_pipette[pip_mount.to_mount()].current_tip_length
+    old_tip_length = api.hardware_pipettes[pip_mount.to_mount()].current_tip_length
+    tip_overlap_error_mm = probed_deck_z - EXPECTED_PROBE_Z_POSITION_MM
     new_tip_length = old_tip_length + tip_overlap_error_mm
     api.remove_tip(pip_mount)
     api.add_tip(pip_mount, tip_length=new_tip_length)
