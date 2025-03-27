@@ -19,12 +19,11 @@ Use Opentrons-verified liquid classes to automatically define transfer settings 
 ### New Features
 
 - Make edits to advanced settings like submerge and retract position and speed, touch tip, and air gap to customize each transfer.
-- Add a push out volume after a low-volume dispense to ensure all liquid leaves the pipette tip.
+- Customize push out volume after a dispense to ensure all liquid leaves the pipette tip.
 - Add conditioning volumes to transfer steps. After aspirating liquid, the pipette will aspirate a smaller conditioning volume for a more accurate first dispense.
 
 ### Improved Features
 
-- Add a Flex Magnetic Block to deck slots A3-D3 when staging area slots are also installed, creating deck slots A4-D4.
 - Protocol Designer includes a warning when you clear a slot with labware, a module, or a fixture used in a protocol step.
 
 ### Bug Fixes
