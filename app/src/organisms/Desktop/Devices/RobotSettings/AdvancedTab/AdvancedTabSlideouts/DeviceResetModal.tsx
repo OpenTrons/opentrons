@@ -58,9 +58,9 @@ export function DeviceResetModal({
   const triggerReset = (): void => {
     if (resetOptions != null) {
       if (isFlex) {
-        const totalOptionsSelected = Object.values(resetOptions).filter(
-          selected => selected === true
-        ).length
+        const totalOptionsSelected = Object.values(
+          resetOptions.settingsResets
+        ).filter(selected => selected === true).length
 
         const isEveryOptionSelected =
           totalOptionsSelected > 0 &&
@@ -71,7 +71,10 @@ export function DeviceResetModal({
         if (isEveryOptionSelected) {
           resetOptions = {
             ...resetOptions,
-            onDeviceDisplay: true,
+            settingsResets: {
+              ...resetOptions.settingsResets,
+              onDeviceDisplay: true,
+            },
           }
         }
       }

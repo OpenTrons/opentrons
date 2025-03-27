@@ -64,7 +64,7 @@ export function DeviceResetSlideout({
   const dispatch = useDispatch<Dispatch>()
   const [resetOptions, setResetOptions] = useState<ResetConfigRequest>({
     resetLabwareOffsets: false,
-    postSettingsResetOptions: {},
+    settingsResets: {},
   })
   const runsQueryResponse = useNotifyAllRunsQuery()
   const isFlex = useIsFlex(robotName)
@@ -142,10 +142,12 @@ export function DeviceResetSlideout({
     onCloseClick()
   }
 
-  const totalOptionsSelected = Object.values(resetOptions).filter(
-    selected => selected === true
-  ).length
+  const totalOptionsSelected = [
+    resetOptions.resetLabwareOffsets,
+    ...Object.values(resetOptions.settingsResets),
+  ].filter(selected => selected === true).length
 
+  // TODO
   // filtering out ODD setting because this gets implicitly cleared if all settings are selected
   const allOptionsWithoutODD =
     options != null ? options.filter(o => o.id !== 'onDeviceDisplay') : []
@@ -154,6 +156,13 @@ export function DeviceResetSlideout({
     totalOptionsSelected > 0 &&
     totalOptionsSelected === allOptionsWithoutODD.length
 
+  // TODO: onDeviceDisplay handling
+  const isAnyOptionSelected =
+    [
+      resetOptions.resetLabwareOffsets,
+      ...Object.values(resetOptions.settingsResets),
+    ].find(val => val) ?? false
+
   return (
     <Slideout
       title={t('device_reset')}
@@ -161,7 +170,7 @@ export function DeviceResetSlideout({
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          disabled={!(Object.values(resetOptions).find(val => val) ?? false)}
+          disabled={!isAnyOptionSelected}
           onClick={handleClearData}
           width="100%"
         >

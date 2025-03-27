@@ -96,7 +96,11 @@ export function RobotSettingsAdvanced({
   const sn = robot?.status != null ? getRobotSerialNumber(robot) : null
 
   const [isRobotReachable, setIsRobotReachable] = useState<boolean>(reachable)
-  const [resetOptions, setResetOptions] = useState<ResetConfigRequest>({})
+  // todo(mm, 2025-03-27): Duplication of default resetOptions between here and DeviceResetSlideout.
+  const [resetOptions, setResetOptions] = useState<ResetConfigRequest>({
+    resetLabwareOffsets: false,
+    settingsResetOptions: {},
+  })
   const findSettings = (id: string): RobotSettingsField | undefined =>
     settings?.find(s => s.id === id)
 

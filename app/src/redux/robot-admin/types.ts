@@ -25,9 +25,12 @@ export interface ResetConfigOption {
 export interface ResetConfigRequest {
   resetLabwareOffsets: boolean
 
-  /** Options to pass as-is to `POST /settings/reset`. */
-  postSettingsResetOptions: {
-    [optionId: string]: boolean
+  /**
+   * Options to pass as-is to `POST /settings/reset`.
+   * The possible keys are theoretically dynamic, coming from `GET /settings/reset/options`,
+   */
+  settingsResets: {
+    [optionId: string]: boolean | undefined
   }
 }
 
