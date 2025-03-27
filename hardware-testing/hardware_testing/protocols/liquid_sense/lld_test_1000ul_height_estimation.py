@@ -30,6 +30,10 @@ requirements = {"robotType": "Flex", "apiLevel": "2.22"}
 SHAKER_RPM = 1100  # TODO: (sigler) double-check this again production script
 SHAKER_SECONDS = 30
 
+# NOTE: (sigler) tip volume probably never changes from 1000uL
+#       because high-volume aspirate are tip priority for this test
+TIP_VOLUME = 1000
+
 # hardcoded distances for when pressure-probing the calibration square
 PROBE_START_HEIGHT_ABOVE_EXPECTED_MM = 10.0
 PROBE_OVERSHOOT_BELOW_EXPECTED_MM = 5.0
@@ -192,7 +196,7 @@ def _binary_search_liquid_volume_at_height(
             best_diff = diff_mm
             best_value = mid_vol
         if diff_mm < tolerance_mm:
-            return best_value
+            break
         if mid_vol_height < height:
             min_vol = mid_vol  # Search in the upper half
         else:
@@ -360,6 +364,21 @@ def _helper_load_all_labware(
     return src_reservoir, test_labware, dst_plates
 
 
+def _pick_up_tip(pipette: InstrumentContext) -> None:
+    pipette.pick_up_tip()
+    pipette_id = pipette._core.pipette_id
+    if (
+        pipette._core._engine_client.state.pipettes.get_config(pipette_id).lld_settings
+        is not None
+    ):
+        # NOTE: (sigler) Purposefully setting minimum LLD height to 0.0 mm, so we
+        #       can test as near the bottoms of the wells as possible, to help determine
+        #       how much "factor of safety" our recommendations/defaults have.
+        pipette._core._engine_client.state.pipettes.get_config(pipette_id).lld_settings[
+            f"t{TIP_VOLUME}"
+        ]["minHeight"] = 0.0
+
+
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     parameters.add_int(
@@ -468,7 +487,7 @@ def run(ctx: ProtocolContext) -> None:
     # LOAD PIPETTES
     num_tip_slots = len([s for s in SLOTS.keys() if "tip" in s])
     pipette = ctx.load_instrument(
-        instrument_name=f"flex_{channels}channel_1000",
+        instrument_name=f"flex_{channels}channel_{TIP_VOLUME}",
         mount=mount,
         tip_racks=[
             _load_labware(
@@ -477,10 +496,11 @@ def run(ctx: ProtocolContext) -> None:
             for i in range(num_tip_slots)
         ],
     )
+
     # NOTE: `InstrumentContext.get_minimum_liquid_sense_height()`
     #       requires a tip to be currently attached, else it raises an error.
     #       We call that function when pre-calculating stuff.
-    pipette.pick_up_tip()
+    _pick_up_tip(pipette)
 
     # LOAD PLATE-READER
     reader_module = ctx.load_module("absorbanceReaderV1", SLOTS["reader"])
@@ -511,6 +531,7 @@ def run(ctx: ProtocolContext) -> None:
     # NOTE: storing trials by test-labware instance, so that during
     #       the test-run loop we can easily know when to use the
     #       gripper to re-arrange things
+    print("pre-calculated all volumes (please wait...)")
     test_trials_by_dst_plate: Dict[Labware, List[TestTrial]] = {
         dst_plate: [] for dst_plate in dst_plates
     }
@@ -563,8 +584,6 @@ def run(ctx: ProtocolContext) -> None:
 
     # DETECT LIQUID
     # NOTE: pipette should already have tip attached
-    # FIXME: remove this once positioning bug is fixed in PE
-    # pipette.move_to(dye_src_well.top())
     pipette.require_liquid_presence(dye_src_well)
     if not ctx.is_simulating():
         assert dye_src_well.current_liquid_volume() >= min_dye_required_in_reservoir, (
@@ -586,9 +605,7 @@ def run(ctx: ProtocolContext) -> None:
                 remaining_ul = trial.ul_to_add - trial.test_well.current_liquid_volume()
                 # NOTE: 1st trial has tip already attached
                 if not pipette.has_tip:
-                    pipette.pick_up_tip()
-                # FIXME: remove this once positioning bug is fixed in PE
-                # pipette.move_to(dye_src_well.top())
+                    _pick_up_tip(pipette)
                 pipette.prepare_to_aspirate()
                 pipette.aspirate(
                     volume=min(remaining_ul, pipette.max_volume),
@@ -596,8 +613,6 @@ def run(ctx: ProtocolContext) -> None:
                         target="dynamic", z=trial.submerge_mm
                     ),
                 )
-                # FIXME: remove this once positioning bug is fixed in PE
-                # pipette.move_to(trial.test_well.top())
                 pipette.dispense(
                     volume=pipette.current_volume,
                     location=trial.test_well.meniscus(
@@ -608,18 +623,13 @@ def run(ctx: ProtocolContext) -> None:
             pipette.drop_tip()
 
             # REMOVE DYE FROM TEST-LABWARE
-            print(f"removing {trial.ul_to_remove} uL")
-            pipette.pick_up_tip()
+            _pick_up_tip(pipette)
             # NOTE: (sigler) calibrating THIS tip, because the
             #       position is critical to determine if our submerge
             #       depths are reliable or not
             calibrate_tip_overlap(ctx, pipette)
             if trial.mode == AspirateMode.MENISCUS_LLD and not ctx.is_simulating():
-                # FIXME: remove this once positioning bug is fixed in PE
-                # pipette.move_to(trial.test_well.top())
                 pipette.require_liquid_presence(trial.test_well)
-            # FIXME: remove this once positioning bug is fixed in PE
-            # pipette.move_to(trial.test_well.top())
             pipette.prepare_to_aspirate()
             pipette.aspirate(
                 volume=trial.ul_to_remove,
@@ -631,8 +641,6 @@ def run(ctx: ProtocolContext) -> None:
             # MULTI-DISPENSE TO PLATE
             for w, v in zip(trial.destination_wells, trial.destination_volumes):
                 push_out = 0 if v < pipette.current_volume else P1000_MAX_PUSH_OUT_UL
-                # FIXME: remove this once positioning bug is fixed in PE
-                # pipette.move_to(w.top())
                 pipette.dispense(
                     volume=v,
                     location=w.meniscus(target="dynamic", z=DISPENSE_MM_FROM_MENISCUS),
