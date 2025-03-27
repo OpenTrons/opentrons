@@ -5510,7 +5510,11 @@
                 ]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "flowRate": 716.0,
+                  "location": "trash"
+                }
               },
               "delay": {
                 "enable": false,
@@ -7656,7 +7660,11 @@
                 ]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "flowRate": 125.0,
+                  "location": "trash"
+                }
               },
               "delay": {
                 "enable": true,
@@ -10124,7 +10132,11 @@
                 ]
               ],
               "blowout": {
-                "enable": false
+                "enable": true,
+                "params": {
+                  "flowRate": 50.0,
+                  "location": "trash"
+                }
               },
               "delay": {
                 "enable": false,
@@ -11943,7 +11955,11 @@
             ]
           ],
           "blowout": {
-            "enable": false
+            "enable": true,
+            "params": {
+              "flowRate": 716.0,
+              "location": "trash"
+            }
           },
           "delay": {
             "enable": false,
@@ -12270,7 +12286,11 @@
             ]
           ],
           "blowout": {
-            "enable": false
+            "enable": true,
+            "params": {
+              "flowRate": 125.0,
+              "location": "trash"
+            }
           },
           "delay": {
             "enable": true,
@@ -12597,7 +12617,11 @@
             ]
           ],
           "blowout": {
-            "enable": false
+            "enable": true,
+            "params": {
+              "flowRate": 50.0,
+              "location": "trash"
+            }
           },
           "delay": {
             "enable": false,
