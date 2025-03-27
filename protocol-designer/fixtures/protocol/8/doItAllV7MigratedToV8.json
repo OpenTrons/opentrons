@@ -278,7 +278,9 @@
           "id": "f9a294f1-f42b-4cae-893a-592405349d56",
           "dispense_touchTip_mmfromTop": null,
           "pushOut_checkbox": true,
-          "pushOut_volume": 7
+          "pushOut_volume": 7,
+          "conditioning_checkbox": false,
+          "conditioning_volume": null
         },
         "5fdb9a12-fab4-42fd-886f-40af107b15d6": {
           "aspirate_delay_checkbox": false,

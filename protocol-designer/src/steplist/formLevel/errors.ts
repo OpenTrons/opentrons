@@ -19,7 +19,11 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
-import { canPipetteUseLabware, getMaxPushOutVolume } from '../../utils'
+import {
+  canPipetteUseLabware,
+  getMaxConditioningVolume,
+  getMaxPushOutVolume,
+} from '../../utils'
 import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
 
@@ -480,6 +484,30 @@ const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
 const PUSH_OUT_VOLUME_REQUIRED: FormError = {
   title: 'Push out volume required',
   dependentFields: ['pushOut_volume'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
+}
+const PUSH_OUT_VOLUME_OUT_OF_RANGE: FormError = {
+  title: 'Push out volume out of range',
+  dependentFields: ['pushOut_volume'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
+}
+const CONDITIONING_VOLUME_REQUIRED: FormError = {
+  title: 'Conditioning volume required',
+  dependentFields: ['conditioning_volume'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
+}
+const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
+  title: 'Conditioning volume out of range',
+  dependentFields: ['conditioning_volume'],
   showAtForm: false,
   showAtField: true,
   page: 2,
@@ -1140,7 +1168,38 @@ export const pushOutVolumeOutOfRange = (
     (pipette as PipetteEntity).spec
   )
   return pushOut_checkbox && pushOut_volume > maxPushOutVolume
-    ? PUSH_OUT_VOLUME_REQUIRED
+    ? PUSH_OUT_VOLUME_OUT_OF_RANGE
+    : null
+}
+export const conditioningVolumeRequired = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const { conditioning_checkbox, conditioning_volume } = fields
+  return conditioning_checkbox && !conditioning_volume
+    ? CONDITIONING_VOLUME_REQUIRED
+    : null
+}
+export const conditioningVolumeOutOfRange = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const {
+    conditioning_checkbox,
+    conditioning_volume,
+    pipette,
+    volume,
+    disposalVolume_checkbox,
+    disposalVolume_volume,
+  } = fields
+  if (pipette == null || conditioning_volume == null) {
+    return null
+  }
+  const maxConditioningVolume = getMaxConditioningVolume(
+    Number(volume),
+    disposalVolume_checkbox === true ? Number(disposalVolume_volume) : 0,
+    pipette.spec
+  )
+  return conditioning_checkbox && conditioning_volume > maxConditioningVolume
+    ? CONDITIONING_VOLUME_OUT_OF_RANGE
     : null
 }
 

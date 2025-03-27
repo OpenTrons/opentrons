@@ -440,6 +440,10 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     castValue: numberOrNull,
   },
+  conditioning_volume: {
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    castValue: numberOrNull,
+  },
 }
 const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
   // profile step fields

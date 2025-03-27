@@ -335,3 +335,17 @@ export const getDefaultPushOutVolume = (
     liquids[lookupKey].supportedTips[tipVolumeKey]?.defaultPushOutVolume ?? 0
   )
 }
+
+export const getMaxConditioningVolume = (
+  transferVolume: number,
+  disposalVolume: number,
+  pipetteSpecs: PipetteV2Specs
+): number => {
+  const { liquids } = pipetteSpecs
+  const isInLowVolumeMode =
+    transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
+  const maxWorkingVolume = isInLowVolumeMode
+    ? liquids.lowVolumeDefault.maxVolume
+    : liquids.default.maxVolume
+  return maxWorkingVolume - disposalVolume - transferVolume
+}

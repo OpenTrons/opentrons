@@ -31,7 +31,10 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { getMaxPushOutVolume } from '../../../../../../utils'
+import {
+  getMaxConditioningVolume,
+  getMaxPushOutVolume,
+} from '../../../../../../utils'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
@@ -149,6 +152,11 @@ export const SecondStepsMoveLiquidTools = ({
 
   const maxPushoutVolume = getMaxPushOutVolume(
     Number(formData.volume),
+    pipetteSpec
+  )
+  const maxConditioningVolume = getMaxConditioningVolume(
+    Number(formData.volume),
+    Number(formData.disposalVolume_volume),
     pipetteSpec
   )
 
@@ -367,6 +375,31 @@ export const SecondStepsMoveLiquidTools = ({
             </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
+        {tab === 'dispense' && formData.path === 'multiDispense' ? (
+          <CheckboxExpandStepFormField
+            title={t('form:step_edit_form.field.conditioning.title')}
+            fieldProps={propsForFields.conditioning_checkbox}
+          >
+            {formData.conditioning_checkbox === true ? (
+              <InputStepFormField
+                title={t(
+                  'form:step_edit_form.field.conditioning.conditioning_volume.label'
+                )}
+                caption={t(
+                  'form:step_edit_form.field.conditioning.conditioning_volume.caption',
+                  { min: 0, max: maxConditioningVolume }
+                )}
+                padding="0"
+                {...propsForFields.conditioning_volume}
+                showTooltip={false}
+                errorToShow={getFormLevelError(
+                  'conditioning_volume',
+                  mappedErrorsToField
+                )}
+              />
+            ) : null}
+          </CheckboxExpandStepFormField>
+        ) : null}
         {tab === 'dispense' ? (
           <CheckboxExpandStepFormField
             title={i18n.format(

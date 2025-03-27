@@ -57,6 +57,8 @@ import {
   dispenseTouchTipMmFromEdgeRequired,
   pushOutVolumeRequired,
   pushOutVolumeOutOfRange,
+  conditioningVolumeOutOfRange,
+  conditioningVolumeRequired,
 } from './errors'
 
 import {
@@ -194,7 +196,9 @@ const stepFormHelperMap: {
       aspirateTouchTipMmFromEdgeOutOfRange,
       dispenseTouchTipMmFromEdgeOutOfRange,
       aspirateTouchTipMmFromEdgeRequired,
-      dispenseTouchTipMmFromEdgeRequired
+      dispenseTouchTipMmFromEdgeRequired,
+      conditioningVolumeRequired,
+      conditioningVolumeOutOfRange
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,

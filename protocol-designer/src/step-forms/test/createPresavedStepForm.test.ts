@@ -219,6 +219,8 @@ describe('createPresavedStepForm', () => {
       preWetTip: false,
       pushOut_checkbox: null,
       pushOut_volume: null,
+      conditioning_checkbox: false,
+      conditioning_volume: null,
       stepDetails: '',
       stepName: 'transfer',
       volume: null,
