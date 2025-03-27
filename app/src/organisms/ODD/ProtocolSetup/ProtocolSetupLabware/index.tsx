@@ -269,7 +269,8 @@ function LabwareLatch({
     params: { moduleId: matchedHeaterShaker.id },
   }
 
-  const toggleLatch = (): void => {
+  const toggleLatch = (e: TouchEvent): void => {
+    e.stopPropagation()
     createLiveCommand({
       command: latchCommand,
       waitUntilComplete: true,
