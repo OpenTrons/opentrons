@@ -242,6 +242,8 @@ export const getFormErrors = (
     return []
   }
 
+  //  TODO: try to find a cleaner way to write this via mapping
+  //  while also making TS happy
   switch (stepType) {
     case 'absorbanceReader':
       return stepFormHelperMap[stepType].getErrors(
@@ -313,6 +315,8 @@ export const getFormWarnings = (
     return []
   }
 
+  //  TODO: try to find a cleaner way to write this via mapping
+  //  while also making TS happy
   switch (stepType) {
     case 'mix':
       return stepFormHelperMap.mix.getWarnings != null
