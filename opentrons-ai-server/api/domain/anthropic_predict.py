@@ -1,6 +1,6 @@
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Literal
+from typing import Any, Dict, List, Literal, cast
 
 import requests
 import structlog
@@ -9,10 +9,10 @@ from anthropic import Anthropic
 from anthropic.types import Message, MessageParam
 from ddtrace import tracer
 
-from api.domain.config_anthropic import DOCUMENTS, PROMPT, SYSTEM_PROMPT
+from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_RELEVANT_API, SYSTEM_PROMPT
 from api.settings import Settings
 
-weave.init("opentronsai/OpentronsAI-Phase-2")
+weave.init("opentronsai/OpentronsAI-Phase-march-25")
 settings: Settings = Settings()
 logger = structlog.stdlib.get_logger(settings.logger_name)
 ROOT_PATH: Path = Path(Path(__file__)).parent.parent.parent
@@ -23,16 +23,30 @@ class AnthropicPredict:
         self.settings: Settings = settings
         self.client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
+        self.model_helper: str = settings.model_helper
         self.system_prompt: str = SYSTEM_PROMPT
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
-        self.cached_docs: List[MessageParam] = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": DOCUMENTS.format(doc_content=self.get_docs()), "cache_control": {"type": "ephemeral"}}  # type: ignore
-                ],
-            }
-        ]
+        self.path_api_docs: Path = ROOT_PATH / "api" / "storage" / "api_docs" / "v2_structure.xml"
+        self.cached_docs: List[MessageParam] = cast(
+            List[MessageParam],
+            [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": DOCUMENTS.format(doc_content=self.get_docs()), "cache_control": {"type": "ephemeral"}}
+                    ],
+                }
+            ],
+        )
+        self.cached_api_docs: List[MessageParam] = cast(
+            List[MessageParam],
+            [
+                {
+                    "role": "user",
+                    "content": [{"type": "text", "text": self.get_api_docs(), "cache_control": {"type": "ephemeral"}}],
+                }
+            ],
+        )
         self.tools: List[Dict[str, Any]] = [
             {
                 "name": "simulate_protocol",
@@ -79,6 +93,49 @@ class AnthropicPredict:
         return "\n".join(xml_output)
 
     @tracer.wrap()
+    def get_api_docs(self) -> str:
+        """
+        Read Python API v2 docs and return as string
+        """
+        logger.info("Getting Python API v2 docs", extra={"path": str(self.path_api_docs)})
+        with open(self.path_api_docs, "r") as f:
+            v2_doc_content = f.read()
+        return f"<python_v2_api_doc>\n{v2_doc_content}\n</python_v2_api_doc>"
+
+    @tracer.wrap()
+    def get_relevant_api_docs(self, query: str, user_id: str) -> str:
+        """
+        Get relevant API docs based on the user's prompt
+        """
+        msg = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "document",
+                        "source": {"type": "text", "media_type": "text/plain", "data": self.get_api_docs()},
+                        "title": "Python API V2 Documentation",
+                        "context": "This is an Official Python API V2 Documentation for Opentrons robots.",
+                        "cache_control": {"type": "ephemeral"},
+                    },
+                    {"type": "text", "text": PROMPT_RELEVANT_API.format(API_QUERY=query)},
+                ],
+            }
+        ]
+
+        response = self.client.messages.create(  # type: ignore[call-overload]
+            max_tokens=2048,
+            temperature=0.0,
+            messages=msg,
+            model=self.model_helper,
+            system="""You are a helpful assistant to collect relevant information to the query. You find information
+                given in tags <python_v2_api_doc>.
+            """,
+            metadata={"user_id": user_id},
+        )
+        return response.content[0].text  # type: ignore[no-any-return]
+
+    @tracer.wrap()
     def _process_message(
         self, user_id: str, messages: List[MessageParam], message_type: Literal["create", "update"], max_tokens: int = 4096
     ) -> Message:
@@ -87,13 +144,12 @@ class AnthropicPredict:
         For now, system prompt is the same.
         """
 
-        response: Message = self.client.messages.create(
-            model=self.model_name,
-            system=self.system_prompt,
+        response: Message = self.client.messages.create(  # type: ignore[call-overload]
             max_tokens=max_tokens,
             messages=messages,
-            tools=self.tools,  # type: ignore
-            extra_headers={"anthropic-beta": "prompt-caching-2024-07-31"},
+            model=self.model_name,
+            system=self.system_prompt,
+            tools=self.tools,
             metadata={"user_id": user_id},
             temperature=0.0,
         )
@@ -119,13 +175,17 @@ class AnthropicPredict:
             if history:
                 messages += history
 
+            if len(messages) == 1:
+                relevant_api_docs = self.get_relevant_api_docs(prompt, user_id)
+                prompt = f"{prompt}\n\n{relevant_api_docs}"
+
             messages.append({"role": "user", "content": PROMPT.format(USER_PROMPT=prompt)})
             response = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
 
             if response.content[-1].type == "tool_use":
                 tool_use = response.content[-1]
                 messages.append({"role": "assistant", "content": response.content})
-                result = self.handle_tool_use(tool_use.name, tool_use.input)  # type: ignore
+                result = self.handle_tool_use(tool_use.name, tool_use.input)  # type: ignore[arg-type]
                 messages.append(
                     {
                         "role": "user",
@@ -139,9 +199,14 @@ class AnthropicPredict:
                     }
                 )
                 follow_up = self._process_message(user_id=user_id, messages=messages, message_type=message_type)
-                return follow_up.content[0].text  # type: ignore
+                if follow_up.content and follow_up.content[0].type == "text":
+                    # Simply return the text directly
+                    return follow_up.content[0].text
+                logger.error("Unexpected follow-up response type")
+                return None
 
-            elif response.content[0].type == "text":
+            elif response.content and response.content[0].type == "text":
+                # Simply return the text directly
                 return response.content[0].text
 
             logger.error("Unexpected response type")

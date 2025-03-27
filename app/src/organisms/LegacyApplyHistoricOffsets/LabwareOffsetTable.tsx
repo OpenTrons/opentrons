@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { SPACING, TYPOGRAPHY, COLORS } from '@opentrons/components'
 
-import { OffsetVector } from '/app/molecules/OffsetVector'
+import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { formatTimestamp } from '/app/transformations/runs'
 import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/utils/getDisplayLocation'
 
@@ -51,7 +51,9 @@ export function LabwareOffsetTable(
           <OffsetTableHeader>{t('location')}</OffsetTableHeader>
           <OffsetTableHeader>{t('run')}</OffsetTableHeader>
           <OffsetTableHeader>{t('labware')}</OffsetTableHeader>
-          <OffsetTableHeader>{t('labware_offset_data')}</OffsetTableHeader>
+          <OffsetTableHeader>
+            {t('legacy_labware_offset_data')}
+          </OffsetTableHeader>
         </tr>
       </thead>
       <tbody>
@@ -70,7 +72,7 @@ export function LabwareOffsetTable(
             </OffsetTableDatum>
             <OffsetTableDatum>{offset.labwareDisplayName}</OffsetTableDatum>
             <OffsetTableDatum>
-              <OffsetVector {...offset.vector} />
+              <LegacyOffsetVector {...offset.vector} />
             </OffsetTableDatum>
           </OffsetTableRow>
         ))}

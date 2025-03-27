@@ -3,20 +3,24 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { DetachProbe } from '/app/organisms/LabwarePositionCheck/steps'
-import { clickButtonLabeled } from '/app/organisms/LabwarePositionCheck/__tests__/utils'
 import {
   selectStepInfo,
   selectActivePipetteChannelCount,
 } from '/app/redux/protocol-runs'
 
-import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
-import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
-import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import detachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
+import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
+import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+
+vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
+  LPCContentContainer: MockLPCContentContainer,
+}))
 
 vi.mock('/app/redux/protocol-runs')
 
@@ -45,12 +49,10 @@ const render = (
 
 describe('DetachProbe', () => {
   let props: ComponentProps<typeof DetachProbe>
-  let mockProceedStep: Mock
-  let mockGoBackLastStep: Mock
+  let mockHandleProceed: Mock
 
   beforeEach(() => {
-    mockProceedStep = vi.fn()
-    mockGoBackLastStep = vi.fn()
+    mockHandleProceed = vi.fn()
 
     vi.mocked(
       selectStepInfo
@@ -63,25 +65,24 @@ describe('DetachProbe', () => {
 
     props = {
       ...mockLPCContentProps,
-      proceedStep: mockProceedStep,
-      goBackLastStep: mockGoBackLastStep,
+      commandUtils: {
+        ...mockLPCContentProps.commandUtils,
+        headerCommands: {
+          ...mockLPCContentProps.commandUtils.headerCommands,
+          handleProceed: mockHandleProceed,
+        },
+      },
     }
   })
 
-  it('renders appropriate header content and onClick behavior', () => {
-    render(props)
+  it('passes correct header props to LPCContentContainer', () => {
+    render(props, 1)
 
-    screen.getByText('Labware Position Check')
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Labware Position Check')
 
-    const progressBar = screen.getByTestId('StepMeter_StepMeterBar')
-    expect(progressBar).toHaveStyle('width: 80%')
-
-    clickButtonLabeled('Confirm removal')
-    expect(mockProceedStep).toHaveBeenCalled()
-
-    const backButton = screen.getByTestId('ChildNavigation_Back_Button')
-    backButton.click()
-    expect(mockGoBackLastStep).toHaveBeenCalled()
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Confirm removal')
   })
 
   it('renders appropriate body content', () => {
@@ -97,8 +98,8 @@ describe('DetachProbe', () => {
     render(props, 1)
 
     const video = screen.getByTestId('probe-video')
-    expect(video).toHaveAttribute('src', attachProbe1)
-    expect(video).toHaveAttribute('autoplay')
+    expect(video).toHaveAttribute('src', detachProbe1)
+    expect(video).toHaveAttribute('autoPlay')
     expect(video).toHaveAttribute('loop')
   })
 
@@ -106,20 +107,20 @@ describe('DetachProbe', () => {
     render(props, 8)
 
     const video = screen.getByTestId('probe-video')
-    expect(video).toHaveAttribute('src', attachProbe8)
+    expect(video).toHaveAttribute('src', detachProbe8)
   })
 
   it('displays correct video for 96-channel pipette', () => {
     render(props, 96)
 
     const video = screen.getByTestId('probe-video')
-    expect(video).toHaveAttribute('src', attachProbe96)
+    expect(video).toHaveAttribute('src', detachProbe96)
   })
 
   it('falls back to single-channel video for unexpected channel count', () => {
     render(props, 42)
 
     const video = screen.getByTestId('probe-video')
-    expect(video).toHaveAttribute('src', attachProbe1)
+    expect(video).toHaveAttribute('src', detachProbe1)
   })
 })

@@ -108,7 +108,10 @@ async def test_success(
                 pipette_id="pipette-id", labware_id="labware-id", well_name="A3"
             ),
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                pipette_id="pipette-id"
+                pipette_id="pipette-id", clean_tip=True
+            ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id", ready_to_aspirate=True
             ),
         ),
     )
@@ -190,7 +193,7 @@ async def test_tip_physically_missing_error(
                 pipette_id="pipette-id", tip_geometry=sentinel.tip_geometry
             ),
             pipette_aspirated_fluid=update_types.PipetteEmptyFluidUpdate(
-                pipette_id="pipette-id"
+                pipette_id="pipette-id", clean_tip=True
             ),
             tips_used=update_types.TipsUsedUpdate(
                 pipette_id="pipette-id", labware_id="labware-id", well_name="well-name"

@@ -149,7 +149,7 @@ export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
     id: string
-    location?: string
+    location: string
     //  Note: leaving as optional since gripper and stagingArea
     //  will never need a pythonName
     pythonName?: string
@@ -159,6 +159,37 @@ export interface NormalizedAdditionalEquipmentById {
 export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
 export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
+}
+
+interface TrashEntity {
+  id: string
+  location: string
+  pythonName: string
+}
+
+export type WasteChuteEntity = TrashEntity
+export interface WasteChuteEntities {
+  [wasteChuteId: string]: WasteChuteEntity
+}
+
+export type TrashBinEntity = TrashEntity
+export interface TrashBinEntities {
+  [trashBinId: string]: TrashBinEntity
+}
+
+export interface StagingAreaEntity {
+  id: string
+  location: string
+}
+export interface StagingAreaEntities {
+  [stagingAreaId: string]: StagingAreaEntity
+}
+
+export interface GripperEntity {
+  id: string
+}
+export interface GripperEntities {
+  [gripperId: string]: GripperEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
@@ -542,7 +573,10 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities
+  trashBinEntities: TrashBinEntities
+  stagingAreaEntities: StagingAreaEntities
+  gripperEntities: GripperEntities
   liquidEntities: LiquidEntities
   config: Config
 }
@@ -581,9 +615,11 @@ export interface TimelineFrame {
         [well: string]: LocationLiquidState
       }
     }
-    additionalEquipment: {
-      /** for the waste chute and trash bin */
-      [additionalEquipmentId: string]: LocationLiquidState
+    trashBins: {
+      [trashBinId: string]: LocationLiquidState
+    }
+    wasteChute: {
+      [wasteChuteId: string]: LocationLiquidState
     }
   }
 }

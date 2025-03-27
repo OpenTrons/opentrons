@@ -51,6 +51,12 @@ import {
   magneticModuleIdRequired,
   aspirateTouchTipSpeedRequired,
   dispenseTouchTipSpeedRequired,
+  aspirateTouchTipMmFromEdgeOutOfRange,
+  dispenseTouchTipMmFromEdgeOutOfRange,
+  aspirateTouchTipMmFromEdgeRequired,
+  dispenseTouchTipMmFromEdgeRequired,
+  pushOutVolumeRequired,
+  pushOutVolumeOutOfRange,
 } from './errors'
 
 import {
@@ -154,7 +160,13 @@ const stepFormHelperMap: Partial<Record<StepType, FormHelpers>> = {
       aspirateWellsRequired,
       dispenseWellsRequired,
       aspirateTouchTipSpeedRequired,
-      dispenseTouchTipSpeedRequired
+      dispenseTouchTipSpeedRequired,
+      pushOutVolumeRequired,
+      pushOutVolumeOutOfRange,
+      aspirateTouchTipMmFromEdgeOutOfRange,
+      dispenseTouchTipMmFromEdgeOutOfRange,
+      aspirateTouchTipMmFromEdgeRequired,
+      dispenseTouchTipMmFromEdgeRequired
     ),
     getWarnings: composeWarnings(
       belowPipetteMinimumVolume,

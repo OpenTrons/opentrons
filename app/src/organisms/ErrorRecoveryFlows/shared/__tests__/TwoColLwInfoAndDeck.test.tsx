@@ -64,6 +64,11 @@ describe('TwoColLwInfoAndDeck', () => {
         selectedRecoveryOption: RECOVERY_MAP.MANUAL_MOVE_AND_SKIP.ROUTE,
       },
       isOnDevice: true,
+      recoveryMap: {
+        route: RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.ROUTE,
+        step:
+          RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
+      },
     } as any
 
     vi.mocked(LeftColumnLabwareInfo).mockReturnValue(
@@ -116,6 +121,54 @@ describe('TwoColLwInfoAndDeck', () => {
         type: 'location',
         bannerText:
           "It's best to replace tips and select the last location used for tip pickup.",
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE}`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Ensure stacker has labware',
+        type: 'location',
+        bannerText:
+          'Make sure you load the correct number of labware into the stacker.',
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE} with manual replace step`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Load labware into labware shuttle',
+        type: 'location',
+        bannerText: null,
+      }),
+      expect.anything()
+    )
+  })
+
+  it(`passes correct title to LeftColumnLabwareInfo for ${RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE} with NOT manual replace step`, () => {
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+    render(props)
+    expect(vi.mocked(LeftColumnLabwareInfo)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Ensure stacker has labware',
+        type: 'location',
+        bannerText:
+          'Make sure you load the correct number of labware into the stacker.',
       }),
       expect.anything()
     )

@@ -198,7 +198,7 @@
           "COLUMN": "Column"
         },
         "option_tooltip": {
-          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
+          "partial": "To use partial tip pickup, a tiprack without an adapter must be placed on the deck."
         }
       },
       "path": {
@@ -234,6 +234,13 @@
       },
       "preWetTip": {
         "label": "pre-wet tip"
+      },
+      "pushOut": {
+        "pushOut_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Push out volume"
+        },
+        "title": "Push out"
       },
       "setTemperature": {
         "options": {
@@ -317,6 +324,10 @@
       },
       "touchTip_speed": {
         "label": "Touch tip speed"
+      },
+      "touchTip_mmFromEdge": {
+        "caption": "Valid range between {{min}} - {{max}}mm",
+        "label": "Distance from edge"
       },
       "useGripper": {
         "label": "use gripper",

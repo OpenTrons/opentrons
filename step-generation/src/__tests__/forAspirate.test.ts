@@ -66,7 +66,8 @@ describe('...single-channel pipette', () => {
               '0': { ingred1: { volume: 0 } },
             },
           },
-          additionalEquipment: {} as any,
+          wasteChute: {} as any,
+          trashBins: {} as any,
         },
       }
       robotState.liquidState.labware[labwareId].A1 = {
@@ -94,7 +95,8 @@ describe('...single-channel pipette', () => {
             A2: {},
           },
         },
-        additionalEquipment: {},
+        wasteChute: {} as any,
+        trashBins: {} as any,
       })
     })
 

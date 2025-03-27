@@ -8,7 +8,6 @@ export const blowOutInPlace: CommandCreator<BlowoutInPlaceParams> = (
   prevRobotState
 ) => {
   const { pipetteId, flowRate } = args
-
   const commands = [
     {
       commandType: 'blowOutInPlace' as const,

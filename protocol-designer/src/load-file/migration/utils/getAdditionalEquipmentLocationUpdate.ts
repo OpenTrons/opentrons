@@ -9,9 +9,9 @@ import {
   COLUMN_4_SLOTS,
   uuid,
   getCutoutIdByAddressableArea,
+  GRIPPER_LOCATION,
 } from '@opentrons/step-generation'
 import { getUnoccupiedSlotForTrash } from '../../../step-forms'
-import { GRIPPER_LOCATION } from '../../../constants'
 import type {
   AddressableAreaName,
   CreateCommand,

@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -30,6 +30,7 @@ import { ChooseNumber } from './ChooseNumber'
 import { ChooseCsvFile } from './ChooseCsvFile'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { ProtocolSetupStep } from '../ProtocolSetupStep'
+import { useScrollRef } from '/app/App/hooks'
 import type {
   CompletedProtocolAnalysis,
   ChoiceParameter,
@@ -40,23 +41,17 @@ import type {
   CsvFileParameterFileData,
 } from '@opentrons/shared-data'
 import type { ProtocolSetupStepStatus } from '../ProtocolSetupStep'
-import type {
-  FileData,
-  LegacyLabwareOffsetCreateData,
-} from '@opentrons/api-client'
+import type { FileData } from '@opentrons/api-client'
 
 interface ProtocolSetupParametersProps {
   protocolId: string
   runTimeParameters: RunTimeParameter[]
-  labwareOffsets?: LegacyLabwareOffsetCreateData[]
   mostRecentAnalysis?: CompletedProtocolAnalysis | null
 }
 
 export function ProtocolSetupParameters({
   protocolId,
-  labwareOffsets,
   runTimeParameters,
-  mostRecentAnalysis,
 }: ProtocolSetupParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
@@ -74,6 +69,10 @@ export function ProtocolSetupParameters({
     chooseCsvFileScreen,
     setChooseCsvFileScreen,
   ] = useState<CsvFileParameter | null>(null)
+  const [prevScrollPosition, setPrevScrollPosition] = useState<number | null>(
+    null
+  )
+  const { element } = useScrollRef()
   const [resetValuesModal, showResetValuesModal] = useState<boolean>(false)
   const [startSetup, setStartSetup] = useState<boolean>(false)
   const [runTimeParametersOverrides, setRunTimeParametersOverrides] = useState<
@@ -87,6 +86,27 @@ export function ProtocolSetupParameters({
           ({ ...parameter, value: parameter.default } as ValueRunTimeParameter)
     )
   )
+
+  // Scroll back to the place where the user was before they went into a specific RTP selection screen
+  useEffect(() => {
+    const isShowingParametersList =
+      chooseValueScreen == null &&
+      chooseCsvFileScreen == null &&
+      showNumericalInputScreen == null
+    const canRestoreScrollPosition =
+      prevScrollPosition != null && element != null
+
+    if (isShowingParametersList && canRestoreScrollPosition) {
+      element.scrollTop = prevScrollPosition
+      setPrevScrollPosition(null) // Reset scroll position
+    }
+  }, [
+    chooseCsvFileScreen,
+    chooseValueScreen,
+    element,
+    prevScrollPosition,
+    showNumericalInputScreen,
+  ])
 
   const hasMissingFileParam =
     runTimeParametersOverrides?.some((parameter): boolean => {
@@ -219,7 +239,6 @@ export function ProtocolSetupParameters({
             onSuccess: () => {
               createRun({
                 protocolId,
-                labwareOffsets,
                 runTimeParameterValues,
                 runTimeParameterFiles,
               })
@@ -307,6 +326,7 @@ export function ProtocolSetupParameters({
                       : parameter.displayName
                   }
                   onClickSetupStep={() => {
+                    setPrevScrollPosition(element?.scrollTop ?? null)
                     handleSetParameter(parameter)
                   }}
                   detail={detail}

@@ -125,6 +125,7 @@ metadata = {
     "description": "Protocol description",
     "created": "2020-02-25T21:48:32.515Z",
     "protocolDesigner": "fake_PD_version",
+    "source": "Protocol Designer",
 }
 
 requirements = {
@@ -136,21 +137,21 @@ def run(protocol: protocol_api.ProtocolContext):
     # Load Labware:
     mock_python_name_1 = protocol.load_labware(
         "fixture_trash",
-        "12",
+        location="12",
         label="Trash",
         namespace="fixture",
         version=1,
     )
     mock_python_name_2 = protocol.load_labware(
         "fixture_tiprack_10_ul",
-        "1",
+        location="1",
         label="Opentrons 96 Tip Rack 10 µL",
         namespace="fixture",
         version=1,
     )
     mock_python_name_3 = protocol.load_labware(
         "fixture_96_plate",
-        "7",
+        location="7",
         label="NEST 96 Well Plate 100 µL PCR Full Skirt",
         namespace="fixture",
         version=1,

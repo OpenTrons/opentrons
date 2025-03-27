@@ -160,7 +160,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
             {buttonSubLabel && (
               <Flex css={SUBBUTTON_LABEL_STYLE}>
                 <StyledText
-                  color={COLORS.grey60}
+                  color={isSelected ? COLORS.white : COLORS.grey60}
                   oddStyle="bodyTextRegular"
                   desktopStyle="bodyDefaultRegular"
                 >

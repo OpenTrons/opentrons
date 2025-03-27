@@ -341,7 +341,7 @@ def test_aspirate(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -379,7 +379,7 @@ def test_aspirate_well_location(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -393,9 +393,7 @@ def test_aspirate_meniscus_well_location(
 ) -> None:
     """It should aspirate to a well."""
     mock_well = decoy.mock(cls=Well)
-    input_location = Location(
-        point=Point(2, 2, 2), labware=mock_well, _ot_internal_is_meniscus=True
-    )
+    input_location = Location(point=Point(2, 2, 2), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
 
@@ -419,7 +417,7 @@ def test_aspirate_meniscus_well_location(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
-            is_meniscus=True,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -456,7 +454,7 @@ def test_aspirate_from_coordinates(
             volume=42.0,
             rate=1.23,
             flow_rate=5.67,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -970,7 +968,7 @@ def test_dispense_with_location(
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1009,7 +1007,7 @@ def test_dispense_with_well_location(
             rate=1.23,
             flow_rate=3.0,
             push_out=7,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1050,7 +1048,7 @@ def test_dispense_with_well(
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1305,7 +1303,7 @@ def test_dispense_0_volume_means_dispense_everything(
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1335,7 +1333,7 @@ def test_dispense_0_volume_means_dispense_nothing(
             rate=1.23,
             flow_rate=5.67,
             push_out=None,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1375,7 +1373,7 @@ def test_aspirate_0_volume_means_aspirate_everything(
             volume=200,
             rate=1.23,
             flow_rate=5.67,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1415,7 +1413,7 @@ def test_aspirate_0_volume_means_aspirate_nothing(
             volume=0,
             rate=1.23,
             flow_rate=5.67,
-            is_meniscus=None,
+            meniscus_tracking=None,
         ),
         times=1,
     )
@@ -1623,6 +1621,7 @@ def test_mix_with_lpd(
     decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
     decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
     decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_has_clean_tip()).then_return(True)
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
     decoy.when(mock_instrument_core.nozzle_configuration_valid_for_lld()).then_return(
         True
@@ -1671,6 +1670,65 @@ def test_mix_with_lpd(
     decoy.verify(
         mock_instrument_core.liquid_probe_with_recovery(mock_well._core, top_location),
         times=1,
+    )
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize("clean,expected", [(True, 1), (False, 0)])
+def test_aspirate_with_lpd(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+    clean: bool,
+    expected: int,
+) -> None:
+    """It should aspirate/dispense to a well several times and do 1 lpd."""
+    mock_well = decoy.mock(cls=Well)
+    bottom_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    top_location = Location(point=Point(3, 2, 1), labware=None)
+    input_location = Location(point=Point(2, 2, 2), labware=None)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+
+    decoy.when(mock_protocol_core.get_last_location(Mount.LEFT)).then_return(
+        last_location
+    )
+    decoy.when(
+        mock_validation.validate_location(
+            location=input_location, last_location=last_location
+        )
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(
+        mock_validation.validate_location(location=None, last_location=last_location)
+    ).then_return(WellTarget(well=mock_well, location=None, in_place=False))
+    decoy.when(mock_well.bottom(z=1.0)).then_return(bottom_location)
+    decoy.when(mock_well.top()).then_return(top_location)
+    decoy.when(mock_instrument_core.get_aspirate_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.get_dispense_flow_rate(1.23)).then_return(5.67)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_instrument_core.get_has_clean_tip()).then_return(clean)
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0.0)
+    decoy.when(mock_instrument_core.nozzle_configuration_valid_for_lld()).then_return(
+        True
+    )
+
+    subject.liquid_presence_detection = True
+    subject.aspirate(volume=10.0, location=input_location, rate=1.23)
+    decoy.verify(
+        mock_instrument_core.aspirate(
+            bottom_location,
+            mock_well._core,
+            10.0,
+            1.23,
+            5.67,
+            False,
+            None,
+        ),
+        times=1,
+    )
+    decoy.verify(
+        mock_instrument_core.liquid_probe_with_recovery(mock_well._core, top_location),
+        times=expected,
     )
 
 

@@ -3,7 +3,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getHasWasteChute } from '@opentrons/step-generation'
 import { timelineFrameBeforeActiveItem } from '../top-selectors/timelineFrames'
 import {
   getUnsavedForm,
@@ -77,7 +76,10 @@ export const shouldShowWasteChuteHint: Selector<boolean> = createSelector(
   getUnsavedForm,
   getAdditionalEquipmentEntities,
   (prevTimelineFrame, unsavedForm, additionalEquipmentEntities) => {
-    const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+    const hasWasteChute =
+      Object.values(additionalEquipmentEntities).find(
+        ae => ae.name === 'wasteChute'
+      ) != null
     if (unsavedForm?.stepType !== 'moveLabware' || !hasWasteChute) {
       return false
     }

@@ -3,9 +3,9 @@ import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { MockLPCContentContainer } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { AttachProbe } from '/app/organisms/LabwarePositionCheck/steps'
-import { clickButtonLabeled } from '/app/organisms/LabwarePositionCheck/__tests__/utils'
 import {
   selectStepInfo,
   selectActivePipetteChannelCount,
@@ -17,6 +17,10 @@ import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attac
 
 import type { ComponentProps } from 'react'
 import type { Mock } from 'vitest'
+
+vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
+  LPCContentContainer: MockLPCContentContainer,
+}))
 
 vi.mock('/app/redux/protocol-runs')
 
@@ -74,25 +78,21 @@ describe('AttachProbe', () => {
     }
   })
 
-  it('renders appropriate header content and onClick behavior', () => {
-    render(props)
+  it('passes correct header props to LPCContentContainer', () => {
+    render(props, 1)
 
-    screen.getByText('Labware Position Check')
-    screen.getByText('Exit')
-    screen.getByText('Continue')
+    const header = screen.getByTestId('header-prop')
+    expect(header).toHaveTextContent('Labware Position Check')
 
-    const progressBar = screen.getByTestId('StepMeter_StepMeterBar')
-    expect(progressBar).toHaveStyle('width: 40%')
+    const primaryButton = screen.getByTestId('primary-button')
+    expect(primaryButton).toHaveAttribute('data-button-text', 'Continue')
 
-    clickButtonLabeled('Continue')
-    expect(mockHandleAttachProbeCheck).toHaveBeenCalled()
-
-    clickButtonLabeled('Exit')
-    expect(mockHandleNavToDetachProbe).toHaveBeenCalled()
+    const secondaryButton = screen.getByTestId('secondary-button')
+    expect(secondaryButton).toHaveAttribute('data-text', 'Exit')
   })
 
-  it('renders appropriate body content', () => {
-    render(props)
+  it('renders with single-channel pipette instructions', () => {
+    render(props, 1)
 
     screen.getByText('Attach calibration probe')
     screen.getByText(
@@ -103,23 +103,56 @@ describe('AttachProbe', () => {
     )
   })
 
-  it('displays correct video for single-channel pipette', () => {
+  it('renders with 8-channel pipette instructions', () => {
+    render(props, 8)
+
+    screen.getByText('Attach calibration probe')
+    screen.getByText(/backmost/i)
+    expect(
+      screen.queryByText(/A1 \(back left corner\)/i)
+    ).not.toBeInTheDocument()
+    screen.getByText(
+      'Test that the probe is secure by gently pulling it back and forth. It should be firmly in place.'
+    )
+  })
+
+  it('renders with 96-channel pipette instructions', () => {
+    render(props, 96)
+
+    screen.getByText('Attach calibration probe')
+    screen.getByText(/A1 \(back left corner\)/i)
+    expect(screen.queryByText(/backmost/i)).not.toBeInTheDocument()
+    screen.getByText(
+      'Test that the probe is secure by gently pulling it back and forth. It should be firmly in place.'
+    )
+  })
+
+  it('falls back to single-channel instructions for unexpected channel count', () => {
+    render(props, 42)
+
+    screen.getByText('Attach calibration probe')
+    screen.getByText(
+      'Take the calibration probe from its storage location. Ensure the collar is fully unlocked. Push the pipette ejector up and press the probe firmly onto the pipette nozzle as far as it can go. Twist the collar to lock the probe.'
+    )
+  })
+
+  it('selects correct video source for single-channel pipette', () => {
     render(props, 1)
 
     const video = screen.getByTestId('probe-video')
     expect(video).toHaveAttribute('src', attachProbe1)
-    expect(video).toHaveAttribute('autoplay')
+    expect(video).toHaveAttribute('autoPlay')
     expect(video).toHaveAttribute('loop')
   })
 
-  it('displays correct video for 8-channel pipette', () => {
+  it('selects correct video source for 8-channel pipette', () => {
     render(props, 8)
 
     const video = screen.getByTestId('probe-video')
     expect(video).toHaveAttribute('src', attachProbe8)
   })
 
-  it('displays correct video for 96-channel pipette', () => {
+  it('selects correct video source for 96-channel pipette', () => {
     render(props, 96)
 
     const video = screen.getByTestId('probe-video')

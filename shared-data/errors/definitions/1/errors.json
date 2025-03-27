@@ -210,6 +210,10 @@
       "detail": "HEPA UV Failed",
       "category": "roboticsInteractionError"
     },
+    "3020": {
+      "detail": "Flex Stacker Shuttle Missing",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"

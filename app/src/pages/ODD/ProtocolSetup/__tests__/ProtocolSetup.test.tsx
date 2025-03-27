@@ -41,7 +41,6 @@ import {
   getUnmatchedModulesForProtocol,
   getIncompleteInstrumentCount,
 } from '/app/organisms/ODD/ProtocolSetup'
-import { useLaunchLegacyLPC } from '/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { mockProtocolModuleInfo } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupInstruments/__fixtures__'
 import {
@@ -66,6 +65,14 @@ import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockRunTimeParameterData } from '/app/organisms/ODD/ProtocolSetup/__fixtures__'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import {
+  selectTotalCountLocationSpecificOffsets,
+  selectCountMissingLSOffsetsWithoutDefault,
+  selectAreOffsetsApplied,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectOffsetSource,
+} from '/app/redux/protocol-runs'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import type { UseQueryResult } from 'react-query'
 import type * as SharedData from '@opentrons/shared-data'
@@ -117,6 +124,8 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('/app/resources/modules')
 vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/organisms/LabwarePositionCheck')
+vi.mock('/app/redux/protocol-runs')
+vi.mock('/app/resources/maintenance_runs')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -229,6 +238,9 @@ describe('ProtocolSetup', () => {
     MockConfirmSetupStepsCompleteModal.mockReturnValue(
       <div>Mock ConfirmSetupStepsCompleteModal</div>
     )
+    vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
+      data: { data: { id: 'mock-id' } },
+    } as any)
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
     vi.mocked(useModuleCalibrationStatus).mockReturnValue({ complete: true })
@@ -302,12 +314,6 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
       .calledWith()
       .thenReturn({ data: { data: [] } } as any)
-    when(vi.mocked(useLaunchLegacyLPC))
-      .calledWith(RUN_ID, FLEX_ROBOT_TYPE, PROTOCOL_NAME)
-      .thenReturn({
-        launchLegacyLPC: mockLaunchLPC,
-        LegacyLPCWizard: <div>mock LPC Wizard</div>,
-      })
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
     vi.mocked(useDoorQuery).mockReturnValue({ data: mockDoorStatus } as any)
     vi.mocked(useModulesQuery).mockReturnValue({
@@ -331,6 +337,17 @@ describe('ProtocolSetup', () => {
       scrollRef: {} as any,
     })
     vi.mocked(useLPCFlows).mockReturnValue({ launchLPC: mockLaunchLPC } as any)
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => true)
+    vi.mocked(
+      selectTotalCountLocationSpecificOffsets
+    ).mockImplementation(() => () => 3)
+    vi.mocked(
+      selectCountMissingLSOffsetsWithoutDefault
+    ).mockImplementation(() => () => 1)
+    vi.mocked(
+      selectIsAnyNecessaryDefaultOffsetMissing
+    ).mockImplementation(() => () => false)
+    vi.mocked(selectOffsetSource).mockImplementation(() => () => 'fromDatabase')
   })
 
   it('should render text, image, and buttons', () => {
@@ -379,7 +396,6 @@ describe('ProtocolSetup', () => {
       })
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware Position Check'))
     fireEvent.click(screen.getByText('Labware'))
     fireEvent.click(screen.getByText('Liquids'))
     expect(mockPlay).toBeCalledTimes(0)
@@ -511,8 +527,7 @@ describe('ProtocolSetup', () => {
       })
     )
     MockProtocolSetupOffsets.mockImplementation(
-      vi.fn(({ setIsConfirmed, setSetupScreen }) => {
-        setIsConfirmed(true)
+      vi.fn(({ setSetupScreen }) => {
         setSetupScreen('prepare to run')
         return <div>Mock ProtocolSetupOffsets</div>
       })

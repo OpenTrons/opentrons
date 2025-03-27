@@ -4,6 +4,10 @@ import math
 from typing import Iterable, Generator, Tuple, TypeVar, Literal, List
 
 
+class NoLiquidClassPropertyError(ValueError):
+    """An error raised when a liquid class property cannot be found for a pipette/tip combination"""
+
+
 class TransferTipPolicyV2(enum.Enum):
     ONCE = "once"
     NEVER = "never"

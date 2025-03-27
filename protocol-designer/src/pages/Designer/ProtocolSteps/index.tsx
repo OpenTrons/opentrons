@@ -40,8 +40,9 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
-import { TimelineAlerts } from '../../../organisms'
+import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
+import { getUserOS } from './Timeline/utils'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
 
@@ -54,6 +55,8 @@ export function ProtocolSteps(): JSX.Element {
   const selectedSubstep = useSelector(getSelectedSubstep)
   const enableHotKeyDisplay = useSelector(getEnableHotKeysDisplay)
   const tab = useSelector(getDesignerTab)
+  const userOs = getUserOS()
+  const isMac = userOs === 'Mac OS'
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
@@ -75,8 +78,7 @@ export function ProtocolSteps(): JSX.Element {
   const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
-  const showTimelineAlerts =
-    hasTimelineErrors && tab === 'protocolSteps' && formData == null
+  const showTimelineAlerts = hasTimelineErrors && tab === 'protocolSteps'
   const stepDetails = currentStep?.stepDetails ?? null
 
   return (
@@ -186,7 +188,11 @@ export function ProtocolSteps(): JSX.Element {
               shrinkToContent
             />
             <Tag
-              text={t('command_click_to_multi_select')}
+              text={
+                isMac
+                  ? t('command_click_to_multi_select_mac')
+                  : t('command_click_to_multi_select_windows')
+              }
               type="default"
               shrinkToContent
             />

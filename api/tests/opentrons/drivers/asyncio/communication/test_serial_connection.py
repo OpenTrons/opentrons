@@ -180,6 +180,14 @@ def test_raise_on_error(
         subject.raise_on_error(response, "fake request")
 
 
+def test_get_error_codes_lowercase(
+    subject: SerialKind,
+) -> None:
+    """It should return an error code dictionary keyed by lowercase value."""
+    lowercase_result = subject._error_codes.get_error_codes()
+    assert lowercase_result == {"err003": DefaultErrorCodes.UNHANDLED_GCODE}
+
+
 async def test_on_retry(mock_serial_port: AsyncMock, subject: SerialKind) -> None:
     """It should try to re-open connection."""
     await subject.on_retry()

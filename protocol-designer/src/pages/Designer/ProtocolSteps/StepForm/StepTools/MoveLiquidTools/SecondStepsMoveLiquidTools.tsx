@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { round } from 'lodash'
 import {
   DIRECTION_COLUMN,
   Divider,
@@ -8,6 +9,7 @@ import {
   StyledText,
   Tabs,
 } from '@opentrons/components'
+import { getMinXYDimension } from '@opentrons/shared-data'
 import { getTrashOrLabware } from '@opentrons/step-generation'
 
 import {
@@ -23,11 +25,13 @@ import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import {
-  getAdditionalEquipmentEntities,
+  getInvariantContext,
   getLabwareEntities,
+  getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
+import { getMaxPushOutVolume } from '../../../../../../utils'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
@@ -64,29 +68,27 @@ export const SecondStepsMoveLiquidTools = ({
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
   const labwares = useSelector(getLabwareEntities)
-  const additionalEquipmentEntities = useSelector(
-    getAdditionalEquipmentEntities
+  const { trashBinEntities, wasteChuteEntities } = useSelector(
+    getInvariantContext
   )
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-
+  const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
-      ? additionalEquipmentEntities[
-          String(propsForFields.dispense_labware.value)
-        ]?.name === 'wasteChute'
+      ? wasteChuteEntities[String(propsForFields.dispense_labware.value)] !=
+        null
       : false
   const isTrashBinSelected =
     propsForFields.dispense_labware?.value != null
-      ? additionalEquipmentEntities[
-          String(propsForFields.dispense_labware.value)
-        ]?.name === 'trashBin'
+      ? trashBinEntities[String(propsForFields.dispense_labware.value)] != null
       : false
   const destinationLabwareType =
     formData.dispense_labware != null
       ? getTrashOrLabware(
           labwares,
-          additionalEquipmentEntities,
+          wasteChuteEntities,
+          trashBinEntities,
           formData.dispense_labware as string
         )
       : null
@@ -145,6 +147,17 @@ export const SecondStepsMoveLiquidTools = ({
     ]
   }
 
+  const maxPushoutVolume = getMaxPushOutVolume(
+    Number(formData.volume),
+    pipetteSpec
+  )
+
+  const minXYDimension = isDestinationTrash
+    ? null
+    : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
+  const minRadiusForTouchTip =
+    minXYDimension != null ? round(minXYDimension / 2, 1) : null
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -195,16 +208,26 @@ export const SecondStepsMoveLiquidTools = ({
             )
           ]
         }
+        referenceField={`${tab}_position_reference`}
       />
       {enableLiquidClasses ? (
         <>
           <Divider marginY="0" />
           <MultiInputField
             name={t('submerge')}
-            prefix={tab}
+            prefix={`${tab}_submerge`}
             tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
             propsForFields={propsForFields}
             fields={getFields('submerge')}
+            isWellPosition
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('submerge_mmFromBottom')
+                )
+              ]
+            }
+            referenceField={`${tab}_submerge_position_reference`}
           />
           <Divider marginY="0" />
           <MultiInputField
@@ -213,7 +236,7 @@ export const SecondStepsMoveLiquidTools = ({
             tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
             propsForFields={propsForFields}
             fields={getFields('retract')}
-            isWellPosition={true}
+            isWellPosition
             labwareId={
               formData[
                 getLabwareFieldForPositioningField(
@@ -221,6 +244,7 @@ export const SecondStepsMoveLiquidTools = ({
                 )
               ]
             }
+            referenceField={`${tab}_retract_position_reference`}
           />
         </>
       ) : null}
@@ -298,6 +322,38 @@ export const SecondStepsMoveLiquidTools = ({
             </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
+        {tab === 'dispense' ? (
+          <CheckboxExpandStepFormField
+            title={i18n.format(
+              t('form:step_edit_form.field.pushOut.title'),
+              'capitalize'
+            )}
+            checkboxValue={propsForFields.pushOut_checkbox.value}
+            isChecked={propsForFields.pushOut_checkbox.value === true}
+            checkboxUpdateValue={propsForFields.pushOut_checkbox.updateValue}
+            tooltipText={propsForFields.pushOut_checkbox.tooltipContent}
+          >
+            {formData.pushOut_checkbox === true ? (
+              <InputStepFormField
+                showTooltip={false}
+                padding="0"
+                title={t(
+                  'form:step_edit_form.field.pushOut.pushOut_volume.label'
+                )}
+                caption={t(
+                  'form:step_edit_form.field.pushOut.pushOut_volume.caption',
+                  { min: 0, max: maxPushoutVolume }
+                )}
+                {...propsForFields.pushOut_volume}
+                units={t('application:units.microliter')}
+                errorToShow={getFormLevelError(
+                  'pushOut_volume',
+                  mappedErrorsToField
+                )}
+              />
+            ) : null}
+          </CheckboxExpandStepFormField>
+        ) : null}
         <CheckboxExpandStepFormField
           title={i18n.format(
             t('form:step_edit_form.field.delay.label'),
@@ -326,18 +382,6 @@ export const SecondStepsMoveLiquidTools = ({
                   `${tab}_delay_seconds`,
                   mappedErrorsToField
                 )}
-              />
-              <PositionField
-                prefix={tab}
-                propsForFields={propsForFields}
-                zField={`${tab}_delay_mmFromBottom`}
-                labwareId={
-                  formData[
-                    getLabwareFieldForPositioningField(
-                      addFieldNamePrefix('delay_mmFromBottom')
-                    )
-                  ]
-                }
               />
             </Flex>
           ) : null}
@@ -403,6 +447,7 @@ export const SecondStepsMoveLiquidTools = ({
           tooltipText={
             propsForFields[`${tab}_touchTip_checkbox`].tooltipContent
           }
+          disabled={propsForFields[`${tab}_touchTip_checkbox`].disabled}
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
@@ -417,7 +462,24 @@ export const SecondStepsMoveLiquidTools = ({
                 )}
                 units={t('application:units.millimeterPerSec')}
               />
-
+              <InputStepFormField
+                showTooltip={false}
+                padding="0"
+                title={t('form:step_edit_form.field.touchTip_mmFromEdge.label')}
+                {...propsForFields[`${tab}_touchTip_mmFromEdge`]}
+                errorToShow={getFormLevelError(
+                  `${tab}_touchTip_mmFromEdge`,
+                  mappedErrorsToField
+                )}
+                caption={t(
+                  `form:step_edit_form.field.touchTip_mmFromEdge.caption`,
+                  {
+                    min: 0,
+                    max: minRadiusForTouchTip,
+                  }
+                )}
+                units={t('application:units.millimeter')}
+              />
               <PositionField
                 prefix={tab}
                 propsForFields={propsForFields}

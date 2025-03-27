@@ -47,7 +47,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         rate: float,
         flow_rate: float,
         in_place: bool,
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
@@ -58,6 +58,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
             rate: The rate for how quickly to aspirate.
             flow_rate: The flow rate in µL/s to aspirate at.
             in_place: Whether this is in-place.
+            meniscus_tracking: Optional data about where to aspirate from.
             correction_volume: The correction volume in uL
         """
         ...
@@ -72,7 +73,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
@@ -85,6 +86,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
             in_place: Whether this is in-place.
             push_out: The amount to push the plunger below bottom position.
             correction_volume: The correction volume in uL
+            meniscus_tracking: Optional data about where to dispense from.
         """
         ...
 
@@ -248,6 +250,10 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
 
     @abstractmethod
     def get_current_volume(self) -> float:
+        ...
+
+    @abstractmethod
+    def get_has_clean_tip(self) -> bool:
         ...
 
     @abstractmethod

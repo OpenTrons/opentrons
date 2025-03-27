@@ -72,11 +72,7 @@ import { RobotConfigurationDetails } from './RobotConfigurationDetails'
 import { ProtocolParameters } from './ProtocolParameters'
 import { AnnotatedSteps } from './AnnotatedSteps'
 
-import type {
-  JsonConfig,
-  PythonConfig,
-  LoadLabwareRunTimeCommand,
-} from '@opentrons/shared-data'
+import type { JsonConfig, PythonConfig } from '@opentrons/shared-data'
 import type {
   GroupedCommands,
   StoredProtocolData,
@@ -277,13 +273,6 @@ export function ProtocolDetails(
       : null
   )
 
-  const loadLabwareCommands =
-    mostRecentAnalysis?.commands.filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware' &&
-        command.result?.definition.parameters.format !== 'trash'
-    ) ?? []
-
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
     srcFileNames,
@@ -331,7 +320,7 @@ export function ProtocolDetails(
 
   const contentsByTabName = {
     labware: (
-      <ProtocolLabwareDetails requiredLabwareDetails={loadLabwareCommands} />
+      <ProtocolLabwareDetails commands={mostRecentAnalysis?.commands ?? []} />
     ),
     robot_config: (
       <RobotConfigurationDetails

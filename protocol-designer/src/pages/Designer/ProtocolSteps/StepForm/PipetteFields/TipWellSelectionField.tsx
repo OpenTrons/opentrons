@@ -11,7 +11,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getPipetteEntities } from '../../../../../step-forms/selectors'
-import { SelectWellsModal, getMainPagePortalEl } from '../../../../../organisms'
+import {
+  SelectWellsModal,
+  getMainPagePortalEl,
+} from '../../../../../components/organisms'
 import { getNozzleType } from '../utils'
 
 import type { FieldProps } from '../types'
@@ -51,7 +54,7 @@ export function TipWellSelectionField(
         <SelectWellsModal
           isOpen={openModal}
           key={`${labwareId}_${name}_TipField`}
-          labwareId={String(labwareId)}
+          labwareId={typeof labwareId === 'string' ? labwareId : null}
           name={name}
           onCloseClick={() => {
             setOpenModal(false)

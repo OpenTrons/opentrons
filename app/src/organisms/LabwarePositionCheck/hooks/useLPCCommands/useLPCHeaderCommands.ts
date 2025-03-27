@@ -16,7 +16,8 @@ export interface UseLPCHeaderCommandsResult {
   handleProceed: () => void
   handleAttachProbeCheck: () => void
   handleNavToDetachProbe: () => void
-  handleClose: () => void
+  handleCloseAndHome: () => void
+  handleCloseWithoutHome: () => void
 }
 
 // Wraps core LPC command functionality, since the header component reuses many of the same commands.
@@ -32,7 +33,8 @@ export function useLPCHeaderCommands({
     handleStartLPC,
     toggleRobotMoving,
     handleValidMoveToMaintenancePosition,
-    handleCleanUpAndClose,
+    handleCloseNoHome,
+    handleHomeAndClose,
     handleProbeAttachment,
   } = LPCHandlerUtils
 
@@ -43,15 +45,22 @@ export function useLPCHeaderCommands({
   }
 
   // If the maintenance run fails, we cannot move the gantry, so just clean up LPC.
-  const handleClose = (): void => {
+  const handleCloseWithoutHome = (): void => {
+    void handleCloseNoHome()
+  }
+
+  const handleCloseAndHome = (): void => {
     void toggleRobotMoving(true).then(() => {
-      void handleCleanUpAndClose()
+      void handleHomeAndClose()
     })
   }
 
   const handleAttachProbeCheck = (): void => {
     void toggleRobotMoving(true)
-      .then(() => handleProbeAttachment(pipette, proceedStep))
+      .then(() => handleProbeAttachment(pipette))
+      .then(() => {
+        proceedStep()
+      })
       .finally(() => toggleRobotMoving(false))
   }
 
@@ -68,6 +77,7 @@ export function useLPCHeaderCommands({
     handleProceed,
     handleAttachProbeCheck,
     handleNavToDetachProbe,
-    handleClose,
+    handleCloseAndHome,
+    handleCloseWithoutHome,
   }
 }

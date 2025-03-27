@@ -6,16 +6,16 @@ import { renderWithProviders } from '../../../__testing-utils__'
 import { loadProtocolFile } from '../../../load-file/actions'
 import { getFileMetadata } from '../../../file-data/selectors'
 import { toggleNewProtocolModal } from '../../../navigation/actions'
-import { useKitchen } from '../../../organisms/Kitchen/hooks'
-import { useAnnouncements } from '../../../organisms/AnnouncementModal/announcements'
+import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
+import { useAnnouncements } from '../../../components/organisms/AnnouncementModal/announcements'
 import { getHasOptedIn } from '../../../analytics/selectors'
 import { Landing } from '../index'
 
 vi.mock('../../../load-file/actions')
 vi.mock('../../../file-data/selectors')
 vi.mock('../../../navigation/actions')
-vi.mock('../../../organisms/AnnouncementModal/announcements')
-vi.mock('../../../organisms/Kitchen/hooks')
+vi.mock('../../../components/organisms/AnnouncementModal/announcements')
+vi.mock('../../../components/organisms/Kitchen/hooks')
 vi.mock('../../../analytics/selectors')
 
 const mockMakeSnackbar = vi.fn()

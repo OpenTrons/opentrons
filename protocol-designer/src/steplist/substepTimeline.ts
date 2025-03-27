@@ -10,6 +10,7 @@ import {
   ALL,
   COLUMN,
   OT2_ROBOT_TYPE,
+  SINGLE,
 } from '@opentrons/shared-data'
 
 import type { Channels } from '@opentrons/components'
@@ -177,27 +178,29 @@ export const substepTimelineSingleChannel = (
             ? OT2_ROBOT_TYPE
             : FLEX_ROBOT_TYPE
         )
-        const additionalEquipmentId = Object.entries(
-          invariantContext.additionalEquipmentEntities
+        const wasteChuteId = Object.entries(
+          invariantContext.wasteChuteEntities
+        ).find(([id, aE]) => aE.location === cutoutId)?.[0]
+        const trashBinId = Object.entries(
+          invariantContext.trashBinEntities
         ).find(([id, aE]) => aE.location === cutoutId)?.[0]
 
-        if (additionalEquipmentId == null) {
+        if (wasteChuteId == null && trashBinId == null) {
           console.error(
             `expected to find an additional equipment id from cutoutId ${cutoutId} but ocould not`
           )
         }
 
+        const isWasteChute = wasteChuteId != null
         const wellInfo = {
-          additionalEquipmentId,
+          additionalEquipmentId: wasteChuteId ?? trashBinId,
           wells: [],
-          preIngreds:
-            acc.prevRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
-            ],
-          postIngreds:
-            nextRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
-            ],
+          preIngreds: isWasteChute
+            ? acc.prevRobotState.liquidState.wasteChute[wasteChuteId]
+            : acc.prevRobotState.liquidState.trashBins[trashBinId ?? ''],
+          postIngreds: isWasteChute
+            ? nextRobotState.liquidState.wasteChute[wasteChuteId]
+            : nextRobotState.liquidState.trashBins[trashBinId ?? ''],
         }
 
         return {
@@ -261,10 +264,12 @@ export const substepTimelineMultiChannel = (
             : null
 
         let numChannels = channels
-        if (nozzles === ALL) {
+        if (nozzles === ALL && channels !== 8) {
           numChannels = 96
         } else if (nozzles === COLUMN) {
           numChannels = 8
+        } else if (nozzles === SINGLE) {
+          numChannels = 1
         }
         const wellsForTips =
           numChannels &&
@@ -340,27 +345,29 @@ export const substepTimelineMultiChannel = (
             ? OT2_ROBOT_TYPE
             : FLEX_ROBOT_TYPE
         )
-        const additionalEquipmentId = Object.entries(
-          invariantContext.additionalEquipmentEntities
+        const wasteChuteId = Object.entries(
+          invariantContext.wasteChuteEntities
+        ).find(([id, aE]) => aE.location === cutoutId)?.[0]
+        const trashBinId = Object.entries(
+          invariantContext.trashBinEntities
         ).find(([id, aE]) => aE.location === cutoutId)?.[0]
 
-        if (additionalEquipmentId == null) {
+        if (wasteChuteId == null && trashBinId == null) {
           console.error(
             `expected to find an additional equipment id from cutoutId ${cutoutId} but ocould not`
           )
         }
 
+        const isWasteChute = wasteChuteId != null
         const wellInfo = {
-          additionalEquipmentId,
+          additionalEquipmentId: wasteChuteId ?? trashBinId,
           wells: [],
-          preIngreds:
-            acc.prevRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
-            ],
-          postIngreds:
-            nextRobotState.liquidState.additionalEquipment[
-              additionalEquipmentId ?? ''
-            ],
+          preIngreds: isWasteChute
+            ? acc.prevRobotState.liquidState.wasteChute[wasteChuteId]
+            : acc.prevRobotState.liquidState.trashBins[trashBinId ?? ''],
+          postIngreds: isWasteChute
+            ? nextRobotState.liquidState.wasteChute[wasteChuteId]
+            : nextRobotState.liquidState.trashBins[trashBinId ?? ''],
         }
 
         return {

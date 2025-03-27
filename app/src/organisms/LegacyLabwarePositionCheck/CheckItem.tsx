@@ -496,7 +496,9 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
           body={
             <UnorderedList
               items={[
-                isOnDevice ? t('clear_all_slots_odd') : t('clear_all_slots'),
+                isOnDevice
+                  ? t('legacy_clear_all_slots_odd')
+                  : t('legacy_clear_all_slots'),
                 placeItemInstruction,
               ]}
             />

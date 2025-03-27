@@ -13,7 +13,6 @@ import * as warningCreators from '../../warningCreators'
 import {
   formatPyStr,
   getCutoutIdByAddressableArea,
-  getHasWasteChute,
   getLabwareHasLiquid,
   getTiprackHasTips,
   OFF_DECK,
@@ -41,11 +40,14 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   const { labwareId, strategy, newLocation } = args
   const useGripper = strategy === 'usingGripper'
   const {
-    additionalEquipmentEntities,
+    gripperEntities,
+    trashBinEntities,
+    wasteChuteEntities,
     labwareEntities,
     moduleEntities,
   } = invariantContext
-  const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+  const hasGripperEntity = Object.keys(gripperEntities).length > 0
+  const hasWasteChute = Object.values(wasteChuteEntities).length > 0
   const tiprackHasTip =
     prevRobotState.tipState != null
       ? getTiprackHasTips(prevRobotState.tipState, labwareId)
@@ -67,15 +69,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     'addressableAreaName' in newLocation &&
     newLocation.addressableAreaName === 'gripperWasteChute'
 
-  const hasGripper = Object.values(additionalEquipmentEntities).find(
-    aE => aE.name === 'gripper'
-  )
-
   const newLocationSlot =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'slotName' in newLocation
-      ? newLocation.slotName
+    newLocation !== 'offDeck' && newLocation !== 'systemLocation'
+      ? Object.values(newLocation)[0]
       : null
 
   const multipleObjectsInSameSlotLabware =
@@ -114,8 +110,8 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
   }
 
   if (
-    (newLocationInWasteChute && hasGripper && !useGripper) ||
-    (!hasGripper && useGripper)
+    (newLocationInWasteChute && hasGripperEntity && !useGripper) ||
+    (!hasGripperEntity && useGripper)
   ) {
     errors.push(errorCreators.gripperRequired())
   }
@@ -255,9 +251,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
         newLocation.addressableAreaName
       ) || isOt2TrashLocation
     const trashCutoutIds = isTrashBinLocation
-      ? Object.values(additionalEquipmentEntities)
-          .filter(ae => ae.name === 'trashBin')
-          ?.map(trash => trash.location as CutoutId)
+      ? Object.values(trashBinEntities)?.map(
+          trash => trash.location as CutoutId
+        )
       : []
 
     const cutoutIdFromAddressableAreaName =
@@ -274,7 +270,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     )
     const matchingTrashId =
       matchingTrashCutoutId != null
-        ? Object.values(additionalEquipmentEntities).find(
+        ? Object.values(trashBinEntities).find(
             ae => ae.location === matchingTrashCutoutId
           )?.id
         : null
@@ -282,12 +278,9 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     if (is4thColumnSlot) {
       location = formatPyStr(newLocation.addressableAreaName)
     } else if (matchingTrashId != null && !isWasteChuteLocation) {
-      location = additionalEquipmentEntities[matchingTrashId]?.pythonName ?? ''
+      location = trashBinEntities[matchingTrashId]?.pythonName ?? ''
     } else if (matchingTrashId == null && isWasteChuteLocation) {
-      location =
-        Object.values(additionalEquipmentEntities).find(
-          ae => ae.name === 'wasteChute'
-        )?.pythonName ?? ''
+      location = Object.values(wasteChuteEntities)[0].pythonName ?? ''
     } else {
       location = ''
     }

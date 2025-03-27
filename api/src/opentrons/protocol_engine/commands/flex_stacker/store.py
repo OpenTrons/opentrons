@@ -12,7 +12,10 @@ from ..command import (
     SuccessData,
     DefinedErrorData,
 )
-from ..flex_stacker.common import FlexStackerStallOrCollisionError
+from ..flex_stacker.common import (
+    FlexStackerStallOrCollisionError,
+    FlexStackerShuttleError,
+)
 from ...errors import (
     ErrorOccurrence,
     CannotPerformModuleAction,
@@ -26,7 +29,11 @@ from ...types import (
     InStackerHopperLocation,
 )
 
-from opentrons_shared_data.errors.exceptions import FlexStackerStallError
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+)
+from opentrons.calibration_storage.helpers import uri_from_details
 
 
 if TYPE_CHECKING:
@@ -74,11 +81,24 @@ class StoreResult(BaseModel):
     lidLabwareId: str | None = Field(
         None, description="The lid in the stack that was stored, if any."
     )
+    primaryLabwareURI: str = Field(
+        ...,
+        description="The labware definition URI of the primary labware.",
+    )
+    adapterLabwareURI: str | None = Field(
+        None,
+        description="The labware definition URI of the adapter labware.",
+    )
+    lidLabwareURI: str | None = Field(
+        None,
+        description="The labware definition URI of the lid labware.",
+    )
 
 
 _ExecuteReturn = Union[
     SuccessData[StoreResult],
-    DefinedErrorData[FlexStackerStallOrCollisionError],
+    DefinedErrorData[FlexStackerStallOrCollisionError]
+    | DefinedErrorData[FlexStackerShuttleError],
 ]
 
 
@@ -193,6 +213,20 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                     ],
                 ),
             )
+        except FlexStackerShuttleMissingError as e:
+            return DefinedErrorData(
+                public=FlexStackerShuttleError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=e,
+                        )
+                    ],
+                ),
+            )
 
         id_list = [
             id for id in (primary_id, maybe_adapter_id, maybe_lid_id) if id is not None
@@ -208,6 +242,10 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
         state_update.update_flex_stacker_labware_pool_count(
             module_id=params.moduleId, count=stacker_state.pool_count + 1
         )
+        if stacker_state.pool_primary_definition is None:
+            raise FlexStackerLabwarePoolNotYetDefinedError(
+                "The Primary Labware must be defined in the stacker pool."
+            )
 
         return SuccessData(
             public=StoreResult(
@@ -228,6 +266,25 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                     else None
                 ),
                 lidLabwareId=maybe_lid_id,
+                primaryLabwareURI=uri_from_details(
+                    stacker_state.pool_primary_definition.namespace,
+                    stacker_state.pool_primary_definition.parameters.loadName,
+                    stacker_state.pool_primary_definition.version,
+                ),
+                adapterLabwareURI=uri_from_details(
+                    stacker_state.pool_adapter_definition.namespace,
+                    stacker_state.pool_adapter_definition.parameters.loadName,
+                    stacker_state.pool_adapter_definition.version,
+                )
+                if stacker_state.pool_adapter_definition is not None
+                else None,
+                lidLabwareURI=uri_from_details(
+                    stacker_state.pool_lid_definition.namespace,
+                    stacker_state.pool_lid_definition.parameters.loadName,
+                    stacker_state.pool_lid_definition.version,
+                )
+                if stacker_state.pool_lid_definition is not None
+                else None,
             ),
             state_update=state_update,
         )

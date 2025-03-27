@@ -1,7 +1,7 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
 
 from __future__ import annotations
-
+from contextlib import contextmanager
 from typing import (
     Optional,
     TYPE_CHECKING,
@@ -10,18 +10,23 @@ from typing import (
     List,
     Tuple,
     NamedTuple,
+    Generator,
 )
 from opentrons.types import (
     Location,
     Mount,
     NozzleConfigurationType,
     NozzleMapInterface,
+    MeniscusTrackingTarget,
 )
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
+from opentrons.protocols.advanced_control.transfers.common import (
+    TransferTipPolicyV2,
+    NoLiquidClassPropertyError,
+)
 from opentrons.protocols.advanced_control.transfers import common as tx_commons
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine import (
@@ -48,7 +53,10 @@ from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackin
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons_shared_data.pipette.types import PIPETTE_API_NAMES_MAP
+from opentrons_shared_data.pipette.types import (
+    PIPETTE_API_NAMES_MAP,
+    LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP,
+)
 from opentrons_shared_data.errors.exceptions import (
     UnsupportedHardwareCommand,
 )
@@ -169,7 +177,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         rate: float,
         flow_rate: float,
         in_place: bool,
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
@@ -180,7 +188,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             rate: Not used in this core.
             flow_rate: The flow rate in µL/s to aspirate at.
             in_place: whether this is a in-place command.
+            meniscus_tracking: Optional data about where to aspirate from.
         """
+        if meniscus_tracking == MeniscusTrackingTarget.START:
+            raise ValueError("Cannot aspirate at the starting liquid height.")
         if well_core is None:
             if not in_place:
                 self._engine_client.execute_command(
@@ -208,14 +219,15 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
-            well_location = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+            (
+                well_location,
+                dynamic_liquid_tracking,
+            ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                is_meniscus=is_meniscus,
+                meniscus_tracking=meniscus_tracking,
             )
-            if well_location.origin == WellOrigin.MENISCUS:
-                well_location.volumeOffset = "operationVolume"
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
                 pipette_id=self._pipette_id,
@@ -223,17 +235,31 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            self._engine_client.execute_command(
-                cmd.AspirateParams(
-                    pipetteId=self._pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    wellLocation=well_location,
-                    volume=volume,
-                    flowRate=flow_rate,
-                    correctionVolume=correction_volume,
+            if dynamic_liquid_tracking:
+
+                self._engine_client.execute_command(
+                    cmd.AspirateWhileTrackingParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        wellLocation=well_location,
+                        volume=volume,
+                        flowRate=flow_rate,
+                        correctionVolume=correction_volume,
+                    )
                 )
-            )
+            else:
+                self._engine_client.execute_command(
+                    cmd.AspirateParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        wellLocation=well_location,
+                        volume=volume,
+                        flowRate=flow_rate,
+                        correctionVolume=correction_volume,
+                    )
+                )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())
 
@@ -246,7 +272,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
@@ -258,6 +284,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             flow_rate: The flow rate in µL/s to dispense at.
             in_place: whether this is a in-place command.
             push_out: The amount to push the plunger below bottom position.
+            meniscus_tracking: Optional data about where to dispense from.
         """
         if self._protocol_core.api_version < _DISPENSE_VOLUME_VALIDATION_ADDED_IN:
             # In older API versions, when you try to dispense more than you can,
@@ -304,11 +331,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             well_name = well_core.get_name()
             labware_id = well_core.labware_id
 
-            well_location = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+            (
+                well_location,
+                dynamic_liquid_tracking,
+            ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
                 labware_id=labware_id,
                 well_name=well_name,
                 absolute_point=location.point,
-                is_meniscus=is_meniscus,
+                meniscus_tracking=meniscus_tracking,
             )
             pipette_movement_conflict.check_safe_for_pipette_movement(
                 engine_state=self._engine_client.state,
@@ -317,18 +347,32 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=well_name,
                 well_location=well_location,
             )
-            self._engine_client.execute_command(
-                cmd.DispenseParams(
-                    pipetteId=self._pipette_id,
-                    labwareId=labware_id,
-                    wellName=well_name,
-                    wellLocation=well_location,
-                    volume=volume,
-                    flowRate=flow_rate,
-                    pushOut=push_out,
-                    correctionVolume=correction_volume,
+            if dynamic_liquid_tracking:
+                self._engine_client.execute_command(
+                    cmd.DispenseWhileTrackingParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        wellLocation=well_location,
+                        volume=volume,
+                        flowRate=flow_rate,
+                        pushOut=push_out,
+                        correctionVolume=correction_volume,
+                    )
                 )
-            )
+            else:
+                self._engine_client.execute_command(
+                    cmd.DispenseParams(
+                        pipetteId=self._pipette_id,
+                        labwareId=labware_id,
+                        wellName=well_name,
+                        wellLocation=well_location,
+                        volume=volume,
+                        flowRate=flow_rate,
+                        pushOut=push_out,
+                        correctionVolume=correction_volume,
+                    )
+                )
 
         if isinstance(location, (TrashBin, WasteChute)):
             self._protocol_core.set_last_location(location=None, mount=self.get_mount())
@@ -813,11 +857,13 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         if flow_rate is None:
             flow_rate = _RESIN_TIP_DEFAULT_FLOW_RATE
 
-        well_location = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
+        (
+            well_location,
+            dynamic_tracking,
+        ) = self._engine_client.state.geometry.get_relative_liquid_handling_well_location(
             labware_id=labware_id,
             well_name=well_name,
             absolute_point=location.point,
-            is_meniscus=None,
         )
         pipette_movement_conflict.check_safe_for_pipette_movement(
             engine_state=self._engine_client.state,
@@ -896,6 +942,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             current_volume = None
 
         return current_volume or 0
+
+    def get_has_clean_tip(self) -> bool:
+        try:
+            clean_tip = self._engine_client.state.pipettes.get_has_clean_tip(
+                self._pipette_id
+            )
+        except TipNotAttachedError:
+            clean_tip = False
+
+        return clean_tip
 
     def get_available_volume(self) -> float:
         try:
@@ -1117,9 +1173,17 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 "No tipracks found for pipette in order to perform transfer"
             )
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-        )
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
+
         # TODO: use the ID returned by load_liquid_class in command annotations
         self.load_liquid_class(
             name=liquid_class.name,
@@ -1230,26 +1294,43 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         air_gap=0,
                     )
                 ]
+                # Enable LPD only if all of these apply:
+                # - LPD is globally enabled for this pipette
+                # - it is the first time visiting this well
+                # - pipette tip is unused
+                enable_lpd = (
+                    self.get_liquid_presence_detection() and step_source != prev_src
+                )
+            elif new_tip == TransferTipPolicyV2.ONCE:
+                # Enable LPD only if:
+                # - LPD is globally enabled for this pipette
+                # - this is the first source well of the entire transfer, which means
+                #   that the current tip is unused
+                enable_lpd = self.get_liquid_presence_detection() and prev_src is None
+            else:
+                enable_lpd = False
 
-            post_asp_tip_contents = self.aspirate_liquid_class(
-                volume=step_volume,
-                source=step_source,
-                transfer_properties=transfer_props,
-                transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
-                tip_contents=post_disp_tip_contents,
-            )
-            post_disp_tip_contents = self.dispense_liquid_class(
-                volume=step_volume,
-                dest=step_destination,
-                source=step_source,
-                transfer_properties=transfer_props,
-                transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
-                tip_contents=post_asp_tip_contents,
-                add_final_air_gap=False
-                if is_last_step and new_tip == TransferTipPolicyV2.NEVER
-                else True,
-                trash_location=trash_location,
-            )
+            with self.lpd_for_transfer(enable_lpd):
+                post_asp_tip_contents = self.aspirate_liquid_class(
+                    volume=step_volume,
+                    source=step_source,
+                    transfer_properties=transfer_props,
+                    transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
+                    tip_contents=post_disp_tip_contents,
+                    volume_for_pipette_mode_configuration=step_volume,
+                )
+                post_disp_tip_contents = self.dispense_liquid_class(
+                    volume=step_volume,
+                    dest=step_destination,
+                    source=step_source,
+                    transfer_properties=transfer_props,
+                    transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
+                    tip_contents=post_asp_tip_contents,
+                    add_final_air_gap=False
+                    if is_last_step and new_tip == TransferTipPolicyV2.NEVER
+                    else True,
+                    trash_location=trash_location,
+                )
             prev_src = step_source
         if new_tip != TransferTipPolicyV2.NEVER:
             _drop_tip()
@@ -1302,11 +1383,28 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 well_name=None,
             ).volume,
         )
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(),
-            tip_rack=tiprack_uri_for_transfer_props,
-        )
 
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
+
+        # If the volume to dispense into a well is less than threashold for low volume mode,
+        # then set the max working volume to the max volume of low volume mode.
+        # NOTE: this logic will need to be updated once we support list of volumes
+        # TODO (spp): refactor this to use the volume thresholds from shared data
+        has_low_volume_mode = self.get_pipette_name() in [
+            "flex_1channel_50",
+            "flex_8channel_50",
+        ]
+        if has_low_volume_mode and volume < 5:
+            working_volume = 30
         # If there are no multi-dispense properties or if the volume to distribute
         # per destination well is so large that the tip cannot hold enough liquid
         # to consecutively distribute to at least two wells, then we resort to using
@@ -1402,6 +1500,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         ]
         next_step_volume, next_dest = next(dest_per_volume_step)
         is_last_step = False
+        is_first_step = True
 
         # This loop will run until the last step has been executed
         while not is_last_step:
@@ -1465,15 +1564,28 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     " Specify a blowout location and enable blowout when using a disposal volume."
                 )
 
-            # Aspirate the total volume determined by the loop above
-            tip_contents = self.aspirate_liquid_class(
-                volume=total_aspirate_volume + conditioning_vol + disposal_vol,
-                source=source,
-                transfer_properties=transfer_props,
-                transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
-                tip_contents=tip_contents,
-                conditioning_volume=conditioning_vol,
-            )
+            if (
+                self.get_liquid_presence_detection()
+                and new_tip != TransferTipPolicyV2.NEVER
+                and is_first_step
+            ):
+                enable_lpd = True
+            else:
+                enable_lpd = False
+            with self.lpd_for_transfer(enable=enable_lpd):
+                # Aspirate the total volume determined by the loop above
+                tip_contents = self.aspirate_liquid_class(
+                    volume=total_aspirate_volume + conditioning_vol + disposal_vol,
+                    source=source,
+                    transfer_properties=transfer_props,
+                    transfer_type=tx_comps_executor.TransferType.ONE_TO_MANY,
+                    tip_contents=tip_contents,
+                    # We configure the mode based on the last dispense volume and disposal volume
+                    # since the mode is only used to determine the dispense push out volume
+                    # and we can do a push out only at the last dispense, that too if there is no disposal volume.
+                    volume_for_pipette_mode_configuration=vol_dest_combo[-1][0],
+                    conditioning_volume=conditioning_vol,
+                )
 
             # If the tip has volumes correspoinding to multiple destinations, then
             # multi-dispense in those destinations.
@@ -1508,6 +1620,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         conditioning_volume=conditioning_vol,
                         disposal_volume=disposal_vol,
                     )
+                is_first_step = False
             tip_used = True
 
         if new_tip != TransferTipPolicyV2.NEVER:
@@ -1549,10 +1662,19 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             raise RuntimeError(
                 "No tipracks found for pipette in order to perform transfer"
             )
+
         tiprack_uri_for_transfer_props = tip_racks[0][1].get_uri()
-        transfer_props = liquid_class.get_for(
-            pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
-        )
+        try:
+            transfer_props = liquid_class.get_for(
+                pipette=self.get_pipette_name(), tip_rack=tiprack_uri_for_transfer_props
+            )
+        except NoLiquidClassPropertyError:
+            if self._protocol_core.robot_type == "OT-2 Standard":
+                raise NoLiquidClassPropertyError(
+                    "Default liquid classes are not supported with OT-2 pipettes and tip racks."
+                ) from None
+            raise
+
         blow_out_properties = transfer_props.dispense.retract.blowout
         if (
             blow_out_properties.enabled
@@ -1675,14 +1797,21 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         air_gap=0,
                     )
                 ]
-            for step_volume, step_source in vol_aspirate_combo:
-                tip_contents = self.aspirate_liquid_class(
-                    volume=step_volume,
-                    source=step_source,
-                    transfer_properties=transfer_props,
-                    transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
-                    tip_contents=tip_contents,
-                )
+            # TODO (spp, 2025-03-24): add LPD feature when 'per source' tip policy is added for consolidate_liquid
+            with self.lpd_for_transfer(enable=False):
+                for step_num, (step_volume, step_source) in enumerate(
+                    vol_aspirate_combo
+                ):
+                    tip_contents = self.aspirate_liquid_class(
+                        volume=step_volume,
+                        source=step_source,
+                        transfer_properties=transfer_props,
+                        transfer_type=tx_comps_executor.TransferType.MANY_TO_ONE,
+                        tip_contents=tip_contents,
+                        volume_for_pipette_mode_configuration=total_dispense_volume
+                        if step_num == 0
+                        else None,
+                    )
             tip_contents = self.dispense_liquid_class(
                 volume=total_dispense_volume,
                 dest=dest,
@@ -1726,6 +1855,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         transfer_properties: TransferProperties,
         transfer_type: tx_comps_executor.TransferType,
         tip_contents: List[tx_comps_executor.LiquidAndAirGapPair],
+        volume_for_pipette_mode_configuration: Optional[float],
         conditioning_volume: Optional[float] = None,
     ) -> List[tx_comps_executor.LiquidAndAirGapPair]:
         """Execute aspiration steps.
@@ -1775,12 +1905,20 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
             ),
         )
-        components_executor.submerge(submerge_properties=aspirate_props.submerge)
+        components_executor.submerge(
+            submerge_properties=aspirate_props.submerge,
+            post_submerge_action="aspirate",
+            volume_for_pipette_mode_configuration=volume_for_pipette_mode_configuration,
+        )
         # Do not do a pre-aspirate mix or pre-wet if consolidating
         if transfer_type != tx_comps_executor.TransferType.MANY_TO_ONE:
+            # TODO: check if we want to do a mix only once when we're splitting a transfer
+            #  and coming back to the source multiple times.
+            #  We will have to do pre-wet always even for split volumes
             components_executor.mix(
                 mix_properties=aspirate_props.mix, last_dispense_push_out=False
             )
+            # TODO: check if pre-wet needs to be enabled for first well of consolidate
             components_executor.pre_wet(
                 volume=volume,
             )
@@ -1878,7 +2016,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
             ),
         )
-        components_executor.submerge(submerge_properties=dispense_props.submerge)
+        components_executor.submerge(
+            submerge_properties=dispense_props.submerge,
+            post_submerge_action="dispense",
+            volume_for_pipette_mode_configuration=None,
+        )
         push_out_vol = (
             0.0
             if dispense_props.mix.enabled
@@ -1956,7 +2098,11 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
             ),
         )
-        components_executor.submerge(submerge_properties=dispense_props.submerge)
+        components_executor.submerge(
+            submerge_properties=dispense_props.submerge,
+            post_submerge_action="dispense",
+            volume_for_pipette_mode_configuration=None,
+        )
         tip_starting_volume = self.get_current_volume()
         is_last_dispense_without_disposal_vol = (
             disposal_volume == 0 and tip_starting_volume == volume
@@ -2057,8 +2203,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def liquid_probe_with_recovery(self, well_core: WellCore, loc: Location) -> None:
         labware_id = well_core.labware_id
         well_name = well_core.get_name()
+        offset = LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
         well_location = WellLocation(
-            origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
+            origin=WellOrigin.TOP, offset=WellOffset(x=offset.x, y=offset.y, z=offset.z)
         )
         self._engine_client.execute_command(
             cmd.LiquidProbeParams(
@@ -2101,6 +2248,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
     def delay(self, seconds: float) -> None:
         """Call a protocol delay."""
         self._protocol_core.delay(seconds=seconds, msg=None)
+
+    @contextmanager
+    def lpd_for_transfer(self, enable: bool) -> Generator[None, None, None]:
+        """Context manager for the instrument's LPD state during a transfer."""
+        global_lpd_enabled = self.get_liquid_presence_detection()
+        self.set_liquid_presence_detection(enable=enable)
+        yield
+        self.set_liquid_presence_detection(enable=global_lpd_enabled)
 
 
 class _TipInfo(NamedTuple):

@@ -239,6 +239,14 @@ class PipetteTipStateUpdate:
 
 
 @dataclasses.dataclass
+class PipetteAspirateReadyUpdate:
+    """Update pipette ready state."""
+
+    pipette_id: str
+    ready_to_aspirate: bool
+
+
+@dataclasses.dataclass
 class TipsUsedUpdate:
     """Represents an update that marks tips in a tip rack as used."""
 
@@ -315,6 +323,7 @@ class PipetteEmptyFluidUpdate:
     """Sets the pipette to be valid and empty."""
 
     pipette_id: str
+    clean_tip: bool
     type: typing.Literal["empty"] = "empty"
 
 
@@ -460,6 +469,8 @@ class StateUpdate:
     files_added: FilesAddedUpdate | NoChangeType = NO_CHANGE
 
     addressable_area_used: AddressableAreaUsedUpdate | NoChangeType = NO_CHANGE
+
+    ready_to_aspirate: PipetteAspirateReadyUpdate | NoChangeType = NO_CHANGE
 
     def append(self, other: Self) -> Self:
         """Apply another `StateUpdate` "on top of" this one.
@@ -767,10 +778,10 @@ class StateUpdate:
         )
         return self
 
-    def set_fluid_empty(self: Self, pipette_id: str) -> Self:
-        """Update record fo fluid held inside a pipette. See `PipetteEmptyFluidUpdate`."""
+    def set_fluid_empty(self: Self, pipette_id: str, clean_tip: bool = False) -> Self:
+        """Update record of fluid held inside a pipette. See `PipetteEmptyFluidUpdate`."""
         self.pipette_aspirated_fluid = PipetteEmptyFluidUpdate(
-            type="empty", pipette_id=pipette_id
+            type="empty", pipette_id=pipette_id, clean_tip=clean_tip
         )
         return self
 
@@ -853,5 +864,14 @@ class StateUpdate:
                 self.flex_stacker_state_update, module_id
             ),
             pool_count=count,
+        )
+        return self
+
+    def set_pipette_ready_to_aspirate(
+        self, pipette_id: str, ready_to_aspirate: bool
+    ) -> Self:
+        """Set the ready to aspirate state for a pipette."""
+        self.ready_to_aspirate = PipetteAspirateReadyUpdate(
+            pipette_id=pipette_id, ready_to_aspirate=ready_to_aspirate
         )
         return self

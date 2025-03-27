@@ -53,7 +53,8 @@ describe('Blowout command', () => {
             },
           },
         },
-        additionalEquipment: {} as any,
+        wasteChute: {} as any,
+        trashBins: {} as any,
       },
     }
 
