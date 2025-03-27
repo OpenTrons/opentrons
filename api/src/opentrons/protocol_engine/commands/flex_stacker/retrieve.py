@@ -32,13 +32,11 @@ from ...types import (
     LabwareLocation,
     LoadedLabware,
 )
-from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
 )
-from opentrons.calibration_storage.helpers import uri_from_details
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
