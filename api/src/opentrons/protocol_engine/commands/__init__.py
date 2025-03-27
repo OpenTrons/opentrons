@@ -419,6 +419,14 @@ from .evotip_dispense import (
     EvotipDispenseCommandType,
 )
 
+from .identify_module import (
+    IdentifyModule,
+    IdentifyModuleParams,
+    IdentifyModuleCreate,
+    IdentifyModuleResult,
+    IdentifyModuleCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -740,4 +748,10 @@ __all__ = [
     "EvotipDispenseCreate",
     "EvotipDispenseResult",
     "EvotipDispenseCommandType",
+    # identify module command bundle
+    "IdentifyModule",
+    "IdentifyModuleParams",
+    "IdentifyModuleCreate",
+    "IdentifyModuleResult",
+    "IdentifyModuleCommandType",
 ]
