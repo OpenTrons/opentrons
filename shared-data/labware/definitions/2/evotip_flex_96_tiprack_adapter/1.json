@@ -2,10 +2,10 @@
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
-    "brandId": []
+    "brandId": ["999-00254"]
   },
   "metadata": {
-    "displayName": "Evotip Tiprack 96-Channel Adapter",
+    "displayName": "Opentrons Flex Evotip Tiprack 96-Channel Adapter",
     "displayCategory": "adapter",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -27,10 +27,10 @@
     "quirks": ["tiprackAdapterFor96Channel", "stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotips_flex_96_tiprack_adapter"
+    "loadName": "evotip_flex_96_tiprack_adapter"
   },
   "namespace": "opentrons",
-  "version": 2,
+  "version": 1,
   "schemaVersion": 2,
   "allowedRoles": ["adapter"],
   "cornerOffsetFromSlot": {

@@ -2,10 +2,10 @@
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
-    "brandId": []
+    "brandId": ["999-00254"]
   },
   "metadata": {
-    "displayName": "Evotip Soaking Reservoir Adapter",
+    "displayName": "Opentrons Flex Evotip Short Adapter",
     "displayCategory": "adapter",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -27,7 +27,7 @@
     "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotips_reservoir_adapter"
+    "loadName": "evotip_flex_short_adapter"
   },
   "namespace": "opentrons",
   "version": 1,

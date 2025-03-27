@@ -15,10 +15,10 @@
   ],
   "brand": {
     "brand": "opentrons",
-    "brandId": []
+    "brandId": ["999-00254"]
   },
   "metadata": {
-    "displayName": "Evotips",
+    "displayName": "Evotip Labware in Opentrons Flex Top Adapter",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -1006,11 +1006,11 @@
     "tipLength": 51.0,
     "tipOverlap": 10.0,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotips_opentrons_96_labware"
+    "loadName": "evotip_flex_96_labware"
   },
   "namespace": "opentrons",
   "allowedRoles": ["labware"],
-  "version": 2,
+  "version": 1,
   "stackLimit": 5,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
