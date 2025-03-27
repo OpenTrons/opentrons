@@ -43,7 +43,10 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import type { MouseEventHandler } from 'react'
 import type { State, Dispatch } from '/app/redux/types'
-import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
+import type {
+  ResetConfigOption,
+  ResetConfigRequest,
+} from '/app/redux/robot-admin/types'
 
 interface DeviceResetSlideoutProps {
   isExpanded: boolean
@@ -73,6 +76,9 @@ export function DeviceResetSlideout({
   const options = useSelector((state: State) =>
     getResetConfigOptions(state, robotName)
   )
+  // Check length>0 to cope with the current behavior of getResetConfigOptions.
+  // Perhaps it should return null instead of [] if we don't have options loaded yet.
+  const areOptionsLoaded = options != null && Object.keys(options).length > 0
 
   const ot2CalibrationOptions =
     options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
@@ -135,7 +141,10 @@ export function DeviceResetSlideout({
 
   const handleClearData = (): void => {
     const reachable = robot?.status !== UNREACHABLE
-    updateResetStatus(reachable, resetOptions)
+    updateResetStatus(
+      reachable,
+      buildResetRequest(resetOptions, options, isFlex)
+    )
     onCloseClick()
   }
 
@@ -158,7 +167,11 @@ export function DeviceResetSlideout({
       isExpanded={isExpanded}
       footer={
         <PrimaryButton
-          disabled={!(Object.values(resetOptions).find(val => val) ?? false)}
+          disabled={
+            !(Object.values(resetOptions).find(val => val) ?? false) ||
+            // handleClearData assumes options are loaded.
+            !areOptionsLoaded
+          }
           onClick={handleClearData}
           width="100%"
         >
@@ -363,4 +376,37 @@ export function DeviceResetSlideout({
       </Flex>
     </Slideout>
   )
+}
+
+function buildResetRequest(
+  displayedState: ResetConfigRequest,
+  serverResetOptions: ResetConfigOption[],
+  isFlex: boolean
+): ResetConfigRequest {
+  let requestToReturn = {
+    ...displayedState,
+  }
+
+  if (isFlex) {
+    // todo(mm, 2025-03-27): This logic for auto-selecting the onDeviceDisplay reset
+    // option will not work if we add a new server-side option to
+    // `GET /settings/reset/options` but leave it out of the UI.
+    // (onDeviceDisplay will never be selected then.) We probably want to base
+    // `isEveryOptionSelected` on what the UI actually lets the user select, not
+    // what the server theoretically accepts.
+
+    const isEveryOptionSelected = serverResetOptions
+      .filter(o => o.id !== 'onDeviceDisplay') // filtering out ODD setting because this gets implicitly cleared if all settings are selected
+      .map(serverOption => requestToReturn?.[serverOption.id] ?? false)
+      .every(value => value)
+
+    if (isEveryOptionSelected) {
+      requestToReturn = {
+        ...requestToReturn,
+        onDeviceDisplay: true,
+      }
+    }
+  }
+
+  return requestToReturn
 }

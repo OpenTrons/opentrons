@@ -23,8 +23,7 @@ import {
   SUCCESS,
   PENDING,
 } from '/app/redux/robot-api'
-import { getResetConfigOptions, resetConfig } from '/app/redux/robot-admin'
-import { useIsFlex } from '/app/redux-resources/robots'
+import { resetConfig } from '/app/redux/robot-admin'
 
 import type { State } from '/app/redux/types'
 import type { ResetConfigRequest } from '/app/redux/robot-admin/types'
@@ -45,38 +44,13 @@ export function DeviceResetModal({
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
   const navigate = useNavigate()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
-  const isFlex = useIsFlex(robotName)
   const resetRequestStatus = useSelector((state: State) => {
     const lastId = last(requestIds)
     return lastId != null ? getRequestById(state, lastId) : null
   })?.status
 
-  const serverResetOptions = useSelector((state: State) =>
-    getResetConfigOptions(state, robotName)
-  )
-
   const triggerReset = (): void => {
     if (resetOptions != null) {
-      if (isFlex) {
-        // todo(mm, 2025-03-27): This logic for auto-selecting the onDeviceDisplay reset
-        // option will not work if we add a new server-side option to
-        // `GET /settings/reset/options` but leave it out of the UI.
-        // (onDeviceDisplay will never be selected then.) We probably want to base
-        // `isEveryOptionSelected` on what the UI actually lets the user select, not
-        // what the server theoretically accepts.
-
-        const isEveryOptionSelected = serverResetOptions
-          .filter(o => o.id !== 'onDeviceDisplay') // filtering out ODD setting because this gets implicitly cleared if all settings are selected
-          .map(serverOption => resetOptions?.[serverOption.id] ?? false)
-          .every(value => value)
-
-        if (isEveryOptionSelected) {
-          resetOptions = {
-            ...resetOptions,
-            onDeviceDisplay: true,
-          }
-        }
-      }
       dispatchRequest(resetConfig(robotName, resetOptions))
       navigate('/devices/')
     }
