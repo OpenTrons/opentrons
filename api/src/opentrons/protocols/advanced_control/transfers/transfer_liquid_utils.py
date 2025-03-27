@@ -139,34 +139,31 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
 
             if well.well_name in active_wells_covered:
                 active_wells_covered.remove(well.well_name)
-            elif labware_format == "384Standard":
-                # If it's a 384 well plate, contiguous wells are not covered by the initial target well.
-                # To support these kinds of transfers given a list of contiguous wells, allow another
-                # target well (or up to 4 total for a full 96-tip config) and add those wells to list
-                # of covered wells
-                if alternate_384_well_coverage_count == 0 or (
+            # If it's a 384 well plate, contiguous wells are not covered by the initial target well.
+            # To support these kinds of transfers given a list of contiguous wells, allow another
+            # target well (or up to 4 total for a full 96-tip config) and add those wells to list
+            # of covered wells
+            elif labware_format == "384Standard" and (
+                alternate_384_well_coverage_count == 0
+                or (
                     nozzle_map.tip_count == 96 and alternate_384_well_coverage_count < 3
-                ):
-                    active_wells_covered.extend(
-                        list(
-                            wells_covered_by_pipette_configuration(
-                                nozzle_map,  # type: ignore[arg-type]
-                                well.well_name,
-                                labware_wells_by_column=[
-                                    [labware_well.well_name for labware_well in column]
-                                    for column in well.parent.columns()
-                                ],
-                            )
+                )
+            ):
+                active_wells_covered.extend(
+                    list(
+                        wells_covered_by_pipette_configuration(
+                            nozzle_map,  # type: ignore[arg-type]
+                            well.well_name,
+                            labware_wells_by_column=[
+                                [labware_well.well_name for labware_well in column]
+                                for column in well.parent.columns()
+                            ],
                         )
                     )
-                    active_wells_covered.remove(well.well_name)
-                    grouped_wells.append(well)
-                    alternate_384_well_coverage_count += 1
-                else:
-                    raise ValueError(
-                        "Could not resolve wells provided to pipette's nozzle configuration. "
-                        "Please ensure wells are ordered to match pipette's nozzle layout."
-                    )
+                )
+                active_wells_covered.remove(well.well_name)
+                grouped_wells.append(well)
+                alternate_384_well_coverage_count += 1
             else:
                 raise ValueError(
                     "Could not resolve wells provided to pipette's nozzle configuration. "
