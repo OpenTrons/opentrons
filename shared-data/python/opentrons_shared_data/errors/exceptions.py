@@ -398,7 +398,7 @@ class FlexStackerStallError(RoboticsControlError):
         self.serial = serial
         self.axis = axis
         super().__init__(
-            ErrorCodes.FLEX_STACKER_STALL_OR_COLLISION_DETECTED,
+            ErrorCodes.STACKER_STALL_OR_COLLISION_DETECTED,
             message,
             detail,
             wrapping,
@@ -788,14 +788,14 @@ class FlexStackerShuttleMissingError(RoboticsInteractionError):
                 f"{expected_state}, found {shuttle_state}."
             )
         super().__init__(
-            ErrorCodes.FLEX_STACKER_SHUTTLE_MISSING,
+            ErrorCodes.STACKER_SHUTTLE_MISSING,
             checked_message,
             checked_detail,
             wrapping,
         )
 
 
-class FlexStackerShuttleLabwareDetectionFailedError(RoboticsInteractionError):
+class FlexStackerShuttleLabwareError(RoboticsInteractionError):
     """An error occurred during Flex Stacker shuttle labware detection."""
 
     def __init__(
@@ -815,9 +815,38 @@ class FlexStackerShuttleLabwareDetectionFailedError(RoboticsInteractionError):
         if message is not None:
             checked_message = message
         else:
-            checked_message = f"Flex Stacker shuttle labware {'not' if labware_expected else ''} detected in state {shuttle_state}"
+            checked_message = (
+                f"Labware {'not' if labware_expected else ''} detected on shuttle"
+            )
         super().__init__(
-            ErrorCodes.FLEX_STACKER_SHUTTLE_LABWARE_DETECTION_FAILED,
+            ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED,
+            checked_message,
+            checked_detail,
+            wrapping,
+        )
+
+
+class FlexStackerHopperLabwareError(RoboticsInteractionError):
+    """An error occurred when detecting labware inside the Flex Stacker hopper."""
+
+    def __init__(
+        self,
+        serial: str,
+        labware_expected: bool,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["serial"] = serial
+        checked_detail["labware_expected"] = labware_expected
+        if message is not None:
+            checked_message = message
+        else:
+            checked_message = f"Labware {'not' if labware_expected else ''} detected in Flex Stacker hopper"
+        super().__init__(
+            ErrorCodes.STACKER_HOPPER_LABWARE_FAILED,
             checked_message,
             checked_detail,
             wrapping,

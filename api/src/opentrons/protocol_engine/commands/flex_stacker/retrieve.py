@@ -346,6 +346,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
 
         try:
             if stacker_hw is not None:
+                await stacker_hw.verify_hopper_labware_presence(labware_expected=True)
                 await stacker_hw.dispense_labware(labware_height=labware_height)
         except FlexStackerStallError as e:
             return DefinedErrorData(

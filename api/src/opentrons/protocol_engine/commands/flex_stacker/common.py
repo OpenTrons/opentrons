@@ -11,8 +11,8 @@ class FlexStackerStallOrCollisionError(ErrorOccurrence):
     isDefined: bool = True
     errorType: Literal["flexStackerStallOrCollision"] = "flexStackerStallOrCollision"
 
-    errorCode: str = ErrorCodes.FLEX_STACKER_STALL_OR_COLLISION_DETECTED.value.code
-    detail: str = ErrorCodes.FLEX_STACKER_STALL_OR_COLLISION_DETECTED.value.detail
+    errorCode: str = ErrorCodes.STACKER_STALL_OR_COLLISION_DETECTED.value.code
+    detail: str = ErrorCodes.STACKER_STALL_OR_COLLISION_DETECTED.value.detail
 
 
 class FlexStackerShuttleError(ErrorOccurrence):
@@ -21,5 +21,5 @@ class FlexStackerShuttleError(ErrorOccurrence):
     isDefined: bool = True
     errorType: Literal["flexStackerShuttleMissing"] = "flexStackerShuttleMissing"
 
-    errorCode: str = ErrorCodes.FLEX_STACKER_SHUTTLE_MISSING.value.code
-    detail: str = ErrorCodes.FLEX_STACKER_SHUTTLE_MISSING.value.detail
+    errorCode: str = ErrorCodes.STACKER_SHUTTLE_MISSING.value.code
+    detail: str = ErrorCodes.STACKER_SHUTTLE_MISSING.value.detail

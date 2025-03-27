@@ -39,7 +39,8 @@ from opentrons.hardware_control.modules.types import (
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
-    FlexStackerShuttleLabwareDetectionFailedError,
+    FlexStackerShuttleLabwareError,
+    FlexStackerHopperLabwareError,
 )
 
 log = logging.getLogger(__name__)
@@ -452,16 +453,26 @@ class FlexStacker(mod_abc.AbstractModule):
             )
 
     async def verify_shuttle_labware_presence(
-        self, direction: Direction, lawbare_expected: bool
+        self, direction: Direction, labware_expected: bool
     ) -> None:
         """Check whether or not a labware is detected on the shuttle."""
         # TODO: implement this function using tof sensor data
-        result = lawbare_expected
-        if lawbare_expected != result:
-            raise FlexStackerShuttleLabwareDetectionFailedError(
+        result = labware_expected
+        if labware_expected != result:
+            raise FlexStackerShuttleLabwareError(
                 self.device_info["serial"],
                 shuttle_state=self.platform_state,
-                labware_expected=lawbare_expected,
+                labware_expected=labware_expected,
+            )
+
+    async def verify_hopper_labware_presence(self, labware_expected: bool) -> None:
+        """Check whether or not a labware is detected inside the hopper."""
+        # TODO: implement this function using tof sensor data
+        result = labware_expected
+        if labware_expected != result:
+            raise FlexStackerHopperLabwareError(
+                self.device_info["serial"],
+                labware_expected=labware_expected,
             )
 
 
