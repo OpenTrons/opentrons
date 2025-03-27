@@ -1440,10 +1440,14 @@ class ModuleView:
         """Get the maximum stack count for the Flex Stacker by stack height."""
         max_fill_height = self.get_stacker_max_fill_height(module_id)
         assert max_fill_height > 0
-        # Subtracting the pool overlap from the stack element (pool height) allows
-        # us to account for elements nesting on one-another, but would also begin
-        # the overall stack at a negative (or "below") height relative to the tower
-        # max fill height. To account for this, we subtract the overlap from both.
+        # Subtracting the pool overlap from the stack element (pool height) allows us to account for
+        # elements nesting on one-another, and we must subtract from max height to apply starting offset.
+        # Ex: Let H be the total height of the stack; h be the height of a stack element;
+        # d be the stack overlap; and N be the number of labware. Then for N >= 1,
+        # H = Nh - (N-1)d
+        # H = Nh - Nd + d
+        # H - d = N(h-d)
+        # (H-d)/(h-d) = N
         return math.floor(
             (max_fill_height - pool_overlap) / (pool_height - pool_overlap)
         )
