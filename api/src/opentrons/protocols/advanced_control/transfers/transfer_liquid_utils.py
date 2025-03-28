@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from logging import Logger
     from opentrons.types import Location
     from opentrons.protocol_api.core.engine import WellCore
-    from opentrons.protocol_api.labware import Well
+    from opentrons.protocol_api.labware import Well, Labware
 
 
 @dataclass
@@ -103,8 +103,6 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
     targets: List[Well], nozzle_map: NozzleMapInterface
 ) -> List[Well]:
     """Groups wells together for a column, row, or full 96 configuration and returns a reduced list of target wells."""
-    from opentrons.protocol_api.labware import Labware
-
     grouped_wells = []
     active_wells_covered: List[str] = []
     active_labware: Optional[Labware] = None
