@@ -13,7 +13,6 @@ from .driver import FlexStackerInterface as FlexStacker
 from opentrons.drivers.flex_stacker.types import (
     Direction,
     StackerAxis,
-    LEDPattern,
     TOFSensor,
 )
 
@@ -84,11 +83,9 @@ async def test_get_tof_sensor_histogram(
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
-    # Reset LEDs to off
     if not stacker._simulating:
         ui.get_user_ready("Make sure both TOF sensors are installed.")
         ui.get_user_ready("Make sure there is no labware in the stacker.")
-        await stacker._driver.set_led(0, pattern=LEDPattern.STATIC)
 
     print("Homing stacker X and Z axis.")
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
