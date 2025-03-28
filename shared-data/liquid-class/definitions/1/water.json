@@ -1102,7 +1102,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 318.0
+                  "flowRate": 478.0
                 }
               },
               "touchTip": {
@@ -1330,7 +1330,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 318.0
+                  "flowRate": 478.0
                 }
               },
               "touchTip": {
@@ -2427,7 +2427,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 318.0
+                  "flowRate": 478.0
                 }
               },
               "touchTip": {
@@ -2655,7 +2655,7 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 318.0
+                  "flowRate": 478.0
                 }
               },
               "touchTip": {
