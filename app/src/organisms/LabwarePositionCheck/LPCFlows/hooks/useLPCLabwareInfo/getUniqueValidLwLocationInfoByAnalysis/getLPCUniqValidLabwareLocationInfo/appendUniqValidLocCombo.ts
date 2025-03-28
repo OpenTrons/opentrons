@@ -1,8 +1,14 @@
 import isEqual from 'lodash/isEqual'
 
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  FLEX_STAGING_ADDRESSABLE_AREAS,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  LabwareLocationSequence,
+} from '@opentrons/shared-data'
 import type { LabwareLocationInfoWithLocSeq } from '.'
 
 // Appends the labware location combo if it is "unique" to the existing list of combos
@@ -38,9 +44,12 @@ function isValidLocCombo(
   )
   const topMostLocSeqComponentKind =
     combo.locationSequence[combo.locationSequence.length - 1].kind
+  const isInStagingAreaSlot = getIsInStagingAreaSlot(combo.locationSequence)
+
   const isNotAnLPCablComponentKind =
     topMostLocSeqComponentKind === 'notOnDeck' ||
-    topMostLocSeqComponentKind === 'inStackerHopper'
+    topMostLocSeqComponentKind === 'inStackerHopper' ||
+    isInStagingAreaSlot
 
   const notLPCable =
     lwDef == null ||
@@ -59,5 +68,22 @@ function isValidLocCombo(
       lwDef.allowedRoles.includes('adapter') ||
       lwDef.allowedRoles.includes('system')
     )
+  }
+}
+
+function getIsInStagingAreaSlot(ls: LabwareLocationSequence): boolean {
+  const aaLocComponent = ls.find(
+    component => component.kind === 'onAddressableArea'
+  )
+
+  if (aaLocComponent != null) {
+    return (
+      aaLocComponent.kind === 'onAddressableArea' &&
+      FLEX_STAGING_ADDRESSABLE_AREAS.includes(
+        aaLocComponent.addressableAreaName
+      )
+    )
+  } else {
+    return false
   }
 }
