@@ -93,7 +93,13 @@ You can manually move any standard or custom labware. Using the gripper to move 
           * ``opentrons_flex_96_filtertiprack_50ul``
           * ``opentrons_flex_96_filtertiprack_200ul``
           * ``opentrons_flex_96_filtertiprack_1000ul``
+    * - Opentrons labware lids 
+      - 
+          * ``opentrons_tough_pcr_auto_sealing_lid``
+          * ``opentrons_flex_tiprack_lid``
     
+You can move compatible Opentrons lids manually or with the Flex gripper, but some restrictions apply. For more, see :ref:`moving-lids`. 
+
 The gripper may work with other ANSI/SLAS standard labware, but this is not recommended.
 
 .. note::
@@ -192,3 +198,32 @@ You can also load labware off-deck, in preparation for a ``move_labware()`` comm
             pipette.pick_up_tip()
 
 Using the off-deck location to remove or replace labware lets you continue your workflow in a single protocol, rather than needing to end a protocol, reset the deck, and start a new protocol run.
+
+.. _moving-lids:
+
+Moving Lids 
+===========
+
+Lids on well plates or tip racks can help prevent contamination on the deck and are required for use with some modules, like the Thermocycler. You can use :py:meth:`.ProtocolContext.move_lid` to move an ``opentrons_tough_pcr_auto_sealing_lid`` or ``opentrons_flex_tiprack_lid`` manually or using the Flex gripper. 
+
+An `opentrons_tough_pcr_auto_sealing_lid` can be moved between deck slots, lid stacks, or compatible labware, modules, and adapters loaded in your protocol. 
+
+.. code-block:: python
+
+    ## load lid stack on the Flex deck 
+
+    lid_stack = protocol.load_lid_stack(
+        load_name="opentrons_tough_pcr_auto_sealing_lid",
+        location="B2", 
+        quantity="4")
+    
+    ## move an Opentrons Tough PCR Auto-Sealing Lid to a compatible well plate in the Thermocycler
+    protocol.move_lid(
+        source_location=("lid_stack", "B2"),
+        new_location=("opentrons_96_wellplate_200ul_pcr_full_skirt", "tcmod"),
+        use_gripper= "True")
+
+Use ``move_lid()`` again to move a used ``opentrons_tough_pcr_auto_sealing_lid`` to a ``WasteChute`` or ``TrashBin`` loaded in your protocol. 
+
+.. note::
+    You can only move an ``opentrons_flex_tip_rack_lid`` from a new tip rack to the ``WasteChute`` or ``TrashBin``, either manually or with the Flex gripper. The tip rack lid must be defined in your protocol using the ``lid`` parameter of ``load_labware``. For more, see :ref:`loading-lids`.
