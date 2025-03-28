@@ -696,7 +696,7 @@ class InstrumentContext(publisher.CommandPublisher):
         :raises: ValueError: If both ``mm_to_edge`` and ``radius`` are specified.
         :returns: This instance.
 
-        .. versionchanged:: 2.23
+        .. versionchanged:: 2.24
                 Added the ``mm_from_edge`` parameter.
         """
         if not self._core.has_tip():
@@ -721,10 +721,10 @@ class InstrumentContext(publisher.CommandPublisher):
             raise TypeError(f"location should be a Well, but it is {location}")
 
         if mm_from_edge:
-            if self.api_version < APIVersion(2, 23):
+            if self.api_version < APIVersion(2, 24):
                 raise APIVersionError(
                     api_element="mm_from_edge",
-                    until_version="2.23",
+                    until_version="2.24",
                     current_version=f"{self.api_version}",
                 )
             if radius != 1.0:
@@ -751,7 +751,9 @@ class InstrumentContext(publisher.CommandPublisher):
             radius=radius,
             z_offset=v_offset,
             speed=checked_speed,
-            mm_from_edge=mm_from_edge,
+            mm_from_edge=mm_from_edge
+            if self.api_version >= APIVersion(2, 24)
+            else None,
         )
         return self
 
