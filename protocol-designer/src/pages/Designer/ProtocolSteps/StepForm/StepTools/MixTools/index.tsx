@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
@@ -17,6 +18,7 @@ import {
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import {
+  getEnableLiquidClasses,
   getEnablePartialTipSupport,
   getEnableReturnTip,
 } from '../../../../../../feature-flags/selectors'
@@ -43,6 +45,7 @@ import {
   getFormLevelError,
   getLabwareFieldForPositioningField,
 } from '../../utils'
+import { ResetSettingsField } from '../MoveLiquidTools/ResetSettingsField'
 import type { StepFormProps } from '../../types'
 
 export function MixTools(props: StepFormProps): JSX.Element {
@@ -54,10 +57,12 @@ export function MixTools(props: StepFormProps): JSX.Element {
     tab,
     setTab,
   } = props
+  const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const pipettes = useSelector(getPipetteEntities)
   const enableReturnTip = useSelector(getEnableReturnTip)
   const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const labwares = useSelector(getLabwareEntities)
+  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const { t, i18n } = useTranslation(['application', 'form'])
   const aspirateTab = {
     text: i18n.format(t('aspirate'), 'capitalize'),
@@ -87,6 +92,15 @@ export function MixTools(props: StepFormProps): JSX.Element {
     labwares[String(propsForFields.dropTip_location.value)] != null
 
   const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
+
+  const handleScrollToTop = (): void => {
+    if (toolsComponentRef.current != null) {
+      toolsComponentRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
 
   return toolboxStep === 0 ? (
     <Flex
@@ -195,6 +209,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
     </Flex>
   ) : (
     <Flex
+      ref={toolsComponentRef}
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       paddingY={SPACING.spacing16}
@@ -341,6 +356,14 @@ export function MixTools(props: StepFormProps): JSX.Element {
           </>
         ) : null}
       </Flex>
+      {enableLiquidClasses ? (
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            handleScrollToTop()
+          }}
+        />
+      ) : null}
     </Flex>
   )
 }
