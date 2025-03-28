@@ -29,7 +29,7 @@ export function ConfirmDeleteEntityInUseModal(
         marginLeft="0"
         zIndexOverlay={11}
         title={t(`are_you_sure_${type}_slot`)}
-        type="info"
+        type="warning"
         onClose={onClose}
         footer={
           <Flex
