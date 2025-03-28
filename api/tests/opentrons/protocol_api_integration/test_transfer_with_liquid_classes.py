@@ -1643,6 +1643,94 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.23", "Flex")], indirect=True
 )
+def test_water_distribute_steps_with_return_tip(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should return tips during the distribution.
+
+    This test uses the same liquid class and transfer parameters as
+    `test_order_of_water_distribution_steps_using_mixed_dispense`, except that it sets
+    `return_tip` arg to True. So we expect the execution to call `drop_tip()` with
+    the well_core pointing to last tip's well and a `location` of None.
+    """
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_1000ul", "D1"
+    )
+    pipette_1k = simulated_protocol_context.load_instrument(
+        "flex_1channel_1000", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+    water = simulated_protocol_context.define_liquid_class("water")
+
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "pick_up_tip",
+            side_effect=InstrumentCore.pick_up_tip,
+            autospec=True,
+        ) as patched_pick_up_tip,
+        mock.patch.object(
+            InstrumentCore,
+            "drop_tip",
+            side_effect=InstrumentCore.drop_tip,
+            autospec=True,
+        ) as patched_drop_tip,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_pick_up_tip, "pick_up_tip")
+        mock_manager.attach_mock(patched_drop_tip, "drop_tip")
+        pipette_1k.distribute_liquid(
+            liquid_class=water,
+            volume=400,
+            source=nest_plate.rows()[0][1],
+            dest=arma_plate.rows()[0][:3],
+            new_tip="always",
+            trash_location=trash,
+            return_tip=True,
+        )
+        expected_calls = [
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            ),
+            mock.call.drop_tip(
+                mock.ANY,
+                location=None,
+                well_core=mock.ANY,
+                home_after=False,
+                alternate_drop_location=False,
+            ),
+            mock.call.pick_up_tip(
+                mock.ANY,
+                location=mock.ANY,
+                well_core=mock.ANY,
+                presses=mock.ANY,
+                increment=mock.ANY,
+            ),
+            mock.call.drop_tip(
+                mock.ANY,
+                location=None,
+                well_core=mock.ANY,
+                home_after=False,
+                alternate_drop_location=False,
+            ),
+        ]
+        assert mock_manager.mock_calls == expected_calls
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+)
 def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
     simulated_protocol_context: ProtocolContext,
 ) -> None:
