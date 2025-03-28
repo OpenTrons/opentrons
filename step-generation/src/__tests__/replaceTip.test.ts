@@ -203,9 +203,9 @@ describe('replaceTip', () => {
     it('Single-channel: dropping tips in waste chute', () => {
       invariantContext = {
         ...invariantContext,
-        additionalEquipmentEntities: {
+        wasteChuteEntities: {
           wasteChuteId: {
-            name: 'wasteChute',
+            pythonName: 'waste_chute',
             id: wasteChuteId,
             location: 'cutoutD3',
           },
@@ -318,9 +318,9 @@ describe('replaceTip', () => {
       invariantContext = {
         ...invariantContext,
 
-        additionalEquipmentEntities: {
+        wasteChuteEntities: {
           wasteChuteId: {
-            name: 'wasteChute',
+            pythonName: 'waste_chute',
             id: wasteChuteId,
             location: 'cutoutD3',
           },

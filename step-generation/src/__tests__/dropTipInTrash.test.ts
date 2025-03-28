@@ -25,9 +25,9 @@ const mockCutout = 'cutoutA3'
 const invariantContext: InvariantContext = {
   ...makeContext(),
   pipetteEntities: mockPipEntities,
-  additionalEquipmentEntities: {
+  trashBinEntities: {
     [mockTrashBinId]: {
-      name: 'trashBin' as const,
+      pythonName: 'trash_bin_1',
       location: mockCutout,
       id: mockTrashBinId,
     },

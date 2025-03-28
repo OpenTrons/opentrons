@@ -91,8 +91,7 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     plate_type = protocol.params.labware_plate_reader_compatible  # type: ignore [attr-defined]
     plate_orientation = protocol.params.plate_orientation  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "01")
-
+    helpers.comment_protocol_version(protocol, "02")
     plate_name_str = "hellma_plate_" + str(plate_orientation)
 
     # Protocol Parameters
@@ -335,6 +334,8 @@ def run(protocol: ProtocolContext) -> None:
 
         pip.flow_rate.aspirate = 300
         pip.flow_rate.dispense = 300
+        if m1000.current_volume > 0.0:
+            m1000.dispense(m1000.current_volume, waste)
 
     def lysis(vol: float, source: List[Well]) -> None:
         """Lysis Steps."""
@@ -512,7 +513,6 @@ def run(protocol: ProtocolContext) -> None:
             m1000.blow_out(m.top(-3))
             m1000.prepare_to_aspirate()
             m1000.air_gap(20)
-
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
         # Shake for 3 minutes to mix wash with beads
@@ -559,6 +559,7 @@ def run(protocol: ProtocolContext) -> None:
                     m1000.aspirate(elution_vol - 10, samples_m[i])
                     m1000.dispense(elution_vol - 10, samples_m[i].bottom(10))
                     m1000.flow_rate.dispense = 300
+            m1000.dispense(m1000.current_volume, waste)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
         # Shake for 3 minutes to mix wash with beads

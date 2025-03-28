@@ -48,7 +48,7 @@ Throughout this section, we'll use the labware listed in the following table.
       - Labware name
       - API load name
     * - Well plate
-      - `Corning 96 Well Plate 360 µL Flat <https://labware.opentrons.com/corning_96_wellplate_360ul_flat/>`_
+      - `Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt <https://labware.opentrons.com/opentrons_96_wellplate_200ul_pcr_full_skirt/>`_
       - ``corning_96_wellplate_360ul_flat``
     * - Flex tip rack
       - `Opentrons Flex 96 Tips 200 µL <https://shop.opentrons.com/opentrons-flex-tips-200-l/>`_
@@ -63,13 +63,13 @@ Similar to the code sample in :ref:`overview-section-v2`, here's how you use the
 
     #Flex
     tiprack = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
-    plate = protocol.load_labware("corning_96_wellplate_360ul_flat", "D2")
+    plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "D2")
 
 .. code-block:: python
 
     #OT-2
     tiprack = protocol.load_labware("opentrons_96_tiprack_300ul", "1")
-    plate = protocol.load_labware("corning_96_wellplate_360ul_flat", "2")
+    plate = protocol.load_labware("opentrons_96_wellplate_200ul_pcr_full_skirt", "2")
     
 .. versionadded:: 2.0
 
@@ -82,9 +82,46 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
     The ``load_labware`` method includes an optional ``label`` argument. You can use it to identify labware with a descriptive name. If used, the label value is displayed in the Opentrons App. For example::
         
         tiprack = protocol.load_labware(
-            load_name="corning_96_wellplate_360ul_flat",
+            load_name="opentrons_flex_96_tiprack_200ul",
             location="D1",
             label="any-name-you-want")
+
+
+.. _loading-lids:
+
+Loading Lids 
+============
+
+You can load lids on compatible plates or tip racks. Use the optional ``lid`` parameter of ``load_labware`` to add an Opentrons Tough Auto-Sealing Lid to a PCR plate, or load a new tip rack's lid in your protocol. 
+
+.. code-block:: python
+
+    plate = protocol.load_labware(
+        load_name="opentrons_96_wellplate_200ul_pcr_full_skirt", 
+        location="D2",
+        lid="opentrons_tough_pcr_auto_sealing_lid")
+
+
+.. code-block:: python
+
+    tiprack = protocol.load_labware(
+        load_name="opentrons_flex_96_tiprack_200ul",
+        location="D1",
+        lid="opentrons_flex_tiprack_lid")
+
+
+You might need multiple lids during your protocol. Use ``load_lid_stack`` to stack up to five Opentrons Tough Auto-Sealing Lids on a deck slot, riser, or compatible adapter. 
+
+.. code-block:: python
+
+    def load_lid_stack(
+        load_name="opentrons_tough_pcr_auto_sealing_lid", 
+        location="B2",
+        quantity="4")
+
+Tip rack lids can't be stacked or placed on the deck. 
+
+.. versionadded:: 2.23
 
 .. _labware-on-adapters:
 

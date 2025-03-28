@@ -256,14 +256,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
             'capitalize'
           )}
           testId="delay_checkbox"
-          checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
-          isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_delay_checkbox`].updateValue
-          }
-          tooltipText={
-            propsForFields[`${tab}_delay_checkbox`].tooltipContent ?? null
-          }
+          fieldProps={propsForFields[`${tab}_delay_checkbox`]}
         >
           {formData[`${tab}_delay_checkbox`] === true ? (
             <InputStepFormField
@@ -287,12 +280,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
                 'capitalize'
               )}
               testId="blowout_checkbox"
-              checkboxValue={propsForFields.blowout_checkbox.value}
-              isChecked={propsForFields.blowout_checkbox.value === true}
-              checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
-              tooltipText={
-                propsForFields.blowout_checkbox.tooltipContent ?? null
-              }
+              fieldProps={propsForFields.blowout_checkbox}
             >
               {formData.blowout_checkbox === true ? (
                 <Flex
@@ -333,14 +321,7 @@ export function MixTools(props: StepFormProps): JSX.Element {
                 'capitalize'
               )}
               testId="touchTip_checkbox"
-              checkboxValue={propsForFields.mix_touchTip_checkbox.value}
-              isChecked={propsForFields.mix_touchTip_checkbox.value === true}
-              checkboxUpdateValue={
-                propsForFields.mix_touchTip_checkbox.updateValue
-              }
-              tooltipText={
-                propsForFields.mix_touchTip_checkbox.tooltipContent ?? null
-              }
+              fieldProps={propsForFields.mix_touchTip_checkbox}
             >
               {formData.mix_touchTip_checkbox === true ? (
                 <PositionField

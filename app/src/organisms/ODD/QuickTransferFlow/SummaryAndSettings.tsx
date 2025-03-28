@@ -17,7 +17,6 @@ import {
   useCreateRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import {
   ANALYTICS_QUICK_TRANSFER_TIME_TO_CREATE,
@@ -26,10 +25,12 @@ import {
 } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { useFeatureFlag } from '/app/redux/config'
 import { Overview } from './Overview'
 import { TipManagement } from './TipManagement'
 import { QuickTransferAdvancedSettings } from './QuickTransferAdvancedSettings'
 import { SaveOrRunModal } from './SaveOrRunModal'
+import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 import { getInitialSummaryState, createQuickTransferFile } from './utils'
 import { quickTransferSummaryReducer } from './reducers'
 
@@ -53,6 +54,7 @@ export function SummaryAndSettings(
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
+  const enableExportPython = useFeatureFlag('quickTransferExportPython')
 
   const displayCategory: string[] = [
     'overview',
@@ -99,11 +101,10 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFile = createQuickTransferFile(
-      state,
-      deckConfig,
-      protocolName
-    )
+    const protocolFile = enableExportPython
+      ? createQuickTransferPythonFile(state, deckConfig, protocolName)
+      : createQuickTransferFile(state, deckConfig, protocolName)
+
     createProtocolAsync({
       files: [protocolFile],
       protocolKind: 'quick-transfer',
@@ -119,7 +120,10 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFile = createQuickTransferFile(state, deckConfig)
+    const protocolFile = enableExportPython
+      ? createQuickTransferPythonFile(state, deckConfig)
+      : createQuickTransferFile(state, deckConfig)
+
     createProtocolAsync({
       files: [protocolFile],
       protocolKind: 'quick-transfer',

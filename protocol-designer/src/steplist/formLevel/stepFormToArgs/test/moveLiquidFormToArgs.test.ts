@@ -140,6 +140,8 @@ describe('move liquid step form -> command creator args', () => {
         id: 'destLabwareId',
         name: 'wasteChute',
         location: 'cutoutD3',
+        isTouchTipAllowed: false,
+        pythonName: 'mockPythonName',
       },
     })
 
