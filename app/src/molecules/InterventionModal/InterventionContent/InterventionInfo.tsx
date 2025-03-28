@@ -20,8 +20,8 @@ import { Divider } from '/app/atoms/structure/Divider'
 
 import type { DeckInfoLabelProps } from '@opentrons/components'
 
-export interface InterventionInfoDefaultProps {
-  layout: 'default'
+export interface BaseInterventionInfo {
+  layout: 'default' | 'stacked'
   type: 'location-arrow-location' | 'location-colon-location' | 'location'
   labwareName: string
   labwareNickname?: string
@@ -29,11 +29,15 @@ export interface InterventionInfoDefaultProps {
   newLocationProps?: DeckInfoLabelProps
 }
 
-export interface InterventionInfoStackedProps
-  extends Omit<InterventionInfoDefaultProps, 'layout'> {
+export interface InterventionInfoDefaultProps extends BaseInterventionInfo {
+  layout: 'default'
+  subText?: undefined
+}
+
+export interface InterventionInfoStackedProps extends BaseInterventionInfo {
   layout: 'stacked'
-  subText: string
-  tagText: string
+  subText?: string | null
+  tagText?: string | null
 }
 
 export type InterventionInfoProps =
@@ -74,7 +78,9 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
             >
               {props.subText}
             </StyledText>
-            <Tag type="default" text={props.tagText} shrinkToContent={true} />
+            {props.tagText && (
+              <Tag type="default" text={props.tagText} shrinkToContent={true} />
+            )}
             <Divider
               borderColor={COLORS.grey35}
               css={`

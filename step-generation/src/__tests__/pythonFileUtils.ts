@@ -23,7 +23,7 @@ import {
   getLoadWasteChute,
   pythonMetadata,
   pythonRequirements,
-} from '../selectors/pythonFile'
+} from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
@@ -33,7 +33,7 @@ import type {
   ModuleEntities,
   PipetteEntities,
   TimelineFrame,
-} from '@opentrons/step-generation'
+} from '../types'
 
 describe('pythonMetadata', () => {
   it('should generate metadata section', () => {
