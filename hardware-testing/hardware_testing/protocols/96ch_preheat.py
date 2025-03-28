@@ -68,8 +68,6 @@ def run(ctx: ProtocolContext) -> None:
     if not ctx.is_simulating():
         messenger = ot3api._backend._messenger
         OT3API.read_sensor = read_sensor
-        OT3API.set_hold_currents = set_hold_currents
-        #loop = ot3api._loop
     primary = EnvironmentSensor.build(
         sensor_id=SensorId.S0,
         node_id=NodeId.pipette_left,
