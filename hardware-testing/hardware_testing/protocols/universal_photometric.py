@@ -68,7 +68,7 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         variable_name="number_of_tipracks",
         display_name="Number of tipracks",
         description="Choose 1 or 5 tipracks to load at the start.",
-        default=1,
+        default=5,
         choices=[
             {"display_name": "1", "value": 1},
             {"display_name": "5", "value": 5},
