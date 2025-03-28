@@ -691,6 +691,22 @@ const updatePatchOnNozzleChange = (
   return patch
 }
 
+const updatePatchOnConditioningVolumeChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (
+    fieldHasChanged(rawForm, patch, 'conditioning_checkbox') &&
+    patch.conditioning_checkbox === true
+  ) {
+    return {
+      ...patch,
+      ...getDefaultFields('aspirate_airGap_checkbox', 'aspirate_airGap_volume'),
+    }
+  }
+  return patch
+}
+
 export function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -730,5 +746,6 @@ export function dependentFieldsUpdateMoveLiquid(
       updatePatchOnTiprackChange(chainPatch, rawForm, pipetteEntities),
     chainPatch =>
       updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchOnConditioningVolumeChange(chainPatch, rawForm),
   ])
 }

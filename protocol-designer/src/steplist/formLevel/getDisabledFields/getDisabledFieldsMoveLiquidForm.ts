@@ -61,6 +61,10 @@ export function getDisabledFieldsMoveLiquidForm(
     }
   })
 
+  if (hydratedForm.conditioning_checkbox === true) {
+    disabled.add('aspirate_airGap_checkbox')
+  }
+
   if (
     !hydratedForm.blowout_location ||
     hydratedForm.blowout_location.includes('wasteChute') ||
