@@ -51,6 +51,12 @@ function getLabwareInfoRecords(
 
   params.lwLocInfo.forEach(combo => {
     const uri = combo.definitionUri
+    const locationSpecificOffsetDetails = getLocationSpecificOffsetDetailsForLabware(
+      {
+        ...params,
+        uri,
+      }
+    )
 
     if (!(uri in labwareDetails)) {
       labwareDetails[uri] = {
@@ -59,13 +65,9 @@ function getLabwareInfoRecords(
         defaultOffsetDetails: getDefaultOffsetDetailsForLabware({
           ...params,
           uri,
+          locationSpecificOffsetDetails,
         }),
-        locationSpecificOffsetDetails: getLocationSpecificOffsetDetailsForLabware(
-          {
-            ...params,
-            uri,
-          }
-        ),
+        locationSpecificOffsetDetails,
       }
     }
   })

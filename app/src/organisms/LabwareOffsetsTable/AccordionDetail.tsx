@@ -35,7 +35,7 @@ export function AccordionDetail({
 
   const buildColTwoText = (): string => {
     if (isHardcoded || lsExistingOffset?.vector != null) {
-      return t('custom')
+      return t('manual')
     } else if (defaultExistingOffset?.vector != null) {
       return t('default')
     } else {

@@ -33,6 +33,7 @@ import type {
   CreateCommand,
   MoveLabwareCreateCommand,
   RobotType,
+  Coordinates,
 } from '@opentrons/shared-data'
 import type { useChainRunCommands } from '/app/resources/runs'
 import type { Jog } from '/app/molecules/JogControls/types'
@@ -41,7 +42,10 @@ import type {
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
-import type { LabwareOffset } from '@opentrons/api-client'
+import type {
+  LabwareOffset,
+  LegacyLabwareOffsetLocation,
+} from '@opentrons/api-client'
 import type { TFunction } from 'i18next'
 
 interface PickUpTipProps extends PickUpTipStep {
@@ -50,6 +54,14 @@ interface PickUpTipProps extends PickUpTipStep {
   registerPosition: Dispatch<RegisterPositionAction>
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   setFatalError: (errorMessage: string) => void
+  calculateAndApplyOffset: (
+    initialPosition: Coordinates | null,
+    finalPosition: Coordinates | null,
+    labwareId: string,
+    location: LegacyLabwareOffsetLocation
+  ) => Promise<void>
+  onSkip: () => void
+  isApplyingOffsets: boolean
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
   handleJog: Jog
@@ -58,6 +70,7 @@ interface PickUpTipProps extends PickUpTipStep {
   protocolHasModules: boolean
   currentStepIndex: number
 }
+
 export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const {
@@ -70,8 +83,11 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     registerPosition,
     handleJog,
     isRobotMoving,
+    isApplyingOffsets,
+    calculateAndApplyOffset,
     existingOffsets,
     workingOffsets,
+    onSkip,
     setFatalError,
     adapterId,
     robotType,
@@ -227,6 +243,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             initialPosition != null && position != null
               ? getVectorDifference(position, initialPosition)
               : undefined
+
           registerPosition({
             type: 'finalPosition',
             labwareId,
@@ -234,7 +251,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
             position,
           })
           registerPosition({ type: 'tipPickUpOffset', offset: offset ?? null })
-          chainRunCommands(
+
+          return chainRunCommands(
             [
               {
                 commandType: 'pickUpTip',
@@ -247,16 +265,20 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
               },
             ],
             false
-          )
-            .then(() => {
-              setShowTipConfirmation(true)
-            })
-            .catch((e: Error) => {
-              setFatalError(
-                `PickUpTip failed to move from final position with message: ${e.message}`
+          ).then(() => {
+            setShowTipConfirmation(true)
+            if (position != null) {
+              return calculateAndApplyOffset(
+                initialPosition ?? null,
+                position,
+                labwareId,
+                location
               )
-            })
+            }
+            return Promise.resolve()
+          })
         }
+        return Promise.resolve()
       })
       .catch((e: Error) => {
         setFatalError(
@@ -435,7 +457,8 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           }
           labwareDef={labwareDef}
           pipetteName={pipetteName}
-          handleConfirmPosition={handleConfirmPosition}
+          handleConfirmPositionAndApply={handleConfirmPosition}
+          isApplyingOffsets={isApplyingOffsets}
           handleGoBack={handleGoBack}
           handleJog={handleJog}
           initialPosition={initialPosition}
@@ -451,6 +474,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           })}
           body={<UnorderedList items={instructions} />}
           labwareDef={labwareDef}
+          onSkip={onSkip}
           confirmPlacement={handleConfirmPlacement}
           robotType={robotType}
         />

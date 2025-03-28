@@ -2,18 +2,21 @@
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
-    "brandId": []
+    "brandId": ["999-00254"],
+    "links": [
+      "https://opentrons.com/products/opentrons-flex-evotip-adapter-set/"
+    ]
   },
   "metadata": {
-    "displayName": "Evotip Soaking Reservoir Adapter",
+    "displayName": "Opentrons Flex Evotip Tiprack 96-Channel Adapter",
     "displayCategory": "adapter",
     "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
-    "xDimension": 130.5,
+    "xDimension": 156.5,
     "yDimension": 98,
-    "zDimension": 51.5
+    "zDimension": 132
   },
   "wells": {},
   "groups": [
@@ -24,18 +27,18 @@
   ],
   "parameters": {
     "format": "96Standard",
-    "quirks": ["stackingMaxFive"],
+    "quirks": ["tiprackAdapterFor96Channel", "stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotips_reservoir_adapter"
+    "loadName": "evotip_flex_96_tiprack_adapter"
   },
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "allowedRoles": ["adapter"],
   "cornerOffsetFromSlot": {
-    "x": -0.19,
-    "y": -0.19,
+    "x": -14.25,
+    "y": -3.5,
     "z": 0
   }
 }
