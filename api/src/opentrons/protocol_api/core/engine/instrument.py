@@ -1191,7 +1191,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             tiprack_uri=tiprack_uri_for_transfer_props,
         )
 
-        # TODO: add multi-channel pipette handling here
         source_dest_per_volume_step = (
             tx_commons.expand_for_volume_constraints_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],
@@ -1712,7 +1711,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             ).volume,
         )
 
-        # TODO: add multi-channel pipette handling here
         source_per_volume_step = (
             tx_commons.expand_for_volume_constraints_for_liquid_classes(
                 volumes=[volume for _ in range(len(source))],

@@ -2006,3 +2006,60 @@ def test_incompatible_transfers_skip_probing_even_with_lpd_on(
             trash_location=trash,
         )
         patched_liquid_probe.assert_not_called()
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.23", "Flex")], indirect=True
+)
+def test_water_transfer_with_multi_channel_pipette(
+    simulated_protocol_context: ProtocolContext,
+) -> None:
+    """It should run the transfer steps for a multi-channel pipette and well grouping without any errors.
+
+    This test only checks that various supported configurations for a transfer
+    analyze successfully. It doesn't check whether the steps are as expected.
+    That will be covered in analysis snapshot tests.
+    """
+    trash = simulated_protocol_context.load_trash_bin("A3")
+    tiprack = simulated_protocol_context.load_labware(
+        "opentrons_flex_96_tiprack_50ul", "D1"
+    )
+    pipette_50 = simulated_protocol_context.load_instrument(
+        "flex_8channel_50", mount="left", tip_racks=[tiprack]
+    )
+    nest_plate = simulated_protocol_context.load_labware(
+        "nest_96_wellplate_200ul_flat", "C3"
+    )
+    arma_plate = simulated_protocol_context.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "C2"
+    )
+
+    water = simulated_protocol_context.define_liquid_class("water")
+    with (
+        mock.patch.object(
+            InstrumentCore,
+            "aspirate_liquid_class",
+            side_effect=InstrumentCore.aspirate_liquid_class,
+            autospec=True,
+        ) as patched_aspirate,
+        mock.patch.object(
+            InstrumentCore,
+            "dispense_liquid_class",
+            side_effect=InstrumentCore.dispense_liquid_class,
+            autospec=True,
+        ) as patched_dispense,
+    ):
+        mock_manager = mock.Mock()
+        mock_manager.attach_mock(patched_aspirate, "aspirate_liquid_class")
+        mock_manager.attach_mock(patched_dispense, "dispense_liquid_class")
+        pipette_50.transfer_liquid(
+            liquid_class=water,
+            volume=40,
+            source=nest_plate.columns()[:2],
+            dest=arma_plate.columns()[:2],
+            new_tip="always",
+            trash_location=trash,
+        )
+        assert patched_aspirate.call_count == 2
+        assert patched_dispense.call_count == 2

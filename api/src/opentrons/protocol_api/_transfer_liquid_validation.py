@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 from typing import List, Union, Sequence, Optional
 
-from opentrons.types import Location
+from opentrons.types import Location, NozzleMapInterface
 from opentrons.protocols.api_support import instrument
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as tx_liquid_utils,
+)
 from opentrons.protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
     TransferTipPolicyV2Type,
@@ -29,11 +32,20 @@ def verify_and_normalize_transfer_args(
     tip_policy: TransferTipPolicyV2Type,
     last_tip_picked_up_from: Optional[Well],
     tip_racks: List[Labware],
+    nozzle_map: NozzleMapInterface,
+    target_all_wells: bool,
     current_volume: float,
     trash_location: Union[Location, Well, Labware, TrashBin, WasteChute],
 ) -> TransferInfo:
     flat_sources_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(source)
     flat_dests_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(dest)
+    if not target_all_wells and nozzle_map.tip_count > 1:
+        flat_sources_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            flat_sources_list, nozzle_map
+        )
+        flat_dests_list = tx_liquid_utils.group_wells_for_multi_channel_transfer(
+            flat_dests_list, nozzle_map
+        )
     for well in flat_sources_list + flat_dests_list:
         instrument.validate_takes_liquid(
             location=well.top(),
