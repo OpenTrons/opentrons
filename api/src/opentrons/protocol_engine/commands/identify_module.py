@@ -53,7 +53,8 @@ class IdentifyModuleImpl(
             module_hw = self._equipment.get_module_hardware_api(
                 module_substate.module_id
             )
-            await module_hw.identify()
+            if module_hw is not None:
+                await module_hw.identify()
         else:
             raise NotImplementedError(
                 f"IdentifyModule is not supported for {params.model}"

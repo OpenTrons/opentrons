@@ -448,6 +448,10 @@ class FlexStacker(mod_abc.AbstractModule):
                 self.device_info["serial"], expected, self.platform_state
             )
 
+    async def identify(self) -> None:
+        """Identify the module."""
+        await self.set_led_state(1.0, LEDColor.WHITE, LEDPattern.PULSE, reps=10)
+
 
 class FlexStackerReader(Reader):
     error: Optional[str]
