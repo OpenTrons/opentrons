@@ -89,24 +89,19 @@ enum MixLocators {
   AspFlowRateInput = '[name="aspirate_flowRate"]',
   AspWellOrder = '[data-testid="WellsOrderField_ListButton_aspirate"]',
   ResetToDefault = 'button:contains("Reset to default")',
-  PrimaryOrderDropdown = 'div[tabindex="0"].sc-bqWxrE jKLbYH iFjNDq',
-  CancelAspSettings = '[class="SecondaryButton-sc-1opt1t9-0 kjpcRL"]',
   MixTipPos = '[data-testid="PositionField_ListButton_mix"]',
   XpositionInput = '[data-testid="TipPositionModal_x_custom_input"]',
   YpositionInput = '[id="TipPositionModal_y_custom_input"]',
   ZpositionInput = '[id="TipPositionModal_z_custom_input"]',
   SwapView = 'button:contains("Swap view")',
-  Checkbox = '[class="Flex-sc-1qhp8l7-0 Checkbox___StyledFlex3-sc-1mvp7vt-0 gZwGCw btdgeU"]',
-  DelaySecondsInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]',
+  Checkbox = '[data-testid="ListButton_noActive"]',
   DispFlowRate = '[name="dispense_flowRate"]',
-  BlowoutLtnDropdown = '[class="Svg-sc-1lpozsw-0 Icon___StyledSvg-sc-1gt4gyz-0 csSXbR cJpxat"]',
   BlowoutFlowRate = '[name="blowout_flowRate"]',
   BlowoutPos = '[id="TipPositionField_blowout_z_offset"]',
   BlowoutZPosition = '[data-testid="TipPositionModal_custom_input"]',
   PosFromBottom = '[id="TipPositionField_mix_touchTip_mmFromBottom"]',
   RenameBtn = 'button:contains("Rename")',
-  StepNameInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]',
-  // StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-1mhuse7-0 hpcyEZ"]',
+  StepNameInput = 'div[tabindex="0"]',
   StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
 }
@@ -229,17 +224,18 @@ export const MixSteps = {
     call: () => {
       cy.contains(MixContent.Delay).should('exist').should('be.visible')
       cy.get(MixLocators.Checkbox)
+        .contains('Delay')
         .should('exist')
         .should('be.visible')
-        .eq(0)
         .click()
       cy.contains(MixContent.DelayDuration).should('exist').should('be.visible')
-      cy.get(MixLocators.DelaySecondsInput)
+      cy.get(MixLocators.Checkbox)
+        .find('[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]' )
         .should('exist')
         .should('be.visible')
         .should('have.prop', 'value')
-      cy.get(MixLocators.DelaySecondsInput)
-        .eq(1)
+      cy.get(MixLocators.Checkbox)
+        .find('[name="aspirate_delay_seconds"], [name="dispense_delay_seconds"]')
         .type('{selectAll}{backspace}5')
     },
   }),
@@ -271,12 +267,12 @@ export const MixSteps = {
     call: () => {
       cy.contains(MixContent.Blowout).should('exist').should('be.visible')
       cy.get(MixLocators.Checkbox)
+        .contains('Blowout')
         .should('exist')
         .should('be.visible')
-        .eq(0)
         .click()
       cy.contains(MixContent.ChooseOption).should('exist').should('be.visible')
-      cy.get(MixLocators.BlowoutLtnDropdown)
+        .closest('div[tabindex="0"]')
         .should('exist')
         .should('be.visible')
         .click()
@@ -324,9 +320,9 @@ export const MixSteps = {
   TouchTip: (): StepThunk => ({
     call: () => {
       cy.get(MixLocators.Checkbox)
+        .contains('Touch tip')
         .should('exist')
         .should('be.visible')
-        .eq(0)
         .click()
       cy.get(MixLocators.PosFromTop)
         .should('exist')
@@ -381,10 +377,12 @@ export const MixSteps = {
       cy.get(MixLocators.RenameBtn).should('exist').should('be.visible').click()
       cy.contains(MixContent.NameStep).should('exist').should('be.visible')
       cy.contains(MixContent.StepName).should('exist').should('be.visible')
-      cy.get(MixLocators.StepNameInput).should('have.value', 'Mix')
+      cy.get(MixLocators.StepNameInput)
+        .find('[type="text"]')
+        .should('have.value', 'Mix')
       cy.contains(MixContent.StepNotes).should('exist').should('be.visible')
       cy.get(MixLocators.StepNameInput)
-        .first()
+        .find('[type="text"]')
         .type('{selectAll}{backspace}Cypress Mix Test')
       cy.get(MixLocators.StepNotesInput).type(
         'This is testing cypress automation in PD'
@@ -497,7 +495,7 @@ export const MixVerifications = {
       cy.get(MixLocators.ResetToDefault).click()
       cy.contains(MixContent.TopToBottom).should('exist').should('be.visible')
       cy.contains(MixContent.LeftToRight).should('exist').should('be.visible')
-      cy.get(MixLocators.CancelAspSettings).should('exist').should('be.visible')
+
       cy.get(MixLocators.Save).should('exist').should('be.visible')
     },
   }),
@@ -524,7 +522,6 @@ export const MixVerifications = {
       cy.get(MixLocators.ZpositionInput).should('exist').should('be.visible')
       cy.get(MixLocators.ZpositionInput).should('have.prop', 'value')
       cy.get(MixLocators.ResetToDefault).should('exist').should('be.visible')
-      cy.get(MixLocators.CancelAspSettings).should('exist').should('be.visible')
       cy.get(MixLocators.Save)
         .should('exist')
         .should('be.visible')

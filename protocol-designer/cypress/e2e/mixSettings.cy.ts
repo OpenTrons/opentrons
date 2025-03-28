@@ -9,6 +9,7 @@ describe('Redesigned Mixing Steps - Happy Path', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.closeAnalyticsModal()
+    cy.closeReleaseNotesModal()
     const protocol = getTestFile(TestFilePath.DoItAllV8)
     cy.importProtocol(protocol.path)
     verifyImportProtocolPage(protocol)
