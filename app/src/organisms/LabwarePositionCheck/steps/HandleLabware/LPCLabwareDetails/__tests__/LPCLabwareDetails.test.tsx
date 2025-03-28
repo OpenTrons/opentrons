@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 import { useDispatch } from 'react-redux'
 
 import { renderWithProviders } from '/app/__testing-utils__'

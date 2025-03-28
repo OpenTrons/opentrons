@@ -62,6 +62,9 @@ describe('useLPCHeaderCommands', () => {
       proceedStep: mockProceedStep,
       goBackLastStep: vi.fn(),
       runId: mockRunId,
+      bannerUtils: {
+        defaultOffsetInfoBanner: { showBanner: false, toggleBanner: vi.fn() },
+      },
     }
 
     store = createStore(vi.fn(), {})

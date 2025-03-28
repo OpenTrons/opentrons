@@ -7,4 +7,7 @@ export const mockLPCContentProps: LPCWizardContentProps = {
   commandUtils: {} as any,
   proceedStep: vi.fn(),
   goBackLastStep: vi.fn(),
+  bannerUtils: {
+    defaultOffsetInfoBanner: { toggleBanner: vi.fn(), showBanner: false },
+  },
 }
