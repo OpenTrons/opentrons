@@ -15,7 +15,7 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux/robot-admin')
 vi.mock('/app/redux/robot-api')
 
-const mockResetOptions = {}
+const mockResetOptions = { resetLabwareOffsets: false, settingsResets: {} }
 const mockCloseModal = vi.fn()
 const ROBOT_NAME = 'otie'
 const render = (props: ComponentProps<typeof DeviceResetModal>) => {
@@ -49,8 +49,11 @@ describe('RobotSettings DeviceResetModal', () => {
 
   it('should close the modal when the user clicks the Yes button', () => {
     const clearMockResetOptions = {
-      bootScript: true,
-      deckCalibration: true,
+      resetLabwareOffsets: false,
+      settingsResets: {
+        bootScript: true,
+        deckCalibration: true,
+      },
     }
     render({
       closeModal: mockCloseModal,
@@ -99,7 +102,10 @@ describe('RobotSettings DeviceResetModal', () => {
       closeModal: mockCloseModal,
       isRobotReachable: false,
       robotName: ROBOT_NAME,
-      resetOptions: {},
+      resetOptions: {
+        resetLabwareOffsets: false,
+        settingsResets: {},
+      },
     })
     screen.getByText('Connection to robot lost')
     screen.getByText(
@@ -113,7 +119,10 @@ describe('RobotSettings DeviceResetModal', () => {
       closeModal: mockCloseModal,
       isRobotReachable: false,
       robotName: ROBOT_NAME,
-      resetOptions: {},
+      resetOptions: {
+        resetLabwareOffsets: false,
+        settingsResets: {},
+      },
     })
 
     const closeButton = screen.getByRole('button', { name: 'close' })
@@ -126,7 +135,10 @@ describe('RobotSettings DeviceResetModal', () => {
       closeModal: mockCloseModal,
       isRobotReachable: false,
       robotName: ROBOT_NAME,
-      resetOptions: {},
+      resetOptions: {
+        resetLabwareOffsets: false,
+        settingsResets: {},
+      },
     })
     const closeIconButton = screen.getByTestId(
       'ModalHeader_icon_close_Connection to robot lost'
