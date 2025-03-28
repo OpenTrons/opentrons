@@ -695,6 +695,9 @@ class InstrumentContext(publisher.CommandPublisher):
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
         :raises: ValueError: If both ``mm_to_edge`` and ``radius`` are specified.
         :returns: This instance.
+
+        .. versionchanged:: 2.23
+                Added the ``mm_from_edge`` parameter.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
@@ -717,8 +720,17 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             raise TypeError(f"location should be a Well, but it is {location}")
 
-        if mm_from_edge and radius != 1.0:
-            raise ValueError("radius must be set to 1.0 if mm_from_edge is specified")
+        if mm_from_edge:
+            if self.api_version < APIVersion(2, 23):
+                raise APIVersionError(
+                    api_element="mm_from_edge",
+                    until_version="2.23",
+                    current_version=f"{self.api_version}",
+                )
+            if radius != 1.0:
+                raise ValueError(
+                    "radius must be set to 1.0 if mm_from_edge is specified"
+                )
 
         if "touchTipDisabled" in parent_labware.quirks:
             _log.info(f"Ignoring touch tip on labware {well}")
