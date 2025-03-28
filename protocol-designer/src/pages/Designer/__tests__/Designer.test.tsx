@@ -16,6 +16,7 @@ import type { NavigateFunction } from 'react-router-dom'
 
 const mockNavigate = vi.fn()
 
+vi.mock('../OffDeck')
 vi.mock('../ProtocolSteps')
 vi.mock('../../../labware-ingred/actions')
 vi.mock('../../../labware-ingred/selectors')

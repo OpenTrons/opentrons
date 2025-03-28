@@ -5,16 +5,11 @@
   },
   "OT_PD_DISABLE_MODULE_RESTRICTIONS": {
     "title": "Disable module placement restrictions",
-    "description_1": "Turn off all restrictions on module placement and related pipette crash guidance.",
-    "description_2": "NOT recommended! Switching from default positions may cause crashes and the Protocol Designer cannot yet give guidance on what to expect. Use at your own discretion. "
+    "description": "Turn off all restrictions on module placement and related pipette crash guidance."
   },
   "OT_PD_ALLOW_ALL_TIPRACKS": {
     "title": "Allow all tip rack options",
     "description": "Enable selection of all tip racks for each pipette."
-  },
-  "OT_PD_ENABLE_ABSORBANCE_READER": {
-    "title": "Enable absorbance plate reader",
-    "description": "Enable absorbance plate reader support."
   },
   "OT_PD_ENABLE_COMMENT": {
     "title": "Enable comment step",
@@ -35,5 +30,25 @@
   "OT_PD_ENABLE_LIQUID_CLASSES": {
     "title": "Enable liquid classes",
     "description": "Enable liquid classes support"
+  },
+  "OT_PD_ENABLE_TIMELINE_SCRUBBER": {
+    "title": "Enable timeline scrubber",
+    "description": "See the protocol timeline visualization in overview"
+  },
+  "OT_PD_ENABLE_PYTHON_EXPORT": {
+    "title": "Enable exporting python",
+    "description": "Enables the ability to export python for pd/python interop"
+  },
+  "OT_PD_ENABLE_MULTIPLE_TEMPS_OT2": {
+    "title": "Allow two temperature modules on OT-2",
+    "description": "This experimental setting may cause collisions, and Opentrons will not be responsible for any damage resulting from its use."
+  },
+  "OT_PD_ENABLE_PARTIAL_TIP_SUPPORT": {
+    "title": "Enable partial tip support",
+    "description": "Partial tip configurations that are not released yet"
+  },
+  "OT_PD_ENABLE_STACKING": {
+    "title": "Enable more labware capabilities",
+    "description": "Ability to stack labware, add lids, etc"
   }
 }

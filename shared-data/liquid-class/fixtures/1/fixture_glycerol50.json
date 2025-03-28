@@ -1,6 +1,7 @@
 {
   "liquidClassName": "fixture_glycerol50",
-  "displayName": "Glycerol 50%",
+  "displayName": "Viscous",
+  "description": "50% glycerol",
   "schemaVersion": 1,
   "namespace": "opentrons",
   "byPipette": [

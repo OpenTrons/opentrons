@@ -27,6 +27,7 @@ import { LiquidIcon } from '../LiquidIcon'
 import { DeckInfoLabel } from '../DeckInfoLabel'
 
 import type { FocusEventHandler } from 'react'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 
 export interface DropdownOption {
   name: string
@@ -38,7 +39,7 @@ export interface DropdownOption {
   /** subtext below the name */
   subtext?: string
   disabled?: boolean
-  tooltipText?: string
+  tooltipText?: string | null
 }
 
 export type DropdownBorder = 'rounded' | 'neutral'
@@ -243,7 +244,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
         <Flex
           onClick={(e: MouseEvent) => {
-            e.preventDefault()
+            e.stopPropagation()
             toggleSetShowDropdownMenu()
           }}
           onFocus={onFocus}
@@ -268,7 +269,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
             >
               <StyledText
                 desktopStyle="captionRegular"
-                css={LINE_CLAMP_TEXT_STYLE}
+                css={LINE_CLAMP_TEXT_STYLE(1)}
               >
                 {currentOption.name}
               </StyledText>
@@ -300,9 +301,10 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                   disabled={option.disabled}
                   zIndex={3}
                   key={`${option.name}-${index}`}
-                  onClick={() => {
+                  onClick={e => {
                     onClick(option.value)
                     setShowDropdownMenu(false)
+                    e.stopPropagation()
                   }}
                   border="none"
                   onMouseEnter={() => onEnter?.(option.value)}
@@ -326,12 +328,15 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
                       flexDirection={DIRECTION_COLUMN}
                       gridGap={option.subtext != null ? SPACING.spacing4 : '0'}
                     >
-                      <StyledText desktopStyle="captionRegular">
+                      <StyledText
+                        desktopStyle="captionRegular"
+                        css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                      >
                         {option.name}
                       </StyledText>
                       <StyledText
                         desktopStyle="captionRegular"
-                        color={COLORS.black70}
+                        color={COLORS.grey60}
                       >
                         {option.subtext}
                       </StyledText>
@@ -362,12 +367,17 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
   )
 }
 
-const LINE_CLAMP_TEXT_STYLE = css`
+export const LINE_CLAMP_TEXT_STYLE = (
+  lineClamp?: number,
+  wordBreak?: boolean
+): FlattenSimpleInterpolation => css`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: ${OVERFLOW_HIDDEN};
   text-overflow: ellipsis;
   word-wrap: break-word;
-  -webkit-line-clamp: 1;
-  word-break: break-all;
+  -webkit-line-clamp: ${lineClamp ?? 1};
+  word-break: ${wordBreak === true
+    ? 'normal'
+    : 'break-all'}; // normal for tile and break-all for a non word case like aaaaaaaa
 `

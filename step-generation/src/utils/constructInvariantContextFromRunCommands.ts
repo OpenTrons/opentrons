@@ -13,10 +13,11 @@ import type {
   LabwareEntities,
   PipetteEntities,
   ModuleEntities,
-  AdditionalEquipmentEntities,
-  AdditionalEquipmentName,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '../types'
 import { uuid } from '.'
+import { GRIPPER_LOCATION } from '../constants'
 
 export function constructInvariantContextFromRunCommands(
   commands: RunTimeCommand[]
@@ -31,6 +32,8 @@ export function constructInvariantContextFromRunCommands(
             id: result.labwareId,
             labwareDefURI: getLabwareDefURI(result.definition),
             def: result.definition,
+            //  ProtocolTimelineScrubber won't need access to pythonNames
+            pythonName: 'n/a',
           },
         }
         return {
@@ -48,6 +51,7 @@ export function constructInvariantContextFromRunCommands(
             id: result.moduleId,
             type: getModuleType(command.params.model),
             model: command.params.model,
+            pythonName: 'n/a',
           },
         }
         return {
@@ -91,6 +95,7 @@ export function constructInvariantContextFromRunCommands(
                 ? [getLabwareDefURI(tiprackLabwareDef)]
                 : [],
             spec: specs,
+            pythonName: 'n/a',
           },
         }
         return {
@@ -103,27 +108,34 @@ export function constructInvariantContextFromRunCommands(
       ) {
         const addressableAreaName = command.params.addressableAreaName
         const id = `${uuid()}:${addressableAreaName}`
-        let name: AdditionalEquipmentName = 'trashBin'
-        let location
+        let location: string = GRIPPER_LOCATION
         if (addressableAreaName === 'fixedTrash') {
           location = '12'
         } else if (addressableAreaName.includes('WasteChute')) {
           location = 'D3'
-          name = 'wasteChute'
         } else if (addressableAreaName.includes('movableTrash')) {
           location = addressableAreaName.split('movableTrash')[1]
         }
-        const additionalEquipmentEntities: AdditionalEquipmentEntities = {
-          ...acc.additionalEquipmentEntities,
+        const trashBinEntities: TrashBinEntities = {
+          ...acc.trashBinEntities,
           [id]: {
-            name,
+            pythonName: 'trash_bin_1',
+            id,
+            location,
+          },
+        }
+        const wasteChuteEntities: WasteChuteEntities = {
+          ...acc.wasteChuteEntities,
+          [id]: {
+            pythonName: 'waste_chute',
             id,
             location,
           },
         }
         return {
           ...acc,
-          additionalEquipmentEntities,
+          trashBinEntities,
+          wasteChuteEntities,
         }
       }
 
@@ -133,7 +145,15 @@ export function constructInvariantContextFromRunCommands(
       labwareEntities: {},
       moduleEntities: {},
       pipetteEntities: {},
-      additionalEquipmentEntities: {},
+      wasteChuteEntities: {},
+      trashBinEntities: {},
+      //  this util is used for the timeline scrubber. It grabs staging area info from
+      //  command analysis. Also, it does not visualize the gripper right now
+      stagingAreaEntities: {},
+      gripperEntities: {},
+      //  this util is used for the timeline scrubber. It grabs liquid info from analysis
+      //  so this will not be wired up right now
+      liquidEntities: {},
       config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: true },
     }
   )

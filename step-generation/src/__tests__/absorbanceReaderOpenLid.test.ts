@@ -17,6 +17,7 @@ import type {
 } from '../types'
 
 const moduleId = 'absorbanceReaderId'
+const gripperId = 'gripperId'
 vi.mock('../robotStateSelectors')
 
 describe('absorbanceReaderOpenLid', () => {
@@ -28,12 +29,10 @@ describe('absorbanceReaderOpenLid', () => {
       id: moduleId,
       type: ABSORBANCE_READER_TYPE,
       model: ABSORBANCE_READER_V1,
+      pythonName: 'mock_absorbance_plate_reader_1',
     }
-    invariantContext.additionalEquipmentEntities = {
-      gripperId: {
-        name: 'gripper',
-        id: 'gripperId',
-      },
+    invariantContext.gripperEntities[gripperId] = {
+      id: gripperId,
     }
 
     robotState = getInitialRobotStateStandard(invariantContext)
@@ -67,6 +66,7 @@ describe('absorbanceReaderOpenLid', () => {
           },
         },
       ],
+      python: 'mock_absorbance_plate_reader_1.open_lid()',
     })
   })
   it('creates returns error if bad module state', () => {
@@ -84,7 +84,7 @@ describe('absorbanceReaderOpenLid', () => {
     })
   })
   it('creates returns error if no gripper', () => {
-    invariantContext.additionalEquipmentEntities = {}
+    invariantContext.gripperEntities = {}
     const result = absorbanceReaderOpenLid(
       {
         moduleId,

@@ -13,7 +13,7 @@ import {
 } from '@opentrons/shared-data'
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { getLabwareLatestSlot } from './utils'
+import { getLabwareLatestSlotFromCurrentStepIndex } from './utils'
 
 import type {
   LabwareEntity,
@@ -55,13 +55,15 @@ const getNickname = (
   initialDeckSetup: AllTemporalPropertiesForTimelineFrame,
   labwareId: string,
   savedStepForms: SavedStepFormState,
-  robotType: RobotType
+  robotType: RobotType,
+  filteredSavedStepFormIds: string[]
 ): string => {
-  const latestSlot = getLabwareLatestSlot(
+  const latestSlot = getLabwareLatestSlotFromCurrentStepIndex(
     initialDeckSetup,
     savedStepForms ?? {},
     labwareId,
-    robotType
+    robotType,
+    filteredSavedStepFormIds
   )
 
   let nickName: string = nicknamesById[labwareId]
@@ -131,7 +133,8 @@ export const getMoveLabwareOptions: Selector<DropdownOption[]> = createSelector(
           initialDeckSetup,
           labwareId,
           savedStepForms,
-          robotType
+          robotType,
+          filteredSavedStepFormIds
         )
 
         //  filter out moving trash, adapters, and labware in
@@ -161,13 +164,24 @@ export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getAdditionalEquipmentEntities,
+  stepFormSelectors.getUnsavedForm,
   (
     labwareEntities,
     nicknamesById,
     initialDeckSetup,
     savedStepForms,
-    additionalEquipmentEntities
+    additionalEquipmentEntities,
+    unsavedForm
   ) => {
+    const savedFormKeys = Object.keys(savedStepForms)
+    const previouslySavedFormDataIndex = unsavedForm
+      ? savedFormKeys.indexOf(unsavedForm.id)
+      : -1
+    const filteredSavedStepFormIds =
+      previouslySavedFormDataIndex !== -1
+        ? savedFormKeys.slice(0, previouslySavedFormDataIndex)
+        : savedFormKeys
+
     const wasteChuteLocation = Object.values(additionalEquipmentEntities).find(
       aE => aE.name === 'wasteChute'
     )?.location
@@ -184,12 +198,13 @@ export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): DropdownOption[] => {
-        const isLabwareInWasteChute = Object.values(savedStepForms).find(
-          form =>
-            form.stepType === 'moveLabware' &&
-            form.labware === labwareId &&
-            form.newLocation === wasteChuteLocation
-        )
+        const isLabwareInWasteChute =
+          filteredSavedStepFormIds.find(
+            id =>
+              savedStepForms[id].stepType === 'moveLabware' &&
+              savedStepForms[id].labware === labwareId &&
+              savedStepForms[id].newLocation === wasteChuteLocation
+          ) != null
 
         const isAdapter =
           labwareEntity.def.allowedRoles?.includes('adapter') ?? false
@@ -198,7 +213,8 @@ export const getLabwareOptions: Selector<DropdownOption[]> = createSelector(
           initialDeckSetup,
           labwareId,
           savedStepForms,
-          robotType
+          robotType,
+          filteredSavedStepFormIds
         )
 
         return getIsTiprack(labwareEntity.def) ||

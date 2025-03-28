@@ -62,9 +62,7 @@ export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
 // special ID for invisible deck setup step-form
 export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
-// TODO: Ian 2019-06-13 don't keep these as hard-coded static values (see #3587)
-export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
-export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 1
+export const DEFAULT_MM_OFFSET_FROM_BOTTOM = 1
 // NOTE: in the negative Z direction, to go down from top
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
 export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
@@ -195,3 +193,7 @@ export const ABSORBANCE_READER_COLOR_BY_WAVELENGTH: Record<number, string> = {
   600: 'Orange',
   650: 'Red',
 }
+
+export const OFFDECK: 'offDeck' = 'offDeck'
+
+export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer' // protocolSource for tracking analytics in the app

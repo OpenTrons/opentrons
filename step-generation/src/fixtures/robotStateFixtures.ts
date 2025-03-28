@@ -34,7 +34,7 @@ import type {
   TEMPERATURE_AT_TARGET,
 } from '../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AdditionalEquipmentEntities } from '../types'
+import type { TrashBinEntities } from '../types'
 import type {
   Config,
   InvariantContext,
@@ -77,78 +77,78 @@ export function makeContext(): InvariantContext {
   const labwareEntities = {
     [SOURCE_LABWARE]: {
       id: SOURCE_LABWARE,
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     [DEST_LABWARE]: {
       id: DEST_LABWARE,
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     [TROUGH_LABWARE]: {
       id: TROUGH_LABWARE,
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixture12Trough),
       def: fixture12Trough,
     },
     tiprack1Id: {
       id: 'tiprack1Id',
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
     },
     tiprack2Id: {
       id: 'tiprack2Id',
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
     },
     tiprack3Id: {
       id: 'tiprack3Id',
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixtureTiprack300ul),
       def: fixtureTiprack300ul,
     },
     tiprack4AdapterId: {
       id: 'tiprack4AdapterId',
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixtureTiprackAdapter),
       def: fixtureTiprackAdapter,
     },
     tiprack5AdapterId: {
       id: 'tiprack5AdapterId',
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixtureTiprackAdapter),
       def: fixtureTiprackAdapter,
     },
     tiprack4Id: {
       id: 'tiprack4Id',
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixtureTiprack1000ul),
       def: fixtureTiprack1000ul,
     },
     tiprack5Id: {
       id: 'tiprack5Id',
-
+      pythonName: 'mockPythonName',
       labwareDefURI: getLabwareDefURI(fixtureTiprack1000ul),
       def: fixtureTiprack1000ul,
     },
   }
   const moduleEntities: ModuleEntities = {}
-  const additionalEquipmentEntities: AdditionalEquipmentEntities = {
+  const trashBinEntities: TrashBinEntities = {
     [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
-      name: 'trashBin',
       location: 'cutoutA3',
+      pythonName: 'trash_bin_1',
     },
   }
   const pipetteEntities: PipetteEntities = {
     p10SingleId: {
       name: 'p10_single',
       id: 'p10SingleId',
-
+      pythonName: 'mockPythonName',
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
       tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10SingleV2Specs,
@@ -156,34 +156,34 @@ export function makeContext(): InvariantContext {
     p10MultiId: {
       name: 'p10_multi',
       id: 'p10MultiId',
-
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
       tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10MultiV2Specs,
+      pythonName: 'mockPythonName',
     },
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
       id: DEFAULT_PIPETTE,
-
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
       tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300SingleV2Specs,
+      pythonName: 'mockPythonName',
     },
     [MULTI_PIPETTE]: {
       name: 'p300_multi',
       id: MULTI_PIPETTE,
-
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
       tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300MultiV2Specs,
+      pythonName: 'mockPythonName',
     },
     [PIPETTE_96]: {
       name: 'p1000_96',
       id: PIPETTE_96,
-
       tiprackDefURI: [getLabwareDefURI(fixtureTiprack1000ul)],
       tiprackLabwareDef: [fixtureTiprack1000ul],
       spec: fixtureP100096V2Specs,
+      pythonName: 'mockPythonName',
     },
   }
 
@@ -191,7 +191,11 @@ export function makeContext(): InvariantContext {
     labwareEntities,
     moduleEntities,
     pipetteEntities,
-    additionalEquipmentEntities,
+    trashBinEntities,
+    wasteChuteEntities: {},
+    stagingAreaEntities: {},
+    gripperEntities: {},
+    liquidEntities: {},
     config: DEFAULT_CONFIG,
   }
 }
@@ -383,11 +387,13 @@ export const getStateAndContextTempTCModules = ({
       id: temperatureModuleId,
       type: TEMPERATURE_MODULE_TYPE,
       model: 'foo',
+      pythonName: 'mock_temperature_module_1',
     },
     [thermocyclerId]: {
       id: thermocyclerId,
       type: THERMOCYCLER_MODULE_TYPE,
       model: 'foo',
+      pythonName: 'mock_thermocycler',
     },
   }
   const robotState = makeState({

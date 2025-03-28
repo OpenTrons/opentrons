@@ -1,0 +1,17 @@
+name: 'Fix Checkout Tags'
+description: >
+  Composite action to fix actions/checkout odd handling of tags
+  by fetching and checking out the exact tag reference.
+  See https://github.com/actions/checkout/issues/290
+inputs: {}
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Fix actions/checkout odd handling of tags'
+      if: startsWith(github.ref, 'refs/tags')
+      shell: bash
+      env:
+        REF: ${{ github.ref }}
+      run: |
+        git fetch -f origin "${REF}:${REF}"
+        git checkout "${REF}"

@@ -206,7 +206,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
       border: ${buttonType === 'stroke'
         ? `2px solid ${COLORS.blue55}`
-        : `${computedBorderStyle()}`};
+        : buttonType === 'primary'
+        ? `4px solid ${COLORS.blue55}`
+        : computedBorderStyle()};
     }
 
     &:focus-visible {

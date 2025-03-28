@@ -4,7 +4,11 @@ from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import FailedTipStateCheck, InstrumentProbeType
+from opentrons.hardware_control.types import (
+    FailedTipStateCheck,
+    InstrumentProbeType,
+    TipScrapeType,
+)
 from opentrons.protocol_engine.errors.exceptions import PickUpTipTipNotAttachedError
 from opentrons.types import Mount, NozzleConfigurationType
 
@@ -62,6 +66,7 @@ class TipHandler(TypingProtocol):
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        do_not_ignore_tip_presence: bool = True,
     ) -> TipGeometry:
         """Pick up the named tip.
 
@@ -75,7 +80,14 @@ class TipHandler(TypingProtocol):
         """
         ...
 
-    async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
+    async def drop_tip(
+        self,
+        pipette_id: str,
+        home_after: Optional[bool],
+        do_not_ignore_tip_presence: bool = True,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
+    ) -> None:
         """Drop the attached tip into the current location.
 
         Pipette should be in place over the destination prior to calling this method.
@@ -230,6 +242,7 @@ class HardwareTipHandler(TipHandler):
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        do_not_ignore_tip_presence: bool = True,
     ) -> TipGeometry:
         """See documentation on abstract base class."""
         hw_mount = self._get_hw_mount(pipette_id)
@@ -253,10 +266,11 @@ class HardwareTipHandler(TipHandler):
         await self._hardware_api.tip_pickup_moves(
             mount=hw_mount, presses=None, increment=None
         )
-        try:
-            await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
-        except TipNotAttachedError as e:
-            raise PickUpTipTipNotAttachedError(tip_geometry=tip_geometry) from e
+        if do_not_ignore_tip_presence:
+            try:
+                await self.verify_tip_presence(pipette_id, TipPresenceStatus.PRESENT)
+            except TipNotAttachedError as e:
+                raise PickUpTipTipNotAttachedError(tip_geometry=tip_geometry) from e
 
         self.cache_tip(pipette_id, tip_geometry)
 
@@ -264,21 +278,33 @@ class HardwareTipHandler(TipHandler):
 
         return tip_geometry
 
-    async def drop_tip(self, pipette_id: str, home_after: Optional[bool]) -> None:
+    async def drop_tip(
+        self,
+        pipette_id: str,
+        home_after: Optional[bool],
+        do_not_ignore_tip_presence: bool = True,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
+    ) -> None:
         """See documentation on abstract base class."""
         hw_mount = self._get_hw_mount(pipette_id)
 
         # Let the hardware controller handle defaulting home_after since its behavior
         # differs between machines
+        kwargs = {}
         if home_after is not None:
-            kwargs = {"home_after": home_after}
-        else:
-            kwargs = {}
+            kwargs["home_after"] = home_after
 
-        await self._hardware_api.tip_drop_moves(mount=hw_mount, **kwargs)
+        await self._hardware_api.tip_drop_moves(
+            mount=hw_mount,
+            ignore_plunger=ignore_plunger,
+            scrape_type=scrape_type,
+            **kwargs,
+        )
 
-        # Allow TipNotAttachedError to propagate.
-        await self.verify_tip_presence(pipette_id, TipPresenceStatus.ABSENT)
+        if do_not_ignore_tip_presence:
+            # Allow TipNotAttachedError to propagate.
+            await self.verify_tip_presence(pipette_id, TipPresenceStatus.ABSENT)
 
         self.remove_tip(pipette_id)
 
@@ -383,6 +409,7 @@ class VirtualTipHandler(TipHandler):
         pipette_id: str,
         labware_id: str,
         well_name: str,
+        do_not_ignore_tip_presence: bool = True,
     ) -> TipGeometry:
         """Pick up a tip at the current location using a virtual pipette.
 
@@ -424,6 +451,9 @@ class VirtualTipHandler(TipHandler):
         self,
         pipette_id: str,
         home_after: Optional[bool],
+        do_not_ignore_tip_presence: bool = True,
+        ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
         """Pick up a tip at the current location using a virtual pipette.
 

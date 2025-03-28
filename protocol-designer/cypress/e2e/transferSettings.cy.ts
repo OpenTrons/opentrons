@@ -1,77 +1,77 @@
-import { Actions, Verifications, runCreateTest } from '../support/createNew'
-import { UniversalActions } from '../support/universalActions'
+import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
+import { UniversalSteps } from '../support/UniversalSteps'
+import { StepBuilder } from '../support/StepBuilder'
 
-describe('The Redesigned Create Protocol Landing Page', () => {
+describe('Transfer stepform testing Single Channel - Happy Path', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.verifyHomePage()
     cy.closeAnalyticsModal()
   })
 
-  it('content and step 1 flow works', () => {
+  it('Goes through onboarding flow and then single-channel one-to-one transfer', () => {
     cy.clickCreateNew()
     cy.verifyCreateNewHeader()
-    const steps: Array<Actions | Verifications | UniversalActions> = [
-      Verifications.OnStep1,
-      Verifications.FlexSelected,
-      UniversalActions.Snapshot,
-      Actions.SelectOT2,
-      Verifications.OT2Selected,
-      UniversalActions.Snapshot,
-      Actions.SelectFlex,
-      Verifications.FlexSelected,
-      UniversalActions.Snapshot,
-      Actions.Confirm,
-      Verifications.OnStep2,
-      Actions.SingleChannelPipette50,
-      Verifications.StepTwo50uL,
-      UniversalActions.Snapshot,
-      Actions.Confirm,
-      Verifications.StepTwoPart3,
-      UniversalActions.Snapshot,
-      Actions.Confirm,
-      Verifications.OnStep3,
-      Actions.YesGripper,
-      Actions.Confirm,
-      Verifications.Step4Verification,
-      Actions.AddThermocycler,
-      Verifications.ThermocyclerImg,
-      Actions.AddHeaterShaker,
-      Verifications.HeaterShakerImg,
-      Actions.AddMagBlock,
-      Verifications.MagBlockImg,
-      Actions.AddTempdeck2,
-      Verifications.Tempdeck2Img,
-      Actions.Confirm,
-      Actions.Confirm,
-      Actions.Confirm,
-      Actions.EditProtocolA,
-      Actions.ChoseDeckSlotC2,
-      Actions.AddHardwareLabware,
-      Actions.ClickLabwareHeader,
-      Actions.ClickWellPlatesSection,
-      Actions.SelectArmadillo96WellPlate,
-      Actions.ChoseDeckSlotC2Labware,
-      Actions.AddLiquid,
-      Actions.ClickLiquidButton,
-      Actions.DefineLiquid,
-      Actions.LiquidSaveWIP,
-      Actions.WellSelector,
-      Actions.LiquidDropdown,
-      Verifications.LiquidPage,
-      UniversalActions.Snapshot,
-      Actions.SelectLiquidWells,
-      Actions.SetVolumeAndSaveforWells,
-      Actions.ChoseDeckSlotC3,
-      Actions.AddHardwareLabware,
-      Actions.ClickLabwareHeader,
-      Actions.ClickWellPlatesSection,
-      Actions.SelectBioRad96WellPlate,
-      Actions.ProtocolStepsH,
-      Actions.AddStep,
-      Verifications.TransferPopOut,
-      UniversalActions.Snapshot,
-    ]
-    runCreateTest(steps)
+    const steps = new StepBuilder()
+    steps.add(SetupVerifications.OnStep1())
+    steps.add(SetupVerifications.FlexSelected())
+    steps.add(UniversalSteps.Snapshot())
+    steps.add(SetupSteps.SelectOT2())
+    steps.add(SetupVerifications.OT2Selected())
+    steps.add(UniversalSteps.Snapshot())
+    steps.add(SetupSteps.SelectFlex())
+    steps.add(SetupVerifications.FlexSelected())
+    steps.add(UniversalSteps.Snapshot())
+    steps.add(SetupSteps.Confirm())
+    steps.add(SetupVerifications.OnStep2())
+    steps.add(SetupSteps.SingleChannelPipette50())
+    steps.add(SetupVerifications.StepTwo50uL())
+    steps.add(UniversalSteps.Snapshot())
+    steps.add(SetupSteps.Confirm())
+    steps.add(SetupVerifications.StepTwoPart3())
+    steps.add(UniversalSteps.Snapshot())
+    steps.add(SetupSteps.Confirm())
+    steps.add(SetupVerifications.OnStep3())
+    steps.add(SetupSteps.YesGripper())
+    steps.add(SetupSteps.Confirm())
+    steps.add(SetupVerifications.Step4Verification())
+    steps.add(SetupSteps.AddThermocycler())
+    steps.add(SetupVerifications.ThermocyclerImg())
+    steps.add(SetupSteps.AddHeaterShaker())
+    steps.add(SetupVerifications.HeaterShakerImg())
+    steps.add(SetupSteps.AddMagBlock())
+    steps.add(SetupVerifications.MagBlockImg())
+    steps.add(SetupSteps.AddTempdeck2())
+    steps.add(SetupVerifications.Tempdeck2Img())
+    steps.add(SetupSteps.Confirm())
+    steps.add(SetupSteps.Confirm())
+    steps.add(SetupSteps.Confirm())
+    steps.add(SetupSteps.EditProtocolA())
+    steps.add(SetupSteps.ChoseDeckSlot('C2'))
+    steps.add(SetupSteps.AddHardwareLabware())
+    steps.add(SetupSteps.ClickLabwareHeader())
+    steps.add(SetupSteps.ClickWellPlatesSection())
+    steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
+    steps.add(SetupSteps.ChoseDeckSlotC2Labware())
+    steps.add(SetupSteps.AddLiquid())
+    steps.add(SetupSteps.ClickLiquidButton())
+    steps.add(SetupSteps.DefineLiquid())
+    steps.add(SetupSteps.LiquidSaveWIP())
+    steps.add(SetupSteps.WellSelector(['A1', 'A2']))
+    steps.add(SetupSteps.LiquidDropdown())
+    steps.add(SetupVerifications.LiquidPage())
+    steps.add(UniversalSteps.Snapshot())
+    steps.add(SetupSteps.SelectLiquidWells())
+    steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
+    steps.add(SetupSteps.ChoseDeckSlot('C3'))
+    steps.add(SetupSteps.AddHardwareLabware())
+    steps.add(SetupSteps.ClickLabwareHeader())
+    steps.add(SetupSteps.ClickWellPlatesSection())
+    steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
+    steps.add(SetupSteps.ProtocolStepsH())
+    steps.add(SetupSteps.AddStep())
+    steps.add(SetupVerifications.TransferPopOut())
+    steps.add(UniversalSteps.Snapshot())
+    steps.execute()
   })
 })

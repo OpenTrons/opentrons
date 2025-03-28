@@ -1,5 +1,5 @@
 import * as Yup from 'yup'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import reduce from 'lodash/reduce'
 import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   FLEX_ROBOT_TYPE,
   getAreSlotsAdjacent,
+  ABSORBANCE_READER_MODELS,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -38,11 +39,10 @@ import {
   createDeckFixture,
   toggleIsGripperRequired,
 } from '../../step-forms/actions/additionalItems'
-import { getNewProtocolModal } from '../../navigation/selectors'
+import { SelectModules } from '../../components/organisms/SelectModules'
 import { SelectRobot } from './SelectRobot'
 import { SelectPipettes } from './SelectPipettes'
 import { SelectGripper } from './SelectGripper'
-import { SelectModules } from './SelectModules'
 import { SelectFixtures } from './SelectFixtures'
 import { AddMetadata } from './AddMetadata'
 import { getTrashSlot } from './utils'
@@ -89,7 +89,7 @@ const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
 
 type PipetteFieldsData = Omit<
   PipetteOnDeck,
-  'id' | 'spec' | 'tiprackLabwareDef'
+  'id' | 'spec' | 'tiprackLabwareDef' | 'pythonName'
 >
 
 interface ModuleCreationArgs {
@@ -156,7 +156,6 @@ const validationSchema: any = Yup.object().shape({
 
 export function CreateNewProtocolWizard(): JSX.Element | null {
   const navigate = useNavigate()
-  const showWizard = useSelector(getNewProtocolModal)
   const [analyticsStartTime] = useState<Date>(new Date())
   const customLabware = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
@@ -165,12 +164,6 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
   const [wizardSteps, setWizardSteps] = useState<WizardStep[]>(WIZARD_STEPS)
 
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
-
-  useEffect(() => {
-    if (!showWizard) {
-      navigate('/overview')
-    }
-  }, [showWizard])
 
   const createProtocolFile = (values: WizardFormState): void => {
     navigate('/overview')
@@ -283,11 +276,20 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
     const stagingAreas = values.additionalEquipment.filter(
       equipment => equipment === 'stagingArea'
     )
+
     if (stagingAreas.length > 0) {
+      // Note: when plate reader is present, cutoutB3 is not available for StagingArea
+      const hasPlateReader = modules.some(
+        module => module.model === ABSORBANCE_READER_MODELS[0]
+      )
       stagingAreas.forEach((_, index) => {
-        return dispatch(
-          createDeckFixture('stagingArea', STAGING_AREA_CUTOUTS_ORDERED[index])
-        )
+        const stagingAreaCutout = hasPlateReader
+          ? STAGING_AREA_CUTOUTS_ORDERED.filter(
+              cutout => cutout !== 'cutoutB3'
+            )[index]
+          : STAGING_AREA_CUTOUTS_ORDERED[index]
+
+        return dispatch(createDeckFixture('stagingArea', stagingAreaCutout))
       })
     }
 
@@ -372,7 +374,7 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
     }
   }
 
-  return showWizard ? (
+  return (
     <Box backgroundColor={COLORS.grey10} height="calc(100vh - 48px)">
       <CreateFileForm
         currentWizardStep={currentWizardStep}
@@ -383,7 +385,7 @@ export function CreateNewProtocolWizard(): JSX.Element | null {
         analyticsStartTime={analyticsStartTime}
       />
     </Box>
-  ) : null
+  )
 }
 
 interface CreateFileFormProps {

@@ -13,8 +13,8 @@ import type { PipetteV2Specs } from '@opentrons/shared-data'
 
 vi.mock('/app/resources/robot-settings/hooks')
 
-const BRANDED_P1000_FLEX_DISPLAY_NAME = 'Flex 1-Channel 1000 μL'
-const ANONYMOUS_P1000_FLEX_DISPLAY_NAME = '1-Channel 1000 μL'
+const BRANDED_P1000_FLEX_DISPLAY_NAME = 'Flex 1-Channel 1000 µL'
+const ANONYMOUS_P1000_FLEX_DISPLAY_NAME = '1-Channel 1000 µL'
 
 const mockP1000V2Specs = {
   $otSharedSchema: '#/pipette/schemas/2/pipetteGeometrySchema.json',

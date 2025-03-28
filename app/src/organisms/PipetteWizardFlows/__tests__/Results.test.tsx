@@ -69,7 +69,7 @@ describe('Results', () => {
       hasCalData: true,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully recalibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully recalibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -87,7 +87,7 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully attached')
+    screen.getByText('Flex 1-Channel 1000 µL successfully attached')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -187,7 +187,7 @@ describe('Results', () => {
       flowType: FLOWS.DETACH,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL still attached')
+    screen.getByText('Flex 1-Channel 1000 µL still attached')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.red50)}`
     )
@@ -222,7 +222,7 @@ describe('Results', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL still attached')
+    screen.getByText('Flex 1-Channel 1000 µL still attached')
     expect(screen.getByLabelText('ot-alert')).toHaveStyle(
       `color: ${String(COLORS.red50)}`
     )
@@ -254,7 +254,7 @@ describe('Results', () => {
       flowType: FLOWS.CALIBRATE,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully calibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -271,7 +271,7 @@ describe('Results', () => {
       totalStepCount: 9,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully calibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -288,7 +288,7 @@ describe('Results', () => {
       totalStepCount: 5,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully calibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully calibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -304,7 +304,7 @@ describe('Results', () => {
       hasCalData: true,
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully recalibrated')
+    screen.getByText('Flex 1-Channel 1000 µL successfully recalibrated')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -340,7 +340,7 @@ describe('Results', () => {
       },
     }
     render(props)
-    screen.getByText('Flex 1-Channel 1000 μL successfully attached')
+    screen.getByText('Flex 1-Channel 1000 µL successfully attached')
     const image = screen.getByRole('img', { name: 'Success Icon' })
     expect(image.getAttribute('src')).toEqual(
       '/app/src/assets/images/icon_success.png'
@@ -359,7 +359,7 @@ describe('Results', () => {
     }
     render(props)
     screen.getByText('Wrong instrument installed')
-    screen.getByText('Install Flex 8-Channel 50 μL instead')
+    screen.getByText('Install Flex 8-Channel 50 µL instead')
     fireEvent.click(screen.getByRole('button', { name: 'Detach and retry' }))
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()

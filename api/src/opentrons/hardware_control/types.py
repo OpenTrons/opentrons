@@ -636,6 +636,12 @@ class InstrumentProbeType(enum.Enum):
     BOTH = enum.auto()
 
 
+class TipScrapeType(enum.Enum):
+    NONE = enum.auto()
+    RIGHT_ONE_COL = enum.auto()
+    LEFT_ONE_COL = enum.auto()
+
+
 class GripperProbe(enum.Enum):
     FRONT = enum.auto()
     REAR = enum.auto()

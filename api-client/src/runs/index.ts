@@ -11,7 +11,7 @@ export { getCommandsAsPreSerializedList } from './commands/getCommandsAsPreSeria
 export { createRunAction } from './createRunAction'
 export { getRunCommandErrors } from './commands/getRunCommandErrors'
 export { getRunCurrentState } from './getRunCurrentState'
-export * from './createLabwareOffset'
+export * from './addLabwareOffsetToRun'
 export * from './createLabwareDefinition'
 export * from './constants'
 export * from './updateErrorRecoveryPolicy'

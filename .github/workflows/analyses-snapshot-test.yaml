@@ -107,6 +107,11 @@ jobs:
         working-directory: analyses-snapshot-testing
         run: make snapshot-test
 
+      - name: Run Audit
+        id: run_audit
+        working-directory: analyses-snapshot-testing
+        run: make snapshot-audit-test
+
       - name: Upload Report
         if: '!cancelled()'
         uses: actions/upload-artifact@v4

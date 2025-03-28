@@ -14,7 +14,7 @@ import {
   getMixData,
 } from '../moveLiquidFormToArgs'
 import { getOrderedWells } from '../../../utils'
-import { DEFAULT_MM_FROM_BOTTOM_ASPIRATE } from '../../../../constants'
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedMoveLiquidFormData,
@@ -73,7 +73,7 @@ describe('move liquid step form -> command creator args', () => {
       aspirate_flowRate: null,
       aspirate_mmFromBottom: null,
       aspirate_touchTip_checkbox: false,
-      aspirate_touchTip_mmFromBottom: null,
+      aspirate_touchTip_mmFromTop: null,
       aspirate_mix_checkbox: false,
       aspirate_mix_volume: null,
       aspirate_mix_times: null,
@@ -93,7 +93,7 @@ describe('move liquid step form -> command creator args', () => {
       dispense_flowRate: null,
       dispense_mmFromBottom: null,
       dispense_touchTip_checkbox: false,
-      dispense_touchTip_mmFromBottom: null,
+      dispense_touchTip_mmFromTop: null,
       dispense_mix_checkbox: false,
       dispense_mix_volume: null,
       dispense_mix_times: null,
@@ -140,6 +140,8 @@ describe('move liquid step form -> command creator args', () => {
         id: 'destLabwareId',
         name: 'wasteChute',
         location: 'cutoutD3',
+        isTouchTipAllowed: false,
+        pythonName: 'mockPythonName',
       },
     })
 
@@ -177,26 +179,26 @@ describe('move liquid step form -> command creator args', () => {
     // TOUCH TIPS
     {
       checkboxField: 'aspirate_touchTip_checkbox',
-      formFields: { aspirate_touchTip_mmFromBottom: 101 },
+      formFields: { aspirate_touchTip_mmFromTop: -11 },
       expectedArgsUnchecked: {
         touchTipAfterAspirate: false,
-        touchTipAfterAspirateOffsetMmFromBottom: 101,
+        touchTipAfterAspirateOffsetMmFromTop: -11,
       },
       expectedArgsChecked: {
         touchTipAfterAspirate: true,
-        touchTipAfterAspirateOffsetMmFromBottom: 101,
+        touchTipAfterAspirateOffsetMmFromTop: -11,
       },
     },
     {
       checkboxField: 'dispense_touchTip_checkbox',
-      formFields: { dispense_touchTip_mmFromBottom: 42 },
+      formFields: { dispense_touchTip_mmFromTop: -22 },
       expectedArgsUnchecked: {
         touchTipAfterDispense: false,
-        touchTipAfterDispenseOffsetMmFromBottom: 42,
+        touchTipAfterDispenseOffsetMmFromTop: -22,
       },
       expectedArgsChecked: {
         touchTipAfterDispense: true,
-        touchTipAfterDispenseOffsetMmFromBottom: 42,
+        touchTipAfterDispenseOffsetMmFromTop: -22,
       },
     },
     // MIXES
@@ -229,7 +231,7 @@ describe('move liquid step form -> command creator args', () => {
       expectedArgsChecked: {
         aspirateDelay: {
           seconds: 11,
-          mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+          mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
         },
       },
     },

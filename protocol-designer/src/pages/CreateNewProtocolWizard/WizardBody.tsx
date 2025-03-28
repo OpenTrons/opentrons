@@ -25,7 +25,7 @@ import three from '../../assets/images/onboarding_animation_3.webm'
 import four from '../../assets/images/onboarding_animation_4.webm'
 import five from '../../assets/images/onboarding_animation_5.webm'
 import six from '../../assets/images/onboarding_animation_6.webm'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
 import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'

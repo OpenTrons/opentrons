@@ -9,9 +9,9 @@ import {
   duplicateLabware,
   openIngredientSelector,
 } from '../../../../labware-ingred/actions'
-import { EditNickNameModal } from '../../../../organisms'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { deleteModule } from '../../../../step-forms/actions'
+import { deleteModule } from '../../../../modules'
+import { EditNickNameModal } from '../../../../components/organisms'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
@@ -25,14 +25,14 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const mockNavigate = vi.fn()
 
 vi.mock('../../../../top-selectors/labware-locations')
-vi.mock('../../../../step-forms/actions')
 vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../step-forms/actions/additionalItems')
-vi.mock('../../../../organisms')
+vi.mock('../../../../components/organisms')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../labware-ingred/utils')
-vi.mock('../../../../organisms/Kitchen/hooks')
+vi.mock('../../../../components/organisms/Kitchen/hooks')
+vi.mock('../../../../modules')
 vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
@@ -67,12 +67,14 @@ describe('SlotOverflowMenu', () => {
           id: 'labId',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
         lab2: {
           slot: 'labId',
           id: 'labId2',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
       },
       pipettes: {},
@@ -83,6 +85,7 @@ describe('SlotOverflowMenu', () => {
           id: 'modId',
           slot: 'D3',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
       },
       additionalEquipmentOnDeck: {
@@ -94,7 +97,7 @@ describe('SlotOverflowMenu', () => {
       },
     })
     vi.mocked(EditNickNameModal).mockReturnValue(
-      <div>mockEditNickNameModal</div>
+      <div>mock EditNickNameModal</div>
     )
     vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({})
     vi.mocked(getNextAvailableDeckSlot).mockReturnValue('A1')
@@ -117,7 +120,7 @@ describe('SlotOverflowMenu', () => {
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
-    screen.getByText('mockEditNickNameModal')
+    screen.getByText('mock EditNickNameModal')
     fireEvent.click(screen.getByRole('button', { name: 'Add liquid' }))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
@@ -175,7 +178,7 @@ describe('SlotOverflowMenu', () => {
       labwareId: 'labId2',
     })
     expect(vi.mocked(deleteModule)).toHaveBeenCalledOnce()
-    expect(vi.mocked(deleteModule)).toHaveBeenCalledWith('modId')
+    expect(vi.mocked(deleteModule)).toHaveBeenCalledWith({ moduleId: 'modId' })
   })
 
   it('renders snackbar if duplicate is clicked and the deck is full', () => {

@@ -23,6 +23,8 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
 )
 
+from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+
 from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ...disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
@@ -87,7 +89,9 @@ class LegacyInstrumentCoreSimulator(
     def set_default_speed(self, speed: float) -> None:
         self._default_speed = speed
 
-    def air_gap_in_place(self, volume: float, flow_rate: float) -> None:
+    def air_gap_in_place(
+        self, volume: float, flow_rate: float, correction_volume: Optional[float] = None
+    ) -> None:
         assert False, "Air gap tracking only available in API version 2.22 and later"
 
     def aspirate(
@@ -98,7 +102,8 @@ class LegacyInstrumentCoreSimulator(
         rate: float,
         flow_rate: float,
         in_place: bool,
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
+        correction_volume: Optional[float] = None,
     ) -> None:
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -140,7 +145,8 @@ class LegacyInstrumentCoreSimulator(
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
+        correction_volume: Optional[float] = None,
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
@@ -282,6 +288,30 @@ class LegacyInstrumentCoreSimulator(
     ) -> None:
         raise APIVersionError(api_element="Dropping tips in a trash bin or waste chute")
 
+    def resin_tip_seal(
+        self,
+        location: types.Location,
+        well_core: WellCore,
+        in_place: Optional[bool] = False,
+    ) -> None:
+        raise APIVersionError(api_element="Sealing resin tips.")
+
+    def resin_tip_unseal(
+        self,
+        location: types.Location,
+        well_core: WellCore,
+    ) -> None:
+        raise APIVersionError(api_element="Unsealing resin tips.")
+
+    def resin_tip_dispense(
+        self,
+        location: types.Location,
+        well_core: WellCore,
+        volume: Optional[float] = None,
+        flow_rate: Optional[float] = None,
+    ) -> None:
+        raise APIVersionError(api_element="Dispensing liquid from resin tips.")
+
     def home(self) -> None:
         self._protocol_interface.set_last_location(None)
 
@@ -346,6 +376,9 @@ class LegacyInstrumentCoreSimulator(
 
     def get_current_volume(self) -> float:
         return self._pipette_dict["current_volume"]
+
+    def get_has_clean_tip(self) -> bool:
+        return False
 
     def get_available_volume(self) -> float:
         return self._pipette_dict["available_volume"]
@@ -489,10 +522,38 @@ class LegacyInstrumentCoreSimulator(
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
     ) -> None:
-        """Transfer a liquid from source to dest according to liquid class properties."""
-        # TODO(spp, 2024-11-20): update the docstring and error to include API version
+        """This will never be called because it was added in API 2.23."""
         assert False, "transfer_liquid is not supported in legacy context"
+
+    def distribute_liquid(
+        self,
+        liquid_class: LiquidClass,
+        volume: float,
+        source: Tuple[types.Location, LegacyWellCore],
+        dest: List[Tuple[types.Location, LegacyWellCore]],
+        new_tip: TransferTipPolicyV2,
+        tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
+    ) -> None:
+        """This will never be called because it was added in API 2.23."""
+        assert False, "distribute_liquid is not supported in legacy context"
+
+    def consolidate_liquid(
+        self,
+        liquid_class: LiquidClass,
+        volume: float,
+        source: List[Tuple[types.Location, LegacyWellCore]],
+        dest: Tuple[types.Location, LegacyWellCore],
+        new_tip: TransferTipPolicyV2,
+        tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
+    ) -> None:
+        """This will never be called because it was added in API 2.23."""
+        assert False, "consolidate_liquid is not supported in legacy context"
 
     def get_active_channels(self) -> int:
         """This will never be called because it was added in API 2.16."""
@@ -522,7 +583,7 @@ class LegacyInstrumentCoreSimulator(
 
     def liquid_probe_without_recovery(
         self, well_core: WellCore, loc: types.Location
-    ) -> float:
+    ) -> LiquidTrackingType:
         """This will never be called because it was added in API 2.20."""
         assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"
 
@@ -532,3 +593,15 @@ class LegacyInstrumentCoreSimulator(
     def nozzle_configuration_valid_for_lld(self) -> bool:
         """Check if the nozzle configuration currently supports LLD."""
         return False
+
+    def get_minimum_liquid_sense_height(self) -> float:
+        return 0.0
+
+    def estimate_liquid_height(
+        self,
+        well_core: LegacyWellCore,
+        starting_liquid_height: float,
+        operation_volume: float,
+    ) -> float:
+        """This will never be called because it was added in API 2.21."""
+        assert False, "estimate_liquid_height only supported in API 2.21 & later"

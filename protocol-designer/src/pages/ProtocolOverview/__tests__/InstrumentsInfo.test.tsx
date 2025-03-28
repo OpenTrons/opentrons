@@ -2,6 +2,7 @@ import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../assets/localization'
@@ -70,6 +71,7 @@ const mockAdditionalEquipment = {
   'mock:gripper': {
     name: 'gripper',
     id: 'mock:gripper',
+    location: GRIPPER_LOCATION,
   },
 } as AdditionalEquipmentEntities
 
@@ -110,9 +112,9 @@ describe('InstrumentsInfo', () => {
     }
     render(props)
 
-    screen.getByText('Flex 1-Channel 50 μL')
+    screen.getByText('Flex 1-Channel 50 µL')
     screen.getByText('Opentrons Flex 96 Tip Rack 50 µL')
-    screen.getByText('Flex 8-Channel 50 μL')
+    screen.getByText('Flex 8-Channel 50 µL')
     screen.getByText('Opentrons Flex 96 Filter Tip Rack 50 µL')
     screen.getByText('Opentrons Flex Gripper')
   })

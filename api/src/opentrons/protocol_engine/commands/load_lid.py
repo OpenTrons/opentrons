@@ -1,4 +1,5 @@
 """Load lid command request, result, and implementation models."""
+
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import TYPE_CHECKING, Optional, Type
@@ -9,10 +10,12 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from ..errors import LabwareCannotBeStackedError, LabwareIsNotAllowedInLocationError
 from ..resources import labware_validation
 from ..types import (
-    LabwareLocation,
+    LoadableLabwareLocation,
     OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
 )
 
+from .labware_handling_common import LabwareHandlingResultMixin
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
@@ -28,7 +31,7 @@ LoadLidCommandType = Literal["loadLid"]
 class LoadLidParams(BaseModel):
     """Payload required to load a lid onto a labware."""
 
-    location: LabwareLocation = Field(
+    location: LoadableLabwareLocation = Field(
         ...,
         description="Labware the lid should be loaded onto.",
     )
@@ -46,13 +49,9 @@ class LoadLidParams(BaseModel):
     )
 
 
-class LoadLidResult(BaseModel):
+class LoadLidResult(LabwareHandlingResultMixin):
     """Result data from the execution of a LoadLabware command."""
 
-    labwareId: str = Field(
-        ...,
-        description="An ID to reference this lid labware in subsequent commands.",
-    )
     definition: LabwareDefinition = Field(
         ...,
         description="The full definition data for this lid labware.",
@@ -88,9 +87,6 @@ class LoadLidImplementation(
             labware_id=None,
         )
 
-        # TODO(chb 2024-12-12) these validation checks happen after the labware is loaded, because they rely on
-        #   on the definition. In practice this will not cause any issues since they will raise protocol ending
-        #   exception, but for correctness should be refactored to do this check beforehand.
         if not labware_validation.validate_definition_is_lid(loaded_labware.definition):
             raise LabwareCannotBeStackedError(
                 f"Labware {params.loadName} is not a Lid and cannot be loaded onto {self._state_view.labware.get_display_name(params.location.labwareId)}."
@@ -122,6 +118,18 @@ class LoadLidImplementation(
             public=LoadLidResult(
                 labwareId=loaded_labware.labware_id,
                 definition=loaded_labware.definition,
+                # Note: the lid is not yet loaded and therefore won't be found as the lid id for the
+                # labware onto which we're loading it, so build that part of the location sequence
+                # here and then build the rest of the sequence from the parent labware
+                locationSequence=[
+                    OnLabwareLocationSequenceComponent(
+                        labwareId=params.location.labwareId,
+                        lidId=loaded_labware.labware_id,
+                    )
+                ]
+                + self._state_view.geometry.get_location_sequence(
+                    params.location.labwareId
+                ),
             ),
             state_update=state_update,
         )
@@ -132,7 +140,7 @@ class LoadLid(BaseCommand[LoadLidParams, LoadLidResult, ErrorOccurrence]):
 
     commandType: LoadLidCommandType = "loadLid"
     params: LoadLidParams
-    result: Optional[LoadLidResult]
+    result: Optional[LoadLidResult] = None
 
     _ImplementationCls: Type[LoadLidImplementation] = LoadLidImplementation
 

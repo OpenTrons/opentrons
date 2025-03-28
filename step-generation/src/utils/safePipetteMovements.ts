@@ -1,5 +1,6 @@
 import {
   FLEX_ROBOT_TYPE,
+  SINGLE,
   THERMOCYCLER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
@@ -22,8 +23,7 @@ import type {
 
 const A12_column_front_left_bound = { x: -11.03, y: 2 }
 const A12_column_back_right_bound = { x: 526.77, y: 506.2 }
-const PRIMARY_NOZZLE = 'A12'
-const NOZZLE_CONFIGURATION = 'COLUMN'
+export const PRIMARY_NOZZLE = 'A12'
 const FLEX_TC_LID_COLLISION_ZONE = {
   back_left: { x: -43.25, y: 454.9, z: 211.91 },
   front_right: { x: 128.75, y: 402, z: 211.91 },
@@ -44,7 +44,7 @@ interface SlotInfo {
   addressableArea: AddressableArea | null
   position: CoordinateTuple | null
 }
-interface Point {
+export interface Point {
   x: number
   y: number
   z?: number
@@ -78,7 +78,7 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
   wellTargetPoint: Point,
-  primaryNozzle: string = 'A12' // hardcoding A12 becasue only column pick up supported currently
+  primaryNozzle: string
 ): Point[] => {
   const {
     nozzleMap,
@@ -293,6 +293,7 @@ const getWellPosition = (
 
 //  util to use in step-generation for if the pipette movement is safe
 export const getIsSafePipetteMovement = (
+  nozzleConfiguation: NozzleConfigurationStyle | null,
   robotState: RobotState,
   invariantContext: InvariantContext,
   pipetteId: string,
@@ -305,13 +306,17 @@ export const getIsSafePipetteMovement = (
   const {
     pipetteEntities,
     labwareEntities,
-    additionalEquipmentEntities,
+    stagingAreaEntities,
     moduleEntities,
   } = invariantContext
   const { labware: labwareState, tipState } = robotState
 
-  //  early exit if labwareId is a trashBin or wasteChute
-  if (labwareEntities[labwareId] == null || wellTargetName == null) {
+  //  early exit if labwareId is a trashBin or wasteChute or if no nozzle is provided
+  if (
+    labwareEntities[labwareId] == null ||
+    wellTargetName == null ||
+    nozzleConfiguation == null
+  ) {
     return true
   }
 
@@ -322,9 +327,9 @@ export const getIsSafePipetteMovement = (
     tiprackEntityId != null
       ? labwareEntities[tiprackEntityId].def.parameters.tipLength
       : 0
-  const stagingAreaSlots = Object.values(additionalEquipmentEntities)
-    .filter(ae => ae.name === 'stagingArea')
-    .map(stagingArea => stagingArea.location as string)
+  const stagingAreaSlots = Object.values(stagingAreaEntities).map(
+    stagingArea => stagingArea.location as string
+  )
   const pipetteEntity = pipetteEntities[pipetteId]
   const pipetteHasTip = tipState.pipettes[pipetteId]
   // account for tip length if picking up tip
@@ -341,13 +346,20 @@ export const getIsSafePipetteMovement = (
     addressableAreaOffset,
     pipetteHasTip
   )
+  let primaryNozzle = 'A12'
+  if (nozzleConfiguation === SINGLE && pipetteEntity.spec.channels === 96) {
+    primaryNozzle = 'H12'
+  } else if (
+    nozzleConfiguation === SINGLE &&
+    pipetteEntity.spec.channels === 8
+  ) {
+    primaryNozzle = 'H1'
+  }
 
   const isWithinPipetteExtents = getIsWithinPipetteExtents(
     wellTargetPoint,
-    //  TODO(jr, 4/22/24): PD only supports A12 as a primary nozzle for now
-    //  and only for 96-channel column pick up
-    NOZZLE_CONFIGURATION,
-    PRIMARY_NOZZLE
+    nozzleConfiguation,
+    primaryNozzle
   )
   if (!isWithinPipetteExtents) {
     return false
@@ -355,7 +367,8 @@ export const getIsSafePipetteMovement = (
     const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
       pipetteEntity,
       tipLength,
-      wellTargetPoint
+      wellTargetPoint,
+      primaryNozzle
     )
     const surroundingSlots = getFlexSurroundingSlots(
       labwareSlot,

@@ -1,13 +1,18 @@
 """ProtocolEngine-based Well core implementations."""
-from typing import Optional
+from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
+
+from opentrons.types import Point
 
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.util import UnsupportedAPIError
-from opentrons.types import Point
+from opentrons.protocol_engine.types.liquid_level_detection import (
+    SimulatedProbeResult,
+    LiquidTrackingType,
+)
 
 from . import point_calculations
 from . import stringify
@@ -44,17 +49,27 @@ class WellCore(AbstractWellCore):
     @property
     def diameter(self) -> Optional[float]:
         """Get the well's diameter, if circular."""
-        return self._definition.diameter
+        return (
+            self._definition.diameter if self._definition.shape == "circular" else None
+        )
 
     @property
     def length(self) -> Optional[float]:
         """Get the well's length, if rectangular."""
-        return self._definition.xDimension
+        return (
+            self._definition.xDimension
+            if self._definition.shape == "rectangular"
+            else None
+        )
 
     @property
     def width(self) -> Optional[float]:
         """Get the well's width, if rectangular."""
-        return self._definition.yDimension
+        return (
+            self._definition.yDimension
+            if self._definition.shape == "rectangular"
+            else None
+        )
 
     @property
     def depth(self) -> float:
@@ -125,6 +140,14 @@ class WellCore(AbstractWellCore):
             well_location=WellLocation(origin=WellOrigin.CENTER),
         )
 
+    def get_meniscus(self) -> Union[Point, SimulatedProbeResult]:
+        """Get the coordinate of the well's meniscus."""
+        current_liquid_height = self.current_liquid_height()
+        if isinstance(current_liquid_height, float):
+            return self.get_bottom(z_offset=current_liquid_height)
+        else:
+            return current_liquid_height
+
     def load_liquid(
         self,
         liquid: Liquid,
@@ -154,4 +177,36 @@ class WellCore(AbstractWellCore):
             x_ratio=x,
             y_ratio=y,
             z_ratio=z,
+        )
+
+    def estimate_liquid_height_after_pipetting(
+        self,
+        operation_volume: float,
+    ) -> LiquidTrackingType:
+        """Return an estimate of liquid height after pipetting without raising an error."""
+        labware_id = self.labware_id
+        well_name = self._name
+        starting_liquid_height = self.current_liquid_height()
+        projected_final_height = self._engine_client.state.geometry.get_well_height_after_liquid_handling_no_error(
+            labware_id=labware_id,
+            well_name=well_name,
+            initial_height=starting_liquid_height,
+            volume=operation_volume,
+        )
+        return projected_final_height
+
+    def current_liquid_height(self) -> LiquidTrackingType:
+        """Return the current liquid height within a well."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_meniscus_height(
+            labware_id=labware_id, well_name=well_name
+        )
+
+    def get_liquid_volume(self) -> LiquidTrackingType:
+        """Return the current volume in a well."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.get_current_well_volume(
+            labware_id=labware_id, well_name=well_name
         )

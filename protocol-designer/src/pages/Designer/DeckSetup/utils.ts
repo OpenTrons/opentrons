@@ -14,8 +14,11 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import { getOnlyLatestDefs } from '../../../labware-defs'
-import { getStagingAreaAddressableAreas } from '../../../utils'
+import { getIsAdapter, getStagingAreaAddressableAreas } from '../../../utils'
+import {
+  getLabwareIsCompatible,
+  getLabwareIsCustom,
+} from '../../../utils/labwareModuleCompatibility'
 import {
   FLEX_MODULE_MODELS,
   OT2_MODULE_MODELS,
@@ -25,23 +28,30 @@ import {
 import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
+  CoordinateTuple,
   CutoutFixture,
   CutoutId,
   DeckDefinition,
   DeckSlotId,
   LabwareDefinition2,
   ModuleModel,
+  ModuleType,
   RobotType,
 } from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from '../../../labware-defs'
 import type {
   AllTemporalPropertiesForTimelineFrame,
   InitialDeckSetup,
   LabwareOnDeck,
+  ModuleOnDeck,
 } from '../../../step-forms'
+import type { Selection } from '../../../ui/steps'
 import type { Fixture } from './constants'
 
 const OT2_TC_SLOTS = ['7', '8', '10', '11']
 const FLEX_TC_SLOTS = ['A1', 'B1']
+
+export type ModuleModelExtended = ModuleModel | 'stagingAreaAndMagneticBlock'
 
 export function getCutoutIdForAddressableArea(
   addressableArea: AddressableAreaName,
@@ -59,16 +69,18 @@ export function getCutoutIdForAddressableArea(
 }
 
 export function getModuleModelsBySlot(
-  enableAbsorbanceReader: boolean,
   robotType: RobotType,
   slot: DeckSlotId
-): ModuleModel[] {
+): ModuleModelExtended[] {
   const FLEX_MIDDLE_SLOTS = new Set(['B2', 'C2', 'A2', 'D2'])
   const OT2_MIDDLE_SLOTS = ['2', '5', '8', '11']
 
   const FLEX_RIGHT_SLOTS = new Set(['A3', 'B3', 'C3', 'D3'])
 
-  let moduleModels: ModuleModel[] = FLEX_MODULE_MODELS
+  let moduleModels: ModuleModelExtended[] = [
+    ...FLEX_MODULE_MODELS,
+    'stagingAreaAndMagneticBlock',
+  ]
 
   switch (robotType) {
     case FLEX_ROBOT_TYPE: {
@@ -76,16 +88,23 @@ export function getModuleModelsBySlot(
         slot as AddressableAreaName
       )
         ? []
-        : FLEX_MODULE_MODELS.filter(model => {
+        : [
+            ...FLEX_MODULE_MODELS,
+            'stagingAreaAndMagneticBlock' as ModuleModelExtended,
+          ].filter(model => {
             if (model === THERMOCYCLER_MODULE_V2) {
               return slot === 'B1'
             } else if (model === ABSORBANCE_READER_V1) {
-              return FLEX_RIGHT_SLOTS.has(slot) && enableAbsorbanceReader
+              return FLEX_RIGHT_SLOTS.has(slot)
             } else if (
               model === TEMPERATURE_MODULE_V2 ||
               model === HEATERSHAKER_MODULE_V1
             ) {
               return !FLEX_MIDDLE_SLOTS.has(slot)
+            } else if (
+              model === ('stagingAreaAndMagneticBlock' as ModuleModelExtended)
+            ) {
+              return FLEX_RIGHT_SLOTS.has(slot)
             }
             return true
           })
@@ -131,15 +150,23 @@ export const getLabwareIsRecommended = (
       )
 }
 
+const STACKING_LABWARE_LOADNAME_FILTER = [
+  'opentrons_96_wellplate_200ul_pcr_full_skirt',
+]
+
 export const getLabwareCompatibleWithAdapter = (
+  defs: LabwareDefByDefURI,
+  enableStacking: boolean,
   adapterLoadName?: string
 ): string[] => {
-  const defs = getOnlyLatestDefs()
-
-  if (adapterLoadName == null) {
+  if (
+    adapterLoadName == null ||
+    (adapterLoadName != null &&
+      !enableStacking &&
+      STACKING_LABWARE_LOADNAME_FILTER.includes(adapterLoadName))
+  ) {
     return []
   }
-
   return Object.entries(defs)
     .filter(
       ([, { stackingOffsetWithLabware }]) =>
@@ -281,6 +308,20 @@ export const getAdjacentLabware = (
   return adjacentLabware
 }
 
+export const getAdjacentSlots = (
+  fixture: Fixture,
+  cutout: CutoutId
+): AddressableAreaName[] | null => {
+  if (fixture === 'stagingArea' || fixture === 'wasteChuteAndStagingArea') {
+    const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
+      [cutout],
+      false
+    )
+    return stagingAreaAddressableAreaNames
+  }
+  return null
+}
+
 type BreakPoint = 'small' | 'medium' | 'large'
 
 export function useDeckSetupWindowBreakPoint(): BreakPoint {
@@ -312,4 +353,263 @@ export function useDeckSetupWindowBreakPoint(): BreakPoint {
   }
 
   return size
+}
+
+export interface SwapBlockedModuleArgs {
+  modulesById: InitialDeckSetup['modules']
+  customLabwareDefs: LabwareDefByDefURI
+  hoveredLabware?: LabwareOnDeck | null
+  draggedLabware?: LabwareOnDeck | null
+}
+
+export const getSwapBlockedModule = (args: SwapBlockedModuleArgs): boolean => {
+  const {
+    hoveredLabware,
+    draggedLabware,
+    modulesById,
+    customLabwareDefs,
+  } = args
+
+  if (!hoveredLabware || !draggedLabware) {
+    return false
+  }
+
+  const sourceModuleType: ModuleType | null =
+    modulesById[draggedLabware.slot]?.type || null
+  const destModuleType: ModuleType | null =
+    modulesById[hoveredLabware.slot]?.type || null
+
+  const draggedLabwareIsCustom = getLabwareIsCustom(
+    customLabwareDefs,
+    draggedLabware
+  )
+  const hoveredLabwareIsCustom = getLabwareIsCustom(
+    customLabwareDefs,
+    hoveredLabware
+  )
+
+  // dragging custom labware to module gives no compat error
+  const labwareSourceToDestBlocked = sourceModuleType
+    ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType) &&
+      !hoveredLabwareIsCustom
+    : false
+  const labwareDestToSourceBlocked = destModuleType
+    ? !getLabwareIsCompatible(draggedLabware.def, destModuleType) &&
+      !draggedLabwareIsCustom
+    : false
+
+  return labwareSourceToDestBlocked || labwareDestToSourceBlocked
+}
+
+export interface SwapBlockedAdapterArgs {
+  labwareById: InitialDeckSetup['labware']
+  hoveredLabware?: LabwareOnDeck | null
+  draggedLabware?: LabwareOnDeck | null
+}
+
+export const getSwapBlockedAdapter = (
+  args: SwapBlockedAdapterArgs
+): boolean => {
+  const { hoveredLabware, draggedLabware, labwareById } = args
+
+  if (!hoveredLabware || !draggedLabware) {
+    return false
+  }
+
+  const adapterSourceToDestLoadname: string | null =
+    labwareById[draggedLabware.slot]?.def.parameters.loadName ?? null
+  const adapterDestToSourceLoadname: string | null =
+    labwareById[hoveredLabware.slot]?.def.parameters.loadName ?? null
+
+  const labwareSourceToDestBlocked =
+    adapterSourceToDestLoadname != null
+      ? hoveredLabware.def.stackingOffsetWithLabware?.[
+          adapterSourceToDestLoadname
+        ] == null
+      : false
+  const labwareDestToSourceBlocked =
+    adapterDestToSourceLoadname != null
+      ? draggedLabware.def.stackingOffsetWithLabware?.[
+          adapterDestToSourceLoadname
+        ] == null
+      : false
+
+  return labwareSourceToDestBlocked || labwareDestToSourceBlocked
+}
+
+interface HoverDimensions {
+  width: number
+  height: number
+  x: number
+  y: number
+}
+
+const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
+
+export const getFlexHoverDimensions = (
+  stagingAreaLocations: string[],
+  cutoutId: CutoutId,
+  slotId: string,
+  hasTCOnSlot: boolean,
+  slotPosition: CoordinateTuple
+): HoverDimensions => {
+  const hasStagingArea = stagingAreaLocations.includes(cutoutId)
+
+  const X_ADJUSTMENT_LEFT_SIDE = -101.5
+  const X_ADJUSTMENT = -17
+  const X_DIMENSION_MIDDLE_SLOTS = 160.3
+  const X_DIMENSION_OUTER_SLOTS = hasStagingArea ? 160.0 : 246.5
+  const X_DIMENSION_4TH_COLUMN_SLOTS = 175.0
+  const Y_DIMENSION = hasTCOnSlot ? 294.0 : 106.0
+
+  const slotFromCutout = slotId
+  const isLeftSideofDeck =
+    slotFromCutout === 'A1' ||
+    slotFromCutout === 'B1' ||
+    slotFromCutout === 'C1' ||
+    slotFromCutout === 'D1'
+  const xAdjustment = isLeftSideofDeck ? X_ADJUSTMENT_LEFT_SIDE : X_ADJUSTMENT
+  const xSlotPosition = slotPosition[0] + xAdjustment
+
+  const yAdjustment = -10
+  const ySlotPosition = slotPosition[1] + yAdjustment
+
+  const isMiddleOfDeck =
+    slotId === 'A2' || slotId === 'B2' || slotId === 'C2' || slotId === 'D2'
+
+  let xDimension = X_DIMENSION_OUTER_SLOTS
+  if (isMiddleOfDeck) {
+    xDimension = X_DIMENSION_MIDDLE_SLOTS
+  } else if (FOURTH_COLUMN_SLOTS.includes(slotId)) {
+    xDimension = X_DIMENSION_4TH_COLUMN_SLOTS
+  }
+  const x = hasTCOnSlot ? xSlotPosition + 20 : xSlotPosition
+  const y = hasTCOnSlot ? ySlotPosition - 70 : ySlotPosition
+
+  return { width: xDimension, height: Y_DIMENSION, x, y }
+}
+
+export const getOT2HoverDimensions = (
+  hasTCOnSlot: boolean,
+  slotPosition: CoordinateTuple
+): HoverDimensions => {
+  const y = slotPosition[1]
+  const x = slotPosition[0]
+
+  return {
+    width: hasTCOnSlot ? 260 : 128,
+    height: hasTCOnSlot ? 178 : 85,
+    x,
+    y: hasTCOnSlot ? y - 72 : y,
+  }
+}
+
+export const getSVGContainerWidth = (
+  robotType: RobotType,
+  tab: string,
+  isZoomed: boolean
+): string => {
+  if (robotType === OT2_ROBOT_TYPE && tab === 'startingDeck' && !isZoomed) {
+    return '78.5%'
+  }
+  if (robotType !== OT2_ROBOT_TYPE && !isZoomed && tab !== 'protocolSteps') {
+    return '70%'
+  }
+  return '100%'
+}
+
+interface HighlightItemsByType {
+  highlightModuleItems: Array<{
+    selection: Selection
+    module: ModuleOnDeck
+    isSelected?: boolean
+  }>
+  highlightLabwareItems: Array<{
+    selection: Selection
+    labware: LabwareOnDeck
+    isSelected?: boolean
+  }>
+}
+
+export function getHighlightLabwareAndModules(
+  hoveredItem: Selection,
+  selectedDropdownItems: Selection[],
+  labware: Record<string, LabwareOnDeck>,
+  modules: Record<string, ModuleOnDeck>
+): HighlightItemsByType {
+  const _getReducedHighlightItemsById = (
+    items: Selection[],
+    isSelected: boolean
+  ): Record<string, { item: Selection; isSelected: boolean }> => {
+    return items.reduce((acc, item) => {
+      if (item.id != null) {
+        const moduleIdUnderLabwareToUse =
+          item.id != null &&
+          labware[item.id] != null &&
+          getIsAdapter(item.id, labware)
+            ? modules[labware[item.id].slot]?.id
+            : null
+
+        const updatedItem =
+          moduleIdUnderLabwareToUse != null
+            ? { ...item, id: moduleIdUnderLabwareToUse }
+            : item
+
+        return updatedItem.id != null
+          ? { ...acc, [updatedItem.id]: { item: updatedItem, isSelected } }
+          : acc
+      }
+      return acc
+    }, {})
+  }
+
+  const reducedHoveredItemsById = _getReducedHighlightItemsById(
+    [hoveredItem],
+    false
+  )
+  const reducedSelectedItemsById = _getReducedHighlightItemsById(
+    selectedDropdownItems,
+    true
+  )
+  const dropdownModulesAndLabwareItemsById = {
+    ...reducedHoveredItemsById,
+    ...reducedSelectedItemsById,
+  }
+
+  const highlightItems = Object.values(
+    dropdownModulesAndLabwareItemsById
+  ).reduce<HighlightItemsByType>(
+    (acc, { item, isSelected }) => {
+      const { id } = item
+      if (id == null) {
+        return acc
+      }
+      if (id in modules) {
+        const moduleOnDeck = modules[id]
+        return {
+          ...acc,
+          highlightModuleItems: [
+            ...acc.highlightModuleItems,
+            { module: moduleOnDeck, selection: item, isSelected },
+          ],
+        }
+      }
+      if (id in labware) {
+        const labwareOnDeck = labware[id]
+        return {
+          ...acc,
+          highlightLabwareItems: [
+            ...acc.highlightLabwareItems,
+            { labware: labwareOnDeck, selection: item, isSelected },
+          ],
+        }
+      }
+      return acc
+    },
+    {
+      highlightModuleItems: [],
+      highlightLabwareItems: [],
+    }
+  )
+  return highlightItems
 }

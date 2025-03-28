@@ -62,7 +62,7 @@ One reason to set ``new_tip="always"`` is to avoid cross-contamination between w
 
 :py:meth:`~.InstrumentContext.transfer` will pick up a new tip before *every* aspirate when ``new_tip="always"``. This includes when :ref:`tip refilling <complex-tip-refilling>` requires multiple aspirations from a single source well.
 
-:py:meth:`~.InstrumentContext.distribute` and :py:meth:`~.InstrumentContext.consolidate` only pick up one tip, even when ``new_tip="always"``. For example, this distribute command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 μL)::
+:py:meth:`~.InstrumentContext.distribute` and :py:meth:`~.InstrumentContext.consolidate` only pick up one tip, even when ``new_tip="always"``. For example, this distribute command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 µL)::
 
     pipette.distribute(
         volume=200,

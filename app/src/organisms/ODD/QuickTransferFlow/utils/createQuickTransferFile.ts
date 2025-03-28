@@ -4,8 +4,12 @@ import {
   transfer,
   distribute,
   getWasteChuteAddressableAreaNamePip,
+  pythonImports,
+  pythonMetadata,
+  pythonRequirements,
 } from '@opentrons/step-generation'
 import { generateQuickTransferArgs } from './'
+import { pythonDef } from './pythonDef'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STANDARD_DECKID,
@@ -202,9 +206,10 @@ export function createQuickTransferFile(
       subcategory: null,
       tags: [],
     },
+    // see QuickTransferFlow/README.md for versioning details
     designerApplication: {
       name: 'opentrons/quick-transfer',
-      version: '1.0.0',
+      version: '1.1.0',
       data: quickTransferState,
     },
   }
@@ -253,4 +258,45 @@ export function createQuickTransferFile(
     [protocolContents],
     `${protocolBase.metadata.protocolName}.json`
   )
+}
+
+export function createQuickTransferPythonFile(
+  quickTransferState: QuickTransferSummaryState,
+  deckConfig: DeckConfiguration,
+  protocolName?: string
+): File {
+  const sourceLabwareName = quickTransferState.source.metadata.displayName
+  let destinationLabwareName = sourceLabwareName
+  if (quickTransferState.destination !== 'source') {
+    destinationLabwareName = quickTransferState.destination.metadata.displayName
+  }
+  const fileMetadata = {
+    protocolName:
+      protocolName ?? `Quick Transfer ${quickTransferState.volume}µL`,
+    description: `This quick transfer moves liquids from a ${sourceLabwareName} to a ${destinationLabwareName}`,
+    source: 'Quick Transfer',
+    //  TODO: increase version for when we export python
+    //  see QuickTransferFlow/README.md for versioning details
+    version: '1.1.0',
+    category: null,
+    subcategory: null,
+    tags: [],
+  }
+
+  const protocolContents =
+    [
+      pythonImports(),
+      pythonMetadata(fileMetadata),
+      pythonRequirements(FLEX_ROBOT_TYPE),
+      pythonDef(quickTransferState, deckConfig),
+    ]
+      .filter(section => section)
+      .join('\n\n') + '\n'
+
+  // so you can view the string in devTools:
+  console.log(protocolContents)
+
+  return new File([protocolContents], `${fileMetadata.protocolName}.py`, {
+    type: 'text/x-python',
+  })
 }

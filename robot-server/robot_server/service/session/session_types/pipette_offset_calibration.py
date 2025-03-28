@@ -2,7 +2,6 @@ import logging
 from typing import Awaitable, Optional, cast
 from opentrons.types import Mount
 from opentrons.protocol_api import labware
-from opentrons_shared_data.labware.types import LabwareDefinition
 from robot_server.robot.calibration.pipette_offset.user_flow import (
     PipetteOffsetCalibrationUserFlow,
 )
@@ -18,14 +17,12 @@ from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
     CompletedCommand,
-    CommandQueue,
     CommandExecutor,
 )
 
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
 from ..models.session import SessionType, PipetteOffsetCalibrationResponseAttributes
-from ..errors import UnsupportedFeature
 
 
 log = logging.getLogger(__name__)
@@ -46,7 +43,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
         instance_meta: SessionMetaData,
         pip_offset_cal_user_flow: PipetteOffsetCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._pip_offset_cal_user_flow = pip_offset_cal_user_flow
         self._command_executor = PipetteOffsetCalibrationCommandExecutor(
@@ -65,7 +62,14 @@ class PipetteOffsetCalibrationSession(BaseSession):
         tip_rack_def = instance_meta.create_params.tipRackDefinition
 
         if tip_rack_def:
-            labware.verify_definition(tip_rack_def)
+            verified_tip_rack_def = labware.verify_definition(tip_rack_def)
+            # todo(mm, 2025-02-13): Move schema validation to the FastAPI layer and turn
+            # this schemaVersion assertion into a proper HTTP API 422 error.
+            # https://opentrons.atlassian.net/browse/EXEC-1230
+            assert verified_tip_rack_def["schemaVersion"] == 2
+        else:
+            verified_tip_rack_def = None
+
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
@@ -80,7 +84,7 @@ class PipetteOffsetCalibrationSession(BaseSession):
                 mount=Mount[mount.upper()],
                 recalibrate_tip_length=recalibrate_tip_length,
                 has_calibration_block=has_cal_block,
-                tip_rack_def=cast(LabwareDefinition, tip_rack_def),
+                tip_rack_def=verified_tip_rack_def,
             )
         except AssertionError as e:
             raise SessionCreationException(str(e))
@@ -105,10 +109,6 @@ class PipetteOffsetCalibrationSession(BaseSession):
         return self._command_executor
 
     @property
-    def command_queue(self) -> CommandQueue:
-        raise UnsupportedFeature()
-
-    @property
     def session_type(self) -> SessionType:
         return SessionType.pipette_offset_calibration
 
@@ -130,6 +130,6 @@ class PipetteOffsetCalibrationSession(BaseSession):
             supportedCommands=uf.supported_commands,
         )
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

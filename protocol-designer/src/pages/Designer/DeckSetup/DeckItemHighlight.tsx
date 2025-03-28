@@ -78,7 +78,7 @@ export function DeckItemHighlight(
       <DeckLabelSet
         deckLabels={[
           {
-            text: t('location'),
+            text: t('new_location'),
             isLast: true,
             isSelected: isSelected,
             isZoomed: false,

@@ -5,6 +5,7 @@ Definitions should be grouped into thematic namespaces.
 """
 import typing
 from enum import Enum
+from typing_extensions import Self
 
 
 class CommandDefinition(str, Enum):
@@ -12,7 +13,7 @@ class CommandDefinition(str, Enum):
 
     """The base of command definition enumerations."""
 
-    def __new__(cls, value):
+    def __new__(cls, value: str) -> Self:
         """Create a string enum."""
         # https://docs.python.org/3/library/enum.html#when-to-use-new-vs-init
         namespace = cls.namespace()
@@ -23,16 +24,16 @@ class CommandDefinition(str, Enum):
         return obj
 
     @staticmethod
-    def namespace():
+    def namespace() -> str | None:
         """
-        Override to create a namespoce for the member definitions. The
-         name.space will be used to make the value of the enum. It will
+        Override to create a namespace for the member definitions. The
+         namespace will be used to make the value of the enum. It will
          be "{namespace}.{value}"
         """
         return None
 
     @property
-    def localname(self):
+    def localname(self) -> str:
         """Get the name of the command without the namespace"""
         return self._localname
 
@@ -45,7 +46,7 @@ class RobotCommand(CommandDefinition):
     toggle_lights = "toggleLights"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "robot"
 
 
@@ -59,7 +60,7 @@ class ProtocolCommand(CommandDefinition):
     resume = "resume"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "protocol"
 
 
@@ -68,7 +69,7 @@ class EquipmentCommand(CommandDefinition):
     load_pipette = "loadPipette"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "equipment"
 
 
@@ -79,7 +80,7 @@ class PipetteCommand(CommandDefinition):
     pick_up_tip = "pickUpTip"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "pipette"
 
 
@@ -101,7 +102,7 @@ class CalibrationCommand(CommandDefinition):
     invalidate_last_action = "invalidateLastAction"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "calibration"
 
 
@@ -112,7 +113,7 @@ class DeckCalibrationCommand(CommandDefinition):
     move_to_point_three = "moveToPointThree"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "calibration.deck"
 
 
@@ -125,7 +126,7 @@ class CheckCalibrationCommand(CommandDefinition):
     transition = "transition"
 
     @staticmethod
-    def namespace():
+    def namespace() -> str:
         return "calibration.check"
 
 

@@ -469,6 +469,10 @@ class MoveScheduler:
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if in_group else 'isn''t'} in group"
             )
+            if self._moves[group_id] and len(self._moves[group_id]) == 0:
+                log.error(
+                    f"Python bug proven if check {bool(not self._moves[group_id])} len check {len(self._moves[group_id]) == 0}"
+                )
             if not self._moves[group_id]:
                 log.debug(f"Move group {group_id+self._start_at_index} has completed.")
                 self._event.set()
@@ -673,7 +677,7 @@ class MoveScheduler:
             log.error(f"received error trying to execute move group: {str(error)}")
 
         expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
-        full_timeout = max(5.0, self._durations[group_id - self._start_at_index] * 2)
+        full_timeout = max(10.0, self._durations[group_id - self._start_at_index] * 2)
         start_time = time.time()
 
         try:

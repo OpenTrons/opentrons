@@ -1,4 +1,5 @@
 import 'cypress-file-upload'
+import { SetupContent } from './SetupSteps'
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
@@ -32,6 +33,10 @@ declare global {
       verifyCreateNewPage: () => Cypress.Chainable<void>
       togglePreWetTip: () => Cypress.Chainable<void>
       mixaspirate: () => Cypress.Chainable<void>
+      clickConfirm: () => Cypress.Chainable<void>
+      verifyOverflowBtn: () => Cypress.Chainable<void>
+      verifyOnboardingPage: () => Cypress.Chainable<void>
+      closeReleaseNotesModal: () => Cypress.Chainable<void>
     }
   }
 }
@@ -49,6 +54,12 @@ export const content = {
   appSettings: 'App Info',
   privacy: 'Privacy',
   shareSessions: 'Share analytics with Opentrons',
+  move: 'Move',
+  transfer: 'Transfer',
+  mix: 'Mix',
+  pause: 'Pause',
+  heaterShaker: 'Heater-Shaker',
+  thermocyler: 'Thermocycler',
 }
 
 export const locators = {
@@ -62,8 +73,9 @@ export const locators = {
   settings: 'Settings',
   privacyPolicy: 'a[href="https://opentrons.com/privacy-policy"]',
   eula: 'a[href="https://opentrons.com/eula"]',
-  privacyToggle: 'Settings_hotKeys',
-  analyticsToggleTestId: 'analyticsToggle',
+  privacyToggle: 'Settings_OT_PD_ENABLE_HOT_KEYS_DISPLAY',
+  analyticsToggleAriaLabel: 'Settings_Privacy',
+  releaseNote: '[data-testid="Toast_info"]',
   confirm: 'Confirm',
 }
 
@@ -101,14 +113,22 @@ Cypress.Commands.add('verifyCreateNewHeader', () => {
   verifyUniversal()
 })
 
+// Onboarding page
+Cypress.Commands.add('verifyOnboardingPage', () => {
+  verifyUniversal()
+  cy.get(locators.privacyPolicy).should('exist').and('be.visible')
+  cy.get(locators.eula).should('exist').and('be.visible')
+  cy.contains(SetupContent.LetsGetStarted)
+})
+
 // Home Page
 Cypress.Commands.add('verifyHomePage', () => {
   cy.contains(content.welcome)
+  cy.get(locators.privacyPolicy).should('exist').and('be.visible')
+  cy.get(locators.eula).should('exist').and('be.visible')
   cy.contains('button', locators.createProtocol).should('be.visible')
   cy.contains('label', locators.importProtocol).should('be.visible')
   cy.getByTestId(locators.settingsDataTestid).should('be.visible')
-  cy.get(locators.privacyPolicy).should('exist').and('be.visible')
-  cy.get(locators.eula).should('exist').and('be.visible')
 })
 
 Cypress.Commands.add('clickCreateNew', () => {
@@ -120,6 +140,10 @@ Cypress.Commands.add('closeAnalyticsModal', () => {
     .contains(locators.confirm)
     .should('be.visible')
     .click({ force: true })
+})
+
+Cypress.Commands.add('clickConfirm', () => {
+  cy.contains(locators.confirm).click()
 })
 
 // Header Import
@@ -153,9 +177,22 @@ Cypress.Commands.add('verifySettingsPage', () => {
   cy.contains(content.privacy).should('exist').should('be.visible')
   cy.contains(content.shareSessions).should('exist').should('be.visible')
   cy.getByAriaLabel(locators.privacyToggle).should('exist').should('be.visible')
-  cy.getByTestId(locators.analyticsToggleTestId)
+  cy.getByAriaLabel(locators.analyticsToggleAriaLabel)
     .should('exist')
     .should('be.visible')
+})
+
+Cypress.Commands.add('verifyOverflowBtn', () => {
+  cy.contains(content.move).should('exist').should('be.visible')
+  cy.contains(content.transfer).should('exist').should('be.visible')
+  cy.contains(content.mix).should('exist').should('be.visible')
+  cy.contains(content.pause).should('exist').should('be.visible')
+  cy.contains(content.heaterShaker).should('exist').should('be.visible')
+  cy.contains(content.thermocyler).should('exist').should('be.visible')
+})
+
+Cypress.Commands.add('closeReleaseNotesModal', () => {
+  cy.get(locators.releaseNote).find('button').click()
 })
 
 /// /////////////////////////////////////////////////////////////////

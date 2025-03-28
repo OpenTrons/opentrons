@@ -23,6 +23,7 @@ beforeEach(() => {
     id: moduleId,
     type: MAGNETIC_MODULE_TYPE,
     model: MAGNETIC_MODULE_V1,
+    pythonName: 'mockPythonName',
   }
   disengagedRobotState = getInitialRobotStateStandard(invariantContext)
   disengagedRobotState.modules[moduleId] = {

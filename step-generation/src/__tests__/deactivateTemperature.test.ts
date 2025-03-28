@@ -38,6 +38,7 @@ describe('deactivateTemperature', () => {
             },
           },
         ],
+        python: 'mock_temperature_module_1.deactivate()',
       },
     },
     {

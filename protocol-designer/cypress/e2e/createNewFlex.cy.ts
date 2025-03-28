@@ -1,72 +1,50 @@
-import { Actions, Verifications, runCreateTest } from '../support/createNew'
-import { UniversalActions } from '../support/universalActions'
+import { UniversalSteps } from '../support/UniversalSteps'
+import {
+  SetupSteps,
+  SetupVerifications,
+  CompositeSetupSteps,
+} from '../support/SetupSteps'
+import { StepBuilder } from '../support/StepBuilder'
 
-describe('The Redesigned Create Protocol Landing Page', () => {
+describe('Create new Flex', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.closeAnalyticsModal()
   })
 
-  it('content and step 1 flow works', () => {
+  it('Goes through onboarding workflow for Flex', () => {
     cy.clickCreateNew()
     cy.verifyCreateNewHeader()
-    const steps: Array<Actions | Verifications | UniversalActions> = [
-      Verifications.OnStep1,
-      Verifications.FlexSelected,
-      UniversalActions.Snapshot,
-      Actions.SelectOT2,
-      Verifications.OT2Selected,
-      UniversalActions.Snapshot,
-      Actions.SelectFlex,
-      Verifications.FlexSelected,
-      UniversalActions.Snapshot,
-      Actions.Confirm,
-      Verifications.OnStep2,
-      Actions.SingleChannelPipette50,
-      Verifications.StepTwo50uL,
-      UniversalActions.Snapshot,
-      Actions.Confirm,
-      Verifications.StepTwoPart3,
-      UniversalActions.Snapshot,
-      Actions.Confirm,
-      Verifications.OnStep3,
-      Actions.YesGripper,
-      Actions.Confirm,
-      Verifications.Step4Verification,
-      Actions.AddThermocycler,
-      Verifications.ThermocyclerImg,
-      Actions.AddHeaterShaker,
-      Verifications.HeaterShakerImg,
-      Actions.AddMagBlock,
-      Verifications.MagBlockImg,
-      Actions.AddTempdeck2,
-      Verifications.Tempdeck2Img,
-      Actions.Confirm,
-      Actions.Confirm,
-      Actions.Confirm,
-      Actions.EditProtocolA,
-      Actions.ChoseDeckSlotC2,
-      Actions.AddHardwareLabware,
-      Actions.ClickLabwareHeader,
-      Actions.ClickWellPlatesSection,
-      Actions.SelectArmadillo96WellPlate,
-      Actions.ChoseDeckSlotC2Labware,
-      Actions.AddLiquid,
-      Actions.ClickLiquidButton,
-      Actions.DefineLiquid,
-      Actions.LiquidSaveWIP,
-      Actions.WellSelector,
-      Actions.LiquidDropdown,
-      Verifications.LiquidPage,
-      UniversalActions.Snapshot,
-      Actions.SelectLiquidWells,
-      Actions.SetVolumeAndSaveforWells,
-      Actions.ChoseDeckSlotC3,
-      Actions.AddHardwareLabware,
-      Actions.ClickLabwareHeader,
-      Actions.ClickWellPlatesSection,
-      Actions.SelectBioRad96WellPlate,
-    ]
-    runCreateTest(steps)
+
+    const steps = new StepBuilder()
+    steps.add(
+      CompositeSetupSteps.FlexSetup({
+        thermocycler: true,
+        heatershaker: true,
+        magblock: true,
+        tempdeck: true,
+      })
+    )
+    steps.add(
+      CompositeSetupSteps.AddLabwareToDeckSlot('C2', 'Bio-Rad 96 Well Plate')
+    )
+    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C2'))
+    steps.add(SetupSteps.AddLiquid())
+    steps.add(SetupSteps.ClickLiquidButton())
+    steps.add(SetupSteps.DefineLiquid())
+    steps.add(SetupSteps.LiquidSaveWIP())
+    steps.add(SetupSteps.WellSelector(['A1', 'A2']))
+    steps.add(SetupSteps.LiquidDropdown())
+    steps.add(SetupVerifications.LiquidPage())
+    steps.add(UniversalSteps.Snapshot())
+    steps.add(SetupSteps.SelectLiquidWells())
+    steps.add(SetupSteps.SetVolumeAndSaveForWells('150'))
+    steps.add(
+      CompositeSetupSteps.AddLabwareToDeckSlot(
+        'C3',
+        'Armadillo 96 Well Plate 200 µL'
+      )
+    )
+    steps.execute()
   })
 })

@@ -1,3 +1,4 @@
+import { last } from 'lodash'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
@@ -26,29 +27,34 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  getIsTiprack,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { OFFDECK } from '../../../../constants'
+import { getEnableComment } from '../../../../feature-flags/selectors'
 import {
-  actions as stepsActions,
-  getIsMultiSelectMode,
-} from '../../../../ui/steps'
-import {
-  selectors as stepFormSelectors,
-  getIsModuleOnDeck,
-} from '../../../../step-forms'
+  getInitialRobotState,
+  getRobotStateTimeline,
+} from '../../../../file-data/selectors'
 import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   getMainPagePortalEl,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import {
-  getEnableAbsorbanceReader,
-  getEnableComment,
-} from '../../../../feature-flags/selectors'
+  selectors as stepFormSelectors,
+  getIsModuleOnDeck,
+} from '../../../../step-forms'
+import { getLabwareEntities } from '../../../../step-forms/selectors'
+import {
+  actions as stepsActions,
+  getIsMultiSelectMode,
+} from '../../../../ui/steps'
+import { getIsAdapterFromDef } from '../../../../utils'
 import { AddStepOverflowButton } from './AddStepOverflowButton'
 
 import type { MouseEvent } from 'react'
@@ -87,8 +93,23 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
   const [enqueuedStepType, setEnqueuedStepType] = useState<StepType | null>(
     null
   )
-  const enableAbsorbanceReader = useSelector(getEnableAbsorbanceReader)
-
+  const labwareEntities = useSelector(getLabwareEntities)
+  const { timeline } = useSelector(getRobotStateTimeline)
+  const initialTimeline = useSelector(getInitialRobotState)
+  const lastTimelineFrame =
+    timeline.length > 0 ? last(timeline)?.robotState : initialTimeline
+  const labwareAtLastState = lastTimelineFrame?.labware ?? {}
+  const isLabwarePresentForLiquidHandling = Object.entries(
+    labwareAtLastState
+  ).some(([labwareId, { slot }]) => {
+    const labwareDef = labwareEntities[labwareId]?.def
+    return (
+      labwareDef != null &&
+      slot !== OFFDECK &&
+      !getIsTiprack(labwareDef) &&
+      !getIsAdapterFromDef(labwareDef)
+    )
+  })
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
   > => [
@@ -109,16 +130,14 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
   > = {
     comment: enableComment,
     moveLabware: true,
-    moveLiquid: true,
-    mix: true,
+    moveLiquid: isLabwarePresentForLiquidHandling,
+    mix: isLabwarePresentForLiquidHandling,
     pause: true,
     magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
     temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
-    absorbanceReader:
-      getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE) &&
-      enableAbsorbanceReader,
+    absorbanceReader: getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE),
   }
 
   const addStep = (stepType: StepType): ReturnType<any> =>
@@ -126,7 +145,7 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
 
   const items = getSupportedSteps()
     .filter(stepType => isStepTypeEnabled[stepType])
-    .map(stepType => (
+    .map((stepType, index, array) => (
       <AddStepOverflowButton
         key={stepType}
         stepType={stepType}
@@ -138,6 +157,8 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
           }
           setShowStepOverflowMenu(false)
         }}
+        isFirstStep={index === 0}
+        isLastStep={index === array.length - 1}
       />
     ))
 
@@ -202,9 +223,9 @@ export function AddStepButton({ hasText }: AddStepButtonProps): JSX.Element {
 const STEP_OVERFLOW_MENU_STYLE = css`
   position: ${POSITION_ABSOLUTE};
   z-index: 5;
-  right: -7.75rem;
+  right: -8.05rem;
   white-space: ${NO_WRAP};
-  bottom: 4.2rem;
+  bottom: 1rem;
   border-radius: ${BORDERS.borderRadius8};
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
   background-color: ${COLORS.white};

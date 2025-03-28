@@ -36,7 +36,7 @@ except (OSError, ModuleNotFoundError):
 
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons_shared_data.protocol.types import JsonProtocol
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition, LabwareDefinition2
 from opentrons_shared_data.module.types import ModuleDefinitionV3
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
@@ -606,7 +606,7 @@ def get_bundle_fixture() -> Callable[[str], Bundle]:
 
 
 @pytest.fixture()
-def minimal_labware_def() -> LabwareDefinition:
+def minimal_labware_def() -> LabwareDefinition2:
     return {
         "metadata": {
             "displayName": "minimal labware",
@@ -652,7 +652,7 @@ def minimal_labware_def() -> LabwareDefinition:
 
 
 @pytest.fixture()
-def minimal_labware_def2() -> LabwareDefinition:
+def minimal_labware_def2() -> LabwareDefinition2:
     return {
         "metadata": {
             "displayName": "other test labware",
@@ -733,14 +733,14 @@ def minimal_labware_def2() -> LabwareDefinition:
 
 
 @pytest.fixture()
-def min_lw_impl(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
+def min_lw_impl(minimal_labware_def: LabwareDefinition2) -> LegacyLabwareCore:
     return LegacyLabwareCore(
         definition=minimal_labware_def, parent=Location(Point(0, 0, 0), "deck")
     )
 
 
 @pytest.fixture()
-def min_lw2_impl(minimal_labware_def2: LabwareDefinition) -> LegacyLabwareCore:
+def min_lw2_impl(minimal_labware_def2: LabwareDefinition2) -> LegacyLabwareCore:
     return LegacyLabwareCore(
         definition=minimal_labware_def2, parent=Location(Point(0, 0, 0), "deck")
     )
@@ -795,6 +795,7 @@ def minimal_liquid_class_def1() -> LiquidClassSchemaV1:
     return LiquidClassSchemaV1(
         liquidClassName="water1",
         displayName="water 1",
+        description="some water",
         schemaVersion=1,
         namespace="test-fixture-1",
         byPipette=[],
@@ -806,6 +807,7 @@ def minimal_liquid_class_def2() -> LiquidClassSchemaV1:
     return LiquidClassSchemaV1(
         liquidClassName="water2",
         displayName="water 2",
+        description="some water",
         schemaVersion=1,
         namespace="test-fixture-2",
         byPipette=[
@@ -879,6 +881,7 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
     return LiquidClassSchemaV1(
         liquidClassName="test_water",
         displayName="Test Water",
+        description="some water",
         schemaVersion=1,
         namespace="opentrons",
         byPipette=[
@@ -986,7 +989,13 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 offset=Coordinate(x=2, y=3, z=1),
                                 speed=50,
                                 airGapByVolume=[(1.0, 0.1), (49.9, 0.1), (50.0, 0.0)],
-                                blowout=BlowoutProperties(enable=False, params=None),
+                                blowout=BlowoutProperties(
+                                    enable=False,
+                                    params=BlowoutParams(
+                                        location=BlowoutLocation.DESTINATION,
+                                        flowRate=10,
+                                    ),
+                                ),
                                 touchTip=TouchTipProperties(
                                     enable=False,
                                     params=LiquidClassTouchTipParams(

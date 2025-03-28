@@ -79,7 +79,7 @@ async def test_dispense_implementation(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=50.0,
         )
     ).then_return(Point(x=1, y=2, z=3))
 
@@ -98,8 +98,19 @@ async def test_dispense_implementation(
     ).then_return(["A3", "A4"])
 
     decoy.when(
+        state_view.pipettes.get_aspirated_volume("pipette-id-abc123")
+    ).then_return(100)
+
+    decoy.when(pipetting.get_state_view()).then_return(state_view)
+
+    decoy.when(
         await pipetting.dispense_in_place(
-            pipette_id="pipette-id-abc123", volume=50, flow_rate=1.23, push_out=None
+            pipette_id="pipette-id-abc123",
+            volume=50,
+            flow_rate=1.23,
+            push_out=None,
+            is_full_dispense=False,
+            correction_volume=0,
         )
     ).then_return(42)
     decoy.when(
@@ -128,6 +139,9 @@ async def test_dispense_implementation(
             ),
             pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
                 pipette_id="pipette-id-abc123", volume=42
+            ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id-abc123", ready_to_aspirate=True
             ),
         ),
     )
@@ -187,13 +201,20 @@ async def test_overpressure_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=50.0,
         ),
     ).then_return(position)
 
+    decoy.when(pipetting.get_state_view()).then_return(state_view)
+
     decoy.when(
         await pipetting.dispense_in_place(
-            pipette_id=pipette_id, volume=50, flow_rate=1.23, push_out=None
+            pipette_id=pipette_id,
+            volume=50,
+            flow_rate=1.23,
+            push_out=None,
+            is_full_dispense=False,
+            correction_volume=0,
         ),
     ).then_raise(PipetteOverpressureError())
 
@@ -225,6 +246,9 @@ async def test_overpressure_error(
             ),
             pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                 pipette_id="pipette-id"
+            ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id", ready_to_aspirate=False
             ),
         ),
         state_update_if_false_positive=update_types.StateUpdate(
@@ -278,7 +302,7 @@ async def test_stall_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=None,
+            operation_volume=50.0,
         ),
     ).then_raise(StallOrCollisionDetectedError())
 

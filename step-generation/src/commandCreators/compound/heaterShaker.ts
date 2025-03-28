@@ -87,11 +87,7 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
       (args.timerSeconds ?? 0) + (args.timerMinutes ?? 0) * 60
     commandCreators.push(
       curryCommandCreator(delay, {
-        commandCreatorFnName: 'delay',
-        description: null,
-        name: null,
-        meta: null,
-        wait: totalSeconds,
+        seconds: totalSeconds,
       })
     )
     commandCreators.push(

@@ -6,6 +6,11 @@ import {
   ListItem,
   StyledText,
   InfoScreen,
+  ALIGN_CENTER,
+  Icon,
+  useHoverTooltip,
+  Tooltip,
+  COLORS,
 } from '@opentrons/components'
 import { ABSORBANCE_READER_COLOR_BY_WAVELENGTH } from '../../../../../../constants'
 import type { Initialization } from '../../../../../../step-forms/types'
@@ -46,6 +51,7 @@ export function InitializationSettings(
 ): JSX.Element {
   const { initialization } = props
   const { t } = useTranslation(['application', 'form'])
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const content =
     initialization == null ? (
       <InfoScreen
@@ -58,7 +64,7 @@ export function InitializationSettings(
           const knownColor = ABSORBANCE_READER_COLOR_BY_WAVELENGTH[wavelength]
           return (
             <ListItem
-              type="noActive"
+              type="default"
               key={`listItem_${wavelength}`}
               padding={SPACING.spacing12}
             >
@@ -70,7 +76,7 @@ export function InitializationSettings(
         })}
         {initialization.referenceWavelength != null ? (
           <ListItem
-            type="noActive"
+            type="default"
             key={`listItem_${initialization.referenceWavelength}`}
             padding={SPACING.spacing12}
           >
@@ -95,11 +101,21 @@ export function InitializationSettings(
       gridGap={SPACING.spacing4}
       width="100%"
     >
-      <StyledText desktopStyle="bodyDefaultSemiBold">
-        {t(
-          'form:step_edit_form.absorbanceReader.current_initialization_settings'
-        )}
-      </StyledText>
+      <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
+        <StyledText desktopStyle="bodyDefaultSemiBold">
+          {t(
+            'form:step_edit_form.absorbanceReader.current_initialization_settings.title'
+          )}
+        </StyledText>
+        <Flex {...targetProps}>
+          <Icon size="1rem" name="information" color={COLORS.grey60} />
+        </Flex>
+        <Tooltip tooltipProps={tooltipProps}>
+          {t(
+            'form:step_edit_form.absorbanceReader.current_initialization_settings.tooltip'
+          )}
+        </Tooltip>
+      </Flex>
       {content}
     </Flex>
   )

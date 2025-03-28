@@ -79,7 +79,6 @@ export function getModuleUnderLabware(
     return location === moduleOnDeck.id
   })
 }
-// @ts-expect-error Flex stacker not yet supported in PD
 export const getModuleShortNames = (type: ModuleType): string => {
   switch (type) {
     case HEATERSHAKER_MODULE_TYPE:
@@ -94,6 +93,11 @@ export const getModuleShortNames = (type: ModuleType): string => {
       return 'Thermocycler'
     case ABSORBANCE_READER_TYPE:
       return 'Absorbance Plate Reader'
+    default:
+      console.warn(
+        `unsupported module ${type} - need to add to getModuleShortNames`
+      )
+      return 'unsupported module'
   }
 }
 

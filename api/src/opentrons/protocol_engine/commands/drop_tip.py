@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from ..state.state import StateView
     from ..execution import MovementHandler, TipHandler
 
+from opentrons.hardware_control.types import TipScrapeType
 
 DropTipCommandType = Literal["dropTip"]
 
@@ -69,6 +70,16 @@ class DropTipParams(PipetteIdMixin):
             " between dropping tips at two predetermined locations inside the specified"
             " labware well."
             " If False, the tip will be dropped at the top center of the well."
+        ),
+        json_schema_extra=_remove_default,
+    )
+    scrape_tips: bool | SkipJsonSchema[None] = Field(
+        False,
+        description=(
+            "Whether or not to scrape off the tips with the ejector all the way down."
+            " If True, and the target location is a tip rack well, it will move the pipette."
+            " Towards the center of the tip rack with the ejector in the 'drop_tip' position."
+            " If False, no horizontal movement will occur."
         ),
         json_schema_extra=_remove_default,
     )
@@ -140,9 +151,20 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
         if isinstance(move_result, DefinedErrorData):
             return move_result
 
+        scrape_type = TipScrapeType.NONE
+        if (
+            params.scrape_tips
+            and self._state_view.geometry._labware.get_definition(
+                labware_id
+            ).parameters.isTiprack
+        ):
+            if int("".join(filter(str.isdigit, well_name))) <= 6:
+                scrape_type = TipScrapeType.RIGHT_ONE_COL
+            else:
+                scrape_type = TipScrapeType.LEFT_ONE_COL
         try:
             await self._tip_handler.drop_tip(
-                pipette_id=pipette_id, home_after=home_after
+                pipette_id=pipette_id, home_after=home_after, scrape_type=scrape_type
             )
         except TipAttachedError as exception:
             error = TipPhysicallyAttachedError(

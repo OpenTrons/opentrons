@@ -2,7 +2,7 @@ import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
 
 import { getLabwareDefinitionUri } from '/app/transformations/protocols'
 import {
-  getLabwareOffsetLocation,
+  getLegacyLabwareOffsetLocation,
   getCurrentOffsetForLabwareInLocation,
 } from '/app/transformations/analysis'
 import {
@@ -29,7 +29,7 @@ export function useLabwareOffsetForLabware(
     labwareDefinitionsByUri
   )
 
-  const labwareLocation = getLabwareOffsetLocation(
+  const labwareLocation = getLegacyLabwareOffsetLocation(
     labwareId,
     mostRecentAnalysis?.commands ?? [],
     mostRecentAnalysis?.modules ?? [],

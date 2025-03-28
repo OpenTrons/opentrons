@@ -163,7 +163,7 @@ interface RetractAxisParams {
   axis: MotorAxis
 }
 
-interface AddressableOffsetVector {
+export interface AddressableOffsetVector {
   x: number
   y: number
   z: number

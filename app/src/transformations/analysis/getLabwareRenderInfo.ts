@@ -5,6 +5,8 @@ import type {
   LabwareDefinition2,
   LoadLabwareRunTimeCommand,
   ProtocolAnalysisOutput,
+  LoadLidRunTimeCommand,
+  LoadLidStackRunTimeCommand,
 } from '@opentrons/shared-data'
 
 export interface LabwareRenderInfoById {
@@ -23,14 +25,22 @@ export const getLabwareRenderInfo = (
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
+    .filter((command): command is
+      | LoadLabwareRunTimeCommand
+      | LoadLidRunTimeCommand
+      | LoadLidStackRunTimeCommand =>
+      ['loadLabware', 'loadLid', 'loadLidStack'].includes(command.commandType)
     )
     .reduce((acc, command) => {
-      const labwareId = command.result?.labwareId
+      const labwareId =
+        command.commandType === 'loadLidStack'
+          ? command.result?.labwareIds[0]
+          : command.result?.labwareId
       const location = command.params.location
-      const displayName = command.params.displayName ?? null
+      const displayName =
+        command.commandType === 'loadLabware'
+          ? command.params?.displayName ?? null
+          : null
       const labwareDef = command.result?.definition
       if (
         location === 'offDeck' ||

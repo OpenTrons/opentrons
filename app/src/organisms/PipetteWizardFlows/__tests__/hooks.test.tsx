@@ -200,7 +200,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
       }
     )
     expect(result.current).toEqual(
-      'Detach Flex 1-Channel 1000 μL and Attach 96-Channel Pipette'
+      'Detach Flex 1-Channel 1000 µL and Attach 96-Channel Pipette'
     )
   })
   it('should return correct title for detaching single mount', () => {

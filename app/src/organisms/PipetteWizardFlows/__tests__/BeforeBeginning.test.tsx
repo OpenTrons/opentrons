@@ -191,7 +191,7 @@ describe('BeforeBeginning', () => {
       screen.getByText(
         'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
       )
-      screen.getByAltText('Flex 1-Channel 1000 μL')
+      screen.getByAltText('Flex 1-Channel 1000 µL')
       screen.getByText('You will need:')
       screen.getByAltText('Calibration Probe')
       screen.getByAltText('2.5 mm Hex Screwdriver')
@@ -449,7 +449,7 @@ describe('BeforeBeginning', () => {
       )
       screen.getByAltText('2.5 mm Hex Screwdriver')
       screen.getByAltText('Calibration Probe')
-      screen.getByAltText('Flex 96-Channel 1000 μL')
+      screen.getByAltText('Flex 96-Channel 1000 µL')
       screen.getByAltText('96-Channel Mounting Plate')
       screen.getByText(
         'Provided with the robot. Using another size can strip the instruments’s screws.'

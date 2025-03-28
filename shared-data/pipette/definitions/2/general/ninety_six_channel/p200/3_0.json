@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 96-Channel 200 μL",
+  "displayName": "Flex 96-Channel 200 µL",
   "model": "p200",
   "displayCategory": "FLEX",
   "validNozzleMaps": {

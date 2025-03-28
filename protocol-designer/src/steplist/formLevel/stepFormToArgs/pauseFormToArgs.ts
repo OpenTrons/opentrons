@@ -13,7 +13,9 @@ import type {
 export const pauseFormToArgs = (
   formData: HydratedPauseFormData
 ): PauseArgs | WaitForTemperatureArgs | null => {
-  const { hours, minutes, seconds } = getTimeFromForm(formData, 'pauseTime')
+  const { hours, minutes, seconds } = getTimeFromForm(
+    'pauseTime' in formData ? formData.pauseTime ?? null : null
+  )
   const totalSeconds = (hours ?? 0) * 3600 + minutes * 60 + seconds
   const temperature = parseFloat(formData.pauseTemperature as string)
   const message = formData.pauseMessage ?? ''
@@ -34,7 +36,7 @@ export const pauseFormToArgs = (
         commandCreatorFnName: 'delay',
         name: formData.stepName,
         description: formData.stepDetails ?? '',
-        wait: totalSeconds,
+        seconds: totalSeconds,
         message,
         meta: {
           hours,
@@ -48,7 +50,6 @@ export const pauseFormToArgs = (
         commandCreatorFnName: 'delay',
         name: formData.stepName,
         description: formData.stepDetails ?? '',
-        wait: true,
         message,
         meta: {
           hours,

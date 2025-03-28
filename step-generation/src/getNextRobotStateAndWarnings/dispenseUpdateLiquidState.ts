@@ -1,6 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import { COLUMN } from '@opentrons/shared-data'
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
 import {
   splitLiquid,
   mergeLiquid,
@@ -44,10 +44,18 @@ export function dispenseUpdateLiquidState(
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
-  const channels = nozzles === COLUMN ? 8 : pipetteSpec.channels
-  const trashId = Object.values(
-    invariantContext.additionalEquipmentEntities
-  ).find(aE => aE.name === 'wasteChute' || aE.name === 'trashBin')?.id
+  let channels = pipetteSpec.channels
+  if (nozzles === COLUMN) {
+    channels = 8
+  } else if (nozzles === SINGLE) {
+    channels = 1
+  }
+  //  TODO: fix this bug, i guess if both entities exist, we default to updating liquid state
+  //  into the first one listed which is wrong if the user is using the 2nd one listed
+  const trashId =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
+      ? Object.keys(invariantContext.wasteChuteEntities)[0]
+      : Object.keys(invariantContext.trashBinEntities)[0]
 
   const sourceId =
     labwareId != null
@@ -82,10 +90,13 @@ export function dispenseUpdateLiquidState(
     prevLiquidState.labware[sourceId] != null
       ? prevLiquidState.labware[sourceId]
       : null
-  const liquidTrash =
-    prevLiquidState.additionalEquipment[sourceId] != null
-      ? prevLiquidState.additionalEquipment[sourceId]
-      : null
+
+  let liquidTrash: LocationLiquidState | null = null
+  if (prevLiquidState.trashBins[sourceId] != null) {
+    liquidTrash = prevLiquidState.trashBins[sourceId]
+  } else if (prevLiquidState.wasteChute[sourceId] != null) {
+    liquidTrash = prevLiquidState.wasteChute[sourceId]
+  }
 
   // remove liquid from pipette tips,
   // create intermediate object where sources are updated tip liquid states
@@ -160,13 +171,8 @@ export function dispenseUpdateLiquidState(
     ? mergeLiquidtoSingleWell
     : mergeTipLiquidToOwnWell
   prevLiquidState.pipettes[pipetteId] = mapValues(splitLiquidStates, 'source')
-  if (
-    prevLiquidState.additionalEquipment[sourceId] != null &&
-    labwareLiquidState != null
-  ) {
-    prevLiquidState.additionalEquipment[sourceId] = Object.assign(
-      labwareLiquidState
-    )
+  if (liquidTrash != null && labwareLiquidState != null) {
+    liquidTrash = Object.assign(labwareLiquidState)
   } else if (
     prevLiquidState.labware[sourceId] != null &&
     labwareLiquidState != null

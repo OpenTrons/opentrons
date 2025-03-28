@@ -14,7 +14,7 @@ from decoy import Decoy
 
 
 from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 from opentrons.protocol_engine import commands
 from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
@@ -71,7 +71,7 @@ def test_add_labware_definition(
     subject: SyncClient,
 ) -> None:
     """It should add a labware definition."""
-    labware_definition = LabwareDefinition.model_construct(namespace="hello")  # type: ignore[call-arg]
+    labware_definition = LabwareDefinition2.model_construct(namespace="hello")  # type: ignore[call-arg]
     expected_labware_uri = LabwareUri("hello/world/123")
 
     decoy.when(

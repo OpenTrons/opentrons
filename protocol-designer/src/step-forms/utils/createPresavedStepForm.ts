@@ -1,6 +1,7 @@
 import last from 'lodash/last'
 import {
   ABSORBANCE_READER_TYPE,
+  ALL,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -26,11 +27,17 @@ import type {
   RobotState,
   Timeline,
   AdditionalEquipmentEntities,
+  AbsorbanceReaderState,
 } from '@opentrons/step-generation'
 import type { FormData, StepType, StepIdType } from '../../form-types'
 import type { InitialDeckSetup } from '../types'
 import type { FormPatch } from '../../steplist/actions/types'
 import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
+import {
+  ABSORBANCE_READER_READ,
+  ABSORBANCE_READER_INITIALIZE,
+  ABSORBANCE_READER_LID,
+} from '../../constants'
 
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType
@@ -75,6 +82,32 @@ const _patchDefaultPipette = (args: {
     const updatedFields = handleFormChange(
       {
         pipette: defaultPipetteId,
+      },
+      formData,
+      pipetteEntities,
+      labwareEntities
+    )
+    return updatedFields
+  }
+
+  return null
+}
+
+const _patchDefaultNozzle = (args: {
+  labwareEntities: LabwareEntities
+  pipetteEntities: PipetteEntities
+}): FormUpdater => formData => {
+  const { labwareEntities, pipetteEntities } = args
+  const hasPartialTipSupportedChannel = Object.values(pipetteEntities).find(
+    pip => pip.spec.channels === 96 || pip.spec.channels === 8
+  )
+
+  const formHasNozzlesField = formData && 'nozzles' in formData
+
+  if (formHasNozzlesField && hasPartialTipSupportedChannel) {
+    const updatedFields = handleFormChange(
+      {
+        nozzles: ALL,
       },
       formData,
       pipetteEntities,
@@ -290,22 +323,47 @@ const _patchAbsorbanceReaderModuleId = (args: {
   orderedStepIds: OrderedStepIdsState
   savedStepForms: SavedStepFormState
   stepType: StepType
+  robotStateTimeline: Timeline
 }): FormUpdater => () => {
-  const { initialDeckSetup, stepType } = args
+  const { initialDeckSetup, stepType, robotStateTimeline } = args
   const numOfModules =
     Object.values(initialDeckSetup.modules).filter(
       module => module.type === ABSORBANCE_READER_TYPE
     )?.length ?? 1
   const hasAbsorbanceReaderModuleId = stepType === 'absorbanceReader'
 
+  const robotState: RobotState | null =
+    last(robotStateTimeline.timeline)?.robotState ?? null
+
+  const modules = robotState?.modules ?? {}
+  const labware = robotState?.labware ?? {}
+
+  // pre-select form type if module is set
   if (hasAbsorbanceReaderModuleId && numOfModules === 1) {
     const moduleId =
       getModuleOnDeckByType(initialDeckSetup, ABSORBANCE_READER_TYPE)?.id ??
       null
-    if (moduleId != null) {
-      return {
-        moduleId,
-      }
+
+    if (moduleId == null) {
+      return null
+    }
+
+    const isLabwareOnAbsorbanceReader = Object.values(labware).some(
+      lw => lw.slot === moduleId
+    )
+    const absorbanceReaderState = modules[moduleId]
+      ?.moduleState as AbsorbanceReaderState | null
+    const initialization = absorbanceReaderState?.initialization ?? null
+    const enableReadOrInitialization =
+      !isLabwareOnAbsorbanceReader || initialization != null
+    const compoundCommandType = isLabwareOnAbsorbanceReader
+      ? ABSORBANCE_READER_READ
+      : ABSORBANCE_READER_INITIALIZE
+    return {
+      moduleId,
+      absorbanceReaderFormType: enableReadOrInitialization
+        ? compoundCommandType
+        : ABSORBANCE_READER_LID,
     }
   }
 
@@ -347,6 +405,21 @@ const _patchThermocyclerFields = (args: {
   }
 }
 
+const _patchMoveLabwareFields = (args: {
+  additionalEquipmentEntities: AdditionalEquipmentEntities
+  stepType: StepType
+}): FormUpdater => () => {
+  const { additionalEquipmentEntities, stepType } = args
+  const isMoveLabware = stepType === 'moveLabware'
+  const hasGripper = Object.values(additionalEquipmentEntities).some(
+    ({ name }) => name === 'gripper'
+  )
+  if (isMoveLabware && hasGripper) {
+    return { useGripper: true }
+  }
+  return null
+}
+
 export const createPresavedStepForm = ({
   initialDeckSetup,
   labwareEntities,
@@ -361,6 +434,11 @@ export const createPresavedStepForm = ({
   const formData = createBlankForm({
     stepId,
     stepType,
+  })
+
+  const updateDefaultNozzles = _patchDefaultNozzle({
+    labwareEntities,
+    pipetteEntities,
   })
 
   const updateDefaultDropTip = _patchDefaultDropTipLocation({
@@ -409,12 +487,18 @@ export const createPresavedStepForm = ({
     orderedStepIds,
     savedStepForms,
     stepType,
+    robotStateTimeline,
   })
 
   const updateThermocyclerFields = _patchThermocyclerFields({
     initialDeckSetup,
     stepType,
     robotStateTimeline,
+  })
+
+  const updateMoveLabwareFields = _patchMoveLabwareFields({
+    additionalEquipmentEntities,
+    stepType,
   })
 
   // finally, compose and apply all the updaters in order,
@@ -428,6 +512,8 @@ export const createPresavedStepForm = ({
     updateMagneticModuleId,
     updateAbsorbanceReaderModuleId,
     updateDefaultLabwareLocations,
+    updateMoveLabwareFields,
+    updateDefaultNozzles,
   ].reduce<FormData>(
     (acc, updater: FormUpdater) => {
       const updates = updater(acc)

@@ -1,0 +1,28 @@
+name: 'Setup JS Environment'
+description: >
+  Composite action to fix tag handling in checkout,
+  setup Node.js, install udev for USB detection, cache Yarn/NPM caches,
+  and perform JS setup.
+
+inputs: {}
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: ./.github/actions/git/resolve-tag
+    - uses: ./.github/actions/environment/complex-variables
+    - name: 'Setup Node'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.11.0'
+        cache: 'yarn'
+
+    - name: 'Install udev for USB-detection'
+      if: runner.os == 'Linux'
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install libudev-dev
+
+    - name: 'Setup JS'
+      shell: bash
+      run: |
+        make setup-js

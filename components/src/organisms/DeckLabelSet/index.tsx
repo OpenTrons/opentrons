@@ -46,7 +46,7 @@ const DeckLabelSetComponent = (
           ? deckLabels.map((deckLabel, index) => (
               <DeckLabel
                 key={`DeckLabel_${index}`}
-                maxWidth={`calc(${width}px - ${SPACING.spacing16})`}
+                maxWidth={`calc(${width}px - 8px)`}
                 {...deckLabel}
                 isLast={deckLabels.length - 1 === index}
               />
@@ -72,7 +72,7 @@ const StyledBox = styled(Box)<StyledBoxProps>`
 `
 
 const LabelContainer = styled.div`
-  padding-left: ${SPACING.spacing12};
+  padding-left: ${SPACING.spacing8};
   & > *:not(:first-child):not(:last-child) {
     border-bottom-right-radius: ${BORDERS.borderRadius4};
     border-top-right-radius: ${BORDERS.borderRadius4};
@@ -82,8 +82,12 @@ const LabelContainer = styled.div`
     border-bottom-right-radius: ${BORDERS.borderRadius4};
   }
 
+  & > *:not(:first-child) {
+    border-top-right-radius: ${BORDERS.borderRadius4};
+    border-bottom-right-radius: ${BORDERS.borderRadius4};
+  }
+
   & > *:last-child {
     border-bottom-left-radius: ${BORDERS.borderRadius4};
-    border-bottom-right-radius: ${BORDERS.borderRadius4};
   }
 `

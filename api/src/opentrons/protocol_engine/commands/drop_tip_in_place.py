@@ -1,11 +1,16 @@
 """Drop tip in place command request, result, and implementation models."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Type, Any
+from typing import TYPE_CHECKING, Optional, Type, Any, Union
 
 from pydantic import Field, BaseModel
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal
+
+from opentrons_shared_data.errors.exceptions import (
+    PipetteOverpressureError,
+    StallOrCollisionDetectedError,
+)
 
 from .command import (
     AbstractCommandImpl,
@@ -14,7 +19,12 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from .pipetting_common import PipetteIdMixin, TipPhysicallyAttachedError
+from .movement_common import StallOrCollisionError
+from .pipetting_common import (
+    PipetteIdMixin,
+    TipPhysicallyAttachedError,
+    OverpressureError,
+)
 from ..errors.exceptions import TipAttachedError
 from ..errors.error_occurrence import ErrorOccurrence
 from ..resources.model_utils import ModelUtils
@@ -51,9 +61,12 @@ class DropTipInPlaceResult(BaseModel):
     pass
 
 
-_ExecuteReturn = (
-    SuccessData[DropTipInPlaceResult] | DefinedErrorData[TipPhysicallyAttachedError]
-)
+_ExecuteReturn = Union[
+    SuccessData[DropTipInPlaceResult]
+    | DefinedErrorData[TipPhysicallyAttachedError]
+    | DefinedErrorData[OverpressureError]
+    | DefinedErrorData[StallOrCollisionError]
+]
 
 
 class DropTipInPlaceImplementation(
@@ -105,6 +118,50 @@ class DropTipInPlaceImplementation(
                 state_update=state_update,
                 state_update_if_false_positive=state_update_if_false_positive,
             )
+        except PipetteOverpressureError as exception:
+            state_update_if_false_positive = update_types.StateUpdate()
+            state_update_if_false_positive.update_pipette_tip_state(
+                pipette_id=params.pipetteId, tip_geometry=None
+            )
+            state_update.set_fluid_unknown(pipette_id=params.pipetteId)
+            return DefinedErrorData(
+                public=OverpressureError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=exception,
+                        )
+                    ],
+                    errorInfo={"retryLocation": retry_location},
+                ),
+                state_update=state_update,
+                state_update_if_false_positive=state_update_if_false_positive,
+            )
+        except StallOrCollisionDetectedError as exception:
+            state_update_if_false_positive = update_types.StateUpdate()
+            state_update_if_false_positive.update_pipette_tip_state(
+                pipette_id=params.pipetteId, tip_geometry=None
+            )
+            state_update.set_fluid_unknown(pipette_id=params.pipetteId)
+            return DefinedErrorData(
+                public=StallOrCollisionError(
+                    id=self._model_utils.generate_id(),
+                    createdAt=self._model_utils.get_timestamp(),
+                    wrappedErrors=[
+                        ErrorOccurrence.from_failed(
+                            id=self._model_utils.generate_id(),
+                            createdAt=self._model_utils.get_timestamp(),
+                            error=exception,
+                        )
+                    ],
+                    errorInfo={"retryLocation": retry_location},
+                ),
+                state_update=state_update,
+                state_update_if_false_positive=state_update_if_false_positive,
+            )
         else:
             state_update.set_fluid_unknown(pipette_id=params.pipetteId)
             state_update.update_pipette_tip_state(
@@ -114,7 +171,11 @@ class DropTipInPlaceImplementation(
 
 
 class DropTipInPlace(
-    BaseCommand[DropTipInPlaceParams, DropTipInPlaceResult, TipPhysicallyAttachedError]
+    BaseCommand[
+        DropTipInPlaceParams,
+        DropTipInPlaceResult,
+        TipPhysicallyAttachedError | OverpressureError | StallOrCollisionError,
+    ]
 ):
     """Drop tip in place command model."""
 

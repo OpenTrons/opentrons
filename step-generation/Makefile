@@ -3,10 +3,10 @@
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-# These variables can be overriden when make is invoked to customize the
+# These variables can be overridden when make is invoked to customize the
 # behavior of jest
 tests ?=
-cov_opts ?= --coverage=true
+cov_opts ?= --coverage --pool=threads
 test_opts ?=
 
 .PHONY: test

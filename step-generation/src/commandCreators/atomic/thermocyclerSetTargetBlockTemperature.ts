@@ -11,6 +11,7 @@ export const thermocyclerSetTargetBlockTemperature: CommandCreator<TemperaturePa
       `'volume' param not implemented for thermocycler/setTargetBlockTemperature, should not be set!`
     )
   }
+  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
 
   return {
     commands: [
@@ -24,5 +25,6 @@ export const thermocyclerSetTargetBlockTemperature: CommandCreator<TemperaturePa
         },
       },
     ],
+    python: `${pythonName}.set_block_temperature(${args.celsius})`,
   }
 }

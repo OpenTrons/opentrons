@@ -37,6 +37,7 @@ beforeEach(() => {
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
       tiprackModel: ['tiprack-10ul'],
       tiprackLabwareDef: [fixtureTiprack10ul],
+      pythonName: 'mockPythonName',
     },
     otherPipetteId: {
       name: 'p300_single_gen2',
@@ -44,6 +45,7 @@ beforeEach(() => {
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
       tiprackModel: ['tiprack-300ul'],
       tiprackLabwareDef: [fixtureTiprack300ul],
+      pythonName: 'mockPythonName',
     },
   }
   labwareEntities = {}

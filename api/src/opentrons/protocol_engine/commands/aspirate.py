@@ -12,6 +12,7 @@ from .pipetting_common import (
     BaseLiquidHandlingResult,
     aspirate_in_place,
     prepare_for_aspirate,
+    DEFAULT_CORRECTION_VOLUME,
 )
 from .movement_common import (
     LiquidHandlingWellLocationMixin,
@@ -151,7 +152,6 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
                 labware_id=labware_id,
                 well_name=well_name,
             )
-
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
@@ -182,6 +182,7 @@ class AspirateImplementation(AbstractCommandImpl[AspirateParams, _ExecuteReturn]
             command_note_adder=self._command_note_adder,
             pipetting=self._pipetting,
             model_utils=self._model_utils,
+            correction_volume=params.correctionVolume or DEFAULT_CORRECTION_VOLUME,
         )
         state_update.append(aspirate_result.state_update)
         if isinstance(aspirate_result, DefinedErrorData):

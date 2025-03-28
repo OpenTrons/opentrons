@@ -7,7 +7,7 @@ from enum import Enum
 
 from typing_extensions import TypedDict, Literal
 from ..pipette.types import PipetteName
-from ..labware.types import LabwareDefinition
+from ..labware.types import LabwareDefinition2
 from ..module.types import ModuleModel
 
 SlotSpan = Literal["span7_8_10_11"]
@@ -392,7 +392,7 @@ JsonProtocolV4 = TypedDict(
         "robot": RobotRequirement,
         "pipettes": Dict[str, PipetteRequirement],
         "labware": Dict[str, LabwareRequirement],
-        "labwareDefinitions": Dict[str, LabwareDefinition],
+        "labwareDefinitions": Dict[str, LabwareDefinition2],
         "modules": Dict[str, ModuleRequirement],
         "commands": List[Command],
         "commandAnnotations": Dict[str, Any],
@@ -410,7 +410,7 @@ JsonProtocolV5 = TypedDict(
         "robot": RobotRequirement,
         "pipettes": Dict[str, PipetteRequirement],
         "labware": Dict[str, LabwareRequirement],
-        "labwareDefinitions": Dict[str, LabwareDefinition],
+        "labwareDefinitions": Dict[str, LabwareDefinition2],
         "modules": Dict[str, ModuleRequirement],
         "commands": List[Command],
         "commandAnnotations": Dict[str, Any],
@@ -426,7 +426,7 @@ class JsonProtocolV3(TypedDict, total=False):
     robot: RobotRequirement
     pipettes: Dict[str, PipetteRequirement]
     labware: Dict[str, LabwareRequirement]
-    labwareDefinitions: Dict[str, LabwareDefinition]
+    labwareDefinitions: Dict[str, LabwareDefinition2]
     commands: List[V3Command]
     commandAnnotations: Dict[str, Any]
     designerApplication: DesignerApplication

@@ -374,7 +374,7 @@ class StateStore(StateView, ActionHandler):
         self._addressable_areas = AddressableAreaView(state.addressable_areas)
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
-        self._modules = ModuleView(state.modules)
+        self._modules = ModuleView(state=state.modules)
         self._liquid = LiquidView(state.liquids)
         self._liquid_classes = LiquidClassView(state.liquid_classes)
         self._tips = TipView(state.tips)

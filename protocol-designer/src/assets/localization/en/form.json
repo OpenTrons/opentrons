@@ -23,7 +23,11 @@
   "liquid_placement": {
     "liquid": "Liquid",
     "volume": "Volume",
-    "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
+    "errors": {
+      "liquid_required": "Define a liquid",
+      "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL",
+      "volume_required": "Define a volume"
+    }
   },
   "pipette_mount_label": {
     "left": "(L)",
@@ -36,7 +40,10 @@
         "label": "Add a wavelength"
       },
       "color_parentheses": "({{color}})",
-      "current_initialization_settings": "Current initialization settings",
+      "current_initialization_settings": {
+        "title": "Current initialization settings",
+        "tooltip": "Module must be empty to change initialization settings"
+      },
       "custom_wavelength": {
         "caption": "Value between 350 - 1000 nm",
         "label": "Custom wavelength"
@@ -47,7 +54,7 @@
         "wavelength_out_of_range": "Value falls outside of accepted range"
       },
       "export_settings": {
-        "description": "A .csv file will appear upon protocol completion in your downloads folder.",
+        "description": "Absorbance Plate Reader data is saved as a .csv file and can be found on the robot's detail page in the Desktop App.",
         "title": "Export settings"
       },
       "initialization_setting": {
@@ -191,7 +198,7 @@
           "COLUMN": "Column"
         },
         "option_tooltip": {
-          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
+          "partial": "To use partial tip pickup, a tiprack without an adapter must be placed on the deck."
         }
       },
       "path": {
@@ -227,6 +234,13 @@
       },
       "preWetTip": {
         "label": "pre-wet tip"
+      },
+      "pushOut": {
+        "pushOut_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Push out volume"
+        },
+        "title": "Push out"
       },
       "setTemperature": {
         "options": {
@@ -307,6 +321,13 @@
       },
       "touchTip": {
         "label": "touch tip"
+      },
+      "touchTip_speed": {
+        "label": "Touch tip speed"
+      },
+      "touchTip_mmFromEdge": {
+        "caption": "Valid range between {{min}} - {{max}}mm",
+        "label": "Distance from edge"
       },
       "useGripper": {
         "label": "use gripper",

@@ -13,6 +13,7 @@
 !api/release-notes.md
 !app-shell/build/release-notes.md
 **/.yarn-cache/**
+protocol-designer/cypress/downloads/**
 
 # components library
 storybook-static
@@ -36,5 +37,7 @@ abr-testing/protocols/**
 analyses-snapshot-testing/files
 # don't format the snapshots
 analyses-snapshot-testing/tests/__snapshots__
+analyses-snapshot-testing/analysis_results
+
 opentrons-ai-server/package
 opentrons-ai-server/api/storage/index/

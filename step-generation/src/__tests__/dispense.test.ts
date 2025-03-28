@@ -2,6 +2,7 @@ import { when } from 'vitest-when'
 import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest'
 import { OT2_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 import {
+  absorbanceReaderCollision,
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
@@ -21,9 +22,10 @@ import {
   SOURCE_LABWARE,
 } from '../fixtures'
 import { dispense } from '../commandCreators/atomic/dispense'
-import type { ExtendedDispenseParams } from '../commandCreators/atomic/dispense'
+import type { DispenseAtomicCommandParams } from '../commandCreators/atomic/dispense'
 import type { InvariantContext, RobotState } from '../types'
 
+vi.mock('../utils/absorbanceReaderCollision')
 vi.mock('../utils/thermocyclerPipetteCollision')
 vi.mock('../utils/heaterShakerCollision')
 
@@ -43,17 +45,18 @@ describe('dispense', () => {
     vi.resetAllMocks()
   })
   describe('tip tracking & commands:', () => {
-    let params: ExtendedDispenseParams
+    let params: DispenseAtomicCommandParams
     beforeEach(() => {
       params = {
-        pipette: DEFAULT_PIPETTE,
+        pipetteId: DEFAULT_PIPETTE,
         volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
-        offsetFromBottomMm: 5,
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
+        wellLocation: {
+          origin: 'bottom',
+          offset: { z: 5, x: 0, y: 0 },
+        },
         flowRate: 6,
-        xOffset: 0,
-        yOffset: 0,
         tipRack: 'tiprack1Id',
         nozzles: null,
       }
@@ -81,6 +84,14 @@ describe('dispense', () => {
           },
         },
       ])
+      expect(getSuccessResult(result).python).toBe(
+        `
+mockPythonName.dispense(
+    volume=50,
+    location=mockPythonName["A1"].bottom(z=5),
+    rate=6 / mockPythonName.flow_rate.dispense,
+)`.trimStart()
+      )
     })
     it('dispensing without tip should throw error', () => {
       const result = dispense(params, invariantContext, initialRobotState)
@@ -97,13 +108,14 @@ describe('dispense', () => {
       const result = dispense(
         {
           flowRate: 10,
-          offsetFromBottomMm: 5,
-          pipette: DEFAULT_PIPETTE,
+          wellLocation: {
+            origin: 'bottom',
+            offset: { z: 5, x: 0, y: 0 },
+          },
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
-          xOffset: 0,
-          yOffset: 0,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
           tipRack: 'tiprack1Id',
           nozzles: null,
         },
@@ -117,7 +129,7 @@ describe('dispense', () => {
     })
     it('dispense to nonexistent labware should throw error', () => {
       const result = dispense(
-        { ...params, labware: 'someBadLabwareId' },
+        { ...params, labwareId: 'someBadLabwareId' },
         invariantContext,
         robotStateWithTip
       )
@@ -158,6 +170,26 @@ describe('dispense', () => {
       expect(res.errors).toHaveLength(1)
       expect(res.errors[0]).toMatchObject({
         type: 'THERMOCYCLER_LID_CLOSED',
+      })
+    })
+    it('should return an error when dispensing into absorbance reader with pipette collision', () => {
+      vi.mocked(absorbanceReaderCollision).mockImplementationOnce(
+        (
+          modules: RobotState['modules'],
+          labware: RobotState['labware'],
+          labwareId: string
+        ) => {
+          expect(modules).toBe(robotStateWithTip.modules)
+          expect(labware).toBe(robotStateWithTip.labware)
+          expect(labwareId).toBe(SOURCE_LABWARE)
+          return true
+        }
+      )
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      const res = getErrorResult(result)
+      expect(res.errors).toHaveLength(1)
+      expect(res.errors[0]).toMatchObject({
+        type: 'ABSORBANCE_READER_LID_CLOSED',
       })
     })
     it('should return an error when dispensing into heater shaker with latch open', () => {

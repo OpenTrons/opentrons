@@ -1,4 +1,4 @@
-import { createRegularLabware } from '@opentrons/shared-data'
+import { createRegularLabware, getModuleDef2 } from '@opentrons/shared-data'
 
 import { DISPLAY_VOLUME_UNITS } from './fields'
 import { getIsCustomTubeRack } from './utils'
@@ -11,6 +11,7 @@ import type {
   LabwareDisplayCategory,
   LabwareWellProperties,
   LabwareOffset,
+  ModuleModel,
 } from '@opentrons/shared-data'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
@@ -121,11 +122,15 @@ export function fieldsToLabware(
     })
     const stackingOffsetWithModule: Record<string, LabwareOffset> = {}
     Object.entries(compatibleModules).forEach(([moduleModel, z]) => {
+      const moduleDefinition = getModuleDef2(moduleModel as ModuleModel)
       return (stackingOffsetWithModule[moduleModel] = {
         x: 0,
         y: 0,
         //  ensure that z is a number!
-        z: fields.labwareZDimension - parseFloat(String(z)),
+        z:
+          fields.labwareZDimension -
+          parseFloat(String(z)) +
+          moduleDefinition.labwareOffset.z,
       })
     })
 

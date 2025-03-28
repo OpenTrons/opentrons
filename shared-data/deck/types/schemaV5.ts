@@ -142,6 +142,7 @@ export type FlexModuleCutoutFixtureId =
   | 'thermocyclerModuleV2Front'
   | 'absorbanceReaderV1'
   | 'flexStackerModuleV1'
+  | 'flexStackerModuleV1WithMagneticBlockV1'
 
 export type OT2SingleStandardSlot = 'singleStandardSlot'
 

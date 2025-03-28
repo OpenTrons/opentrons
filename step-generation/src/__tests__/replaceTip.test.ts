@@ -19,7 +19,7 @@ import {
   DEFAULT_PIPETTE,
   PIPETTE_96,
 } from '../fixtures'
-import { replaceTip } from '../commandCreators/atomic/replaceTip'
+import { replaceTip } from '../commandCreators/compound/replaceTip'
 import { FIXED_TRASH_ID } from '../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
@@ -203,9 +203,9 @@ describe('replaceTip', () => {
     it('Single-channel: dropping tips in waste chute', () => {
       invariantContext = {
         ...invariantContext,
-        additionalEquipmentEntities: {
+        wasteChuteEntities: {
           wasteChuteId: {
-            name: 'wasteChute',
+            pythonName: 'waste_chute',
             id: wasteChuteId,
             location: 'cutoutD3',
           },
@@ -318,9 +318,9 @@ describe('replaceTip', () => {
       invariantContext = {
         ...invariantContext,
 
-        additionalEquipmentEntities: {
+        wasteChuteEntities: {
           wasteChuteId: {
-            name: 'wasteChute',
+            pythonName: 'waste_chute',
             id: wasteChuteId,
             location: 'cutoutD3',
           },

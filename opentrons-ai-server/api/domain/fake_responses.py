@@ -32,7 +32,7 @@ pcr_flex: ChatResponse = ChatResponse(
     fake=True,
 )
 
-no_markdown: ChatResponse = ChatResponse(reply="👀 at me I am a response without markdown! 😊 99.99μl", fake=True)
+no_markdown: ChatResponse = ChatResponse(reply="👀 at me I am a response without markdown! 😊 99.99µl", fake=True)
 
 empty_reply: ChatResponse = ChatResponse(reply="", fake=True)
 

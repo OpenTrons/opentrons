@@ -3,7 +3,7 @@ from copy import deepcopy
 from typing import Any, Callable, Dict, List, Tuple
 import typing
 from opentrons.protocol_api.core.well import AbstractWellCore
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons_shared_data.protocol.types import (
     BlowoutParams,
     DelayParams,
@@ -65,7 +65,7 @@ def test_load_pipettes_from_json() -> None:
     assert result == {"aID": ("p10_single", "left"), "bID": ("p50_single", "right")}  # type: ignore[comparison-overlap]
 
 
-def test_get_well(minimal_labware_def2: LabwareDefinition) -> None:
+def test_get_well(minimal_labware_def2: LabwareDefinition2) -> None:
     deck = Location(Point(0, 0, 0), "deck")
     mock_core = mock.create_autospec(AbstractWellCore)
     mock_map = mock.create_autospec(LoadedCoreMap)
@@ -142,7 +142,7 @@ def test_get_location_with_offset(min_lw2: labware.Labware) -> None:
 
 
 def test_get_location_with_offset_fixed_trash(
-    minimal_labware_def2: LabwareDefinition,
+    minimal_labware_def2: LabwareDefinition2,
 ) -> None:
     deck = Location(Point(0, 0, 0), "deck")
     mock_core = mock.create_autospec(AbstractWellCore)
@@ -244,7 +244,7 @@ def test_drop_tip() -> None:
     assert pipette_mock.mock_calls == [mock.call.drop_tip(mock_labware.__getitem__())]
 
 
-def test_air_gap(minimal_labware_def2: LabwareDefinition) -> None:
+def test_air_gap(minimal_labware_def2: LabwareDefinition2) -> None:
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
     m.mock_set_flow_rate = mock.MagicMock()

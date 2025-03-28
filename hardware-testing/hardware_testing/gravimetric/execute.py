@@ -20,6 +20,8 @@ from .helpers import (
     _sense_liquid_height,
     _pick_up_tip,
     _drop_tip,
+    get_latest_offset_for_labware,
+    _get_offsets_from_ctx,
 )
 from .trial import (
     build_gravimetric_trials,
@@ -54,6 +56,7 @@ import glob
 
 from opentrons.hardware_control.types import StatusBarState
 from hardware_testing.gravimetric.workarounds import get_sync_hw_api
+from opentrons.protocol_api.labware import SET_OFFSET_RESTORED_API_VERSION
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -180,6 +183,11 @@ def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labwar
     labware_on_scale = ctx.load_labware(
         cfg.labware_on_scale, location=cfg.slot_scale, namespace=namespace
     )
+    if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+        offset = get_latest_offset_for_labware(
+            _get_offsets_from_ctx(ctx), labware_on_scale
+        )
+        labware_on_scale.set_offset(offset.x, offset.y, offset.z)
     return labware_on_scale
 
 

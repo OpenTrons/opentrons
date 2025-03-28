@@ -9,12 +9,18 @@ on:
       - 'shared-data/**'
       - 'package.json'
       - '.github/workflows/step-generation-test.yaml'
+      - '.github/actions/js/setup/action.yml'
+      - '.github/actions/git/resolve-tag/action.yml'
+      - '.github/actions/environment/complex-variables/action.yml'
   push:
     paths:
       - 'step-generation/**'
       - 'shared-data/**'
       - 'package.json'
       - '.github/workflows/step-generation-test.yaml'
+      - '.github/actions/js/setup/action.yml'
+      - '.github/actions/git/resolve-tag/action.yml'
+      - '.github/actions/environment/complex-variables/action.yml'
     branches:
       - '*'
 
@@ -32,36 +38,16 @@ env:
 jobs:
   js-unit-test:
     name: 'step generation unit tests'
-    runs-on: 'ubuntu-22.04'
-    timeout-minutes: 30
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 20
     steps:
-      - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.11.0'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/js/setup
       - name: 'run step generation unit tests'
         run: make -C step-generation test-cov
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/lcov.info
           flags: step-generation
+          token: ${{ secrets.CODECOV_TOKEN }}

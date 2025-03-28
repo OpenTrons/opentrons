@@ -1,26 +1,41 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import {
   useCreateMaintenanceRunLabwareDefinitionMutation,
   useDeleteMaintenanceRunMutation,
   useRunLoadedLabwareDefinitions,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   useCreateTargetedMaintenanceRunMutation,
-  useNotifyRunQuery,
   useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
 } from '/app/resources/runs'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
+import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { getRelevantOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/utils'
+import {
+  useLPCLabwareInfo,
+  useCompatibleAnalysis,
+  useUpdateDeckConfig,
+  useHandleClientAppliedOffsets,
+  useOffsetConflictTimestamp,
+} from './hooks'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
-import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import type {
+  LegacySupportLPCFlowsProps,
+  LPCFlowsProps,
+} from '/app/organisms/LabwarePositionCheck/LPCFlows/LPCFlows'
+import { useInitLPCStore } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore'
 
 interface UseLPCFlowsBase {
   showLPC: boolean
   lpcProps: LPCFlowsProps | null
   isLaunchingLPC: boolean
+  isFlexLPCInitializing: boolean
   launchLPC: () => Promise<void>
 }
 interface UseLPCFlowsIdle extends UseLPCFlowsBase {
@@ -29,13 +44,13 @@ interface UseLPCFlowsIdle extends UseLPCFlowsBase {
 }
 interface UseLPCFlowsLaunched extends UseLPCFlowsBase {
   showLPC: true
-  lpcProps: LPCFlowsProps
+  lpcProps: LegacySupportLPCFlowsProps
   isLaunchingLPC: false
 }
 export type UseLPCFlowsResult = UseLPCFlowsIdle | UseLPCFlowsLaunched
 
 export interface UseLPCFlowsProps {
-  runId: string
+  runId: string | null
   robotType: RobotType
   protocolName: string | undefined
 }
@@ -49,10 +64,53 @@ export function useLPCFlows({
   const [isLaunching, setIsLaunching] = useState(false)
   const [hasCreatedLPCRun, setHasCreatedLPCRun] = useState(false)
 
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const isFlex = robotType === FLEX_ROBOT_TYPE
   const deckConfig = useNotifyDeckConfigurationQuery().data
-  const currentOffsets = runRecord?.data?.labwareOffsets ?? []
+  const { data: runRecord } = useNotifyRunQuery(runId ?? null)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
+  const compatibleFlexAnalysis = useCompatibleAnalysis(
+    runId,
+    runRecord,
+    mostRecentAnalysis,
+    isFlex
+  )
+  const compatibleRobotAnalysis = isFlex
+    ? compatibleFlexAnalysis
+    : mostRecentAnalysis
+
+  const labwareDefs = useMemo(() => {
+    const labwareDefsFromCommands = getLabwareDefinitionsFromCommands(
+      compatibleRobotAnalysis?.commands ?? []
+    )
+    return labwareDefsFromCommands
+  }, [compatibleRobotAnalysis?.commands.length])
+
+  const {
+    labwareInfo,
+    storedOffsets: flexOffsets,
+    legacyOffsets: ot2Offsets,
+  } = useLPCLabwareInfo({
+    labwareDefs,
+    protocolData: compatibleRobotAnalysis,
+    robotType,
+    runId,
+  })
+
+  useOffsetConflictTimestamp(isFlex, runId, runRecord)
+  useUpdateDeckConfig(runId, deckConfig)
+  useHandleClientAppliedOffsets(runId)
+  useInitLPCStore({
+    runId,
+    runRecord,
+    analysis: compatibleRobotAnalysis,
+    protocolName,
+    maintenanceRunId,
+    labwareDefs,
+    labwareInfo,
+    deckConfig,
+    robotType,
+    flexStoredOffsets: flexOffsets,
+  })
 
   useMonitorMaintenanceRunForDeletion({ maintenanceRunId, setMaintenanceRunId })
 
@@ -63,9 +121,7 @@ export function useLPCFlows({
     createLabwareDefinition,
   } = useCreateMaintenanceRunLabwareDefinitionMutation()
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
-  // TODO(jh, 01-14-25): There's no external error handing if LPC fails this series of POST requests.
-  // If the server doesn't absorb this functionality for the redesign, add error handling.
-  useRunLoadedLabwareDefinitions(runId, {
+  useRunLoadedLabwareDefinitions(runId ?? null, {
     onSuccess: res => {
       void Promise.all(
         res.data.map(def => {
@@ -87,19 +143,25 @@ export function useLPCFlows({
   })
 
   const launchLPC = (): Promise<void> => {
-    setIsLaunching(true)
+    // Avoid accidentally creating several maintenance runs if a request is ongoing.
+    if (!isLaunching) {
+      setIsLaunching(true)
+      const labwareOffsets = getRelevantOffsets(
+        robotType,
+        ot2Offsets,
+        flexOffsets ?? []
+      )
+      const createRunData = labwareOffsets != null ? { labwareOffsets } : {}
 
-    return createTargetedMaintenanceRun({
-      labwareOffsets: currentOffsets.map(
-        ({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        })
-      ),
-    }).then(maintenanceRun => {
-      setMaintenanceRunId(maintenanceRun.data.id)
-    })
+      return createTargetedMaintenanceRun(createRunData).then(
+        maintenanceRun => {
+          setMaintenanceRunId(maintenanceRun.data.id)
+        }
+      )
+    } else {
+      console.warn('Attempted to launch LPC while already launching.')
+      return Promise.resolve()
+    }
   }
 
   const handleCloseLPC = (): void => {
@@ -113,30 +175,42 @@ export function useLPCFlows({
     }
   }
 
+  const isFlexLPCInitializing = flexOffsets == null
+
   const showLPC =
+    runId != null &&
     hasCreatedLPCRun &&
     maintenanceRunId != null &&
     protocolName != null &&
-    mostRecentAnalysis != null &&
+    compatibleRobotAnalysis != null &&
     deckConfig != null
 
   return showLPC
     ? {
         launchLPC,
         isLaunchingLPC: false,
+        isFlexLPCInitializing,
         showLPC,
         lpcProps: {
           onCloseClick: handleCloseLPC,
           runId,
           robotType,
           deckConfig,
-          existingOffsets: currentOffsets,
-          mostRecentAnalysis,
+          labwareDefs,
+          labwareInfo,
+          analysis: compatibleRobotAnalysis,
           protocolName,
           maintenanceRunId,
+          ot2Offsets,
         },
       }
-    : { launchLPC, isLaunchingLPC: isLaunching, lpcProps: null, showLPC }
+    : {
+        launchLPC,
+        isLaunchingLPC: isLaunching,
+        isFlexLPCInitializing,
+        lpcProps: null,
+        showLPC,
+      }
 }
 
 const RUN_REFETCH_INTERVAL = 5000

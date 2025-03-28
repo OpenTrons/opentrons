@@ -11,12 +11,13 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
-import { getCutoutIdByAddressableArea } from '../../utils'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
   AddressableAreaName,
+  CreateCommand,
   CutoutId,
   DeckSlotId,
   LoadLabwareCreateCommand,
@@ -34,7 +35,6 @@ import type {
 } from '@opentrons/step-generation'
 import type { DeckSlot } from '../../types'
 import type { FormData, HydratedFormData } from '../../form-types'
-import type { PDProtocolFile } from '../../file-types'
 import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
@@ -132,23 +132,27 @@ export function getDeckItemIdInSlot(
 }
 export function denormalizePipetteEntities(
   pipetteInvariantProperties: NormalizedPipetteById,
-  labwareDefs: LabwareDefByDefURI
+  labwareDefs: LabwareDefByDefURI,
+  pipetteLocationUpdate: Record<string, string>
 ): PipetteEntities {
   return reduce(
     pipetteInvariantProperties,
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
       const spec = getPipetteSpecsV2(pipette.name)
-
       if (!spec) {
         throw new Error(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
         )
       }
+      const is96Channel = spec.channels === 96
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,
         tiprackLabwareDef: pipette.tiprackDefURI.map(def => labwareDefs[def]),
+        pythonName: is96Channel
+          ? 'pipette'
+          : `pipette_${pipetteLocationUpdate[pipetteId]}`,
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },
@@ -186,13 +190,16 @@ export const getSlotIdsBlockedBySpanningForThermocycler = (
   return []
 }
 
-//  TODO(jr, 3/13/24): refactor this util it is messy and confusing
+//  TODO(ja, 3/7/25): this util is very outdated, much of it is probably
+//  not even in use. we should refactor this!!!
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
   /* we don't always want to count the slot as full if there is a staging area present
      since labware/wasteChute can still go on top of staging areas  **/
-  includeStagingAreas?: boolean
+  includeStagingAreas?: boolean,
+  /* optional disallowing for additionalEquipmentAreas or not **/
+  discountAdditionalEquipmentAreas?: boolean
 ): boolean => {
   //   special-casing the TC's slot A1 for the Flex
   if (
@@ -232,6 +239,9 @@ export const getSlotIsEmpty = (
       return additionalEquipment.location?.includes(slot) && includeStaging
     }
   })
+  const additionalEquipment = discountAdditionalEquipmentAreas
+    ? []
+    : filteredAdditionalEquipmentOnDeck
   return (
     [
       ...values(initialDeckSetup.modules).filter(
@@ -245,7 +255,7 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
-      ...filteredAdditionalEquipmentOnDeck,
+      ...additionalEquipment,
     ].length === 0
   )
 }
@@ -296,7 +306,7 @@ export function getHydratedForm(
 }
 
 export const getUnoccupiedSlotForTrash = (
-  file: PDProtocolFile,
+  commands: CreateCommand[],
   hasWasteChuteCommands: boolean,
   stagingAreaSlotNames: AddressableAreaName[]
 ): string => {
@@ -308,7 +318,7 @@ export const getUnoccupiedSlotForTrash = (
       FLEX_ROBOT_TYPE
     )
   )
-  const allLoadLabwareSlotNames = Object.values(file.commands)
+  const allLoadLabwareSlotNames = Object.values(commands)
     .filter(
       (command): command is LoadLabwareCreateCommand =>
         command.commandType === 'loadLabware'
@@ -326,7 +336,7 @@ export const getUnoccupiedSlotForTrash = (
       return acc
     }, [])
 
-  const allLoadModuleSlotNames = Object.values(file.commands)
+  const allLoadModuleSlotNames = Object.values(commands)
     .filter(
       (command): command is LoadModuleCreateCommand =>
         command.commandType === 'loadModule'
@@ -340,7 +350,7 @@ export const getUnoccupiedSlotForTrash = (
       }
     })
 
-  const allMoveLabwareLocations = Object.values(file.commands)
+  const allMoveLabwareLocations = Object.values(commands)
     .filter(
       (command): command is MoveLabwareCreateCommand =>
         command.commandType === 'moveLabware'

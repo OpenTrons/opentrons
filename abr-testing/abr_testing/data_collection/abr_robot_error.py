@@ -17,13 +17,64 @@ from statistics import mean, StatisticsError
 from abr_testing.tools import plate_reader
 
 
-def retrieve_protocol_file(
-    protocol_id: str,
+def retrieve_version_file(
     robot_ip: str,
     storage: str,
 ) -> Path | str:
-    """Find and copy protocol file on robot with error."""
-    protocol_dir = f"/var/lib/opentrons-robot-server/7.1/protocols/{protocol_id}"
+    """Retrieve Version file."""
+    version_file_path = "/etc/VERSION.json"
+    save_dir = Path(f"{storage}")
+    print(save_dir)
+    command = ["scp", "-r", f"root@{robot_ip}:{version_file_path}", save_dir]
+    try:
+        subprocess.run(command, check=True)  # type: ignore
+        return os.path.join(save_dir, "VERSION.json")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during file transfer: {e}")
+        return ""
+
+
+def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Path | str:
+    """Find and copy protocol file on robot with error handling."""
+    # List folders in the robot's directory
+    list_folder_command = [
+        "ssh",
+        f"root@{robot_ip}",
+        "ls /var/lib/opentrons-robot-server",
+    ]
+    try:
+        result = subprocess.run(
+            list_folder_command, check=True, capture_output=True, text=True
+        )
+        folders = result.stdout.splitlines()
+
+        def convert_to_floats(data: List) -> List:
+            """Convert list to floats."""
+            float_list = []
+            for item in data:
+                try:
+                    float_value = float(item)
+                    float_list.append(float_value)
+                except ValueError:
+                    pass  # Ignore items that cannot be converted to float
+            return float_list
+
+        folders_float = convert_to_floats(folders)
+        if not folders_float:
+            print("No folders found.")
+            return ""
+        folder_num = max(
+            folders_float
+        )  # Assuming the highest folder number is the latest
+        if folder_num.is_integer():
+            folder_num = int(folder_num)
+    except subprocess.CalledProcessError:
+        print("Could not find folder.")
+        return ""
+    protocol_dir = (
+        f"/var/lib/opentrons-robot-server/{folder_num}/protocols/{protocol_id}"
+    )
+
     # Copy protocol file found in robot onto host computer
     save_dir = Path(f"{storage}")
     command = ["scp", "-r", f"root@{robot_ip}:{protocol_dir}", save_dir]
@@ -366,6 +417,8 @@ def get_run_error_info_from_robot(
     description = dict()
     # get run information
     results = get_run_logs.get_run_data(one_run, ip)
+    # Get version file
+
     # save run information to local directory as .json file
     saved_file_path = read_robot_logs.save_run_log_to_json(
         ip, results, storage_directory
@@ -545,6 +598,8 @@ if __name__ == "__main__":
     except requests.exceptions.InvalidURL:
         print("Invalid IP address.")
         sys.exit()
+    version_file_dir = retrieve_version_file(robot_ip=ip, storage=storage_directory)
+    version_file_path = os.path.join(storage_directory, version_file_dir)
     if len(run_or_other) < 1:
         # Retrieve the most recently run protocol file
         protocol_folder = retrieve_protocol_file(
@@ -611,12 +666,14 @@ if __name__ == "__main__":
     # OPEN TICKET
     issue_url = ticket.open_issue(issue_key)
     # MOVE FILES TO ERROR FOLDER.
+    print(version_file_path)
+    print(run_log_file_path)
     error_files = [
         saved_file_path_calibration,
         run_log_file_path,
         protocol_file_path,
+        version_file_path,
     ] + file_paths
-
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)
     for source_file in error_files:

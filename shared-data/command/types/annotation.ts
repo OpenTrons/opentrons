@@ -17,7 +17,7 @@ export interface CommentRunTimeCommand
   result?: any
 }
 
-interface CommentParams {
+export interface CommentParams {
   message: string
 }
 

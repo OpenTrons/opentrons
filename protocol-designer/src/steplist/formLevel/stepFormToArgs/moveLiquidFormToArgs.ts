@@ -1,9 +1,7 @@
-import { getWellsDepth } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+  DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
@@ -122,10 +120,6 @@ export const moveLiquidFormToArgs = (
       }
     }
   }
-  const wellDepth =
-    'def' in destLabware && destWells != null
-      ? getWellsDepth(destLabware.def, destWells)
-      : 0
 
   const disposalVolume = hydratedFormData.disposalVolume_checkbox
     ? hydratedFormData.disposalVolume_volume
@@ -133,16 +127,24 @@ export const moveLiquidFormToArgs = (
   const touchTipAfterAspirate = Boolean(
     hydratedFormData.aspirate_touchTip_checkbox
   )
-  const touchTipAfterAspirateOffsetMmFromBottom =
-    hydratedFormData.aspirate_touchTip_mmFromBottom ||
-    getWellsDepth(hydratedFormData.aspirate_labware.def, sourceWells) +
-      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterAspirateOffsetMmFromTop =
+    hydratedFormData.aspirate_touchTip_mmFromTop ??
+    DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterAspirateSpeed =
+    hydratedFormData.aspirate_touchTip_speed ?? null
+  const touchTipAfterAspirateMmFromEdge =
+    hydratedFormData.aspirate_touchTip_mmFromEdge ?? null
   const touchTipAfterDispense = Boolean(
     hydratedFormData.dispense_touchTip_checkbox
   )
-  const touchTipAfterDispenseOffsetMmFromBottom =
-    hydratedFormData.dispense_touchTip_mmFromBottom ||
-    wellDepth + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterDispenseOffsetMmFromTop =
+    hydratedFormData.dispense_touchTip_mmFromTop ??
+    DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterDispenseSpeed =
+    hydratedFormData.aspirate_touchTip_speed ?? null
+  const touchTipAfterDispenseMmFromEdge =
+    hydratedFormData.dispense_touchTip_mmFromEdge ?? null
+
   const mixBeforeAspirate = getMixData(
     hydratedFormData,
     'aspirate_mix_checkbox',
@@ -207,9 +209,9 @@ export const moveLiquidFormToArgs = (
       hydratedFormData.dispense_flowRate ||
       matchingTipLiquidSpecs.defaultDispenseFlowRate.default,
     aspirateOffsetFromBottomMm:
-      hydratedFormData.aspirate_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+      hydratedFormData.aspirate_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM,
     dispenseOffsetFromBottomMm:
-      hydratedFormData.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+      hydratedFormData.dispense_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM,
     blowoutFlowRateUlSec:
       hydratedFormData.blowout_flowRate ||
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
@@ -221,9 +223,13 @@ export const moveLiquidFormToArgs = (
     aspirateAirGapVolume,
     dispenseAirGapVolume,
     touchTipAfterAspirate,
-    touchTipAfterAspirateOffsetMmFromBottom,
+    touchTipAfterAspirateOffsetMmFromTop,
+    touchTipAfterAspirateSpeed,
+    touchTipAfterAspirateMmFromEdge,
     touchTipAfterDispense,
-    touchTipAfterDispenseOffsetMmFromBottom,
+    touchTipAfterDispenseOffsetMmFromTop,
+    touchTipAfterDispenseSpeed,
+    touchTipAfterDispenseMmFromEdge,
     description: hydratedFormData.stepDetails,
     name: hydratedFormData.stepName,
     //  TODO(jr, 7/26/24): wire up wellNames
@@ -233,6 +239,13 @@ export const moveLiquidFormToArgs = (
     aspirateYOffset: aspirate_y_position ?? 0,
     dispenseXOffset: dispense_x_position ?? 0,
     dispenseYOffset: dispense_y_position ?? 0,
+    aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed,
+    aspirateRetractSpeed: hydratedFormData.aspirate_submerge_speed,
+    dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed,
+    dispenseRetractSpeed: hydratedFormData.dispense_submerge_speed,
+    aspirateRetractXOffset: hydratedFormData.aspirate_retract_x_position,
+    aspirateRetractYOffset: hydratedFormData.aspirate_retract_y_position,
+    aspirateRetractZOffset: hydratedFormData.aspirate_retract_mmFromBottom,
   }
   console.assert(
     sourceWellsUnordered.length > 0,

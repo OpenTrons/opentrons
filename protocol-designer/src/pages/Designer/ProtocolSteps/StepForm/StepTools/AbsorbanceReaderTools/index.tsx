@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -14,11 +14,12 @@ import {
   ABSORBANCE_READER_LID,
   ABSORBANCE_READER_READ,
 } from '../../../../../../constants'
-import { DropdownStepFormField } from '../../../../../../molecules'
+import { DropdownStepFormField } from '../../../../../../components/molecules'
 import { getRobotStateAtActiveItem } from '../../../../../../top-selectors/labware-locations'
 import { getAbsorbanceReaderLabwareOptions } from '../../../../../../ui/modules/selectors'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'
 import { useAbsorbanceReaderCommandType } from '../../hooks'
+import { getFormErrorsMappedToField } from '../../utils'
 import { InitializationSettings } from './InitializationSettings'
 import { Initialization } from './Initialization'
 import { LidControls } from './LidControls'
@@ -39,6 +40,7 @@ export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
   const { moduleId } = formData
   const dispatch = useDispatch()
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
+  const isAfterMount = useRef(false)
   const robotState = useSelector(getRobotStateAtActiveItem)
   const absorbanceReaderOptions = useSelector(getAbsorbanceReaderLabwareOptions)
   const compoundCommandType = useAbsorbanceReaderCommandType(
@@ -47,18 +49,21 @@ export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
   const { modules } = robotState ?? {}
   const absorbanceReaderFormType = formData.absorbanceReaderFormType as AbsorbanceReaderFormType
   const initialization = (modules?.[moduleId]
-    ?.moduleState as AbsorbanceReaderState).initialization
+    ?.moduleState as AbsorbanceReaderState)?.initialization
 
-  // pre-select radio button on mount and module change if not previously set
+  // pre-select radio button on module change if compound command (read/initialize)
+  // we useRef to avoid changing data from a previously created form
   useEffect(() => {
-    if (formData.absorbanceReaderFormType == null) {
-      if (compoundCommandType != null) {
-        propsForFields.absorbanceReaderFormType.updateValue(compoundCommandType)
-        return
-      }
-      propsForFields.absorbanceReaderFormType.updateValue(ABSORBANCE_READER_LID)
+    if (isAfterMount.current) {
+      propsForFields.absorbanceReaderFormType.updateValue(
+        compoundCommandType ?? ABSORBANCE_READER_LID
+      )
+      return
     }
+    isAfterMount.current = true
   }, [formData.moduleId])
+
+  const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   const lidRadioButton = (
     <RadioButton
@@ -114,6 +119,7 @@ export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
         onExit={() => {
           dispatch(hoverSelection({ id: null, text: null }))
         }}
+        errorToShow={mappedErrorsToField.moduleId?.title}
       />
       {moduleId != null ? (
         <>

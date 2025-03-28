@@ -457,7 +457,7 @@
     ]
   },
   "p50_single_flex": {
-    "displayName": "Flex 1-Channel 50 μL",
+    "displayName": "Flex 1-Channel 50 µL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 35,
@@ -502,7 +502,7 @@
     ]
   },
   "p1000_single_flex": {
-    "displayName": "Flex 1-Channel 1000 μL",
+    "displayName": "Flex 1-Channel 1000 µL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 478,
@@ -552,7 +552,7 @@
     ]
   },
   "p1000_multi_flex": {
-    "displayName": "Flex 8-Channel 1000 μL",
+    "displayName": "Flex 8-Channel 1000 µL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 478,
@@ -600,7 +600,7 @@
     ]
   },
   "p1000_multi_em_flex": {
-    "displayName": "Flex 8-Channel EM 1000 μL",
+    "displayName": "Flex 8-Channel EM 1000 µL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 478,
@@ -648,7 +648,7 @@
     ]
   },
   "p50_multi_flex": {
-    "displayName": "Flex 8-Channel 50 μL",
+    "displayName": "Flex 8-Channel 50 µL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 35,
@@ -693,7 +693,7 @@
     ]
   },
   "p1000_96": {
-    "displayName": "Flex 96-Channel 1000 μL",
+    "displayName": "Flex 96-Channel 1000 µL",
     "displayCategory": "GEN1",
     "defaultAspirateFlowRate": {
       "value": 6,
@@ -740,7 +740,7 @@
     ]
   },
   "p200_96": {
-    "displayName": "Flex 96-Channel 200 μL",
+    "displayName": "Flex 96-Channel 200 µL",
     "displayCategory": "FLEX",
     "defaultAspirateFlowRate": {
       "value": 7.85,

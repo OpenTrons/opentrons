@@ -8,8 +8,8 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    Parameters,
+    LabwareDefinition2,
+    Parameters2,
     Dimensions,
 )
 from opentrons_shared_data.errors.exceptions import (
@@ -36,6 +36,11 @@ from opentrons.protocol_engine.types import (
     LabwareMovementOffsetData,
     DeckType,
     AddressableAreaLocation,
+    OnAddressableAreaLocationSequenceComponent,
+    OnLabwareLocationSequenceComponent,
+    NotOnDeckLocationSequenceComponent,
+    OFF_DECK_LOCATION,
+    LabwareLocationSequence,
 )
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
@@ -123,15 +128,32 @@ async def test_manual_move_labware_implementation(
             labware_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         )
     ).then_return("wowzers-a-new-offset-id")
+    decoy.when(
+        state_view.geometry.get_location_sequence("my-cool-labware-id")
+    ).then_return([OnAddressableAreaLocationSequenceComponent(addressableAreaName="5")])
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(new_location)
+    ).then_return([OnAddressableAreaLocationSequenceComponent(addressableAreaName="4")])
 
     result = await subject.execute(data)
     decoy.verify(await run_control.wait_for_resume(), times=times_pause_called)
     decoy.verify(
-        state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id")
+        state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+            "my-cool-labware-id"
+        )
     )
     assert result == SuccessData(
         public=MoveLabwareResult(
             offsetId="wowzers-a-new-offset-id",
+            originLocationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="5")
+            ],
+            immediateDestinationLocationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="4")
+            ],
+            eventualDestinationLocationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="4")
+            ],
         ),
         state_update=update_types.StateUpdate(
             labware_location=update_types.LabwareLocationUpdate(
@@ -172,7 +194,7 @@ async def test_move_labware_implementation_on_labware(
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(
-        LabwareDefinition.model_construct(namespace="spacename")  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(namespace="spacename")  # type: ignore[call-arg]
     )
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
@@ -185,21 +207,51 @@ async def test_move_labware_implementation_on_labware(
             labware_location=OnLabwareLocation(labwareId="my-even-cooler-labware-id"),
         )
     ).then_return("wowzers-a-new-offset-id")
+    decoy.when(
+        state_view.geometry.get_location_sequence("my-cool-labware-id")
+    ).then_return([OnAddressableAreaLocationSequenceComponent(addressableAreaName="1")])
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(
+            OnLabwareLocation(labwareId="new-labware-id")
+        )
+    ).then_return(
+        [
+            OnLabwareLocationSequenceComponent(labwareId="new-labware-id", lidId=None),
+            OnAddressableAreaLocationSequenceComponent(addressableAreaName="2"),
+        ]
+    )
 
     result = await subject.execute(data)
     decoy.verify(
-        state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id"),
+        state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+            "my-cool-labware-id"
+        ),
         state_view.labware.raise_if_labware_has_labware_on_top(
             "my-even-cooler-labware-id"
         ),
         state_view.labware.raise_if_labware_cannot_be_stacked(
-            LabwareDefinition.model_construct(namespace="spacename"),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(namespace="spacename"),  # type: ignore[call-arg]
             "my-even-cooler-labware-id",
         ),
     )
     assert result == SuccessData(
         public=MoveLabwareResult(
             offsetId="wowzers-a-new-offset-id",
+            originLocationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="1")
+            ],
+            immediateDestinationLocationSequence=[
+                OnLabwareLocationSequenceComponent(
+                    labwareId="new-labware-id", lidId=None
+                ),
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="2"),
+            ],
+            eventualDestinationLocationSequence=[
+                OnLabwareLocationSequenceComponent(
+                    labwareId="new-labware-id", lidId=None
+                ),
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="2"),
+            ],
         ),
         state_update=update_types.StateUpdate(
             labware_location=update_types.LabwareLocationUpdate(
@@ -264,10 +316,26 @@ async def test_gripper_move_labware_implementation(
     decoy.when(
         labware_validation.validate_gripper_compatible(sentinel.labware_definition)
     ).then_return(True)
+    decoy.when(
+        state_view.geometry.get_location_sequence("my-cool-labware-id")
+    ).then_return(
+        [
+            OnAddressableAreaLocationSequenceComponent(
+                addressableAreaName="1",
+            )
+        ]
+    )
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(
+            sentinel.new_location_validated_for_gripper
+        )
+    ).then_return([OnAddressableAreaLocationSequenceComponent(addressableAreaName="5")])
 
     result = await subject.execute(data)
     decoy.verify(
-        state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id"),
+        state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+            "my-cool-labware-id"
+        ),
         await labware_movement.move_labware_with_gripper(
             labware_id="my-cool-labware-id",
             current_location=sentinel.from_location_validated_for_gripper,
@@ -282,6 +350,15 @@ async def test_gripper_move_labware_implementation(
     assert result == SuccessData(
         public=MoveLabwareResult(
             offsetId="wowzers-a-new-offset-id",
+            originLocationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="1")
+            ],
+            immediateDestinationLocationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="5")
+            ],
+            eventualDestinationLocationSequence=[
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="5")
+            ],
         ),
         state_update=update_types.StateUpdate(
             pipette_location=update_types.CLEAR,
@@ -318,30 +395,30 @@ async def test_gripper_error(
     labware_namespace = "labware-namespace"
     labware_load_name = "load-name"
     labware_definition_uri = "opentrons-test/load-name/1"
-    labware_def = LabwareDefinition.model_construct(  # type: ignore[call-arg]
+    labware_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         namespace=labware_namespace,
     )
-    original_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_A1)
+    origin_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_A1)
     new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_A2)
     error_id = "error-id"
     error_created_at = datetime.now()
 
     # Common MoveLabwareImplementation boilerplate:
     decoy.when(state_view.labware.get_definition(labware_id=labware_id)).then_return(
-        LabwareDefinition.model_construct(namespace=labware_namespace)  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(namespace=labware_namespace)  # type: ignore[call-arg]
     )
     decoy.when(state_view.labware.get(labware_id=labware_id)).then_return(
         LoadedLabware(
             id=labware_id,
             loadName=labware_load_name,
             definitionUri=labware_definition_uri,
-            location=original_location,
+            location=origin_location,
             offsetId=None,
         )
     )
     decoy.when(
-        state_view.geometry.ensure_valid_gripper_location(original_location)
-    ).then_return(original_location)
+        state_view.geometry.ensure_valid_gripper_location(origin_location)
+    ).then_return(origin_location)
     decoy.when(
         state_view.geometry.ensure_valid_gripper_location(new_location)
     ).then_return(new_location)
@@ -363,7 +440,7 @@ async def test_gripper_error(
     decoy.when(
         await labware_movement.move_labware_with_gripper(
             labware_id=labware_id,
-            current_location=original_location,
+            current_location=origin_location,
             new_location=new_location,
             user_offset_data=LabwareMovementOffsetData(
                 pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
@@ -374,6 +451,14 @@ async def test_gripper_error(
     ).then_raise(underlying_exception)
     decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
     decoy.when(model_utils.generate_id()).then_return(error_id)
+    decoy.when(state_view.geometry.get_location_sequence("labware-id")).then_return(
+        [OnAddressableAreaLocationSequenceComponent(addressableAreaName="A1")]
+    )
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(new_location)
+    ).then_return(
+        [OnAddressableAreaLocationSequenceComponent(addressableAreaName="A2")]
+    )
 
     result = await subject.execute(params)
 
@@ -383,6 +468,17 @@ async def test_gripper_error(
             createdAt=error_created_at,
             errorCode=underlying_exception.code.value.code,
             detail=underlying_exception.code.value.detail,
+            errorInfo={
+                "originLocationSequence": [
+                    OnAddressableAreaLocationSequenceComponent(addressableAreaName="A1")
+                ],
+                "immediateDestinationLocationSequence": [
+                    OnAddressableAreaLocationSequenceComponent(addressableAreaName="A2")
+                ],
+                "eventualDestinationLocationSequence": [
+                    OnAddressableAreaLocationSequenceComponent(addressableAreaName="A2")
+                ],
+            },
             wrappedErrors=[matchers.Anything()],
         ),
         state_update=update_types.StateUpdate(
@@ -429,6 +525,12 @@ async def test_clears_location_if_current_labware_moved_from_under_pipette(
             pipette_id="pipette-id", labware_id=current_labware_id, well_name="A1"
         )
     )
+    decoy.when(state_view.geometry.get_location_sequence(moved_labware_id)).then_return(
+        []
+    )
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(to_location)
+    ).then_return([])
 
     result = await subject.execute(
         params=MoveLabwareParams(
@@ -458,6 +560,17 @@ async def test_gripper_move_to_waste_chute_implementation(
     expected_slide_offset = Point(
         x=labware_width / 2 + GRIPPER_PADDLE_WIDTH / 2 + 8, y=0, z=0
     )
+    from_loc_sequence: LabwareLocationSequence = [
+        OnAddressableAreaLocationSequenceComponent(addressableAreaName="1")
+    ]
+    immediate_dest_loc_sequence: LabwareLocationSequence = [
+        OnAddressableAreaLocationSequenceComponent(
+            addressableAreaName="gripperWasteChute"
+        )
+    ]
+    eventual_dest_loc_sequence: LabwareLocationSequence = [
+        NotOnDeckLocationSequenceComponent(logicalLocationName=OFF_DECK_LOCATION)
+    ]
 
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
@@ -466,7 +579,7 @@ async def test_gripper_move_to_waste_chute_implementation(
         pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
         dropOffset=None,
     )
-    labware_def = LabwareDefinition.model_construct(  # type: ignore[call-arg]
+    labware_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
         namespace="my-cool-namespace",
         dimensions=Dimensions(
             yDimension=labware_width, zDimension=labware_width, xDimension=labware_width
@@ -475,6 +588,12 @@ async def test_gripper_move_to_waste_chute_implementation(
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(labware_def)
+    decoy.when(
+        state_view.geometry.get_location_sequence("my-cool-labware-id")
+    ).then_return(from_loc_sequence)
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(new_location)
+    ).then_return(immediate_dest_loc_sequence)
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
         LoadedLabware(
             id="my-cool-labware-id",
@@ -508,7 +627,9 @@ async def test_gripper_move_to_waste_chute_implementation(
 
     result = await subject.execute(data)
     decoy.verify(
-        state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id"),
+        state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+            "my-cool-labware-id"
+        ),
         await labware_movement.move_labware_with_gripper(
             labware_id="my-cool-labware-id",
             current_location=from_location,
@@ -523,6 +644,9 @@ async def test_gripper_move_to_waste_chute_implementation(
     assert result == SuccessData(
         public=MoveLabwareResult(
             offsetId="wowzers-a-new-offset-id",
+            originLocationSequence=from_loc_sequence,
+            immediateDestinationLocationSequence=immediate_dest_loc_sequence,
+            eventualDestinationLocationSequence=eventual_dest_loc_sequence,
         ),
         state_update=update_types.StateUpdate(
             pipette_location=update_types.CLEAR,
@@ -674,8 +798,8 @@ async def test_move_labware_raises_when_moving_adapter_with_gripper(
         strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
 
-    definition = LabwareDefinition.model_construct(  # type: ignore[call-arg]
-        parameters=Parameters.model_construct(loadName="My cool adapter"),  # type: ignore[call-arg]
+    definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(loadName="My cool adapter"),  # type: ignore[call-arg]
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -715,8 +839,8 @@ async def test_move_labware_raises_when_moving_labware_with_gripper_incompatible
         strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
 
-    definition = LabwareDefinition.model_construct(  # type: ignore[call-arg]
-        parameters=Parameters.model_construct(loadName="My cool labware"),  # type: ignore[call-arg]
+    definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(loadName="My cool labware"),  # type: ignore[call-arg]
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -765,7 +889,7 @@ async def test_move_labware_with_gripper_raises_on_ot2(
     decoy.when(
         state_view.labware.get_definition(labware_id="my-cool-labware-id")
     ).then_return(
-        LabwareDefinition.model_construct(namespace="spacename")  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(namespace="spacename")  # type: ignore[call-arg]
     )
 
     decoy.when(state_view.config).then_return(
@@ -787,8 +911,8 @@ async def test_move_labware_raises_when_moving_fixed_trash_labware(
         strategy=LabwareMovementStrategy.USING_GRIPPER,
     )
 
-    definition = LabwareDefinition.model_construct(  # type: ignore[call-arg]
-        parameters=Parameters.model_construct(  # type: ignore[call-arg]
+    definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
             loadName="My cool labware", quirks=["fixedTrash"]
         ),
     )

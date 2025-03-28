@@ -1166,7 +1166,20 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "A2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutA2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -2324,7 +2337,20 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "B2",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutB2",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -3502,7 +3528,22 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "C3",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutC3",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "flexStackerModuleV1",
+              "singleRightSlot",
+              "stagingAreaRightSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -3595,7 +3636,22 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "D3",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutD3",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "flexStackerModuleV1",
+              "singleRightSlot",
+              "stagingAreaRightSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -3841,7 +3897,22 @@
             }
           }
         },
-        "labwareId": "UUID"
+        "labwareId": "UUID",
+        "locationSequence": [
+          {
+            "addressableAreaName": "B3",
+            "kind": "onAddressableArea"
+          },
+          {
+            "cutoutId": "cutoutB3",
+            "kind": "onCutoutFixture",
+            "possibleCutoutFixtureIds": [
+              "flexStackerModuleV1",
+              "singleRightSlot",
+              "stagingAreaRightSlot"
+            ]
+          }
+        ]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4141,7 +4212,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 26.85
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4317,7 +4388,7 @@
           "y": 256.78,
           "z": 33.4
         },
-        "z_position": 26.85
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4391,43 +4462,11 @@
       "status": "succeeded"
     },
     {
-      "commandType": "liquidProbe",
-      "completedAt": "TIMESTAMP",
-      "createdAt": "TIMESTAMP",
-      "id": "UUID",
-      "key": "8a6371348d39f444fc65e7304dde52ce",
-      "notes": [],
-      "params": {
-        "labwareId": "UUID",
-        "pipetteId": "UUID",
-        "wellLocation": {
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 2.0
-          },
-          "origin": "top",
-          "volumeOffset": 0.0
-        },
-        "wellName": "A3"
-      },
-      "result": {
-        "position": {
-          "x": 360.38,
-          "y": 256.78,
-          "z": 33.4
-        },
-        "z_position": 26.85
-      },
-      "startedAt": "TIMESTAMP",
-      "status": "succeeded"
-    },
-    {
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "b22e2f859d148b4dfdb91b3e43ddd7c0",
+      "key": "778e826c901184eabfcc20d2b5a2e49f",
       "notes": [],
       "params": {
         "flowRate": 35.0,
@@ -4461,7 +4500,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d7b826433bfc2c5dd7650b7f64de4387",
+      "key": "38675e4e928860df768c3e85d5768603",
       "notes": [],
       "params": {
         "flowRate": 57.0,
@@ -4495,7 +4534,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "45c70122bf33abff61217f0c752c06a4",
+      "key": "b4caf3b2661bcba8f6a838f6ea450075",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -4524,7 +4563,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "440594c1295a83478b3bf55db1efc12d",
+      "key": "2b7db72bdd89db19f1ed47e67528f28b",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -4538,7 +4577,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "dbeb059b62f722adf17e49167171024f",
+      "key": "41dbfe52d75d3788b387c0d9338e34ea",
       "notes": [],
       "params": {
         "message": "Reservoir in D3 is to have NO liquid"
@@ -4552,7 +4591,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "04ea53a488348ffb1688af708b65f7e4",
+      "key": "4b3f9b7518054b692c5325c9f314bbc2",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -4585,7 +4624,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "e94242544868a35ba08cec280d753bc6",
+      "key": "1263b3f609a7880eaa95c752e2bd475d",
       "notes": [],
       "params": {
         "flowRate": 35.0,
@@ -4619,7 +4658,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "ef6736559fde071db453f5eab377a125",
+      "key": "909c08dccafd36971e0152dd6e1a8139",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -4648,7 +4687,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "57ecb3ed1ba19f712a64f34d0098c991",
+      "key": "d100078485070fc9ffbd5402abc866cc",
       "notes": [],
       "params": {
         "flowRate": 57.0,
@@ -4663,7 +4702,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "ff5d401da9025c5e29c5687c101a5e3d",
+      "key": "fd14cf1ab3d29a1beb839f773714c75c",
       "notes": [],
       "params": {
         "message": "Current volume in pipette: 0"
@@ -4677,7 +4716,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d4d7653c4ef95313ee313641835096ad",
+      "key": "6d4749de29e5b16690b4c24357519c71",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -4691,7 +4730,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "572506e8a901de4c31b05824435605e3",
+      "key": "785e9be5b17c72f142d39f03297bc799",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -4713,7 +4752,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4723,7 +4762,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "99ff896a8dd377c6b88d73e413dd83fb",
+      "key": "7ccc6abf8a3db11ce7e6acd5aad7c371",
       "notes": [],
       "params": {
         "message": "Is there liquid in the reservoir? True"
@@ -4737,7 +4776,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f3ad90410318c85bdafc440398099b1c",
+      "key": "b3a1a14a2952fffaa3ffec6b16057ee7",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -4766,7 +4805,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "5f601c702191a47b8e0e0d99ae514a34",
+      "key": "f3cca7482c4018c4ef6df79c1803b756",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -4780,7 +4819,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "3d627373932d2d82fdee646567e0aa8e",
+      "key": "c6c070d903d15619cb5558c1ca1c2686",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -4813,7 +4852,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "286f5eaff085f0888fa20b1f7e6ea0d8",
+      "key": "98193cec066e166983e2f35c505411f3",
       "notes": [],
       "params": {
         "message": "We expect an error on the next line"
@@ -4827,7 +4866,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "f0ce6617868dd419408be36fa2c9b687",
+      "key": "9805906fd76d9e4ea5b48c4dd4a47f11",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -4849,7 +4888,7 @@
           "y": 42.74,
           "z": 46.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4859,7 +4898,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d184edc87ae8067624e33f43a08fe0c3",
+      "key": "945ed7582aa88ad9af48034e185e78cb",
       "notes": [],
       "params": {
         "flowRate": 35.0,
@@ -4893,7 +4932,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "7e96f475215267b1f53e6431009b68f9",
+      "key": "cda1a90c5d9583258d101cde416ac69c",
       "notes": [],
       "params": {
         "addressableAreaName": "movableTrashA3",
@@ -4922,7 +4961,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "36e0b46690493b64dea41f3d6c27e266",
+      "key": "3c43bc864ede9c53854dc16d03e83237",
       "notes": [],
       "params": {
         "pipetteId": "UUID"
@@ -4936,7 +4975,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "2c58bd55bfad83d78f2859e636ee2723",
+      "key": "3412243e76c37f838b113e7eb6b592ac",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -4969,7 +5008,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "c713a0160a4176161ba486b32b07d0dd",
+      "key": "67e7abea27e463d130e20a1b519ccb68",
       "notes": [],
       "params": {
         "message": "Reservoir in D3 is to have NO liquid"
@@ -4983,7 +5022,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "ecd85454102ce7575176fc1430b9854f",
+      "key": "8b1fcd8c6726c9cbe49ad45391015980",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -5005,7 +5044,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -5015,7 +5054,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "1bae2c05e983ffa93cb1e081d438f8ef",
+      "key": "ecce1348844aa390a8de623d60b09b4c",
       "notes": [],
       "params": {
         "labwareId": "UUID",
@@ -5037,7 +5076,7 @@
           "y": 42.74,
           "z": 44.4
         },
-        "z_position": 39.55
+        "z_position": "SimulatedProbeResult"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -5047,7 +5086,7 @@
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
       "id": "UUID",
-      "key": "d249c3b29b22c37a6412d69a4c83b5c7",
+      "key": "86cd2f1c02989e5f6a8cdc3e02d98255",
       "notes": [],
       "params": {
         "message": "Is there liquid in the reservoir? True"

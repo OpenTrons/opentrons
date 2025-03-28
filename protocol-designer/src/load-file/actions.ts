@@ -1,6 +1,6 @@
 import { migration } from './migration'
 import { selectors as fileDataSelectors } from '../file-data'
-import { saveFile } from './utils'
+import { saveFile, savePythonFile } from './utils'
 
 import type { SyntheticEvent } from 'react'
 import type { PDProtocolFile } from '../file-types'
@@ -111,4 +111,24 @@ export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () =>
     fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
   const fileName = `${protocolName}.json`
   saveFile(fileData, fileName)
+}
+// Eventually this will replace saveProtocolFile:
+export const savePythonProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () => (
+  dispatch,
+  getState
+) => {
+  // dispatching this should update the state, eg lastModified timestamp
+  dispatch({
+    type: 'SAVE_PROTOCOL_FILE',
+  })
+  const state = getState()
+  const fileData = fileDataSelectors.createPythonFile(state)
+  const protocolName =
+    fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
+  // unlike JSON files, Python filenames can't have funny characters
+  const fileName = `${protocolName
+    .trim()
+    .replace(/\S+/g, '_')
+    .replace(/[^A-Za-z0-9_]/g, '')}.py`
+  savePythonFile(fileData, fileName)
 }

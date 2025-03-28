@@ -1,43 +1,60 @@
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_ROBOT_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
+import { COLUMN_4_SLOTS } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import * as warningCreators from '../../warningCreators'
 import {
-  getHasWasteChute,
-  getTiprackHasTips,
+  formatPyStr,
+  getCutoutIdByAddressableArea,
   getLabwareHasLiquid,
+  getTiprackHasTips,
+  OFF_DECK,
+  PROTOCOL_CONTEXT_NAME,
   uuid,
 } from '../../utils'
 import type {
+  AddressableAreaName,
   CreateCommand,
-  LabwareMovementStrategy,
+  CutoutId,
+  MoveLabwareParams,
 } from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CommandCreatorError,
-  MoveLabwareArgs,
   CommandCreatorWarning,
 } from '../../types'
 
 /** Move labware from one location to another, manually or via a gripper. */
-export const moveLabware: CommandCreator<MoveLabwareArgs> = (
+export const moveLabware: CommandCreator<MoveLabwareParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { labware, useGripper, newLocation } = args
-  const { additionalEquipmentEntities, labwareEntities } = invariantContext
-  const hasWasteChute = getHasWasteChute(additionalEquipmentEntities)
+  const { labwareId, strategy, newLocation } = args
+  const useGripper = strategy === 'usingGripper'
+  const {
+    gripperEntities,
+    trashBinEntities,
+    wasteChuteEntities,
+    labwareEntities,
+    moduleEntities,
+  } = invariantContext
+  const hasGripperEntity = Object.keys(gripperEntities).length > 0
+  const hasWasteChute = Object.values(wasteChuteEntities).length > 0
   const tiprackHasTip =
     prevRobotState.tipState != null
-      ? getTiprackHasTips(prevRobotState.tipState, labware)
+      ? getTiprackHasTips(prevRobotState.tipState, labwareId)
       : false
   const labwareHasLiquid =
     prevRobotState.liquidState != null
-      ? getLabwareHasLiquid(prevRobotState.liquidState, labware)
+      ? getLabwareHasLiquid(prevRobotState.liquidState, labwareId)
       : false
   const hasTipOnPipettes = Object.values(
     prevRobotState.tipState.pipettes
@@ -52,15 +69,9 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     'addressableAreaName' in newLocation &&
     newLocation.addressableAreaName === 'gripperWasteChute'
 
-  const hasGripper = Object.values(additionalEquipmentEntities).find(
-    aE => aE.name === 'gripper'
-  )
-
   const newLocationSlot =
-    newLocation !== 'offDeck' &&
-    newLocation !== 'systemLocation' &&
-    'slotName' in newLocation
-      ? newLocation.slotName
+    newLocation !== 'offDeck' && newLocation !== 'systemLocation'
+      ? Object.values(newLocation)[0]
       : null
 
   const multipleObjectsInSameSlotLabware =
@@ -72,14 +83,17 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     prevRobotState.modules
   ).find(module => module.slot === newLocationSlot)
 
-  if (!labware || !prevRobotState.labware[labware]) {
+  if (!labwareId || !prevRobotState.labware[labwareId]) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
-        labware,
+        labware: labwareId,
       })
     )
-  } else if (prevRobotState.labware[labware].slot === 'offDeck' && useGripper) {
+  } else if (
+    prevRobotState.labware[labwareId].slot === 'offDeck' &&
+    useGripper
+  ) {
     errors.push(errorCreators.labwareOffDeck())
   } else if (
     multipleObjectsInSameSlotLabware ||
@@ -89,15 +103,15 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   }
 
   const isAluminumBlock =
-    labwareEntities[labware]?.def.metadata.displayCategory === 'aluminumBlock'
+    labwareEntities[labwareId]?.def.metadata.displayCategory === 'aluminumBlock'
 
   if (useGripper && isAluminumBlock) {
     errors.push(errorCreators.cannotMoveWithGripper())
   }
 
   if (
-    (newLocationInWasteChute && hasGripper && !useGripper) ||
-    (!hasGripper && useGripper)
+    (newLocationInWasteChute && hasGripperEntity && !useGripper) ||
+    (!hasGripperEntity && useGripper)
   ) {
     errors.push(errorCreators.gripperRequired())
   }
@@ -106,7 +120,7 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     errors.push(errorCreators.pipetteHasTip())
   }
 
-  const initialLabwareSlot = prevRobotState.labware[labware]?.slot
+  const initialLabwareSlot = prevRobotState.labware[labwareId]?.slot
 
   if (hasWasteChute && initialLabwareSlot === 'gripperWasteChute') {
     errors.push(errorCreators.labwareDiscarded())
@@ -198,10 +212,8 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   }
 
   const params = {
-    labwareId: labware,
-    strategy: useGripper
-      ? 'usingGripper'
-      : ('manualMoveWithPause' as LabwareMovementStrategy),
+    labwareId,
+    strategy,
     newLocation,
   }
 
@@ -213,8 +225,77 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     },
   ]
 
+  const labwarePythonName = labwareEntities[labwareId].pythonName
+  let location: string = ''
+  if (newLocation === 'offDeck') {
+    location = OFF_DECK
+  } else if (newLocation === 'systemLocation') {
+    location = 'system_location' // NOTE: i think this is for LPC but shouldn't be used in PD
+  } else if ('labwareId' in newLocation) {
+    location = labwareEntities[newLocation.labwareId].pythonName
+  } else if ('moduleId' in newLocation) {
+    location = moduleEntities[newLocation.moduleId].pythonName
+  } else if ('slotName' in newLocation) {
+    location = formatPyStr(newLocation.slotName)
+  } else if ('addressableAreaName' in newLocation) {
+    const is4thColumnSlot = COLUMN_4_SLOTS.includes(
+      newLocation.addressableAreaName
+    )
+
+    const isWasteChuteLocation = WASTE_CHUTE_ADDRESSABLE_AREAS.includes(
+      newLocation.addressableAreaName
+    )
+    const isOt2TrashLocation = newLocation.addressableAreaName === 'fixedTrash'
+    const isTrashBinLocation =
+      MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
+        newLocation.addressableAreaName
+      ) || isOt2TrashLocation
+    const trashCutoutIds = isTrashBinLocation
+      ? Object.values(trashBinEntities)?.map(
+          trash => trash.location as CutoutId
+        )
+      : []
+
+    const cutoutIdFromAddressableAreaName =
+      !isWasteChuteLocation && !is4thColumnSlot
+        ? getCutoutIdByAddressableArea(
+            newLocation.addressableAreaName as AddressableAreaName,
+            isOt2TrashLocation ? 'fixedTrashSlot' : 'trashBinAdapter',
+            isOt2TrashLocation ? OT2_ROBOT_TYPE : FLEX_ROBOT_TYPE
+          )
+        : null
+
+    const matchingTrashCutoutId = trashCutoutIds.find(
+      cutoutId => cutoutId === cutoutIdFromAddressableAreaName
+    )
+    const matchingTrashId =
+      matchingTrashCutoutId != null
+        ? Object.values(trashBinEntities).find(
+            ae => ae.location === matchingTrashCutoutId
+          )?.id
+        : null
+
+    if (is4thColumnSlot) {
+      location = formatPyStr(newLocation.addressableAreaName)
+    } else if (matchingTrashId != null && !isWasteChuteLocation) {
+      location = trashBinEntities[matchingTrashId]?.pythonName ?? ''
+    } else if (matchingTrashId == null && isWasteChuteLocation) {
+      location = Object.values(wasteChuteEntities)[0].pythonName ?? ''
+    } else {
+      location = ''
+    }
+  }
+
+  if (location === '') {
+    console.error('expected to find a python new location but could not')
+  }
+
+  const pythonUseGripper = useGripper ? ', use_gripper=True' : ''
+  const python = `${PROTOCOL_CONTEXT_NAME}.move_labware(${labwarePythonName}, ${location}${pythonUseGripper})`
+
   return {
     commands,
     warnings: warnings.length > 0 ? warnings : undefined,
+    python,
   }
 }

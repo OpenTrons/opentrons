@@ -5,15 +5,28 @@ import inspect
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.labware_definition import WellDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    WellDefinition2,
+    RectangularWellDefinition2,
+    CircularWellDefinition2,
+)
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.errors.exceptions import (
+    LiquidHeightUnknownError,
+    LiquidVolumeUnknownError,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import UnsupportedAPIError
 from opentrons.types import Point
+from opentrons_shared_data.labware.labware_definition import (
+    InnerWellGeometry,
+    ConicalFrustum,
+    SphericalSegment,
+)
 
 from opentrons.protocol_api._liquid import Liquid
 from opentrons.protocol_api.core.engine import WellCore, point_calculations, stringify
@@ -48,14 +61,14 @@ def api_version() -> APIVersion:
 
 
 @pytest.fixture
-def well_definition() -> WellDefinition:
-    """Get a partial WellDefinition value object."""
-    return WellDefinition.model_construct()  # type: ignore[call-arg]
+def well_definition() -> WellDefinition2:
+    """Get a partial WellDefinition2 value object."""
+    return CircularWellDefinition2.model_construct()  # type: ignore[call-arg]
 
 
 @pytest.fixture
 def subject(
-    decoy: Decoy, mock_engine_client: EngineClient, well_definition: WellDefinition
+    decoy: Decoy, mock_engine_client: EngineClient, well_definition: WellDefinition2
 ) -> WellCore:
     """Get a WellCore test subject with mocked dependencies."""
     decoy.when(
@@ -94,7 +107,7 @@ def test_display_name(
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(totalLiquidVolume=101)],  # type: ignore[call-arg]
+    [CircularWellDefinition2.model_construct(totalLiquidVolume=101)],  # type: ignore[call-arg]
 )
 def test_max_volume(subject: WellCore) -> None:
     """It should have a max volume."""
@@ -169,6 +182,31 @@ def test_set_has_tip(subject: WellCore) -> None:
         subject.set_has_tip(True)
 
 
+def test_get_meniscus(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
+) -> None:
+    """Get meniscus coordinates."""
+    decoy.when(
+        mock_engine_client.state.geometry.get_meniscus_height(
+            labware_id="labware-id",
+            well_name="well-name",
+        )
+    ).then_return(1.23)
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_position(
+            labware_id="labware-id",
+            well_name="well-name",
+            well_location=WellLocation(
+                origin=WellOrigin.BOTTOM,
+                offset=WellOffset(x=0, y=0, z=1.23),
+                volumeOffset=0.0,
+            ),
+        )
+    ).then_return(Point(1, 2, 4.23))
+
+    assert subject.get_meniscus() == Point(1, 2, 4.23)
+
+
 def test_load_liquid(
     decoy: Decoy, mock_engine_client: EngineClient, subject: WellCore
 ) -> None:
@@ -193,7 +231,7 @@ def test_load_liquid(
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(diameter=123.4)],  # type: ignore[call-arg]
+    [CircularWellDefinition2.model_construct(shape="circular", diameter=123.4)],  # type: ignore[call-arg]
 )
 def test_diameter(subject: WellCore) -> None:
     """It should get the diameter."""
@@ -202,7 +240,7 @@ def test_diameter(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(xDimension=567.8)],  # type: ignore[call-arg]
+    [RectangularWellDefinition2.model_construct(shape="rectangular", xDimension=567.8)],  # type: ignore[call-arg]
 )
 def test_length(subject: WellCore) -> None:
     """It should get the length."""
@@ -211,7 +249,7 @@ def test_length(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(yDimension=987.6)],  # type: ignore[call-arg]
+    [RectangularWellDefinition2.model_construct(shape="rectangular", yDimension=987.6)],  # type: ignore[call-arg]
 )
 def test_width(subject: WellCore) -> None:
     """It should get the width."""
@@ -220,11 +258,113 @@ def test_width(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(depth=42.0)],  # type: ignore[call-arg]
+    [CircularWellDefinition2.model_construct(depth=42.0)],  # type: ignore[call-arg]
 )
 def test_depth(subject: WellCore) -> None:
     """It should get the depth."""
     assert subject.depth == 42.0
+
+
+def test_current_liquid_height(
+    decoy: Decoy, subject: WellCore, mock_engine_client: EngineClient
+) -> None:
+    """Make sure current_liquid_height returns the correct meniscus value or raises an error."""
+    fake_meniscus_height = 2222.2
+    decoy.when(
+        mock_engine_client.state.geometry.get_meniscus_height(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_return(fake_meniscus_height)
+    assert subject.current_liquid_height() == fake_meniscus_height
+
+    # make sure that WellCore propagates a LiquidHeightUnknownError
+    decoy.when(
+        mock_engine_client.state.geometry.get_meniscus_height(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_raise(LiquidHeightUnknownError())
+
+    with pytest.raises(LiquidHeightUnknownError):
+        subject.current_liquid_height()
+
+
+def test_current_liquid_volume(
+    decoy: Decoy, subject: WellCore, mock_engine_client: EngineClient
+) -> None:
+    """Make sure current_liquid_volume returns the correct value or raises an error."""
+    fake_volume = 2222.2
+    decoy.when(
+        mock_engine_client.state.geometry.get_current_well_volume(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_return(fake_volume)
+    assert subject.get_liquid_volume() == fake_volume
+
+    # make sure that WellCore propagates a LiquidVolumeUnknownError
+    decoy.when(
+        mock_engine_client.state.geometry.get_current_well_volume(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_raise(LiquidVolumeUnknownError())
+
+    with pytest.raises(LiquidVolumeUnknownError):
+        subject.get_liquid_volume()
+
+
+@pytest.mark.parametrize("operation_volume", [0.0, 100, -100, 2, -4, 5])
+def test_estimate_liquid_height_after_pipetting(
+    decoy: Decoy,
+    subject: WellCore,
+    mock_engine_client: EngineClient,
+    operation_volume: float,
+) -> None:
+    """Make sure estimate_liquid_height_after_pipetting returns the correct value and does not raise an error."""
+    fake_well_geometry = InnerWellGeometry(
+        sections=[
+            SphericalSegment(
+                shape="spherical",
+                radiusOfCurvature=1.0,
+                topHeight=2.5,
+                bottomHeight=0.0,
+            ),
+            ConicalFrustum(
+                shape="conical",
+                bottomHeight=2.5,
+                topHeight=10.1,
+                bottomDiameter=4.4,
+                topDiameter=6.7,
+            ),
+            ConicalFrustum(
+                shape="conical",
+                bottomHeight=10.1,
+                topHeight=10.2,
+                bottomDiameter=6.7,
+                topDiameter=7.7,
+            ),
+        ]
+    )
+    decoy.when(
+        mock_engine_client.state.labware.get_well_geometry(
+            labware_id="labware-id", well_name="well-name"
+        )
+    ).then_return(fake_well_geometry)
+    initial_liquid_height = 5.6
+    fake_final_height = 10000000
+    decoy.when(subject.current_liquid_height()).then_return(initial_liquid_height)
+    decoy.when(
+        mock_engine_client.state.geometry.get_well_height_after_liquid_handling_no_error(
+            labware_id="labware-id",
+            well_name="well-name",
+            initial_height=initial_liquid_height,
+            volume=operation_volume,
+        )
+    ).then_return(fake_final_height)
+
+    # make sure that no error was raised
+    final_height = subject.estimate_liquid_height_after_pipetting(
+        operation_volume=operation_volume,
+    )
+    assert final_height == fake_final_height
 
 
 def test_from_center_cartesian(

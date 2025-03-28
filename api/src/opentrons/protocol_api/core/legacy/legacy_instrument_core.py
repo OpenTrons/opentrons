@@ -22,6 +22,8 @@ from opentrons.protocols.geometry import planning
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api._liquid import LiquidClass
 
+from opentrons.protocol_engine.types.liquid_level_detection import LiquidTrackingType
+
 from ...disposal_locations import TrashBin, WasteChute
 from ..instrument import AbstractInstrument
 from .legacy_well_core import LegacyWellCore
@@ -74,7 +76,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         """Sets the speed at which the robot's gantry moves."""
         self._default_speed = speed
 
-    def air_gap_in_place(self, volume: float, flow_rate: float) -> None:
+    def air_gap_in_place(
+        self, volume: float, flow_rate: float, correction_volume: Optional[float] = None
+    ) -> None:
         assert False, "Air gap tracking only available in API version 2.22 and later"
 
     def aspirate(
@@ -85,7 +89,8 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         rate: float,
         flow_rate: float,
         in_place: bool,
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
+        correction_volume: Optional[float] = None,
     ) -> None:
         """Aspirate a given volume of liquid from the specified location.
         Args:
@@ -95,6 +100,8 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             rate: The rate in µL/s to aspirate at.
             flow_rate: Not used in this core.
             in_place: Whether we should move_to location.
+            correction_volume: Not used in this core
+            meniscus_tracking: Optional data about where to aspirate from.
         """
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -128,7 +135,8 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         flow_rate: float,
         in_place: bool,
         push_out: Optional[float],
-        is_meniscus: Optional[bool] = None,
+        meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
+        correction_volume: Optional[float] = None,
     ) -> None:
         """Dispense a given volume of liquid into the specified location.
         Args:
@@ -138,7 +146,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             rate: The rate in µL/s to dispense at.
             flow_rate: Not used in this core.
             in_place: Whether we should move_to location.
+            correction_volume: Not used in this core.
             push_out: The amount to push the plunger below bottom position.
+            meniscus_tracking: Optional data about where to dispense from.
         """
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
@@ -312,6 +322,30 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
     ) -> None:
         raise APIVersionError(api_element="Dropping tips in a trash bin or waste chute")
 
+    def resin_tip_seal(
+        self,
+        location: types.Location,
+        well_core: WellCore,
+        in_place: Optional[bool] = False,
+    ) -> None:
+        raise APIVersionError(api_element="Sealing resin tips.")
+
+    def resin_tip_unseal(
+        self,
+        location: types.Location,
+        well_core: WellCore,
+    ) -> None:
+        raise APIVersionError(api_element="Unsealing resin tips.")
+
+    def resin_tip_dispense(
+        self,
+        location: types.Location,
+        well_core: WellCore,
+        volume: Optional[float] = None,
+        flow_rate: Optional[float] = None,
+    ) -> None:
+        raise APIVersionError(api_element="Dispensing liquid from resin tips.")
+
     def home(self) -> None:
         """Home the mount"""
         self._protocol_interface.get_hardware().home_z(
@@ -404,6 +438,32 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
                 location=location, mount=location_cache_mount
             )
 
+    def evotip_seal(
+        self,
+        location: types.Location,
+        well_core: LegacyWellCore,
+        in_place: Optional[bool] = False,
+    ) -> None:
+        """This will never be called because it was added in API 2.22."""
+        assert False, "evotip_seal only supported in API 2.22 & later"
+
+    def evotip_unseal(
+        self, location: types.Location, well_core: WellCore, home_after: Optional[bool]
+    ) -> None:
+        """This will never be called because it was added in API 2.22."""
+        assert False, "evotip_unseal only supported in API 2.22 & later"
+
+    def evotip_dispense(
+        self,
+        location: types.Location,
+        well_core: WellCore,
+        volume: Optional[float] = None,
+        flow_rate: Optional[float] = None,
+        push_out: Optional[float] = None,
+    ) -> None:
+        """This will never be called because it was added in API 2.22."""
+        assert False, "evotip_dispense only supported in API 2.22 & later"
+
     def get_mount(self) -> types.Mount:
         """Get the mount this pipette is attached to."""
         return self._mount
@@ -439,6 +499,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
     def get_current_volume(self) -> float:
         """Get the current volume."""
         return self.get_hardware_state()["current_volume"]
+
+    def get_has_clean_tip(self) -> bool:
+        """Get if has a clean tip, only used with LLD and engine commands."""
+        return False
 
     def get_available_volume(self) -> float:
         """Get the available volume."""
@@ -569,10 +633,38 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         new_tip: TransferTipPolicyV2,
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
     ) -> None:
-        """This will never be called because it was added in .."""
-        # TODO(spp, 2024-11-20): update the docstring and error to include API version
+        """This will never be called because it was added in API 2.23"""
         assert False, "transfer_liquid is not supported in legacy context"
+
+    def distribute_liquid(
+        self,
+        liquid_class: LiquidClass,
+        volume: float,
+        source: Tuple[types.Location, LegacyWellCore],
+        dest: List[Tuple[types.Location, LegacyWellCore]],
+        new_tip: TransferTipPolicyV2,
+        tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
+    ) -> None:
+        """This will never be called because it was added in API 2.23"""
+        assert False, "distribute_liquid is not supported in legacy context"
+
+    def consolidate_liquid(
+        self,
+        liquid_class: LiquidClass,
+        volume: float,
+        source: List[Tuple[types.Location, LegacyWellCore]],
+        dest: Tuple[types.Location, LegacyWellCore],
+        new_tip: TransferTipPolicyV2,
+        tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
+        trash_location: Union[types.Location, TrashBin, WasteChute],
+        return_tip: bool,
+    ) -> None:
+        """This will never be called because it was added in API 2.23."""
+        assert False, "consolidate_liquid is not supported in legacy context"
 
     def get_active_channels(self) -> int:
         """This will never be called because it was added in API 2.16."""
@@ -602,7 +694,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
 
     def liquid_probe_without_recovery(
         self, well_core: WellCore, loc: types.Location
-    ) -> float:
+    ) -> LiquidTrackingType:
         """This will never be called because it was added in API 2.20."""
         assert False, "liquid_probe_without_recovery only supported in API 2.20 & later"
 
@@ -612,3 +704,14 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
     def nozzle_configuration_valid_for_lld(self) -> bool:
         """Check if the nozzle configuration currently supports LLD."""
         return False
+
+    def get_minimum_liquid_sense_height(self) -> float:
+        return 0.0
+
+    def estimate_liquid_height(
+        self,
+        well_core: LegacyWellCore,
+        starting_liquid_height: float,
+        operation_volume: float,
+    ) -> float:
+        return 0.0

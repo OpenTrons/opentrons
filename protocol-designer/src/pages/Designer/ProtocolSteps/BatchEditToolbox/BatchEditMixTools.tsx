@@ -11,7 +11,7 @@ import {
 import {
   CheckboxExpandStepFormField,
   InputStepFormField,
-} from '../../../../molecules'
+} from '../../../../components/molecules'
 import {
   BlowoutLocationField,
   FlowRateField,
@@ -24,7 +24,7 @@ import {
 } from '../StepForm/utils'
 
 import type { WellOrderOption } from '../../../../form-types'
-import type { FieldPropsByName } from '../StepForm/types'
+import type { FieldPropsByName, LiquidHandlingTab } from '../StepForm/types'
 
 interface BatchEditMixToolsProps {
   propsForFields: FieldPropsByName
@@ -33,7 +33,7 @@ interface BatchEditMixToolsProps {
 export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
   const { propsForFields } = props
   const { t, i18n } = useTranslation(['form', 'button', 'tooltip'])
-  const [tab, setTab] = useState<'aspirate' | 'dispense'>('aspirate')
+  const [tab, setTab] = useState<LiquidHandlingTab>('aspirate')
   const aspirateTab = {
     text: i18n.format(t('aspirate'), 'capitalize'),
     isActive: tab === 'aspirate',
@@ -127,11 +127,7 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
             t('form:step_edit_form.field.delay.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
-          isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_delay_checkbox`].updateValue
-          }
+          fieldProps={propsForFields[`${tab}_delay_checkbox`]}
         >
           {propsForFields[`${tab}_delay_checkbox`].value === true ? (
             <InputStepFormField
@@ -150,9 +146,7 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
                 t('form:step_edit_form.field.blowout.label'),
                 'capitalize'
               )}
-              checkboxValue={propsForFields.blowout_checkbox.value}
-              isChecked={propsForFields.blowout_checkbox.value === true}
-              checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
+              fieldProps={propsForFields.blowout_checkbox}
             >
               {propsForFields.blowout_checkbox.value === true ? (
                 <BlowoutLocationField
@@ -169,19 +163,15 @@ export function BatchEditMixTools(props: BatchEditMixToolsProps): JSX.Element {
                 t('form:step_edit_form.field.touchTip.label'),
                 'capitalize'
               )}
-              checkboxValue={propsForFields.mix_touchTip_checkbox.value}
-              isChecked={propsForFields.mix_touchTip_checkbox.value === true}
-              checkboxUpdateValue={
-                propsForFields.mix_touchTip_checkbox.updateValue
-              }
+              fieldProps={propsForFields.mix_touchTip_checkbox}
             >
               {propsForFields.mix_touchTip_checkbox.value === true ? (
                 <PositionField
                   prefix="dispense"
                   propsForFields={propsForFields}
-                  zField="mix_touchTip_mmFromBottom"
+                  zField="mix_touchTip_mmFromTop"
                   labwareId={getLabwareIdForPositioningField(
-                    'mix_touchTip_mmFromBottom'
+                    'mix_touchTip_mmFromTop'
                   )}
                 />
               ) : null}

@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../labware/selectors'
 import {
   getModuleLabwareOptions,
@@ -86,11 +87,11 @@ export const getHeaterShakerLabwareOptions: Selector<
 export const getAbsorbanceReaderLabwareOptions: Selector<
   DropdownOption[]
 > = createSelector(
-  getInitialDeckSetup,
+  getDeckSetupForActiveItem,
   getLabwareNicknamesById,
-  (initialDeckSetup, nicknamesById) => {
+  (deckSetup, nicknamesById) => {
     const absorbanceReaderModuleOptions = getModuleLabwareOptions(
-      initialDeckSetup,
+      deckSetup,
       nicknamesById,
       ABSORBANCE_READER_TYPE
     )

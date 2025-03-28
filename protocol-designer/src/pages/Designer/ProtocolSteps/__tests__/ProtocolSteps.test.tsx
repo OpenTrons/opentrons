@@ -18,14 +18,15 @@ import {
 } from '../../../../file-data/selectors'
 import { getEnableHotKeysDisplay } from '../../../../feature-flags/selectors'
 import { DeckSetupContainer } from '../../DeckSetup'
-import { OffDeck } from '../../Offdeck'
+import { OffDeck } from '../../OffDeck'
 import { SubStepsToolbox } from '../Timeline'
+import { getUserOS } from '../Timeline/utils'
 import { DraggableSidebar } from '../DraggableSidebar'
 import { ProtocolSteps } from '..'
 
 import type { SavedStepFormState } from '../../../../step-forms'
 
-vi.mock('../../Offdeck')
+vi.mock('../../OffDeck')
 vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../ui/steps/selectors')
 vi.mock('../../../../ui/labware/selectors')
@@ -36,7 +37,8 @@ vi.mock('../Timeline')
 vi.mock('../DraggableSidebar')
 vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
-vi.mock('../../../../organisms/Alerts')
+vi.mock('../../../../components/organisms/Alerts')
+vi.mock('../Timeline/utils')
 const render = () => {
   return renderWithProviders(<ProtocolSteps />, {
     i18nInstance: i18n,
@@ -62,6 +64,7 @@ const MOCK_STEP_FORMS = {
 
 describe('ProtocolSteps', () => {
   beforeEach(() => {
+    vi.mocked(getUserOS).mockReturnValue('Mac OS')
     vi.mocked(getDesignerTab).mockReturnValue('protocolSteps')
     vi.mocked(getRobotStateTimeline).mockReturnValue({
       timeline: [],
@@ -106,15 +109,23 @@ describe('ProtocolSteps', () => {
     screen.getByText('mock SubStepsToolbox')
   })
 
-  it('renders the hot keys display', () => {
+  it('renders the hot keys display for mac', () => {
     render()
     screen.getByText('Double-click to edit')
-    screen.getByText('Shift + click to select range')
-    screen.getByText('Command + click to select multiple')
+    screen.getByText('⇧ + click to select range')
+    screen.getByText('⌘ + click to select multiple')
+  })
+
+  it('renders the hot keys display for windows', () => {
+    vi.mocked(getUserOS).mockReturnValue('Windows')
+    render()
+    screen.getByText('Double-click to edit')
+    screen.getByText('⇧ + click to select range')
+    screen.getByText('^ + click to select multiple')
   })
 
   it('renders the current step name', () => {
     render()
-    screen.getByText('Custom pause')
+    screen.getByText('Custom Pause')
   })
 })

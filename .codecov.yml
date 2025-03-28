@@ -1,27 +1,53 @@
-ignore:
-  - '**/node_modules'
-  - 'webpack-config'
-  - 'hardware-testing'
-  - '**/*.md'
-  - '**/*.yaml'
-  - '**/Makefile'
-  - '**/*.in'
-  - '**/*.json'
-  - '**/*.config.js'
-  - '**/*.mk'
-  - '**/*.stories.tsx'
-
-comment:
-  # add flags to `layout` configuration to show up in the PR comment
-  layout: 'reach, diff, flags, files'
-
-flag_management:
-  default_rules:
-    carryforward: true
-
 coverage:
   status:
     project:
       default:
         target: auto
-        threshold: 10
+        threshold: '10'
+    patch:
+      default:
+        target: auto
+        threshold: 0
+
+comment:
+  layout: 'reach, diff, flags, files'
+
+ignore:
+  - 'hardware-testing/**/*'
+  - 'abr-testing/**/*'
+  - 'test-data-generation/**/*'
+  - 'performance-metrics/**/*'
+  - 'package-testing/**/*'
+  - 'opentrons-ai-server/**/*'
+  - 'opentrons-ai-client/**/*'
+  - 'g-code-testing/**/*'
+  - 'api-client/**/*'
+  - 'analyses-snapshot-testing/**/*'
+  - '.storybook/**/*'
+  - 'react-api-client/**/*'
+  - 'scripts/**/*'
+  - '.github/**/*'
+  - '**/build/**/*'
+  - '**/dist/**/*'
+  - '**/node_modules/**/*'
+  - '**/cypress/**/*'
+  - '**/{test,tests,__tests__,__mocks__,mocks}/**/*'
+  - '**/*.{md,yaml,yml,json,rst}'
+  - '**/Makefile'
+  - '**/*.{in,ini,lock,toml,cfg}'
+  - '**/setup.py'
+  - '**/requirements.txt'
+  - '**/.flake8'
+  - '**/.coveragerc'
+  - '**/.prettierrc.js'
+  - '**/.eslintrc.js'
+  - '**/Pipfile'
+  - '**/Dockerfile*'
+  - '**/*.{config.js,config.ts}'
+  - '**/*.mk'
+  - '**/*.stories.tsx'
+  - '**/*.{mjs,css,cjs,mts}'
+
+flag_management:
+  default_rules:
+    carryforward: true

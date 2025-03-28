@@ -39,6 +39,12 @@ import type {
   LabwareEntities,
   ModuleEntities,
   PipetteEntities,
+  LiquidEntities,
+  StagingAreaEntities,
+  AdditionalEquipmentEntity,
+  TrashBinEntities,
+  WasteChuteEntities,
+  GripperEntities,
 } from '@opentrons/step-generation'
 import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -93,8 +99,15 @@ import type {
   SavedStepFormState,
   BatchEditFormChangesState,
 } from '../reducers'
+import type { RootState as LabwareIngredRootState } from '../../labware-ingred/reducers'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
+const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
+  state.labwareIngred
+
+const _getInitialDeckSetupStepFormRootState: (
+  arg: RootState
+) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
 
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
   rootSelector(state).presavedStepForm
@@ -104,6 +117,19 @@ export const getCurrentFormIsPresaved: Selector<
 > = createSelector(
   getPresavedStepForm,
   presavedStepForm => presavedStepForm != null
+)
+
+const _getNormalizedLiquidById: Selector<
+  BaseState,
+  LiquidEntities
+> = createSelector(labwareIngredRootSelector, state => state.ingredients)
+
+export const getLiquidEntities: Selector<
+  BaseState,
+  LiquidEntities
+> = createSelector(
+  _getNormalizedLiquidById,
+  normalizedLiquidById => normalizedLiquidById
 )
 
 // NOTE Ian 2019-04-15: outside of this file, you probably only care about
@@ -164,8 +190,15 @@ export const _getPipetteEntitiesRootState: (
 ) => PipetteEntities = createSelector(
   rs => rs.pipetteInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
-  denormalizePipetteEntities
+  _getInitialDeckSetupStepFormRootState,
+  (pipetteInvariantProperties, labwareDefs, initialDeckSetupStepForm) =>
+    denormalizePipetteEntities(
+      pipetteInvariantProperties,
+      labwareDefs,
+      initialDeckSetupStepForm.pipetteLocationUpdate as Record<string, string>
+    )
 )
+
 // Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
 export const _getAdditionalEquipmentEntitiesRootState: (
   arg: RootState
@@ -190,10 +223,6 @@ export const getAdditionalEquipment: Selector<
   BaseState,
   NormalizedAdditionalEquipmentById
 > = createSelector(rootSelector, _getAdditionalEquipmentRootState)
-
-const _getInitialDeckSetupStepFormRootState: (
-  arg: RootState
-) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
 
 export const getInitialDeckSetupStepForm: Selector<
   BaseState,
@@ -253,11 +282,7 @@ const _getInitialDeckSetup = (
   const additionalEquipmentEntitiesOnDeck = Object.values(
     additionalEquipmentEntities
   ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
-    if (
-      ae.name === 'wasteChute' ||
-      ae.name === 'stagingArea' ||
-      ae.name === 'trashBin'
-    ) {
+    if (ae.name !== 'gripper') {
       aeEntities[ae.id] = ae
     }
     return aeEntities
@@ -287,6 +312,7 @@ const _getInitialDeckSetup = (
               type: MAGNETIC_MODULE_TYPE,
               slot,
               moduleState: MAGNETIC_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case TEMPERATURE_MODULE_TYPE:
             return {
@@ -295,6 +321,7 @@ const _getInitialDeckSetup = (
               type: TEMPERATURE_MODULE_TYPE,
               slot,
               moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case THERMOCYCLER_MODULE_TYPE:
             return {
@@ -303,6 +330,7 @@ const _getInitialDeckSetup = (
               type: THERMOCYCLER_MODULE_TYPE,
               slot,
               moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case HEATERSHAKER_MODULE_TYPE:
             return {
@@ -311,6 +339,7 @@ const _getInitialDeckSetup = (
               type: HEATERSHAKER_MODULE_TYPE,
               slot,
               moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case MAGNETIC_BLOCK_TYPE:
             return {
@@ -319,6 +348,7 @@ const _getInitialDeckSetup = (
               type: MAGNETIC_BLOCK_TYPE,
               slot,
               moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case ABSORBANCE_READER_TYPE:
             return {
@@ -327,6 +357,7 @@ const _getInitialDeckSetup = (
               type: ABSORBANCE_READER_TYPE,
               slot,
               moduleState: ABSORBANCE_READER_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
         }
       }
@@ -555,8 +586,11 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
   boolean
 > = createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
 
-const _formLevelErrors = (hydratedForm: HydratedFormData): StepFormErrors => {
-  return getFormErrors(hydratedForm.stepType, hydratedForm)
+const _formLevelErrors = (
+  hydratedForm: HydratedFormData,
+  moduleEntities: ModuleEntities
+): StepFormErrors => {
+  return getFormErrors(hydratedForm.stepType, hydratedForm, moduleEntities)
 }
 
 const _dynamicFieldFormErrors = (
@@ -638,7 +672,10 @@ export const _hasFormLevelErrors = (
   hydratedForm: HydratedFormData,
   invariantContext: InvariantContext
 ): boolean => {
-  if (_formLevelErrors(hydratedForm).length > 0) return true
+  if (
+    _formLevelErrors(hydratedForm, invariantContext.moduleEntities).length > 0
+  )
+    return true
 
   if (
     hydratedForm.stepType === 'thermocycler' &&
@@ -672,29 +709,87 @@ export const getInvariantContext: Selector<
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
+  getLiquidEntities,
   getAdditionalEquipmentEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
-  featureFlagSelectors.getEnableAbsorbanceReader,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    liquidEntities,
     additionalEquipmentEntities,
     disableModuleRestrictions,
-    allowAllTipracks,
-    enableAbsorbanceReader
-  ) => ({
-    labwareEntities,
-    moduleEntities,
-    pipetteEntities,
-    additionalEquipmentEntities,
-    config: {
-      OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
-      OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
-      OT_PD_ENABLE_ABSORBANCE_READER: Boolean(enableAbsorbanceReader),
-    },
-  })
+    allowAllTipracks
+  ) => {
+    const stagingAreaEntities = Object.values(
+      additionalEquipmentEntities
+    ).reduce((acc: StagingAreaEntities, entity: AdditionalEquipmentEntity) => {
+      if (entity.name === 'stagingArea') {
+        acc[entity.id] = { id: entity.id, location: entity.location }
+        return acc
+      } else {
+        return acc
+      }
+    }, {})
+    const trashBinEntities = Object.values(additionalEquipmentEntities).reduce(
+      (acc: TrashBinEntities, entity: AdditionalEquipmentEntity) => {
+        if (entity.name === 'trashBin' && entity.pythonName != null) {
+          acc[entity.id] = {
+            id: entity.id,
+            location: entity.location,
+            pythonName: entity.pythonName,
+          }
+          return acc
+        } else {
+          return acc
+        }
+      },
+      {}
+    )
+    const wasteChuteEntities = Object.values(
+      additionalEquipmentEntities
+    ).reduce((acc: WasteChuteEntities, entity: AdditionalEquipmentEntity) => {
+      if (entity.name === 'wasteChute' && entity.pythonName != null) {
+        acc[entity.id] = {
+          id: entity.id,
+          pythonName: entity.pythonName,
+          location: entity.location,
+        }
+        return acc
+      } else {
+        return acc
+      }
+    }, {})
+    const gripperEntities = Object.values(additionalEquipmentEntities).reduce(
+      (acc: GripperEntities, entity: AdditionalEquipmentEntity) => {
+        if (entity.name === 'gripper') {
+          acc[entity.id] = {
+            id: entity.id,
+          }
+          return acc
+        } else {
+          return acc
+        }
+      },
+      {}
+    )
+
+    return {
+      labwareEntities,
+      moduleEntities,
+      pipetteEntities,
+      liquidEntities,
+      trashBinEntities,
+      wasteChuteEntities,
+      stagingAreaEntities,
+      gripperEntities,
+      config: {
+        OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
+        OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
+      },
+    }
+  }
 )
 export const getHydratedUnsavedForm: Selector<
   BaseState,
@@ -730,13 +825,20 @@ export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
 export const getFormLevelErrorsForUnsavedForm: Selector<
   BaseState,
   StepFormErrors
-> = createSelector(getHydratedUnsavedForm, hydratedForm => {
-  if (!hydratedForm) return []
+> = createSelector(
+  getHydratedUnsavedForm,
+  getInvariantContext,
+  (hydratedForm, invariantContext) => {
+    if (!hydratedForm) return []
 
-  const errors = _formLevelErrors(hydratedForm)
+    const errors = _formLevelErrors(
+      hydratedForm,
+      invariantContext.moduleEntities
+    )
 
-  return errors
-})
+    return errors
+  }
+)
 export const getCurrentFormCanBeSaved: Selector<
   BaseState,
   boolean

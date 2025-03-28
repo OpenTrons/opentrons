@@ -38,11 +38,11 @@ describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
     expect(result.current).toEqual({
       left: {
         ...instrumentsResponseLeftPipetteFixture,
-        displayName: 'Flex 1-Channel 1000 μL',
+        displayName: 'Flex 1-Channel 1000 µL',
       },
       right: {
         ...instrumentsResponseRightPipetteFixture,
-        displayName: 'Flex 1-Channel 1000 μL',
+        displayName: 'Flex 1-Channel 1000 µL',
       },
     })
   })

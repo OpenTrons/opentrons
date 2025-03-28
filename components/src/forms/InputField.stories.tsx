@@ -35,7 +35,7 @@ export const InputField = Template.bind({})
 InputField.args = {
   label: 'Input field',
   placeholder: 'Placeholder Text',
-  units: 'μL',
+  units: 'µL',
   caption: 'caption here',
   isIndeterminate: false,
 }

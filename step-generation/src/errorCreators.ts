@@ -103,7 +103,7 @@ export function tipVolumeExceeded(args: {
 }): CommandCreatorError {
   const { volume, maxVolume, actionName } = args
   return {
-    message: `This step tries to ${actionName} ${volume}μL, but the tip can only hold ${maxVolume}μL.`,
+    message: `This step tries to ${actionName} ${volume}µL, but the tip can only hold ${maxVolume}µL.`,
     type: 'TIP_VOLUME_EXCEEDED',
   }
 }
@@ -118,7 +118,7 @@ export function pipetteVolumeExceeded(args: {
   const message =
     disposalVolume != null
       ? `Attemped to ${actionName} volume + disposal volume greater than pipette max volume (${volume} + ${disposalVolume} > ${maxVolume})`
-      : `This step tries to ${actionName} ${volume}μL, but the tip can only hold ${maxVolume}μL.`
+      : `This step tries to ${actionName} ${volume}µL, but the tip can only hold ${maxVolume}µL.`
   return {
     message,
     type: 'PIPETTE_VOLUME_EXCEEDED',

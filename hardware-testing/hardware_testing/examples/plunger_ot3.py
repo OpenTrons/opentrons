@@ -24,7 +24,7 @@ async def _main(is_simulating: bool) -> None:
     max_vol = pipette.working_volume
     for vol in [max_vol, max_vol / 2, max_vol / 10]:
         await api.aspirate(mount, volume=vol)
-        await api.dispense(mount, volume=vol)
+        await api.dispense(mount, volume=vol, is_full_dispense=True)
         await api.prepare_for_aspirate(mount)
     api.remove_tip(mount)
 

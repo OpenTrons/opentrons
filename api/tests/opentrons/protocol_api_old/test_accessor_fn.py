@@ -1,13 +1,13 @@
 from opentrons.types import Point
 from opentrons.protocol_api import Labware
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 
 
 def test_wells_accessor(
     min_lw: Labware,
     min_lw_impl: LegacyLabwareCore,
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinition2,
 ) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
@@ -23,7 +23,7 @@ def test_wells_accessor(
 def test_wells_name_accessor(
     min_lw: Labware,
     min_lw_impl: LegacyLabwareCore,
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinition2,
 ) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
@@ -45,7 +45,7 @@ def test_deprecated_index_accessors(min_lw: Labware) -> None:
 def test_dict_accessor(
     min_lw: Labware,
     min_lw_impl: LegacyLabwareCore,
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinition2,
 ) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
@@ -61,7 +61,7 @@ def test_dict_accessor(
 def test_rows_accessor(
     min_lw2_impl: LegacyLabwareCore,
     min_lw2: Labware,
-    minimal_labware_def2: LabwareDefinition,
+    minimal_labware_def2: LabwareDefinition2,
 ) -> None:
     depth1 = minimal_labware_def2["wells"]["A1"]["depth"]
     x1 = minimal_labware_def2["wells"]["A1"]["x"]
@@ -79,7 +79,7 @@ def test_rows_accessor(
 def test_row_name_accessor(
     min_lw2_impl: LegacyLabwareCore,
     min_lw2: Labware,
-    minimal_labware_def2: LabwareDefinition,
+    minimal_labware_def2: LabwareDefinition2,
 ) -> None:
     depth1 = minimal_labware_def2["wells"]["A1"]["depth"]
     x1 = minimal_labware_def2["wells"]["A1"]["x"]
@@ -97,7 +97,7 @@ def test_row_name_accessor(
 def test_cols_accessor(
     min_lw_impl: LegacyLabwareCore,
     min_lw: Labware,
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinition2,
 ) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]
@@ -113,7 +113,7 @@ def test_cols_accessor(
 def test_col_name_accessor(
     min_lw: Labware,
     min_lw_impl: LegacyLabwareCore,
-    minimal_labware_def: LabwareDefinition,
+    minimal_labware_def: LabwareDefinition2,
 ) -> None:
     depth1 = minimal_labware_def["wells"]["A1"]["depth"]
     depth2 = minimal_labware_def["wells"]["A2"]["depth"]

@@ -5,6 +5,7 @@ import { Icon } from '../../icons'
 import {
   ALIGN_CENTER,
   CURSOR_AUTO,
+  CURSOR_DEFAULT,
   CURSOR_POINTER,
   DIRECTION_ROW,
   FLEX_MAX_CONTENT,
@@ -66,8 +67,12 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       outline-offset: 2px;
     }
     &:disabled {
-      background-color: ${COLORS.grey35};
-      color: ${COLORS.grey50};
+      background-color: ${COLORS.grey30};
+      color: ${COLORS.grey40};
+      cursor: ${CURSOR_DEFAULT};
+    }
+    &:disabled:hover {
+      background-color: ${COLORS.grey30}; /* Prevent hover from overriding */
     }
     &:hover {
       background-color: ${isChecked ? COLORS.blue55 : COLORS.blue35};
@@ -93,7 +98,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextSemiBold">
         {labelText}
       </StyledText>
-      <Check isChecked={isChecked} />
+      <Check isChecked={isChecked} disabled={disabled} />
     </Flex>
   )
 }

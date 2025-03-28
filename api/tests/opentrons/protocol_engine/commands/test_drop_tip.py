@@ -32,6 +32,7 @@ from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 
 
 from opentrons.types import Point
+from opentrons.hardware_control.types import TipScrapeType
 
 
 @pytest.fixture
@@ -158,7 +159,9 @@ async def test_drop_tip_implementation(
     )
 
     decoy.verify(
-        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=True),
+        await mock_tip_handler.drop_tip(
+            pipette_id="abc", home_after=True, scrape_type=TipScrapeType.NONE
+        ),
         times=1,
     )
 
@@ -263,6 +266,7 @@ async def test_tip_attached_error(
         labwareId="123",
         wellName="A3",
         wellLocation=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        scrape_tips=False,
     )
 
     decoy.when(
@@ -292,7 +296,9 @@ async def test_tip_attached_error(
         )
     ).then_return(Point(x=111, y=222, z=333))
     decoy.when(
-        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=None)
+        await mock_tip_handler.drop_tip(
+            pipette_id="abc", home_after=None, scrape_type=TipScrapeType.NONE
+        )
     ).then_raise(TipAttachedError("Egads!"))
 
     decoy.when(mock_model_utils.generate_id()).then_return("error-id")

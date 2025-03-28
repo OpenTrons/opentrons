@@ -32,7 +32,7 @@ import {
   getModuleType,
 } from '@opentrons/shared-data'
 
-import { LINK_BUTTON_STYLE } from '../../../atoms'
+import { LINK_BUTTON_STYLE } from '../../../components/atoms'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import {
@@ -45,11 +45,11 @@ import { getRobotType } from '../../../file-data/selectors'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { getPipetteEntities } from '../../../step-forms/selectors'
 import { selectors } from '../../../labware-ingred/selectors'
+import { getEnableStacking } from '../../../feature-flags/selectors'
 import {
   selectLabware,
   selectNestedLabware,
 } from '../../../labware-ingred/actions'
-import { getEnableAbsorbanceReader } from '../../../feature-flags/selectors'
 import {
   ALL_ORDERED_CATEGORIES,
   CUSTOM_CATEGORY,
@@ -104,6 +104,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const has96Channel = getHas96Channel(pipetteEntities)
   const defs = getOnlyLatestDefs()
+  const enableStacking = useSelector(getEnableStacking)
   const deckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
@@ -133,8 +134,6 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
   const [filterHeight, setFilterHeight] = useState<boolean>(
     robotType === OT2_ROBOT_TYPE ? isNextToHeaterShaker : false
   )
-
-  const enablePlateReader = useSelector(getEnableAbsorbanceReader)
 
   const getLabwareCompatible = useCallback(
     (def: LabwareDefinition2) => {
@@ -171,8 +170,7 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
           moduleType !== HEATERSHAKER_MODULE_TYPE) ||
         (isAdapter96Channel && !has96Channel) ||
         (slot === 'offDeck' && isAdapter) ||
-        (!enablePlateReader &&
-          PLATE_READER_LOADNAME === parameters.loadName &&
+        (PLATE_READER_LOADNAME === parameters.loadName &&
           moduleType !== ABSORBANCE_READER_TYPE)
       )
     },
@@ -385,8 +383,11 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                             />
 
                             {uri === selectedLabwareDefUri &&
-                              getLabwareCompatibleWithAdapter(loadName)
-                                ?.length > 0 && (
+                              getLabwareCompatibleWithAdapter(
+                                defs,
+                                enableStacking,
+                                loadName
+                              )?.length > 0 && (
                                 <ListButtonAccordionContainer
                                   id={`nestedAccordionContainer_${loadName}`}
                                 >
@@ -435,12 +436,11 @@ export function LabwareTools(props: LabwareToolsProps): JSX.Element {
                                             )
                                           }
                                         )
-                                      : [
-                                          ...getLabwareCompatibleWithAdapter(
-                                            loadName
-                                          ),
-                                          ...Object.keys(customLabwareDefs),
-                                        ].map(nestedDefUri => {
+                                      : getLabwareCompatibleWithAdapter(
+                                          { ...defs, ...customLabwareDefs },
+                                          enableStacking,
+                                          loadName
+                                        ).map(nestedDefUri => {
                                           const nestedDef =
                                             defs[nestedDefUri] ??
                                             customLabwareDefs[nestedDefUri]

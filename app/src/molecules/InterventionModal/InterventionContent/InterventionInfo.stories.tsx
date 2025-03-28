@@ -70,36 +70,55 @@ type Story = StoryObj<typeof InterventionInfo>
 
 export const MoveBetweenSlots: Story = {
   args: {
+    layout: 'default',
     type: 'location-arrow-location',
     labwareName: 'Plate',
     currentLocationProps: {
-      slotName: 'A1',
+      deckLabel: 'A1',
     },
     newLocationProps: {
-      slotName: 'B2',
+      deckLabel: 'B2',
     },
   },
 }
 
 export const Refill: Story = {
   args: {
+    layout: 'default',
     type: 'location',
     labwareName: 'Tip Rack',
     currentLocationProps: {
-      slotName: 'A1',
+      deckLabel: 'A1',
     },
   },
 }
 
 export const Select: Story = {
   args: {
+    layout: 'default',
     type: 'location-colon-location',
     labwareName: 'Well',
     currentLocationProps: {
-      slotName: 'A1',
+      deckLabel: 'A1',
     },
     newLocationProps: {
-      slotName: 'B1',
+      deckLabel: 'B1',
+    },
+  },
+}
+
+export const LabwareWithLidAndQuantity: Story = {
+  args: {
+    layout: 'stacked',
+    type: 'location',
+    labwareName: 'Labware with lid',
+    subText: 'With Tip Rack Lid',
+    tagText: 'Quantity: 3',
+    currentLocationProps: {
+      deckLabel: 'STACKER A',
+    },
+    newLocationProps: {
+      deckLabel: 'OFF-DECK',
     },
   },
 }

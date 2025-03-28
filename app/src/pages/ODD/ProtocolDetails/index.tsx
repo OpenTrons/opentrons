@@ -41,12 +41,7 @@ import {
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
-import {
-  getApplyHistoricOffsets,
-  getPinnedProtocolIds,
-  updateConfigValue,
-} from '/app/redux/config'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
 import { useRunTimeParameters } from '/app/resources/protocols'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
@@ -164,19 +159,19 @@ const ProtocolHeader = ({
 }
 
 const protocolSectionTabOptions = [
-  'Summary',
-  'Parameters',
-  'Hardware',
-  'Labware',
-  'Liquids',
-  'Deck',
+  'summary',
+  'parameters',
+  'hardware',
+  'labware',
+  'liquids',
+  'deck',
 ] as const
 const protocolSectionTabOptionsWithoutParameters = [
-  'Summary',
-  'Hardware',
-  'Labware',
-  'Liquids',
-  'Deck',
+  'summary',
+  'hardware',
+  'labware',
+  'liquids',
+  'deck',
 ] as const
 
 type TabOption =
@@ -192,11 +187,12 @@ const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
 }: ProtocolSectionTabsProps): JSX.Element => {
+  const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex gridGap={SPACING.spacing8}>
       <Tabs
         tabs={protocolSectionTabOptions.map(option => ({
-          text: option,
+          text: i18n.format(t(option), 'capitalize'),
           onClick: () => {
             setCurrentOption(option)
           },
@@ -266,7 +262,7 @@ const ProtocolSectionContent = ({
 
   let protocolSection: JSX.Element | null = null
   switch (currentOption) {
-    case 'Summary':
+    case 'summary':
       protocolSection = (
         <Summary
           author={protocolData.data.metadata.author ?? null}
@@ -275,26 +271,26 @@ const ProtocolSectionContent = ({
         />
       )
       break
-    case 'Parameters':
+    case 'parameters':
       protocolSection = <Parameters protocolId={protocolId} />
       break
-    case 'Hardware':
+    case 'hardware':
       protocolSection = <Hardware protocolId={protocolId} />
       break
-    case 'Labware':
+    case 'labware':
       protocolSection = <Labware protocolId={protocolId} />
       break
-    case 'Liquids':
+    case 'liquids':
       protocolSection = <Liquids protocolId={protocolId} />
       break
-    case 'Deck':
+    case 'deck':
       protocolSection = <Deck protocolId={protocolId} />
       break
   }
   return (
     <Flex
       paddingTop={SPACING.spacing32}
-      justifyContent={currentOption === 'Deck' ? JUSTIFY_CENTER : undefined}
+      justifyContent={currentOption === 'deck' ? JUSTIFY_CENTER : undefined}
     >
       {protocolSection}
     </Flex>
@@ -349,19 +345,6 @@ export function ProtocolDetails(): JSX.Element | null {
     { enabled: protocolRecord != null }
   )
 
-  const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
-  // I'd love to skip scraping altogether if we aren't applying
-  // conditional offsets, but React won't let us use hooks conditionally.
-  // So, we'll scrape regardless and just toss them if we don't need them.
-  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
-    mostRecentAnalysis ?? null
-  ).map(({ vector, location, definitionUri }) => ({
-    vector,
-    location,
-    definitionUri,
-  }))
-  const labwareOffsets = shouldApplyOffsets ? scrapedLabwareOffsets : []
-
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
@@ -399,7 +382,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const handleRunProtocol = (): void => {
     runTimeParameters.length > 0
       ? setShowParameters(true)
-      : createRun({ protocolId, labwareOffsets })
+      : createRun({ protocolId })
   }
   const [
     showConfirmDeleteProtocol,
@@ -446,7 +429,6 @@ export function ProtocolDetails(): JSX.Element | null {
   return showParameters ? (
     <ProtocolSetupParameters
       protocolId={protocolId}
-      labwareOffsets={labwareOffsets}
       runTimeParameters={runTimeParameters}
       mostRecentAnalysis={mostRecentAnalysis}
     />

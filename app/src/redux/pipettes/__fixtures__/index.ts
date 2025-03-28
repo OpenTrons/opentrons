@@ -51,14 +51,14 @@ export const mockAttachedFlexPipette: Omit<AttachedPipette, 'modelSpecs'> = {
 }
 
 export const mockFlexP1000PipetteSpecs: any = {
-  displayName: 'Flex 1-Channel 1000 μL',
+  displayName: 'Flex 1-Channel 1000 µL',
   name: 'p1000_single_flex',
   backCompatNames: ['p1000_single'],
   channels: 1,
 }
 
 export const mockFlexP1000Pipette8ChannelSpecs: any = {
-  displayName: 'Flex 8-Channel 1000 μL',
+  displayName: 'Flex 8-Channel 1000 µL',
   name: 'p1000_multi_flex',
   channels: 8,
   backCompatNames: ['p1000_multi'],
@@ -355,7 +355,7 @@ export const mockPipetteData1Channel: PipetteData = {
 }
 export const mockAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData1Channel,
-  displayName: 'Flex 1-Channel 1000 μL',
+  displayName: 'Flex 1-Channel 1000 µL',
 }
 
 export const mockPipetteData8Channel: PipetteData = {
@@ -383,7 +383,7 @@ export const mockPipetteData8Channel: PipetteData = {
 }
 export const mock8ChannelAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData8Channel,
-  displayName: 'Flex 8-Channel 1000 μL',
+  displayName: 'Flex 8-Channel 1000 µL',
 }
 
 export const mockPipetteData96Channel: PipetteData = {
@@ -410,5 +410,5 @@ export const mockPipetteData96Channel: PipetteData = {
 }
 export const mock96ChannelAttachedPipetteInformation: PipetteInformation = {
   ...mockPipetteData96Channel,
-  displayName: 'Flex 96-Channel 1000 μL',
+  displayName: 'Flex 96-Channel 1000 µL',
 }

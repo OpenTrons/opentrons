@@ -45,6 +45,7 @@ vi.mock('react-redux', async () => {
 describe('useErrorRecoveryFlows', () => {
   beforeEach(() => {
     vi.mocked(useCurrentlyRecoveringFrom).mockReturnValue('mockCommand' as any)
+    vi.mocked(useRunLoadedLabwareDefinitionsByUri).mockReturnValue({})
   })
 
   it('should have initial state of isERActive as false', () => {
@@ -89,12 +90,32 @@ describe('useErrorRecoveryFlows', () => {
     expect(result.current.failedCommand).toEqual('mockCommand')
   })
 
+  it("should return the run's labware definitions", () => {
+    const { result } = renderHook(() =>
+      useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_RUNNING)
+    )
+
+    expect(result.current.failedCommand).toEqual('mockCommand')
+  })
+
   it(`should return isERActive false if the run status is ${RUN_STATUS_STOP_REQUESTED} before seeing ${RUN_STATUS_AWAITING_RECOVERY}`, () => {
     const { result } = renderHook(() =>
       useErrorRecoveryFlows('MOCK_ID', RUN_STATUS_STOP_REQUESTED)
     )
 
-    expect(result.current.isERActive).toEqual(false)
+    expect(result.current.runLwDefsByUri).toEqual({})
+  })
+
+  it('should not return isERActive if the run labware defintions is null', () => {
+    vi.mocked(useRunLoadedLabwareDefinitionsByUri).mockReturnValue(null)
+
+    const { result } = renderHook(
+      runStatus => useErrorRecoveryFlows('MOCK_ID', runStatus),
+      {
+        initialProps: RUN_STATUS_AWAITING_RECOVERY,
+      }
+    )
+    expect(result.current.isERActive).toBe(false)
   })
 
   it('should set hasSeenAwaitingRecovery to true when runStatus is RUN_STATUS_AWAITING_RECOVERY', () => {
@@ -143,6 +164,7 @@ describe('ErrorRecoveryFlows', () => {
       unvalidatedFailedCommand: mockFailedCommand,
       runId: 'MOCK_RUN_ID',
       protocolAnalysis: null,
+      runLwDefsByUri: {},
     }
     vi.mocked(ErrorRecoveryWizard).mockReturnValue(<div>MOCK WIZARD</div>)
     vi.mocked(RecoverySplash).mockReturnValue(<div>MOCK RUN PAUSED SPLASH</div>)
@@ -167,7 +189,6 @@ describe('ErrorRecoveryFlows', () => {
       intent: 'recovering',
       showTakeover: false,
     })
-    vi.mocked(useRunLoadedLabwareDefinitionsByUri).mockReturnValue({})
   })
 
   it('renders the wizard when showERWizard is true', () => {

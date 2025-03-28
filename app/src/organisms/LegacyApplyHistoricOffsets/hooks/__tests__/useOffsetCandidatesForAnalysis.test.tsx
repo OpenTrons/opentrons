@@ -7,7 +7,7 @@ import {
   fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 import { useAllHistoricOffsets } from '../useAllHistoricOffsets'
-import { getLabwareLocationCombos } from '../getLabwareLocationCombos'
+import { getLegacyLabwareLocationCombos } from '../getLegacyLabwareLocationCombos'
 
 import { useOffsetCandidatesForAnalysis } from '../useOffsetCandidatesForAnalysis'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
@@ -17,7 +17,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { OffsetCandidate } from '../useOffsetCandidatesForAnalysis'
 
 vi.mock('../useAllHistoricOffsets')
-vi.mock('../getLabwareLocationCombos')
+vi.mock('../getLegacyLabwareLocationCombos')
 vi.mock('@opentrons/shared-data')
 vi.mock('/app/resources/runs')
 vi.mock('/app/resources/useNotifyDataReady')
@@ -64,15 +64,17 @@ const mockRobotIp = 'fakeRobotIp'
 describe('useOffsetCandidatesForAnalysis', () => {
   beforeEach(() => {
     when(useAllHistoricOffsets)
-      .calledWith({ hostname: mockRobotIp })
+      .calledWith({ hostname: mockRobotIp }, { enabled: true })
       .thenReturn([
         mockFirstDupCandidate,
         mockThirdCandidate,
         mockSecondCandidate,
         mockFirstCandidate,
       ])
-    when(useAllHistoricOffsets).calledWith(null).thenReturn([])
-    when(getLabwareLocationCombos)
+    when(useAllHistoricOffsets)
+      .calledWith(null, { enabled: true })
+      .thenReturn([])
+    when(getLegacyLabwareLocationCombos)
       .calledWith(expect.any(Array), expect.any(Array), expect.any(Array))
       .thenReturn([
         {
@@ -106,7 +108,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
       children,
     }) => <div>{children}</div>
     const { result } = renderHook(
-      () => useOffsetCandidatesForAnalysis(null, mockRobotIp),
+      () => useOffsetCandidatesForAnalysis(null, false, mockRobotIp),
       { wrapper }
     )
     await waitFor(() => {
@@ -122,6 +124,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
       () =>
         useOffsetCandidatesForAnalysis(
           storedProtocolDataFixture.mostRecentAnalysis,
+          false,
           null
         ),
       { wrapper }
@@ -138,6 +141,7 @@ describe('useOffsetCandidatesForAnalysis', () => {
       () =>
         useOffsetCandidatesForAnalysis(
           storedProtocolDataFixture.mostRecentAnalysis,
+          false,
           mockRobotIp
         ),
       { wrapper }

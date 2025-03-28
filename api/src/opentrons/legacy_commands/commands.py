@@ -234,9 +234,25 @@ def touch_tip(instrument: InstrumentContext) -> command_types.TouchTipCommand:
     }
 
 
-def air_gap() -> command_types.AirGapCommand:
-    text = "Air gap"
-    return {"name": command_types.AIR_GAP, "payload": {"text": text}}
+def air_gap(
+    instrument: InstrumentContext,
+    volume: float | None,
+    height: float | None,
+) -> command_types.AirGapCommand:
+    text = (
+        "Air gap"
+        + (f" of {volume} uL" if volume is not None else "")
+        + (f" at height {height}" if height is not None else "")
+    )
+    return {
+        "name": command_types.AIR_GAP,
+        "payload": {
+            "instrument": instrument,
+            "volume": volume,
+            "height": height,
+            "text": text,
+        },
+    }
 
 
 def return_tip() -> command_types.ReturnTipCommand:
@@ -298,4 +314,41 @@ def move_to_disposal_location(
     return {
         "name": command_types.MOVE_TO_DISPOSAL_LOCATION,
         "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
+def seal(
+    instrument: InstrumentContext,
+    location: Well,
+) -> command_types.SealCommand:
+    location_text = stringify_location(location)
+    text = f"Sealing to {location_text}"
+    return {
+        "name": command_types.SEAL,
+        "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
+def unseal(
+    instrument: InstrumentContext,
+    location: Well,
+) -> command_types.UnsealCommand:
+    location_text = stringify_location(location)
+    text = f"Unsealing from {location_text}"
+    return {
+        "name": command_types.UNSEAL,
+        "payload": {"instrument": instrument, "location": location, "text": text},
+    }
+
+
+def resin_tip_dispense(
+    instrument: InstrumentContext,
+    flow_rate: float | None,
+) -> command_types.PressurizeCommand:
+    if flow_rate is None:
+        flow_rate = 10  # The Protocol Engine default for Resin Tip Dispense
+    text = f"Pressurize pipette to dispense from resin tip at {flow_rate}uL/s."
+    return {
+        "name": command_types.PRESSURIZE,
+        "payload": {"instrument": instrument, "text": text},
     }

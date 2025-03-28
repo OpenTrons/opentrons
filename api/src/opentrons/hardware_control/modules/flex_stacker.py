@@ -6,6 +6,8 @@ from typing import Dict, Optional, Mapping
 
 from opentrons.drivers.flex_stacker.types import (
     Direction,
+    LEDColor,
+    LEDPattern,
     MoveParams,
     MoveResult,
     StackerAxis,
@@ -13,6 +15,7 @@ from opentrons.drivers.flex_stacker.types import (
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.flex_stacker.driver import (
     STACKER_MOTION_CONFIG,
+    STALLGUARD_CONFIG,
     FlexStackerDriver,
 )
 from opentrons.drivers.flex_stacker.abstract import AbstractFlexStackerDriver
@@ -33,6 +36,11 @@ from opentrons.hardware_control.modules.types import (
     FlexStackerData,
 )
 
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerStallError,
+    FlexStackerShuttleMissingError,
+)
+
 log = logging.getLogger(__name__)
 
 POLL_PERIOD = 1.0
@@ -42,9 +50,9 @@ DFU_PID = "df11"
 
 # Maximum distance in mm the axis can travel.
 MAX_TRAVEL = {
-    StackerAxis.X: 192.5,
-    StackerAxis.Z: 136.0,
-    StackerAxis.L: 23.0,
+    StackerAxis.X: 194.0,
+    StackerAxis.Z: 139.5,
+    StackerAxis.L: 22.0,
 }
 
 # The offset in mm to subtract from MAX_TRAVEL when moving an axis before we home.
@@ -54,6 +62,9 @@ MAX_TRAVEL = {
 OFFSET_SM = 5.0
 OFFSET_MD = 10.0
 OFFSET_LG = 20.0
+
+# height limit in mm of labware to use OFFSET_MD used when storing labware.
+MEDIUM_LABWARE_Z_LIMIT = 20.0
 
 
 class FlexStacker(mod_abc.AbstractModule):
@@ -113,6 +124,12 @@ class FlexStacker(mod_abc.AbstractModule):
             disconnected_callback=disconnected_callback,
         )
 
+        # Enable stallguard
+        for axis, config in STALLGUARD_CONFIG.items():
+            await driver.set_stallguard_threshold(
+                axis, config.enabled, config.threshold
+            )
+
         try:
             await poller.start()
         except Exception:
@@ -144,6 +161,7 @@ class FlexStacker(mod_abc.AbstractModule):
         self._reader = reader
         self._poller = poller
         self._stacker_status = FlexStackerStatus.IDLE
+        self._stall_detected = False
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
@@ -226,6 +244,25 @@ class FlexStacker(mod_abc.AbstractModule):
     async def deactivate(self, must_be_running: bool = True) -> None:
         await self._driver.stop_motors()
 
+    async def reset_stall_detected(self) -> None:
+        """Sets the statusbar to normal."""
+        if self._stall_detected:
+            await self.set_led_state(0.5, LEDColor.GREEN, LEDPattern.STATIC)
+            self._stall_detected = False
+
+    async def set_led_state(
+        self,
+        power: float,
+        color: Optional[LEDColor] = None,
+        pattern: Optional[LEDPattern] = None,
+        duration: Optional[int] = None,
+        reps: Optional[int] = None,
+    ) -> None:
+        """Sets the statusbar state."""
+        return await self._driver.set_led(
+            power, color=color, pattern=pattern, duration=duration, reps=reps
+        )
+
     async def move_axis(
         self,
         axis: StackerAxis,
@@ -236,15 +273,21 @@ class FlexStacker(mod_abc.AbstractModule):
         current: Optional[float] = None,
     ) -> bool:
         """Move the axis in a direction by the given distance in mm."""
-        motion_params = STACKER_MOTION_CONFIG[axis]["move"]
-        await self._driver.set_run_current(axis, current or motion_params.current or 0)
-        if any([speed, acceleration]):
-            motion_params.max_speed = speed or motion_params.max_speed
-            motion_params.acceleration = acceleration or motion_params.acceleration
+        await self.reset_stall_detected()
+        default = STACKER_MOTION_CONFIG[axis]["move"]
+        await self._driver.set_run_current(
+            axis, current if current is not None else default.run_current
+        )
+        await self._driver.set_ihold_current(axis, default.hold_current)
+        motion_params = default.move_params.update(
+            max_speed=speed, acceleration=acceleration
+        )
         distance = direction.distance(distance)
-        success = await self._driver.move_in_mm(axis, distance, params=motion_params)
-        # TODO: This can return a stall, handle that here
-        return success == MoveResult.NO_ERROR
+        res = await self._driver.move_in_mm(axis, distance, params=motion_params)
+        if res == MoveResult.STALL_ERROR:
+            self._stall_detected = True
+            raise FlexStackerStallError(self.device_info["serial"], axis)
+        return res == MoveResult.NO_ERROR
 
     async def home_axis(
         self,
@@ -254,18 +297,21 @@ class FlexStacker(mod_abc.AbstractModule):
         acceleration: Optional[float] = None,
         current: Optional[float] = None,
     ) -> bool:
-        motion_params = STACKER_MOTION_CONFIG[axis]["home"]
-        await self._driver.set_run_current(axis, current or motion_params.current or 0)
-        # Set the max hold current for the Z axis
-        if axis == StackerAxis.Z:
-            await self._driver.set_ihold_current(axis, 1.8)
-        if any([speed, acceleration]):
-            motion_params.max_speed = speed or motion_params.max_speed
-            motion_params.acceleration = acceleration or motion_params.acceleration
+        await self.reset_stall_detected()
+        default = STACKER_MOTION_CONFIG[axis]["home"]
+        await self._driver.set_run_current(
+            axis, current if current is not None else default.run_current
+        )
+        await self._driver.set_ihold_current(axis, default.hold_current)
+        motion_params = default.move_params.update(
+            max_speed=speed, acceleration=acceleration
+        )
         success = await self._driver.move_to_limit_switch(
             axis=axis, direction=direction, params=motion_params
         )
-        # TODO: This can return a stall, handle that here
+        if success == MoveResult.STALL_ERROR:
+            self._stall_detected = True
+            raise FlexStackerStallError(self.device_info["serial"], axis)
         return success == MoveResult.NO_ERROR
 
     async def close_latch(
@@ -277,14 +323,11 @@ class FlexStacker(mod_abc.AbstractModule):
         # Dont move the latch if its already closed.
         if self.limit_switch_status[StackerAxis.L] == StackerAxisState.EXTENDED:
             return True
-        motion_params = STACKER_MOTION_CONFIG[StackerAxis.L]["move"]
-        speed = velocity or motion_params.max_speed
-        accel = acceleration or motion_params.acceleration
         success = await self.home_axis(
             StackerAxis.L,
             Direction.RETRACT,
-            speed=speed,
-            acceleration=accel,
+            speed=velocity,
+            acceleration=acceleration,
         )
         # Check that the latch is closed.
         await self._reader.get_limit_switch_status()
@@ -302,18 +345,14 @@ class FlexStacker(mod_abc.AbstractModule):
         # Dont move the latch if its already opened.
         if self.limit_switch_status[StackerAxis.L] == StackerAxisState.RETRACTED:
             return True
-        motion_params = STACKER_MOTION_CONFIG[StackerAxis.L]["move"]
-        speed = velocity or motion_params.max_speed
-        accel = acceleration or motion_params.acceleration
-        distance = MAX_TRAVEL[StackerAxis.L]
         # The latch only has one limit switch, so we have to travel a fixed distance
         # to open the latch.
         success = await self.move_axis(
             StackerAxis.L,
-            Direction.EXTENT,
-            distance=distance,
-            speed=speed,
-            acceleration=accel,
+            Direction.EXTEND,
+            distance=MAX_TRAVEL[StackerAxis.L],
+            speed=velocity,
+            acceleration=acceleration,
         )
         # Check that the latch is opened.
         await self._reader.get_limit_switch_status()
@@ -326,7 +365,7 @@ class FlexStacker(mod_abc.AbstractModule):
 
         # Move platform along the X then Z axis
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
-        await self._move_and_home_axis(StackerAxis.Z, Direction.EXTENT, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.Z, Direction.EXTEND, OFFSET_SM)
 
         # Transfer
         await self.open_latch()
@@ -336,7 +375,7 @@ class FlexStacker(mod_abc.AbstractModule):
         # Move platform along the Z then X axis
         offset = labware_height / 2 + OFFSET_MD
         await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, offset)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTENT, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
         return True
 
     async def store_labware(self, labware_height: float) -> bool:
@@ -344,19 +383,25 @@ class FlexStacker(mod_abc.AbstractModule):
         await self._prepare_for_action()
 
         # Move X then Z axis
-        distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - OFFSET_MD
+        offset = OFFSET_MD if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
+        distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
-        await self.move_axis(StackerAxis.Z, Direction.EXTENT, distance)
+        await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
         # Transfer
         await self.open_latch()
-        await self.move_axis(StackerAxis.Z, Direction.EXTENT, (labware_height / 2))
-        await self.home_axis(StackerAxis.Z, Direction.EXTENT)
+        z_speed = (
+            STACKER_MOTION_CONFIG[StackerAxis.Z]["move"].move_params.max_speed or 0
+        ) / 2
+        await self.move_axis(
+            StackerAxis.Z, Direction.EXTEND, (labware_height / 2), z_speed
+        )
+        await self.home_axis(StackerAxis.Z, Direction.EXTEND, z_speed)
         await self.close_latch()
 
         # Move Z then X axis
         await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, OFFSET_LG)
-        await self._move_and_home_axis(StackerAxis.X, Direction.EXTENT, OFFSET_SM)
+        await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
         return True
 
     async def _move_and_home_axis(
@@ -369,10 +414,39 @@ class FlexStacker(mod_abc.AbstractModule):
     async def _prepare_for_action(self) -> bool:
         """Helper to prepare axis for dispensing or storing labware."""
         # TODO: check if we need to home first
-        await self.home_axis(StackerAxis.X, Direction.EXTENT)
+        await self.home_axis(StackerAxis.X, Direction.EXTEND)
         await self.home_axis(StackerAxis.Z, Direction.RETRACT)
         await self.close_latch()
+        await self.verify_shuttle_location(PlatformState.EXTENDED)
         return True
+
+    async def home_all(self, ignore_latch: bool = False) -> None:
+        """Home all axes based on current state, assuming normal operation.
+
+        If ignore_latch is True, we will not attempt to close the latch. This
+        is useful when we want the shuttle to be out of the way for error
+        recovery (e.g. when the latch is stuck open).
+        """
+        await self._reader.read()
+        # we should always be able to home the X axis first
+        await self.home_axis(StackerAxis.X, Direction.RETRACT)
+        # If latch is open, we must first close it
+        if not ignore_latch and self.latch_state == LatchState.OPENED:
+            if self.limit_switch_status[StackerAxis.Z] != StackerAxisState.RETRACTED:
+                # it was likely in the middle of a dispense/store command
+                # z should be moved up before we can safely close the latch
+                await self.home_axis(StackerAxis.Z, Direction.EXTEND)
+            await self.close_latch()
+        await self.home_axis(StackerAxis.Z, Direction.RETRACT)
+        await self.home_axis(StackerAxis.X, Direction.EXTEND)
+
+    async def verify_shuttle_location(self, expected: PlatformState) -> None:
+        """Verify the shuttle is present and in the expected location."""
+        await self._reader.read()
+        if self.platform_state != expected:
+            raise FlexStackerShuttleMissingError(
+                self.device_info["serial"], expected, self.platform_state
+            )
 
 
 class FlexStackerReader(Reader):
@@ -386,7 +460,9 @@ class FlexStackerReader(Reader):
         }
         self.platform_state = PlatformState.UNKNOWN
         self.hopper_door_closed = False
-        self.motion_params = {axis: MoveParams(axis=axis) for axis in StackerAxis}
+        self.motion_params: Dict[StackerAxis, Optional[MoveParams]] = {
+            axis: None for axis in StackerAxis
+        }
         self.get_config = True
 
     async def read(self) -> None:
@@ -402,15 +478,13 @@ class FlexStackerReader(Reader):
         """Get the limit switch status."""
         status = await self._driver.get_limit_switches_status()
         self.limit_switch_status = {
-            StackerAxis.X: StackerAxisState.from_status(status, StackerAxis.X),
-            StackerAxis.Z: StackerAxisState.from_status(status, StackerAxis.Z),
-            StackerAxis.L: StackerAxisState.from_status(status, StackerAxis.L),
+            axis: StackerAxisState.from_status(status, axis) for axis in StackerAxis
         }
 
     async def get_motion_parameters(self) -> None:
         """Get the motion parameters used by the axis motors."""
-        self.move_params = {
-            axis: self._driver.get_motion_params(axis) for axis in StackerAxis
+        self.motion_params = {
+            axis: await self._driver.get_motion_params(axis) for axis in StackerAxis
         }
 
     async def get_platform_sensor_state(self) -> None:
@@ -423,6 +497,7 @@ class FlexStackerReader(Reader):
         self.hopper_door_closed = await self._driver.get_hopper_door_closed()
 
     def on_error(self, exception: Exception) -> None:
+        self._driver.reset_serial_buffers()
         self._set_error(exception)
 
     def _set_error(self, exception: Optional[Exception]) -> None:

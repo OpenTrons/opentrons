@@ -36,9 +36,3 @@ export interface DeleteModuleAction {
     id: string
   }
 }
-export const deleteModule = (id: string): DeleteModuleAction => ({
-  type: 'DELETE_MODULE',
-  payload: {
-    id,
-  },
-})

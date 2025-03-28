@@ -1,12 +1,13 @@
 import { it, describe, expect } from 'vitest'
 import {
   FLEX_ROBOT_TYPE,
+  ABSORBANCE_READER_V1,
+  ABSORBANCE_READER_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V2,
@@ -36,18 +37,25 @@ describe('getNumSlotsAvailable', () => {
     const result = getNumSlotsAvailable(null, [], 'gripper')
     expect(result).toBe(0)
   })
-  it('should return 1 for a non MoaM module', () => {
-    const result = getNumSlotsAvailable(null, [], TEMPERATURE_MODULE_V1)
-    expect(result).toBe(1)
+
+  it('should return 3 when there a plate reader', () => {
+    const mockModules = {
+      0: {
+        model: ABSORBANCE_READER_V1,
+        type: ABSORBANCE_READER_TYPE,
+        slot: 'B3',
+      },
+    }
+    const mockAdditionalEquipment: AdditionalEquipment[] = ['trashBin']
+    const result = getNumSlotsAvailable(
+      mockModules,
+      mockAdditionalEquipment,
+      'stagingArea'
+    )
+    // Note: the return value is 3 because trashBin can be placed slot1 and plate reader is on B3
+    expect(result).toBe(3)
   })
-  it('should return 2 for a thermocycler', () => {
-    const result = getNumSlotsAvailable(null, [], THERMOCYCLER_MODULE_V2)
-    expect(result).toBe(2)
-  })
-  it('should return 8 when there are no modules or additional equipment for a heater-shaker', () => {
-    const result = getNumSlotsAvailable(null, [], HEATERSHAKER_MODULE_V1)
-    expect(result).toBe(8)
-  })
+
   it('should return 0 when there is a TC and 7 modules for a temperature module v2', () => {
     const mockModules = {
       0: {
@@ -90,6 +98,7 @@ describe('getNumSlotsAvailable', () => {
     const result = getNumSlotsAvailable(mockModules, [], TEMPERATURE_MODULE_V2)
     expect(result).toBe(0)
   })
+
   it('should return 1 when there are 9 additional equipment and 1 is a waste chute on the staging area and one is a gripper for a heater-shaker', () => {
     const mockAdditionalEquipment: AdditionalEquipment[] = [
       'trashBin',
@@ -109,6 +118,7 @@ describe('getNumSlotsAvailable', () => {
     )
     expect(result).toBe(1)
   })
+
   it('should return 1 when there is a full deck but one staging area for waste chute', () => {
     const mockModules = {
       0: {
@@ -148,6 +158,7 @@ describe('getNumSlotsAvailable', () => {
     )
     expect(result).toBe(1)
   })
+
   it('should return 1 when there are 7 modules (with one magnetic block) and one trash for staging area', () => {
     const mockModules = {
       0: {
@@ -187,8 +198,10 @@ describe('getNumSlotsAvailable', () => {
       mockAdditionalEquipment,
       'stagingArea'
     )
+
     expect(result).toBe(1)
   })
+
   it('should return 1 when there are 8 modules with 2 magnetic blocks and one trash for staging area', () => {
     const mockModules = {
       0: {
@@ -235,7 +248,103 @@ describe('getNumSlotsAvailable', () => {
     )
     expect(result).toBe(1)
   })
-  it('should return 8 when there are 4 staging area for magnetic block', () => {
+  it('should return 0 when there are 11 magnetic blocks for staging area', () => {
+    const mockModules = {
+      0: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'D2',
+      },
+      1: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C2',
+      },
+      2: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'B2',
+      },
+      3: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'A2',
+      },
+      4: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'D3',
+      },
+      5: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C3',
+      },
+      6: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'B3',
+      },
+      7: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'D1',
+      },
+      8: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'C1',
+      },
+      9: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'B1',
+      },
+      10: {
+        model: MAGNETIC_BLOCK_V1,
+        type: MAGNETIC_BLOCK_TYPE,
+        slot: 'A1',
+      },
+    } as any
+    const mockAdditionalEquipment: AdditionalEquipment[] = []
+    const result = getNumSlotsAvailable(
+      mockModules,
+      mockAdditionalEquipment,
+      'stagingArea'
+    )
+    // Note: the return value is 0 because trashBin A3
+    expect(result).toBe(0)
+  })
+
+  it('should return 3 when slots in column 1 are occupied', () => {
+    const mockModules = {
+      0: {
+        model: TEMPERATURE_MODULE_V2,
+        type: TEMPERATURE_MODULE_TYPE,
+        slot: 'D1',
+      },
+      1: {
+        model: HEATERSHAKER_MODULE_V1,
+        type: HEATERSHAKER_MODULE_TYPE,
+        slot: 'C1',
+      },
+      2: {
+        model: THERMOCYCLER_MODULE_V2,
+        type: THERMOCYCLER_MODULE_TYPE,
+        slot: 'B1',
+      },
+    } as any
+    const mockAdditionalEquipment: AdditionalEquipment[] = ['trashBin']
+    const result = getNumSlotsAvailable(
+      mockModules,
+      mockAdditionalEquipment,
+      'stagingArea'
+    )
+
+    expect(result).toBe(3)
+  })
+
+  it('should return 11 when there are 4 staging area for magnetic block', () => {
     const mockAdditionalEquipment: AdditionalEquipment[] = [
       'stagingArea',
       'stagingArea',
@@ -247,9 +356,9 @@ describe('getNumSlotsAvailable', () => {
       mockAdditionalEquipment,
       MAGNETIC_BLOCK_V1
     )
-    expect(result).toBe(8)
+    expect(result).toBe(11)
   })
-  it('should return 4 when there are 4 modules, 4 staging area for magnetic block', () => {
+  it('should return 8 when there are 4 modules, 4 staging area for magnetic block since magnetic blocks can now go on staging areas', () => {
     const mockModules = {
       0: {
         model: HEATERSHAKER_MODULE_V1,
@@ -278,7 +387,7 @@ describe('getNumSlotsAvailable', () => {
       mockAdditionalEquipment,
       MAGNETIC_BLOCK_V1
     )
-    expect(result).toBe(4)
+    expect(result).toBe(6)
   })
 })
 

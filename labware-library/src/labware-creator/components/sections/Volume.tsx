@@ -23,7 +23,7 @@ const Content = (props: ContentProps): JSX.Element => {
       </div>
 
       <div className={styles.form_fields_column}>
-        <TextField name="wellVolume" inputMasks={[maskTo2Decimal]} units="μL" />
+        <TextField name="wellVolume" inputMasks={[maskTo2Decimal]} units="µL" />
       </div>
     </div>
   )

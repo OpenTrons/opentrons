@@ -67,6 +67,7 @@ describe('StepOverflowMenu', () => {
       handleEdit: vi.fn(),
       confirmDelete: mockConfirm,
       confirmMultiDelete: vi.fn(),
+      sidebarWidth: 235,
     }
     vi.mocked(getMultiSelectItemIds).mockReturnValue(null)
     vi.mocked(getCurrentFormIsPresaved).mockReturnValue(false)
@@ -86,6 +87,7 @@ describe('StepOverflowMenu', () => {
         id: mockId,
         tiprackLabwareDef: [],
         tiprackDefURI: ['mockDefURI1', 'mockDefURI2'],
+        pythonName: 'mockPythonName',
       },
     })
   })
@@ -124,6 +126,7 @@ describe('StepOverflowMenu', () => {
         id: mockId96,
         tiprackLabwareDef: [],
         tiprackDefURI: ['mockDefURI1_96'],
+        pythonName: 'mockPythonName',
       },
     })
     render(props)

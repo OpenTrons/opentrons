@@ -154,7 +154,7 @@ export const getHoveredStepLabware = createSelector(
     }
 
     if (stepArgs.commandCreatorFnName === 'moveLabware') {
-      const src = stepArgs.labware
+      const src = stepArgs.labwareId
       return [src]
     }
 

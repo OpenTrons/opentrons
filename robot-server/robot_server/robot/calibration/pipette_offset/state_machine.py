@@ -93,7 +93,7 @@ PIP_OFFSET_WITH_TL_TRANSITIONS: PipetteOffsetWithTLTransitions = {
 
 
 class PipetteOffsetCalibrationStateMachine:
-    def __init__(self):
+    def __init__(self) -> None:
         self._state_machine = SimpleStateMachine(
             states=set(s for s in POCState), transitions=PIP_OFFSET_CAL_TRANSITIONS
         )
@@ -108,10 +108,12 @@ class PipetteOffsetCalibrationStateMachine:
     def current_state(self) -> POCState:
         return self._current_state
 
-    def set_state(self, state: POCState):
+    def set_state(self, state: POCState) -> None:
         self._current_state = state
 
-    def get_next_state(self, from_state: POCState, command: CommandDefinition):
+    def get_next_state(
+        self, from_state: POCState, command: CommandDefinition
+    ) -> POCState:
         next_state = self._state_machine.get_next_state(from_state, command)
         if next_state:
             return next_state
@@ -120,7 +122,7 @@ class PipetteOffsetCalibrationStateMachine:
 
 
 class PipetteOffsetWithTipLengthStateMachine:
-    def __init__(self):
+    def __init__(self) -> None:
         self._state_machine = SimpleStateMachine(
             states=set(s for s in POWTState),
             transitions=PIP_OFFSET_WITH_TL_TRANSITIONS,
@@ -136,10 +138,12 @@ class PipetteOffsetWithTipLengthStateMachine:
     def current_state(self) -> POWTState:
         return self._current_state
 
-    def set_state(self, state: POWTState):
+    def set_state(self, state: POWTState) -> None:
         self._current_state = state
 
-    def get_next_state(self, from_state: POWTState, command: CommandDefinition):
+    def get_next_state(
+        self, from_state: POWTState, command: CommandDefinition
+    ) -> POWTState:
         next_state = self._state_machine.get_next_state(from_state, command)
         if next_state:
             return next_state

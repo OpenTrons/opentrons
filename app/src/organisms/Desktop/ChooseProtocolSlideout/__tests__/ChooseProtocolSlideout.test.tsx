@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import {
+  FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
   simpleAnalysisFileFixture,
 } from '@opentrons/shared-data'
@@ -18,6 +19,7 @@ import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/h
 import { useCreateRunFromProtocol } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout/useCreateRunFromProtocol'
 import { ChooseProtocolSlideout } from '../'
 import { useNotifyDataReady } from '/app/resources/useNotifyDataReady'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import type { ComponentProps } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
@@ -29,6 +31,7 @@ vi.mock('/app/redux/protocol-storage')
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/useNotifyDataReady')
+vi.mock('/app/redux-resources/robots')
 
 const render = (props: ComponentProps<typeof ChooseProtocolSlideout>) => {
   return renderWithProviders(
@@ -72,6 +75,7 @@ describe('ChooseProtocolSlideout', () => {
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
     vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
+    vi.mocked(useRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
   })
 
   it('renders slideout if showSlideout true', () => {

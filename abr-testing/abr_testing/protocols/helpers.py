@@ -18,6 +18,7 @@ from opentrons.protocol_api.module_contexts import (
 from typing import List, Union, Dict, Tuple
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from opentrons_shared_data.errors.exceptions import PipetteLiquidNotFoundError
+from datetime import datetime
 
 # FUNCTIONS FOR LOADING COMMON CONFIGURATIONS
 
@@ -80,6 +81,7 @@ def load_hs_adapter_and_labware(
     heatershaker_adapters = {
         "nest_96_wellplate_2ml_deep": "opentrons_96_deep_well_adapter",
         "armadillo_96_wellplate_200ul_pcr_full_skirt": "opentrons_96_pcr_adapter",
+        "corning_96_wellplate_360ul_flat": "opentrons_96_flat_bottom_adapter",
     }
     hs_adapter_type = heatershaker_adapters.get(labware_str, "")
     if hs_adapter_type:
@@ -200,6 +202,16 @@ def create_two_pipette_mount_parameters(parameters: ParameterContext) -> None:
     )
 
 
+def create_dry_run_parameter(parameters: ParameterContext) -> None:
+    """Create dry run parameter."""
+    parameters.add_bool(
+        variable_name="dry_run",
+        display_name="Dry Run",
+        description="If Dry Run is True, skip incubation.",
+        default=False,
+    )
+
+
 def create_csv_parameter(parameters: ParameterContext) -> None:
     """Create parameter for sample volume csvs."""
     parameters.add_csv_file(
@@ -215,7 +227,7 @@ def create_disposable_lid_parameter(parameters: ParameterContext) -> None:
         variable_name="disposable_lid",
         display_name="Disposable Lid",
         description="True means use lid.",
-        default=True,
+        default=False,
     )
 
 
@@ -252,6 +264,28 @@ def create_tip_size_parameter(parameters: ParameterContext) -> None:
         ],
         default="opentrons_flex_96_tiprack_50ul",
     )
+
+
+def create_all_deck_slot_parameters(parameters: ParameterContext) -> None:
+    """Create parameters for all deck slots."""
+    deck_slots = [f"{letter}{number}" for letter in "ABCD" for number in range(1, 4)]
+    for deck_slot in deck_slots:
+        parameters.add_bool(
+            variable_name=deck_slot, display_name=f"Slot {deck_slot}", default=True
+        )
+    # WHAT TO COPY PASTE IN PROTOCOL
+    # slot_a1 = protocol.params.A1 # type: ignore[attr-defined]
+    # slot_a2 = protocol.params.A2 # type: ignore[attr-defined]
+    # slot_a3 = protocol.params.A3 # type: ignore[attr-defined]
+    # slot_b1 = protocol.params.B1 # type: ignore[attr-defined]
+    # slot_b2 = protocol.params.B2 # type: ignore[attr-defined]
+    # slot_b3 = protocol.params.B3 # type: ignore[attr-defined]
+    # slot_c1 = protocol.params.C1 # type: ignore[attr-defined]
+    # slot_c2 = protocol.params.C2 # type: ignore[attr-defined]
+    # slot_c3 = protocol.params.C3 # type: ignore[attr-defined]
+    # slot_d1 = protocol.params.D1 # type: ignore[attr-defined]
+    # slot_d2 = protocol.params.D2 # type: ignore[attr-defined]
+    # slot_d3 = protocol.params.D3 # type: ignore[attr-defined]
 
 
 def create_dot_bottom_parameter(parameters: ParameterContext) -> None:
@@ -297,7 +331,7 @@ def create_plate_reader_compatible_labware_parameter(
     parameters.add_str(
         variable_name="labware_plate_reader_compatible",
         display_name="Plate Reader Labware",
-        default="nest_96_wellplate_200ul_flat",
+        default="hellma_reference_plate",
         choices=[
             {
                 "display_name": "Corning_96well",
@@ -361,6 +395,41 @@ def deactivate_modules(protocol: ProtocolContext) -> None:
                 module.disengage()
             elif isinstance(module, ThermocyclerContext):
                 module.deactivate()
+
+
+def plate_reader_actions(
+    protocol: ProtocolContext,
+    plate_reader: AbsorbanceReaderContext,
+    hellma_plate: Labware,
+    hellma_plate_name: str,
+) -> None:
+    """Plate reader single and multi wavelength readings."""
+    wavelengths = [450, 650]
+    # Single Wavelength Readings
+    hellma_plate_slot = hellma_plate.parent
+    plate_reader.close_lid()
+    for wavelength in wavelengths:
+        plate_reader.initialize("single", [wavelength], reference_wavelength=wavelength)
+        plate_reader.open_lid()
+        protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
+        plate_reader.close_lid()
+        result = plate_reader.read(str(datetime.now()))
+        msg = f"{hellma_plate_name} result: {result}"
+        protocol.comment(msg=msg)
+        plate_reader.open_lid()
+        protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
+        plate_reader.close_lid()
+    # Multi Wavelength
+    plate_reader.initialize("multi", [450, 650])
+    plate_reader.open_lid()
+    protocol.move_labware(hellma_plate, plate_reader, use_gripper=True)
+    plate_reader.close_lid()
+    result = plate_reader.read(str(datetime.now()))
+    msg = f"{hellma_plate_name} result: {result}"
+    protocol.comment(msg=msg)
+    plate_reader.open_lid()
+    protocol.move_labware(hellma_plate, hellma_plate_slot, use_gripper=True)
+    plate_reader.close_lid()
 
 
 def move_labware_from_hs_to_destination(
@@ -467,7 +536,7 @@ def find_liquid_height(pipette: InstrumentContext, well_to_probe: Well) -> float
         )
     except PipetteLiquidNotFoundError:
         liquid_height = 0
-    return liquid_height
+    return liquid_height if isinstance(liquid_height, (float, int)) else 0
 
 
 def load_wells_with_custom_liquids(

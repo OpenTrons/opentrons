@@ -1,8 +1,12 @@
+import find from 'lodash/find'
 import {
+  getAllLiquidClassDefs,
   getModuleDisplayName,
   getModuleType,
   getOccludedSlotCountForModule,
   getPipetteSpecsV2,
+  THERMOCYCLER_MODULE_V1,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
 import { getPipetteNameOnMount } from '../getPipetteNameOnMount'
@@ -41,22 +45,34 @@ export const getLoadCommandText = ({
         getModuleType(command.params.model),
         robotType
       )
+      let slotName = command.params.location.slotName
+      if (
+        THERMOCYCLER_MODULE_V2 === command.params.model ||
+        THERMOCYCLER_MODULE_V1 === command.params.model
+      ) {
+        slotName = 'A1 + B1'
+      }
       return t('load_module_protocol_setup', {
         count: occludedSlotCount,
         module: getModuleDisplayName(command.params.model),
-        slot_name: command.params.location.slotName,
+        slot_name: slotName,
       })
     }
+    case 'loadLid':
     case 'loadLabware': {
       const location = getLabwareDisplayLocation({
-        location: command.params.location,
+        location: command.result?.locationSequence ?? command.params.location,
         robotType,
         allRunDefs,
         loadedLabwares: commandTextData?.labware ?? [],
         loadedModules: commandTextData?.modules ?? [],
         t,
       })
-      const labwareName = command.result?.definition.metadata.displayName
+      const labwareName =
+        'displayName' in command.params && command.params.displayName != null
+          ? command.params.displayName
+          : command.result?.definition.metadata.displayName
+
       // use in preposition for modules and slots, on for labware and adapters
       let displayLocation = t('in_location', { location })
       if (
@@ -70,6 +86,39 @@ export const getLoadCommandText = ({
 
       return t('load_labware_to_display_location', {
         labware: labwareName,
+        display_location: displayLocation,
+      })
+    }
+    case 'loadLidStack': {
+      // this will be the case if the system creates an empty stack to move lids onto
+      if (command.result?.definition == null) {
+        return t('load_lid_stack_empty')
+      }
+      const location =
+        command.result?.stackLocationSequence != null
+          ? getLabwareDisplayLocation({
+              location: command.result.stackLocationSequence,
+              robotType,
+              allRunDefs,
+              loadedLabwares: commandTextData?.labware ?? [],
+              loadedModules: commandTextData?.modules ?? [],
+              t,
+            })
+          : ''
+      // use in preposition for modules and slots, on for labware and adapters
+      let displayLocation = t('in_location', { location })
+      if (
+        command.params.location !== 'systemLocation' &&
+        command.params.location !== 'offDeck' &&
+        'labwareId' in command.params.location
+      ) {
+        displayLocation = t('on_location', { location })
+      }
+      const lidName = command.result.definition.metadata.displayName
+      const quantity = command.params.quantity
+      return t('load_lid_stack', {
+        quantity,
+        labware: lidName,
         display_location: displayLocation,
       })
     }
@@ -100,6 +149,16 @@ export const getLoadCommandText = ({
                 allRunDefs,
               })
             : null,
+      })
+    }
+    case 'loadLiquidClass': {
+      const { liquidClassName } = command.params.liquidClassRecord
+      const liquidClassDisplayName = find(
+        getAllLiquidClassDefs(),
+        liquidClassDef => liquidClassDef.liquidClassName === liquidClassName
+      )?.displayName
+      return t('load_liquid_class', {
+        liquidClassDisplayName,
       })
     }
     default: {

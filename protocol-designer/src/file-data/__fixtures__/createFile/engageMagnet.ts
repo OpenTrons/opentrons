@@ -31,7 +31,8 @@ export const initialRobotState: RobotState = {
   liquidState: {
     labware: {},
     pipettes: {},
-    additionalEquipment: {},
+    trashBins: {},
+    wasteChute: {},
   },
   tipState: {
     tipracks: {},
@@ -87,5 +88,6 @@ export const moduleEntities: ModuleEntities = {
     id: 'magneticModuleId',
     type: 'magneticModuleType',
     model: 'magneticModuleV1',
+    pythonName: 'mockPythonName',
   },
 }

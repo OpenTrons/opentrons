@@ -21,11 +21,11 @@ export async function fillApplicationSectionAndClickConfirm(): Promise<void> {
 export async function fillInstrumentsSectionAndClickConfirm(): Promise<void> {
   const leftMount = screen.getAllByText('Choose pipette')[0]
   fireEvent.click(leftMount)
-  fireEvent.click(screen.getByText('Flex 1-Channel 50 μL'))
+  fireEvent.click(screen.getByText('Flex 1-Channel 50 µL'))
 
   const rightMount = screen.getAllByText('Choose pipette')[0]
   fireEvent.click(rightMount)
-  fireEvent.click(screen.getByText('Flex 8-Channel 50 μL'))
+  fireEvent.click(screen.getByText('Flex 8-Channel 50 µL'))
 
   const confirmButton = screen.getByText('Confirm')
   await waitFor(() => {
