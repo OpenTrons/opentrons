@@ -1,4 +1,4 @@
-import { useMemo, Fragment } from 'react'
+import { Fragment } from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
@@ -7,8 +7,6 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
-  getVectorDifference,
-  getVectorSum,
   IDENTITY_VECTOR,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
@@ -40,7 +38,6 @@ import {
 } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
 import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
-import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type {
@@ -61,8 +58,8 @@ interface ResultsSummaryProps extends ResultsSummaryStep {
   protocolData: CompletedProtocolAnalysis
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
-  handleApplyOffsets: (offsets: LegacyLabwareOffsetCreateData[]) => void
-  isApplyingOffsets: boolean
+  allAppliedOffsets: LegacyLabwareOffsetCreateData[]
+  onCloseClick: () => void
   isDeletingMaintenanceRun?: boolean
 }
 export const ResultsSummary = (
@@ -71,71 +68,34 @@ export const ResultsSummary = (
   const { i18n, t } = useTranslation('labware_position_check')
   const {
     protocolData,
-    workingOffsets,
-    handleApplyOffsets,
-    existingOffsets,
-    isApplyingOffsets,
+    allAppliedOffsets,
+    onCloseClick,
     isDeletingMaintenanceRun,
   } = props
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
   )
-  const isSubmittingAndClosing = isApplyingOffsets || isDeletingMaintenanceRun
+  const isSubmittingAndClosing = isDeletingMaintenanceRun
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
   const isOnDevice = useSelector(getIsOnDevice)
 
-  const offsetsToApply = useMemo(() => {
-    return workingOffsets.map<LegacyLabwareOffsetCreateData>(
-      ({ initialPosition, finalPosition, labwareId, location }) => {
-        const definitionUri =
-          protocolData.labware.find(l => l.id === labwareId)?.definitionUri ??
-          null
-        if (
-          finalPosition == null ||
-          initialPosition == null ||
-          definitionUri == null
-        ) {
-          throw new Error(
-            `cannot create offset for labware with id ${labwareId}, in location ${JSON.stringify(
-              location
-            )}, with initial position ${String(
-              initialPosition
-            )}, and final position ${String(finalPosition)}`
-          )
-        }
-
-        const existingOffset =
-          getCurrentOffsetForLabwareInLocation(
-            existingOffsets,
-            definitionUri,
-            location
-          )?.vector ?? IDENTITY_VECTOR
-        const vector = getVectorSum(
-          existingOffset,
-          getVectorDifference(finalPosition, initialPosition)
-        )
-        return { definitionUri, location, vector }
-      }
-    )
-  }, [workingOffsets])
-
   const TableComponent = isOnDevice ? (
     <TerseOffsetTable
-      offsets={offsetsToApply}
+      offsets={allAppliedOffsets}
       labwareDefinitions={labwareDefinitions}
     />
   ) : (
     <OffsetTable
-      offsets={offsetsToApply}
+      offsets={allAppliedOffsets}
       labwareDefinitions={labwareDefinitions}
     />
   )
   const JupyterSnippet = (
     <LabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={offsetsToApply}
+      labwareOffsets={allAppliedOffsets}
       commands={protocolData?.commands ?? []}
       labware={protocolData?.labware ?? []}
       modules={protocolData?.modules ?? []}
@@ -145,7 +105,7 @@ export const ResultsSummary = (
   const CommandLineSnippet = (
     <LabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={offsetsToApply}
+      labwareOffsets={allAppliedOffsets}
       commands={protocolData?.commands ?? []}
       labware={protocolData?.labware ?? []}
       modules={protocolData?.modules ?? []}
@@ -176,13 +136,10 @@ export const ResultsSummary = (
       {isOnDevice ? (
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          onClick={() => {
-            handleApplyOffsets(offsetsToApply)
-          }}
-          buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
+          buttonText={i18n.format(t('complete'), 'capitalize')}
           iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
           iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
-          disabled={isSubmittingAndClosing}
+          onClick={onCloseClick}
         />
       ) : (
         <Flex
@@ -193,12 +150,10 @@ export const ResultsSummary = (
         >
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
           <PrimaryButton
-            onClick={() => {
-              handleApplyOffsets(offsetsToApply)
-            }}
+            onClick={onCloseClick}
             disabled={isSubmittingAndClosing}
           >
-            <Flex>
+            <Flex alignItems={ALIGN_CENTER}>
               {isSubmittingAndClosing ? (
                 <Icon
                   size="1rem"
@@ -208,7 +163,7 @@ export const ResultsSummary = (
                 />
               ) : null}
               <LegacyStyledText>
-                {i18n.format(t('apply_offsets'), 'capitalize')}
+                {i18n.format(t('complete'), 'capitalize')}
               </LegacyStyledText>
             </Flex>
           </PrimaryButton>

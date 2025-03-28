@@ -1,27 +1,20 @@
 import { useEffect } from 'react'
-import { updateLPC } from '/app/redux/protocol-runs'
-import { useDispatch, useSelector } from 'react-redux'
+import { updateLPCDeck } from '/app/redux/protocol-runs'
+import { useDispatch } from 'react-redux'
 
-import type { State } from '/app/redux/types'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 
+// The deck config may change after LPC state initialization, and LPC needs to account
+// for those changes.
 export function useUpdateDeckConfig(
   runId: string | null,
   deckConfig: DeckConfiguration | undefined
 ): void {
   const dispatch = useDispatch()
-  const lpcState = useSelector(
-    (state: State) => state?.protocolRuns[runId ?? '']?.lpc
-  )
 
   useEffect(() => {
-    if (lpcState != null && runId != null) {
-      const updatedState = {
-        ...lpcState,
-        deckConfig: deckConfig ?? lpcState.deckConfig,
-      }
-
-      dispatch(updateLPC(runId, updatedState))
+    if (runId != null && deckConfig != null) {
+      dispatch(updateLPCDeck(runId, deckConfig))
     }
   }, [deckConfig])
 }

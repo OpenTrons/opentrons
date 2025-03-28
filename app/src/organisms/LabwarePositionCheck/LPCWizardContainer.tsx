@@ -17,6 +17,7 @@ export function LPCWizardContainer(
           {...props}
           existingOffsets={props.ot2Offsets}
           mostRecentAnalysis={props.analysis}
+          isDeletingMaintenanceRun={props.isClosing}
         />
       )
     default: {

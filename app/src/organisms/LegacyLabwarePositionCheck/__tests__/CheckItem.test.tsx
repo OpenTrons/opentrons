@@ -32,9 +32,11 @@ const render = (props: ComponentProps<typeof CheckItem>) => {
 describe('CheckItem', () => {
   let props: ComponentProps<typeof CheckItem>
   let mockChainRunCommands: Mock
+  let mockApplyMostRecentWorkingOffset: Mock
 
   beforeEach(() => {
     mockChainRunCommands = vi.fn().mockImplementation(() => Promise.resolve([]))
+    mockApplyMostRecentWorkingOffset = vi.fn()
     props = {
       section: SECTIONS.CHECK_LABWARE,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
@@ -52,6 +54,8 @@ describe('CheckItem', () => {
       isRobotMoving: false,
       robotType: FLEX_ROBOT_TYPE,
       shouldUseMetalProbe: false,
+      calculateAndApplyOffset: mockApplyMostRecentWorkingOffset,
+      isApplyingOffsets: false,
     }
   })
   afterEach(() => {
@@ -430,6 +434,7 @@ describe('CheckItem', () => {
       location: { slotName: 'D1' },
       position: mockEndPosition,
     })
+    expect(mockApplyMostRecentWorkingOffset).toHaveBeenCalled()
   })
 
   it('executes heater shaker open latch command on component mount if step is on HS', async () => {
@@ -613,6 +618,8 @@ describe('CheckItem', () => {
       location: { slotName: 'D1', moduleModel: HEATERSHAKER_MODULE_V1 },
       position: mockEndPosition,
     })
+
+    expect(mockApplyMostRecentWorkingOffset).toHaveBeenCalled()
   })
 
   it('executes thermocycler open lid command on mount if checking labware on thermocycler', () => {

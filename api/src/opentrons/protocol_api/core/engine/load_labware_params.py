@@ -46,8 +46,6 @@ _APILEVEL_2_23_OT_DEFAULT_VERSIONS: dict[str, int] = {
     "corning_48_wellplate_1.6ml_flat": 3,
     "corning_6_wellplate_16.8ml_flat": 3,
     "corning_96_wellplate_360ul_flat": 3,
-    "evotips_flex_96_tiprack_adapter": 2,
-    "evotips_opentrons_96_labware": 2,
     "nest_12_reservoir_15ml": 2,
     "nest_1_reservoir_195ml": 3,
     "nest_1_reservoir_290ml": 2,

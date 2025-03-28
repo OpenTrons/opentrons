@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
 
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.errors import UnsupportedLabwareForActionError
 from opentrons.protocol_engine.types import MotorAxis
 from opentrons.types import MountType
 
@@ -27,7 +26,6 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from ..resources import labware_validation
 
 if TYPE_CHECKING:
     from ..state.state import StateView
@@ -86,11 +84,7 @@ class EvotipUnsealPipetteImplementation(
         well_name = params.wellName
 
         well_location = params.wellLocation
-        labware_definition = self._state_view.labware.get_definition(params.labwareId)
-        if not labware_validation.is_evotips(labware_definition.parameters.loadName):
-            raise UnsupportedLabwareForActionError(
-                f"Cannot use command: `EvotipUnsealPipette` with labware: {labware_definition.parameters.loadName}"
-            )
+
         is_partially_configured = self._state_view.pipettes.get_is_partially_configured(
             pipette_id=pipette_id
         )

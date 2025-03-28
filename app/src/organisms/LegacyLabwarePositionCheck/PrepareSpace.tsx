@@ -14,6 +14,7 @@ import {
   PrimaryButton,
   BaseDeck,
   ALIGN_FLEX_START,
+  SecondaryButton,
 } from '@opentrons/components'
 import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '@opentrons/shared-data'
 
@@ -61,13 +62,23 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
   labwareDef: LabwareDefinition2
   protocolData: CompletedProtocolAnalysis
   confirmPlacement: () => void
+  onSkip: () => void
   header: ReactNode
   body: ReactNode
   robotType: RobotType
 }
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
-  const { location, labwareDef, protocolData, header, body, robotType } = props
+  const {
+    location,
+    labwareDef,
+    protocolData,
+    header,
+    body,
+    robotType,
+    section,
+    onSkip,
+  } = props
 
   const isOnDevice = useSelector(getIsOnDevice)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
@@ -131,9 +142,14 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
       ) : (
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
-          <PrimaryButton onClick={props.confirmPlacement}>
-            {i18n.format(t('shared:confirm_placement'), 'capitalize')}
-          </PrimaryButton>
+          <Flex gap={SPACING.spacing8}>
+            {section !== 'PICK_UP_TIP' && section !== 'RETURN_TIP' && (
+              <SecondaryButton onClick={onSkip}>{t('skip')}</SecondaryButton>
+            )}
+            <PrimaryButton onClick={props.confirmPlacement}>
+              {i18n.format(t('shared:confirm_placement'), 'capitalize')}
+            </PrimaryButton>
+          </Flex>
         </Flex>
       )}
     </Flex>

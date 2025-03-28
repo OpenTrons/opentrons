@@ -1658,6 +1658,8 @@ def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
         "nest_96_wellplate_200ul_flat", "C3"
     )
     water = simulated_protocol_context.define_liquid_class("water")
+    water_props = water.get_for(pipette_1k, tiprack)
+    water_props.multi_dispense.retract.blowout.enabled = False  # type: ignore[union-attr]
     with pytest.raises(
         RuntimeError,
         match="Specify a blowout location and enable blowout when using a disposal volume",

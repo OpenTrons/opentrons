@@ -5,7 +5,6 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { ResultsSummary } from '../ResultsSummary'
 import { SECTIONS } from '../constants'
-import { mockTipRackDefinition } from '/app/redux/custom-labware/__fixtures__'
 import {
   mockCompletedAnalysis,
   mockExistingOffsets,
@@ -13,6 +12,7 @@ import {
 } from '../__fixtures__'
 
 import type { ComponentProps } from 'react'
+import type { Mock } from 'vitest'
 
 vi.mock('/app/redux/config')
 
@@ -24,16 +24,30 @@ const render = (props: ComponentProps<typeof ResultsSummary>) => {
 
 describe('ResultsSummary', () => {
   let props: ComponentProps<typeof ResultsSummary>
+  let mockOnCloseClick: Mock
 
   beforeEach(() => {
+    mockOnCloseClick = vi.fn()
+
     props = {
       section: SECTIONS.RESULTS_SUMMARY,
       protocolData: mockCompletedAnalysis,
       workingOffsets: mockWorkingOffsets,
       existingOffsets: mockExistingOffsets,
-      isApplyingOffsets: false,
       isDeletingMaintenanceRun: false,
-      handleApplyOffsets: vi.fn(),
+      allAppliedOffsets: [
+        {
+          location: { slotName: '1' },
+          vector: { x: 1.0, y: 1.0, z: 1.0 },
+          definitionUri: 'mock-uri',
+        },
+        {
+          location: { slotName: '3' },
+          vector: { x: 3.0, y: 3.0, z: 3.0 },
+          definitionUri: 'mock-uri-2',
+        },
+      ],
+      onCloseClick: mockOnCloseClick,
     }
   })
   afterEach(() => {
@@ -42,40 +56,28 @@ describe('ResultsSummary', () => {
   it('renders correct copy', () => {
     render(props)
     screen.getByText('New labware offset data')
-    screen.getByRole('button', { name: 'Apply offsets' })
+    screen.getByRole('button', { name: 'Complete' })
     screen.getByRole('link', { name: 'Need help?' })
     screen.getByRole('columnheader', { name: 'location' })
     screen.getByRole('columnheader', { name: 'labware' })
     screen.getByRole('columnheader', { name: 'labware offset data' })
   })
-  it('calls handle apply offsets function when button is clicked', () => {
+  it('calls on close function when button is clicked', () => {
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Apply offsets' }))
-    expect(props.handleApplyOffsets).toHaveBeenCalled()
-  })
-  it('does disables the CTA to apply offsets when offsets are already being applied', () => {
-    props.isApplyingOffsets = true
-    render(props)
-    const button = screen.getByRole('button', { name: 'Apply offsets' })
-    expect(button).toBeDisabled()
-    fireEvent.click(button)
-    expect(props.handleApplyOffsets).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Complete' }))
+    expect(mockOnCloseClick).toHaveBeenCalled()
   })
   it('does disables the CTA to apply offsets when the maintenance run is being deleted', () => {
     props.isDeletingMaintenanceRun = true
     render(props)
-    const button = screen.getByRole('button', { name: 'Apply offsets' })
+    const button = screen.getByRole('button', { name: 'Complete' })
     expect(button).toBeDisabled()
     fireEvent.click(button)
-    expect(props.handleApplyOffsets).not.toHaveBeenCalled()
+    expect(mockOnCloseClick).not.toHaveBeenCalled()
   })
   it('renders a row per offset to apply', () => {
     render(props)
-    expect(
-      screen.queryAllByRole('cell', {
-        name: mockTipRackDefinition.metadata.displayName,
-      })
-    ).toHaveLength(2)
+
     screen.getByRole('cell', { name: 'Slot 1' })
     screen.getByRole('cell', { name: 'Slot 3' })
     screen.getByRole('cell', { name: 'X 1.0 Y 1.0 Z 1.0' })

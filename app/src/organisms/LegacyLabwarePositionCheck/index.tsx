@@ -23,7 +23,7 @@ interface LabwarePositionCheckModalProps {
   mostRecentAnalysis: CompletedProtocolAnalysis | null
   protocolName: string
   setMaintenanceRunId?: (id: string | null) => void
-  isDeletingMaintenanceRun?: boolean
+  isDeletingMaintenanceRun: boolean
   caughtError?: Error
 }
 

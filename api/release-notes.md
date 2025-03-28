@@ -7,6 +7,24 @@ log][]. For a list of currently known issues, please see the [Opentrons issue tr
 By installing and using Opentrons software, you agree to the Opentrons End-User License Agreement (EULA). You can view the EULA at [opentrons.com/eula](https://opentrons.com/eula).
 
 ---
+## Opentrons Robot Software Changes in 8.4.0
+
+Welcome to the v8.4.0 release of the Opentrons robot software! This release includes updated liquid handling commands for Opentrons-verified liquid classes and other new features, improvements, and bug fixes. 
+
+### New Features
+
+- Use new ``transfer_liquid``, ``distribute_liquid``, and ``consolidate_liquid`` commands on Flex to optimize liquid handling based on Opentrons-verified liquid classes. 
+- Stack multiple Opentrons Tough Auto-Sealing Lids on the deck. 
+- Move Opentrons Tough Auto-Sealing Lids or remove tip rack lids with the Flex Gripper. 
+- Aspirate or dispense in a well based on the liquid meniscus. 
+
+### Improvements
+
+- Improved tip drop motions for Flex 1- and 8-channel pipettes correctly drop and return attached tips to the tip rack. 
+
+### Bug Fixes
+
+- The API raises an error if the Absorbance Plate Reader fails to initialize before reading a plate inside the module. 
 
 ## Opentrons Robot Software Changes in 8.3.1
 

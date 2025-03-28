@@ -2,10 +2,13 @@
   "ordering": [],
   "brand": {
     "brand": "Opentrons",
-    "brandId": []
+    "brandId": ["999-00254"],
+    "links": [
+      "https://opentrons.com/products/opentrons-flex-evotip-adapter-set/"
+    ]
   },
   "metadata": {
-    "displayName": "Evotip Tiprack Adapter",
+    "displayName": "Opentrons Flex Evotip Short Adapter",
     "displayCategory": "adapter",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -13,7 +16,7 @@
   "dimensions": {
     "xDimension": 130.5,
     "yDimension": 98,
-    "zDimension": 67.5
+    "zDimension": 51.5
   },
   "wells": {},
   "groups": [
@@ -27,7 +30,7 @@
     "quirks": ["stackingMaxFive"],
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "evotips_tiprack_adapter"
+    "loadName": "evotip_flex_short_adapter"
   },
   "namespace": "opentrons",
   "version": 1,

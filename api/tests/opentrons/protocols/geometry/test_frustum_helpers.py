@@ -1,11 +1,12 @@
 import pytest
 from math import pi, isclose
-from typing import Any, List
+from typing import Any, List, cast
 
 from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
     CuboidalFrustum,
     SphericalSegment,
+    InnerWellGeometry,
 )
 from opentrons.protocol_engine.state.frustum_helpers import (
     _cross_section_area_rectangular,
@@ -20,6 +21,7 @@ from opentrons.protocol_engine.state.frustum_helpers import (
     _height_from_volume_spherical,
     height_at_volume_within_section,
     _get_segment_capacity,
+    find_volume_at_well_height,
 )
 from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
@@ -45,7 +47,7 @@ def fake_frusta() -> List[List[Any]]:
                 bottomXDimension=15.0,
                 bottomYDimension=18.0,
                 topHeight=5.0,
-                bottomHeight=1.0,
+                bottomHeight=2.0,
             ),
             ConicalFrustum(
                 shape="conical",
@@ -323,3 +325,21 @@ def test_height_at_volume_within_section(well: List[Any]) -> None:
             segment, _get_segment_capacity(segment), segment_height
         )
         assert isclose(height, segment_height)
+
+
+@pytest.mark.parametrize("well", fake_frusta())
+def test_volume_at_section_boundary_heights(well: List[Any]) -> None:
+    """Test that finds the volume at the segment boundaries (top/bottom)."""
+    inner_well_geometry = InnerWellGeometry(sections=well)
+    tot_ul = 0.0
+    # reverse b/c list of top->bottom
+    for segment in reversed(well):
+        bottom_ul = find_volume_at_well_height(
+            target_height=segment.bottomHeight, well_geometry=inner_well_geometry
+        )
+        assert isclose(cast(float, bottom_ul), tot_ul)
+        top_ul = find_volume_at_well_height(
+            target_height=segment.topHeight, well_geometry=inner_well_geometry
+        )
+        tot_ul += _get_segment_capacity(segment)
+        assert isclose(cast(float, top_ul), tot_ul)

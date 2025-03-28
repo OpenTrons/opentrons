@@ -36,6 +36,7 @@ interface ReturnTipProps extends ReturnTipStep {
   proceed: () => void
   chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
   setFatalError: (errorMessage: string) => void
+  onSkip: () => void
   tipPickUpOffset: VectorOffset | null
   isRobotMoving: boolean
   robotType: RobotType
@@ -51,6 +52,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     tipPickUpOffset,
     isRobotMoving,
     chainRunCommands,
+    onSkip,
     setFatalError,
     adapterId,
   } = props
@@ -222,6 +224,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         body={<UnorderedList items={instructions} />}
         labwareDef={labwareDef}
         confirmPlacement={handleConfirmPlacement}
+        onSkip={onSkip}
       />
     </Flex>
   )
