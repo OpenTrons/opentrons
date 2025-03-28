@@ -9,8 +9,9 @@ export interface UseInfoBannersResult {
   defaultOffsetInfoBanner: BannerProps
 }
 
-// Holds state & functionality for managing banners that require app-wide persistent state.
-// If state should persist between LPC wizard sessions, use Redux instead!
+// TODO(jh, 03-28-25): This could live in redux.
+
+// Holds state & functionality for managing banners that require persistent state for this LPC session only.
 export function useInfoBanners(): UseInfoBannersResult {
   const [
     showDefaultOffsetInfoBanner,
