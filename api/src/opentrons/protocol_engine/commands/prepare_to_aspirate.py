@@ -5,7 +5,12 @@ from pydantic import BaseModel
 from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
-from .pipetting_common import OverpressureError, PipetteIdMixin, prepare_for_aspirate
+from .pipetting_common import (
+    OverpressureError,
+    PipetteIdMixin,
+    prepare_for_aspirate,
+    EmptyResult,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -66,6 +71,14 @@ class PrepareToAspirateImplementation(
 
     async def execute(self, params: PrepareToAspirateParams) -> _ExecuteReturn:
         """Prepare the pipette to aspirate."""
+        ready_to_aspirate = self._pipetting_handler.get_is_ready_to_aspirate(
+            pipette_id=params.pipetteId
+        )
+        if ready_to_aspirate:
+            return SuccessData(
+                public=PrepareToAspirateResult(),
+            )
+
         current_position = await self._gantry_mover.get_position(params.pipetteId)
         prepare_result = await prepare_for_aspirate(
             pipette_id=params.pipetteId,
@@ -79,6 +92,7 @@ class PrepareToAspirateImplementation(
                 )
             },
         )
+
         if isinstance(prepare_result, DefinedErrorData):
             return prepare_result
         else:
@@ -99,9 +113,9 @@ class PrepareToAspirate(
     params: PrepareToAspirateParams
     result: Optional[PrepareToAspirateResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[PrepareToAspirateImplementation] = (
         PrepareToAspirateImplementation
-    ] = PrepareToAspirateImplementation
+    )
 
 
 class PrepareToAspirateCreate(BaseCommandCreate[PrepareToAspirateParams]):
