@@ -20,6 +20,7 @@ import {
   SOURCE_OFFSETS_FROM_RUN,
   UPDATE_CONFLICT_TIMESTAMP,
   UPDATE_LPC,
+  UPDATE_LPC_DECK,
 } from '../constants'
 import {
   clearAllWorkingOffsets,
@@ -51,6 +52,13 @@ export function LPCReducer(
     return undefined
   } else {
     switch (action.type) {
+      case UPDATE_LPC_DECK: {
+        return {
+          ...state,
+          deckConfig: action.payload.deck,
+        }
+      }
+
       case PROCEED_STEP: {
         const { currentStepIndex, lastStepIndices } = state.steps
 

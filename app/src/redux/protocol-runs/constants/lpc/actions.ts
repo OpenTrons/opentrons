@@ -1,4 +1,5 @@
 export const UPDATE_LPC = 'UPDATE_LPC'
+export const UPDATE_LPC_DECK = 'UPDATE_LPC_DECK'
 export const FINISH_LPC = 'FINISH_LPC'
 export const PROCEED_STEP = 'PROCEED_STEP'
 export const GO_BACK_LAST_STEP = 'GO_BACK_LAST_STEP'
