@@ -1,4 +1,5 @@
 """Test prepare to aspirate commands."""
+
 from datetime import datetime
 from opentrons.types import Point
 import pytest
@@ -42,7 +43,9 @@ async def test_prepare_to_aspirate_implementation(
     """A PrepareToAspirate command should have an executing implementation."""
     data = PrepareToAspirateParams(pipetteId="some id")
     position = Point(x=1, y=2, z=3)
-
+    decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="some id")).then_return(
+        False
+    )
     decoy.when(await pipetting.prepare_for_aspirate(pipette_id="some id")).then_return(
         None
     )
@@ -81,6 +84,9 @@ async def test_overpressure_error(
     data = PrepareToAspirateParams(
         pipetteId=pipette_id,
     )
+    decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="pipette-id")).then_return(
+        False
+    )
 
     decoy.when(
         await pipetting.prepare_for_aspirate(
@@ -106,4 +112,27 @@ async def test_overpressure_error(
                 pipette_id="pipette-id"
             )
         ),
+    )
+
+
+async def test_prepare_noops_if_prepared(
+    decoy: Decoy,
+    gantry_mover: GantryMover,
+    pipetting: PipettingHandler,
+    subject: PrepareToAspirateImplementation,
+    model_utils: ModelUtils,
+) -> None:
+    """It should do nothing if the pipette does not need to be prepared."""
+    data = PrepareToAspirateParams(pipetteId="some id")
+    position = Point(x=1, y=2, z=3)
+    decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id="some id")).then_return(
+        True
+    )
+    decoy.when(await gantry_mover.get_position("some id")).then_return(position)
+
+    result = await subject.execute(data)
+    decoy.verify(await pipetting.prepare_for_aspirate(pipette_id="some id"), times=0)
+    assert result == SuccessData(
+        public=PrepareToAspirateResult(),
+        state_update=update_types.StateUpdate(),
     )
