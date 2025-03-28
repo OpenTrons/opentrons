@@ -9,8 +9,11 @@ import type { Action } from '../../../types'
 
 const makeResetConfigAction = (robotName: string) =>
   Actions.resetConfig(robotName, {
-    foo: true,
-    bar: false,
+    resetLabwareOffsets: false,
+    settingsResets: {
+      foo: true,
+      bar: false,
+    },
   })
 
 describe('robotAdminEpic handles performing a "factory reset"', () => {

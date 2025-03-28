@@ -41,6 +41,7 @@ describe('DeviceReset', () => {
     screen.getByText('Clear gripper calibration')
     screen.getByText('Clear module calibration')
     screen.getByText('Clear protocol run history')
+    screen.getByText('Clear labware offset data')
     screen.getByText('Clears information about past runs of all protocols.')
     screen.getByText('Clear all stored data')
     screen.getByText(
@@ -62,9 +63,12 @@ describe('DeviceReset', () => {
 
   it('when tapping a option button and tapping the clear button, a mock function is called', () => {
     const clearMockResetOptions = {
-      pipetteOffsetCalibrations: true,
-      moduleCalibration: true,
-      runsHistory: true,
+      resetLabwareOffsets: false,
+      settingsResets: {
+        pipetteOffsetCalibrations: true,
+        moduleCalibration: true,
+        runsHistory: true,
+      },
     }
     render(props)
     fireEvent.click(screen.getByText('Clear pipette calibration'))
@@ -81,13 +85,16 @@ describe('DeviceReset', () => {
 
   it('when tapping clear all stored data, all options are active', () => {
     const clearMockResetOptions = {
-      pipetteOffsetCalibrations: true,
-      moduleCalibration: true,
-      runsHistory: true,
-      gripperOffsetCalibrations: true,
-      authorizedKeys: true,
-      onDeviceDisplay: true,
-      deckConfiguration: true,
+      resetLabwareOffsets: true,
+      settingsResets: {
+        pipetteOffsetCalibrations: true,
+        moduleCalibration: true,
+        runsHistory: true,
+        gripperOffsetCalibrations: true,
+        authorizedKeys: true,
+        onDeviceDisplay: true,
+        deckConfiguration: true,
+      },
     }
 
     render(props)
@@ -103,13 +110,16 @@ describe('DeviceReset', () => {
 
   it('when tapping all options except clear all stored data, all options are active', () => {
     const clearMockResetOptions = {
-      pipetteOffsetCalibrations: true,
-      moduleCalibration: true,
-      runsHistory: true,
-      gripperOffsetCalibrations: true,
-      authorizedKeys: true,
-      onDeviceDisplay: true,
-      deckConfiguration: true,
+      resetLabwareOffsets: true,
+      settingsResets: {
+        pipetteOffsetCalibrations: true,
+        moduleCalibration: true,
+        runsHistory: true,
+        gripperOffsetCalibrations: true,
+        authorizedKeys: true,
+        onDeviceDisplay: true,
+        deckConfiguration: true,
+      },
     }
 
     render(props)
@@ -117,6 +127,7 @@ describe('DeviceReset', () => {
     fireEvent.click(screen.getByText('Clear gripper calibration'))
     fireEvent.click(screen.getByText('Clear module calibration'))
     fireEvent.click(screen.getByText('Clear protocol run history'))
+    fireEvent.click(screen.getByText('Clear labware offset data'))
     const clearButton = screen.getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     screen.getByText('Are you sure you want to reset your device?')
@@ -128,13 +139,16 @@ describe('DeviceReset', () => {
 
   it('when tapping clear all stored data and unselect one options, all options are not active', () => {
     const clearMockResetOptions = {
-      pipetteOffsetCalibrations: false,
-      moduleCalibration: true,
-      runsHistory: true,
-      gripperOffsetCalibrations: true,
-      authorizedKeys: false,
-      onDeviceDisplay: false,
-      deckConfiguration: false,
+      resetLabwareOffsets: true,
+      settingsResets: {
+        pipetteOffsetCalibrations: false,
+        moduleCalibration: true,
+        runsHistory: true,
+        gripperOffsetCalibrations: true,
+        authorizedKeys: false,
+        onDeviceDisplay: false,
+        deckConfiguration: false,
+      },
     }
 
     render(props)
