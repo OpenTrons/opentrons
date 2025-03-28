@@ -257,6 +257,9 @@ class SerialConnection:
 
         Raises: SerialException
         """
+        if not response or not request:
+            return
+
         lower = response.lower()
         res_gcode = response.split()[0]
         req_gcode = request.split()[0]
