@@ -17,25 +17,25 @@ stages:
             description: Clear custom boot scripts
           - id: pipetteOffsetCalibrations
             name: Pipette Offset Calibrations
-            description: !re_search 'Clear pipette offset calibrations'
+            description: !anystr
           - id: gripperOffsetCalibrations
             name: Gripper Offset Calibrations
-            description: !re_search 'Clear gripper offset calibrations'
+            description: !anystr
           - id: runsHistory
-            name: Clear Runs History
-            description: !re_search "Erase this device's stored history of protocols and runs"
+            name: Clear Robot Server Data
+            description: !anystr
           - id: onDeviceDisplay
             name: On-Device Display Configuration
-            description: !re_search 'on-device display'
+            description: !anystr
           - id: deckConfiguration
             name: Deck Configuration
             description: Clear deck configuration
           - id: moduleCalibration
             name: Module Calibrations
-            description: !re_search 'Clear module offset calibrations'
+            description: !anystr
           - id: authorizedKeys
             name: SSH Authorized Keys
-            description: !re_search 'Clear the ssh authorized keys'
+            description: !anystr
 
   - name: POST Reset gripperOffsetCalibrations true on OT-3
     request:
