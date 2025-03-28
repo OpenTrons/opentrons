@@ -1,17 +1,9 @@
-"""Test Flex Stacker retrieve command implementation."""
-
-from datetime import datetime
+"""Test Flex Stacker unsafe manual retrieve command implementation."""
 
 import pytest
-from decoy import Decoy, matchers
-from typing import Type, Union
+from decoy import Decoy
 
-from opentrons.drivers.flex_stacker.types import StackerAxis
-from opentrons.hardware_control.modules import FlexStacker, PlatformState
-from opentrons.protocol_engine.commands.flex_stacker.common import (
-    FlexStackerStallOrCollisionError,
-    FlexStackerShuttleError,
-)
+from opentrons.hardware_control.modules import FlexStacker
 from opentrons.protocol_engine.resources import ModelUtils
 
 from opentrons.protocol_engine.state.state import StateView
@@ -27,9 +19,11 @@ from opentrons.protocol_engine.state.module_substates import (
     FlexStackerId,
 )
 from opentrons.protocol_engine.execution import EquipmentHandler
-from opentrons.protocol_engine.commands import flex_stacker
-from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
-from opentrons.protocol_engine.commands.flex_stacker.retrieve import RetrieveImpl
+from opentrons.protocol_engine.commands import unsafe
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.unsafe.unsafe_manual_retrieve import (
+    UnsafeManualRetrieveImpl,
+)
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
@@ -51,10 +45,23 @@ from opentrons.protocol_engine.execution.equipment import LoadedLabwarePoolData
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
 )
-from opentrons_shared_data.errors.exceptions import (
-    FlexStackerStallError,
-    FlexStackerShuttleMissingError,
-)
+from opentrons.hardware_control.modules.types import PlatformState
+
+
+@pytest.fixture
+def stacker_id() -> FlexStackerId:
+    """Get a consistent ID for a stacker."""
+    return FlexStackerId("flex-stacker-id")
+
+
+@pytest.fixture
+def stacker_hardware(
+    decoy: Decoy, equipment: EquipmentHandler, stacker_id: FlexStackerId
+) -> FlexStacker:
+    """Get a mocked hardware stacker."""
+    hardware = decoy.mock(cls=FlexStacker)
+    decoy.when(equipment.get_module_hardware_api(stacker_id)).then_return(hardware)
+    return hardware
 
 
 def _prep_stacker_own_location(
@@ -93,23 +100,23 @@ def _stacker_base_loc_seq(stacker_id: str) -> LabwareLocationSequence:
 @pytest.fixture
 def subject(
     state_view: StateView, equipment: EquipmentHandler, model_utils: ModelUtils
-) -> RetrieveImpl:
+) -> UnsafeManualRetrieveImpl:
     """Get a retrieve command to test."""
-    return RetrieveImpl(
+    return UnsafeManualRetrieveImpl(
         state_view=state_view, equipment=equipment, model_utils=model_utils
     )
 
 
-async def test_retrieve_raises_when_empty(
+async def test_manual_retrieve_raises_when_empty(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: RetrieveImpl,
+    subject: UnsafeManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     stacker_id: FlexStackerId,
 ) -> None:
     """It should raise an exception when called on an empty pool."""
-    data = flex_stacker.RetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
 
     fs_module_substate = FlexStackerSubState(
         module_id=stacker_id,
@@ -131,17 +138,17 @@ async def test_retrieve_raises_when_empty(
         await subject.execute(data)
 
 
-async def test_retrieve_primary_only(
+async def test_manual_retrieve_primary_only(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: RetrieveImpl,
+    subject: UnsafeManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should be able to retrieve a labware."""
-    data = flex_stacker.RetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
 
     loaded_labware = LoadedLabware(
         id="labware-id",
@@ -195,12 +202,12 @@ async def test_retrieve_primary_only(
 
     _prep_stacker_own_location(decoy, state_view, stacker_id)
 
+    decoy.when(stacker_hardware.platform_state).then_return(PlatformState.EXTENDED)
+
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.dispense_labware(labware_height=4), times=1)
-
     assert result == SuccessData(
-        public=flex_stacker.RetrieveResult(
+        public=unsafe.UnsafeManualRetrieveResult(
             labwareId="labware-id",
             primaryLocationSequence=_stacker_base_loc_seq(stacker_id),
             primaryLabwareURI="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
@@ -225,18 +232,18 @@ async def test_retrieve_primary_only(
     )
 
 
-async def test_retrieve_primary_and_lid(
+async def test_manual_retrieve_primary_and_lid(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: RetrieveImpl,
+    subject: UnsafeManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     tiprack_lid_def: LabwareDefinition,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should be able to retrieve a labware with a lid on it."""
-    data = flex_stacker.RetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
 
     loaded_labware = LoadedLabware(
         id="labware-id",
@@ -316,12 +323,12 @@ async def test_retrieve_primary_and_lid(
     ).then_return(8)
 
     _prep_stacker_own_location(decoy, state_view, stacker_id)
+    decoy.when(stacker_hardware.platform_state).then_return(PlatformState.EXTENDED)
+
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.dispense_labware(labware_height=8), times=1)
-
     assert result == SuccessData(
-        public=flex_stacker.RetrieveResult(
+        public=unsafe.UnsafeManualRetrieveResult(
             labwareId="labware-id",
             lidId="lid-id",
             primaryLocationSequence=_stacker_base_loc_seq(stacker_id),
@@ -366,18 +373,18 @@ async def test_retrieve_primary_and_lid(
     )
 
 
-async def test_retrieve_primary_and_adapter(
+async def test_manual_retrieve_primary_and_adapter(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: RetrieveImpl,
+    subject: UnsafeManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     tiprack_adapter_def: LabwareDefinition,
     stacker_id: FlexStackerId,
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should be able to retrieve a labware on an adapter."""
-    data = flex_stacker.RetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
 
     loaded_adapter = LoadedLabware(
         id="adapter-id",
@@ -467,12 +474,12 @@ async def test_retrieve_primary_and_adapter(
     ).then_return(12)
 
     _prep_stacker_own_location(decoy, state_view, stacker_id)
+    decoy.when(stacker_hardware.platform_state).then_return(PlatformState.EXTENDED)
+
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.dispense_labware(labware_height=12), times=1)
-
     assert result == SuccessData(
-        public=flex_stacker.RetrieveResult(
+        public=unsafe.UnsafeManualRetrieveResult(
             labwareId="labware-id",
             adapterId="adapter-id",
             primaryLocationSequence=(
@@ -510,11 +517,11 @@ async def test_retrieve_primary_and_adapter(
     )
 
 
-async def test_retrieve_primary_adapter_and_lid(
+async def test_manual_retrieve_primary_adapter_and_lid(
     decoy: Decoy,
     state_view: StateView,
     equipment: EquipmentHandler,
-    subject: RetrieveImpl,
+    subject: UnsafeManualRetrieveImpl,
     flex_50uL_tiprack: LabwareDefinition,
     tiprack_adapter_def: LabwareDefinition,
     tiprack_lid_def: LabwareDefinition,
@@ -522,7 +529,7 @@ async def test_retrieve_primary_adapter_and_lid(
     stacker_hardware: FlexStacker,
 ) -> None:
     """It should be able to retrieve a labware on an adapter."""
-    data = flex_stacker.RetrieveParams(moduleId=stacker_id)
+    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
 
     loaded_adapter = LoadedLabware(
         id="adapter-id",
@@ -632,12 +639,12 @@ async def test_retrieve_primary_adapter_and_lid(
     ).then_return(16)
 
     _prep_stacker_own_location(decoy, state_view, stacker_id)
+    decoy.when(stacker_hardware.platform_state).then_return(PlatformState.EXTENDED)
+
     result = await subject.execute(data)
 
-    decoy.verify(await stacker_hardware.dispense_labware(labware_height=16), times=1)
-
     assert result == SuccessData(
-        public=flex_stacker.RetrieveResult(
+        public=unsafe.UnsafeManualRetrieveResult(
             labwareId="labware-id",
             adapterId="adapter-id",
             lidId="lid-id",
@@ -698,42 +705,18 @@ async def test_retrieve_primary_adapter_and_lid(
     )
 
 
-@pytest.mark.parametrize(
-    "shared_data_error,protocol_engine_error",
-    [
-        (
-            FlexStackerStallError(serial="123", axis=StackerAxis.Z),
-            FlexStackerStallOrCollisionError,
-        ),
-        (
-            FlexStackerShuttleMissingError(
-                serial="123",
-                expected_state=PlatformState.EXTENDED,
-                shuttle_state=PlatformState.UNKNOWN,
-            ),
-            FlexStackerShuttleError,
-        ),
-    ],
-)
-async def test_retrieve_raises_if_stall(
+async def test_manual_retrieve_fails_due_to_platform_state(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
-    subject: RetrieveImpl,
+    subject: UnsafeManualRetrieveImpl,
     model_utils: ModelUtils,
     stacker_id: FlexStackerId,
     flex_50uL_tiprack: LabwareDefinition,
     stacker_hardware: FlexStacker,
-    shared_data_error: Exception,
-    protocol_engine_error: Type[
-        Union[FlexStackerStallOrCollisionError, FlexStackerShuttleError]
-    ],
 ) -> None:
-    """It should raise a stall error."""
-    error_id = "error-id"
-    error_timestamp = datetime(year=2020, month=1, day=2)
-
-    data = flex_stacker.RetrieveParams(moduleId=stacker_id)
+    """It should raise a CannotPerformModuleAction error."""
+    data = unsafe.UnsafeManualRetrieveParams(moduleId=stacker_id)
     loaded_labware = LoadedLabware(
         id="labware-id",
         loadName="opentrons_flex_96_filtertiprack_50ul",
@@ -779,26 +762,9 @@ async def test_retrieve_raises_if_stall(
         )
     ).then_return(_stacker_base_loc_seq(stacker_id))
 
-    decoy.when(
-        state_view.geometry.get_height_of_labware_stack(definitions=[flex_50uL_tiprack])
-    ).then_return(16)
-
-    _prep_stacker_own_location(decoy, state_view, stacker_id)
-
-    decoy.when(model_utils.generate_id()).then_return(error_id)
-    decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
-
-    decoy.when(await stacker_hardware.dispense_labware(labware_height=16)).then_raise(
-        shared_data_error
-    )
-
-    result = await subject.execute(data)
-
-    assert result == DefinedErrorData(
-        public=protocol_engine_error.model_construct(
-            id=error_id,
-            createdAt=error_timestamp,
-            wrappedErrors=[matchers.Anything()],
-        ),
-        state_update=StateUpdate(),
-    )
+    decoy.when(stacker_hardware.platform_state).then_return(PlatformState.UNKNOWN)
+    with pytest.raises(
+        CannotPerformModuleAction,
+        match="Cannot manually retrieve a labware from Flex Stacker if the carriage is not in gripper position.",
+    ):
+        await subject.execute(data)

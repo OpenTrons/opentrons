@@ -48,6 +48,13 @@ from .unsafe_place_labware import (
     UnsafePlaceLabwareCreate,
 )
 
+from .unsafe_manual_retrieve import (
+    UnsafeManualRetrieveCommandType,
+    UnsafeManualRetrieveParams,
+    UnsafeManualRetrieveResult,
+    UnsafeManualRetrieve,
+    UnsafeManualRetrieveCreate,
+)
 
 __all__ = [
     # Unsafe blow-out-in-place command models
@@ -86,4 +93,10 @@ __all__ = [
     "UnsafePlaceLabwareResult",
     "UnsafePlaceLabware",
     "UnsafePlaceLabwareCreate",
+    # Unsafe manual retrieve
+    "UnsafeManualRetrieveCommandType",
+    "UnsafeManualRetrieveParams",
+    "UnsafeManualRetrieveResult",
+    "UnsafeManualRetrieve",
+    "UnsafeManualRetrieveCreate",
 ]

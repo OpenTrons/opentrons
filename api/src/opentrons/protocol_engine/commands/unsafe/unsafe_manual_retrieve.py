@@ -1,4 +1,4 @@
-"""Command models to retrieve a labware from a Flex Stacker."""
+"""Command models to manually retrieve a labware from a Flex Stacker in an unsafe situation."""
 
 from __future__ import annotations
 from typing import Literal, TYPE_CHECKING, Any, Union, Optional
@@ -14,10 +14,7 @@ from ..command import (
     SuccessData,
     DefinedErrorData,
 )
-from ..flex_stacker.common import (
-    FlexStackerStallOrCollisionError,
-    FlexStackerShuttleError,
-)
+from ..flex_stacker.common import FlexStackerStallOrCollisionError
 from ...errors import (
     ErrorOccurrence,
     CannotPerformModuleAction,
@@ -32,25 +29,23 @@ from ...types import (
     LabwareLocation,
     LoadedLabware,
 )
+from opentrons.hardware_control.modules.types import PlatformState
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors.exceptions import (
-    FlexStackerStallError,
-    FlexStackerShuttleMissingError,
-)
+from ..flex_stacker.retrieve import RetrieveResult
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-RetrieveCommandType = Literal["flexStacker/retrieve"]
+UnsafeManualRetrieveCommandType = Literal["unsafe/manualRetrieve"]
 
 
 def _remove_default(s: dict[str, Any]) -> None:
     s.pop("default", None)
 
 
-class RetrieveParams(BaseModel):
+class UnsafeManualRetrieveParams(BaseModel):
     """Input parameters for a labware retrieval command."""
 
     moduleId: str = Field(
@@ -83,7 +78,7 @@ class RetrieveParams(BaseModel):
     )
 
 
-class RetrieveResult(BaseModel):
+class UnsafeManualRetrieveResult(RetrieveResult):
     """Result data from a labware retrieval command."""
 
     labwareId: str = Field(
@@ -123,13 +118,14 @@ class RetrieveResult(BaseModel):
 
 
 _ExecuteReturn = Union[
-    SuccessData[RetrieveResult],
-    DefinedErrorData[FlexStackerStallOrCollisionError]
-    | DefinedErrorData[FlexStackerShuttleError],
+    SuccessData[UnsafeManualRetrieveResult],
+    DefinedErrorData[FlexStackerStallOrCollisionError],
 ]
 
 
-class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
+class UnsafeManualRetrieveImpl(
+    AbstractCommandImpl[UnsafeManualRetrieveParams, _ExecuteReturn]
+):
     """Implementation of a labware retrieval command."""
 
     def __init__(
@@ -144,14 +140,14 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         self._model_utils = model_utils
 
     async def _load_labware_from_pool(
-        self, params: RetrieveParams, stacker_state: FlexStackerSubState
-    ) -> tuple[RetrieveResult, update_types.StateUpdate]:
+        self, params: UnsafeManualRetrieveParams, stacker_state: FlexStackerSubState
+    ) -> tuple[UnsafeManualRetrieveResult, update_types.StateUpdate]:
         state_update = update_types.StateUpdate()
 
         # Always load the primary labware
         if stacker_state.pool_primary_definition is None:
             raise CannotPerformModuleAction(
-                f"Flex Stacker {params.moduleId} has no labware to retrieve"
+                f"Flex Stacker {params.moduleId} has no labware to manually retrieve."
             )
 
         # Load the Stacker Pool Labwares
@@ -242,7 +238,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             )
 
         return (
-            RetrieveResult(
+            UnsafeManualRetrieveResult(
                 labwareId=loaded_labware_pool.primary_labware.id,
                 adapterId=loaded_labware_pool.adapter_labware.id
                 if loaded_labware_pool.adapter_labware is not None
@@ -264,7 +260,7 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
             state_update,
         )
 
-    async def execute(self, params: RetrieveParams) -> _ExecuteReturn:
+    async def execute(self, params: UnsafeManualRetrieveParams) -> _ExecuteReturn:
         """Execute the labware retrieval command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -286,7 +282,17 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         # Allow propagation of ModuleNotAttachedError.
         stacker_hw = self._equipment.get_module_hardware_api(stacker_state.module_id)
 
+        # Validate that the stacker is fully in the gripper position
+        if (
+            stacker_hw is not None
+            and stacker_hw.platform_state != PlatformState.EXTENDED
+        ):
+            raise CannotPerformModuleAction(
+                "Cannot manually retrieve a labware from Flex Stacker if the carriage is not in gripper position."
+            )
+
         try:
+            # In theory given this is an unsafe manual retrieve this should never raise
             self._state_view.labware.raise_if_labware_in_location(stacker_loc)
         except LocationIsOccupiedError:
             raise CannotPerformModuleAction(
@@ -296,42 +302,6 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         retrieve_result, state_update = await self._load_labware_from_pool(
             params, stacker_state
         )
-
-        labware_height = self._state_view.geometry.get_height_of_labware_stack(
-            definitions=pool_definitions
-        )
-
-        try:
-            if stacker_hw is not None:
-                await stacker_hw.dispense_labware(labware_height=labware_height)
-        except FlexStackerStallError as e:
-            return DefinedErrorData(
-                public=FlexStackerStallOrCollisionError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                ),
-            )
-        except FlexStackerShuttleMissingError as e:
-            return DefinedErrorData(
-                public=FlexStackerShuttleError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=e,
-                        )
-                    ],
-                ),
-            )
 
         # Update the state to reflect the labware is now in the Flex Stacker slot
         # todo(chb, 2025-02-19): This ModuleLocation piece should probably instead be an AddressableAreaLocation
@@ -353,20 +323,22 @@ class RetrieveImpl(AbstractCommandImpl[RetrieveParams, _ExecuteReturn]):
         )
 
 
-class Retrieve(BaseCommand[RetrieveParams, RetrieveResult, ErrorOccurrence]):
-    """A command to retrieve a labware from a Flex Stacker."""
+class UnsafeManualRetrieve(
+    BaseCommand[UnsafeManualRetrieveParams, UnsafeManualRetrieveResult, ErrorOccurrence]
+):
+    """A command to manually retrieve a labware from a Flex Stacker."""
 
-    commandType: RetrieveCommandType = "flexStacker/retrieve"
-    params: RetrieveParams
-    result: RetrieveResult | None = None
+    commandType: UnsafeManualRetrieveCommandType = "unsafe/manualRetrieve"
+    params: UnsafeManualRetrieveParams
+    result: UnsafeManualRetrieveResult | None = None
 
-    _ImplementationCls: Type[RetrieveImpl] = RetrieveImpl
+    _ImplementationCls: Type[UnsafeManualRetrieveImpl] = UnsafeManualRetrieveImpl
 
 
-class RetrieveCreate(BaseCommandCreate[RetrieveParams]):
-    """A request to execute a Flex Stacker retrieve command."""
+class UnsafeManualRetrieveCreate(BaseCommandCreate[UnsafeManualRetrieveParams]):
+    """A request to execute a Flex Stacker manual retrieve command."""
 
-    commandType: RetrieveCommandType = "flexStacker/retrieve"
-    params: RetrieveParams
+    commandType: UnsafeManualRetrieveCommandType = "unsafe/manualRetrieve"
+    params: UnsafeManualRetrieveParams
 
-    _CommandCls: Type[Retrieve] = Retrieve
+    _CommandCls: Type[UnsafeManualRetrieve] = UnsafeManualRetrieve
