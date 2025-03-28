@@ -651,7 +651,7 @@ async def test_get_tof_histogram(
     subject: FlexStackerDriver,
     connection: AsyncMock,
     decoy: Decoy,
-    histogram_bins: Dict[int, List[int]],
+    histogram_bins: Dict[int, List[float]],
 ) -> None:
     """it should send a start and get tof measurements until full payload is transfered"""
     connection.send_command.side_effect = [

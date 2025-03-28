@@ -27,6 +27,7 @@ from .types import (
     LEDColor,
     StallGuardParams,
     TOFConfiguration,
+    TOFDetection,
     TOFMeasurement,
     TOFMeasurementFrame,
     TOFMeasurementResult,
@@ -35,7 +36,12 @@ from .types import (
     TOFSensorState,
     TOFSensorStatus,
 )
-from .utils import validate_histogram_frame
+from .utils import (
+    NUMBER_OF_BINS,
+    TOF_BASELINE_FILE,
+    load_tof_baseline,
+    validate_histogram_frame,
+)
 
 
 FS_BAUDRATE = 115200
@@ -55,7 +61,36 @@ MAX_REPS = 10
 
 # TOF Sensor
 TOF_FRAME_RETRIES = 1
-NUMBER_OF_BINS = 128
+TOF_PHOTON_THRESHOLD = 10000
+TOF_DETECTION_CONFIG = {
+    TOFSensor.X: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=[10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.X,
+            zones=[5, 6, 7],
+            bins=[10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+        ),
+    },
+    TOFSensor.Z: {
+        Direction.EXTEND: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            # TODO: check the specific bins for Z
+            bins=list(range(NUMBER_OF_BINS)),
+        ),
+        Direction.RETRACT: TOFDetection(
+            TOFSensor.Z,
+            zones=[1, 2, 3],
+            # TODO: check the specific bins for Z
+            bins=list(range(NUMBER_OF_BINS)),
+        ),
+    },
+}
+
 
 # Stallguard defaults
 STALLGUARD_CONFIG = {
@@ -592,7 +627,8 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             msb = data[ch + 20]
             # combine lsb, mid, and msb bytes to generate bin count for the ch
             bins[ch] = [
-                (msb[b] << 16) | (mid[b] << 8) | lsb[b] for b in range(NUMBER_OF_BINS)
+                float((msb[b] << 16) | (mid[b] << 8) | lsb[b])
+                for b in range(NUMBER_OF_BINS)
             ]
         return TOFMeasurementResult(start.sensor, start.kind, bins)
 
@@ -609,6 +645,30 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             raise ValueError(
                 f"Incorrect Response for set motor driver register: {resp}"
             )
+
+    async def labware_detected(self, sensor: TOFSensor, direction: Direction) -> bool:
+        """Detect labware on the TOF sensor using the `baseline` method
+
+        NOTE: This method is still under development and is inconsistent when detecting
+        labware on the X axis smaller than a tiprack. We can consistently detect
+        labware on the Z, but we need to do more data collection and testing
+        to validate this method.
+        """
+        histogram = await self.get_tof_histogram(sensor)
+        config = TOF_DETECTION_CONFIG[sensor][direction]
+        baseline = load_tof_baseline(TOF_BASELINE_FILE)[sensor.value]
+        for zone in config.zones:
+            raw_data = histogram.bins[zone]
+            baseline_data = baseline[zone]
+            for bin in config.bins:
+                # We need to ignore raw photon count below 10000 on the X as
+                # it becomes inconsistent to detect labware on the home position.
+                if sensor == TOFSensor.X and raw_data[bin] < TOF_PHOTON_THRESHOLD:
+                    continue
+                delta = raw_data[bin] - baseline_data[bin]
+                if delta > 0:
+                    return True
+        return False
 
     async def get_motor_driver_register(self, axis: StackerAxis, reg: int) -> int:
         """Gets the register value of the given motor axis driver."""
