@@ -356,6 +356,83 @@ def test_grouping_wells_for_column_384_plate(
 
 
 @pytest.mark.parametrize(
+    argnames="nozzle_map", argvalues=[_8_FULL_MAP, _96_COL1_MAP, _96_COL12_MAP]
+)
+def test_grouping_wells_for_column_96_plate_raises(
+    nozzle_map: NozzleMap, mock_96_well_labware: Labware, decoy: Decoy
+) -> None:
+    """It should raise if a valid grouping can't be found for all wells."""
+    mock_wells = [decoy.mock(cls=Well) for _ in range(18)]
+    for mock_well, well_name in zip(
+        mock_wells, WELLS_BY_COLUMN_96[0] + WELLS_BY_COLUMN_96[1] + ["A3", "B3"]
+    ):
+        decoy.when(mock_well.well_name).then_return(well_name)
+        decoy.when(mock_well.parent).then_return(mock_96_well_labware)
+
+    # leftover wells
+    with pytest.raises(ValueError, match="Could not target all wells"):
+        group_wells_for_multi_channel_transfer(mock_wells, nozzle_map)
+
+    # non-contiguous wells from the same labware
+    with pytest.raises(ValueError, match="Could not resolve wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:7] + [mock_wells[-1], mock_wells[7]], nozzle_map
+        )
+
+    other_labware = decoy.mock(cls=Labware)
+    decoy.when(other_labware.parameters).then_return({"format": "96Standard"})  # type: ignore[typeddict-item]
+    other_well = decoy.mock(cls=Well)
+    decoy.when(other_well.well_name).then_return("H1")
+    decoy.when(other_well.parent).then_return(other_labware)
+
+    # non-contiguous wells from different labware, well name is correct though
+    with pytest.raises(ValueError, match="Could not resolve wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:7] + [other_well], nozzle_map
+        )
+
+
+@pytest.mark.parametrize(
+    argnames="nozzle_map", argvalues=[_8_FULL_MAP, _96_COL1_MAP, _96_COL12_MAP]
+)
+def test_grouping_wells_for_column_384_plate_raises(
+    nozzle_map: NozzleMap, mock_384_well_labware: Labware, decoy: Decoy
+) -> None:
+    """It should raise if a valid grouping can't be found for all wells."""
+    mock_wells = [decoy.mock(cls=Well) for _ in range(32)]
+    for mock_well, well_name in zip(
+        mock_wells, WELLS_BY_COLUMN_384[0] + WELLS_BY_COLUMN_384[1]
+    ):
+        decoy.when(mock_well.well_name).then_return(well_name)
+        decoy.when(mock_well.parent).then_return(mock_384_well_labware)
+
+    # leftover wells
+    with pytest.raises(ValueError, match="Could not target all wells"):
+        group_wells_for_multi_channel_transfer(mock_wells[:-1], nozzle_map)
+
+    # non-contiguous or every other wells from the same labware
+    with pytest.raises(ValueError, match="Could not resolve wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:2] + [mock_wells[-1]], nozzle_map
+        )
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:-1] + [mock_wells[0]], nozzle_map
+        )
+
+    other_labware = decoy.mock(cls=Labware)
+    decoy.when(other_labware.parameters).then_return({"format": "384Standard"})  # type: ignore[typeddict-item]
+    other_well = decoy.mock(cls=Well)
+    decoy.when(other_well.well_name).then_return("P1")
+    decoy.when(other_well.parent).then_return(other_labware)
+
+    # non-contiguous wells from different labware, well name is correct though
+    with pytest.raises(ValueError, match="Could not resolve wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:15] + [other_well], nozzle_map
+        )
+
+
+@pytest.mark.parametrize(
     argnames="nozzle_map", argvalues=[_96_ROW_A_MAP, _96_ROW_H_MAP]
 )
 def test_grouping_wells_for_row_96_plate(
@@ -399,6 +476,85 @@ def test_grouping_wells_for_row_384_plate(
     assert wells[3].well_name == "B2"
 
 
+@pytest.mark.parametrize(
+    argnames="nozzle_map", argvalues=[_96_ROW_A_MAP, _96_ROW_H_MAP]
+)
+def test_grouping_wells_for_row_96_plate_raises(
+    nozzle_map: NozzleMap, mock_96_well_labware: Labware, decoy: Decoy
+) -> None:
+    """It should raise if a valid grouping can't be found for all wells."""
+    mock_wells = [decoy.mock(cls=Well) for _ in range(24)]
+    first_two_row_well_names = [f"A{i}" for i in range(1, 13)] + [
+        f"B{i}" for i in range(1, 13)
+    ]
+    for mock_well, well_name in zip(mock_wells, first_two_row_well_names):
+        decoy.when(mock_well.well_name).then_return(well_name)
+        decoy.when(mock_well.parent).then_return(mock_96_well_labware)
+
+    # leftover wells
+    with pytest.raises(ValueError, match="Could not target all wells"):
+        group_wells_for_multi_channel_transfer(mock_wells[:-1], nozzle_map)
+
+    # non-contiguous wells from the same labware
+    with pytest.raises(ValueError, match="Could not resolve wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:11] + [mock_wells[-1], mock_wells[11]], nozzle_map
+        )
+
+    other_labware = decoy.mock(cls=Labware)
+    decoy.when(other_labware.parameters).then_return({"format": "96Standard"})  # type: ignore[typeddict-item]
+    other_well = decoy.mock(cls=Well)
+    decoy.when(other_well.well_name).then_return("A12")
+    decoy.when(other_well.parent).then_return(other_labware)
+
+    # non-contiguous wells from different labware, well name is correct though
+    with pytest.raises(ValueError, match="Could not resolve wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:11] + [other_well], nozzle_map
+        )
+
+
+@pytest.mark.parametrize(
+    argnames="nozzle_map", argvalues=[_96_ROW_A_MAP, _96_ROW_H_MAP]
+)
+def test_grouping_wells_for_row_384_plate_raises(
+    nozzle_map: NozzleMap, mock_384_well_labware: Labware, decoy: Decoy
+) -> None:
+    """It should raise if a valid grouping can't be found for all wells."""
+    mock_wells = [decoy.mock(cls=Well) for _ in range(48)]
+    first_two_row_well_names = [f"A{i}" for i in range(1, 25)] + [
+        f"B{i}" for i in range(1, 25)
+    ]
+    for mock_well, well_name in zip(mock_wells, first_two_row_well_names):
+        decoy.when(mock_well.well_name).then_return(well_name)
+        decoy.when(mock_well.parent).then_return(mock_384_well_labware)
+
+    # leftover wells
+    with pytest.raises(ValueError, match="Could not target all wells"):
+        group_wells_for_multi_channel_transfer(mock_wells[:-1], nozzle_map)
+
+    # non-contiguous or every other wells from the same labware
+    with pytest.raises(ValueError, match="Could not resolve wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:2] + [mock_wells[-1]], nozzle_map
+        )
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:-1] + [mock_wells[0]], nozzle_map
+        )
+
+    other_labware = decoy.mock(cls=Labware)
+    decoy.when(other_labware.parameters).then_return({"format": "384Standard"})  # type: ignore[typeddict-item]
+    other_well = decoy.mock(cls=Well)
+    decoy.when(other_well.well_name).then_return("A24")
+    decoy.when(other_well.parent).then_return(other_labware)
+
+    # non-contiguous wells from different labware, well name is correct though
+    with pytest.raises(ValueError, match="Could not resolve wells"):
+        group_wells_for_multi_channel_transfer(
+            mock_wells[:23] + [other_well], nozzle_map
+        )
+
+
 def test_grouping_wells_for_full_96_plate(
     mock_96_well_labware: Labware, decoy: Decoy
 ) -> None:
@@ -429,3 +585,45 @@ def test_grouping_wells_for_full_384_plate(
     assert wells[1].well_name == "B1"
     assert wells[2].well_name == "A2"
     assert wells[3].well_name == "B2"
+
+
+def test_grouping_wells_raises_for_unsupported_configuration() -> None:
+    """It should raise if the well configuration is not supported."""
+    nozzle_map = NozzleMap.build(
+        physical_nozzles=EIGHT_CHANNEL_MAP,
+        physical_rows=EIGHT_CHANNEL_ROWS,
+        physical_columns=EIGHT_CHANNEL_COLS,
+        starting_nozzle="A1",
+        back_left_nozzle="A1",
+        front_right_nozzle="D1",
+        valid_nozzle_maps=ValidNozzleMaps(maps={"Half": ["A1", "B1", "C1", "D1"]}),
+    )
+    with pytest.raises(ValueError, match="Unsupported tip configuration"):
+        group_wells_for_multi_channel_transfer([], nozzle_map)
+
+
+@pytest.mark.parametrize(
+    argnames="nozzle_map",
+    argvalues=[
+        _8_FULL_MAP,
+        _96_FULL_MAP,
+        _96_COL1_MAP,
+        _96_COL12_MAP,
+        _96_ROW_A_MAP,
+        _96_ROW_H_MAP,
+    ],
+)
+def test_grouping_well_returns_all_wells_for_non_96_or_384_plate(
+    nozzle_map: NozzleMap, decoy: Decoy
+) -> None:
+    """It should return all wells if parent labware is not a 96 or 384 well plate"""
+    mock_reservoir = decoy.mock(cls=Labware)
+    decoy.when(mock_reservoir.parameters).then_return({"format": "reservoir"})  # type: ignore[typeddict-item]
+
+    mock_wells = [decoy.mock(cls=Well) for _ in range(12)]
+    for mock_well, well_name in zip(mock_wells, [f"A{i}" for i in range(1, 13)]):
+        decoy.when(mock_well.well_name).then_return(well_name)
+        decoy.when(mock_well.parent).then_return(mock_reservoir)
+
+    result = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map)
+    assert result == mock_wells
