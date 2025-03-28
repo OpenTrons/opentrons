@@ -396,6 +396,8 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                      Only {round(actual_starting_dye_volume, 2)} uL detected. Refill and try again."
                 )
                 retrying = True
+        pip._retract()
+        ctx.pause("Replace tip rack.")
         return src_liquid_height
 
     def _set_pipettte_motion_settings() -> Tuple[float, float, float, float, float]:
@@ -404,7 +406,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             dispense_submerge_speed = 50
             aspirate_exit_speed = 50
             dispense_exit_speed = 50
-            if not ctx.is_simulating:
+            if not ctx.is_simulating:  # type: ignore [truthy-function]
                 from hardware_testing.gravimetric.liquid_class.defaults import (
                     get_liquid_class,
                 )
