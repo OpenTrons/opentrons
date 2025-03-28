@@ -14,7 +14,7 @@ import type { FetchResetConfigOptionsAction, ResetConfigOption } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchResetConfigOptionsAction> = action => ({
   method: GET,
-  path: Constants.RESET_CONFIG_OPTIONS_PATH,
+  path: Constants.SETTINGS_RESET_OPTIONS_PATH,
 })
 
 const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction> = (

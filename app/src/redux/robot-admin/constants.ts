@@ -42,11 +42,13 @@ export const SYNC_SYSTEM_TIME: 'robotAdmin:SYNC_SYSTEM_TIME' =
 
 // http paths
 
+export const LABWARE_OFFSETS_PATH: '/labwareOffsets' = '/labwareOffsets'
+
 export const RESTART_PATH: '/server/restart' = '/server/restart'
 
-export const RESET_CONFIG_PATH: '/settings/reset' = '/settings/reset'
+export const SETTINGS_RESET_PATH: '/settings/reset' = '/settings/reset'
 
-export const RESET_CONFIG_OPTIONS_PATH: '/settings/reset/options' =
+export const SETTINGS_RESET_OPTIONS_PATH: '/settings/reset/options' =
   '/settings/reset/options'
 
 export const SYSTEM_TIME_PATH: '/system/time' = '/system/time'

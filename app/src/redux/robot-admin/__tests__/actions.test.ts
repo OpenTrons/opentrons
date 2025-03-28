@@ -88,10 +88,22 @@ describe('robot admin actions', () => {
     {
       name: 'robotAdmin:RESET_CONFIG',
       creator: Actions.resetConfig,
-      args: ['robotName', { foo: true, bar: false }],
+      args: [
+        'robotName',
+        {
+          resetLabwareOffsets: true,
+          settingsResets: { foo: true, bar: false },
+        },
+      ],
       expected: {
         type: 'robotAdmin:RESET_CONFIG',
-        payload: { robotName: 'robotName', resets: { foo: true, bar: false } },
+        payload: {
+          robotName: 'robotName',
+          resets: {
+            resetLabwareOffsets: true,
+            settingsResets: { foo: true, bar: false },
+          },
+        },
         meta: {} as any,
       },
     },
@@ -129,6 +141,8 @@ describe('robot admin actions', () => {
 
   SPECS.forEach(spec => {
     const { name, creator, args, expected } = spec
-    it(name, () => expect(creator(...args)).toEqual(expected))
+    it(name, () => {
+      expect(creator(...args)).toEqual(expected)
+    })
   })
 })

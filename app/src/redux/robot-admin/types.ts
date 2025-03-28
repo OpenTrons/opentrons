@@ -22,9 +22,18 @@ export interface ResetConfigOption {
   description: string
 }
 
-export type ResetConfigRequest = Partial<{
-  [optionId: string]: boolean
-}>
+export interface ResetConfigRequest {
+  resetLabwareOffsets: boolean
+
+  /**
+   * Options to pass as-is to `POST /settings/reset`.
+   * The possible keys are theoretically dynamic,
+   * coming from `GET /settings/reset/options`.
+   */
+  settingsResets: {
+    [optionId: string]: boolean | undefined
+  }
+}
 
 // action types
 

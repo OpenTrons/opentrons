@@ -54,6 +54,7 @@ interface DisplayedResetOptionState extends Record<string, boolean> {
   pipetteOffsetCalibrations: boolean
   gripperOffsetCalibrations: boolean
   moduleCalibration: boolean
+  labwareOffsets: boolean
   runsHistory: boolean
 }
 
@@ -61,6 +62,7 @@ const targetOptionsOrder: Array<keyof DisplayedResetOptionState> = [
   'pipetteOffsetCalibrations',
   'gripperOffsetCalibrations',
   'moduleCalibration',
+  'labwareOffsets',
   'runsHistory',
 ]
 
@@ -80,20 +82,26 @@ function buildResetRequest(
   displayedState: DisplayedResetOptionState
 ): ResetConfigRequest {
   return {
-    // Returned keys need to follow the server's HTTP API.
-    pipetteOffsetCalibrations: displayedState.pipetteOffsetCalibrations,
-    gripperOffsetCalibrations: displayedState.gripperOffsetCalibrations,
-    moduleCalibration: displayedState.moduleCalibration,
-    // If the user selected every visible option, implicitly select certain additional options.
-    ...(isEveryOptionSelected(displayedState)
-      ? {
-          authorizedKeys: true,
-          onDeviceDisplay: true,
-          deckConfiguration: true,
-          // todo(mm, 2025-03-27): This omits bootScripts because that's what the older
-          // code did, but it's unclear if that's intentional.
-        }
-      : {}),
+    resetLabwareOffsets: displayedState.labwareOffsets,
+
+    settingsResets: {
+      // These keys need to follow the server's HTTP API.
+      pipetteOffsetCalibrations: displayedState.pipetteOffsetCalibrations,
+      gripperOffsetCalibrations: displayedState.gripperOffsetCalibrations,
+      moduleCalibration: displayedState.moduleCalibration,
+      // If the user selected every visible option, implicitly select certain additional options.
+      ...(isEveryOptionSelected(displayedState)
+        ? {
+            authorizedKeys: true,
+            onDeviceDisplay: true,
+            deckConfiguration: true,
+            // todo(mm, 2025-03-27): This omits bootScripts because that's what the older
+            // code did, but it's unclear if that's intentional. For comparison, when the
+            // desktop app does this, it currently enables every option that the server
+            // advertises.
+          }
+        : {}),
+    },
   }
 }
 
@@ -111,6 +119,7 @@ export function DeviceReset({
     pipetteOffsetCalibrations: false,
     gripperOffsetCalibrations: false,
     moduleCalibration: false,
+    labwareOffsets: false,
     runsHistory: false,
   })
   const [dispatchRequest] = useDispatchApiRequest()
@@ -139,6 +148,9 @@ export function DeviceReset({
         break
       case 'moduleCalibration':
         optionText = t('clear_option_module_calibration')
+        break
+      case 'labwareOffsets':
+        optionText = t('clear_option_labware_offsets')
         break
       case 'runsHistory':
         optionText = t('clear_option_runs_history')
@@ -235,12 +247,14 @@ export function DeviceReset({
                       pipetteOffsetCalibrations: false,
                       gripperOffsetCalibrations: false,
                       moduleCalibration: false,
+                      labwareOffsets: false,
                       runsHistory: false,
                     }
                   : {
                       pipetteOffsetCalibrations: true,
                       gripperOffsetCalibrations: true,
                       moduleCalibration: true,
+                      labwareOffsets: true,
                       runsHistory: true,
                     }
               )

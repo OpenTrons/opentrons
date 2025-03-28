@@ -309,7 +309,7 @@ export function DeviceResetSlideout({
                 marginBottom={SPACING.spacing8}
               >
                 <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-                  {t('protocol_run_history')}
+                  {t('protocol_run_data')}
                 </LegacyStyledText>
                 <Link
                   role="button"
@@ -319,15 +319,30 @@ export function DeviceResetSlideout({
                   {t('download')}
                 </Link>
               </Flex>
-              <CheckboxField
-                onChange={() => {
-                  const options = cloneDeep(displayedOptions)
-                  options.common.runsHistory = !options.common.runsHistory
-                  setDisplayedOptions(options)
-                }}
-                value={displayedOptions.common.runsHistory}
-                label={t('clear_option_runs_history')}
-              />
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={-SPACING.spacing4}
+              >
+                <CheckboxField
+                  onChange={() => {
+                    const options = cloneDeep(displayedOptions)
+                    options.common.runsHistory = !options.common.runsHistory
+                    setDisplayedOptions(options)
+                  }}
+                  value={displayedOptions.common.runsHistory}
+                  label={t('clear_option_runs_history')}
+                />
+                <CheckboxField
+                  onChange={() => {
+                    const options = cloneDeep(displayedOptions)
+                    options.common.labwareOffsets = !options.common
+                      .labwareOffsets
+                    setDisplayedOptions(options)
+                  }}
+                  value={displayedOptions.common.labwareOffsets}
+                  label={t('clear_option_labware_offsets')}
+                />
+              </Flex>
             </Box>
             <Box>
               <LegacyStyledText
@@ -382,6 +397,7 @@ interface DisplayedResetOptionState {
     bootScripts: boolean
     authorizedKeys: boolean
     pipetteOffsetCalibrations: boolean
+    labwareOffsets: boolean
   }
   ot2Only: {
     deckCalibration: boolean
@@ -399,6 +415,7 @@ const ALL_DESELECTED: DisplayedResetOptionState = {
     bootScripts: false,
     authorizedKeys: false,
     pipetteOffsetCalibrations: false,
+    labwareOffsets: false,
   },
   ot2Only: {
     deckCalibration: false,
@@ -416,6 +433,7 @@ const ALL_SELECTED: DisplayedResetOptionState = {
     bootScripts: true,
     authorizedKeys: true,
     pipetteOffsetCalibrations: true,
+    labwareOffsets: true,
   },
   ot2Only: {
     deckCalibration: true,
@@ -455,28 +473,36 @@ function buildResetRequest(
   isFlex: boolean
 ): ResetConfigRequest {
   let requestToReturn: ResetConfigRequest = {
-    // Keys in this object need to follow the server's HTTP API.
+    resetLabwareOffsets: displayedState.common.labwareOffsets,
 
-    bootScripts: displayedState.common.bootScripts,
-    runsHistory: displayedState.common.runsHistory,
-    authorizedKeys: displayedState.common.authorizedKeys,
-    pipetteOffsetCalibrations: displayedState.common.pipetteOffsetCalibrations,
+    settingsResets: {
+      // Keys in this object need to follow the server's HTTP API.
 
-    deckCalibration: displayedState.ot2Only.deckCalibration,
-    tipLengthCalibrations: displayedState.ot2Only.tipLengthCalibrations,
+      bootScripts: displayedState.common.bootScripts,
+      runsHistory: displayedState.common.runsHistory,
+      authorizedKeys: displayedState.common.authorizedKeys,
+      pipetteOffsetCalibrations:
+        displayedState.common.pipetteOffsetCalibrations,
 
-    gripperOffsetCalibrations: displayedState.flexOnly.gripperCalibrations,
-    moduleCalibration: displayedState.flexOnly.moduleCalibrations,
+      deckCalibration: displayedState.ot2Only.deckCalibration,
+      tipLengthCalibrations: displayedState.ot2Only.tipLengthCalibrations,
+
+      gripperOffsetCalibrations: displayedState.flexOnly.gripperCalibrations,
+      moduleCalibration: displayedState.flexOnly.moduleCalibrations,
+    },
   }
 
   if (isFlex) {
-    // If the user selected every option in the UI, implicitly also select any options
-    // that the server advertises but that we don't show in the UI. Notably, this
-    // includes onDeviceDisplay.
+    // If the user selected every option in the UI, implicitly select *everything,*
+    // including any options that the server advertises but that we don't show in the UI.
+    // Notably, this includes onDeviceDisplay.
     if (isEveryOptionSelected(displayedState, isFlex)) {
-      requestToReturn = Object.fromEntries(
-        serverResetOptions.map(o => [o.id, true])
-      )
+      requestToReturn = {
+        resetLabwareOffsets: true,
+        settingsResets: Object.fromEntries(
+          serverResetOptions.map(o => [o.id, true])
+        ),
+      }
     }
   }
 
@@ -484,8 +510,8 @@ function buildResetRequest(
   // understand, which it could choke on. Filter to send only the options that the
   // server advertises.
   const serverResetOptionIds = serverResetOptions.map(o => o.id)
-  requestToReturn = Object.fromEntries(
-    Object.entries(requestToReturn).filter(([k, _v]) =>
+  requestToReturn.settingsResets = Object.fromEntries(
+    Object.entries(requestToReturn.settingsResets).filter(([k, _v]) =>
       serverResetOptionIds.includes(k)
     )
   )
