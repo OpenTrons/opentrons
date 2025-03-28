@@ -361,8 +361,16 @@ class FlexStacker(mod_abc.AbstractModule):
         axis_state = self.limit_switch_status[StackerAxis.L]
         return success and axis_state == StackerAxisState.RETRACTED
 
-    async def dispense_labware(self, labware_height: float) -> bool:
+    async def dispense_labware(
+        self,
+        labware_height: float,
+        enforce_hopper_lw_sensing: bool = True,
+        enforce_shuttle_lw_sensing: bool = True,
+    ) -> bool:
         """Dispenses the next labware in the stacker."""
+        if enforce_hopper_lw_sensing:
+            await self.verify_hopper_labware_presence(True)
+
         await self._prepare_for_action()
 
         # Move platform along the X then Z axis
@@ -378,11 +386,16 @@ class FlexStacker(mod_abc.AbstractModule):
         offset = labware_height / 2 + OFFSET_MD
         await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, offset)
 
-        await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
+        if enforce_shuttle_lw_sensing:
+            await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
         await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
         return True
 
-    async def store_labware(self, labware_height: float) -> bool:
+    async def store_labware(
+        self,
+        labware_height: float,
+        enforce_shuttle_lw_sensing: bool = True,
+    ) -> bool:
         """Stores a labware in the stacker."""
         await self._prepare_for_action()
 
@@ -390,6 +403,10 @@ class FlexStacker(mod_abc.AbstractModule):
         offset = OFFSET_MD if labware_height < MEDIUM_LABWARE_Z_LIMIT else OFFSET_LG * 2
         distance = MAX_TRAVEL[StackerAxis.Z] - (labware_height / 2) - offset
         await self._move_and_home_axis(StackerAxis.X, Direction.RETRACT, OFFSET_SM)
+
+        if enforce_shuttle_lw_sensing:
+            await self.verify_shuttle_labware_presence(Direction.RETRACT, True)
+
         await self.move_axis(StackerAxis.Z, Direction.EXTEND, distance)
 
         # Transfer
@@ -405,6 +422,9 @@ class FlexStacker(mod_abc.AbstractModule):
 
         # Move Z then X axis
         await self._move_and_home_axis(StackerAxis.Z, Direction.RETRACT, OFFSET_LG)
+
+        if enforce_shuttle_lw_sensing:
+            await self.verify_shuttle_labware_presence(Direction.RETRACT, False)
         await self._move_and_home_axis(StackerAxis.X, Direction.EXTEND, OFFSET_SM)
         return True
 

@@ -820,7 +820,7 @@ async def test_retrieve_primary_adapter_and_lid(
         ),
     ],
 )
-async def test_retrieve_raises_if_stall(
+async def test_retrieve_raises_recoverable_error(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
