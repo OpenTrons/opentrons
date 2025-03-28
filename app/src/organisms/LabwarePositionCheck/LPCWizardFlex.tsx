@@ -12,7 +12,10 @@ import {
 import { LPCRobotInMotion } from './LPCRobotInMotion'
 import { LPCFatalError } from './LPCFatalError'
 import { LPCProbeNotAttached } from './LPCProbeNotAttached'
-import { useLPCCommands } from '/app/organisms/LabwarePositionCheck/hooks'
+import {
+  useInfoBanners,
+  useLPCCommands,
+} from '/app/organisms/LabwarePositionCheck/hooks'
 import {
   closeLPC,
   proceedStep as proceedStepDispatch,
@@ -40,6 +43,7 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
   const LPCHandlerUtils = useLPCCommands({
     ...props,
   })
+  const bannerUtils = useInfoBanners()
 
   // Clean up state on LPC close.
   useEffect(() => {
@@ -53,6 +57,7 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
     LPCHandlerUtils,
     proceedStep,
     goBackLastStep,
+    bannerUtils,
   })
 
   return (
@@ -61,6 +66,7 @@ export function LPCWizardFlex(props: LPCWizardFlexProps): JSX.Element {
       proceedStep={proceedStep}
       goBackLastStep={goBackLastStep}
       commandUtils={{ ...LPCHandlerUtils, headerCommands }}
+      bannerUtils={bannerUtils}
     />
   )
 }

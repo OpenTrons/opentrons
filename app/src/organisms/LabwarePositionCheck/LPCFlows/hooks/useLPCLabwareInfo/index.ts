@@ -68,10 +68,7 @@ function useFlexLPCLabwareInfo({
   const { data: lwOffsetsData } = useNotifySearchLabwareOffsets(
     searchLwOffsetsParams,
     {
-      enabled:
-        searchLwOffsetsParams.filters.length > 0 &&
-        robotType === FLEX_ROBOT_TYPE &&
-        runStatus === RUN_STATUS_IDLE,
+      enabled: runStatus === RUN_STATUS_IDLE && robotType === FLEX_ROBOT_TYPE,
       refetchInterval: REFETCH_OFFSET_SEARCH_MS,
     }
   )

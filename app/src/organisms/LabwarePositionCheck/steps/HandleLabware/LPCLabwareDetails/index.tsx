@@ -101,7 +101,11 @@ export function LPCLabwareDetails(props: LPCWizardContentProps): JSX.Element {
 
 function LPCLabwareDetailsContent(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
-  const { runId } = props
+  const { runId, bannerUtils } = props
+  const {
+    showBanner: showInfoBanner,
+    toggleBanner: toggleInfoBanner,
+  } = bannerUtils.defaultOffsetInfoBanner
 
   const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
   const isOnDevice = useSelector(getIsOnDevice)
@@ -148,6 +152,13 @@ function LPCLabwareDetailsContent(props: LPCWizardContentProps): JSX.Element {
                   setShowHardCodedBanner(false)
                 }
           }
+        />
+      )}
+      {showInfoBanner && (
+        <InlineNotification
+          type="neutral"
+          heading={t('default_offset_description')}
+          onCloseClick={toggleInfoBanner}
         />
       )}
       <DefaultLocationOffset {...props} />
