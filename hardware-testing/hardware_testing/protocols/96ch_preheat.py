@@ -1,9 +1,11 @@
 """Heat up and wait for a 96ch to reach the desired temperature."""
 
 from opentrons.protocol_api import ProtocolContext, ParameterContext
+from opentrons.hardware_control.adapters import SynchronousAdapter
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import Axis
-from opentrons_hardware.sensors.scheduler import SensorScheduler
+from opentrons.hardware_control.types import Axis, OT3AxisMap
+from opentrons_hardware.sensors.sensor_driver import SensorDriver
+from opentrons_hardware.sensors.sensor_types import EnvironmentSensor
 from opentrons_hardware.sensors.utils import (
     ReadSensorInformation,
 )
@@ -41,29 +43,23 @@ metadata = {"protocolName": "96ch Pre-heating protocol"}
 requirements = {"robotType": "Flex", "apiLevel": "2.21"}
 
 
-def read_sensor(
-    sensor: SensorInformation, messenger: CanMessenger, loop: asyncio.AbstractEventLoop
-) -> float:
+async def read_sensor(self, sensor: EnvironmentSensor) -> float:
     """Read and return the current sensor information."""
-    scheduler = SensorScheduler()
-    sensor_data = loop.run_until_complete(
-        scheduler.send_read(
-            ReadSensorInformation(sensor=sensor, offset=False),
-            can_messenger=messenger,
-            timeout=1,
+
+    s_driver = SensorDriver()
+    sensor_data = await s_driver.read(
+            can_messenger=self._backend._messenger,
+            sensor=sensor, offset=False,
         )
-    )
-    sensor_floats = [d.to_float() for d in sensor_data]
-    return sum(sensor_floats) / len(sensor_floats)
+    assert sensor_data.temperature is not None
+    return sensor_data.temperature.to_float()
 
 
-def get_motors_hot(ot3api: OT3API, loop: asyncio.AbstractEventLoop) -> None:
+def get_motors_hot(ot3api: SynchronousAdapter) -> None:
     """Adjust the motor hold currents to heat quicker."""
+
     axis_settings = {Axis.P_L: 1.5, Axis.Q: 1.5}
-    loop.run_until_complete(ot3api.engage_axes([a for a in axis_settings.keys()]))
-    loop.run_until_complete(
-        ot3api._backend.set_hold_current(axis_settings)  # type: ignore [attr-defined]
-    )
+    ot3api.engage_axes([a for a in axis_settings.keys()])
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -71,14 +67,14 @@ def run(ctx: ProtocolContext) -> None:
     ot3api = ctx._core.get_hardware()
     if not ctx.is_simulating():
         messenger = ot3api._backend._messenger
-        loop = ot3api._loop
-    primary = SensorInformation(
-        sensor_type=SensorType.temperature,
+        OT3API.read_sensor = read_sensor
+        OT3API.set_hold_currents = set_hold_currents
+        #loop = ot3api._loop
+    primary = EnvironmentSensor.build(
         sensor_id=SensorId.S0,
         node_id=NodeId.pipette_left,
     )
-    secondary = SensorInformation(
-        sensor_type=SensorType.temperature,
+    secondary =  EnvironmentSensor.build(
         sensor_id=SensorId.S1,
         node_id=NodeId.pipette_left,
     )
@@ -86,13 +82,13 @@ def run(ctx: ProtocolContext) -> None:
         f"flex_96channel_{ctx.params.model_type}", "left"  # type: ignore [attr-defined]
     )
     if not ctx.is_simulating():
-        current_temp_1 = read_sensor(primary, messenger, loop)
-        current_temp_2 = read_sensor(secondary, messenger, loop)
-        get_motors_hot(ot3api, loop)  # type: ignore [arg-type]
+        current_temp_1 = ot3api.read_sensor(primary)
+        current_temp_2 = ot3api.read_sensor(secondary)
+        get_motors_hot(ot3api)  # type: ignore [arg-type]
         avg_temp = (current_temp_1 + current_temp_2) / 2
         target = ctx.params.temp  # type: ignore [attr-defined]
         while avg_temp < target:
-            ctx.delay(minutes=5, msg=f"Current temperature={avg_temp} target={target}")
-            current_temp_1 = read_sensor(primary, messenger, loop)
-            current_temp_2 = read_sensor(secondary, messenger, loop)
+            current_temp_1 = ot3api.read_sensor(primary)
+            current_temp_2 = ot3api.read_sensor(secondary)
             avg_temp = (current_temp_1 + current_temp_2) / 2
+            ctx.delay(seconds=15, msg=f"Current temperature {avg_temp} target={target}")
