@@ -47,7 +47,6 @@ import {
   ProtocolSetupDeckConfiguration,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
-  ProtocolSetupLiquids,
   ProtocolSetupModulesAndDeck,
   ProtocolSetupOffsets,
   ProtocolSetupStep,
@@ -126,7 +125,6 @@ interface PrepareToRunProps {
   robotName: string
   runRecord: Run | null
   labwareConfirmed: boolean
-  liquidsConfirmed: boolean
   offsetsConfirmed: boolean
   isLPCInitializing: boolean
 }
@@ -139,7 +137,6 @@ function PrepareToRun({
   robotName,
   runRecord,
   labwareConfirmed,
-  liquidsConfirmed,
   offsetsConfirmed,
   isLPCInitializing,
   confirmStepsComplete,
@@ -349,9 +346,6 @@ function PrepareToRun({
     areModulesReady && areFixturesReady && !isLocationConflict
       ? 'ready'
       : 'not ready'
-  // Liquids information
-  const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
-  const areLiquidsInProtocol = liquidsInProtocol.length > 0
 
   const isReadyToRun =
     incompleteInstrumentCount === 0 &&
@@ -363,10 +357,7 @@ function PrepareToRun({
       makeSnackbar(t('shared:close_robot_door') as string)
     } else {
       if (isReadyToRun) {
-        if (
-          runStatus === RUN_STATUS_IDLE &&
-          !(labwareConfirmed && (liquidsConfirmed || !areLiquidsInProtocol))
-        ) {
+        if (runStatus === RUN_STATUS_IDLE && !labwareConfirmed) {
           confirmStepsComplete()
         } else if (runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol) {
           confirmAttachment()
@@ -655,28 +646,11 @@ function PrepareToRun({
               onClickSetupStep={() => {
                 setSetupScreen('labware')
               }}
-              title={i18n.format(t('labware'), 'capitalize')}
+              title={t('labware_liquids_setup_step_title')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
               status={labwareConfirmed ? 'ready' : 'general'}
               disabled={labwareDetail == null}
-            />
-            <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('liquids')
-              }}
-              title={i18n.format(t('liquids'), 'capitalize')}
-              status={
-                liquidsConfirmed || !areLiquidsInProtocol ? 'ready' : 'general'
-              }
-              detail={
-                areLiquidsInProtocol
-                  ? t('initial_liquids_num', {
-                      count: liquidsInProtocol.length,
-                    })
-                  : t('liquids_not_in_setup')
-              }
-              interactionDisabled={!areLiquidsInProtocol}
             />
           </>
         ) : (
@@ -746,8 +720,6 @@ export function ProtocolSetup(): JSX.Element {
     }
   )
 
-  const areLiquidsInProtocol = (mostRecentAnalysis?.liquids?.length ?? 0) > 0
-
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
       setIsPollingForCompletedAnalysis(false)
@@ -814,20 +786,15 @@ export function ProtocolSetup(): JSX.Element {
   >([])
   // TODO(jh 10-31-24): Refactor the below to utilize useMissingStepsModal.
   const [labwareConfirmed, setLabwareConfirmed] = useState<boolean>(false)
-  const [liquidsConfirmed, setLiquidsConfirmed] = useState<boolean>(false)
   const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
   const missingSteps = [
     !labwareConfirmed ? t('labware_placement') : null,
-    !liquidsConfirmed && areLiquidsInProtocol ? t('liquids') : null,
   ].filter(s => s != null)
   const {
     confirm: confirmMissingSteps,
     showConfirmation: showMissingStepsConfirmation,
     cancel: cancelExitMissingStepsConfirmation,
-  } = useConditionalConfirm(
-    handleProceedToRunClick,
-    !(labwareConfirmed && liquidsConfirmed)
-  )
+  } = useConditionalConfirm(handleProceedToRunClick, !labwareConfirmed)
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const lpcLaunchProps = useLPCFlows({
@@ -850,7 +817,6 @@ export function ProtocolSetup(): JSX.Element {
         robotName={robotName}
         runRecord={runRecord ?? null}
         labwareConfirmed={labwareConfirmed}
-        liquidsConfirmed={liquidsConfirmed}
         offsetsConfirmed={offsetsConfirmed}
         isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
       />
@@ -882,14 +848,6 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         isConfirmed={labwareConfirmed}
         setIsConfirmed={setLabwareConfirmed}
-      />
-    ),
-    liquids: (
-      <ProtocolSetupLiquids
-        runId={runId}
-        setSetupScreen={setSetupScreen}
-        isConfirmed={liquidsConfirmed}
-        setIsConfirmed={setLiquidsConfirmed}
       />
     ),
     'deck configuration': (

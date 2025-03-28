@@ -17,7 +17,7 @@ import type {
 } from '@opentrons/shared-data'
 
 export * from './utils/getStandardDeckViewLayerBlockList'
-
+export * from './types'
 interface ProtocolDeckProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   /** extra props to pass through to BaseDeck component */

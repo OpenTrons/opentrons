@@ -79,7 +79,7 @@ export function ListItem(props: ListItemProps): JSX.Element {
   const listItemProps = LISTITEM_PROPS_BY_TYPE[type]
 
   const LIST_ITEM_STYLE = css`
-    background-color: ${listItemProps.backgroundColor};
+    background-color: ${props.backgroundColor ?? listItemProps.backgroundColor};
     color: ${listItemProps.color ?? COLORS.black90};
     width: 100%;
     height: ${FLEX_MAX_CONTENT};

@@ -11,6 +11,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Icon,
+  Tag,
   JUSTIFY_SPACE_BETWEEN,
   StyledText,
 } from '../..'
@@ -33,6 +34,7 @@ interface RadioButtonProps extends StyleProps {
   onChange: ChangeEventHandler<HTMLInputElement>
   disabled?: boolean
   iconName?: IconName
+  tagText?: string
   isSelected?: boolean
   largeDesktopBorderRadius?: boolean
   radioButtonType?: 'large' | 'small'
@@ -55,6 +57,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     onChange,
     disabled = false,
     iconName,
+    tagText,
     isSelected = false,
     largeDesktopBorderRadius = false,
     radioButtonType = 'large',
@@ -134,7 +137,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing2}
+          gridGap={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
         >
           {iconName != null ? (
@@ -143,6 +146,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
               size="1rem"
               data-testid={`icon_${iconName}`}
             />
+          ) : null}
+          {tagText != null ? (
+            <Tag type={isSelected ? 'onColor' : 'default'} text={tagText} />
           ) : null}
           <Flex css={copyContainerStyle(buttonSubLabel)}>
             {typeof buttonLabel === 'string' ? (
@@ -186,6 +192,7 @@ const copyContainerStyle = (
     ? ALIGN_START
     : ALIGN_CENTER};
   width: ${buttonSubLabel != null ? '100%' : ''};
+  word-break: break-word;
 `
 
 const DISABLED_BUTTON_STYLE = css`

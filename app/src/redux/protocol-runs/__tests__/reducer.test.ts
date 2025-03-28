@@ -19,7 +19,6 @@ describe('protocol runs reducer', () => {
       required: true,
       complete: false,
     },
-    [Constants.LIQUID_SETUP_STEP_KEY]: { required: true, complete: false },
   }
   it('establishes an empty state if you tell it one', () => {
     const nextState = protocolRunReducer(
@@ -34,7 +33,7 @@ describe('protocol runs reducer', () => {
         'some-run-id': {
           setup: {
             ...INITIAL,
-            [Constants.LIQUID_SETUP_STEP_KEY]: {
+            [Constants.LABWARE_SETUP_STEP_KEY]: {
               complete: true,
               required: true,
             },
@@ -47,7 +46,7 @@ describe('protocol runs reducer', () => {
     )
     expect(nextState['some-run-id']?.setup).toEqual({
       ...INITIAL,
-      [Constants.LIQUID_SETUP_STEP_KEY]: {
+      [Constants.LABWARE_SETUP_STEP_KEY]: {
         required: true,
         complete: true,
       },
@@ -62,12 +61,12 @@ describe('protocol runs reducer', () => {
         },
       },
       updateRunSetupStepsRequired('some-run-id', {
-        [Constants.LIQUID_SETUP_STEP_KEY]: false,
+        [Constants.LABWARE_SETUP_STEP_KEY]: false,
       })
     )
     expect(nextState['some-run-id']?.setup).toEqual({
       ...INITIAL,
-      [Constants.LIQUID_SETUP_STEP_KEY]: {
+      [Constants.LABWARE_SETUP_STEP_KEY]: {
         required: false,
         complete: false,
       },

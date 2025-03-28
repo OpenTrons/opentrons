@@ -7,9 +7,12 @@ import type { ReactNode } from 'react'
 export const useToggleGroup = (
   left: string,
   right: string,
-  trackEventName?: string
+  trackEventName?: string,
+  selectRightFirst?: boolean
 ): [string, ReactNode] => {
-  const [selectedValue, setSelectedValue] = useState<string>(left)
+  const [selectedValue, setSelectedValue] = useState<string>(
+    selectRightFirst ? right : left
+  )
   const trackEvent = useTrackEvent()
   const handleLeftClick = (): void => {
     setSelectedValue(left)

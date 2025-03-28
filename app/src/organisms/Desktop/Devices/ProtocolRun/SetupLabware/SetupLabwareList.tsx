@@ -1,77 +1,125 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  getLabwareInfoByLiquidId,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
   StyledText,
   COLORS,
 } from '@opentrons/components'
-import { getLabwareSetupItemGroups } from '/app/transformations/commands'
+import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 import { LabwareListItem } from './LabwareListItem'
 
-import type { RunTimeCommand } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
+import type { StackItem } from '/app/transformations/commands'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
-import type { LabwareSetupItem } from '/app/transformations/commands'
+import { SlotDetailModal } from './SlotDetailModal'
 
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
-  commands: RunTimeCommand[]
+  protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
   extraAttentionModules: ModuleTypesThatRequireExtraAttention[]
   isFlex: boolean
 }
 export function SetupLabwareList(
   props: SetupLabwareListProps
 ): JSX.Element | null {
-  const { attachedModuleInfo, commands, extraAttentionModules, isFlex } = props
+  const {
+    attachedModuleInfo,
+    protocolAnalysis,
+    extraAttentionModules,
+    isFlex,
+  } = props
   const { t } = useTranslation('protocol_setup')
-  const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(commands)
-  const allItems: LabwareSetupItem[] = []
-  allItems.push.apply(allItems, onDeckItems)
-  allItems.push.apply(allItems, offDeckItems)
+  const [selectedStack, setSelectedStack] = useState<{
+    slotName: string
+    stack: StackItem[]
+  } | null>(null)
+  const startingDeck = getStackedItemsOnStartingDeck(
+    protocolAnalysis?.commands ?? [],
+    protocolAnalysis?.labware ?? [],
+    protocolAnalysis?.modules ?? []
+  )
+  const labwareByLiquidId = getLabwareInfoByLiquidId(
+    protocolAnalysis?.commands ?? []
+  )
+  const sortedStartingDeckEntries = Object.entries(startingDeck)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .filter(([key]) => key !== 'offDeck')
+  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    ? startingDeck.offDeck
+    : null
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      marginBottom={SPACING.spacing16}
-    >
+    <>
       <Flex
-        gridGap={SPACING.spacing16}
-        paddingLeft={SPACING.spacing24}
-        paddingTop={SPACING.spacing20}
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
       >
-        <StyledText
-          width="5rem"
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
+        <Flex
+          gridGap={SPACING.spacing16}
+          paddingLeft={SPACING.spacing16}
+          paddingTop={SPACING.spacing20}
         >
-          {t('location')}
-        </StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          {t('labware_name')}
-        </StyledText>
-      </Flex>
-      {allItems.map((labwareItem, index) => {
-        // filtering out all labware that aren't on a module or the deck
-        const labwareOnAdapter = allItems.find(
-          item =>
-            labwareItem.initialLocation !== 'offDeck' &&
-            labwareItem.initialLocation !== 'systemLocation' &&
-            'labwareId' in labwareItem.initialLocation &&
-            item.labwareId === labwareItem.initialLocation.labwareId
-        )
-        return labwareOnAdapter != null ? null : (
+          <StyledText
+            width="6.25rem"
+            desktopStyle="bodyDefaultRegular"
+            color={COLORS.grey60}
+          >
+            {t('location')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+            {t('labware_name')}
+          </StyledText>
+        </Flex>
+        {sortedStartingDeckEntries.map(([key, value]) => {
+          return (
+            <LabwareListItem
+              key={key}
+              attachedModuleInfo={attachedModuleInfo}
+              extraAttentionModules={extraAttentionModules}
+              isFlex={isFlex}
+              slotName={key}
+              stackedItems={value}
+              labwareByLiquidId={labwareByLiquidId}
+              onClick={() => {
+                setSelectedStack({ slotName: key, stack: value })
+              }}
+            />
+          )
+        })}
+        {offDeckItems?.map((item, index) => (
           <LabwareListItem
-            commands={commands}
             key={index}
             attachedModuleInfo={attachedModuleInfo}
             extraAttentionModules={extraAttentionModules}
-            {...labwareItem}
+            slotName={'offDeck'}
+            stackedItems={[item]}
             isFlex={isFlex}
+            onClick={() => {
+              setSelectedStack({ slotName: 'offDeck', stack: [item] })
+            }}
           />
-        )
-      })}
-    </Flex>
+        ))}
+      </Flex>
+      {selectedStack != null && protocolAnalysis != null ? (
+        <SlotDetailModal
+          stackedItems={selectedStack.stack}
+          slotName={selectedStack.slotName}
+          labwareByLiquidId={labwareByLiquidId}
+          mostRecentAnalysis={protocolAnalysis}
+          closeModal={() => {
+            setSelectedStack(null)
+          }}
+          isFlex={isFlex}
+        />
+      ) : null}
+    </>
   )
 }

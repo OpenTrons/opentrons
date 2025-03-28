@@ -325,7 +325,7 @@ interface LoadLidStackResult {
   locationSequences?: LabwareLocationSequence[]
 }
 
-interface LoadLidParams {
+export interface LoadLidParams {
   location: LabwareLocation
   loadName: string
   namespace: string

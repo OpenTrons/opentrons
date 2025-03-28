@@ -18,6 +18,7 @@ export interface ModalProps extends StyleProps {
   title?: ReactNode
   titleElement1?: JSX.Element
   titleElement2?: JSX.Element
+  headerTagElement?: JSX.Element
   fullPage?: boolean
   childrenPadding?: string | number
   children?: ReactNode
@@ -42,6 +43,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
     footer,
     titleElement1,
     titleElement2,
+    headerTagElement,
     zIndexOverlay,
     position,
     showOverlay,
@@ -74,6 +76,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
       title={title}
       titleElement1={titleElement1}
       titleElement2={titleElement2}
+      tagElement={headerTagElement}
       icon={['error', 'warning'].includes(type) ? modalIcon : undefined}
       color={COLORS.black90}
       backgroundColor={COLORS.white}

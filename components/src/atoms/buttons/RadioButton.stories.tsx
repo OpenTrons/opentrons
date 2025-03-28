@@ -2,6 +2,7 @@ import { action } from '@storybook/addon-actions'
 
 import { VIEWPORT } from '../../ui-style-constants'
 import { RadioButton as RadioButtonComponent } from './RadioButton'
+import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof RadioButtonComponent> = {
@@ -27,7 +28,14 @@ const meta: Meta<typeof RadioButtonComponent> = {
         },
       },
     },
+    iconName: {
+      options: Object.keys(ICON_DATA_BY_NAME),
+      control: {
+        type: 'select',
+      },
+    },
   },
+
   parameters: VIEWPORT.touchScreenViewport,
   args: {
     onChange: action('on-change'),
@@ -75,4 +83,26 @@ export const RadioButtonWithVerticalSubLabel: Story = {
     },
   },
   name: 'With Vertical Subtext',
+}
+
+export const RadioButtonWithIcon: Story = {
+  args: {
+    buttonLabel: 'Button text',
+    buttonValue: 1,
+    disabled: false,
+    isSelected: false,
+    iconName: 'stacked',
+  },
+  name: 'RadioButton with Icon',
+}
+
+export const RadioButtonWithTag: Story = {
+  args: {
+    buttonLabel: 'Button text',
+    buttonValue: 1,
+    disabled: false,
+    isSelected: false,
+    tagText: '1',
+  },
+  name: 'RadioButton with Tag',
 }
