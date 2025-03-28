@@ -16,7 +16,7 @@ from opentrons.protocol_api import (
 # FIXME: make these variables configurable through RUNTIME-VARIABLES
 
 metadata = {"protocolName": "Flex: Diluent for 96ch"}
-requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+requirements = {"robotType": "Flex", "apiLevel": "2.21"}
 
 RETURN_TIP = False
 FILL_MULTIPLE_PLATES = True
@@ -67,6 +67,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Target volume of diluent",
         variable_name="target_volume",
         default=195,
+        minimum=1,
+        maximum=200,
         description="How much diluent to put in each well",
     )
 
@@ -235,6 +237,8 @@ def run(ctx: ProtocolContext) -> None:
     plate = ctx.load_labware("corning_96_wellplate_360ul_flat", "D2")
     pipette = ctx.load_instrument("flex_8channel_1000", "left", tip_racks=[tips])
     _assign_starting_volumes(ctx, pipette, reservoir)
+
+    ctx.load_trash_bin("A3")
     for i in range(12):
         pipette.configure_for_volume(ctx.params.target_volume)  # type: ignore[attr-defined]
         pipette.pick_up_tip()
