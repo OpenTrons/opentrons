@@ -1,9 +1,13 @@
 import {
   COLORS,
+  DIRECTION_COLUMN,
   Flex,
   LabwareRender,
   Module,
   MoveLabwareOnDeck,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
@@ -94,44 +98,15 @@ export function TwoColTextAndImage(
     }
   }
 
-  const buildBannerText = (): string | null => {
+  const buildBody = (): string | null => {
     switch (selectedRecoveryOption) {
-      case MANUAL_MOVE_AND_SKIP.ROUTE:
-      case MANUAL_REPLACE_AND_RETRY.ROUTE:
-        return t('ensure_lw_is_accurately_placed')
-      case RETRY_NEW_TIPS.ROUTE:
-      case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
-      case HOME_AND_RETRY.ROUTE: {
-        return isPartialTipConfigValid
-          ? t('replace_tips_and_select_loc_partial_tip')
-          : t('replace_tips_and_select_location')
-      }
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-        return t('make_sure_loaded_correct_number_of_labware_stacker')
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-        if (step === MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE) {
-          return null
-        } else {
-          return t('make_sure_loaded_correct_number_of_labware_stacker')
-        }
+      case LOAD_LABWARE_SHUTTLE_AND_RETRY.ROUTE:
+          return t('take_any_necessary_precautions_before_loading_shuttle')
       default:
         console.error(
           `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
-    }
-  }
-
-  const buildType = (): ComponentProps<
-    typeof InterventionContent
-  >['infoProps']['type'] => {
-    switch (selectedRecoveryOption) {
-      case MANUAL_MOVE_AND_SKIP.ROUTE:
-        return 'location-arrow-location'
-      default:
-      case MANUAL_REPLACE_AND_RETRY.ROUTE:
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-        return 'location'
     }
   }
 
@@ -142,7 +117,72 @@ export function TwoColTextAndImage(
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
-        <div>{buildTitle()}</div>
+         <Flex
+              flexDirection={DIRECTION_COLUMN}
+              css={`
+                gap: ${SPACING.spacing16};
+                width: 100%;
+                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                  gap: ${SPACING.spacing8};
+                  width: 27rem;
+                }
+              `}
+            >
+              <StyledText
+                oddStyle="level4HeaderSemiBold"
+                desktopStyle="headingSmallBold"
+              >
+                {buildTitle()}
+              </StyledText>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                css={`
+                  gap: ${SPACING.spacing16};
+                  width: 100%;
+                  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                    gap: ${SPACING.spacing24};
+                  }
+                `}
+              >
+                {/* <InterventionInfo {...infoProps} />
+                {notificationProps ? (
+                  <InlineNotification {...notificationProps} />
+                ) : null} */}
+              </Flex>
+            </Flex>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              css={`
+                gap: ${SPACING.spacing16};
+                width: 100%;
+                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                  gap: ${SPACING.spacing8};
+                  width: 27rem;
+                }
+              `}
+            >
+              <StyledText
+                oddStyle="level4HeaderRegular"
+                desktopStyle="bodyDefaultRegular"
+              >
+                {buildBody()}
+              </StyledText>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                css={`
+                  gap: ${SPACING.spacing16};
+                  width: 100%;
+                  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                    gap: ${SPACING.spacing24};
+                  }
+                `}
+              >
+                {/* <InterventionInfo {...infoProps} />
+                {notificationProps ? (
+                  <InlineNotification {...notificationProps} />
+                ) : null} */}
+              </Flex>
+            </Flex>
         <Flex marginTop="0.7rem">{buildImage()}</Flex>
       </TwoColumn>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
