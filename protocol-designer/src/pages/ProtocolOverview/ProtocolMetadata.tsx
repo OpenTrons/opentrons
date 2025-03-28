@@ -18,7 +18,7 @@ import {
   LINE_CLAMP_TEXT_STYLE,
 } from '../../components/atoms'
 
-const REQUIRED_APP_VERSION = '8.3.0'
+const REQUIRED_APP_VERSION = '8.4.0'
 
 type MetadataInfo = Array<{
   author?: string
