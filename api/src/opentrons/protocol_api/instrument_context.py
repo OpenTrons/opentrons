@@ -644,12 +644,13 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @publisher.publish(command=cmds.touch_tip)
     @requires_version(2, 0)
-    def touch_tip(
+    def touch_tip(  # noqa: C901
         self,
         location: Optional[labware.Well] = None,
         radius: float = 1.0,
         v_offset: float = -1.0,
         speed: float = 60.0,
+        mm_from_edge: float = 0,
     ) -> InstrumentContext:
         """
         Touch the pipette tip to the sides of a well, with the intent of removing leftover droplets.
@@ -675,12 +676,28 @@ class InstrumentContext(publisher.CommandPublisher):
                         - Maximum: 80.0 mm/s
                         - Minimum: 1.0 mm/s
         :type speed: float
+        :param mm_from_edge: How far to move inside the well, as a distance from the
+                             well's edge.
+                             When ``mm_from_edge=0``, the pipette tip will move all the
+                             way to the edge of the target well. When ``mm_from_edge=1``,
+                             the pipette tip will move to 1 mm from the well's edge.
+                             Lower values will press the tip harder into the well's
+                             walls; higher values will touch the well more lightly, or
+                             not at all.
+                             ``mm_from_edge`` and ``radius`` are mutually exclusive: to
+                             use ``mm_from_edge``, ``radius`` must be unspecified (left
+                             to its default value of 1.0).
+        :type mm_from_edge: float
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
         :raises RuntimeError: If no location is specified and the location cache is
                               ``None``. This should happen if ``touch_tip`` is called
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
+        :raises: ValueError: If both ``mm_to_edge`` and ``radius`` are specified.
         :returns: This instance.
+
+        .. versionchanged:: 2.24
+                Added the ``mm_from_edge`` parameter.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
@@ -703,6 +720,18 @@ class InstrumentContext(publisher.CommandPublisher):
         else:
             raise TypeError(f"location should be a Well, but it is {location}")
 
+        if mm_from_edge:
+            if self.api_version < APIVersion(2, 24):
+                raise APIVersionError(
+                    api_element="mm_from_edge",
+                    until_version="2.24",
+                    current_version=f"{self.api_version}",
+                )
+            if radius != 1.0:
+                raise ValueError(
+                    "radius must be set to 1.0 if mm_from_edge is specified"
+                )
+
         if "touchTipDisabled" in parent_labware.quirks:
             _log.info(f"Ignoring touch tip on labware {well}")
             return self
@@ -722,6 +751,9 @@ class InstrumentContext(publisher.CommandPublisher):
             radius=radius,
             z_offset=v_offset,
             speed=checked_speed,
+            mm_from_edge=mm_from_edge
+            if self.api_version >= APIVersion(2, 24)
+            else None,
         )
         return self
 
