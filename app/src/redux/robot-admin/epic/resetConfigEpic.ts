@@ -14,7 +14,10 @@ import type {
 } from '../types'
 import { forkJoin } from 'rxjs'
 import { fetchRobotApi } from '../../robot-api'
-import { type RobotApiResponse, type RobotApiRequestOptions } from '../../robot-api/types'
+import type {
+  RobotApiResponse,
+  RobotApiRequestOptions,
+} from '../../robot-api/types'
 
 function mapActionToRequests(
   action: ResetConfigAction
@@ -27,20 +30,24 @@ function mapActionToRequests(
 
   // This endpoint does not exist on older robot versions.
   // We'll send the request blindly and rely on it returning a harmless 404 in that case.
-  const deleteLabwareOffsetsRequest = action.payload.resets.resetLabwareOffsets ? {
-    method: DELETE,
-    path: Constants.LABWARE_OFFSETS_PATH,
-    body: {},
-  } : null
+  const deleteLabwareOffsetsRequest = action.payload.resets.resetLabwareOffsets
+    ? {
+        method: DELETE,
+        path: Constants.LABWARE_OFFSETS_PATH,
+        body: {},
+      }
+    : null
 
   const requests: RobotApiRequestOptions[] = []
   requests.push(settingsResetRequest)
-  if (deleteLabwareOffsetsRequest !== null) requests.push(deleteLabwareOffsetsRequest)
+  if (deleteLabwareOffsetsRequest !== null)
+    requests.push(deleteLabwareOffsetsRequest)
   return requests
 }
 
 function mapResponsesToAction(
-  responses: RobotApiResponse[], originalAction: ResetConfigAction
+  responses: RobotApiResponse[],
+  originalAction: ResetConfigAction
 ): Action {
   const allResponsesOk = responses.every(r => r.ok)
 
@@ -55,12 +62,12 @@ function mapResponsesToAction(
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return allResponsesOk
-      ? Actions.resetConfigSuccess(host.name, meta)
-      : Actions.resetConfigFailure(
-          host.name,
-          body as Record<string, unknown>,
-          meta
-        )
+    ? Actions.resetConfigSuccess(host.name, meta)
+    : Actions.resetConfigFailure(
+        host.name,
+        body as Record<string, unknown>,
+        meta
+      )
 }
 
 /**
@@ -79,7 +86,7 @@ export const resetConfigEpic: Epic = (action$, state$) => {
       forkJoin(
         mapActionToRequests(action).map(request => fetchRobotApi(host, request))
       ).pipe(map(responseGroup => mapResponsesToAction(responseGroup, action)))
-    ),
+    )
   )
 }
 
