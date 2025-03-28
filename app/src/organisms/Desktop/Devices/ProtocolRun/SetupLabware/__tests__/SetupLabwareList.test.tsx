@@ -35,7 +35,7 @@ describe('SetupLabwareList', () => {
   })
   it('renders the correct headers and labware list items', () => {
     render({
-      commands: protocolWithTC.commands,
+      protocolAnalysis: protocolWithTC,
       extraAttentionModules: [],
       attachedModuleInfo: {
         x: 1,

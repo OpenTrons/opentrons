@@ -344,6 +344,7 @@
   "view_snippets": "View Jupyter Notebook/Command Line Interface (SSH) code snippets",
   "volume": "Volume",
   "what_labware_offset_is": "A Labware Offset is a type of positional adjustment that accounts for small, real-world variances in the overall position of the labware on a robot’s deck. Labware Offset data is unique to a specific combination of labware definition, deck slot, and robot.",
+  "with_lid": "With {{lidDisplayName}}",
   "with_the_chosen_value": "With the chosen values, the following error occurred:",
   "you_can_still_adjust_offsets": "You can still adjust offsets by running Labware Position Check.",
   "you_havent_confirmed": "You haven't confirmed the {{missingSteps}} yet. Ensure these are correct before proceeding to run the protocol."

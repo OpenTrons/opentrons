@@ -276,7 +276,9 @@ export function LabwareListItem(
                         desktopStyle="bodyDefaultRegular"
                         color={COLORS.grey60}
                       >
-                        {labware.lidDisplayName}
+                        {t('with_lid', {
+                          lidDisplayName: labware.lidDisplayName,
+                        })}
                       </StyledText>
                     ) : null}
                     {labware.quantity > 1 || labware.liquids > 0 ? (

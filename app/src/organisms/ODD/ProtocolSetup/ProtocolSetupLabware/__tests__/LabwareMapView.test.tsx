@@ -111,14 +111,23 @@ describe('LabwareMapView', () => {
       },
     })
     render({
-      handleLabwareClick: vi.fn(),
-      deckDef: (deckDefFixture as unknown) as DeckDefinition,
-      mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
       attachedProtocolModuleMatches: [
         {
           ...mockProtocolModuleInfo[0],
         },
       ],
+      handleLabwareClick: vi.fn(),
+      mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
+      startingDeck: {
+        A1: [
+          {
+            displayName: 'nickName',
+            definitionUri: 'mock def uri',
+            labwareId: '1234',
+          },
+        ],
+      },
+      labwareByLiquidId: {},
     })
     expect(vi.mocked(BaseDeck)).toHaveBeenCalled()
   })
