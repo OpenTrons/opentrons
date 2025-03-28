@@ -9,25 +9,24 @@ import { inferModuleOrientationFromXCoordinate } from '@opentrons/shared-data'
 
 import { useTranslation } from 'react-i18next'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
-import { TwoColumn, DeckMapContent } from '/app/molecules/InterventionModal'
+import { TwoColumn } from '/app/molecules/InterventionModal'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
+import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
 import { RECOVERY_MAP } from '../constants'
 
 import type { ComponentProps } from 'react'
 import type { RecoveryContentProps } from '../types'
 import type { InterventionContent } from '/app/molecules/InterventionModal/InterventionContent'
 
-export function TwoColLwInfoAndDeck(
+export function TwoColTextAndImage(
   props: RecoveryContentProps
 ): JSX.Element | null {
   const {
     routeUpdateActions,
     failedPipetteUtils,
     failedLabwareUtils,
-    deckMapUtils,
     currentRecoveryOptionUtils,
-    isOnDevice,
     recoveryMap,
   } = props
   const {
@@ -56,9 +55,6 @@ export function TwoColLwInfoAndDeck(
   } = failedLabwareUtils.failedLabwareLocations
 
   const buildTitle = (): string => {
-    console.log('title!!!')
-    console.log('selectedRecoveryOption!!!', selectedRecoveryOption)
-    console.log('step!!!', step)
     switch (selectedRecoveryOption) {
       case MANUAL_MOVE_AND_SKIP.ROUTE:
         return t('manually_move_lw_on_deck')
@@ -92,7 +88,7 @@ export function TwoColLwInfoAndDeck(
         return t('load_labware_shuttle_onto_track')
       default:
         console.error(
-          `TwoColLwInfoAndDeck: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
+          `TwoColTextAndImage: Unexpected recovery option: ${selectedRecoveryOption}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
     }
@@ -120,7 +116,7 @@ export function TwoColLwInfoAndDeck(
         }
       default:
         console.error(
-          `TwoColLwInfoAndDeck:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
+          `TwoColTextAndImage:buildBannerText: Unexpected recovery option ${selectedRecoveryOption}. Handle retry step copy explicitly.`
         )
         return 'UNEXPECTED RECOVERY OPTION'
     }
@@ -139,99 +135,15 @@ export function TwoColLwInfoAndDeck(
     }
   }
 
-  const buildLayoutType = (): ComponentProps<
-    typeof InterventionContent
-  >['infoProps']['layout'] => {
-    switch (selectedRecoveryOption) {
-      case MANUAL_LOAD_IN_STACKER_AND_SKIP.ROUTE:
-      case MANUAL_REPLACE_STACKER_AND_RETRY.ROUTE:
-        return 'stacked'
-      default:
-        return 'default'
-    }
-  }
-
-  // TODO(jh, 10-22-24): Componentize an app-only abstraction above MoveLabwareOnDeck. EXEC-788.
-  const buildDeckView = (): JSX.Element => {
-    switch (selectedRecoveryOption) {
-      case MANUAL_MOVE_AND_SKIP.ROUTE: {
-        const { newLoc, currentLoc } = failedLabwareUtils.failedLabwareLocations
-        const {
-          movedLabwareDef,
-          moduleRenderInfo,
-          labwareRenderInfo,
-          ...restUtils
-        } = deckMapUtils
-
-        const failedLwId = failedLabware?.id ?? ''
-
-        const isValidDeck =
-          currentLoc != null && newLoc != null && movedLabwareDef != null
-
-        return isValidDeck ? (
-          <MoveLabwareOnDeck
-            deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
-            initialLabwareLocation={currentLoc}
-            finalLabwareLocation={newLoc}
-            movedLabwareDef={movedLabwareDef}
-            {...restUtils}
-            backgroundItems={
-              <>
-                {moduleRenderInfo.map(
-                  ({
-                    x,
-                    y,
-                    moduleId,
-                    moduleDef,
-                    nestedLabwareDef,
-                    nestedLabwareId,
-                  }) => (
-                    <Module
-                      key={moduleId}
-                      def={moduleDef}
-                      x={x}
-                      y={y}
-                      orientation={inferModuleOrientationFromXCoordinate(x)}
-                    >
-                      {nestedLabwareDef != null &&
-                      nestedLabwareId !== failedLwId ? (
-                        <LabwareRender definition={nestedLabwareDef} />
-                      ) : null}
-                    </Module>
-                  )
-                )}
-                {labwareRenderInfo
-                  .filter(l => l.labwareId !== failedLwId)
-                  .map(({ x, y, labwareDef, labwareId }) => (
-                    <g key={labwareId} transform={`translate(${x},${y})`}>
-                      {labwareDef != null && labwareId !== failedLwId ? (
-                        <LabwareRender definition={labwareDef} />
-                      ) : null}
-                    </g>
-                  ))}
-              </>
-            }
-          />
-        ) : (
-          <Flex />
-        )
-      }
-      default:
-        return <DeckMapContent {...deckMapUtils} />
-    }
+  const buildImage = (): JSX.Element => {
+    return <Flex></Flex>
   }
 
   return (
     <RecoverySingleColumnContentWrapper>
       <TwoColumn>
-        <LeftColumnLabwareInfo
-          {...props}
-          title={buildTitle()}
-          type={buildType()}
-          layout={buildLayoutType()}
-          bannerText={buildBannerText()}
-        />
-        <Flex marginTop="0.7rem">{buildDeckView()}</Flex>
+        <div>{buildTitle()}</div>
+        <Flex marginTop="0.7rem">{buildImage()}</Flex>
       </TwoColumn>
       <RecoveryFooterButtons primaryBtnOnClick={primaryOnClick} />
     </RecoverySingleColumnContentWrapper>

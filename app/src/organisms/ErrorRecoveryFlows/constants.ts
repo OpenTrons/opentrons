@@ -22,6 +22,7 @@ export const DEFINED_ERROR_TYPES = {
   GRIPPER_MOVEMENT: 'gripperMovement',
   STALL_OR_COLLISION: 'stallOrCollision',
   STACKER_STALL: 'flexStackerStallOrCollision',
+  SHUTTLE_MISSING: 'FlexStackerShuttleError',
 }
 
 // Client-defined error-handling flows.
