@@ -101,6 +101,7 @@
     "moveLiquid": {
       "disabled": {
         "$generic": "Incompatible with current path",
+        "aspirate_airGap_checkbox": "Air gap after aspirate not available with conditioning volume configured",
         "aspirate_wells": "Select a source labware in order to select wells",
         "aspirate_mix_checkbox": "Advanced setting not compatible with pipette path",
         "aspirate_touchTip_checkbox": "Touch tip is not supported",
