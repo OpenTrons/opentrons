@@ -10,6 +10,7 @@ import {
   getVectorDifference,
   getVectorSum,
   IDENTITY_VECTOR,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import {
@@ -32,13 +33,13 @@ import {
   getLabwareDefinitionsFromCommands,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   getIsOnDevice,
 } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
-import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
@@ -132,21 +133,23 @@ export const ResultsSummary = (
     />
   )
   const JupyterSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="jupyter"
       labwareOffsets={offsetsToApply}
       commands={protocolData?.commands ?? []}
       labware={protocolData?.labware ?? []}
       modules={protocolData?.modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const CommandLineSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="cli"
       labwareOffsets={offsetsToApply}
       commands={protocolData?.commands ?? []}
       labware={protocolData?.labware ?? []}
       modules={protocolData?.modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
 
@@ -160,7 +163,7 @@ export const ResultsSummary = (
       <ScrollContainer flexDirection={DIRECTION_COLUMN} maxHeight="20rem">
         <Header>{t('new_labware_offset_data')}</Header>
         {isLabwareOffsetCodeSnippetsOn ? (
-          <LabwareOffsetTabs
+          <LegacyLabwareOffsetTabs
             TableComponent={TableComponent}
             JupyterComponent={JupyterSnippet}
             CommandLineComponent={CommandLineSnippet}
@@ -282,7 +285,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
         <tr>
           <TableHeader>{t('location')}</TableHeader>
           <TableHeader>{t('labware')}</TableHeader>
-          <TableHeader>{t('labware_offset_data')}</TableHeader>
+          <TableHeader>{t('legacy_labware_offset_data')}</TableHeader>
         </tr>
       </thead>
 

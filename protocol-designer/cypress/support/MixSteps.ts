@@ -33,7 +33,7 @@ enum MixContent {
   WasteChute = 'Waste chute',
   AspFlowRate = 'Aspirate flow rate',
   AspWellOrder = 'Aspirate well order',
-  MixTipPosition = 'Mix tip position',
+  MixTipPosition = 'Mix position',
   AdvancedPipSettings = 'Advanced pipetting settings',
   Delay = 'Delay',
   DelayDuration = 'Delay duration',
@@ -106,8 +106,8 @@ enum MixLocators {
   PosFromBottom = '[id="TipPositionField_mix_touchTip_mmFromBottom"]',
   RenameBtn = 'button:contains("Rename")',
   StepNameInput = '[class="InputField__StyledInput-sc-1gyyvht-0 cLVzBl"]',
-  StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-ug50vm-0 fSXuLe"]',
-  // StepNotesInput = '[data-testid="TextAreaField_step_notes"]',
+  // StepNotesInput = '[class="TextAreaField__StyledTextArea-sc-1mhuse7-0 hpcyEZ"]',
+  StepNotesInput = '[data-testid="TextAreaField"]',
   PosFromTop = '[data-testid="TipPositionField_mix_touchTip_mmFromTop"]',
 }
 
@@ -131,7 +131,7 @@ export const MixSteps = {
   SelectLabware: (): StepThunk => ({
     call: () => {
       cy.contains(MixContent.ChooseOption).should('be.visible').click()
-      cy.contains(MixContent.Reservoir).should('be.visible').click()
+      cy.contains(MixContent.WellPlate).should('be.visible').click()
     },
   }),
 
@@ -212,10 +212,10 @@ export const MixSteps = {
         .should('be.visible')
       cy.get(MixLocators.MixTipPos).click()
       cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}2')
-      cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}3')
+      cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.ZpositionInput).type('{selectAll}{backspace}4')
       cy.get(MixLocators.ResetToDefault).click()
-      cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}3')
+      cy.get(MixLocators.XpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.YpositionInput).type('{selectAll}{backspace}2')
       cy.get(MixLocators.ZpositionInput).type('{selectAll}{backspace}5')
       cy.contains(MixContent.Cancel).should('exist').should('be.visible')

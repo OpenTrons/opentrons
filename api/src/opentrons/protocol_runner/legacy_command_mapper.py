@@ -38,7 +38,9 @@ from opentrons.protocol_engine.state.update_types import (
     StateUpdate,
 )
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    labware_definition_type_adapter,
+)
 from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
 
 
@@ -659,7 +661,7 @@ class LegacyCommandMapper:
             notes=[],
             result=pe_commands.LoadLabwareResult.model_construct(
                 labwareId=labware_id,
-                definition=LabwareDefinition.model_validate(
+                definition=labware_definition_type_adapter.validate_python(
                     labware_load_info.labware_definition
                 ),
                 offsetId=labware_load_info.offset_id,

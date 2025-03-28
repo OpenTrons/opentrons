@@ -78,6 +78,7 @@ export function SelectTips(props: RecoveryContentProps): JSX.Element | null {
             title={t('select_tip_pickup_location')}
             type="location"
             bannerText={buildBannerText()}
+            layout="default"
           />
           <TipSelection
             {...props}

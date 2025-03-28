@@ -1,19 +1,15 @@
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import { round } from 'lodash'
 import {
-  ALIGN_CENTER,
-  COLORS,
   DIRECTION_COLUMN,
   Divider,
   Flex,
-  Icon,
-  ListItem,
   SPACING,
   StyledText,
   Tabs,
-  Tooltip,
-  useHoverTooltip,
 } from '@opentrons/components'
+import { getMinXYDimension } from '@opentrons/shared-data'
 import { getTrashOrLabware } from '@opentrons/step-generation'
 
 import {
@@ -29,19 +25,23 @@ import {
   CheckboxExpandStepFormField,
   InputStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import {
-  getAdditionalEquipmentEntities,
+  getInvariantContext,
   getLabwareEntities,
+  getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
+import { getMaxPushOutVolume } from '../../../../../../utils'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
   getFormLevelError,
   getLabwareFieldForPositioningField,
 } from '../../utils'
+import { MultiInputField } from './MultiInputField'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { StepInputFieldProps } from './MultiInputField'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { FormData, StepFieldName } from '../../../../../../form-types'
 import type { StepFormErrors } from '../../../../../../steplist'
@@ -67,31 +67,28 @@ export const SecondStepsMoveLiquidTools = ({
   visibleFormErrors,
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
-  const [targetProps, tooltipProps] = useHoverTooltip()
   const labwares = useSelector(getLabwareEntities)
-  const additionalEquipmentEntities = useSelector(
-    getAdditionalEquipmentEntities
+  const { trashBinEntities, wasteChuteEntities } = useSelector(
+    getInvariantContext
   )
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
-
+  const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
-      ? additionalEquipmentEntities[
-          String(propsForFields.dispense_labware.value)
-        ]?.name === 'wasteChute'
+      ? wasteChuteEntities[String(propsForFields.dispense_labware.value)] !=
+        null
       : false
   const isTrashBinSelected =
     propsForFields.dispense_labware?.value != null
-      ? additionalEquipmentEntities[
-          String(propsForFields.dispense_labware.value)
-        ]?.name === 'trashBin'
+      ? trashBinEntities[String(propsForFields.dispense_labware.value)] != null
       : false
   const destinationLabwareType =
     formData.dispense_labware != null
       ? getTrashOrLabware(
           labwares,
-          additionalEquipmentEntities,
+          wasteChuteEntities,
+          trashBinEntities,
           formData.dispense_labware as string
         )
       : null
@@ -126,6 +123,40 @@ export const SecondStepsMoveLiquidTools = ({
     tab === 'dispense' && (isWasteChuteSelected || isTrashBinSelected)
 
   const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
+
+  const getFields = (type: 'submerge' | 'retract'): StepInputFieldProps[] => {
+    return [
+      {
+        fieldTitle: t(`protocol_steps:${type}_speed`),
+        fieldKey: `${tab}_${type}_speed`,
+        units: 'application:units.millimeterPerSec',
+        errorToShow: getFormLevelError(
+          `${tab}_${type}_speed`,
+          mappedErrorsToField
+        ),
+      },
+      {
+        fieldTitle: t('protocol_steps:delay_duration'),
+        fieldKey: `${tab}_${type}_delay_seconds`,
+        units: 'application:units.seconds',
+        errorToShow: getFormLevelError(
+          `${tab}_${type}_delay_seconds`,
+          mappedErrorsToField
+        ),
+      },
+    ]
+  }
+
+  const maxPushoutVolume = getMaxPushOutVolume(
+    Number(formData.volume),
+    pipetteSpec
+  )
+
+  const minXYDimension = isDestinationTrash
+    ? null
+    : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
+  const minRadiusForTouchTip =
+    minXYDimension != null ? round(minXYDimension / 2, 1) : null
 
   return (
     <Flex
@@ -177,66 +208,44 @@ export const SecondStepsMoveLiquidTools = ({
             )
           ]
         }
+        referenceField={`${tab}_position_reference`}
       />
       {enableLiquidClasses ? (
         <>
           <Divider marginY="0" />
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing8}
-            padding={`0 ${SPACING.spacing16}`}
-          >
-            <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-              >
-                {t('protocol_steps:submerge')}
-              </StyledText>
-              <Flex {...targetProps}>
-                <Icon
-                  name="information"
-                  size="1rem"
-                  color={COLORS.grey60}
-                  data-testid="information_icon"
-                />
-              </Flex>
-              <Tooltip tooltipProps={tooltipProps}>
-                {t(`tooltip:step_fields.defaults.${tab}_submerge`)}
-              </Tooltip>
-            </Flex>
-            <ListItem type="noActive">
-              <Flex
-                padding={SPACING.spacing12}
-                width="100%"
-                flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing8}
-              >
-                <InputStepFormField
-                  showTooltip={false}
-                  padding="0"
-                  title={t('protocol_steps:submerge_speed')}
-                  {...propsForFields[`${tab}_submerge_speed`]}
-                  units={t('application:units.millimeterPerSec')}
-                  errorToShow={getFormLevelError(
-                    `${tab}_submerge_speed`,
-                    mappedErrorsToField
-                  )}
-                />
-                <InputStepFormField
-                  showTooltip={false}
-                  padding="0"
-                  title={t('protocol_steps:delay_duration')}
-                  {...propsForFields[`${tab}_submerge_delay_seconds`]}
-                  units={t('application:units.seconds')}
-                  errorToShow={getFormLevelError(
-                    `${tab}_submerge_delay_seconds`,
-                    mappedErrorsToField
-                  )}
-                />
-              </Flex>
-            </ListItem>
-          </Flex>
+          <MultiInputField
+            name={t('submerge')}
+            prefix={`${tab}_submerge`}
+            tooltipContent={t(`tooltip:step_fields.defaults.${tab}_submerge`)}
+            propsForFields={propsForFields}
+            fields={getFields('submerge')}
+            isWellPosition
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('submerge_mmFromBottom')
+                )
+              ]
+            }
+            referenceField={`${tab}_submerge_position_reference`}
+          />
+          <Divider marginY="0" />
+          <MultiInputField
+            name={t('retract')}
+            prefix={`${tab}_retract`}
+            tooltipContent={t(`tooltip:step_fields.defaults.${tab}_retract`)}
+            propsForFields={propsForFields}
+            fields={getFields('retract')}
+            isWellPosition
+            labwareId={
+              formData[
+                getLabwareFieldForPositioningField(
+                  addFieldNamePrefix('retract_mmFromBottom')
+                )
+              ]
+            }
+            referenceField={`${tab}_retract_position_reference`}
+          />
         </>
       ) : null}
       <Divider marginY="0" />
@@ -266,20 +275,9 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.mix.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_mix_checkbox`].value}
-          isChecked={propsForFields[`${tab}_mix_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_mix_checkbox`].updateValue
-          }
-          tooltipText={
-            tab === 'dispense'
-              ? dispenseMixDisabledTooltipText
-              : propsForFields.aspirate_mix_checkbox.tooltipContent
-          }
-          disabled={
-            tab === 'dispense'
-              ? isDestinationTrash || formData.path === 'multiDispense'
-              : formData.path === 'multiAspirate'
+          fieldProps={propsForFields[`${tab}_mix_checkbox`]}
+          tooltipOverride={
+            tab === 'dispense' ? dispenseMixDisabledTooltipText : null
           }
         >
           {formData[`${tab}_mix_checkbox`] === true ? (
@@ -313,17 +311,41 @@ export const SecondStepsMoveLiquidTools = ({
             </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
+        {tab === 'dispense' ? (
+          <CheckboxExpandStepFormField
+            title={i18n.format(
+              t('form:step_edit_form.field.pushOut.title'),
+              'capitalize'
+            )}
+            fieldProps={propsForFields.pushOut_checkbox}
+          >
+            {formData.pushOut_checkbox === true ? (
+              <InputStepFormField
+                showTooltip={false}
+                padding="0"
+                title={t(
+                  'form:step_edit_form.field.pushOut.pushOut_volume.label'
+                )}
+                caption={t(
+                  'form:step_edit_form.field.pushOut.pushOut_volume.caption',
+                  { min: 0, max: maxPushoutVolume }
+                )}
+                {...propsForFields.pushOut_volume}
+                units={t('application:units.microliter')}
+                errorToShow={getFormLevelError(
+                  'pushOut_volume',
+                  mappedErrorsToField
+                )}
+              />
+            ) : null}
+          </CheckboxExpandStepFormField>
+        ) : null}
         <CheckboxExpandStepFormField
           title={i18n.format(
             t('form:step_edit_form.field.delay.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
-          isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_delay_checkbox`].updateValue
-          }
-          tooltipText={propsForFields[`${tab}_delay_checkbox`].tooltipContent}
+          fieldProps={propsForFields[`${tab}_delay_checkbox`]}
         >
           {formData[`${tab}_delay_checkbox`] === true ? (
             <Flex
@@ -342,18 +364,6 @@ export const SecondStepsMoveLiquidTools = ({
                   mappedErrorsToField
                 )}
               />
-              <PositionField
-                prefix={tab}
-                propsForFields={propsForFields}
-                zField={`${tab}_delay_mmFromBottom`}
-                labwareId={
-                  formData[
-                    getLabwareFieldForPositioningField(
-                      addFieldNamePrefix('delay_mmFromBottom')
-                    )
-                  ]
-                }
-              />
             </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
@@ -363,14 +373,7 @@ export const SecondStepsMoveLiquidTools = ({
               t('form:step_edit_form.field.blowout.label'),
               'capitalize'
             )}
-            checkboxValue={propsForFields.blowout_checkbox.value}
-            isChecked={propsForFields.blowout_checkbox.value === true}
-            checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
-            tooltipText={propsForFields.blowout_checkbox.tooltipContent}
-            disabled={
-              formData.path === 'multiDispense' &&
-              formData.disposalVolume_checkbox
-            }
+            fieldProps={propsForFields.blowout_checkbox}
           >
             {formData.blowout_checkbox === true ? (
               <Flex
@@ -410,28 +413,55 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.touchTip.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_touchTip_checkbox`].value}
-          isChecked={propsForFields[`${tab}_touchTip_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_touchTip_checkbox`].updateValue
-          }
-          tooltipText={
-            propsForFields[`${tab}_touchTip_checkbox`].tooltipContent
-          }
+          fieldProps={propsForFields[`${tab}_touchTip_checkbox`]}
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
-            <PositionField
-              prefix={tab}
-              propsForFields={propsForFields}
-              zField={`${tab}_touchTip_mmFromTop`}
-              labwareId={
-                formData[
-                  getLabwareFieldForPositioningField(
-                    addFieldNamePrefix('touchTip_mmFromTop')
-                  )
-                ]
-              }
-            />
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
+              <InputStepFormField
+                showTooltip={false}
+                padding="0"
+                title={t('form:step_edit_form.field.touchTip_speed.label')}
+                {...propsForFields[`${tab}_touchTip_speed`]}
+                errorToShow={getFormLevelError(
+                  `${tab}_touchTip_speed`,
+                  mappedErrorsToField
+                )}
+                units={t('application:units.millimeterPerSec')}
+              />
+              <InputStepFormField
+                showTooltip={false}
+                padding="0"
+                title={t('form:step_edit_form.field.touchTip_mmFromEdge.label')}
+                {...propsForFields[`${tab}_touchTip_mmFromEdge`]}
+                errorToShow={getFormLevelError(
+                  `${tab}_touchTip_mmFromEdge`,
+                  mappedErrorsToField
+                )}
+                caption={t(
+                  `form:step_edit_form.field.touchTip_mmFromEdge.caption`,
+                  {
+                    min: 0,
+                    max: minRadiusForTouchTip,
+                  }
+                )}
+                units={t('application:units.millimeter')}
+              />
+              <PositionField
+                prefix={tab}
+                propsForFields={propsForFields}
+                zField={`${tab}_touchTip_mmFromTop`}
+                labwareId={
+                  formData[
+                    getLabwareFieldForPositioningField(
+                      addFieldNamePrefix('touchTip_mmFromTop')
+                    )
+                  ]
+                }
+                showButton
+                padding="0"
+                isNested
+              />
+            </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
         <CheckboxExpandStepFormField
@@ -439,12 +469,7 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.airGap.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_airGap_checkbox`].value}
-          isChecked={propsForFields[`${tab}_airGap_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_airGap_checkbox`].updateValue
-          }
-          tooltipText={propsForFields[`${tab}_airGap_checkbox`].tooltipContent}
+          fieldProps={propsForFields[`${tab}_airGap_checkbox`]}
         >
           {formData[`${tab}_airGap_checkbox`] === true ? (
             <InputStepFormField

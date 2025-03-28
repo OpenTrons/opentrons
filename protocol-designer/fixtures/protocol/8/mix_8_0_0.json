@@ -7,6 +7,7 @@
     "description": "A test for 5.0.0 -> 5.1.0 migration",
     "created": 1600714068238,
     "lastModified": 1714570500165,
+    "source": "Protocol Designer",
     "category": null,
     "subcategory": null,
     "tags": []
@@ -2139,7 +2140,7 @@
   },
   "liquidSchemaId": "opentronsLiquidSchemaV1",
   "liquids": {},
-  "commandSchemaId": "opentronsCommandSchemaV8",
+  "commandSchemaId": "opentronsCommandSchemaV10",
   "commands": [
     {
       "key": "d66aa1db-df76-492d-ab2c-533b982522aa",

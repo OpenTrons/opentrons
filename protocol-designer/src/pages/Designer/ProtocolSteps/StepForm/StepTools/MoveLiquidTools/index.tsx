@@ -1,5 +1,8 @@
+import { useSelector } from 'react-redux'
+import { getEnableLiquidClasses } from '../../../../../../feature-flags/selectors'
 import { FirstStepMoveLiquidTools } from './FirstStepMoveLiquidTools'
 import { SecondStepsMoveLiquidTools } from './SecondStepsMoveLiquidTools'
+import { LiquidClassesStepTools } from './LiquidClassesStepTools'
 
 import type { StepFormProps } from '../../types'
 
@@ -13,6 +16,7 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
     tab,
     setTab,
   } = props
+  const enableLiquidClasses = useSelector(getEnableLiquidClasses)
 
   // Object mapping step numbers to functions returning the correct JSX
   const stepComponents: Record<number, () => JSX.Element> = {
@@ -24,6 +28,25 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
       />
     ),
     1: () => (
+      <>
+        {enableLiquidClasses ? (
+          <LiquidClassesStepTools
+            propsForFields={propsForFields}
+            setShowFormErrors={setShowFormErrors}
+          />
+        ) : (
+          <SecondStepsMoveLiquidTools
+            propsForFields={propsForFields}
+            formData={formData}
+            tab={tab}
+            setTab={setTab}
+            setShowFormErrors={setShowFormErrors}
+            visibleFormErrors={visibleFormErrors}
+          />
+        )}
+      </>
+    ),
+    2: () => (
       <SecondStepsMoveLiquidTools
         propsForFields={propsForFields}
         formData={formData}
@@ -33,9 +56,6 @@ export function MoveLiquidTools(props: StepFormProps): JSX.Element {
         visibleFormErrors={visibleFormErrors}
       />
     ),
-    // 2: () => (
-    //   third step tools here
-    // ),
   }
 
   const StepComponent = stepComponents[toolboxStep] ?? stepComponents[0]

@@ -8,7 +8,7 @@ import {
   CheckboxExpandStepFormField,
   DropdownStepFormField,
   InputStepFormField,
-} from '../../../../../molecules'
+} from '../../../../../components/molecules'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 import { FlowRateField } from './FlowRateField'
 import { BlowoutOffsetField } from './BlowoutOffsetField'
@@ -70,13 +70,11 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
         })
       : ''
 
-  const { value, updateValue } = propsForFields.disposalVolume_checkbox
+  const { value } = propsForFields.disposalVolume_checkbox
   return (
     <CheckboxExpandStepFormField
       title={t('protocol_steps:multi_dispense_options')}
-      checkboxValue={value}
-      isChecked={value === true}
-      checkboxUpdateValue={updateValue}
+      fieldProps={propsForFields.disposalVolume_checkbox}
     >
       {value ? (
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing6}>
@@ -93,7 +91,7 @@ export function DisposalField(props: DisposalFieldProps): JSX.Element {
             options={disposalDestinationOptions}
             title={t('protocol_steps:blowout_location')}
             padding="0"
-            width="16.5rem"
+            width="100%"
           />
           <FlowRateField
             {...propsForFields.blowout_flowRate}

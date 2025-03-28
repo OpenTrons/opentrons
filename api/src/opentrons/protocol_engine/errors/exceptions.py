@@ -1269,3 +1269,15 @@ class FlexStackerNotLogicallyEmptyError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class FlexStackerLabwarePoolNotYetDefinedError(ProtocolEngineError):
+    """Raised when attempting to modify labware in a stacker whose labware pool is not yet defined."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)

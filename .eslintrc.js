@@ -56,6 +56,7 @@ module.exports = {
               'useCurrentMaintenanceRun',
               'useDeckConfigurationQuery',
               'useAllCommandsAsPreSerializedList',
+              'useSearchLabwareOffsets',
             ],
             message:
               'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
@@ -104,7 +105,6 @@ module.exports = {
         '@typescript-eslint/no-floating-promises': 'warn',
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
-        '@typescript-eslint/consistent-indexed-object-style': 'warn',
         '@typescript-eslint/ban-types': 'warn',
         '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
         '@typescript-eslint/await-thenable': 'warn',

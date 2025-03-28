@@ -84,6 +84,14 @@ describe('dispense', () => {
           },
         },
       ])
+      expect(getSuccessResult(result).python).toBe(
+        `
+mockPythonName.dispense(
+    volume=50,
+    location=mockPythonName["A1"].bottom(z=5),
+    rate=6 / mockPythonName.flow_rate.dispense,
+)`.trimStart()
+      )
     })
     it('dispensing without tip should throw error', () => {
       const result = dispense(params, invariantContext, initialRobotState)

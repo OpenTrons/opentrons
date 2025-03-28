@@ -8,7 +8,10 @@ import {
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
-import { getEnableReturnTip } from '../../../../../../feature-flags/selectors'
+import {
+  getEnablePartialTipSupport,
+  getEnableReturnTip,
+} from '../../../../../../feature-flags/selectors'
 
 import {
   ChangeTipField,
@@ -42,6 +45,7 @@ export function FirstStepMoveLiquidTools({
   const { t } = useTranslation('protocol_steps')
   const labwares = useSelector(getLabwareEntities)
   const pipettes = useSelector(getPipetteEntities)
+  const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -50,6 +54,9 @@ export function FirstStepMoveLiquidTools({
   const { pipette, tipRack } = propsForFields
   const is96Channel =
     pipette.value != null && pipettes[String(pipette.value)].name === 'p1000_96'
+  const is8Channel =
+    propsForFields.pipette.value != null &&
+    pipettes[String(propsForFields.pipette.value)].spec.channels === 8
   const userSelectedDropTipLocation =
     labwares[String(propsForFields.dropTip_location.value)] != null
   const userSelectedPickUpTipLocation =
@@ -68,10 +75,14 @@ export function FirstStepMoveLiquidTools({
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
-      {is96Channel ? (
+      {propsForFields.pipette.value != null &&
+      (is96Channel || (is8Channel && enablePartialTip)) ? (
         <>
           <Divider marginY="0" />
-          <PartialTipField {...propsForFields.nozzles} />
+          <PartialTipField
+            {...propsForFields.nozzles}
+            pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+          />
         </>
       ) : null}
       <Divider marginY="0" />
@@ -87,9 +98,17 @@ export function FirstStepMoveLiquidTools({
         />
         <WellSelectionField
           {...propsForFields.aspirate_wells}
-          labwareId={String(propsForFields.aspirate_labware.value)}
+          labwareId={
+            typeof propsForFields.aspirate_labware.value === 'string'
+              ? propsForFields.aspirate_labware.value
+              : null
+          }
           pipetteId={formData.pipette}
-          nozzles={String(propsForFields.nozzles.value) ?? null}
+          nozzles={
+            typeof propsForFields.nozzles.value === 'string'
+              ? propsForFields.nozzles.value
+              : null
+          }
           hasFormError={
             visibleFormErrors?.some(error =>
               error.dependentFields.includes('aspirate_wells')
@@ -110,9 +129,17 @@ export function FirstStepMoveLiquidTools({
         {isDisposalLocation ? null : (
           <WellSelectionField
             {...propsForFields.dispense_wells}
-            labwareId={String(propsForFields.dispense_labware.value)}
+            labwareId={
+              typeof propsForFields.dispense_labware.value === 'string'
+                ? propsForFields.dispense_labware.value
+                : null
+            }
             pipetteId={formData.pipette}
-            nozzles={String(propsForFields.nozzles.value) ?? null}
+            nozzles={
+              typeof propsForFields.nozzles.value === 'string'
+                ? propsForFields.nozzles.value
+                : null
+            }
             hasFormError={
               visibleFormErrors?.some(error =>
                 error.dependentFields.includes('dispense_wells')
@@ -162,7 +189,11 @@ export function FirstStepMoveLiquidTools({
             <>
               <TipWellSelectionField
                 {...propsForFields.pickUpTip_wellNames}
-                nozzles={String(propsForFields.nozzles.value) ?? null}
+                nozzles={
+                  typeof propsForFields.nozzles.value === 'string'
+                    ? propsForFields.nozzles.value
+                    : null
+                }
                 labwareId={propsForFields.pickUpTip_location.value}
                 pipetteId={propsForFields.pipette.value}
               />
@@ -180,7 +211,11 @@ export function FirstStepMoveLiquidTools({
           <Divider marginY="0" />
           <TipWellSelectionField
             {...propsForFields.dropTip_wellNames}
-            nozzles={String(propsForFields.nozzles.value) ?? null}
+            nozzles={
+              typeof propsForFields.nozzles.value === 'string'
+                ? propsForFields.nozzles.value
+                : null
+            }
             labwareId={propsForFields.dropTip_location.value}
             pipetteId={propsForFields.pipette.value}
           />

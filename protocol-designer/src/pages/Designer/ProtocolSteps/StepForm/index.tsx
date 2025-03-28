@@ -16,7 +16,7 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import { maskField } from '../../../../steplist/fieldLevel'
 import { getInvariantContext } from '../../../../step-forms/selectors'
 import { getDirtyFields, makeSingleEditFieldProps } from './utils'

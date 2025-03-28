@@ -241,4 +241,20 @@ describe('useNotifyDataReady', () => {
     result.current.queryOptionsNotify.onSettled?.(undefined, null)
     expect(mockOnSettled).toHaveBeenCalled()
   })
+
+  it('should enable notifications if `enabled` is initially false and then becomes true', () => {
+    const { rerender, result } = renderHook(
+      props =>
+        useNotifyDataReady({
+          topic: MOCK_TOPIC,
+          options: props,
+        }),
+      { initialProps: { enabled: false, refetchInterval: 5000 } }
+    )
+    expect(result.current.shouldRefetch).toEqual(false)
+
+    rerender({ enabled: true, refetchInterval: 5000 })
+
+    expect(result.current.shouldRefetch).toEqual(true)
+  })
 })

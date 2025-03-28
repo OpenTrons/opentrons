@@ -1,4 +1,5 @@
 import { beforeEach, describe, it, expect } from 'vitest'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
@@ -70,6 +71,7 @@ describe('waitForTemperature', () => {
           message: expect.any(String),
         },
       ],
+      python: 'mock_temperature_module_1.await_temperature(20)',
     }
     const result = waitForTemperature(
       args,
@@ -117,6 +119,7 @@ describe('waitForTemperature', () => {
           },
         },
       ],
+      python: 'mock_temperature_module_1.await_temperature(42)',
     }
     const result = waitForTemperature(
       args,
@@ -160,5 +163,51 @@ describe('waitForTemperature', () => {
       previousRobotState
     )
     expect(result).toEqual(missingTemperatureStep)
+  })
+  it('renders the correct comand and python for a heater-shaker waitForTemperature', () => {
+    const heaterShakerId = 'heaterShakerId'
+    invariantContext = {
+      ...invariantContext,
+      moduleEntities: {
+        heaterShakerId: {
+          id: heaterShakerId,
+          type: HEATERSHAKER_MODULE_TYPE,
+          model: 'heaterShakerModuleV1',
+          pythonName: 'mock_heater_shaker_module_1',
+        },
+      },
+    }
+    robotState = {
+      ...robotState,
+      modules: {
+        heaterShakerId: {
+          slot: 'A1',
+          moduleState: {
+            type: HEATERSHAKER_MODULE_TYPE,
+            targetTemp: null,
+            latchOpen: false,
+            targetSpeed: null,
+          },
+        },
+      },
+    }
+    const args: TemperatureParams = {
+      moduleId: heaterShakerId,
+      celsius: 80,
+    }
+
+    expect(waitForTemperature(args, invariantContext, robotState)).toEqual({
+      commands: [
+        {
+          commandType: 'heaterShaker/waitForTemperature',
+          key: expect.any(String),
+          params: {
+            moduleId: heaterShakerId,
+            celsius: 80,
+          },
+        },
+      ],
+      python: 'mock_heater_shaker_module_1.wait_for_temperature()',
+    })
   })
 })

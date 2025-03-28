@@ -111,6 +111,7 @@ def run(protocol: ProtocolContext) -> None:
         pvt1abr7_labware = [res1, elution_plate, sample_plate]
         for lw in pvt1abr7_labware:
             protocol.move_labware(lw, OFF_DECK, use_gripper=False)
+        pipette.reset_tipracks()
     if pvt1abr9:
         protocol.pause("SET UP PVT1ABR9")
         res1 = protocol.load_labware(
@@ -220,7 +221,7 @@ def run(protocol: ProtocolContext) -> None:
             "nest_96_wellplate_2ml_deep", str(SLOTS["LABWARE"][0]), "Reservoir 1"
         )  # Reservoir
         sample_plate_2 = protocol.load_labware(
-            "thermoscientificnunc_96_wellplate_1300ul",
+            "nest_96_wellplate_2ml_deep",
             str(SLOTS["LABWARE"][1]),
             "Sample Plate 2",
         )  # Reservoir

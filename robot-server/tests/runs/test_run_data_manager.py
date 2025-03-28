@@ -28,7 +28,7 @@ from opentrons.protocol_runner import RunResult
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 from robot_server.protocols.protocol_models import ProtocolKind
@@ -1264,16 +1264,16 @@ async def test_get_current_run_labware_definition(
         mock_run_orchestrator_store.get_loaded_labware_definitions()
     ).then_return(
         [
-            LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
-            LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+            LabwareDefinition2.model_construct(namespace="test_2"),  # type: ignore[call-arg]
         ]
     )
 
     result = subject.get_run_loaded_labware_definitions(run_id="run-id")
 
     assert result == [
-        LabwareDefinition.model_construct(namespace="test_1"),  # type: ignore[call-arg]
-        LabwareDefinition.model_construct(namespace="test_2"),  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(namespace="test_1"),  # type: ignore[call-arg]
+        LabwareDefinition2.model_construct(namespace="test_2"),  # type: ignore[call-arg]
     ]
 
 

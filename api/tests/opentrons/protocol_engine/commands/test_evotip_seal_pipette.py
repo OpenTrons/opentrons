@@ -6,7 +6,10 @@ from datetime import datetime
 from decoy import Decoy, matchers
 from unittest.mock import sentinel
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    labware_definition_type_adapter,
+)
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
@@ -44,7 +47,7 @@ from opentrons_shared_data.labware import load_definition
 def evotips_definition() -> LabwareDefinition:
     """A fixturee of the evotips definition."""
     # TODO (chb 2025-01-29): When we migrate all labware to v3 we can clean this up
-    return LabwareDefinition.model_validate(
+    return labware_definition_type_adapter.validate_python(
         load_definition("evotips_opentrons_96_labware", 1)
     )
 
@@ -130,7 +133,7 @@ async def test_success(
             ),
             pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
                 pipette_id="pipette-id",
-                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=400),
+                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=1000),
             ),
         ),
     )
@@ -218,7 +221,7 @@ async def test_no_tip_physically_missing_error(
             ),
             pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
                 pipette_id="pipette-id",
-                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=400),
+                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=1000),
             ),
         ),
     )

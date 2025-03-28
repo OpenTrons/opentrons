@@ -1,6 +1,6 @@
 import * as errorCreators from '../../errorCreators'
 import { absorbanceReaderStateGetter } from '../../robotStateSelectors'
-import { uuid } from '../../utils'
+import { formatPyStr, uuid } from '../../utils'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { AbsorbanceReaderReadCreateCommand } from '@opentrons/shared-data'
 
@@ -23,6 +23,10 @@ export const absorbanceReaderRead: CommandCreator<
     errors.push(errorCreators.absorbanceReaderLidClosed())
   }
 
+  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
+  const pythonfileName =
+    fileName != null ? `export_filename=${formatPyStr(fileName)}` : ''
+
   return errors.length > 0
     ? { errors }
     : {
@@ -36,5 +40,6 @@ export const absorbanceReaderRead: CommandCreator<
             },
           },
         ],
+        python: `${pythonName}.read(${pythonfileName})`,
       }
 }

@@ -5,6 +5,7 @@ from opentrons.drivers.asyncio.communication.errors import (
     AlarmResponse,
     ErrorResponse,
     UnhandledGcode,
+    DefaultErrorCodes,
 )
 from .async_serial import AsyncSerial
 
@@ -17,4 +18,5 @@ __all__ = [
     "AlarmResponse",
     "ErrorResponse",
     "UnhandledGcode",
+    "DefaultErrorCodes",
 ]

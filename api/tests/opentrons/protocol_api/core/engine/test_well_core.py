@@ -5,7 +5,11 @@ import inspect
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.labware_definition import WellDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    WellDefinition2,
+    RectangularWellDefinition2,
+    CircularWellDefinition2,
+)
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
@@ -57,14 +61,14 @@ def api_version() -> APIVersion:
 
 
 @pytest.fixture
-def well_definition() -> WellDefinition:
-    """Get a partial WellDefinition value object."""
-    return WellDefinition.model_construct()  # type: ignore[call-arg]
+def well_definition() -> WellDefinition2:
+    """Get a partial WellDefinition2 value object."""
+    return CircularWellDefinition2.model_construct()  # type: ignore[call-arg]
 
 
 @pytest.fixture
 def subject(
-    decoy: Decoy, mock_engine_client: EngineClient, well_definition: WellDefinition
+    decoy: Decoy, mock_engine_client: EngineClient, well_definition: WellDefinition2
 ) -> WellCore:
     """Get a WellCore test subject with mocked dependencies."""
     decoy.when(
@@ -103,7 +107,7 @@ def test_display_name(
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(totalLiquidVolume=101)],  # type: ignore[call-arg]
+    [CircularWellDefinition2.model_construct(totalLiquidVolume=101)],  # type: ignore[call-arg]
 )
 def test_max_volume(subject: WellCore) -> None:
     """It should have a max volume."""
@@ -227,7 +231,7 @@ def test_load_liquid(
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(diameter=123.4)],  # type: ignore[call-arg]
+    [CircularWellDefinition2.model_construct(shape="circular", diameter=123.4)],  # type: ignore[call-arg]
 )
 def test_diameter(subject: WellCore) -> None:
     """It should get the diameter."""
@@ -236,7 +240,7 @@ def test_diameter(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(xDimension=567.8)],  # type: ignore[call-arg]
+    [RectangularWellDefinition2.model_construct(shape="rectangular", xDimension=567.8)],  # type: ignore[call-arg]
 )
 def test_length(subject: WellCore) -> None:
     """It should get the length."""
@@ -245,7 +249,7 @@ def test_length(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(yDimension=987.6)],  # type: ignore[call-arg]
+    [RectangularWellDefinition2.model_construct(shape="rectangular", yDimension=987.6)],  # type: ignore[call-arg]
 )
 def test_width(subject: WellCore) -> None:
     """It should get the width."""
@@ -254,7 +258,7 @@ def test_width(subject: WellCore) -> None:
 
 @pytest.mark.parametrize(
     "well_definition",
-    [WellDefinition.model_construct(depth=42.0)],  # type: ignore[call-arg]
+    [CircularWellDefinition2.model_construct(depth=42.0)],  # type: ignore[call-arg]
 )
 def test_depth(subject: WellCore) -> None:
     """It should get the depth."""

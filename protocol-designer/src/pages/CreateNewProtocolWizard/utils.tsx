@@ -8,14 +8,9 @@ import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_V2,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import wasteChuteImage from '../../assets/images/waste_chute.png'
@@ -127,23 +122,6 @@ export const getNumSlotsAvailable = (
   switch (type) {
     case 'gripper': {
       return 0
-    }
-
-    //  these modules don't support MoaM
-    case ABSORBANCE_READER_V1:
-    case THERMOCYCLER_MODULE_V1:
-    case TEMPERATURE_MODULE_V1:
-    case MAGNETIC_MODULE_V1:
-    case MAGNETIC_MODULE_V2: {
-      return 1
-    }
-
-    case THERMOCYCLER_MODULE_V2: {
-      if (filteredModuleLength + filteredAdditionalEquipmentLength > 7) {
-        return 0
-      } else {
-        return 2
-      }
     }
 
     case 'trashBin':

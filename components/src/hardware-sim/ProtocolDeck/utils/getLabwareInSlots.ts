@@ -6,6 +6,7 @@ import type {
   ProtocolAnalysisOutput,
   LabwareDefinition2,
   LoadLidRunTimeCommand,
+  LoadLidStackRunTimeCommand,
 } from '@opentrons/shared-data'
 
 interface LabwareInSlot {
@@ -110,7 +111,73 @@ export const getTopMostLabwareInSlots = (
   const initialLoadedLabwareByAdapter = getInitialLoadedLabwareByAdapter(
     commands
   )
-  return commands
+  const lidStackObjects: LabwareInSlot[] = commands
+    .filter(
+      (command): command is LoadLidStackRunTimeCommand =>
+        command.commandType === 'loadLidStack'
+    )
+    .reduce<LabwareInSlot[]>((acc, command) => {
+      const labwareId = command.result?.labwareIds.at(-1)
+      if (labwareId == null) {
+        console.warn(
+          `expected to find labware id from command id ${String(
+            command.id
+          )} but could not`
+        )
+        return acc
+      }
+      const labwareDef = command.result?.definition
+      if (labwareDef == null) {
+        console.warn(
+          `expected to find labware def for labware id ${String(
+            labwareId
+          )} in command id ${String(command.id)}but could not`
+        )
+        return acc
+      }
+      let location = command.params.location
+      if (
+        location !== 'offDeck' &&
+        location !== 'systemLocation' &&
+        'labwareId' in location
+      ) {
+        const locationLabwareId = location.labwareId
+        const adapterCommand = commands.find(
+          (command): command is LoadLabwareRunTimeCommand =>
+            command.commandType === 'loadLabware' &&
+            command.result?.labwareId === locationLabwareId
+        )
+        if (adapterCommand != null) {
+          location = adapterCommand.params.location
+        } else {
+          return acc
+        }
+      }
+      if (
+        location === 'offDeck' ||
+        location === 'systemLocation' ||
+        'moduleId' in location ||
+        'labwareId' in location
+      ) {
+        return acc
+      }
+
+      const slotName =
+        'addressableAreaName' in location
+          ? location.addressableAreaName
+          : location.slotName
+
+      return [
+        ...acc,
+        {
+          labwareId,
+          labwareDef,
+          labwareNickName: null,
+          location: { slotName },
+        },
+      ]
+    }, [])
+  const labwareObjects: LabwareInSlot[] = commands
     .filter(
       (command): command is LoadLabwareRunTimeCommand =>
         command.commandType === 'loadLabware'
@@ -126,6 +193,18 @@ export const getTopMostLabwareInSlots = (
         'labwareId' in location
       )
         return acc
+      const slotName =
+        'addressableAreaName' in location
+          ? location.addressableAreaName
+          : location.slotName
+      // if there is a lid stack in this slot, don't add the adapter below it
+      if (
+        lidStackObjects.some(
+          lidStackObject => lidStackObject.location.slotName === slotName
+        )
+      ) {
+        return acc
+      }
       if (labwareId == null) {
         console.warn(
           `expected to find labware id from command id ${String(
@@ -142,11 +221,6 @@ export const getTopMostLabwareInSlots = (
         )
         return acc
       }
-
-      const slotName =
-        'addressableAreaName' in location
-          ? location.addressableAreaName
-          : location.slotName
 
       const labwareInAdapter = initialLoadedLabwareByAdapter[labwareId]
 
@@ -170,13 +244,15 @@ export const getTopMostLabwareInSlots = (
         },
       ]
     }, [])
+
+  return labwareObjects.concat(lidStackObjects)
 }
 
 const getAllLabwareDefinitions = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
 ): LabwareWithDef[] => {
   const { commands } = protocolAnalysis
-  return commands
+  const lidAndLabware: LabwareWithDef[] = commands
     .filter((command): command is
       | LoadLabwareRunTimeCommand
       | LoadLidRunTimeCommand =>
@@ -214,4 +290,32 @@ const getAllLabwareDefinitions = (
         },
       ]
     }, [])
+
+  const lidStacks: LabwareWithDef[] = commands
+    .filter(
+      (command): command is LoadLidStackRunTimeCommand =>
+        command.commandType === 'loadLidStack'
+    )
+    .reduce<LabwareWithDef[]>((acc, command) => {
+      const lidStackObjects: LabwareWithDef[] = []
+      const labwareDef = command.result?.definition
+      if (labwareDef == null) {
+        console.warn(
+          `expected to find labware def for lid stack ${String(
+            command.result?.stackLabwareId
+          )} fromm command id ${String(command.id)} but could not`
+        )
+        return acc
+      }
+      command.result?.labwareIds.forEach(labwareId => {
+        lidStackObjects.push({
+          labwareId: labwareId,
+          labwareDef: labwareDef,
+          labwareNickName: null,
+        })
+      })
+      return [...acc, ...lidStackObjects]
+    }, [])
+
+  return lidAndLabware.concat(lidStacks)
 }

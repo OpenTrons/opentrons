@@ -15,19 +15,25 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { getWellsDepth, getWellDimension } from '@opentrons/shared-data'
-import { TipPositionModal, ZTipPositionModal } from '../../../../../organisms'
+import { prefixMap } from '../../../../../resources/utils'
+import {
+  TipPositionModal,
+  ZTipPositionModal,
+} from '../../../../../components/organisms'
 import { getIsDelayPositionField } from '../../../../../form-types'
-import { getDefaultMmFromEdge } from '../../../../../organisms/TipPositionModal/utils'
+import { getDefaultMmFromEdge } from '../../../../../components/organisms/TipPositionModal/utils'
 import { selectors as stepFormSelectors } from '../../../../../step-forms'
 
 import type {
+  ReferenceFields,
   TipXOffsetFields,
   TipYOffsetFields,
   TipZOffsetFields,
 } from '../../../../../form-types'
-import type { PositionSpecs } from '../../../../../organisms'
+import type { PositionSpecs } from '../../../../../components/organisms'
 import type { FieldPropsByName } from '../types'
 import type { MoveLiquidPrefixType } from '../../../../../resources/types'
+
 interface PositionFieldProps {
   prefix: MoveLiquidPrefixType
   propsForFields: FieldPropsByName
@@ -36,6 +42,9 @@ interface PositionFieldProps {
   yField?: TipYOffsetFields
   labwareId?: string | null
   padding?: string
+  showButton?: boolean
+  isNested?: boolean
+  referenceField?: ReferenceFields
 }
 
 export function PositionField(props: PositionFieldProps): JSX.Element {
@@ -47,6 +56,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     yField,
     prefix,
     padding = `0 ${SPACING.spacing16}`,
+    showButton = false,
+    isNested = false,
+    referenceField,
   } = props
   const {
     name: zName,
@@ -59,7 +71,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
 
   const { t, i18n } = useTranslation(['application', 'protocol_steps'])
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const [isModalOpen, setModalOpen] = useState<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const labwareDef =
     labwareId != null && labwareEntities[labwareId] != null
@@ -91,15 +103,15 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
   }
 
   const handleOpen = (has3Specs: boolean): void => {
-    if (has3Specs && wellDepthMm && wellXWidthMm && wellYWidthMm) {
-      setModalOpen(true)
-    }
-    if (!has3Specs && wellDepthMm) {
-      setModalOpen(true)
+    if (
+      wellDepthMm != null &&
+      (has3Specs ? wellXWidthMm != null && wellYWidthMm != null : true)
+    ) {
+      setIsModalOpen(true)
     }
   }
   const handleClose = (): void => {
-    setModalOpen(false)
+    setIsModalOpen(false)
   }
   const isDelayPositionField = getIsDelayPositionField(zName)
   let zValue: string | number = '0'
@@ -107,7 +119,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
   const mmFromBottom = typeof rawZValue === 'number' ? rawZValue : null
   if (wellDepthMm !== null) {
     // show default value for field in parens if no mmFromBottom value is selected
-    zValue = mmFromBottom ?? getDefaultMmFromEdge({ name: zName })
+    zValue =
+      mmFromBottom ??
+      getDefaultMmFromEdge({ name: zName, wellDepth: wellDepthMm })
   }
 
   let modal = (
@@ -159,15 +173,20 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
         isIndeterminate={isIndeterminate}
         specs={specs}
         prefix={prefix}
+        reference={
+          referenceField != null ? propsForFields[referenceField] : null
+        }
       />
     )
   }
+
+  const isRetract = prefixMap[prefix] === 'retract'
 
   return (
     <>
       <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
       {isModalOpen ? modal : null}
-      {yField != null && xField != null ? (
+      {(yField != null && xField != null) || showButton ? (
         <Flex
           {...targetProps}
           padding={padding}
@@ -176,13 +195,15 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
         >
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {i18n.format(
-              t('protocol_steps:tip_position', { prefix }),
+              t('protocol_steps:tip_position', {
+                prefix: prefixMap[prefix],
+              }),
               'capitalize'
             )}
           </StyledText>
           <ListButton
             padding={SPACING.spacing12}
-            type="noActive"
+            type={isNested ? 'onColor' : 'noActive'}
             onClick={() => {
               handleOpen(true)
             }}
@@ -190,19 +211,28 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
             alignItems={ALIGN_CENTER}
             testId={`PositionField_ListButton_${prefix}`}
           >
-            <Icon name="tip-position" size="1.25rem" />
+            {!isNested ? <Icon name="tip-position" size="1.25rem" /> : null}
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('protocol_steps:well_position', {
-                x:
-                  propsForFields[xField].value != null
-                    ? Number(propsForFields[xField].value)
-                    : 0,
-                y:
-                  propsForFields[yField].value != null
-                    ? Number(propsForFields[yField].value)
-                    : 0,
-                z: zValue,
-              })}
+              {xField != null && yField != null
+                ? t(
+                    isRetract
+                      ? 'protocol_steps:well_position_xyz'
+                      : 'protocol_steps:well_position',
+                    {
+                      x:
+                        propsForFields[xField].value != null
+                          ? Number(propsForFields[xField].value)
+                          : 0,
+                      y:
+                        propsForFields[yField].value != null
+                          ? Number(propsForFields[yField].value)
+                          : 0,
+                      z: zValue,
+                    }
+                  )
+                : t('protocol_steps:well_position_z_only', {
+                    z: zValue,
+                  })}
             </StyledText>
           </ListButton>
         </Flex>
@@ -215,8 +245,9 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
           }
           disabled={disabled}
           readOnly
-          onClick={() => {
+          onClick={e => {
             handleOpen(false)
+            e.stopPropagation()
           }}
           value={String(zValue)}
           isIndeterminate={isIndeterminate}

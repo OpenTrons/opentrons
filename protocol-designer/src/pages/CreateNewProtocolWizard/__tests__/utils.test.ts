@@ -7,13 +7,9 @@ import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
-  TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import { getNumSlotsAvailable, getTrashSlot } from '../utils'
@@ -40,41 +36,6 @@ describe('getNumSlotsAvailable', () => {
   it('should return 0 for a gripper', () => {
     const result = getNumSlotsAvailable(null, [], 'gripper')
     expect(result).toBe(0)
-  })
-
-  it('should return 1 for a non MoaM module - temperature module', () => {
-    const result = getNumSlotsAvailable(null, [], TEMPERATURE_MODULE_V1)
-    expect(result).toBe(1)
-  })
-
-  it('should return 1 for a non MoaM module - absorbance plate reader', () => {
-    const result = getNumSlotsAvailable(null, [], ABSORBANCE_READER_V1)
-    expect(result).toBe(1)
-  })
-
-  it('should return 1 for a non MoaM module - thermocycler v1', () => {
-    const result = getNumSlotsAvailable(null, [], THERMOCYCLER_MODULE_V1)
-    expect(result).toBe(1)
-  })
-
-  it('should return 1 for a non MoaM module -  magnetic module v1', () => {
-    const result = getNumSlotsAvailable(null, [], MAGNETIC_MODULE_V1)
-    expect(result).toBe(1)
-  })
-
-  it('should return 1 for a non MoaM module - magnetic module v2', () => {
-    const result = getNumSlotsAvailable(null, [], MAGNETIC_MODULE_V2)
-    expect(result).toBe(1)
-  })
-
-  it('should return 2 for a thermocycler', () => {
-    const result = getNumSlotsAvailable(null, [], THERMOCYCLER_MODULE_V2)
-    expect(result).toBe(2)
-  })
-
-  it('should return 8 when there are no modules or additional equipment for a heater-shaker', () => {
-    const result = getNumSlotsAvailable(null, [], HEATERSHAKER_MODULE_V1)
-    expect(result).toBe(8)
   })
 
   it('should return 3 when there a plate reader', () => {

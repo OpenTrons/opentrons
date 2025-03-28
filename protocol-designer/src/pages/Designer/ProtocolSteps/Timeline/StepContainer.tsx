@@ -25,14 +25,14 @@ import {
   DELETE_MULTIPLE_STEP_FORMS,
   DELETE_STEP_FORM,
   getMainPagePortalEl,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import { actions as steplistActions } from '../../../../steplist'
 import {
   deselectAllSteps,
   populateForm,
 } from '../../../../ui/steps/actions/actions'
 import { getMultiSelectItemIds } from '../../../../ui/steps/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../../../components/atoms'
 import { StepOverflowMenu } from './StepOverflowMenu'
 import { capitalizeFirstLetterAfterNumber } from './utils'
 
@@ -107,9 +107,13 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
     backgroundColor = isStartingOrEndingState ? COLORS.blue30 : COLORS.grey30
     color = COLORS.black90
   }
-  if (hasError) {
+  if (hasError && selected) {
     backgroundColor = COLORS.red50
     color = COLORS.white
+  }
+  if (hasError && !selected) {
+    backgroundColor = COLORS.red30
+    color = COLORS.red60
   }
 
   const handleClick = (event: MouseEvent): void => {
@@ -214,6 +218,7 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
       >
         <Box
           role="button"
+          data-testid={`StepContainer_${stepId}`}
           onDoubleClick={onDoubleClick}
           onClick={onClick}
           padding={`${SPACING.spacing4} ${SPACING.spacing12}`}

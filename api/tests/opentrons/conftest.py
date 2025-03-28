@@ -795,6 +795,7 @@ def minimal_liquid_class_def1() -> LiquidClassSchemaV1:
     return LiquidClassSchemaV1(
         liquidClassName="water1",
         displayName="water 1",
+        description="some water",
         schemaVersion=1,
         namespace="test-fixture-1",
         byPipette=[],
@@ -806,6 +807,7 @@ def minimal_liquid_class_def2() -> LiquidClassSchemaV1:
     return LiquidClassSchemaV1(
         liquidClassName="water2",
         displayName="water 2",
+        description="some water",
         schemaVersion=1,
         namespace="test-fixture-2",
         byPipette=[
@@ -879,6 +881,7 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
     return LiquidClassSchemaV1(
         liquidClassName="test_water",
         displayName="Test Water",
+        description="some water",
         schemaVersion=1,
         namespace="opentrons",
         byPipette=[
@@ -986,7 +989,13 @@ def maximal_liquid_class_def() -> LiquidClassSchemaV1:
                                 offset=Coordinate(x=2, y=3, z=1),
                                 speed=50,
                                 airGapByVolume=[(1.0, 0.1), (49.9, 0.1), (50.0, 0.0)],
-                                blowout=BlowoutProperties(enable=False, params=None),
+                                blowout=BlowoutProperties(
+                                    enable=False,
+                                    params=BlowoutParams(
+                                        location=BlowoutLocation.DESTINATION,
+                                        flowRate=10,
+                                    ),
+                                ),
                                 touchTip=TouchTipProperties(
                                     enable=False,
                                     params=LiquidClassTouchTipParams(

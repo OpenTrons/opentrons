@@ -24,6 +24,7 @@ export const fileMetadata: FileMetadataFields = {
   author: 'The Author',
   description: 'Protocol description',
   created: 1582667312515,
+  source: 'Protocol Designer',
 }
 export const dismissedWarnings: DismissedWarningState = {
   form: [],

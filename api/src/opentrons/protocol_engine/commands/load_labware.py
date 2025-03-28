@@ -19,8 +19,6 @@ from ..types import (
     DeckSlotLocation,
     AddressableAreaLocation,
     LoadedModule,
-    InStackerHopperLocation,
-    LabwareLocation,
 )
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
@@ -105,7 +103,7 @@ class LoadLabwareImplementation(
         module: LoadedModule = self._state_view.modules.get(location.moduleId)
         return module.model == module_model
 
-    async def execute(  # noqa: C901
+    async def execute(
         self, params: LoadLabwareParams
     ) -> SuccessData[LoadLabwareResult]:
         """Load definition and calibration data necessary for a labware."""
@@ -142,25 +140,9 @@ class LoadLabwareImplementation(
             )
             state_update.set_addressable_area_used(params.location.slotName.id)
 
-        # TODO: make this LoadableLabwareLocation again once we add the rest of the commands
-        # for stacker labware pool configuration. Until then, this is the only way to put a
-        # labware in the stacker hopper at the time the protocol starts.
-        verified_location: LabwareLocation
-        if (
-            self._is_loading_to_module(
-                params.location, ModuleModel.FLEX_STACKER_MODULE_V1
-            )
-            and not self._state_view.modules.get_flex_stacker_substate(
-                params.location.moduleId
-            ).in_static_mode
-        ):
-            verified_location = InStackerHopperLocation(
-                moduleId=params.location.moduleId
-            )
-        else:
-            verified_location = self._state_view.geometry.ensure_location_not_occupied(
-                params.location
-            )
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location
+        )
 
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,
@@ -184,17 +166,24 @@ class LoadLabwareImplementation(
                 bottom_labware_id=verified_location.labwareId,
             )
             # Validate load location is valid for lids
-            if (
-                labware_validation.validate_definition_is_lid(
-                    definition=loaded_labware.definition
-                )
-                and loaded_labware.definition.compatibleParentLabware is not None
-                and self._state_view.labware.get_load_name(verified_location.labwareId)
-                not in loaded_labware.definition.compatibleParentLabware
+            if labware_validation.validate_definition_is_lid(
+                definition=loaded_labware.definition
             ):
-                raise ValueError(
-                    f"Labware Lid {params.loadName} may not be loaded on parent labware {self._state_view.labware.get_display_name(verified_location.labwareId)}."
+                # This parent is assumed to be compatible, unless the lid enumerates
+                # all its compatible parents and this parent is missing from the list.
+                parent_is_incompatible = (
+                    loaded_labware.definition.compatibleParentLabware is not None
+                    and self._state_view.labware.get_load_name(
+                        verified_location.labwareId
+                    )
+                    not in loaded_labware.definition.compatibleParentLabware
                 )
+
+                if parent_is_incompatible:
+                    raise ValueError(
+                        f"Labware Lid {params.loadName} may not be loaded on parent labware"
+                        f" {self._state_view.labware.get_display_name(verified_location.labwareId)}."
+                    )
 
         # Validate labware for the absorbance reader
         if self._is_loading_to_module(
@@ -202,12 +191,6 @@ class LoadLabwareImplementation(
         ):
             self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
                 loaded_labware.definition
-            )
-
-        if isinstance(verified_location, InStackerHopperLocation):
-            state_update.load_flex_stacker_hopper_labware(
-                module_id=verified_location.moduleId,
-                labware_id=loaded_labware.labware_id,
             )
 
         self._state_view.labware.raise_if_labware_cannot_be_ondeck(

@@ -17,7 +17,7 @@ import {
   LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { OffsetVector } from '/app/molecules/OffsetVector'
+import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import { useLabwareOffsetForLabware } from './useLabwareOffsetForLabware'
@@ -79,7 +79,7 @@ const LabwareInfo = (props: LabwareInfoProps): JSX.Element | null => {
           >
             {t('offset_data')}
           </LegacyStyledText>
-          <OffsetVector {...vector} />
+          <LegacyOffsetVector {...vector} />
         </>
       )}
     </Box>

@@ -8,6 +8,42 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.4.3
+
+**Welcome to Protocol Designer 8.4.3!**
+
+This release adds support for drag and drop labware in Protocol Designer, and includes feature improvements and bug fixes.
+
+When editing your protocol starting deck, click and drag to move any individual piece of labware to a new slot.
+
+### Improvements
+
+- To avoid deck conflicts with fixtures like the trash bin, add only one of each module in protocol setup. Click **Edit protocol** and **Protocol starting deck** to add and edit multiple modules as needed.
+- See your protocol starting deck edits more easily with module highlighting when moving labware or editing a module step.
+
+### Bug Fixes
+
+- Protocol Designer always redirects to the protocol overview when you import an existing protocol from the home or settings page.
+- When tip racks, labware, or modules aren't assigned to a transfer or module step, improved error recovery in Protocol Designer avoids a crash or unknown error.
+- Protocol Designer displays an error for transfer or Flex gripper move steps with off-deck labware, and when a transfer volume exceeds the well limit.
+- Touch tip is no longer available during a dispense into the trash bin.
+
+Running a protocol created in Protocol Designer now requires Opentrons App version 8.3.0 or newer.
+
+## Opentrons Protocol Designer Changes in 8.4.2
+
+**Welcome to Protocol Designer 8.4.2!**
+
+This hotfix release addresses a bug during protocol analysis on the Opentrons App caused by an air gap after dispense.
+
+---
+
+## Opentrons Protocol Designer Changes in 8.4.1
+
+Version 8.4.1 was not released due to internal branching issues.
+
+---
+
 ## Opentrons Protocol Designer Changes in 8.4.0
 
 **Welcome to Protocol Designer 8.4.0!**

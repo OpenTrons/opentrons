@@ -125,6 +125,10 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
+.PHONT: test-fast
+test-fast:
+	$(pytest) $(tests) $(test_opts) -m 'not slow'
+
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)

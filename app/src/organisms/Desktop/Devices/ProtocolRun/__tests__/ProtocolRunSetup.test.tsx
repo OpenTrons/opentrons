@@ -32,7 +32,12 @@ import { useDeckConfigurationCompatibility } from '/app/resources/deck_configura
 import { useRobot, useIsFlex } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { getMissingSetupSteps } from '/app/redux/protocol-runs'
+import {
+  getMissingSetupSteps,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectAreOffsetsApplied,
+  selectTotalCountLocationSpecificOffsets,
+} from '/app/redux/protocol-runs'
 import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
 
 import { SetupLabware } from '../SetupLabware'
@@ -69,6 +74,7 @@ vi.mock('/app/redux-resources/robots')
 vi.mock('/app/redux-resources/runs')
 vi.mock('/app/resources/analysis')
 vi.mock('/app/organisms/LabwarePositionCheck')
+vi.mock('/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck')
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()
   return {
@@ -79,6 +85,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getSimplestDeckConfigForProtocol: vi.fn(),
   }
 })
+vi.mock('/app/redux/protocol-runs')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -193,7 +200,15 @@ describe('ProtocolRunSetup', () => {
       lpcProps: null,
       showLPC: false,
       isLaunchingLPC: false,
+      isFlexLPCInitializing: false,
     })
+    vi.mocked(
+      selectIsAnyNecessaryDefaultOffsetMissing
+    ).mockImplementation(() => () => false)
+    vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
+    vi.mocked(
+      selectTotalCountLocationSpecificOffsets
+    ).mockImplementation(() => () => 3)
   })
   afterEach(() => {
     vi.resetAllMocks()

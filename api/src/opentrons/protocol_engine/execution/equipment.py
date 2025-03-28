@@ -47,6 +47,7 @@ from ..types import (
     ModuleModel,
     ModuleDefinition,
     AddressableAreaLocation,
+    LoadedLabware,
 )
 
 
@@ -160,6 +161,46 @@ class EquipmentHandler:
             )
             return definition, definition_uri
 
+    async def load_labware_from_definition(
+        self,
+        definition: LabwareDefinition,
+        location: LabwareLocation,
+        labware_id: Optional[str],
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
+    ) -> LoadedLabwareData:
+        """Load labware from already-found definition."""
+        definition_uri = uri_from_details(
+            load_name=definition.parameters.loadName,
+            namespace=definition.namespace,
+            version=definition.version,
+        )
+        return await self._load_labware_from_def_and_uri(
+            definition, definition_uri, location, labware_id, labware_pending_load
+        )
+
+    async def _load_labware_from_def_and_uri(
+        self,
+        definition: LabwareDefinition,
+        definition_uri: str,
+        location: LabwareLocation,
+        labware_id: str | None,
+        labware_pending_load: dict[str, LoadedLabware] | None,
+    ) -> LoadedLabwareData:
+        labware_id = (
+            labware_id if labware_id is not None else self._model_utils.generate_id()
+        )
+
+        # Allow propagation of ModuleNotLoadedError.
+        offset_id = self.find_applicable_labware_offset_id(
+            labware_definition_uri=definition_uri,
+            labware_location=location,
+            labware_pending_load=labware_pending_load,
+        )
+
+        return LoadedLabwareData(
+            labware_id=labware_id, definition=definition, offsetId=offset_id
+        )
+
     async def load_labware(
         self,
         load_name: str,
@@ -188,19 +229,8 @@ class EquipmentHandler:
         definition, definition_uri = await self.load_definition_for_details(
             load_name, namespace, version
         )
-
-        labware_id = (
-            labware_id if labware_id is not None else self._model_utils.generate_id()
-        )
-
-        # Allow propagation of ModuleNotLoadedError.
-        offset_id = self.find_applicable_labware_offset_id(
-            labware_definition_uri=definition_uri,
-            labware_location=location,
-        )
-
-        return LoadedLabwareData(
-            labware_id=labware_id, definition=definition, offsetId=offset_id
+        return await self._load_labware_from_def_and_uri(
+            definition, definition_uri, location, labware_id, None
         )
 
     async def reload_labware(self, labware_id: str) -> ReloadedLabwareData:
@@ -454,18 +484,19 @@ class EquipmentHandler:
                 f"Requested quantity {quantity} is greater than the stack limit of {stack_limit} provided by definition for {load_name}."
             )
 
-        # Allow propagation of ModuleNotLoadedError.
-        if (
-            isinstance(location, DeckSlotLocation)
-            and definition.parameters.isDeckSlotCompatible is not None
-            and not definition.parameters.isDeckSlotCompatible
-        ):
+        is_deck_slot_compatible = (
+            True
+            if definition.parameters.isDeckSlotCompatible is None
+            else definition.parameters.isDeckSlotCompatible
+        )
+
+        if isinstance(location, DeckSlotLocation) and not is_deck_slot_compatible:
             raise ValueError(
                 f"Lid Labware {load_name} cannot be loaded onto a Deck Slot."
             )
 
-        load_labware_data_list = []
-        ids = []
+        load_labware_data_list: list[LoadedLabwareData] = []
+        ids: list[str] = []
         if labware_ids is not None:
             if len(labware_ids) < quantity:
                 raise ValueError(
@@ -645,8 +676,11 @@ class EquipmentHandler:
         )
 
     def find_applicable_labware_offset_id(
-        self, labware_definition_uri: str, labware_location: LabwareLocation
-    ) -> Optional[str]:
+        self,
+        labware_definition_uri: str,
+        labware_location: LabwareLocation,
+        labware_pending_load: dict[str, LoadedLabware] | None = None,
+    ) -> str | None:
         """Figure out what offset would apply to a labware in the given location.
 
         Raises:
@@ -658,7 +692,9 @@ class EquipmentHandler:
             or None if no labware offset will apply.
         """
         labware_offset_location = (
-            self._state_store.geometry.get_projected_offset_location(labware_location)
+            self._state_store.geometry.get_projected_offset_location(
+                labware_location, labware_pending_load
+            )
         )
 
         if labware_offset_location is None:

@@ -2,8 +2,9 @@ import path from 'path'
 import glob from 'glob'
 import { describe, expect, it, test } from 'vitest'
 
-import type { LabwareDefinition3 } from '../types'
 import Ajv from 'ajv'
+
+import type { LabwareDefinition3 } from '../types'
 import schema from '../../labware/schemas/3.json'
 
 const fixturesDir = path.join(__dirname, '../../labware/fixtures/3')
@@ -12,6 +13,8 @@ const globPattern = '**/*.json'
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(schema)
+
+// todo(mm, 2025-03-17): Unify these tests with labwareDefSchemaV2.test.ts.
 
 const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
   test('innerLabwareGeometry sections should be sorted top to bottom', () => {
@@ -41,13 +44,10 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition3): void => {
 
       expect(wellGeometryId in labwareDef.innerLabwareGeometry).toBe(true)
 
-      // FIXME(mm, 2025-02-04):
-      // `wellDepth` != `topFrustumHeight` for ~23/60 definitions.
-      //
-      // const wellDepth = labwareDef.wells[wellName].depth
-      // const topFrustumHeight =
-      //   labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
-      // expect(wellDepth).toEqual(topFrustumHeight)
+      const wellDepth = labwareDef.wells[wellName].depth
+      const topFrustumHeight =
+        labwareDef.innerLabwareGeometry[wellGeometryId].sections[0].topHeight
+      expect(wellDepth).toStrictEqual(topFrustumHeight)
     }
   })
 }
@@ -64,7 +64,10 @@ describe(`test labware definitions with schema v3`, () => {
   const allPaths = definitionPaths.concat(fixturePaths)
 
   test("paths didn't break, which would give false positives", () => {
-    expect(definitionPaths.length).toBeGreaterThan(0)
+    // todo(mm, 2025-03-17): Update this to .toBeGreaterThan(0) when some
+    // schema 3 definitions exist.
+    expect(definitionPaths.length).toStrictEqual(0)
+
     expect(fixturePaths.length).toBeGreaterThan(0)
   })
 
@@ -75,15 +78,8 @@ describe(`test labware definitions with schema v3`, () => {
       const valid = validate(labwareDef)
       const validationErrors = validate.errors
 
-      // FIXME(mm, 2025-02-04): These new definitions have a displayCategory that
-      // the schema does not recognize. Either they need to change or the schema does.
-      const expectFailure = ['protocol_engine_lid_stack_object'].includes(
-        labwareDef.parameters.loadName
-      )
-
-      if (expectFailure) expect(validationErrors).not.toBe(null)
-      else expect(validationErrors).toBe(null)
-      expect(valid).toBe(!expectFailure)
+      expect(validationErrors).toBe(null)
+      expect(valid).toBe(true)
     })
 
     checkGeometryDefinitions(labwareDef)

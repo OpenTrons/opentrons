@@ -30,8 +30,15 @@ from opentrons_shared_data.labware.types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.protocol_api import ProtocolContext, InstrumentContext
-from .workarounds import get_sync_hw_api
-from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
+from opentrons.protocol_api.labware import SET_OFFSET_RESTORED_API_VERSION
+from .workarounds import (
+    get_sync_hw_api,
+    get_latest_offset_for_labware,
+)
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    clear_pipette_ul_per_mm,
+)
+from opentrons.protocol_engine.types import LabwareOffset
 
 import opentrons.protocol_engine.execution.pipetting as PE_pipetting
 from opentrons.protocol_engine.notes import CommandNoteAdder
@@ -473,6 +480,12 @@ def _get_tag_from_pipette(
     return pipette_tag
 
 
+def _get_offsets_from_ctx(ctx: ProtocolContext) -> List[LabwareOffset]:
+    state = ctx._core._engine_client._transport._engine.state_view  # type: ignore[attr-defined]
+    ctx_offsets = state._labware_store._state.labware_offsets_by_id
+    return [_o for _o in ctx_offsets.values()]
+
+
 def _load_tipracks(
     ctx: ProtocolContext,
     cfg: config.VolumetricConfig,
@@ -525,6 +538,11 @@ def _load_tipracks(
             )
         else:
             tipracks.append(ctx.load_labware(ls[1], location=ls[0], adapter=adapter))
+
+    if ctx.api_version >= SET_OFFSET_RESTORED_API_VERSION:
+        for tiprack in tipracks:
+            offset = get_latest_offset_for_labware(_get_offsets_from_ctx(ctx), tiprack)
+            tiprack.set_offset(offset.x, offset.y, offset.z)
     return tipracks
 
 

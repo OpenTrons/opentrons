@@ -22,7 +22,10 @@ import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '../../../../../../constants'
-import { InputStepFormField, TextAreaField } from '../../../../../../molecules'
+import {
+  InputStepFormField,
+  TextAreaField,
+} from '../../../../../../components/molecules'
 import { getInitialDeckSetup } from '../../../../../../step-forms/selectors'
 import { selectors as uiModuleSelectors } from '../../../../../../ui/modules'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'

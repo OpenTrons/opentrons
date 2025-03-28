@@ -1,30 +1,41 @@
 import asyncio
 import re
+import base64
 from typing import List, Optional
 
-from opentrons.drivers.asyncio.communication.errors import MotorStall
+from opentrons.drivers.asyncio.communication.errors import NoResponse
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
 from .abstract import AbstractFlexStackerDriver
+from .errors import StackerErrorCodes, MotorStallDetected
 from .types import (
     GCODE,
+    ActiveRange,
     LEDPattern,
+    MeasurementKind,
     MoveResult,
+    SpadMapID,
     StackerAxis,
     PlatformStatus,
     Direction,
     StackerInfo,
     HardwareRevision,
     MoveParams,
+    AxisParams,
     LimitSwitchStatus,
     LEDColor,
     StallGuardParams,
+    TOFConfiguration,
+    TOFMeasurement,
+    TOFMeasurementFrame,
+    TOFMeasurementResult,
     TOFSensor,
     TOFSensorMode,
     TOFSensorState,
     TOFSensorStatus,
 )
+from .utils import validate_histogram_frame
 
 
 FS_BAUDRATE = 115200
@@ -42,60 +53,75 @@ MIN_DURATION_MS = 25  # 25ms
 MAX_DURATION_MS = 10000  # 10s
 MAX_REPS = 10
 
+# TOF Sensor
+TOF_FRAME_RETRIES = 1
+NUMBER_OF_BINS = 128
+
 # Stallguard defaults
 STALLGUARD_CONFIG = {
     StackerAxis.X: StallGuardParams(StackerAxis.X, True, 2),
     StackerAxis.Z: StallGuardParams(StackerAxis.Z, True, 2),
-    StackerAxis.L: StallGuardParams(StackerAxis.L, True, 2),
 }
 
 STACKER_MOTION_CONFIG = {
     StackerAxis.X: {
-        "home": MoveParams(
-            StackerAxis.X,
-            max_speed=10.0,  # mm/s
-            acceleration=100.0,  # mm/s^2
-            max_speed_discont=40,  # mm/s
-            current=1.5,  # mAmps
+        "home": AxisParams(
+            run_current=1.5,  # mAmps
+            hold_current=0.75,
+            move_params=MoveParams(
+                max_speed=10.0,  # mm/s
+                acceleration=100.0,  # mm/s^2
+                max_speed_discont=40.0,  # mm/s
+            ),
         ),
-        "move": MoveParams(
-            StackerAxis.X,
-            max_speed=200.0,
-            acceleration=1500.0,
-            max_speed_discont=40,
-            current=1.0,
+        "move": AxisParams(
+            run_current=1.0,
+            hold_current=0.75,
+            move_params=MoveParams(
+                max_speed=200.0,
+                acceleration=1500.0,
+                max_speed_discont=40.0,
+            ),
         ),
     },
     StackerAxis.Z: {
-        "home": MoveParams(
-            StackerAxis.Z,
-            max_speed=10.0,
-            acceleration=100.0,
-            max_speed_discont=40,
-            current=1.5,
+        "home": AxisParams(
+            run_current=1.5,
+            hold_current=1.8,
+            move_params=MoveParams(
+                max_speed=10.0,
+                acceleration=100.0,
+                max_speed_discont=25.0,
+            ),
         ),
-        "move": MoveParams(
-            StackerAxis.Z,
-            max_speed=200.0,
-            acceleration=500.0,
-            max_speed_discont=40,
-            current=1.5,
+        "move": AxisParams(
+            run_current=1.5,
+            hold_current=0.5,
+            move_params=MoveParams(
+                max_speed=150.0,
+                acceleration=500.0,
+                max_speed_discont=25.0,
+            ),
         ),
     },
     StackerAxis.L: {
-        "home": MoveParams(
-            StackerAxis.L,
-            max_speed=100.0,
-            acceleration=800.0,
-            max_speed_discont=40,
-            current=0.8,
+        "home": AxisParams(
+            run_current=0.8,
+            hold_current=0.15,
+            move_params=MoveParams(
+                max_speed=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
+            ),
         ),
-        "move": MoveParams(
-            StackerAxis.L,
-            max_speed=100.0,
-            acceleration=800.0,
-            max_speed_discont=40,
-            current=0.6,
+        "move": AxisParams(
+            run_current=0.6,
+            hold_current=0.15,
+            move_params=MoveParams(
+                max_speed=100.0,
+                acceleration=800.0,
+                max_speed_discont=40.0,
+            ),
         ),
     },
 }
@@ -107,7 +133,6 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
     @classmethod
     def parse_device_info(cls, response: str) -> StackerInfo:
         """Parse stacker info."""
-        # TODO: Validate serial number format once established
         _RE = re.compile(
             f"^{GCODE.DEVICE_INFO} FW:(?P<fw>\\S+) HW:Opentrons-flex-stacker-(?P<hw>\\S+) SerialNo:(?P<sn>\\S+)$"
         )
@@ -159,21 +184,26 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         return bool(int(match.group(1)))
 
     @classmethod
+    def parse_installation_detected(cls, response: str) -> bool:
+        """Parse install detection."""
+        _RE = re.compile(rf"^{GCODE.GET_INSTALL_DETECTED} I:(\d)$")
+        match = _RE.match(response)
+        if not match:
+            raise ValueError(
+                f"Incorrect Response for installation detected: {response}"
+            )
+        return bool(int(match.group(1)))
+
+    @classmethod
     def parse_move_params(cls, response: str) -> MoveParams:
         """Parse move params."""
         field_names = MoveParams.get_fields()
-        pattern = r"\s".join(
-            [
-                rf"{f}:(?P<{f}>(\d*\.)?\d+)" if f != "M" else rf"{f}:(?P<{f}>[XZL])"
-                for f in field_names
-            ]
-        )
-        _RE = re.compile(f"^{GCODE.GET_MOVE_PARAMS} {pattern}$")
+        pattern = r"\s".join(rf"{f}:(?P<{f}>(\d*\.)?\d+)" for f in field_names)
+        _RE = re.compile(rf"^{GCODE.GET_MOVE_PARAMS} M:([XZL]) {pattern}$")
         m = _RE.match(response)
         if not m:
             raise ValueError(f"Incorrect Response for move params: {response}")
         return MoveParams(
-            axis=StackerAxis(m.group("M")),
             max_speed=float(m.group("V")),
             acceleration=float(m.group("A")),
             max_speed_discont=float(m.group("D")),
@@ -235,19 +265,66 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         )
 
     @classmethod
+    def parse_manage_tof_measurement(cls, response: str) -> TOFMeasurement:
+        """Parse manage tof measurement response."""
+        pattern = r"(?P<S>[XZ]) K:(?P<K>\d+) C:(?P<C>\d) L:(?P<L>\d+)"
+        _RE = re.compile(f"^{GCODE.MANAGE_TOF_MEASUREMENT} {pattern}$")
+        m = _RE.match(response)
+        if not m:
+            raise ValueError(
+                f"Incorrect Response for manage tof measurements: {response}"
+            )
+        return TOFMeasurement(
+            sensor=TOFSensor(m.group("S")),
+            kind=MeasurementKind(int(m.group("K"))),
+            cancelled=bool(int(m.group("C"))),
+            total_bytes=int(m.group("L")),
+        )
+
+    @classmethod
+    def parse_get_tof_measurement(cls, response: str) -> TOFMeasurementFrame:
+        """Parse get tof measurement response frame."""
+        pattern = r"(?P<S>[XZ]) I:(?P<I>\d+) D:(?P<D>.+)"
+        _RE = re.compile(f"^{GCODE.GET_TOF_MEASUREMENT} {pattern}$")
+        m = _RE.match(response)
+        if not m:
+            raise ValueError(
+                f"Incorrect Response for get tof measurement frame: {response}"
+            )
+        return TOFMeasurementFrame(
+            sensor=TOFSensor(m.group("S")),
+            frame_id=int(m.group("I")),
+            data=base64.b64decode(m.group("D")),
+        )
+
+    @classmethod
+    def parse_get_tof_configuration(cls, response: str) -> TOFConfiguration:
+        """Parse get tof sensor configuration response."""
+        pattern = r"(?P<S>[XZ]) I:(?P<I>\d+) A:(?P<A>\d+) K:(?P<K>\d+) P:(?P<P>\d+) H:(?P<H>\d)"
+        _RE = re.compile(f"^{GCODE.GET_TOF_CONFIGURATION} {pattern}$")
+        m = _RE.match(response)
+        if not m:
+            raise ValueError(
+                f"Incorrect Response for get tof sensor configuration: {response}"
+            )
+        return TOFConfiguration(
+            sensor=TOFSensor(m.group("S")),
+            spad_map_id=SpadMapID(int(m.group("I"))),
+            active_range=ActiveRange(int(m.group("A"))),
+            kilo_iterations=int(m.group("K")),
+            report_period_ms=int(m.group("P")),
+            histogram_dump=bool(m.group("H")),
+        )
+
+    @classmethod
     def append_move_params(
         cls, command: CommandBuilder, params: MoveParams | None
     ) -> CommandBuilder:
         """Append move params."""
         if params is not None:
-            if params.max_speed is not None:
-                command.add_float("V", params.max_speed, GCODE_ROUNDING_PRECISION)
-            if params.acceleration is not None:
-                command.add_float("A", params.acceleration, GCODE_ROUNDING_PRECISION)
-            if params.max_speed_discont is not None:
-                command.add_float(
-                    "D", params.max_speed_discont, GCODE_ROUNDING_PRECISION
-                )
+            command.add_float("V", params.max_speed, GCODE_ROUNDING_PRECISION)
+            command.add_float("A", params.acceleration, GCODE_ROUNDING_PRECISION)
+            command.add_float("D", params.max_speed_discont, GCODE_ROUNDING_PRECISION)
         return command
 
     @classmethod
@@ -264,6 +341,8 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             loop=loop,
             error_keyword=FS_ERROR_KEYWORD,
             async_error_ack=FS_ASYNC_ERROR_ACK,
+            reset_buffer_before_write=True,
+            error_codes=StackerErrorCodes,
         )
         return cls(connection)
 
@@ -301,21 +380,19 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         device_info.rr = reason
         return device_info
 
-    async def set_serial_number(self, sn: str) -> bool:
+    async def set_serial_number(self, sn: str) -> None:
         """Set Serial Number."""
         if not re.match(r"^FST[\w]{1}[\d]{2}[\d]{8}[\d]+$", sn):
             raise ValueError(
                 f"Invalid serial number: ({sn}) expected format: FSTA1020250119001"
             )
-
         resp = await self._connection.send_command(
             GCODE.SET_SERIAL_NUMBER.build_command().add_element(sn)
         )
         if not re.match(rf"^{GCODE.SET_SERIAL_NUMBER}$", resp):
             raise ValueError(f"Incorrect Response for set serial number: {resp}")
-        return True
 
-    async def enable_motors(self, axis: List[StackerAxis]) -> bool:
+    async def enable_motors(self, axis: List[StackerAxis]) -> None:
         """Enables the axis motor if present, disables it otherwise."""
         command = GCODE.ENABLE_MOTORS.build_command()
         for a in axis:
@@ -323,42 +400,38 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.ENABLE_MOTORS}$", resp):
             raise ValueError(f"Incorrect Response for enable motors: {resp}")
-        return True
 
-    async def stop_motors(self) -> bool:
+    async def stop_motors(self) -> None:
         """Stop all motor movement."""
         resp = await self._connection.send_command(GCODE.STOP_MOTORS.build_command())
         if not re.match(rf"^{GCODE.STOP_MOTORS}$", resp):
             raise ValueError(f"Incorrect Response for stop motors: {resp}")
-        return True
 
-    async def set_run_current(self, axis: StackerAxis, current: float) -> bool:
+    async def set_run_current(self, axis: StackerAxis, current: float) -> None:
         """Set axis peak run current in amps."""
         resp = await self._connection.send_command(
             GCODE.SET_RUN_CURRENT.build_command().add_float(axis.name, current)
         )
         if not re.match(rf"^{GCODE.SET_RUN_CURRENT}$", resp):
             raise ValueError(f"Incorrect Response for set run current: {resp}")
-        return True
 
-    async def set_ihold_current(self, axis: StackerAxis, current: float) -> bool:
+    async def set_ihold_current(self, axis: StackerAxis, current: float) -> None:
         """Set axis hold current in amps."""
         resp = await self._connection.send_command(
             GCODE.SET_IHOLD_CURRENT.build_command().add_float(axis.name, current)
         )
         if not re.match(rf"^{GCODE.SET_IHOLD_CURRENT}$", resp):
             raise ValueError(f"Incorrect Response for set ihold current: {resp}")
-        return True
 
     async def set_stallguard_threshold(
         self, axis: StackerAxis, enable: bool, threshold: int
-    ) -> bool:
+    ) -> None:
         """Enables and sets the stallguard threshold for the given axis motor."""
+        assert axis != StackerAxis.L, "Stallguard not supported for L axis"
         if not -64 < threshold < 63:
             raise ValueError(
                 f"Threshold value ({threshold}) should be between -64 and 63."
             )
-
         resp = await self._connection.send_command(
             GCODE.SET_STALLGUARD.build_command()
             .add_int(axis.name, int(enable))
@@ -366,9 +439,8 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         )
         if not re.match(rf"^{GCODE.SET_STALLGUARD}$", resp):
             raise ValueError(f"Incorrect Response for set stallguard threshold: {resp}")
-        return True
 
-    async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> bool:
+    async def enable_tof_sensor(self, sensor: TOFSensor, enable: bool) -> None:
         """Enable or disable the TOF sensor."""
         # Enabling the TOF sensor takes a while, so give extra timeout.
         timeout = FS_TOF_TIMEOUT if enable else DEFAULT_FS_TIMEOUT
@@ -378,11 +450,155 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         )
         if not re.match(rf"^{GCODE.ENABLE_TOF_SENSOR}$", resp):
             raise ValueError(f"Incorrect Response for enable TOF sensor: {resp}")
-        return True
+
+    async def set_tof_configuration(
+        self,
+        sensor: TOFSensor,
+        spad_map_id: SpadMapID,
+        active_range: Optional[ActiveRange] = None,
+        kilo_iterations: Optional[int] = None,
+        report_period_ms: Optional[int] = None,
+        histogram_dump: Optional[bool] = None,
+    ) -> None:
+        """Set the configuration of the TOF sensor.
+
+        :param sensor: The TOF sensor to configure.
+        :param spad_map_id: The pre-defined SPAD map which sets the fov and focus area (14 default).
+        :active_range: The operating mode Short-range high-accuracy (default) or long range.
+        :kilo_iterations: The Measurement iterations times 1024 (4000 default).
+        :report_period_ms: The reporting period before each measurement (500 default).
+        :histogram_dump: Enables/Disables histogram measurements (True default).
+        :return: None
+        """
+        command = (
+            GCODE.SET_TOF_CONFIGURATION.build_command()
+            .add_element(sensor.name)
+            .add_int("I", spad_map_id.value)
+        )
+        if active_range:
+            command.add_int("A", active_range.value)
+        if kilo_iterations:
+            command.add_int("K", kilo_iterations)
+        if report_period_ms:
+            command.add_int("P", report_period_ms)
+        if histogram_dump:
+            command.add_int("H", int(histogram_dump))
+        resp = await self._connection.send_command(command)
+        if not re.match(rf"^{GCODE.SET_TOF_CONFIGURATION}$", resp):
+            raise ValueError(f"Incorrect Response for set TOF configuration: {resp}")
+
+    async def get_tof_configuration(self, sensor: TOFSensor) -> TOFConfiguration:
+        """Get the configuration of the TOF sensor."""
+        resp = await self._connection.send_command(
+            GCODE.GET_TOF_CONFIGURATION.build_command().add_element(sensor.value)
+        )
+        return self.parse_get_tof_configuration(resp)
+
+    async def manage_tof_measurement(
+        self,
+        sensor: TOFSensor,
+        kind: MeasurementKind = MeasurementKind.HISTOGRAM,
+        start: bool = True,
+    ) -> TOFMeasurement:
+        """Start or stop Measurements from the TOF sensor."""
+        command = (
+            GCODE.MANAGE_TOF_MEASUREMENT.build_command()
+            .add_element(sensor.name)
+            .add_int("K", kind.value)
+        )
+        if not start:
+            command.add_element("C")
+        resp = await self._connection.send_command(command)
+        return self.parse_manage_tof_measurement(resp)
+
+    async def _get_tof_histogram_frame(
+        self, sensor: TOFSensor, resend: bool = False
+    ) -> TOFMeasurementFrame:
+        """Get the next measurement frame from TOF sensor or resend previous."""
+        command = GCODE.GET_TOF_MEASUREMENT.build_command().add_element(sensor.name)
+        if resend:
+            command.add_element("R")
+        resp = await self._connection.send_command(command)
+        return self.parse_get_tof_measurement(resp)
+
+    async def get_tof_histogram(self, sensor: TOFSensor) -> TOFMeasurementResult:
+        """Get the full histogram measurement from the TOF sensor."""
+        data = []
+        data_len = 0
+        next_frame_id = 0
+        resend = False
+        retries = TOF_FRAME_RETRIES
+
+        # Cancel any ongoing measurements
+        status = await self.get_tof_sensor_status(sensor)
+        if status.state == TOFSensorState.MEASURING:
+            await self.manage_tof_measurement(sensor, start=False)
+
+        # Put the TOF sensor into histogram measurement mode
+        start = await self.manage_tof_measurement(
+            sensor, MeasurementKind.HISTOGRAM, start=True
+        )
+        # Request frames until the full histogram is transfered
+        while data_len < start.total_bytes:
+            try:
+                # Request next histogram frame
+                frame = await self._get_tof_histogram_frame(sensor, resend=resend)
+                # Validate histogram frame
+                validate_histogram_frame(frame.data, next_frame_id)
+                # append frame data
+                channel = frame.data[7:]
+                data.append(channel)
+                data_len += len(channel)
+                assert (
+                    not data_len > start.total_bytes
+                ), f"Invalid number of bytes, expected {start.total_bytes} got {data_len}."
+                retries = TOF_FRAME_RETRIES
+                next_frame_id += 1
+                resend = False
+            except (ValueError, NoResponse):
+                # There was a timeout or timing error, request previous frame.
+                if retries <= 0:
+                    # Cancel the measurement
+                    await self.manage_tof_measurement(sensor, start.kind, start=False)
+                    raise RuntimeError(f"Exceded frame {next_frame_id} retries")
+                retries -= 1
+                resend = True
+                continue
+            except Exception as e:
+                # Cancel the histogram request
+                await self.manage_tof_measurement(sensor, start.kind, start=False)
+                raise RuntimeError(f"Could not get {sensor} Histogram", e)
+
+        # Parse channel bin measurements from data
+        #
+        # There are 10 channels (0 - 9), each channel is comprised of 3 * 128 bytes.
+        # The data starts with all the 128 LSB bytes, then all the 128 MID bytes, and
+        # finally all the 128 MSB bytes for all the channels as seen below.
+        #
+        # ch0 lsb = data[0], mid = data[10], msb = data[20]
+        # ch1 lsb = data[1], mid = data[11], msb = data[21]
+        # ch2 lsb = data[2], mid = data[12], msb = data[22]
+        # ...
+        # ch9 lsb = data[9], mid = data[19], msb = data[29]
+        #
+        # Each channel has 128 bins comprised of the lsb, mid, and msb payload from above.
+        # We can get the bins for each channel by combining the lsb, mid, and msb payload
+        # for that specific channel.
+        bins = {}
+        for ch in range(10):  # 0-9 channels
+            # Get the lsb, mid, and msb payload for the ch
+            lsb = data[ch]
+            mid = data[ch + 10]
+            msb = data[ch + 20]
+            # combine lsb, mid, and msb bytes to generate bin count for the ch
+            bins[ch] = [
+                (msb[b] << 16) | (mid[b] << 8) | lsb[b] for b in range(NUMBER_OF_BINS)
+            ]
+        return TOFMeasurementResult(start.sensor, start.kind, bins)
 
     async def set_motor_driver_register(
         self, axis: StackerAxis, reg: int, value: int
-    ) -> bool:
+    ) -> None:
         """Set the register of the given motor axis driver to the given value."""
         resp = await self._connection.send_command(
             GCODE.SET_MOTOR_DRIVER_REGISTER.build_command()
@@ -393,7 +609,6 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             raise ValueError(
                 f"Incorrect Response for set motor driver register: {resp}"
             )
-        return True
 
     async def get_motor_driver_register(self, axis: StackerAxis, reg: int) -> int:
         """Gets the register value of the given motor axis driver."""
@@ -404,7 +619,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
 
     async def set_tof_driver_register(
         self, sensor: TOFSensor, reg: int, value: int
-    ) -> bool:
+    ) -> None:
         """Set the register of the given tof sensor driver to the given value."""
         resp = await self._connection.send_command(
             GCODE.SET_TOF_DRIVER_REGISTER.build_command()
@@ -415,7 +630,6 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             raise ValueError(
                 f"Incorrect Response for set tof sensor driver register: {resp}"
             )
-        return True
 
     async def get_tof_driver_register(self, sensor: TOFSensor, reg: int) -> int:
         """Gets the register value of the given tof sensor driver."""
@@ -485,6 +699,16 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         )
         return self.parse_door_closed(response)
 
+    async def get_installation_detected(self) -> bool:
+        """Get whether or not installation is detected.
+
+        :return: True if installation is detected, False otherwise
+        """
+        response = await self._connection.send_command(
+            GCODE.GET_INSTALL_DETECTED.build_command()
+        )
+        return self.parse_installation_detected(response)
+
     async def move_in_mm(
         self, axis: StackerAxis, distance: float, params: MoveParams | None = None
     ) -> MoveResult:
@@ -499,7 +723,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             resp = await self._connection.send_command(command, timeout=FS_MOVE_TIMEOUT)
             if not re.match(rf"^{GCODE.MOVE_TO}$", resp):
                 raise ValueError(f"Incorrect Response for move to: {resp}")
-        except MotorStall:
+        except MotorStallDetected:
             self.reset_serial_buffers()
             return MoveResult.STALL_ERROR
         return MoveResult.NO_ERROR
@@ -516,7 +740,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
             resp = await self._connection.send_command(command, timeout=FS_MOVE_TIMEOUT)
             if not re.match(rf"^{GCODE.MOVE_TO_SWITCH}$", resp):
                 raise ValueError(f"Incorrect Response for move to switch: {resp}")
-        except MotorStall:
+        except MotorStallDetected:
             self.reset_serial_buffers()
             return MoveResult.STALL_ERROR
         return MoveResult.NO_ERROR
@@ -526,7 +750,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         command = GCODE.HOME_AXIS.build_command().add_int(axis.name, direction.value)
         try:
             resp = await self._connection.send_command(command, timeout=FS_MOVE_TIMEOUT)
-        except MotorStall:
+        except MotorStallDetected:
             self.reset_serial_buffers()
             return MoveResult.STALL_ERROR
         if not re.match(rf"^{GCODE.HOME_AXIS}$", resp):
@@ -541,7 +765,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         pattern: Optional[LEDPattern] = None,
         duration: Optional[int] = None,
         reps: Optional[int] = None,
-    ) -> bool:
+    ) -> None:
         """Set LED Status bar color and pattern.
 
         :param power: Power of the LED (0-1.0), 0 is off, 1 is full power
@@ -569,7 +793,6 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_LED}$", resp):
             raise ValueError(f"Incorrect Response for set led: {resp}")
-        return True
 
     async def enter_programming_mode(self) -> None:
         """Reboot into programming mode"""
