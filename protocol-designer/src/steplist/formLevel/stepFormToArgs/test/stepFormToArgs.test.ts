@@ -73,6 +73,8 @@ describe('form casting', () => {
       dispense_position_reference: 'well-bottom',
       pushOut_volume: null,
       pushOut_checkbox: false,
+      conditioning_checkbox: false,
+      conditioning_volume: null,
     }
     expect(_castForm(input)).toEqual({
       ...input,

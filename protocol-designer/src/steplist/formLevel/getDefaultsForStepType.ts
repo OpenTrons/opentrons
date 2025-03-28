@@ -90,6 +90,8 @@ export function getDefaultsForStepType(
         blowout_location: null,
         blowout_z_offset: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
+        conditioning_checkbox: false,
+        conditioning_volume: null,
         dispense_airGap_checkbox: false,
         dispense_airGap_volume: null,
         dispense_delay_checkbox: false,

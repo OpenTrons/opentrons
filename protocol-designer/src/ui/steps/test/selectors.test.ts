@@ -485,6 +485,14 @@ describe('_getSavedMultiSelectFieldValues', () => {
           isIndeterminate: false,
           value: undefined,
         },
+        conditioning_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
         aspirate_mix_checkbox: {
           value: true,
           isIndeterminate: false,
@@ -878,6 +886,14 @@ describe('_getSavedMultiSelectFieldValues', () => {
           value: undefined,
         },
         pushOut_volume: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_checkbox: {
+          isIndeterminate: false,
+          value: undefined,
+        },
+        conditioning_volume: {
           isIndeterminate: false,
           value: undefined,
         },

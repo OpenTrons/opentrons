@@ -47,6 +47,7 @@
       "blowout_location": "Where to dispose of remaining volume in tip",
       "blowout_z_offset": "The height at which blowout occurs from the top of the well",
       "changeTip": "Choose when the robot picks up fresh tips",
+      "conditioning_checkbox": "First aspirate and dispense liquid into the source well to ensure a more accurate first multi-dispense",
       "dispense_airGap_checkbox": "Draw in air before moving to trash to dispose of tip.",
       "dispense_delay_checkbox": "Delay after each dispense",
       "dispense_delay_mmFromBottom": "Distance from the bottom of the well",

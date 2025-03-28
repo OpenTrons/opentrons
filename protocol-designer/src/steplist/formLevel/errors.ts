@@ -19,13 +19,17 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../constants'
 import { getPipetteCapacity } from '../../pipettes/pipetteData'
-import { canPipetteUseLabware, getMaxPushOutVolume } from '../../utils'
+import {
+  canPipetteUseLabware,
+  getMaxConditioningVolume,
+  getMaxPushOutVolume,
+} from '../../utils'
 import { getWellRatio } from '../utils'
 import { getTimeFromForm } from '../utils/getTimeFromForm'
 
 import type { ReactNode } from 'react'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
-import type { PipetteEntity } from '@opentrons/step-generation'
+import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedFormData,
@@ -480,6 +484,30 @@ const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
 const PUSH_OUT_VOLUME_REQUIRED: FormError = {
   title: 'Push out volume required',
   dependentFields: ['pushOut_volume'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
+}
+const PUSH_OUT_VOLUME_OUT_OF_RANGE: FormError = {
+  title: 'Push out volume out of range',
+  dependentFields: ['pushOut_volume'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
+}
+const CONDITIONING_VOLUME_REQUIRED: FormError = {
+  title: 'Conditioning volume required',
+  dependentFields: ['conditioning_volume'],
+  showAtForm: false,
+  showAtField: true,
+  page: 2,
+  tab: 'dispense',
+}
+const CONDITIONING_VOLUME_OUT_OF_RANGE: FormError = {
+  title: 'Conditioning volume out of range',
+  dependentFields: ['conditioning_volume'],
   showAtForm: false,
   showAtField: true,
   page: 2,
@@ -1140,7 +1168,44 @@ export const pushOutVolumeOutOfRange = (
     (pipette as PipetteEntity).spec
   )
   return pushOut_checkbox && pushOut_volume > maxPushOutVolume
-    ? PUSH_OUT_VOLUME_REQUIRED
+    ? PUSH_OUT_VOLUME_OUT_OF_RANGE
+    : null
+}
+export const conditioningVolumeRequired = (
+  fields: HydratedMoveLiquidFormData
+): FormError | null => {
+  const { conditioning_checkbox, conditioning_volume } = fields
+  return conditioning_checkbox && !conditioning_volume
+    ? CONDITIONING_VOLUME_REQUIRED
+    : null
+}
+export const conditioningVolumeOutOfRange = (
+  fields: HydratedMoveLiquidFormData,
+  moduleEntities?: ModuleEntities,
+  labwareEntities?: LabwareEntities
+): FormError | null => {
+  const {
+    conditioning_checkbox,
+    conditioning_volume,
+    pipette,
+    volume,
+    disposalVolume_checkbox,
+    disposalVolume_volume,
+    tipRack,
+  } = fields
+  if (pipette == null || conditioning_volume == null) {
+    return null
+  }
+  const maxConditioningVolume = getMaxConditioningVolume({
+    transferVolume: Number(volume),
+    disposalVolume:
+      disposalVolume_checkbox === true ? Number(disposalVolume_volume) : 0,
+    pipetteSpecs: pipette.spec,
+    labwareEntities: labwareEntities ?? {},
+    tiprackDefUri: tipRack,
+  })
+  return conditioning_checkbox && conditioning_volume > maxConditioningVolume
+    ? CONDITIONING_VOLUME_OUT_OF_RANGE
     : null
 }
 
@@ -1158,15 +1223,31 @@ export const getIsOutOfRange = (
  ********************/
 type ComposeErrors = <T extends HydratedFormData>(
   ...errorCheckers: Array<
-    (fields: T, moduleEntities?: ModuleEntities) => FormError | null
+    (
+      fields: T,
+      moduleEntities?: ModuleEntities,
+      labwareEntities?: LabwareEntities
+    ) => FormError | null
   >
-) => (arg: T, moduleEntities?: ModuleEntities) => FormError[]
+) => (
+  arg: T,
+  moduleEntities?: ModuleEntities,
+  labwareEntities?: LabwareEntities
+) => FormError[]
 
 export const composeErrors: ComposeErrors = <T extends HydratedFormData>(
   ...errorCheckers: Array<
-    (fields: T, moduleEntities?: ModuleEntities) => FormError | null
+    (
+      fields: T,
+      moduleEntities?: ModuleEntities,
+      labwareEntities?: LabwareEntities
+    ) => FormError | null
   >
-) => (formData: T, moduleEntities?: ModuleEntities) =>
+) => (
+  formData: T,
+  moduleEntities?: ModuleEntities,
+  labwareEntities?: LabwareEntities
+) =>
   errorCheckers
-    .map(checker => checker(formData, moduleEntities))
+    .map(checker => checker(formData, moduleEntities, labwareEntities))
     .filter((error): error is FormError => error !== null)

@@ -310,6 +310,8 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   blowout_flowRate?: number | null
   blowout_location?: string | null
   blowout_z_offset?: number | null
+  conditioning_checkbox: boolean | null
+  conditioning_volume: number | null
   dispense_airGap_volume?: number | null
   dispense_delay_mmFromBottom?: number | null
   dispense_delay_seconds?: number | null

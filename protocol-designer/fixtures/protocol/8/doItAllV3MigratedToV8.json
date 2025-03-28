@@ -228,7 +228,9 @@
           "id": "3961e4c0-75c7-11ea-b42f-4b64e50f43e5",
           "dispense_touchTip_mmfromTop": -2,
           "pushOut_checkbox": false,
-          "pushOut_volume": 0
+          "pushOut_volume": 0,
+          "conditioning_checkbox": false,
+          "conditioning_volume": null
         },
         "54dc3200-75c7-11ea-b42f-4b64e50f43e5": {
           "moduleId": null,

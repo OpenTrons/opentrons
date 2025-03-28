@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { round } from 'lodash'
@@ -31,7 +32,10 @@ import {
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { getMaxPushOutVolume } from '../../../../../../utils'
+import {
+  getMaxConditioningVolume,
+  getMaxPushOutVolume,
+} from '../../../../../../utils'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
@@ -151,7 +155,25 @@ export const SecondStepsMoveLiquidTools = ({
     Number(formData.volume),
     pipetteSpec
   )
-
+  const maxConditioningVolume = useMemo(
+    () =>
+      getMaxConditioningVolume({
+        transferVolume: Number(formData.volume),
+        disposalVolume:
+          formData.disposalVolume_checkbox === true
+            ? Number(formData.disposalVolume_volume)
+            : 0,
+        pipetteSpecs: pipetteSpec,
+        labwareEntities: labwares,
+        tiprackDefUri: formData.tipRack,
+      }),
+    [
+      formData.transferVolume,
+      formData.disposalVolume_volume,
+      formData.pipette,
+      formData.tipRack,
+    ]
+  )
   const minXYDimension = isDestinationTrash
     ? null
     : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
@@ -367,6 +389,31 @@ export const SecondStepsMoveLiquidTools = ({
             </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
+        {tab === 'dispense' && formData.path === 'multiDispense' ? (
+          <CheckboxExpandStepFormField
+            title={t('form:step_edit_form.field.conditioning.title')}
+            fieldProps={propsForFields.conditioning_checkbox}
+          >
+            {formData.conditioning_checkbox === true ? (
+              <InputStepFormField
+                title={t(
+                  'form:step_edit_form.field.conditioning.conditioning_volume.label'
+                )}
+                caption={t(
+                  'form:step_edit_form.field.conditioning.conditioning_volume.caption',
+                  { min: 0, max: maxConditioningVolume }
+                )}
+                padding="0"
+                {...propsForFields.conditioning_volume}
+                showTooltip={false}
+                errorToShow={getFormLevelError(
+                  'conditioning_volume',
+                  mappedErrorsToField
+                )}
+              />
+            ) : null}
+          </CheckboxExpandStepFormField>
+        ) : null}
         {tab === 'dispense' ? (
           <CheckboxExpandStepFormField
             title={i18n.format(
