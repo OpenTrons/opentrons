@@ -104,8 +104,8 @@ M = AspirateMode.MENISCUS
 M_LLD = AspirateMode.MENISCUS_LLD
 ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[AspirateMode]]] = {
     6: {
-        "A": [M_LLD, M, M_LLD],
-        "B": [M, M_LLD, M],
+        "A": [M_LLD, M_LLD, M_LLD],
+        "B": [M, M, M],
     },
     12: {
         "A": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
@@ -116,20 +116,20 @@ ASPIRATE_MODE_BY_WELL: Dict[int, Dict[str, List[AspirateMode]]] = {
         "C": [M_LLD, M, M_LLD, M, M_LLD],
     },
     24: {
-        "A": [M_LLD, M, M_LLD, M, M_LLD, M],
-        "B": [M_LLD, M, M_LLD, M, M_LLD, M],
-        "C": [M_LLD, M, M_LLD, M, M_LLD, M],
-        "D": [M_LLD, M, M_LLD, M, M_LLD, M],
+        "A": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
+        "B": [M, M, M, M, M, M],
+        "C": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
+        "D": [M, M, M, M, M, M],
     },
     96: {
-        "A": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
-        "B": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
-        "C": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
-        "D": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
-        "E": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
-        "F": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
-        "G": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
-        "H": [M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M, M_LLD, M],
+        "A": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
+        "B": [M, M, M, M, M, M, M, M, M, M, M, M],
+        "C": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
+        "D": [M, M, M, M, M, M, M, M, M, M, M, M],
+        "E": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
+        "F": [M, M, M, M, M, M, M, M, M, M, M, M],
+        "G": [M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD, M_LLD],
+        "H": [M, M, M, M, M, M, M, M, M, M, M, M],
     },
 }
 
