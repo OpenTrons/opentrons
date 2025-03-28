@@ -49,3 +49,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
             else:
                 led_on = True
             report(section, f"{tag}-{color}", [CSVResult.from_bool(led_on)])
+
+    # Turn LEDs back to green
+    if not stacker._simulating:
+        await stacker._driver.set_led(0.5, color=LEDColor.GREEN, pattern=LEDPattern.STATIC)

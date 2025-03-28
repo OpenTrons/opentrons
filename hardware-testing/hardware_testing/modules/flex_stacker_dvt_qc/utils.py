@@ -15,7 +15,7 @@ from opentrons.drivers.flex_stacker.types import StackerAxis, Direction
 
 
 TOF_DETECTION_CONFIG: Dict[TOFSensor, Dict[str, Any]] = {
-    TOFSensor.X: {"zones": [5, 6, 7], "bins": list(range(10, 20)), "threshold": 20000},
+    TOFSensor.X: {"zones": [5, 6, 7], "bins": list(range(10, 20)), "threshold": 30000},
     TOFSensor.Z: {"zones": [1], "bins": list(range(50, 56)), "threshold": 20000},
 }
 
