@@ -21,6 +21,7 @@ import {
   UPDATE_CONFLICT_TIMESTAMP,
   UPDATE_LPC,
   UPDATE_LPC_DECK,
+  UPDATE_LPC_LABWARE,
 } from '../constants'
 import {
   clearAllWorkingOffsets,
@@ -56,6 +57,13 @@ export function LPCReducer(
         return {
           ...state,
           deckConfig: action.payload.deck,
+        }
+      }
+
+      case UPDATE_LPC_LABWARE: {
+        return {
+          ...state,
+          labwareInfo: action.payload.labware,
         }
       }
 

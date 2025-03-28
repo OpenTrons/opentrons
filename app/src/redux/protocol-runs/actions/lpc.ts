@@ -17,6 +17,7 @@ import {
   SOURCE_OFFSETS_FROM_DATABASE,
   UPDATE_CONFLICT_TIMESTAMP,
   UPDATE_LPC_DECK,
+  UPDATE_LPC_LABWARE,
 } from '../constants'
 
 import type {
@@ -44,9 +45,11 @@ import type {
   UpdateConflictTimestampAction,
   ConflictTimestampInfo,
   UpdateLPCDeckAction,
+  LPCLabwareInfo,
+  UpdateLPCLabwareAction,
 } from '../types'
 import type { StoredLabwareOffset } from '@opentrons/api-client'
-import { DeckConfiguration } from '@opentrons/shared-data'
+import type { DeckConfiguration } from '@opentrons/shared-data'
 
 export const proceedStep = (
   runId: string,
@@ -140,6 +143,14 @@ export const updateLPCDeck = (
 ): UpdateLPCDeckAction => ({
   type: UPDATE_LPC_DECK,
   payload: { runId, deck },
+})
+
+export const updateLPCLabware = (
+  runId: string,
+  labware: LPCLabwareInfo
+): UpdateLPCLabwareAction => ({
+  type: UPDATE_LPC_LABWARE,
+  payload: { runId, labware },
 })
 
 export const closeLPC = (runId: string): FinishLPCAction => ({

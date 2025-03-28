@@ -21,6 +21,7 @@ import {
   useUpdateDeckConfig,
   useHandleClientAppliedOffsets,
   useOffsetConflictTimestamp,
+  useUpdateLabwareInfo,
 } from './hooks'
 
 import type { RobotType } from '@opentrons/shared-data'
@@ -97,6 +98,7 @@ export function useLPCFlows({
 
   useOffsetConflictTimestamp(isFlex, runId, runRecord)
   useUpdateDeckConfig(runId, deckConfig)
+  useUpdateLabwareInfo(runId, maintenanceRunId, labwareInfo)
   useHandleClientAppliedOffsets(runId)
   useInitLPCStore({
     runId,

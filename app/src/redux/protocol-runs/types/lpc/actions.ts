@@ -1,6 +1,7 @@
 import type {
   ConflictTimestampInfo,
   LocationSpecificOffsetLocationDetails,
+  LPCLabwareInfo,
   LPCStep,
   LPCWizardState,
   OffsetLocationDetails,
@@ -22,6 +23,11 @@ export interface UpdateLPCAction {
 export interface UpdateLPCDeckAction {
   type: 'UPDATE_LPC_DECK'
   payload: { runId: string; deck: DeckConfiguration }
+}
+
+export interface UpdateLPCLabwareAction {
+  type: 'UPDATE_LPC_LABWARE'
+  payload: { runId: string; labware: LPCLabwareInfo }
 }
 
 export interface FinishLPCAction {
@@ -118,6 +124,7 @@ export interface UpdateConflictTimestampAction {
 export type LPCWizardAction =
   | UpdateLPCAction
   | UpdateLPCDeckAction
+  | UpdateLPCLabwareAction
   | FinishLPCAction
   | SelectedLabwareNameAction
   | SelectedLabwareAction
