@@ -31,15 +31,17 @@ import {
 import { getNextAvailableDeckSlot } from '../../../labware-ingred/utils'
 import { deleteModule } from '../../../modules'
 import {
+  ConfirmDeleteEntityInUseModal,
   ConfirmDeleteStagingAreaModal,
   EditNickNameModal,
 } from '../../../components/organisms'
+import { getSavedStepForms } from '../../../step-forms/selectors'
 import { useKitchen } from '../../../components/organisms/Kitchen/hooks'
 import { deleteDeckFixture } from '../../../step-forms/actions/additionalItems'
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
-
 import { getStagingAreaAddressableAreas } from '../../../utils'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { getIsEntityOnSlotInUse } from './utils'
 
 import type { MouseEvent, SetStateAction } from 'react'
 import type {
@@ -94,15 +96,25 @@ export function SlotOverflowMenu(
   } = props
   const { t } = useTranslation('starting_deck_state')
   const navigate = useNavigate()
+  const savedSteps = useSelector(getSavedStepForms)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [showDeleteLabwareModal, setShowDeleteLabwareModal] = useState<boolean>(
     false
   )
+  const [
+    showDeleteEntityInUseModal,
+    setShowDeleteEntityInUseModal,
+  ] = useState<boolean>(false)
   const [showNickNameModal, setShowNickNameModal] = useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
-      if (showNickNameModal || showDeleteLabwareModal) return
-      setShowMenuList(false)
+      if (
+        !showNickNameModal &&
+        !showDeleteLabwareModal &&
+        !showDeleteEntityInUseModal
+      ) {
+        setShowMenuList(false)
+      }
     },
   })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
@@ -190,6 +202,15 @@ export function SlotOverflowMenu(
     setShowMenuList(false)
   }
 
+  const isEntityOnSlotInUse = getIsEntityOnSlotInUse(
+    savedSteps,
+    matchingLabware,
+    moduleOnSlot,
+    labwareOnSlot,
+    nestedLabwareOnSlot,
+    fixturesOnSlot
+  )
+
   const handleClear = (): void => {
     //  clear module from slot
     if (moduleOnSlot != null) {
@@ -266,6 +287,24 @@ export function SlotOverflowMenu(
 
   const slotOverflowBody = (
     <>
+      {isEntityOnSlotInUse && showDeleteEntityInUseModal ? (
+        <ConfirmDeleteEntityInUseModal
+          onConfirm={() => {
+            if (matchingLabware != null) {
+              setShowDeleteLabwareModal(true)
+              setShowDeleteEntityInUseModal(false)
+            } else {
+              handleClear()
+              setShowMenuList(false)
+              setShowDeleteEntityInUseModal(false)
+            }
+          }}
+          onClose={() => {
+            setShowDeleteEntityInUseModal(false)
+          }}
+          type="clear"
+        />
+      ) : null}
       {showNickNameModal && nickNameId != null ? (
         <EditNickNameModal
           labwareId={nickNameId}
@@ -351,7 +390,11 @@ export function SlotOverflowMenu(
         <MenuItem
           disabled={hasNoItems && !isStagingSlot}
           onClick={(e: MouseEvent) => {
-            if (matchingLabware != null) {
+            if (isEntityOnSlotInUse) {
+              setShowDeleteEntityInUseModal(true)
+              e.preventDefault()
+              e.stopPropagation()
+            } else if (!isEntityOnSlotInUse && matchingLabware != null) {
               setShowDeleteLabwareModal(true)
               e.preventDefault()
               e.stopPropagation()

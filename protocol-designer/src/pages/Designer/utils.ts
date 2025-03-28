@@ -16,7 +16,7 @@ import type {
 } from '../../step-forms'
 import type { Fixture } from './DeckSetup/constants'
 
-interface AdditionalEquipment {
+export interface AdditionalEquipment {
   name: AdditionalEquipmentName
   id: string
   location?: string
@@ -28,7 +28,7 @@ interface SlotInformation {
   createdModuleForSlot?: ModuleOnDeck
   createdLabwareForSlot?: LabwareOnDeck
   createdNestedLabwareForSlot?: LabwareOnDeck
-  createFixtureForSlots?: AdditionalEquipment[]
+  createdFixtureForSlots?: AdditionalEquipment[]
   preSelectedFixture?: Fixture
 }
 
@@ -61,16 +61,14 @@ export const getSlotInformation = (
   const createdNestedLabwareForSlot = Object.values(deckSetupLabware).find(
     lw => lw.slot === createdLabwareForSlot?.id
   )
-  const createFixtureForSlots = Object.values(additionalEquipmentOnDeck).filter(
-    ae => {
-      const slotKey = FOURTH_COLUMN_SLOTS.includes(slot)
-        ? FOURTH_COLUMN_CONVERSION[
-            slot as keyof typeof FOURTH_COLUMN_CONVERSION
-          ]
-        : slot
-      return ae.location?.split('cutout')[1] === slotKey
-    }
-  )
+  const createdFixtureForSlots = Object.values(
+    additionalEquipmentOnDeck
+  ).filter(ae => {
+    const slotKey = FOURTH_COLUMN_SLOTS.includes(slot)
+      ? FOURTH_COLUMN_CONVERSION[slot as keyof typeof FOURTH_COLUMN_CONVERSION]
+      : slot
+    return ae.location?.split('cutout')[1] === slotKey
+  })
 
   const fixturesOnSlot = Object.values(additionalEquipmentOnDeck).filter(
     ae => ae.location?.split('cutout')[1] === slot
@@ -91,15 +89,15 @@ export const getSlotInformation = (
   }
 
   const preSelectedFixture =
-    createFixtureForSlots != null && createFixtureForSlots.length === 2
+    createdFixtureForSlots != null && createdFixtureForSlots.length === 2
       ? ('wasteChuteAndStagingArea' as Fixture)
-      : (createFixtureForSlots[0]?.name as Fixture)
+      : (createdFixtureForSlots[0]?.name as Fixture)
 
   return {
     createdModuleForSlot,
     createdLabwareForSlot,
     createdNestedLabwareForSlot,
-    createFixtureForSlots,
+    createdFixtureForSlots,
     preSelectedFixture,
     slotPosition: slotPosition,
     matchingLabwareFor4thColumn: matchingLabware,

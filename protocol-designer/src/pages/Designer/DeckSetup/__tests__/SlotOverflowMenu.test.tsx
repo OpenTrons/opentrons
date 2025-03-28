@@ -10,13 +10,18 @@ import {
   openIngredientSelector,
 } from '../../../../labware-ingred/actions'
 import { deleteModule } from '../../../../modules'
-import { EditNickNameModal } from '../../../../components/organisms'
+import {
+  ConfirmDeleteEntityInUseModal,
+  EditNickNameModal,
+} from '../../../../components/organisms'
 import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
 import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import { selectors as labwareIngredSelectors } from '../../../../labware-ingred/selectors'
 import { getNextAvailableDeckSlot } from '../../../../labware-ingred/utils'
+import { getSavedStepForms } from '../../../../step-forms/selectors'
 import { SlotOverflowMenu } from '../SlotOverflowMenu'
+import { getIsEntityOnSlotInUse } from '../utils'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
@@ -24,6 +29,8 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 const mockNavigate = vi.fn()
 
+vi.mock('../utils')
+vi.mock('../../../../step-forms/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../labware-ingred/actions')
 vi.mock('../../../../labware-ingred/selectors')
@@ -59,7 +66,7 @@ describe('SlotOverflowMenu', () => {
       setShowMenuList: vi.fn(),
       addEquipment: vi.fn(),
     }
-
+    vi.mocked(getSavedStepForms).mockReturnValue({})
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {
         labId: {
@@ -106,6 +113,9 @@ describe('SlotOverflowMenu', () => {
       eatToast: vi.fn(),
       bakeToast: vi.fn(),
     })
+    vi.mocked(ConfirmDeleteEntityInUseModal).mockReturnValue(
+      <div>mock ConfirmDeleteEntityInUseModal</div>
+    )
   })
 
   afterEach(() => {
@@ -186,5 +196,11 @@ describe('SlotOverflowMenu', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Duplicate labware' }))
     expect(MOCK_MAKE_SNACKBAR).toHaveBeenCalled()
+  })
+  it('renders the ConfirmDeleteEntityInUseModal modal', () => {
+    vi.mocked(getIsEntityOnSlotInUse).mockReturnValue(true)
+    render(props)
+    fireEvent.click(screen.getByRole('button', { name: 'Clear slot' }))
+    screen.getByText('mock ConfirmDeleteEntityInUseModal')
   })
 })
