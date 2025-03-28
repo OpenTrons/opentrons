@@ -63,23 +63,38 @@ import {
   createContainerAboveModule,
   createModuleEntityAndChangeForm,
 } from '../../../step-forms/actions/thunks'
-import { ConfirmDeleteStagingAreaModal } from '../../../components/organisms'
+import {
+  ConfirmDeleteEntityInUseModal,
+  ConfirmDeleteStagingAreaModal,
+} from '../../../components/organisms'
 import { getSlotInformation } from '../utils'
 import { ALL_ORDERED_CATEGORIES, FIXTURES, MOAM_MODELS } from './constants'
 import { LabwareTools } from './LabwareTools'
 import { MagnetModuleChangeContent } from './MagnetModuleChangeContent'
-import { getModuleModelsBySlot, getDeckErrors } from './utils'
+import {
+  getModuleModelsBySlot,
+  getDeckErrors,
+  getIsEntityOnSlotInUse,
+} from './utils'
 
-import type { AddressableAreaName, ModuleModel } from '@opentrons/shared-data'
+import type {
+  AddressableAreaName,
+  ModuleModel,
+  ModuleType,
+} from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
 import type { Fixture } from './constants'
 import type { ModuleModelExtended } from './utils'
+import type { StepType } from '../../../form-types'
 
-const mapModTypeToStepType: Record<string, string> = {
+//  @ts-expect-error: add flexStackerType and stepType
+const mapModTypeToStepType: Record<ModuleType, StepType> = {
   heaterShakerModuleType: 'heaterShaker',
   magneticModuleType: 'magnet',
   temperatureModuleType: 'temperature',
   thermocyclerModuleType: 'thermocycler',
+  absorbanceReaderType: 'absorbanceReader',
+  magneticBlockType: 'magnet',
 }
 
 interface DeckSetupToolsProps {
@@ -104,6 +119,9 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
   } = props
   const { t, i18n } = useTranslation(['starting_deck_state', 'shared'])
   const { makeSnackbar } = useKitchen()
+  const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] = useState<
+    'clear' | 'confirm' | null
+  >(null)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const robotType = useSelector(getRobotType)
   const savedSteps = useSelector(getSavedStepForms)
@@ -226,7 +244,7 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     createdNestedLabwareForSlot,
     createdModuleForSlot,
     createdLabwareForSlot,
-    createFixtureForSlots,
+    createdFixtureForSlots,
     matchingLabwareFor4thColumn,
   } = getSlotInformation({ deckSetup, slot })
 
@@ -327,8 +345,8 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
         dispatch(deleteContainer({ labwareId: matchingLabwareFor4thColumn.id }))
       }
       //  clear fixture(s) from slot
-      if (createFixtureForSlots != null && createFixtureForSlots.length > 0) {
-        createFixtureForSlots.forEach(fixture =>
+      if (createdFixtureForSlots != null && createdFixtureForSlots.length > 0) {
+        createdFixtureForSlots.forEach(fixture =>
           dispatch(deleteDeckFixture(fixture.id))
         )
         // zoom out if you're clearing a staging area slot directly from a 4th column
@@ -445,6 +463,16 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
     dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
     onCloseClick()
   }
+
+  const isEntityOnSlotInUse = getIsEntityOnSlotInUse(
+    savedSteps,
+    matchingLabwareFor4thColumn,
+    createdModuleForSlot,
+    createdLabwareForSlot,
+    createdNestedLabwareForSlot,
+    createdFixtureForSlots
+  )
+
   const positionStyles =
     position === POSITION_FIXED
       ? {
@@ -454,6 +482,27 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
       : {}
   return (
     <>
+      {isEntityOnSlotInUse && showDeleteEntityInUseModal != null ? (
+        <ConfirmDeleteEntityInUseModal
+          onConfirm={() => {
+            if (showDeleteEntityInUseModal === 'confirm') {
+              handleConfirm()
+            } else if (matchingLabwareFor4thColumn != null) {
+              setShowDeleteLabwareModal('clear')
+            } else {
+              handleClear()
+              handleResetToolbox()
+            }
+            setShowDeleteEntityInUseModal(null)
+          }}
+          onClose={() => {
+            setShowDeleteEntityInUseModal(null)
+          }}
+          type={
+            showDeleteEntityInUseModal === 'confirm' ? 'reconfigure' : 'clear'
+          }
+        />
+      ) : null}
       {showDeleteLabwareModal != null ? (
         <ConfirmDeleteStagingAreaModal
           onClose={() => {
@@ -497,8 +546,8 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
         secondaryHeaderButton={
           <Btn
             onClick={() => {
-              if (matchingLabwareFor4thColumn != null) {
-                setShowDeleteLabwareModal('clear')
+              if (isEntityOnSlotInUse) {
+                setShowDeleteEntityInUseModal('clear')
               } else {
                 handleClear()
                 handleResetToolbox()
@@ -518,7 +567,18 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
           dispatch(selectZoomedIntoSlot({ slot: null, cutout: null }))
           handleResetToolbox()
         }}
-        onConfirmClick={handleConfirm}
+        onConfirmClick={() => {
+          if (isEntityOnSlotInUse) {
+            setShowDeleteEntityInUseModal('confirm')
+          } else if (
+            !isEntityOnSlotInUse &&
+            matchingLabwareFor4thColumn != null
+          ) {
+            setShowDeleteLabwareModal('clear')
+          } else {
+            handleConfirm()
+          }
+        }}
         confirmButtonText={t('done')}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>

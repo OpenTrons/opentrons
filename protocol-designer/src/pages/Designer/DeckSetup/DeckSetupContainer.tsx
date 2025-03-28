@@ -32,6 +32,7 @@ import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import { getRobotType } from '../../../file-data/selectors'
 import { getHasGen1MultiChannelPipette } from '../../../step-forms'
 import { selectZoomedIntoSlot } from '../../../labware-ingred/actions'
+import { FixedTrashText } from '../../../components/molecules'
 import { selectors } from '../../../labware-ingred/selectors'
 import { DeckSetupDetails } from './DeckSetupDetails'
 import { DECK_SETUP_TOOLS_WIDTH_REM, DeckSetupTools } from './DeckSetupTools'
@@ -56,7 +57,6 @@ import type {
 } from '@opentrons/step-generation'
 import type { DeckSetupTabType } from '../types'
 import type { Fixture } from './constants'
-import { FixedTrashText } from '../../../components/molecules'
 
 const WASTE_CHUTE_SPACE = 30
 const DETAILS_HOVER_SPACE = 60
