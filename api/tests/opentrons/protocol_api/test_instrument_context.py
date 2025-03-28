@@ -1786,6 +1786,7 @@ def test_air_gap_uses_air_gap(
     subject.air_gap(volume=10, height=5)
 
     decoy.verify(mock_move_to(top_location, publish=False))
+    decoy.verify(mock_instrument_core.prepare_to_aspirate())
     decoy.verify(mock_instrument_core.air_gap_in_place(10, 11))
 
 

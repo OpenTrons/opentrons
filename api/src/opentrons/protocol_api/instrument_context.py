@@ -778,6 +778,7 @@ class InstrumentContext(publisher.CommandPublisher):
         target = loc.labware.as_well().top(height)
         self.move_to(target, publish=False)
         if self.api_version >= _AIR_GAP_TRACKING_ADDED_IN:
+            self._core.prepare_to_aspirate()
             c_vol = self._core.get_available_volume() if volume is None else volume
             flow_rate = self._core.get_aspirate_flow_rate()
             self._core.air_gap_in_place(c_vol, flow_rate)
