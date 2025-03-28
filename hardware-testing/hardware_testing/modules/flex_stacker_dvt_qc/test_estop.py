@@ -101,7 +101,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     limit_switch_triggered = await stacker._driver.get_limit_switch(
         StackerAxis.L, l_limit
     )
-    if not limit_switch_triggered:
+    if limit_switch_triggered:
         report(
             section,
             "l-move-disabled",
@@ -111,7 +111,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         print("try to move L axis off the limit switch...")
         try:
             await stacker._driver.move_in_mm(
-                StackerAxis.L, l_limit.opposite().distance(1)
+                StackerAxis.L, l_limit.opposite().distance(5)
             )
         except EStopTriggered:
             print("E-Stop Error is raised")
@@ -120,7 +120,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         report(
             section,
             "l-move-disabled",
-            [CSVResult.from_bool(triggered)],
+            [CSVResult.from_bool(not triggered)],
         )
 
     if not stacker._simulating:

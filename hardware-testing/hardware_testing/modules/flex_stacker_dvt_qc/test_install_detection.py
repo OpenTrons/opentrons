@@ -25,12 +25,12 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
     ui.print_header("Window Detected")
     if not stacker._simulating:
-        ui.get_user_ready("Attach to detection pins")
+        ui.get_user_ready("Press the window detect switch")
     detected = await stacker._driver.get_installation_detected()
     report(section, "window-detected-high", [CSVResult.from_bool(detected)])
 
     ui.print_header("Window Not Detected")
     if not stacker._simulating:
-        ui.get_user_ready("Remove from detection pins")
+        ui.get_user_ready("Un-press the window detect switch")
     not_detected = not await stacker._driver.get_installation_detected()
     report(section, "window-not-detected-low", [CSVResult.from_bool(not_detected)])
