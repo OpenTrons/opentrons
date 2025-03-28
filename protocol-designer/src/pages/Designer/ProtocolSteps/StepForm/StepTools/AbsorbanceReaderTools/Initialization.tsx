@@ -24,7 +24,7 @@ import {
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../../../../../atoms'
+import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
   ABSORBANCE_READER_MAX_WAVELENGTH_NM,
   ABSORBANCE_READER_MIN_WAVELENGTH_NM,
@@ -195,7 +195,7 @@ function IntializationEditor(props: InitializationEditorProps): JSX.Element {
     const wavelength = i <= wavelengths.length ? wavelengths[i] : null
     wavelengthItems.push(
       <ListItem
-        type="noActive"
+        type="default"
         padding={SPACING.spacing12}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}

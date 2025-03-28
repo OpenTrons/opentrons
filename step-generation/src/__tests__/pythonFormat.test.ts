@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { formatPyStr, formatPyValue } from '../utils/pythonFormat'
+import {
+  formatPyStr,
+  formatPyValue,
+  formatPyWellLocation,
+} from '../utils/pythonFormat'
 
 describe('pythonFormat utils', () => {
   it('format string', () => {
@@ -46,4 +50,76 @@ describe('pythonFormat utils', () => {
       '{\n    "hello": "world",\n    "nested": {\n        "inner": 5,\n        "extra": 6,\n    },\n}'
     )
   })
+})
+
+describe('formatPyWellLocation', () => {
+  it('format well location', () => {
+    // So many cases to test ...
+    expect(formatPyWellLocation(undefined)).toBe('')
+    expect(formatPyWellLocation({ origin: 'top' })).toBe('.top()')
+    expect(formatPyWellLocation({ origin: 'bottom' })).toBe('.bottom()')
+    expect(formatPyWellLocation({ origin: 'center' })).toBe('.center()')
+    expect(formatPyWellLocation({ origin: 'meniscus' })).toBe('.meniscus()')
+
+    // Should not emit extranous code if the offset is specified but set to 0:
+    expect(
+      formatPyWellLocation({ origin: 'top', offset: { x: 0, y: 0, z: 0 } })
+    ).toBe('.top()')
+    expect(
+      formatPyWellLocation({ origin: 'bottom', offset: { x: 0, y: 0, z: 0 } })
+    ).toBe('.bottom()')
+    expect(
+      formatPyWellLocation({ origin: 'center', offset: { x: 0, y: 0, z: 0 } })
+    ).toBe('.center()')
+    expect(
+      formatPyWellLocation({ origin: 'meniscus', offset: { x: 0, y: 0, z: 0 } })
+    ).toBe('.meniscus()')
+
+    // Handle z-offsets:
+    expect(formatPyWellLocation({ origin: 'top', offset: { z: 2 } })).toBe(
+      '.top(z=2)'
+    )
+    expect(formatPyWellLocation({ origin: 'bottom', offset: { z: 2 } })).toBe(
+      '.bottom(z=2)'
+    )
+    expect(formatPyWellLocation({ origin: 'center', offset: { z: 2 } })).toBe(
+      '.center().move(types.Point(z=2))'
+    )
+    expect(formatPyWellLocation({ origin: 'meniscus', offset: { z: 2 } })).toBe(
+      '.meniscus(z=2)'
+    )
+
+    // Handle x/y offsets:
+    expect(
+      formatPyWellLocation({ origin: 'top', offset: { x: 1, y: 2 } })
+    ).toBe('.top().move(types.Point(x=1, y=2))')
+    expect(
+      formatPyWellLocation({ origin: 'bottom', offset: { x: 1, y: 2 } })
+    ).toBe('.bottom().move(types.Point(x=1, y=2))')
+    expect(
+      formatPyWellLocation({ origin: 'center', offset: { x: 1, y: 2 } })
+    ).toBe('.center().move(types.Point(x=1, y=2))')
+    expect(
+      formatPyWellLocation({ origin: 'meniscus', offset: { x: 1, y: 2 } })
+    ).toBe('.meniscus().move(types.Point(x=1, y=2))')
+  })
+
+  // Handle x/y/z offsets:
+  expect(
+    formatPyWellLocation({ origin: 'top', offset: { x: 1, y: 2, z: 3 } })
+  ).toBe('.top(z=3).move(types.Point(x=1, y=2))')
+  expect(
+    formatPyWellLocation({ origin: 'bottom', offset: { x: 1, y: 2, z: 3 } })
+  ).toBe('.bottom(z=3).move(types.Point(x=1, y=2))')
+  expect(
+    formatPyWellLocation({ origin: 'center', offset: { x: 1, y: 2, z: 3 } })
+  ).toBe('.center().move(types.Point(x=1, y=2, z=3))')
+  expect(
+    formatPyWellLocation({ origin: 'meniscus', offset: { x: 1, y: 2, z: 3 } })
+  ).toBe('.meniscus(z=3).move(types.Point(x=1, y=2))')
+
+  // If origin is missing, treat it as top:
+  expect(formatPyWellLocation({ offset: { x: 1, y: 2, z: 3 } })).toBe(
+    '.top(z=3).move(types.Point(x=1, y=2))'
+  )
 })

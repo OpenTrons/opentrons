@@ -42,7 +42,8 @@
         "aluminumBlock",
         "adapter",
         "other",
-        "lid"
+        "lid",
+        "system"
       ]
     },
     "safeString": {
@@ -191,19 +192,24 @@
           "enum": ["spherical"]
         },
         "radiusOfCurvature": {
-          "type": "number"
+          "type": "number",
+          "description": "radius of curvature of bottom subsection of wells"
         },
         "topHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The depth of a spherical bottom of a well"
         },
         "bottomHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "Height of the bottom of the segment, must be 0.0"
         },
         "xCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         },
         "yCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         }
       }
     },
@@ -223,22 +229,28 @@
           "enum": ["conical"]
         },
         "bottomDiameter": {
-          "type": "number"
+          "type": "number",
+          "description": "The diameter at the bottom cross-section of a circular frustum"
         },
         "topDiameter": {
-          "type": "number"
+          "type": "number",
+          "description": "The diameter at the top cross-section of a circular frustum"
         },
         "topHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well"
         },
         "bottomHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
         },
         "xCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         },
         "yCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         }
       }
     },
@@ -260,28 +272,36 @@
           "enum": ["cuboidal"]
         },
         "bottomXDimension": {
-          "type": "number"
+          "type": "number",
+          "description": "x dimension of the bottom cross-section of a rectangular frustum"
         },
         "bottomYDimension": {
-          "type": "number"
+          "type": "number",
+          "description": "y dimension of the bottom cross-section of a rectangular frustum"
         },
         "topXDimension": {
-          "type": "number"
+          "type": "number",
+          "description": "x dimension of the top cross-section of a rectangular frustum"
         },
         "topYDimension": {
-          "type": "number"
+          "type": "number",
+          "description": "y dimension of the top cross-section of a rectangular frustum"
         },
         "topHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well"
         },
         "bottomHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
         },
         "xCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         },
         "yCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         }
       }
     },
@@ -304,28 +324,36 @@
         },
         "bottomCrossSection": {
           "type": "string",
-          "enum": ["circular", "rectangular"]
+          "enum": ["circular", "rectangular"],
+          "description": "Denote if the shape is going from circular to rectangular or vise versa"
         },
         "circleDiameter": {
-          "type": "number"
+          "type": "number",
+          "description": "diameter of the circular face of a truncated circular segment"
         },
         "rectangleXDimension": {
-          "type": "number"
+          "type": "number",
+          "description": "x dimension of the rectangular face of a truncated circular segment"
         },
         "rectangleYDimension": {
-          "type": "number"
+          "type": "number",
+          "description": "y dimension of the rectangular face of a truncated circular segment"
         },
         "topHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom of the well"
         },
         "bottomHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
         },
         "xCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         },
         "yCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         }
       }
     },
@@ -348,28 +376,36 @@
         },
         "bottomCrossSection": {
           "type": "string",
-          "enum": ["circular", "rectangular"]
+          "enum": ["circular", "rectangular"],
+          "description": "Denote if the shape is going from circular to rectangular or vise versa"
         },
         "circleDiameter": {
-          "type": "number"
+          "type": "number",
+          "description": "diameter of the circular face of a rounded rectangular segment"
         },
         "rectangleXDimension": {
-          "type": "number"
+          "type": "number",
+          "description": "x dimension of the rectangular face of a rounded rectangular segment"
         },
         "rectangleYDimension": {
-          "type": "number"
+          "type": "number",
+          "description": "y dimension of the rectangular face of a rounded rectangular segment"
         },
         "topHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The height at the top of a bounded subsection of a well, relative to the bottom"
         },
         "bottomHeight": {
-          "type": "number"
+          "type": "number",
+          "description": "The height at the bottom of a bounded subsection of a well, relative to the bottom of the well"
         },
         "xCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         },
         "yCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Number of instances of this shape in the stackup, used for wells that have multiple sub-wells"
         }
       }
     },
@@ -380,6 +416,7 @@
         "sections": {
           "description": "A list of all of the sections of the well that have a contiguous shape. Must be ordered from top (highest z) to bottom (lowest z).",
           "type": "array",
+          "minItems": 1,
           "items": {
             "oneOf": [
               {
@@ -406,6 +443,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "$otSharedSchema",
     "schemaVersion",
     "version",
     "namespace",
@@ -419,6 +457,10 @@
     "groups"
   ],
   "properties": {
+    "$otSharedSchema": {
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension.",
+      "enum": ["#/labware/schemas/3"]
+    },
     "schemaVersion": {
       "description": "Which schema version a labware is using",
       "type": "number",
@@ -631,17 +673,6 @@
         "$ref": "#/definitions/vector"
       }
     },
-    "stackLimit": {
-      "type": "number",
-      "description": "The limit representing the maximum stack size for a given labware."
-    },
-    "compatibleParentLabware": {
-      "type": "array",
-      "description": "Array of parent Labware on which a labware may be loaded, primarily the labware which owns a lid.",
-      "items": {
-        "type": "string"
-      }
-    },
     "gripperOffsets": {
       "type": "object",
       "description": "Offsets to add when picking up or dropping another labware stacked atop this one. Do not use this to adjust the position of the gripper paddles relative to this labware or the child labware; use `gripHeightFromLabwareBottom` on this definition or the child's definition for that.",
@@ -671,6 +702,17 @@
     "gripHeightFromLabwareBottom": {
       "type": "number",
       "description": "Recommended Z-height, from labware bottom to the center of gripper pads, when gripping the labware."
+    },
+    "stackLimit": {
+      "type": "number",
+      "description": "The limit representing the maximum stack size for a given labware. Defaults to 1 when unspecified indicating a single labware with no labware below it."
+    },
+    "compatibleParentLabware": {
+      "type": "array",
+      "description": "Array of parent Labware on which a labware may be loaded, primarily the labware which owns a lid.",
+      "items": {
+        "type": "string"
+      }
     },
     "innerLabwareGeometry": {
       "type": ["object", "null"],

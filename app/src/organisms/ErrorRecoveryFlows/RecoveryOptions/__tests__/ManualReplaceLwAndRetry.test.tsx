@@ -32,6 +32,9 @@ describe('ManualReplaceLwAndRetry', () => {
         step:
           RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.GRIPPER_HOLDING_LABWARE,
       },
+      routeUpdateActions: {
+        proceedToRouteAndStep: vi.fn(),
+      },
     } as any
   })
 
@@ -71,6 +74,20 @@ describe('ManualReplaceLwAndRetry', () => {
     props.recoveryMap.step = RECOVERY_MAP.MANUAL_REPLACE_AND_RETRY.STEPS.RETRY
     render(props)
     screen.getByText('MOCK_RETRY_STEP_INFO')
+  })
+
+  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY} step`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_REPLACE_STACKER_AND_RETRY.STEPS.CONFIRM_RETRY
+    render(props)
+    screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
+  })
+
+  it(`renders TwoColLwInfoAndDeck for ${RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE} step`, () => {
+    props.recoveryMap.step =
+      RECOVERY_MAP.MANUAL_LOAD_IN_STACKER_AND_SKIP.STEPS.MANUAL_REPLACE
+    render(props)
+    screen.getByText('MOCK_TWO_COL_LW_INFO_AND_DECK')
   })
 
   it('renders SelectRecoveryOption for unknown step', () => {

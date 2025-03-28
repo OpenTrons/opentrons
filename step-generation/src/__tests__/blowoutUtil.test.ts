@@ -1,15 +1,11 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 import {
-  blowoutUtil,
+  blowoutLocationHelper,
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils'
-import {
-  blowOutInPlace,
-  moveToAddressableArea,
-  blowout,
-} from '../commandCreators/atomic'
+import { blowOutInWell } from '../commandCreators/atomic'
+import { blowOutInWasteChute } from '../commandCreators/compound'
 import { curryCommandCreator } from '../utils/curryCommandCreator'
 import {
   DEFAULT_PIPETTE,
@@ -23,6 +19,7 @@ import {
 } from '../fixtures'
 import type { RobotState, InvariantContext } from '../types'
 import type { BlowoutParams } from '@opentrons/shared-data'
+
 vi.mock('../utils/curryCommandCreator')
 
 let blowoutArgs: {
@@ -37,7 +34,7 @@ let blowoutArgs: {
   invariantContext: InvariantContext
   prevRobotState: RobotState
 }
-describe('blowoutUtil', () => {
+describe('blowoutLocationHelper', () => {
   let invariantContext: InvariantContext
 
   beforeEach(() => {
@@ -57,12 +54,12 @@ describe('blowoutUtil', () => {
     }
     vi.mocked(curryCommandCreator).mockClear()
   })
-  it('blowoutUtil curries blowout with source well params', () => {
-    blowoutUtil({
+  it('blowoutLocationHelper curries blowout with source well params', () => {
+    blowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: blowoutArgs.sourceLabwareId,
       wellName: blowoutArgs.sourceWell,
@@ -75,41 +72,37 @@ describe('blowoutUtil', () => {
       },
     })
   })
-  it('blowoutUtil curries waste chute commands when there is no well', () => {
+  it('blowoutLocationHelper curries waste chute commands when there is no well', () => {
     const wasteChuteId = 'wasteChuteId'
     invariantContext = {
       ...invariantContext,
-      additionalEquipmentEntities: {
+      wasteChuteEntities: {
         [wasteChuteId]: {
           id: wasteChuteId,
-          name: 'wasteChute',
           location: 'cutoutD3',
+          pythonName: 'mockPythonName',
         },
       },
     }
-    blowoutUtil({
+    blowoutLocationHelper({
       ...blowoutArgs,
       destLabwareId: wasteChuteId,
       invariantContext: invariantContext,
       destWell: null,
       blowoutLocation: wasteChuteId,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(moveToAddressableArea, {
-      addressableAreaName: ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWasteChute, {
       pipetteId: blowoutArgs.pipette,
-      offset: { x: 0, y: 0, z: 0 },
-    })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInPlace, {
       flowRate: 2.3,
-      pipetteId: blowoutArgs.pipette,
+      wasteChuteId,
     })
   })
-  it('blowoutUtil curries blowout with dest plate params', () => {
-    blowoutUtil({
+  it('blowoutLocationHelper curries blowout with dest plate params', () => {
+    blowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: blowoutArgs.destLabwareId,
       wellName: blowoutArgs.destWell,
@@ -122,12 +115,12 @@ describe('blowoutUtil', () => {
       },
     })
   })
-  it('blowoutUtil curries blowout with an arbitrary labware Id', () => {
-    blowoutUtil({
+  it('blowoutLocationHelper curries blowout with an arbitrary labware Id', () => {
+    blowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: TROUGH_LABWARE,
     })
-    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowOutInWell, {
       pipetteId: blowoutArgs.pipette,
       labwareId: TROUGH_LABWARE,
       wellName: 'A1',
@@ -140,8 +133,8 @@ describe('blowoutUtil', () => {
       },
     })
   })
-  it('blowoutUtil returns an empty array if not given a blowoutLocation', () => {
-    const result = blowoutUtil({
+  it('blowoutLocationHelper returns an empty array if not given a blowoutLocation', () => {
+    const result = blowoutLocationHelper({
       ...blowoutArgs,
       blowoutLocation: null,
     })

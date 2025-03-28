@@ -11,18 +11,38 @@ import {
   StyledText,
   ALIGN_CENTER,
   RESPONSIVENESS,
+  Tag,
+  SPACING_1,
+  SPACING_2,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { Divider } from '/app/atoms/structure/Divider'
 
 import type { DeckInfoLabelProps } from '@opentrons/components'
 
-export interface InterventionInfoProps {
+export interface BaseInterventionInfo {
+  layout: 'default' | 'stacked'
   type: 'location-arrow-location' | 'location-colon-location' | 'location'
   labwareName: string
   labwareNickname?: string
   currentLocationProps: DeckInfoLabelProps
   newLocationProps?: DeckInfoLabelProps
 }
+
+export interface InterventionInfoDefaultProps extends BaseInterventionInfo {
+  layout: 'default'
+  subText?: undefined
+}
+
+export interface InterventionInfoStackedProps extends BaseInterventionInfo {
+  layout: 'stacked'
+  subText?: string | null
+  tagText?: string | null
+}
+
+export type InterventionInfoProps =
+  | InterventionInfoDefaultProps
+  | InterventionInfoStackedProps
 
 export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
   const content = buildContent(props)
@@ -39,32 +59,40 @@ export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
           desktopStyle="bodyDefaultSemiBold"
           css={LINE_CLAMP_STYLE}
         >
-          {props.labwareName}
+          {props.labwareNickname ?? props.labwareName}
         </StyledText>
-        {props.labwareNickname != null ? (
-          <StyledText
-            oddStyle="hidden"
-            desktopStyle="bodyDefaultRegular"
-            color={COLORS.grey60}
-            css={css`
-              ${LINE_CLAMP_STYLE}
-              @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-                display: none;
-              }
-            `}
-          >
-            {props.labwareNickname}{' '}
-          </StyledText>
+        {props.layout === 'stacked' ? (
+          <>
+            <StyledText
+              oddStyle="hidden"
+              desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
+              css={css`
+                ${LINE_CLAMP_STYLE}
+                margin: 0.125rem 0 ${SPACING_2} 0;
+                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                  font-size: ${TYPOGRAPHY.fontSize22};
+                  margin: ${SPACING_1} 0 ${SPACING_2} 0;
+                }
+              `}
+            >
+              {props.subText}
+            </StyledText>
+            {props.tagText && (
+              <Tag type="default" text={props.tagText} shrinkToContent={true} />
+            )}
+            <Divider
+              borderColor={COLORS.grey35}
+              css={`
+                margin: ${SPACING_2} 0 0 0;
+                @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+                  border-bottom-color: ${COLORS.grey60};
+                }
+              `}
+            />
+          </>
         ) : null}
       </Flex>
-      <Divider
-        borderColor={COLORS.grey35}
-        css={`
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            display: none;
-          }
-        `}
-      />
       {content}
     </Flex>
   )

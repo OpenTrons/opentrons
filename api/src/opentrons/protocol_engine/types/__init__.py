@@ -65,6 +65,7 @@ from .module import (
     ABSMeasureMode,
     ModuleOffsetVector,
     ModuleOffsetData,
+    StackerFillEmptyStrategy,
 )
 from .location import (
     DeckSlotLocation,
@@ -200,6 +201,7 @@ __all__ = [
     "ABSMeasureMode",
     "ModuleOffsetVector",
     "ModuleOffsetData",
+    "StackerFillEmptyStrategy",
     # Locations of things on deck
     "DeckSlotLocation",
     "StagingSlotLocation",

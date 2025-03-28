@@ -33,6 +33,7 @@ describe('LeftColumnLabwareInfo', () => {
         },
       } as any,
       type: 'location',
+      layout: 'default',
       bannerText: 'MOCK_BANNER_TEXT',
     }
 
@@ -49,6 +50,7 @@ describe('LeftColumnLabwareInfo', () => {
       expect.objectContaining({
         headline: 'MOCK_TITLE',
         infoProps: {
+          layout: 'default',
           type: 'location',
           labwareName: 'MOCK_LW_NAME',
           labwareNickname: 'MOCK_LW_NICKNAME',

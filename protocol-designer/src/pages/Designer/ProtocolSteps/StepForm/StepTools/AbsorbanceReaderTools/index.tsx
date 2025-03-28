@@ -14,7 +14,7 @@ import {
   ABSORBANCE_READER_LID,
   ABSORBANCE_READER_READ,
 } from '../../../../../../constants'
-import { DropdownStepFormField } from '../../../../../../molecules'
+import { DropdownStepFormField } from '../../../../../../components/molecules'
 import { getRobotStateAtActiveItem } from '../../../../../../top-selectors/labware-locations'
 import { getAbsorbanceReaderLabwareOptions } from '../../../../../../ui/modules/selectors'
 import { hoverSelection } from '../../../../../../ui/steps/actions/actions'

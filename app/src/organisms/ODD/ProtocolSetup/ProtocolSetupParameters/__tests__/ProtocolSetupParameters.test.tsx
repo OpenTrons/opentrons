@@ -63,7 +63,6 @@ describe('ProtocolSetupParameters', () => {
   beforeEach(() => {
     props = {
       protocolId: 'mockId',
-      labwareOffsets: [],
       runTimeParameters: mockRunTimeParameterData,
       mostRecentAnalysis: mockMostRecentAnalysis,
     }

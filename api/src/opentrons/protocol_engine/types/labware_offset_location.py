@@ -27,7 +27,7 @@ class OnModuleOffsetLocationSequenceComponent(BaseModel):
 
     kind: Literal["onModule"] = "onModule"
     moduleModel: ModuleModel = Field(
-        ..., description="The model of a module that a lwbare can be loaded on to."
+        ..., description="The model of a module that a labware can be loaded on to."
     )
 
 

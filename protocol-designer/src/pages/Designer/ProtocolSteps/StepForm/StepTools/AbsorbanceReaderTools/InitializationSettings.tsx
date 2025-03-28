@@ -64,7 +64,7 @@ export function InitializationSettings(
           const knownColor = ABSORBANCE_READER_COLOR_BY_WAVELENGTH[wavelength]
           return (
             <ListItem
-              type="noActive"
+              type="default"
               key={`listItem_${wavelength}`}
               padding={SPACING.spacing12}
             >
@@ -76,7 +76,7 @@ export function InitializationSettings(
         })}
         {initialization.referenceWavelength != null ? (
           <ListItem
-            type="noActive"
+            type="default"
             key={`listItem_${initialization.referenceWavelength}`}
             padding={SPACING.spacing12}
           >

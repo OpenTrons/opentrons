@@ -1,6 +1,7 @@
 import { describe, beforeEach, afterEach, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import { useSelector } from 'react-redux'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'

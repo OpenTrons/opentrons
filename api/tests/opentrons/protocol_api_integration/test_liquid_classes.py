@@ -20,7 +20,7 @@ def test_liquid_class_creation_and_property_fetching(
     water = simulated_protocol_context.define_liquid_class("water")
 
     assert water.name == "water"
-    assert water.display_name == "Water"
+    assert water.display_name == "Aqueous"
 
     # TODO (spp, 2024-10-17): update this to fetch pipette load name from instrument context
     assert (

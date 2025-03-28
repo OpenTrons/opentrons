@@ -19,7 +19,10 @@ from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
 )
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+)
 from opentrons.protocol_engine.execution.tip_handler import (
     HardwareTipHandler,
     VirtualTipHandler,
@@ -52,7 +55,7 @@ def mock_labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
 @pytest.fixture
 def tip_rack_definition() -> LabwareDefinition:
     """Get a tip rack defintion value object."""
-    return LabwareDefinition.model_construct(namespace="test", version=42)  # type: ignore[call-arg]
+    return LabwareDefinition2.model_construct(namespace="test", version=42)  # type: ignore[call-arg]
 
 
 MOCK_MAP = NozzleMap.build(

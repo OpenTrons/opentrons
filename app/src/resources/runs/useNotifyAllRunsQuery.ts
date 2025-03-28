@@ -8,10 +8,15 @@ import type { HostConfig, GetRunsParams, Runs } from '@opentrons/api-client'
 import type { UseAllRunsQueryOptions } from '@opentrons/react-api-client/src/runs/useAllRunsQuery'
 import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 
+export type UseNotifyAllRunsQueryOptions = QueryOptionsWithPolling<
+  UseAllRunsQueryOptions,
+  AxiosError
+>
+
 // TODO(jh, 08-21-24): Abstract harder.
 export function useNotifyAllRunsQuery(
   params: GetRunsParams = {},
-  options: QueryOptionsWithPolling<UseAllRunsQueryOptions, AxiosError> = {},
+  options: UseNotifyAllRunsQueryOptions = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs, AxiosError> {
   const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({

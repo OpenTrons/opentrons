@@ -3,7 +3,7 @@ import { DeckLabel as DeckLabelComponent } from '.'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof DeckLabelComponent> = {
-  title: 'Library/Molecules/DeckLabel',
+  title: 'Helix/Molecules/DeckLabel',
   component: DeckLabelComponent,
   argTypes: {
     isSelected: {

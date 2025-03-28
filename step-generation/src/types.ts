@@ -149,13 +149,47 @@ export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
     id: string
-    location?: string
+    location: string
+    //  Note: leaving as optional since gripper and stagingArea
+    //  will never need a pythonName
+    pythonName?: string
   }
 }
 
 export type AdditionalEquipmentEntity = NormalizedAdditionalEquipmentById[keyof NormalizedAdditionalEquipmentById]
 export interface AdditionalEquipmentEntities {
   [additionalEquipmentId: string]: AdditionalEquipmentEntity
+}
+
+interface TrashEntity {
+  id: string
+  location: string
+  pythonName: string
+}
+
+export type WasteChuteEntity = TrashEntity
+export interface WasteChuteEntities {
+  [wasteChuteId: string]: WasteChuteEntity
+}
+
+export type TrashBinEntity = TrashEntity
+export interface TrashBinEntities {
+  [trashBinId: string]: TrashBinEntity
+}
+
+export interface StagingAreaEntity {
+  id: string
+  location: string
+}
+export interface StagingAreaEntities {
+  [stagingAreaId: string]: StagingAreaEntity
+}
+
+export interface GripperEntity {
+  id: string
+}
+export interface GripperEntities {
+  [gripperId: string]: GripperEntity
 }
 
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
@@ -217,6 +251,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterAspirate: boolean
   /** Optional offset for touch tip after aspirate (if null, use PD default) */
   touchTipAfterAspirateOffsetMmFromTop: number
+  /** Optional speed for touch tip after aspirate (if null, use PD default) */
+  touchTipAfterAspirateSpeed: number | null
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions
   /** Delay after every aspirate */
@@ -241,6 +277,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   touchTipAfterDispense: boolean
   /** Optional offset for touch tip after dispense (if null, use PD default) */
   touchTipAfterDispenseOffsetMmFromTop: number
+  /** Optional speed for touch tip after dispense (if null, use PD default) */
+  touchTipAfterDispenseSpeed: number | null
   /** Flow rate in uL/sec for all dispenses */
   dispenseFlowRateUlSec: number
   /** offset from bottom of well in mm */
@@ -535,7 +573,10 @@ export interface InvariantContext {
   labwareEntities: LabwareEntities
   moduleEntities: ModuleEntities
   pipetteEntities: PipetteEntities
-  additionalEquipmentEntities: AdditionalEquipmentEntities
+  wasteChuteEntities: WasteChuteEntities
+  trashBinEntities: TrashBinEntities
+  stagingAreaEntities: StagingAreaEntities
+  gripperEntities: GripperEntities
   liquidEntities: LiquidEntities
   config: Config
 }
@@ -574,9 +615,11 @@ export interface TimelineFrame {
         [well: string]: LocationLiquidState
       }
     }
-    additionalEquipment: {
-      /** for the waste chute and trash bin */
-      [additionalEquipmentId: string]: LocationLiquidState
+    trashBins: {
+      [trashBinId: string]: LocationLiquidState
+    }
+    wasteChute: {
+      [wasteChuteId: string]: LocationLiquidState
     }
   }
 }

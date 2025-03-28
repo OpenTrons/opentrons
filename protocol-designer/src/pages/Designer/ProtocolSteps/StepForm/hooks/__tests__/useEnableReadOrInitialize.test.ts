@@ -37,7 +37,7 @@ const MOCK_LABWARE = {
 const DEFAULT_ROBOT_STATE = {
   pipettes: {},
   tipState: { tipracks: {}, pipettes: {} },
-  liquidState: { labware: {}, pipettes: {}, additionalEquipment: {} },
+  liquidState: { labware: {}, pipettes: {}, trashBins: {}, wasteChute: {} },
   labware: {},
   modules: {
     [MOCK_MODULE_ID]: MOCK_MODULE_STATE,

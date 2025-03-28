@@ -7,6 +7,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
+import type { VectorOffset } from '@opentrons/api-client'
 
 const PROBE_LENGTH_MM = 44.5
 
@@ -16,9 +17,14 @@ export const savePositionCommands = (pipetteId: string): CreateCommand[] => [
 
 export const moveToWellCommands = (
   offsetLocationDetails: OffsetLocationDetails,
-  pipetteId: string
+  pipetteId: string,
+  vectorOffset?: VectorOffset | null
 ): CreateCommand[] => {
   const { labwareId } = offsetLocationDetails
+  const offset =
+    vectorOffset != null
+      ? { ...vectorOffset, z: vectorOffset.z + PROBE_LENGTH_MM }
+      : { x: 0, y: 0, z: PROBE_LENGTH_MM }
 
   return [
     {
@@ -29,7 +35,7 @@ export const moveToWellCommands = (
         wellName: 'A1',
         wellLocation: {
           origin: 'top' as const,
-          offset: { x: 0, y: 0, z: PROBE_LENGTH_MM },
+          offset,
         },
       },
     },

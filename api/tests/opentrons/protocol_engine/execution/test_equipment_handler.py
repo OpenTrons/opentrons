@@ -238,7 +238,7 @@ async def test_load_labware(
     ).then_return(sentinel.labware_def)
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None
         )
     ).then_return(
         [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="3")]
@@ -333,7 +333,7 @@ async def test_load_labware_uses_provided_id(
     ).then_return(sentinel.labware_def)
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None
         )
     ).then_return(
         [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="3")]
@@ -384,7 +384,7 @@ async def test_load_labware_uses_loaded_labware_def(
 
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None
         )
     ).then_return(
         [OnAddressableAreaOffsetLocationSequenceComponent(addressableAreaName="3")]
@@ -447,7 +447,7 @@ async def test_load_labware_on_module(
 
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            ModuleLocation(moduleId="module-id")
+            ModuleLocation(moduleId="module-id"), None
         )
     ).then_return(
         [
@@ -514,7 +514,7 @@ def test_find_offset_id_of_labware_on_deck_slot(
     """It should find the offset by resolving the provided location."""
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_3), None
         )
     ).then_return(
         [
@@ -571,7 +571,7 @@ def test_find_offset_id_of_labware_on_module(
 
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            ModuleLocation(moduleId="input-module-id")
+            ModuleLocation(moduleId="input-module-id"), None
         )
     ).then_return(
         [
@@ -647,7 +647,7 @@ def test_find_offset_id_of_labware_on_labware(
     )
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            OnLabwareLocation(labwareId="labware-id")
+            OnLabwareLocation(labwareId="labware-id"), None
         )
     ).then_return(
         [
@@ -724,7 +724,7 @@ def test_find_offset_id_of_labware_on_labware_on_modules(
 
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            OnLabwareLocation(labwareId="labware-id")
+            OnLabwareLocation(labwareId="labware-id"), None
         )
     ).then_return(
         [
@@ -818,7 +818,7 @@ def test_find_offset_id_of_labware_on_labware_on_labware_modules(
 
     decoy.when(
         state_store.geometry.get_projected_offset_location(
-            OnLabwareLocation(labwareId="labware-id")
+            OnLabwareLocation(labwareId="labware-id"), None
         )
     ).then_return(
         [

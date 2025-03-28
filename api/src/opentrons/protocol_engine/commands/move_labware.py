@@ -450,9 +450,9 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             parent_updates: List[str] = []
             lid_updates: List[str | None] = []
             # when moving a lid between locations we need to:
-            assert isinstance(current_labware.location, OnLabwareLocation)
             if (
-                self._state_view.labware.get_lid_by_labware_id(
+                isinstance(current_labware.location, OnLabwareLocation)
+                and self._state_view.labware.get_lid_by_labware_id(
                     current_labware.location.labwareId
                 )
                 is not None

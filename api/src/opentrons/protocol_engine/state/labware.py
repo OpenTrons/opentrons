@@ -12,10 +12,10 @@ from typing import (
     Sequence,
     Tuple,
     NamedTuple,
-    cast,
     Union,
     overload,
 )
+from typing_extensions import assert_never
 
 from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
@@ -24,7 +24,8 @@ from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
     LabwareDefinition,
     LabwareRole,
-    WellDefinition,
+    WellDefinition2,
+    WellDefinition3,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
@@ -89,6 +90,9 @@ _RIGHT_SIDE_SLOTS = {
 
 # The max height of the labware that can fit in a plate reader
 _PLATE_READER_MAX_LABWARE_Z_MM = 16
+
+
+_WellDefinition = WellDefinition2 | WellDefinition3
 
 
 class LabwareLoadParams(NamedTuple):
@@ -161,8 +165,10 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         """Modify state in reaction to an action."""
         for state_update in get_state_updates(action):
             self._add_loaded_labware(state_update)
+            self._add_batch_loaded_labwares(state_update)
             self._add_loaded_lid_stack(state_update)
             self._set_labware_location(state_update)
+            self._set_batch_labware_location(state_update)
             self._set_labware_lid(state_update)
 
         if isinstance(action, AddLabwareOffsetAction):
@@ -229,6 +235,49 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 displayName=display_name,
             )
 
+    def _add_batch_loaded_labwares(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
+        batch_loaded_labware_update = state_update.batch_loaded_labware
+        if batch_loaded_labware_update == update_types.NO_CHANGE:
+            return
+        # If the labware load refers to an offset, that offset must actually exist.
+        for labware_id in batch_loaded_labware_update.new_locations_by_id:
+            if batch_loaded_labware_update.offset_ids_by_id[labware_id] is not None:
+                assert (
+                    batch_loaded_labware_update.offset_ids_by_id[labware_id]
+                    in self._state.labware_offsets_by_id
+                )
+
+            definition_uri = uri_from_details(
+                namespace=batch_loaded_labware_update.definitions_by_id[
+                    labware_id
+                ].namespace,
+                load_name=batch_loaded_labware_update.definitions_by_id[
+                    labware_id
+                ].parameters.loadName,
+                version=batch_loaded_labware_update.definitions_by_id[
+                    labware_id
+                ].version,
+            )
+
+            self._state.definitions_by_uri[
+                definition_uri
+            ] = batch_loaded_labware_update.definitions_by_id[labware_id]
+
+            location = batch_loaded_labware_update.new_locations_by_id[labware_id]
+
+            self._state.labware_by_id[labware_id] = LoadedLabware.model_construct(
+                id=labware_id,
+                location=location,
+                loadName=batch_loaded_labware_update.definitions_by_id[
+                    labware_id
+                ].parameters.loadName,
+                definitionUri=definition_uri,
+                offsetId=batch_loaded_labware_update.offset_ids_by_id[labware_id],
+                displayName=batch_loaded_labware_update.display_names_by_id[labware_id],
+            )
+
     def _add_loaded_lid_stack(self, state_update: update_types.StateUpdate) -> None:
         loaded_lid_stack_update = state_update.loaded_lid_stack
         if loaded_lid_stack_update != update_types.NO_CHANGE:
@@ -287,27 +336,46 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 lid_id = labware_lid_update.lid_ids[i]
                 self._state.labware_by_id[parent_labware_ids[i]].lid_id = lid_id
 
+    def _do_update_labware_location(
+        self, labware_id: str, new_location: LabwareLocation, new_offset_id: str | None
+    ) -> None:
+        self._state.labware_by_id[labware_id].offsetId = new_offset_id
+
+        if isinstance(new_location, AddressableAreaLocation) and (
+            fixture_validation.is_gripper_waste_chute(new_location.addressableAreaName)
+            or fixture_validation.is_trash(new_location.addressableAreaName)
+        ):
+            # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+            new_location = OFF_DECK_LOCATION
+
+        self._state.labware_by_id[labware_id].location = new_location
+
     def _set_labware_location(self, state_update: update_types.StateUpdate) -> None:
         labware_location_update = state_update.labware_location
-        if labware_location_update != update_types.NO_CHANGE:
-            labware_id = labware_location_update.labware_id
-            new_offset_id = labware_location_update.offset_id
+        if labware_location_update == update_types.NO_CHANGE:
+            return
 
-            self._state.labware_by_id[labware_id].offsetId = new_offset_id
+        self._do_update_labware_location(
+            labware_location_update.labware_id,
+            labware_location_update.new_location,
+            labware_location_update.offset_id,
+        )
 
-            if labware_location_update.new_location:
-                new_location = labware_location_update.new_location
-
-                if isinstance(new_location, AddressableAreaLocation) and (
-                    fixture_validation.is_gripper_waste_chute(
-                        new_location.addressableAreaName
-                    )
-                    or fixture_validation.is_trash(new_location.addressableAreaName)
-                ):
-                    # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
-                    new_location = OFF_DECK_LOCATION
-
-                self._state.labware_by_id[labware_id].location = new_location
+    def _set_batch_labware_location(
+        self, state_update: update_types.StateUpdate
+    ) -> None:
+        batch_location_update = state_update.batch_labware_location
+        if batch_location_update == update_types.NO_CHANGE:
+            return
+        for (
+            labware_id,
+            new_location,
+        ) in batch_location_update.new_locations_by_id.items():
+            self._do_update_labware_location(
+                labware_id,
+                new_location,
+                batch_location_update.new_offset_ids_by_id.get(labware_id, None),
+            )
 
 
 class LabwareView:
@@ -490,13 +558,30 @@ class LabwareView:
 
     def get_highest_child_labware(self, labware_id: str) -> str:
         """Get labware's highest child labware returning the labware ID."""
+        if (child_id := self.get_next_child_labware(labware_id)) is not None:
+            return self.get_highest_child_labware(labware_id=child_id)
+        return labware_id
+
+    def get_next_child_labware(self, labware_id: str) -> str | None:
+        """Get the labware that is on this labware, if any.
+
+        This includes lids.
+        """
         for labware in self._state.labware_by_id.values():
             if (
                 isinstance(labware.location, OnLabwareLocation)
                 and labware.location.labwareId == labware_id
             ):
-                return self.get_highest_child_labware(labware_id=labware.id)
-        return labware_id
+                return labware.id
+        return None
+
+    def get_labware_stack_from_parent(self, labware_id: str) -> list[str]:
+        """Get the stack of labware starting from the specified labware ID and moving up."""
+        labware_ids = [labware_id]
+        while (next_id := self.get_next_child_labware(labware_id)) is not None:
+            labware_ids.append(next_id)
+            labware_id = next_id
+        return labware_ids
 
     def get_labware_stack(
         self, labware_stack: List[LoadedLabware]
@@ -574,7 +659,7 @@ class LabwareView:
         self,
         labware_id: str,
         well_name: Optional[str] = None,
-    ) -> WellDefinition:
+    ) -> WellDefinition2 | WellDefinition3:
         """Get a well's definition by labware and well name.
 
         If `well_name` is omitted, the first well in the labware
@@ -601,16 +686,16 @@ class LabwareView:
                 message=f"No innerLabwareGeometry found in labware definition for labware_id: {labware_id}."
             )
         well_def = self.get_well_definition(labware_id, well_name)
-        well_id = well_def.geometryDefinitionId
-        if well_id is None:
+        geometry_id = well_def.geometryDefinitionId
+        if geometry_id is None:
             raise errors.IncompleteWellDefinitionError(
                 message=f"No geometryDefinitionId found in well definition for well: {well_name} in labware_id: {labware_id}"
             )
         else:
-            well_geometry = labware_def.innerLabwareGeometry.get(well_id)
+            well_geometry = labware_def.innerLabwareGeometry.get(geometry_id)
             if well_geometry is None:
                 raise errors.IncompleteLabwareDefinitionError(
-                    message=f"No innerLabwareGeometry found in labware definition for well_id: {well_id} in labware_id: {labware_id}"
+                    message=f"No innerLabwareGeometry found in labware definition for well_id: {geometry_id} in labware_id: {labware_id}"
                 )
             return well_geometry
 
@@ -629,12 +714,13 @@ class LabwareView:
         """
         well_definition = self.get_well_definition(labware_id, well_name)
 
-        if well_definition.diameter is not None:
+        if well_definition.shape == "circular":
             x_size = y_size = well_definition.diameter
+        elif well_definition.shape == "rectangular":
+            x_size = well_definition.xDimension
+            y_size = well_definition.yDimension
         else:
-            # If diameter is None we know these values will be floats
-            x_size = cast(float, well_definition.xDimension)
-            y_size = cast(float, well_definition.yDimension)
+            assert_never(well_definition.shape)
 
         return x_size, y_size, well_definition.depth
 
@@ -993,6 +1079,41 @@ class LabwareView:
                 f" maximum allowed labware height is {_PLATE_READER_MAX_LABWARE_Z_MM}mm."
             )
 
+    def raise_if_stacker_labware_pool_is_not_valid(
+        self,
+        primary_labware_definition: LabwareDefinition,
+        lid_labware_definition: LabwareDefinition | None,
+        adapter_labware_definition: LabwareDefinition | None,
+    ) -> None:
+        """Raise if the primary, lid, and adapter do not go together."""
+        if lid_labware_definition:
+            if not labware_validation.validate_definition_is_lid(
+                lid_labware_definition
+            ):
+                raise errors.LabwareCannotBeStackedError(
+                    f"Labware {lid_labware_definition.parameters.loadName} cannot be used as a lid in the Flex Stacker."
+                )
+            if not labware_validation.validate_labware_can_be_stacked(
+                lid_labware_definition, primary_labware_definition.parameters.loadName
+            ):
+                raise errors.LabwareCannotBeStackedError(
+                    f"Labware {lid_labware_definition.parameters.loadName} cannot be used as a lid for {primary_labware_definition.parameters.loadName}"
+                )
+        if adapter_labware_definition:
+            if not labware_validation.validate_definition_is_adapter(
+                adapter_labware_definition
+            ):
+                raise errors.LabwareCannotBeStackedError(
+                    f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter in the Flex Stacker."
+                )
+            if not labware_validation.validate_labware_can_be_stacked(
+                primary_labware_definition,
+                adapter_labware_definition.parameters.loadName,
+            ):
+                raise errors.LabwareCannotBeStackedError(
+                    f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter for {primary_labware_definition.parameters.loadName}"
+                )
+
     def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
     ) -> None:
@@ -1167,7 +1288,7 @@ class LabwareView:
         )
 
     @staticmethod
-    def _max_x_of_well(well_defn: WellDefinition) -> float:
+    def _max_x_of_well(well_defn: _WellDefinition) -> float:
         if well_defn.shape == "rectangular":
             return well_defn.x + (well_defn.xDimension or 0) / 2
         elif well_defn.shape == "circular":
@@ -1176,7 +1297,7 @@ class LabwareView:
             return well_defn.x
 
     @staticmethod
-    def _min_x_of_well(well_defn: WellDefinition) -> float:
+    def _min_x_of_well(well_defn: _WellDefinition) -> float:
         if well_defn.shape == "rectangular":
             return well_defn.x - (well_defn.xDimension or 0) / 2
         elif well_defn.shape == "circular":
@@ -1185,7 +1306,7 @@ class LabwareView:
             return 0
 
     @staticmethod
-    def _max_y_of_well(well_defn: WellDefinition) -> float:
+    def _max_y_of_well(well_defn: _WellDefinition) -> float:
         if well_defn.shape == "rectangular":
             return well_defn.y + (well_defn.yDimension or 0) / 2
         elif well_defn.shape == "circular":
@@ -1194,7 +1315,7 @@ class LabwareView:
             return 0
 
     @staticmethod
-    def _min_y_of_well(well_defn: WellDefinition) -> float:
+    def _min_y_of_well(well_defn: _WellDefinition) -> float:
         if well_defn.shape == "rectangular":
             return well_defn.y - (well_defn.yDimension or 0) / 2
         elif well_defn.shape == "circular":
@@ -1203,7 +1324,7 @@ class LabwareView:
             return 0
 
     @staticmethod
-    def _max_z_of_well(well_defn: WellDefinition) -> float:
+    def _max_z_of_well(well_defn: _WellDefinition) -> float:
         return well_defn.z + well_defn.depth
 
     def get_well_bbox(self, labware_definition: LabwareDefinition) -> Dimensions:

@@ -4,7 +4,12 @@ metadata = {
 
 requirements = {"robotType": "Flex", "apiLevel": "2.18"}
 
-too_long: str = "This is a description that is longer than 30 characters."
+# This was the previous test and did not fail.
+# the character limit is 100 not 30
+# too_long: str = "This is a description that is longer than 30 characters."
+
+# a string with characters
+too_long = "a" * 101
 
 
 def add_parameters(parameters):

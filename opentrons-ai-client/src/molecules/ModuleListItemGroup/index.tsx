@@ -96,7 +96,7 @@ export function ModuleListItemGroup(): JSX.Element | null {
               )
 
               return (
-                <ListItem type="noActive" key={module.type}>
+                <ListItem type="default" key={module.type}>
                   <ListItemCustomize
                     label={
                       adapters != null && adapters.length > 0

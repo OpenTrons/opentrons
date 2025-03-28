@@ -1,10 +1,7 @@
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
+import { v4 as uuidv4 } from 'uuid'
 
-// ToDo need to add analytics
-
-import type { FallbackProps } from 'react-error-boundary'
-
-import { actions } from '../load-file'
 import {
   AlertPrimaryButton,
   ALIGN_FLEX_END,
@@ -15,17 +12,35 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { useDispatch } from 'react-redux'
+
+import { actions } from '../load-file'
+import { analyticsEvent } from '../analytics/actions'
+
+import type { FallbackProps } from 'react-error-boundary'
 import type { ThunkDispatch } from '../types'
+import type { AnalyticsEvent } from '../analytics/mixpanel'
 
 export function ProtocolDesignerAppFallback({
   error,
   resetErrorBoundary,
 }: FallbackProps): JSX.Element {
   const { t } = useTranslation('shared')
-
   const dispatch: ThunkDispatch<any> = useDispatch()
+
+  // Note (kk:02/12/25) this is to track a users' error since many users send a screenshot.
+  const errorId = uuidv4()
+
+  const errorEvent: AnalyticsEvent = {
+    name: 'protocolDesignerAppError',
+    properties: {
+      errorId,
+      errorStack: error.stack,
+      errorMessage: error.message,
+    },
+  }
+
   const handleReloadClick = (): void => {
+    dispatch(analyticsEvent(errorEvent))
     resetErrorBoundary()
   }
   const handleDownloadProtocol = (): void => {
@@ -42,6 +57,7 @@ export function ProtocolDesignerAppFallback({
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {error.message}
           </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">{errorId}</StyledText>
         </Flex>
         <Flex alignSelf={ALIGN_FLEX_END} gridGap={SPACING.spacing8}>
           <SecondaryButton onClick={handleDownloadProtocol}>

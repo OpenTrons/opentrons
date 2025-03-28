@@ -41,12 +41,7 @@ import {
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
-import {
-  getApplyHistoricOffsets,
-  getPinnedProtocolIds,
-  updateConfigValue,
-} from '/app/redux/config'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
 import { useRunTimeParameters } from '/app/resources/protocols'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { ProtocolSetupParameters } from '/app/organisms/ODD/ProtocolSetup/ProtocolSetupParameters'
@@ -350,19 +345,6 @@ export function ProtocolDetails(): JSX.Element | null {
     { enabled: protocolRecord != null }
   )
 
-  const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
-  // I'd love to skip scraping altogether if we aren't applying
-  // conditional offsets, but React won't let us use hooks conditionally.
-  // So, we'll scrape regardless and just toss them if we don't need them.
-  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
-    mostRecentAnalysis ?? null
-  ).map(({ vector, location, definitionUri }) => ({
-    vector,
-    location,
-    definitionUri,
-  }))
-  const labwareOffsets = shouldApplyOffsets ? scrapedLabwareOffsets : []
-
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
@@ -400,7 +382,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const handleRunProtocol = (): void => {
     runTimeParameters.length > 0
       ? setShowParameters(true)
-      : createRun({ protocolId, labwareOffsets })
+      : createRun({ protocolId })
   }
   const [
     showConfirmDeleteProtocol,
@@ -447,7 +429,6 @@ export function ProtocolDetails(): JSX.Element | null {
   return showParameters ? (
     <ProtocolSetupParameters
       protocolId={protocolId}
-      labwareOffsets={labwareOffsets}
       runTimeParameters={runTimeParameters}
       mostRecentAnalysis={mostRecentAnalysis}
     />

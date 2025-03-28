@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
 
-SetStoredLabwareCommandType = Literal["flexStacker/setStoredlabware"]
+SetStoredLabwareCommandType = Literal["flexStacker/setStoredLabware"]
 
 
 class StackerStoredLabwareDetails(BaseModel):
@@ -41,13 +41,6 @@ class SetStoredLabwareParams(BaseModel):
         ...,
         description="Unique ID of the Flex Stacker.",
     )
-    initialCount: int = Field(
-        ...,
-        description=(
-            "The number of labware that should be initially stored in the stacker. This number will be silently clamped to "
-            "the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker."
-        ),
-    )
     primaryLabware: StackerStoredLabwareDetails = Field(
         ...,
         description="The details of the primary labware (i.e. not the lid or adapter, if any) stored in the stacker.",
@@ -59,6 +52,14 @@ class SetStoredLabwareParams(BaseModel):
     adapterLabware: StackerStoredLabwareDetails | None = Field(
         default=None,
         description="The details of the adapter under the primary labware, if any.",
+    )
+    initialCount: int | None = Field(
+        None,
+        description=(
+            "The number of labware that should be initially stored in the stacker. This number will be silently clamped to "
+            "the maximum number of labware that will fit; do not rely on the parameter to know how many labware are in the stacker."
+        ),
+        ge=0,
     )
 
 
@@ -101,21 +102,16 @@ class SetStoredLabwareImpl(
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
         )
-        error_messages: list[str] = []
-        if stacker_state.hopper_labware_ids != []:
-            error_messages.append(
-                f"{len(stacker_state.hopper_labware_ids)} unique labware"
-            )
+
         if stacker_state.pool_count != 0:
-            error_messages.append(f"a pool of {stacker_state.pool_count} labware")
-        if error_messages != []:
             # Note: this error catches if the protocol tells us the stacker is not empty, making this command
             # invalid at this point in the protocol. This error is not recoverable and should occur during
             # analysis; the protocol must be changed.
+
             raise FlexStackerNotLogicallyEmptyError(
                 message=(
                     "The Flex Stacker must be known to be empty before reconfiguring its labware pool, but it has "
-                    + " and ".join(error_messages)
+                    f"a pool of {stacker_state.pool_count} labware"
                 )
             )
 
@@ -124,7 +120,6 @@ class SetStoredLabwareImpl(
             namespace=params.primaryLabware.namespace,
             version=params.primaryLabware.version,
         )
-        definition_stack = [labware_def]
         lid_def: LabwareDefinition | None = None
         if params.lidLabware:
             lid_def, _ = await self._equipment.load_definition_for_details(
@@ -132,7 +127,6 @@ class SetStoredLabwareImpl(
                 namespace=params.lidLabware.namespace,
                 version=params.lidLabware.version,
             )
-            definition_stack.insert(0, lid_def)
         adapter_def: LabwareDefinition | None = None
         if params.adapterLabware:
             adapter_def, _ = await self._equipment.load_definition_for_details(
@@ -140,20 +134,46 @@ class SetStoredLabwareImpl(
                 namespace=params.adapterLabware.namespace,
                 version=params.adapterLabware.version,
             )
-            definition_stack.insert(-1, adapter_def)
 
-        # TODO: propagate the limit on max height of the stacker
-        count = min(params.initialCount, 5)
+        self._state_view.labware.raise_if_stacker_labware_pool_is_not_valid(
+            labware_def, lid_def, adapter_def
+        )
+
+        pool_height = self._state_view.geometry.get_height_of_labware_stack(
+            [x for x in [lid_def, labware_def, adapter_def] if x is not None]
+        )
+        pool_definitions = [
+            x for x in [lid_def, labware_def, adapter_def] if x is not None
+        ]
+
+        overlap = self._state_view._labware.get_labware_overlap_offsets(
+            pool_definitions[-1], pool_definitions[0].parameters.loadName
+        )
+
+        max_pool_count = self._state_view.modules.stacker_max_pool_count_by_height(
+            params.moduleId,
+            pool_height,
+            overlap.z,
+        )
+        initial_count = (
+            params.initialCount if params.initialCount is not None else max_pool_count
+        )
+        count = min(initial_count, max_pool_count)
 
         state_update = (
             update_types.StateUpdate()
             .update_flex_stacker_labware_pool_definition(
-                params.moduleId, labware_def, adapter_def, lid_def
+                params.moduleId,
+                max_pool_count,
+                overlap.z,
+                labware_def,
+                adapter_def,
+                lid_def,
             )
             .update_flex_stacker_labware_pool_count(params.moduleId, count)
         )
         return SuccessData(
-            public=SetStoredLabwareResult(
+            public=SetStoredLabwareResult.model_construct(
                 primaryLabwareDefinition=labware_def,
                 lidLabwareDefinition=lid_def,
                 adapterLabwareDefinition=adapter_def,
@@ -168,7 +188,7 @@ class SetStoredLabware(
 ):
     """A command to setstoredlabware the Flex Stacker."""
 
-    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredlabware"
+    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredLabware"
     params: SetStoredLabwareParams
     result: Optional[SetStoredLabwareResult] = None
 
@@ -178,7 +198,7 @@ class SetStoredLabware(
 class SetStoredLabwareCreate(BaseCommandCreate[SetStoredLabwareParams]):
     """A request to execute a Flex Stacker SetStoredLabware command."""
 
-    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredlabware"
+    commandType: SetStoredLabwareCommandType = "flexStacker/setStoredLabware"
     params: SetStoredLabwareParams
 
     _CommandCls: Type[SetStoredLabware] = SetStoredLabware

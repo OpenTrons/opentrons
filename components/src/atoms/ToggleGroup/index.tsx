@@ -40,7 +40,6 @@ export const ToggleGroup = (props: ToggleGroupProps): JSX.Element => {
 
 const BUTTON_GROUP_STYLES = css`
   border-radius: ${BORDERS.borderRadius8};
-  margin-top: -1px;
   width: fit-content;
 
   button {

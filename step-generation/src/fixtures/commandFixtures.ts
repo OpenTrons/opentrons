@@ -3,10 +3,11 @@ import {
   tiprackWellNamesFlat,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
+  AIR_GAP_META,
   DEFAULT_BLOWOUT_WELL,
   DEST_LABWARE,
-  AIR_GAP_META,
 } from './data'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
 import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 
 import type {
@@ -100,17 +101,7 @@ export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => (
 type MakeAspDispHelper<P> = (
   bakedParams?: Partial<P>
 ) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
-type MakeAirGapHelper<P> = (
-  bakedParams: Partial<P> & {
-    wellLocation: {
-      origin: 'bottom'
-      offset: {
-        z: number
-      }
-    }
-  }
-) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
-type MakeDispenseAirGapHelper<P> = MakeAirGapHelper<P>
+
 const _defaultAspirateParams = {
   pipetteId: DEFAULT_PIPETTE,
   labwareId: SOURCE_LABWARE,
@@ -139,12 +130,7 @@ export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     ...params,
   },
 })
-export const makeMoveToWellHelper = (
-  wellName: string,
-  labwareId?: string,
-  forceDirect?: boolean,
-  minimumZHeight?: number
-) => ({
+export const makeMoveToWellHelper = (wellName: string, labwareId?: string) => ({
   commandType: 'moveToWell',
   key: expect.any(String),
   params: {
@@ -152,26 +138,46 @@ export const makeMoveToWellHelper = (
     labwareId: labwareId ?? SOURCE_LABWARE,
     wellName,
     wellLocation: {
-      origin: 'bottom',
+      origin: 'top',
       offset: {
         x: 0,
         y: 0,
-        z: 11.54,
+        z: AIR_GAP_OFFSET_FROM_TOP,
       },
     },
-    forceDirect,
-    minimumZHeight,
   },
 })
-export const makeAirGapHelper = (volume: number) => ({
+export const makeAirGapAfterAspirateHelper = (
+  volume: number,
+  flowRate?: number
+) => ({
   commandType: 'airGapInPlace',
   key: expect.any(String),
   params: {
     pipetteId: DEFAULT_PIPETTE,
     volume,
-    flowRate: ASPIRATE_FLOW_RATE,
+    flowRate: flowRate ?? ASPIRATE_FLOW_RATE,
   },
 })
+export const makeAirGapHelper = (volume: number, flowRate?: number) => [
+  {
+    commandType: 'prepareToAspirate',
+    key: expect.any(String),
+    params: {
+      pipetteId: DEFAULT_PIPETTE,
+    },
+  },
+  {
+    commandType: 'airGapInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: DEFAULT_PIPETTE,
+      volume,
+      flowRate: flowRate ?? ASPIRATE_FLOW_RATE,
+    },
+  },
+]
+
 export const blowoutHelper = (
   labware: string,
   params?: Partial<BlowoutParams>
@@ -240,19 +246,26 @@ export const makeDispenseHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     ...params,
   },
 })
-export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AspDispAirgapParams> = bakedParams => (
-  wellName,
-  volume,
-  params
-) => ({
+export const makeDispenseAirGapHelper = (
+  wellName: string,
+  volume: number
+): CreateCommand => ({
   commandType: 'dispense',
   key: expect.any(String),
   params: {
-    ..._defaultDispenseParams,
-    ...bakedParams,
+    pipetteId: DEFAULT_PIPETTE,
+    labwareId: DEST_LABWARE,
+    wellLocation: {
+      origin: 'top' as const,
+      offset: {
+        y: 0,
+        x: 0,
+        z: 1,
+      },
+    },
+    flowRate: DISPENSE_FLOW_RATE,
     wellName,
     volume,
-    ...params,
   },
   meta: AIR_GAP_META,
 })

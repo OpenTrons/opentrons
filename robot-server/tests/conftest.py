@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import json
 import os
 import pathlib
@@ -401,7 +402,14 @@ def clear_custom_tiprack_def_dir() -> Iterator[None]:
 @pytest.fixture
 def sql_engine(tmp_path: Path) -> Generator[SQLEngine, None, None]:
     """Return a set-up database to back the store."""
-    db_file_path = tmp_path / "test.db"
+    with make_sql_engine(tmp_path) as engine:
+        yield engine
+
+
+@contextmanager
+def make_sql_engine(parent_dir: Path) -> Generator[SQLEngine, None, None]:
+    """Like sql_engine, but not a pytest fixture."""
+    db_file_path = parent_dir / "test.db"
     with sql_engine_ctx(db_file_path) as engine:
         metadata.create_all(engine)
         yield engine
