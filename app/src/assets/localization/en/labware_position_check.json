@@ -47,6 +47,7 @@
   "default_labware_offset": "Default Labware Offset",
   "default_location_offset_added": "Default location offset added",
   "default_location_offset_adjusted": "Default location offset adjusted",
+  "default_offset_description": "The default offset is used for all placements of the labware unless a manual adjustment is made to specific slot location.",
   "detach_probe": "Remove calibration probe",
   "ensure_nozzle_position_desktop": "<block>Ensure that the {{tip_type}} is centered above and level with {{item_location}}. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned.</block>",
   "ensure_nozzle_position_odd": "<block>Ensure that the {{tip_type}} is centered above and level with {{item_location}}. If it isn't, tap <bold>Move pipette</bold> and then jog the pipette until it is properly aligned.</block>",
