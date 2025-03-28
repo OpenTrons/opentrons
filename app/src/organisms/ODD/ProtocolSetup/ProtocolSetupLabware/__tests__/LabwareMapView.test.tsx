@@ -3,11 +3,7 @@ import { when } from 'vitest-when'
 import { describe, it, vi, beforeEach, afterEach, expect } from 'vitest'
 
 import { BaseDeck, EXTENDED_DECK_CONFIG_FIXTURE } from '@opentrons/components'
-import {
-  FLEX_ROBOT_TYPE,
-  deckExample as deckDefFixture,
-  fixtureTiprack300ul,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, fixtureTiprack300ul } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -20,7 +16,6 @@ import type { ComponentProps } from 'react'
 import type {
   getSimplestDeckConfigForProtocol,
   CompletedProtocolAnalysis,
-  DeckDefinition,
   LabwareDefinition2,
   ModuleModel,
 } from '@opentrons/shared-data'
