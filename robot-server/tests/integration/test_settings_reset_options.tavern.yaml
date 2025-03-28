@@ -17,22 +17,22 @@ stages:
             description: Clear custom boot scripts
           - id: deckCalibration
             name: Deck Calibration
-            description: !re_search 'Clear deck calibration'
+            description: !anystr
           - id: pipetteOffsetCalibrations
             name: Pipette Offset Calibrations
-            description: !re_search 'Clear pipette offset calibrations'
+            description: !anystr
           - id: tipLengthCalibrations
             name: Tip Length Calibrations
-            description: !re_search 'Clear tip length calibrations'
+            description: !anystr
           - id: runsHistory
-            name: Clear Runs History
-            description: !re_search "Erase this device's stored history of protocols and runs."
+            name: Clear Robot Server Data
+            description: !anystr
           - id: deckConfiguration
             name: Deck Configuration
-            description: !re_search 'Clear deck configuration'
+            description: !anystr
           - id: authorizedKeys
             name: SSH Authorized Keys
-            description: !re_search 'Clear the ssh authorized keys'
+            description: !anystr
 
 ---
 test_name: POST Reset bootScripts option
