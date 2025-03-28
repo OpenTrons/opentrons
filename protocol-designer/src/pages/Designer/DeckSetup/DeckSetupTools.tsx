@@ -570,6 +570,11 @@ export function DeckSetupTools(props: DeckSetupToolsProps): JSX.Element | null {
         onConfirmClick={() => {
           if (isEntityOnSlotInUse) {
             setShowDeleteEntityInUseModal('confirm')
+          } else if (
+            !isEntityOnSlotInUse &&
+            matchingLabwareFor4thColumn != null
+          ) {
+            setShowDeleteLabwareModal('clear')
           } else {
             handleConfirm()
           }
