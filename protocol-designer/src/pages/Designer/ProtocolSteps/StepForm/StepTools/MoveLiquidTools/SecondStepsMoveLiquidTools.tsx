@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { round } from 'lodash'
@@ -39,6 +40,7 @@ import {
   getLabwareFieldForPositioningField,
 } from '../../utils'
 import { MultiInputField } from './MultiInputField'
+import { ResetSettingsField } from './ResetSettingsField'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { StepInputFieldProps } from './MultiInputField'
@@ -67,6 +69,7 @@ export const SecondStepsMoveLiquidTools = ({
   visibleFormErrors,
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
+  const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const labwares = useSelector(getLabwareEntities)
   const { trashBinEntities, wasteChuteEntities } = useSelector(
     getInvariantContext
@@ -158,8 +161,18 @@ export const SecondStepsMoveLiquidTools = ({
   const minRadiusForTouchTip =
     minXYDimension != null ? round(minXYDimension / 2, 1) : null
 
+  const handleScrollToTop = (): void => {
+    if (toolsComponentRef.current != null) {
+      toolsComponentRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
+
   return (
     <Flex
+      ref={toolsComponentRef}
       flexDirection={DIRECTION_COLUMN}
       width="100%"
       paddingY={SPACING.spacing16}
@@ -497,6 +510,14 @@ export const SecondStepsMoveLiquidTools = ({
           />
         )}
       </Flex>
+      {enableLiquidClasses ? (
+        <ResetSettingsField
+          tab={tab}
+          onClick={() => {
+            handleScrollToTop()
+          }}
+        />
+      ) : null}
     </Flex>
   )
 }
