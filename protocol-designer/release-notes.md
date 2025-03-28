@@ -8,6 +8,30 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.5
+
+**Welcome to Protocol Designer v8.5!**
+
+This release adds support for liquid classes in Protocol Designer protocols for the Flex, and includes feature improvements and bug fixes.
+
+Use Opentrons-verified liquid classes to automatically define transfer settings and optimize liquid handling behavior based on liquid properties like viscosity. When adding liquids to your protocol, select an Opentrons-verified liquid class from the dropdown menu. You can choose whether or not to apply liquid class settings to protocol steps that use compatible Opentrons labware and pipettes.
+
+### New Features
+
+- Make edits to advanced settings like submerge and retract position and speed, touch tip, and air gap to customize each transfer.
+- Customize push out volume after a dispense to ensure all liquid leaves the pipette tip.
+- Add conditioning volumes to transfer steps. After aspirating liquid, the pipette will aspirate a smaller conditioning volume for a more accurate first dispense.
+
+### Improved Features
+
+- Protocol Designer includes a warning when you clear a slot with labware, a module, or a fixture used in a protocol step.
+
+### Bug Fixes
+
+- Transfer step details show correct aspirate and dispense volumes when distributing liquid (a single aspirate and multiple dispenses).
+
+Running a protocol created in Protocol Designer now requires Opentrons App version 8.4.0 or newer.
+
 ## Opentrons Protocol Designer Changes in 8.4.3
 
 **Welcome to Protocol Designer 8.4.3!**
