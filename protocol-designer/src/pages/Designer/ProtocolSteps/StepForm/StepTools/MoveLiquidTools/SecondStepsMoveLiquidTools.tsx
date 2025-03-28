@@ -154,12 +154,16 @@ export const SecondStepsMoveLiquidTools = ({
     Number(formData.volume),
     pipetteSpec
   )
-  const maxConditioningVolume = getMaxConditioningVolume(
-    Number(formData.volume),
-    Number(formData.disposalVolume_volume),
-    pipetteSpec
-  )
-
+  const maxConditioningVolume = getMaxConditioningVolume({
+    transferVolume: Number(formData.volume),
+    disposalVolume:
+      formData.disposalVolume_checkbox === true
+        ? Number(formData.disposalVolume_volume)
+        : 0,
+    pipetteSpecs: pipetteSpec,
+    labwareEntities: labwares,
+    tiprackDefUri: formData.tipRack,
+  })
   const minXYDimension = isDestinationTrash
     ? null
     : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])

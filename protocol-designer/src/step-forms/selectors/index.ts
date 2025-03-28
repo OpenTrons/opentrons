@@ -588,9 +588,15 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
 
 const _formLevelErrors = (
   hydratedForm: HydratedFormData,
-  moduleEntities: ModuleEntities
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities
 ): StepFormErrors => {
-  return getFormErrors(hydratedForm.stepType, hydratedForm, moduleEntities)
+  return getFormErrors(
+    hydratedForm.stepType,
+    hydratedForm,
+    moduleEntities,
+    labwareEntities
+  )
 }
 
 const _dynamicFieldFormErrors = (
@@ -673,7 +679,11 @@ export const _hasFormLevelErrors = (
   invariantContext: InvariantContext
 ): boolean => {
   if (
-    _formLevelErrors(hydratedForm, invariantContext.moduleEntities).length > 0
+    _formLevelErrors(
+      hydratedForm,
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
+    ).length > 0
   )
     return true
 
@@ -833,7 +843,8 @@ export const getFormLevelErrorsForUnsavedForm: Selector<
 
     const errors = _formLevelErrors(
       hydratedForm,
-      invariantContext.moduleEntities
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
     )
 
     return errors

@@ -9,6 +9,7 @@ import {
   isAddressableAreaStandardSlot,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
   LOW_VOLUME_PIPETTES,
+  getTiprackVolume,
 } from '@opentrons/shared-data'
 import { PROTOCOL_CONTEXT_NAME } from '@opentrons/step-generation'
 import type {
@@ -336,16 +337,33 @@ export const getDefaultPushOutVolume = (
   )
 }
 
-export const getMaxConditioningVolume = (
-  transferVolume: number,
-  disposalVolume: number,
+export const getMaxConditioningVolume = (args: {
+  transferVolume: number
+  disposalVolume: number
+  tiprackDefUri: string
+  labwareEntities: LabwareEntities
   pipetteSpecs: PipetteV2Specs
-): number => {
+}): number => {
+  const {
+    transferVolume,
+    disposalVolume,
+    labwareEntities,
+    tiprackDefUri,
+    pipetteSpecs,
+  } = args
   const { liquids } = pipetteSpecs
   const isInLowVolumeMode =
     transferVolume < liquids.default.minVolume && 'lowVolumeDefault' in liquids
-  const maxWorkingVolume = isInLowVolumeMode
-    ? liquids.lowVolumeDefault.maxVolume
-    : liquids.default.maxVolume
+  const tiprack = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === tiprackDefUri
+  )
+  const tipMaxVolume = tiprack != null ? getTiprackVolume(tiprack.def) : null
+
+  const maxWorkingVolume = Math.min(
+    isInLowVolumeMode
+      ? liquids.lowVolumeDefault.maxVolume
+      : liquids.default.maxVolume,
+    ...(tipMaxVolume != null ? [tipMaxVolume] : [])
+  )
   return maxWorkingVolume - disposalVolume - transferVolume
 }

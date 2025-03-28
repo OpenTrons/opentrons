@@ -88,7 +88,10 @@ import type {
   StepType,
 } from '../../form-types'
 import type { FormError } from './errors'
-import type { ModuleEntities } from '@opentrons/step-generation'
+import type {
+  LabwareEntities,
+  ModuleEntities,
+} from '@opentrons/step-generation'
 export { handleFormChange } from './handleFormChange'
 export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
@@ -118,7 +121,8 @@ interface StepFormDataMap {
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
     arg: StepFormDataMap[K],
-    moduleEntities: ModuleEntities
+    moduleEntities: ModuleEntities,
+    labwareEntities: LabwareEntities
   ) => FormError[]
   getWarnings?: (arg: StepFormDataMap[K]) => FormWarning[] // Changed to match step type
 }
@@ -239,7 +243,8 @@ const stepFormHelperMap: {
 export const getFormErrors = (
   stepType: StepType,
   formData: HydratedFormData,
-  moduleEntities: ModuleEntities
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities
 ): FormError[] => {
   //  manualIntervention is the initial starting deck state step
   if (stepType === 'manualIntervention') {
@@ -252,60 +257,70 @@ export const getFormErrors = (
     case 'absorbanceReader':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedAbsorbanceReaderFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
     case 'heaterShaker':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedHeaterShakerFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
 
     case 'magnet':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedMagnetFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
 
     case 'mix':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedMixFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
 
     case 'moveLabware':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedMoveLabwareFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
 
     case 'moveLiquid':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedMoveLiquidFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
 
     case 'pause':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedPauseFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
 
     case 'temperature':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedTemperatureFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
 
     case 'thermocycler':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedThermocyclerFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
 
     case 'comment':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedCommentFormData,
-        moduleEntities
+        moduleEntities,
+        labwareEntities
       )
   }
 }
