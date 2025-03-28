@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { round } from 'lodash'
@@ -154,16 +155,25 @@ export const SecondStepsMoveLiquidTools = ({
     Number(formData.volume),
     pipetteSpec
   )
-  const maxConditioningVolume = getMaxConditioningVolume({
-    transferVolume: Number(formData.volume),
-    disposalVolume:
-      formData.disposalVolume_checkbox === true
-        ? Number(formData.disposalVolume_volume)
-        : 0,
-    pipetteSpecs: pipetteSpec,
-    labwareEntities: labwares,
-    tiprackDefUri: formData.tipRack,
-  })
+  const maxConditioningVolume = useMemo(
+    () =>
+      getMaxConditioningVolume({
+        transferVolume: Number(formData.volume),
+        disposalVolume:
+          formData.disposalVolume_checkbox === true
+            ? Number(formData.disposalVolume_volume)
+            : 0,
+        pipetteSpecs: pipetteSpec,
+        labwareEntities: labwares,
+        tiprackDefUri: formData.tipRack,
+      }),
+    [
+      formData.transferVolume,
+      formData.disposalVolume_volume,
+      formData.pipette,
+      formData.tipRack,
+    ]
+  )
   const minXYDimension = isDestinationTrash
     ? null
     : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
