@@ -82,9 +82,7 @@ async def _main(cfg: TestConfig) -> None:
     # Restart the robot server
     if not cfg.simulate:
         print("Starting the robot server")
-        subprocess.run(
-            ["systemctl restart opentrons-robot-server &"], shell=True
-        )
+        subprocess.run(["systemctl restart opentrons-robot-server &"], shell=True)
 
 
 if __name__ == "__main__":

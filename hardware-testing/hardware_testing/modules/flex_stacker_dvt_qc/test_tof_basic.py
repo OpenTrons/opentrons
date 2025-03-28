@@ -13,7 +13,6 @@ from .driver import FlexStackerInterface as FlexStacker
 from opentrons.drivers.flex_stacker.types import (
     Direction,
     StackerAxis,
-    LEDPattern,
     TOFSensor,
 )
 

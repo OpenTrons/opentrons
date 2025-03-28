@@ -16,7 +16,6 @@ from .utils import NUMBER_OF_BINS, NUMBER_OF_ZONES
 from opentrons.drivers.flex_stacker.types import (
     Direction,
     StackerAxis,
-    LEDPattern,
     TOFSensor,
 )
 
