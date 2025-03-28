@@ -21,6 +21,7 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerStatus,
     UploadFunction,
     LiveData,
+    HeaterShakerData,
 )
 
 log = logging.getLogger(__name__)
@@ -200,18 +201,19 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> LiveData:
+        data: HeaterShakerData = {
+            "temperatureStatus": self.temperature_status,
+            "speedStatus": self.speed_status,
+            "labwareLatchStatus": self.labware_latch_status,
+            "currentTemp": self.temperature,
+            "targetTemp": self.target_temperature,
+            "currentSpeed": self.speed,
+            "targetSpeed": self.target_speed,
+            "errorDetails": self._reader.error,
+        }
         return {
             "status": self.status.value,
-            "data": {
-                "temperatureStatus": self.temperature_status.value,
-                "speedStatus": self.speed_status.value,
-                "labwareLatchStatus": self.labware_latch_status.value,
-                "currentTemp": self.temperature,
-                "targetTemp": self.target_temperature,
-                "currentSpeed": self.speed,
-                "targetSpeed": self.target_speed,
-                "errorDetails": self._reader.error,
-            },
+            "data": data,
         }
 
     @property

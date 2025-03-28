@@ -172,7 +172,9 @@ class WifiConfiguration(BaseModel):
 
     @field_validator("eapConfig")
     @classmethod
-    def eap_config_validate(cls, v):
+    def eap_config_validate(
+        cls, v: typing.Optional[typing.Dict[str, str]]
+    ) -> typing.Optional[typing.Dict[str, str]]:
         """Custom validator for the eapConfig field"""
         if v is not None:
             if not v.get("eapType"):
@@ -186,7 +188,11 @@ class WifiConfiguration(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_configuration(cls, values):
+    def validate_configuration(
+        cls,
+        # todo(mm, 2025-03-18): I think values can actually be other types, like str or bool.
+        values: typing.Dict[str, object],
+    ) -> typing.Dict[str, object]:
         """Validate the configuration"""
         security_type = values.get("securityType")
         psk = values.get("psk")

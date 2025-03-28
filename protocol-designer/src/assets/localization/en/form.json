@@ -23,14 +23,85 @@
   "liquid_placement": {
     "liquid": "Liquid",
     "volume": "Volume",
-    "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
+    "errors": {
+      "liquid_required": "Define a liquid",
+      "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL",
+      "volume_required": "Define a volume"
+    }
   },
   "pipette_mount_label": {
     "left": "(L)",
     "right": "(R)"
   },
   "step_edit_form": {
+    "absorbanceReader": {
+      "add_wavelength": {
+        "disabled": "Maximum allowed wavelengths reached",
+        "label": "Add a wavelength"
+      },
+      "color_parentheses": "({{color}})",
+      "current_initialization_settings": {
+        "title": "Current initialization settings",
+        "tooltip": "Module must be empty to change initialization settings"
+      },
+      "custom_wavelength": {
+        "caption": "Value between 350 - 1000 nm",
+        "label": "Custom wavelength"
+      },
+      "delete": "Delete",
+      "errors": {
+        "custom_wavelength_required": "Custom wavelength required",
+        "wavelength_out_of_range": "Value falls outside of accepted range"
+      },
+      "export_settings": {
+        "description": "Absorbance Plate Reader data is saved as a .csv file and can be found on the robot's detail page in the Desktop App.",
+        "title": "Export settings"
+      },
+      "initialization_setting": {
+        "multi": {
+          "description": "Up to 6 wavelengths can be programmed.",
+          "title": "Multi initialization setting"
+        },
+        "single": {
+          "title": "Single initialization setting"
+        }
+      },
+      "module_controls": "Module controls",
+      "no_settings_defined": "No settings defined",
+      "reference_wavelength": {
+        "title": "Reference wavelength",
+        "tooltip": "A reference wavelength is a baseline wavelength used for comparing measurements of other wavelengths."
+      },
+      "reference_wavelength_parentheses": "(Reference wavelength)",
+      "reference_wavelength_color_parentheses": "({{color}}, reference wavelength)",
+      "wavelength": "Wavelength"
+    },
     "field": {
+      "absorbanceReader": {
+        "absorbanceReaderFormType": {
+          "absorbanceReaderInitialize": {
+            "change": "Change initialization settings",
+            "define": "Define initialization settings"
+          },
+          "absorbanceReaderLid": "Change lid position",
+          "absorbanceReaderRead": "Read labware"
+        },
+        "fileName": "Exported file name",
+        "lidOpen": {
+          "closed": "Closed",
+          "label": "Lid position",
+          "open": "Open"
+        },
+        "mode": {
+          "label": "Select mode type",
+          "multi": "Multi",
+          "single": "Single"
+        },
+        "moduleId": {
+          "module": "Module"
+        },
+        "referenceWavelengthActive": "Add reference wavelength?"
+      },
       "airGap": {
         "label": "air gap"
       },
@@ -127,7 +198,7 @@
           "COLUMN": "Column"
         },
         "option_tooltip": {
-          "COLUMN": "To use column partial tip pickup, a tiprack without an adapter must be placed on the deck."
+          "partial": "To use partial tip pickup, a tiprack without an adapter must be placed on the deck."
         }
       },
       "path": {
@@ -163,6 +234,13 @@
       },
       "preWetTip": {
         "label": "pre-wet tip"
+      },
+      "pushOut": {
+        "pushOut_volume": {
+          "caption": "Valid range between {{min}}-{{max}}µL",
+          "label": "Push out volume"
+        },
+        "title": "Push out"
       },
       "setTemperature": {
         "options": {
@@ -243,6 +321,13 @@
       },
       "touchTip": {
         "label": "touch tip"
+      },
+      "touchTip_speed": {
+        "label": "Touch tip speed"
+      },
+      "touchTip_mmFromEdge": {
+        "caption": "Valid range between {{min}} - {{max}}mm",
+        "label": "Distance from edge"
       },
       "useGripper": {
         "label": "use gripper",

@@ -1,6 +1,6 @@
-from typing import cast, Awaitable, Optional, Any, Union
+from typing import cast, Awaitable, Optional, Union
 from opentrons.types import Mount
-from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareDefinition2
 from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUserFlow
 from robot_server.robot.calibration.models import SessionCreateParams
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
@@ -12,7 +12,6 @@ from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
     CompletedCommand,
-    CommandQueue,
     CommandExecutor,
 )
 from opentrons.protocol_api import labware
@@ -20,7 +19,6 @@ from opentrons.protocol_api import labware
 from .base_session import BaseSession, SessionMetaData
 from ..configuration import SessionConfiguration
 from ..models.session import SessionType, TipLengthCalibrationResponseAttributes
-from ..errors import UnsupportedFeature
 
 
 class TipLengthCalibrationCommandExecutor(CallableExecutor):
@@ -38,7 +36,7 @@ class TipLengthCalibration(BaseSession):
         instance_meta: SessionMetaData,
         tip_cal_user_flow: TipCalibrationUserFlow,
         shutdown_handler: Optional[Awaitable[None]] = None,
-    ):
+    ) -> None:
         super().__init__(configuration, instance_meta)
         self._tip_cal_user_flow = tip_cal_user_flow
         self._command_executor = TipLengthCalibrationCommandExecutor(
@@ -47,10 +45,16 @@ class TipLengthCalibration(BaseSession):
         self._shutdown_coroutine = shutdown_handler
 
     @staticmethod
-    def _verify_tip_rack(tip_rack_def: Union[Any, None]) -> Optional[LabwareDefinition]:
+    def _verify_tip_rack(
+        tip_rack_def: Union[dict[str, object], None]
+    ) -> Optional[LabwareDefinition2]:
         if tip_rack_def:
-            labware.verify_definition(tip_rack_def)
-            return cast(LabwareDefinition, tip_rack_def)
+            verified_definition = labware.verify_definition(tip_rack_def)
+            # todo(mm, 2025-02-13): Move schema validation to the FastAPI layer and turn
+            # this schemaVersion assertion into a proper HTTP API 422 error.
+            # https://opentrons.atlassian.net/browse/EXEC-1230
+            assert verified_definition["schemaVersion"] == 2
+            return verified_definition
         return None
 
     @classmethod
@@ -73,7 +77,7 @@ class TipLengthCalibration(BaseSession):
                 hardware=configuration.hardware,
                 mount=Mount[mount.upper()],
                 has_calibration_block=has_calibration_block,
-                tip_rack=TipLengthCalibration._verify_tip_rack(
+                tip_rack=cls._verify_tip_rack(
                     instance_meta.create_params.tipRackDefinition
                 ),
             )
@@ -100,10 +104,6 @@ class TipLengthCalibration(BaseSession):
         return self._command_executor
 
     @property
-    def command_queue(self) -> CommandQueue:
-        raise UnsupportedFeature()
-
-    @property
     def session_type(self) -> SessionType:
         return SessionType.tip_length_calibration
 
@@ -123,6 +123,6 @@ class TipLengthCalibration(BaseSession):
             supportedCommands=self._tip_cal_user_flow.supported_commands,
         )
 
-    async def clean_up(self):
+    async def clean_up(self) -> None:
         if self._shutdown_coroutine:
             await self._shutdown_coroutine

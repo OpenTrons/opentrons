@@ -31,6 +31,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MODULE_MODELS_OT2_ONLY,
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { RUN_STATUS_FINISHING, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
@@ -75,7 +76,7 @@ import type {
 import type { State, Dispatch } from '/app/redux/types'
 import type { RequestState } from '/app/redux/robot-api/types'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
-import { AbsorbanceReaderSlideout } from './AbsorbanceReaderSlideout'
+import { FlexStackerModuleData } from './FlexStackerModuleData'
 
 interface ModuleCardProps {
   module: AttachedModule
@@ -132,6 +133,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     isFlex &&
     !MODULE_MODELS_OT2_ONLY.some(modModel => modModel === module.moduleModel) &&
     module.moduleType !== ABSORBANCE_READER_TYPE &&
+    module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
     module.moduleOffset?.last_modified == null
   const isPipetteReady =
     !Boolean(attachPipetteRequired) &&
@@ -212,6 +214,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
     case ABSORBANCE_READER_TYPE: {
       moduleData = <AbsorbanceReaderData moduleData={module.data} />
+      break
+    }
+
+    case FLEX_STACKER_MODULE_TYPE: {
+      moduleData = <FlexStackerModuleData moduleData={module.data} />
       break
     }
   }
@@ -419,6 +426,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   {module?.usbPort !== null
                     ? t('usb_port', {
                         port: module?.usbPort?.port,
+                        hubPort:
+                          module?.usbPort?.hubPort != null
+                            ? `.${module.usbPort.hubPort}`
+                            : '',
                       })
                     : t('usb_port_not_connected')}
                 </LegacyStyledText>
@@ -532,15 +543,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
-  } else if (module.moduleType === ABSORBANCE_READER_TYPE) {
-    return (
-      <AbsorbanceReaderSlideout
-        module={module}
-        onCloseClick={onCloseClick}
-        isExpanded={showSlideout}
-      />
-    )
-  } else {
+  } else if (module.moduleType === HEATERSHAKER_MODULE_TYPE) {
     return (
       <HeaterShakerSlideout
         module={module}
@@ -548,5 +551,7 @@ const ModuleSlideout = (props: ModuleSlideoutProps): JSX.Element => {
         isExpanded={showSlideout}
       />
     )
+  } else {
+    return <></>
   }
 }

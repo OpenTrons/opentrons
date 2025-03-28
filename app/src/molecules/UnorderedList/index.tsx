@@ -1,24 +1,24 @@
-import { css } from 'styled-components'
+import styled from 'styled-components'
 import { SPACING, LegacyStyledText } from '@opentrons/components'
 
 import type { ReactNode } from 'react'
 
+const ListItem = styled.li`
+  margin-left: ${SPACING.spacing24};
+`
+
 interface UnorderedListProps {
   items: ReactNode[]
 }
+
 export function UnorderedList(props: UnorderedListProps): JSX.Element {
   const { items } = props
   return (
     <ul>
       {items.map((item, index) => (
-        <li
-          key={index}
-          css={css`
-            margin-left: ${SPACING.spacing24};
-          `}
-        >
+        <ListItem key={index}>
           <LegacyStyledText as="p">{item}</LegacyStyledText>
-        </li>
+        </ListItem>
       ))}
     </ul>
   )

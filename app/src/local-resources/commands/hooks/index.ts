@@ -1,4 +1,4 @@
-export { useCommandTextString } from './useCommandTextString'
+export { useCommandTextString } from '@opentrons/components'
 
 export type {
   UseCommandTextStringParams,
@@ -6,4 +6,4 @@ export type {
   GetCommandTextResult,
   GetTCRunExtendedProfileCommandTextResult,
   GetTCRunProfileCommandTextResult,
-} from './useCommandTextString'
+} from '@opentrons/components'

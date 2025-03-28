@@ -11,6 +11,9 @@ on:
       - 'components/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
+      - '.github/actions/js/setup/action.yml'
+      - '.github/actions/git/resolve-tag/action.yml'
+      - '.github/actions/environment/complex-variables/action.yml'
   push:
     paths:
       - 'protocol-designer/**'
@@ -19,6 +22,9 @@ on:
       - 'components/**'
       - 'package.json'
       - '.github/workflows/pd-test-build-deploy.yaml'
+      - '.github/actions/js/setup/action.yml'
+      - '.github/actions/git/resolve-tag/action.yml'
+      - '.github/actions/environment/complex-variables/action.yml'
     branches:
       - '**'
     tags:
@@ -37,126 +43,44 @@ env:
   CI: true
 
 jobs:
-  js-unit-test:
+  unit-test:
     name: 'protocol designer unit tests'
-    runs-on: 'ubuntu-22.04'
-    timeout-minutes: 30
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 20
     steps:
-      - uses: 'actions/checkout@v4'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.11.0'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
-      - name: 'run PD unit tests'
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/js/setup
+      - name: 'run unit tests'
         run: make -C protocol-designer test-cov
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/lcov.info
           flags: protocol-designer
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   e2e-test:
-    name: 'pd e2e tests'
-    needs: ['js-unit-test']
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        os: ['ubuntu-22.04']
-    runs-on: '${{ matrix.os }}'
+    name: 'protocol designer e2e tests'
+    runs-on: 'ubuntu-24.04'
+    timeout-minutes: 20
     steps:
-      - uses: 'actions/checkout@v4'
-        with:
-          fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.11.0'
-      - name: 'install udev for usb-detection'
-        if: startsWith(matrix.os, 'ubuntu')
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
-      - name: 'test-e2e'
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/js/setup
+      - name: 'run test-e2e'
         run: make -C protocol-designer test-e2e
+
   build-pd:
-    name: 'build protocol designer artifact'
-    needs: ['js-unit-test']
-    runs-on: 'ubuntu-22.04'
+    timeout-minutes: 20
+    name: 'build protocol designer'
+    needs: ['unit-test', 'e2e-test']
+    runs-on: 'ubuntu-24.04'
     if: github.event_name != 'pull_request'
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.11.0'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'cache yarn cache'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/.yarn-cache
-            ${{ github.workspace }}/.npm-cache
-          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          yarn config set cache-folder ./.yarn-cache
-          make setup-js
+      - uses: ./.github/actions/js/setup
       - name: 'build PD'
         env:
           OT_PD_MIXPANEL_ID: ${{ secrets.OT_PD_MIXPANEL_ID }}
@@ -168,40 +92,28 @@ jobs:
         with:
           name: 'pd-artifact'
           path: protocol-designer/dist
+
   deploy-pd:
-    name: 'deploy PD artifact to S3'
-    runs-on: 'ubuntu-22.04'
-    needs: ['js-unit-test', 'build-pd']
+    timeout-minutes: 10
+    name: 'deploy protocol designer'
+    needs: ['build-pd']
+    runs-on: 'ubuntu-24.04'
     if: github.event_name != 'pull_request'
     steps:
-      - uses: 'actions/checkout@v4'
-      # https://github.com/actions/checkout/issues/290
-      - name: 'Fix actions/checkout odd handling of tags'
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
-          git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
-        with:
-          node-version: '22.11.0'
-      - name: 'install udev for usb-detection'
-        run: |
-          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
-          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && sudo apt-get install libudev-dev
-      - name: 'set complex environment variables'
-        id: 'set-vars'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
-            buildComplexEnvVars(core, context)
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+
+      - uses: ./.github/actions/git/resolve-tag
+
+      - uses: ./.github/actions/environment/complex-variables
+
       - name: 'download PD build'
         uses: 'actions/download-artifact@v4'
         with:
           name: pd-artifact
           path: ./dist
       - name: 'configure ot3 s3 deploy creds and deploy'
+        shell: bash
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PD_S3_SANDBOX_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PD_S3_SANDBOX_SECRET }}
@@ -218,4 +130,3 @@ jobs:
           # invalidate both sandbox.opentrons.com and www.sandbox.opentrons.com cloudfront caches
           aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_DISTRIBUTION_ID }} --paths "/*" --profile deploy
           aws cloudfront create-invalidation --distribution-id ${{ secrets.PD_CLOUDFRONT_SANDBOX_WWW_DISTRIBUTION_ID }} --paths "/*" --profile deploy
-        shell: bash

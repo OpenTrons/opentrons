@@ -76,6 +76,7 @@ from .exceptions import (
     CommandNotAllowedError,
     InvalidLiquidHeightFound,
     LiquidHeightUnknownError,
+    LiquidVolumeUnknownError,
     IncompleteLabwareDefinitionError,
     IncompleteWellDefinitionError,
     OperationLocationNotInWellError,
@@ -84,6 +85,9 @@ from .exceptions import (
     InvalidLiquidError,
     LiquidClassDoesNotExistError,
     LiquidClassRedefinitionError,
+    OffsetLocationInvalidError,
+    FlexStackerLabwarePoolNotYetDefinedError,
+    FlexStackerNotLogicallyEmptyError,
 )
 
 from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
@@ -164,11 +168,15 @@ __all__ = [
     "LocationIsLidDockSlotError",
     "InvalidAxisForRobotType",
     "NotSupportedOnRobotType",
+    "OffsetLocationInvalidError",
+    "FlexStackerLabwarePoolNotYetDefinedError",
+    "FlexStackerNotLogicallyEmptyError",
     # error occurrence models
     "ErrorOccurrence",
     "CommandNotAllowedError",
     "InvalidLiquidHeightFound",
     "LiquidHeightUnknownError",
+    "LiquidVolumeUnknownError",
     "IncompleteLabwareDefinitionError",
     "IncompleteWellDefinitionError",
     "OperationLocationNotInWellError",

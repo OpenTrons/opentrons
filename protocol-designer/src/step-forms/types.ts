@@ -62,9 +62,18 @@ export interface HeaterShakerModuleState {
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
+
+export type InitializationMode = 'single' | 'multi'
+export interface Initialization {
+  mode: InitializationMode
+  wavelengths: number[]
+  referenceWavelength?: number
+}
+
 export interface AbsorbanceReaderState {
   type: typeof ABSORBANCE_READER_TYPE
   lidOpen: boolean | null
+  initialization: Initialization | null
 }
 export interface ModuleTemporalProperties {
   slot: DeckSlot
@@ -85,6 +94,8 @@ export type NormalizedLabwareById = Record<
   string,
   {
     labwareDefURI: string
+    pythonName: string
+    displayCategory: string
   }
 >
 export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareById]

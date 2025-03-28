@@ -8,6 +8,8 @@ REDOC := npx @redocly/cli
 
 # Path of source package
 SRC_PATH = robot_server
+SCRIPTS_PATH = scripts
+TESTS_PATH = tests
 
 # Project to get the version for
 ot_project := $(OPENTRONS_PROJECT)
@@ -74,7 +76,7 @@ clean_all_cmd = $(clean_cmd) dist
 #     probably POSIX-only.
 dev_port ?= "31950"
 dev_host ?= "localhost"
-run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload
+run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) --ws wsproto --lifespan on --reload --reload-dir robot_server
 
 .PHONY: all
 all: clean sdist wheel
@@ -123,11 +125,15 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
+.PHONT: test-fast
+test-fast:
+	$(pytest) $(tests) $(test_opts) -m 'not slow'
+
 .PHONY: lint
 lint:
-	$(python) -m mypy $(SRC_PATH) $(tests)
+	$(python) -m mypy $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)
 	$(python) -m black $(black_opts) --check .
-	$(python) -m flake8 $(SRC_PATH) $(tests) setup.py
+	$(python) -m flake8 $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH) setup.py
 
 .PHONY: format
 format:

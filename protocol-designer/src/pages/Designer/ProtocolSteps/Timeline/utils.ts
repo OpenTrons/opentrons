@@ -9,7 +9,7 @@ export const capitalizeFirstLetterAfterNumber = (title: string): string =>
   title.replace(
     /(^[\d\W]*)([a-zA-Z])|(-[a-zA-Z])/g,
     (match, prefix, firstLetter) => {
-      if (prefix) {
+      if (prefix != null) {
         return `${prefix}${firstLetter.toUpperCase()}`
       } else {
         return `${match.charAt(0)}${match.charAt(1).toUpperCase()}`

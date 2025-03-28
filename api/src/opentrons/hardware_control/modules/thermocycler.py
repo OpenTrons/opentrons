@@ -544,22 +544,23 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> types.LiveData:
+        data: types.ThermocyclerData = {
+            "lid": self.lid_status,
+            "lidTarget": self.lid_target,
+            "lidTemp": self.lid_temp,
+            "lidTempStatus": self.lid_temp_status,
+            "currentTemp": self.temperature,
+            "targetTemp": self.target,
+            "holdTime": self.hold_time,
+            "rampRate": self.ramp_rate,
+            "currentCycleIndex": self.current_cycle_index,
+            "totalCycleCount": self.total_cycle_count,
+            "currentStepIndex": self.current_step_index,
+            "totalStepCount": self.total_step_count,
+        }
         return {
             "status": self.status,
-            "data": {
-                "lid": self.lid_status,
-                "lidTarget": self.lid_target,
-                "lidTemp": self.lid_temp,
-                "lidTempStatus": self.lid_temp_status,
-                "currentTemp": self.temperature,
-                "targetTemp": self.target,
-                "holdTime": self.hold_time,
-                "rampRate": self.ramp_rate,
-                "currentCycleIndex": self.current_cycle_index,
-                "totalCycleCount": self.total_cycle_count,
-                "currentStepIndex": self.current_step_index,
-                "totalStepCount": self.total_step_count,
-            },
+            "data": data,
         }
 
     @property

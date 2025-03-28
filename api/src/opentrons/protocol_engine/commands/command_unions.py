@@ -14,8 +14,10 @@ from .pipetting_common import (
     TipPhysicallyAttachedError,
 )
 from .movement_common import StallOrCollisionError
+from .flex_stacker.common import FlexStackerStallOrCollisionError
 
 from . import absorbance_reader
+from . import flex_stacker
 from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
@@ -57,6 +59,14 @@ from .aspirate_in_place import (
     AspirateInPlaceCommandType,
 )
 
+from .aspirate_while_tracking import (
+    AspirateWhileTracking,
+    AspirateWhileTrackingParams,
+    AspirateWhileTrackingCreate,
+    AspirateWhileTrackingResult,
+    AspirateWhileTrackingCommandType,
+)
+
 from .comment import (
     Comment,
     CommentParams,
@@ -79,6 +89,14 @@ from .dispense import (
     DispenseCreate,
     DispenseResult,
     DispenseCommandType,
+)
+
+from .dispense_while_tracking import (
+    DispenseWhileTracking,
+    DispenseWhileTrackingParams,
+    DispenseWhileTrackingCreate,
+    DispenseWhileTrackingResult,
+    DispenseWhileTrackingCommandType,
 )
 
 from .dispense_in_place import (
@@ -389,10 +407,12 @@ Command = Annotated[
         AirGapInPlace,
         Aspirate,
         AspirateInPlace,
+        AspirateWhileTracking,
         Comment,
         Custom,
         Dispense,
         DispenseInPlace,
+        DispenseWhileTracking,
         BlowOut,
         BlowOutInPlace,
         ConfigureForVolume,
@@ -457,6 +477,14 @@ Command = Annotated[
         absorbance_reader.OpenLid,
         absorbance_reader.Initialize,
         absorbance_reader.ReadAbsorbance,
+        flex_stacker.Retrieve,
+        flex_stacker.Store,
+        flex_stacker.SetStoredLabware,
+        flex_stacker.Fill,
+        flex_stacker.Empty,
+        flex_stacker.CloseLatch,
+        flex_stacker.OpenLatch,
+        flex_stacker.PrepareShuttle,
         calibration.CalibrateGripper,
         calibration.CalibratePipette,
         calibration.CalibrateModule,
@@ -479,6 +507,7 @@ Command = Annotated[
 CommandParams = Union[
     AirGapInPlaceParams,
     AspirateParams,
+    AspirateWhileTrackingParams,
     AspirateInPlaceParams,
     CommentParams,
     ConfigureForVolumeParams,
@@ -486,6 +515,7 @@ CommandParams = Union[
     CustomParams,
     DispenseParams,
     DispenseInPlaceParams,
+    DispenseWhileTrackingParams,
     BlowOutParams,
     BlowOutInPlaceParams,
     DropTipParams,
@@ -548,6 +578,14 @@ CommandParams = Union[
     absorbance_reader.OpenLidParams,
     absorbance_reader.InitializeParams,
     absorbance_reader.ReadAbsorbanceParams,
+    flex_stacker.RetrieveParams,
+    flex_stacker.StoreParams,
+    flex_stacker.SetStoredLabwareParams,
+    flex_stacker.FillParams,
+    flex_stacker.EmptyParams,
+    flex_stacker.CloseLatchParams,
+    flex_stacker.OpenLatchParams,
+    flex_stacker.PrepareShuttleParams,
     calibration.CalibrateGripperParams,
     calibration.CalibratePipetteParams,
     calibration.CalibrateModuleParams,
@@ -568,6 +606,7 @@ CommandParams = Union[
 CommandType = Union[
     AirGapInPlaceCommandType,
     AspirateCommandType,
+    AspirateWhileTrackingCommandType,
     AspirateInPlaceCommandType,
     CommentCommandType,
     ConfigureForVolumeCommandType,
@@ -575,6 +614,7 @@ CommandType = Union[
     CustomCommandType,
     DispenseCommandType,
     DispenseInPlaceCommandType,
+    DispenseWhileTrackingCommandType,
     BlowOutCommandType,
     BlowOutInPlaceCommandType,
     DropTipCommandType,
@@ -637,6 +677,14 @@ CommandType = Union[
     absorbance_reader.OpenLidCommandType,
     absorbance_reader.InitializeCommandType,
     absorbance_reader.ReadAbsorbanceCommandType,
+    flex_stacker.RetrieveCommandType,
+    flex_stacker.StoreCommandType,
+    flex_stacker.SetStoredLabwareCommandType,
+    flex_stacker.FillCommandType,
+    flex_stacker.EmptyCommandType,
+    flex_stacker.CloseLatchCommandType,
+    flex_stacker.OpenLatchCommandType,
+    flex_stacker.PrepareShuttleCommandType,
     calibration.CalibrateGripperCommandType,
     calibration.CalibratePipetteCommandType,
     calibration.CalibrateModuleCommandType,
@@ -658,6 +706,7 @@ CommandCreate = Annotated[
     Union[
         AirGapInPlaceCreate,
         AspirateCreate,
+        AspirateWhileTrackingCreate,
         AspirateInPlaceCreate,
         CommentCreate,
         ConfigureForVolumeCreate,
@@ -665,6 +714,7 @@ CommandCreate = Annotated[
         CustomCreate,
         DispenseCreate,
         DispenseInPlaceCreate,
+        DispenseWhileTrackingCreate,
         BlowOutCreate,
         BlowOutInPlaceCreate,
         DropTipCreate,
@@ -727,6 +777,14 @@ CommandCreate = Annotated[
         absorbance_reader.OpenLidCreate,
         absorbance_reader.InitializeCreate,
         absorbance_reader.ReadAbsorbanceCreate,
+        flex_stacker.RetrieveCreate,
+        flex_stacker.StoreCreate,
+        flex_stacker.SetStoredLabwareCreate,
+        flex_stacker.FillCreate,
+        flex_stacker.EmptyCreate,
+        flex_stacker.CloseLatchCreate,
+        flex_stacker.OpenLatchCreate,
+        flex_stacker.PrepareShuttleCreate,
         calibration.CalibrateGripperCreate,
         calibration.CalibratePipetteCreate,
         calibration.CalibrateModuleCreate,
@@ -756,6 +814,7 @@ CommandAdapter: TypeAdapter[Command] = TypeAdapter(Command)
 CommandResult = Union[
     AirGapInPlaceResult,
     AspirateResult,
+    AspirateWhileTrackingResult,
     AspirateInPlaceResult,
     CommentResult,
     ConfigureForVolumeResult,
@@ -763,6 +822,7 @@ CommandResult = Union[
     CustomResult,
     DispenseResult,
     DispenseInPlaceResult,
+    DispenseWhileTrackingResult,
     BlowOutResult,
     BlowOutInPlaceResult,
     DropTipResult,
@@ -825,6 +885,14 @@ CommandResult = Union[
     absorbance_reader.OpenLidResult,
     absorbance_reader.InitializeResult,
     absorbance_reader.ReadAbsorbanceResult,
+    flex_stacker.RetrieveResult,
+    flex_stacker.StoreResult,
+    flex_stacker.SetStoredLabwareResult,
+    flex_stacker.FillResult,
+    flex_stacker.EmptyResult,
+    flex_stacker.CloseLatchResult,
+    flex_stacker.OpenLatchResult,
+    flex_stacker.PrepareShuttleResult,
     calibration.CalibrateGripperResult,
     calibration.CalibratePipetteResult,
     calibration.CalibrateModuleResult,
@@ -851,6 +919,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[LiquidNotFoundError],
     DefinedErrorData[GripperMovementError],
     DefinedErrorData[StallOrCollisionError],
+    DefinedErrorData[FlexStackerStallOrCollisionError],
 ]
 
 

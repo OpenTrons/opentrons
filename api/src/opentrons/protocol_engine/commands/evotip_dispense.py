@@ -4,13 +4,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
-from opentrons.protocol_engine.errors import UnsupportedLabwareForActionError
 from .pipetting_common import (
     PipetteIdMixin,
     FlowRateMixin,
     DispenseVolumeMixin,
     BaseLiquidHandlingResult,
     dispense_in_place,
+    increase_evo_disp_count,
+    DEFAULT_CORRECTION_VOLUME,
 )
 from .movement_common import (
     LiquidHandlingWellLocationMixin,
@@ -26,7 +27,6 @@ from .command import (
     DefinedErrorData,
 )
 from ..state.update_types import StateUpdate
-from ..resources import labware_validation
 from ..errors import ProtocolEngineError
 
 if TYPE_CHECKING:
@@ -84,11 +84,6 @@ class EvotipDispenseImplementation(
         labware_id = params.labwareId
         well_name = params.wellName
 
-        labware_definition = self._state_view.labware.get_definition(params.labwareId)
-        if not labware_validation.is_evotips(labware_definition.parameters.loadName):
-            raise UnsupportedLabwareForActionError(
-                f"Cannot use command: `EvotipDispense` with labware: {labware_definition.parameters.loadName}"
-            )
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
@@ -101,6 +96,9 @@ class EvotipDispenseImplementation(
             return move_result
 
         current_position = await self._gantry_mover.get_position(params.pipetteId)
+        await increase_evo_disp_count(
+            pipette_id=params.pipetteId, pipetting=self._pipetting
+        )
         result = await dispense_in_place(
             pipette_id=params.pipetteId,
             volume=params.volume,
@@ -115,6 +113,7 @@ class EvotipDispenseImplementation(
             },
             pipetting=self._pipetting,
             model_utils=self._model_utils,
+            correction_volume=params.correctionVolume or DEFAULT_CORRECTION_VOLUME,
         )
         if isinstance(result, DefinedErrorData):
             # TODO (chb, 2025-01-29): Remove this and the OverpressureError returns once disabled for this function

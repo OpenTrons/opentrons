@@ -18,7 +18,7 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../../../../../atoms'
+import { LINK_BUTTON_STYLE } from '../../../../../../components/atoms'
 import {
   temperatureRangeFieldValue,
   isTimeFormatMinutesSeconds,
@@ -285,7 +285,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
             handleValueUpdate(
               'temp',
               maskToFloat(e.target.value),
-              temperatureRangeFieldValue(4, 96)
+              temperatureRangeFieldValue(4, 99)
             )
           }}
           onBlur={() => {
@@ -333,6 +333,7 @@ export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
       flexDirection={DIRECTION_COLUMN}
       backgroundColor={backgroundColor}
       borderRadius={BORDERS.borderRadius4}
+      data-testid="thermocyclerStep"
     >
       {header}
       {showEdit ? editContent : null}

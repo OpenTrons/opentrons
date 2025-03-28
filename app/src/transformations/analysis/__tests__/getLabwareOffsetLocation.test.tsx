@@ -6,7 +6,7 @@ import {
   multiple_tipacks_with_tc,
   opentrons96PcrAdapterV1,
 } from '@opentrons/shared-data'
-import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
+import { getLegacyLabwareOffsetLocation } from '../getLegacyLabwareOffsetLocation'
 import {
   getModuleInitialLoadInfo,
   getLabwareLocation,
@@ -62,7 +62,12 @@ describe('getLabwareOffsetLocation', () => {
       .thenReturn({ slotName: MOCK_SLOT })
 
     expect(
-      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES, [])
+      getLegacyLabwareOffsetLocation(
+        MOCK_LABWARE_ID,
+        MOCK_COMMANDS,
+        MOCK_MODULES,
+        []
+      )
     ).toEqual({ slotName: MOCK_SLOT })
   })
   it('should return null if the location is off deck', () => {
@@ -71,7 +76,12 @@ describe('getLabwareOffsetLocation', () => {
       .thenReturn('offDeck')
 
     expect(
-      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES, [])
+      getLegacyLabwareOffsetLocation(
+        MOCK_LABWARE_ID,
+        MOCK_COMMANDS,
+        MOCK_MODULES,
+        []
+      )
     ).toEqual(null)
   })
   it('should return the slot name and module model if the labware is on top of a module', () => {
@@ -83,7 +93,12 @@ describe('getLabwareOffsetLocation', () => {
       .thenReturn({ location: { slotName: MOCK_SLOT } } as any)
 
     expect(
-      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES, [])
+      getLegacyLabwareOffsetLocation(
+        MOCK_LABWARE_ID,
+        MOCK_COMMANDS,
+        MOCK_MODULES,
+        []
+      )
     ).toEqual({ slotName: MOCK_SLOT, moduleModel: TCModelInProtocol })
   })
 
@@ -93,7 +108,7 @@ describe('getLabwareOffsetLocation', () => {
       location: { slotName: MOCK_SLOT },
     } as any)
     expect(
-      getLabwareOffsetLocation(
+      getLegacyLabwareOffsetLocation(
         MOCK_LABWARE_ID,
         MOCK_COMMANDS,
         MOCK_MODULES,
@@ -119,7 +134,7 @@ describe('getLabwareOffsetLocation', () => {
     MOCK_MODULES = []
     vi.mocked(getLabwareLocation).mockReturnValue({ labwareId: mockAdapterId })
     expect(
-      getLabwareOffsetLocation(
+      getLegacyLabwareOffsetLocation(
         MOCK_LABWARE_ID,
         MOCK_COMMANDS,
         MOCK_MODULES,

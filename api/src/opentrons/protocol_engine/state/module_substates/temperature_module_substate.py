@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from typing import NewType, Optional
 
+from opentrons.hardware_control.modules import ModuleDataValidator, ModuleData
 from opentrons.protocol_engine.types import TemperatureRange
 from opentrons.protocol_engine.errors import (
     InvalidTargetTemperatureError,
@@ -52,3 +53,15 @@ class TemperatureModuleSubState:
                 f"Module {self.module_id} does not have a target temperature set."
             )
         return target
+
+    @classmethod
+    def from_live_data(
+        cls, module_id: TemperatureModuleId, data: ModuleData | None
+    ) -> "TemperatureModuleSubState":
+        """Create a TemperatureModuleSubState from live data."""
+        return cls(
+            module_id=module_id,
+            plate_target_temperature=data["targetTemp"]
+            if ModuleDataValidator.is_temperature_module_data(data)
+            else None,
+        )

@@ -1,4 +1,5 @@
 import { beforeEach, describe, it, expect } from 'vitest'
+import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
@@ -9,16 +10,12 @@ import {
   getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../fixtures'
-import type {
-  WaitForTemperatureArgs,
-  InvariantContext,
-  RobotState,
-} from '../types'
+import type { TemperatureParams } from '@opentrons/shared-data'
+import type { InvariantContext, RobotState } from '../types'
 
 describe('waitForTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'
   const thermocyclerId = 'thermocyclerId'
-  const commandCreatorFnName = 'waitForTemperature'
   const prevRobotTemp = 42
   const missingModuleError = {
     errors: [
@@ -47,11 +44,9 @@ describe('waitForTemperature', () => {
     robotState = stateAndContext.robotState
   })
   it('temperature module id exists and temp status is approaching temp with a warning that the temp might not be hit', () => {
-    const temperature = 20
-    const args: WaitForTemperatureArgs = {
-      module: temperatureModuleId,
-      temperature,
-      commandCreatorFnName,
+    const args: TemperatureParams = {
+      moduleId: temperatureModuleId,
+      celsius: 20,
     }
     const previousRobotState = robotWithStatusAndTemp(
       robotState,
@@ -76,6 +71,7 @@ describe('waitForTemperature', () => {
           message: expect.any(String),
         },
       ],
+      python: 'mock_temperature_module_1.await_temperature(20)',
     }
     const result = waitForTemperature(
       args,
@@ -85,31 +81,26 @@ describe('waitForTemperature', () => {
     expect(result).toEqual(expected)
   })
   it('returns missing module error when module id does not exist', () => {
-    const temperature = 42
-    const args: WaitForTemperatureArgs = {
-      module: 'someNonexistentModuleId',
-      temperature,
-      commandCreatorFnName,
+    const args: TemperatureParams = {
+      moduleId: 'someNonexistentModuleId',
+      celsius: 42,
     }
     const result = waitForTemperature(args, invariantContext, robotState)
     expect(result).toEqual(missingModuleError)
   })
   it('returns missing module error when module id is null', () => {
-    const temperature = 42
-    const args: WaitForTemperatureArgs = {
-      module: null,
-      temperature,
-      commandCreatorFnName,
+    const args: TemperatureParams = {
+      //  @ts-expect-error: testing its null to trigger the error
+      moduleId: null,
+      celsius: 42,
     }
     const result = waitForTemperature(args, invariantContext, robotState)
     expect(result).toEqual(missingModuleError)
   })
   it('returns waitForTemperature command creator when temperature module already at target temp and awaiting that same temp', () => {
-    const temperature = 42
-    const args: WaitForTemperatureArgs = {
-      module: temperatureModuleId,
-      temperature,
-      commandCreatorFnName,
+    const args: TemperatureParams = {
+      moduleId: temperatureModuleId,
+      celsius: 42,
     }
     const previousRobotState = robotWithStatusAndTemp(
       robotState,
@@ -128,6 +119,7 @@ describe('waitForTemperature', () => {
           },
         },
       ],
+      python: 'mock_temperature_module_1.await_temperature(42)',
     }
     const result = waitForTemperature(
       args,
@@ -137,11 +129,9 @@ describe('waitForTemperature', () => {
     expect(result).toEqual(expected)
   })
   it('returns missing temperature step error when temperature module already at target temp and awaiting different temp', () => {
-    const temperature = 80
-    const args: WaitForTemperatureArgs = {
-      module: temperatureModuleId,
-      temperature,
-      commandCreatorFnName,
+    const args: TemperatureParams = {
+      moduleId: temperatureModuleId,
+      celsius: 80,
     }
     const previousRobotState = robotWithStatusAndTemp(
       robotState,
@@ -157,11 +147,9 @@ describe('waitForTemperature', () => {
     expect(result).toEqual(missingTemperatureStep)
   })
   it('returns missing temperature step error when prev temp state is DEACTIVATED', () => {
-    const temperature = 80
-    const args: WaitForTemperatureArgs = {
-      module: temperatureModuleId,
-      temperature,
-      commandCreatorFnName,
+    const args: TemperatureParams = {
+      moduleId: temperatureModuleId,
+      celsius: 80,
     }
     const previousRobotState = robotWithStatusAndTemp(
       robotState,
@@ -175,5 +163,51 @@ describe('waitForTemperature', () => {
       previousRobotState
     )
     expect(result).toEqual(missingTemperatureStep)
+  })
+  it('renders the correct comand and python for a heater-shaker waitForTemperature', () => {
+    const heaterShakerId = 'heaterShakerId'
+    invariantContext = {
+      ...invariantContext,
+      moduleEntities: {
+        heaterShakerId: {
+          id: heaterShakerId,
+          type: HEATERSHAKER_MODULE_TYPE,
+          model: 'heaterShakerModuleV1',
+          pythonName: 'mock_heater_shaker_module_1',
+        },
+      },
+    }
+    robotState = {
+      ...robotState,
+      modules: {
+        heaterShakerId: {
+          slot: 'A1',
+          moduleState: {
+            type: HEATERSHAKER_MODULE_TYPE,
+            targetTemp: null,
+            latchOpen: false,
+            targetSpeed: null,
+          },
+        },
+      },
+    }
+    const args: TemperatureParams = {
+      moduleId: heaterShakerId,
+      celsius: 80,
+    }
+
+    expect(waitForTemperature(args, invariantContext, robotState)).toEqual({
+      commands: [
+        {
+          commandType: 'heaterShaker/waitForTemperature',
+          key: expect.any(String),
+          params: {
+            moduleId: heaterShakerId,
+            celsius: 80,
+          },
+        },
+      ],
+      python: 'mock_heater_shaker_module_1.wait_for_temperature()',
+    })
   })
 })

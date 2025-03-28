@@ -147,7 +147,7 @@
     "maxVolume": 1000
   },
   "p1000_96": {
-    "displayName": "Flex 96-Channel 1000 μL",
+    "displayName": "Flex 96-Channel 1000 µL",
     "defaultAspirateFlowRate": {
       "value": 7.85,
       "min": 3,

@@ -4,7 +4,6 @@ import {
   orderWells,
   getAllDefinitions,
   getLabwareDefURI,
-  getWellsDepth,
   getTipTypeFromTipRackDefinition,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
@@ -68,6 +67,7 @@ function getInvariantContextAndRobotState(
       tiprackDefURI: [tipRackDefURI],
       tiprackLabwareDef: [quickTransferState.tipRack],
       spec: quickTransferState.pipette,
+      pythonName: 'pipette',
     },
   }
   const pipetteLocations: RobotState['pipettes'] = {
@@ -77,6 +77,8 @@ function getInvariantContextAndRobotState(
   }
   const sourceLabwareURI = getLabwareDefURI(quickTransferState.source)
   const sourceLabwareId = `${uuid()}_${sourceLabwareURI}`
+  const pythonTrashBinName = 'trash_bin_1'
+  const pythonWasteChuteName = 'waste_chute'
 
   let labwareEntities: LabwareEntities = {}
   let labwareLocations: RobotState['labware'] = {}
@@ -89,6 +91,7 @@ function getInvariantContextAndRobotState(
         id: adapterId,
         labwareDefURI: adapter96ChannelDefUri,
         def: getAllDefinitions()[adapter96ChannelDefUri],
+        pythonName: 'adapter_1',
       },
     }
     labwareLocations = {
@@ -97,6 +100,14 @@ function getInvariantContextAndRobotState(
       },
     }
   }
+  const sourceDisplayCategory =
+    quickTransferState.source.metadata.displayCategory
+  const destDisplayCategory =
+    quickTransferState.destination !== 'source'
+      ? quickTransferState.destination.metadata.displayCategory
+      : sourceDisplayCategory
+
+  const isSameDisplayCategory = sourceDisplayCategory === destDisplayCategory
 
   labwareEntities = {
     ...labwareEntities,
@@ -104,11 +115,13 @@ function getInvariantContextAndRobotState(
       id: tipRackId,
       labwareDefURI: tipRackDefURI,
       def: quickTransferState.tipRack,
+      pythonName: 'tip_rack_1',
     },
     [sourceLabwareId]: {
       id: sourceLabwareId,
       labwareDefURI: sourceLabwareURI,
       def: quickTransferState.source,
+      pythonName: `${sourceDisplayCategory}_1`,
     },
   }
   labwareLocations = {
@@ -130,6 +143,9 @@ function getInvariantContextAndRobotState(
         id: destLabwareId,
         labwareDefURI: destLabwareURI,
         def: quickTransferState.destination,
+        pythonName: isSameDisplayCategory
+          ? `${destDisplayCategory}_2`
+          : `${destDisplayCategory}_1`,
       },
     }
     labwareLocations = {
@@ -152,6 +168,7 @@ function getInvariantContextAndRobotState(
         name: 'trashBin',
         id: trashId,
         location: trashLocation,
+        pythonName: pythonTrashBinName,
       },
     }
   }
@@ -173,6 +190,7 @@ function getInvariantContextAndRobotState(
           name: 'trashBin',
           id: trashId,
           location: trashLocation,
+          pythonName: pythonTrashBinName,
         },
       }
     }
@@ -191,6 +209,7 @@ function getInvariantContextAndRobotState(
         name: 'wasteChute',
         id: wasteChuteId,
         location: wasteChuteLocation,
+        pythonName: pythonWasteChuteName,
       },
     }
   }
@@ -212,6 +231,7 @@ function getInvariantContextAndRobotState(
           name: 'wasteChute',
           id: wasteChuteId,
           location: wasteChuteLocation,
+          pythonName: pythonWasteChuteName,
         },
       }
     }
@@ -221,6 +241,7 @@ function getInvariantContextAndRobotState(
     moduleEntities: {},
     pipetteEntities,
     additionalEquipmentEntities,
+    liquidEntities: {},
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
   const moduleLocations = {}
@@ -322,6 +343,12 @@ export function generateQuickTransferArgs(
   if (pipetteEntity.spec.channels === 96) {
     nozzles = 'ALL' as NozzleConfigurationStyle
   }
+  const touchTipAfterDispenseOffsetMmFromTop =
+    quickTransferState.touchTipDispense ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+
+  const touchTipAfterAspirateOffsetMmFromTop =
+    quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+
   const commonFields = {
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
@@ -355,19 +382,13 @@ export function generateQuickTransferArgs(
     aspirateAirGapVolume: quickTransferState.airGapAspirate ?? null,
     dispenseAirGapVolume: quickTransferState.airGapDispense ?? null,
     touchTipAfterAspirate: quickTransferState.touchTipAspirate != null,
-    touchTipAfterAspirateOffsetMmFromBottom:
-      quickTransferState.touchTipAspirate ??
-      getWellsDepth(quickTransferState.source, sourceWells) +
-        DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+    touchTipAfterAspirateSpeed:
+      quickTransferState.touchTipAspirateSpeed ?? null,
+    touchTipAfterAspirateOffsetMmFromTop,
     touchTipAfterDispense: quickTransferState.touchTipDispense != null,
-    touchTipAfterDispenseOffsetMmFromBottom:
-      quickTransferState.touchTipDispense ??
-      getWellsDepth(
-        quickTransferState.destination === 'source'
-          ? quickTransferState.source
-          : quickTransferState.destination,
-        destWells
-      ) + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+    touchTipAfterDispenseOffsetMmFromTop,
+    touchTipAfterDispenseSpeed:
+      quickTransferState.touchTipDispenseSpeed ?? null,
     dropTipLocation,
     aspirateXOffset: 0,
     aspirateYOffset: 0,

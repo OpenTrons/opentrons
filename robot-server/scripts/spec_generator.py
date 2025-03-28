@@ -7,18 +7,16 @@ a machine handy.
 """
 
 from argparse import ArgumentParser, FileType
-from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 import json
 from io import TextIOBase
-import os
 import sys
 
 from robot_server.app_setup import app
 from robot_server.versioning import API_VERSION
 
 
-def write_api_spec(output: TextIOBase) -> None:
+def _write_api_spec(output: TextIOBase) -> None:
     spec_dict = get_openapi(
         title="Opentrons HTTP API Spec",
         version=str(API_VERSION),
@@ -45,7 +43,7 @@ def _run_cmdline() -> int:
         help="Where to write the file (will be json)",
     )
     args = parser.parse_args()
-    write_api_spec(args.output)
+    _write_api_spec(args.output)
     return 0
 
 

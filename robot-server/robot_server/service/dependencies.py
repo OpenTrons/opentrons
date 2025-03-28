@@ -35,7 +35,27 @@ async def get_session_manager(
 
 async def get_unique_id() -> str:
     """Get a unique ID string to use as a resource identifier."""
-    return str(uuid4())
+    return UniqueIDFactory().get()
+
+
+class UniqueIDFactory:
+    """
+    This is equivalent to the `get_unique_id()` free function. Wrapping it in a factory
+    class makes things easier for FastAPI endpoint functions that need multiple unique
+    IDs. They can do:
+
+        unique_id_factory: UniqueIDFactory = fastapi.Depends(UniqueIDFactory)
+
+    And then:
+
+        unique_id_1 = await unique_id_factory.get()
+        unique_id_2 = await unique_id_factory.get()
+    """
+
+    @staticmethod
+    def get() -> str:
+        """Get a unique ID to use as a resource identifier."""
+        return str(uuid4())
 
 
 async def get_current_time() -> datetime:

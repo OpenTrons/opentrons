@@ -86,7 +86,8 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   }
   const memoizedAttachedPipettes = useMemo(() => attachedPipettes, [])
   const is96ChannelPipette =
-    memoizedAttachedPipettes[mount]?.instrumentName === 'p1000_96'
+    memoizedAttachedPipettes[mount]?.instrumentName === 'p1000_96' ||
+    memoizedAttachedPipettes[mount]?.instrumentName === 'p200_96'
   const pipetteName =
     attachedPipettes[mount] != null
       ? attachedPipettes[mount]?.displayName

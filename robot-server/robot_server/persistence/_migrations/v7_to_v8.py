@@ -9,11 +9,10 @@ Summary of changes from schema 7:
 import json
 from pathlib import Path
 from contextlib import ExitStack
-import shutil
 
 import sqlalchemy
 
-from ._util import add_column
+from ._util import add_column, copy_contents
 from ..database import sql_engine_ctx
 from ..tables import schema_8
 from .._folder_migrator import Migration
@@ -28,11 +27,7 @@ class Migration7to8(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
         """Migrate the persistence directory from schema 6 to 7."""
         # Copy over all existing directories and files to new version
-        for item in source_dir.iterdir():
-            if item.is_dir():
-                shutil.copytree(src=item, dst=dest_dir / item.name)
-            else:
-                shutil.copy(src=item, dst=dest_dir / item.name)
+        copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
         dest_db_file = dest_dir / DB_FILE
 

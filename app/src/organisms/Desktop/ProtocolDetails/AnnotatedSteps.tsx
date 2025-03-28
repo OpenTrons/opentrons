@@ -4,21 +4,22 @@ import { css } from 'styled-components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   ALIGN_CENTER,
+  ALIGN_FLEX_START,
   BORDERS,
   COLORS,
+  CommandText,
+  CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
-  SPACING,
-  LegacyStyledText,
-  TYPOGRAPHY,
-  OVERFLOW_AUTO,
   Icon,
-  ALIGN_FLEX_START,
-  CURSOR_POINTER,
+  LegacyStyledText,
+  OVERFLOW_AUTO,
+  SPACING,
+  TYPOGRAPHY,
+  getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
 
-import { CommandIcon, CommandText } from '/app/molecules/Command'
-import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
+import { CommandIcon } from '/app/molecules/Command'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,

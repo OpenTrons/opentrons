@@ -3,6 +3,7 @@ import {
   ALIGN_CENTER,
   ALIGN_END,
   CURSOR_DEFAULT,
+  DISPLAY_FLEX,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   OVERFLOW_AUTO,
@@ -110,7 +111,7 @@ const ContentArea = styled.div<{
   position: Position
   noPadding: boolean
 }>`
-  display: flex;
+  display: ${DISPLAY_FLEX};
   position: ${POSITION_ABSOLUTE};
   align-items: ${({ position }) =>
     position === 'center' ? ALIGN_CENTER : ALIGN_END};
@@ -137,6 +138,7 @@ const ModalArea = styled.div<
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};
+
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-radius: ${BORDERS.borderRadius16};
   }

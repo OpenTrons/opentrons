@@ -27,6 +27,7 @@ from .module_contexts import (
     HeaterShakerContext,
     MagneticBlockContext,
     AbsorbanceReaderContext,
+    FlexStackerContext,
 )
 from .disposal_locations import TrashBin, WasteChute
 from ._liquid import Liquid, LiquidClass
@@ -70,6 +71,7 @@ __all__ = [
     "HeaterShakerContext",
     "MagneticBlockContext",
     "AbsorbanceReaderContext",
+    "FlexStackerContext",
     "ParameterContext",
     "Labware",
     "TrashBin",

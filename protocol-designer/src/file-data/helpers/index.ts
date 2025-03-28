@@ -79,6 +79,26 @@ export const commandCreatorFromStepArgs = (
       )
     case 'comment':
       return StepGeneration.curryCommandCreator(StepGeneration.comment, args)
+    case 'absorbanceReaderOpenLid':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.absorbanceReaderOpenLid,
+        args
+      )
+    case 'absorbanceReaderCloseLid':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.absorbanceReaderCloseLid,
+        args
+      )
+    case 'absorbanceReaderRead':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.absorbanceReaderCloseRead,
+        args
+      )
+    case 'absorbanceReaderInitialize':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.absorbanceReaderCloseInitialize,
+        args
+      )
   }
   // @ts-expect-error we've exhausted all command creators, but keeping this console warn
   // for when we impelement the next command creator

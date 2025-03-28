@@ -12,11 +12,11 @@ export type DevInternalFlag =
   | 'forceHttpPolling'
   | 'protocolStats'
   | 'enableRunNotes'
-  | 'lpcRedesign'
   | 'protocolTimeline'
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
   | 'reactScan'
+  | 'quickTransferExportPython'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
 

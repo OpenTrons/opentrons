@@ -39,6 +39,7 @@ import type {
   LabwareEntities,
   ModuleEntities,
   PipetteEntities,
+  LiquidEntities,
 } from '@opentrons/step-generation'
 import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -51,7 +52,22 @@ import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, DeckSlot } from '../../types'
-import type { FormData, ProfileItem, StepIdType } from '../../form-types'
+import type {
+  FormData,
+  HydratedAbsorbanceReaderFormData,
+  HydratedCommentFormData,
+  HydratedFormData,
+  HydratedHeaterShakerFormData,
+  HydratedMagnetFormData,
+  HydratedMixFormData,
+  HydratedMoveLabwareFormData,
+  HydratedMoveLiquidFormData,
+  HydratedPauseFormData,
+  HydratedTemperatureFormData,
+  HydratedThermocyclerFormData,
+  ProfileItem,
+  StepIdType,
+} from '../../form-types'
 import type {
   StepArgsAndErrorsById,
   StepFormErrors,
@@ -78,8 +94,15 @@ import type {
   SavedStepFormState,
   BatchEditFormChangesState,
 } from '../reducers'
+import type { RootState as LabwareIngredRootState } from '../../labware-ingred/reducers'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
+const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
+  state.labwareIngred
+
+const _getInitialDeckSetupStepFormRootState: (
+  arg: RootState
+) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
 
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
   rootSelector(state).presavedStepForm
@@ -89,6 +112,19 @@ export const getCurrentFormIsPresaved: Selector<
 > = createSelector(
   getPresavedStepForm,
   presavedStepForm => presavedStepForm != null
+)
+
+const _getNormalizedLiquidById: Selector<
+  BaseState,
+  LiquidEntities
+> = createSelector(labwareIngredRootSelector, state => state.ingredients)
+
+export const getLiquidEntities: Selector<
+  BaseState,
+  LiquidEntities
+> = createSelector(
+  _getNormalizedLiquidById,
+  normalizedLiquidById => normalizedLiquidById
 )
 
 // NOTE Ian 2019-04-15: outside of this file, you probably only care about
@@ -149,8 +185,15 @@ export const _getPipetteEntitiesRootState: (
 ) => PipetteEntities = createSelector(
   rs => rs.pipetteInvariantProperties,
   labwareDefSelectors._getLabwareDefsByIdRootState,
-  denormalizePipetteEntities
+  _getInitialDeckSetupStepFormRootState,
+  (pipetteInvariantProperties, labwareDefs, initialDeckSetupStepForm) =>
+    denormalizePipetteEntities(
+      pipetteInvariantProperties,
+      labwareDefs,
+      initialDeckSetupStepForm.pipetteLocationUpdate as Record<string, string>
+    )
 )
+
 // Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
 export const _getAdditionalEquipmentEntitiesRootState: (
   arg: RootState
@@ -175,10 +218,6 @@ export const getAdditionalEquipment: Selector<
   BaseState,
   NormalizedAdditionalEquipmentById
 > = createSelector(rootSelector, _getAdditionalEquipmentRootState)
-
-const _getInitialDeckSetupStepFormRootState: (
-  arg: RootState
-) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
 
 export const getInitialDeckSetupStepForm: Selector<
   BaseState,
@@ -211,6 +250,7 @@ const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
 const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
   type: ABSORBANCE_READER_TYPE,
   lidOpen: null,
+  initialization: null,
 }
 
 const _getInitialDeckSetup = (
@@ -237,11 +277,7 @@ const _getInitialDeckSetup = (
   const additionalEquipmentEntitiesOnDeck = Object.values(
     additionalEquipmentEntities
   ).reduce((aeEntities: AdditionalEquipmentEntities, ae) => {
-    if (
-      ae.name === 'wasteChute' ||
-      ae.name === 'stagingArea' ||
-      ae.name === 'trashBin'
-    ) {
+    if (ae.name !== 'gripper') {
       aeEntities[ae.id] = ae
     }
     return aeEntities
@@ -259,6 +295,7 @@ const _getInitialDeckSetup = (
     ),
     modules: mapValues<Record<DeckSlot, string>, ModuleOnDeck>(
       moduleLocations as Record<DeckSlot, string>,
+      // @ts-expect-error Flex stacker not yet supported in PD
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
 
@@ -270,6 +307,7 @@ const _getInitialDeckSetup = (
               type: MAGNETIC_MODULE_TYPE,
               slot,
               moduleState: MAGNETIC_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case TEMPERATURE_MODULE_TYPE:
             return {
@@ -278,6 +316,7 @@ const _getInitialDeckSetup = (
               type: TEMPERATURE_MODULE_TYPE,
               slot,
               moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case THERMOCYCLER_MODULE_TYPE:
             return {
@@ -286,6 +325,7 @@ const _getInitialDeckSetup = (
               type: THERMOCYCLER_MODULE_TYPE,
               slot,
               moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case HEATERSHAKER_MODULE_TYPE:
             return {
@@ -294,6 +334,7 @@ const _getInitialDeckSetup = (
               type: HEATERSHAKER_MODULE_TYPE,
               slot,
               moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case MAGNETIC_BLOCK_TYPE:
             return {
@@ -302,6 +343,7 @@ const _getInitialDeckSetup = (
               type: MAGNETIC_BLOCK_TYPE,
               slot,
               moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
           case ABSORBANCE_READER_TYPE:
             return {
@@ -310,6 +352,7 @@ const _getInitialDeckSetup = (
               type: ABSORBANCE_READER_TYPE,
               slot,
               moduleState: ABSORBANCE_READER_INITIAL_STATE,
+              pythonName: moduleEntity.pythonName,
             }
         }
       }
@@ -538,54 +581,96 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
   boolean
 > = createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
 
-// TODO type with hydrated form type
-const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
-  return getFormErrors(hydratedForm.stepType, hydratedForm)
+const _formLevelErrors = (
+  hydratedForm: HydratedFormData,
+  moduleEntities: ModuleEntities
+): StepFormErrors => {
+  return getFormErrors(hydratedForm.stepType, hydratedForm, moduleEntities)
 }
 
-// TODO type with hydrated form type
 const _dynamicFieldFormErrors = (
-  hydratedForm: FormData
+  hydratedForm: HydratedFormData
 ): ProfileFormError[] => {
-  return getProfileFormErrors(hydratedForm)
+  return getProfileFormErrors(hydratedForm as HydratedThermocyclerFormData)
 }
 
 const _dynamicMoveLabwareFieldFormErrors = (
-  hydratedForm: FormData,
+  hydratedForm: HydratedFormData,
   invariantContext: InvariantContext
 ): ProfileFormError[] => {
   return getMoveLabwareFormErrors(hydratedForm, invariantContext)
 }
-// TODO type with hydrated form type
-export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
-  for (const fieldName in hydratedForm) {
-    const value = hydratedForm[fieldName]
 
-    if (
-      hydratedForm.stepType === 'thermocycler' &&
-      fieldName === 'profileItemsById'
-    ) {
-      if (getProfileItemsHaveErrors(value as Record<string, ProfileItem>)) {
-        return true
-      }
-    } else {
-      // TODO: fieldName includes id, stepType, etc... this is weird #3161
-      const fieldErrors = getFieldErrors(fieldName, value)
+export const _hasFieldLevelErrors = (
+  hydratedForm: HydratedFormData
+): boolean => {
+  const getHasFieldErrors = <T extends HydratedFormData>(form: T): boolean => {
+    for (const fieldName of Object.keys(form) as Array<keyof T>) {
+      const value = form[fieldName]
 
-      if (fieldErrors && fieldErrors.length > 0) {
-        return true
+      if (
+        form.stepType === 'thermocycler' &&
+        fieldName === 'profileItemsById'
+      ) {
+        if (getProfileItemsHaveErrors(value as Record<string, ProfileItem>)) {
+          return true
+        }
+      } else {
+        // TODO: fieldName includes id, stepType, etc... this is weird #3161
+        const fieldErrors = getFieldErrors(fieldName as string, value)
+
+        if (fieldErrors && fieldErrors.length > 0) {
+          return true
+        }
       }
     }
+    return false
   }
 
-  return false
+  switch (hydratedForm.stepType) {
+    case 'thermocycler':
+      return getHasFieldErrors(hydratedForm as HydratedThermocyclerFormData)
+
+    case 'mix':
+      return getHasFieldErrors(hydratedForm as HydratedMixFormData)
+
+    case 'absorbanceReader':
+      return getHasFieldErrors(hydratedForm as HydratedAbsorbanceReaderFormData)
+
+    case 'comment':
+      return getHasFieldErrors(hydratedForm as HydratedCommentFormData)
+
+    case 'heaterShaker':
+      return getHasFieldErrors(hydratedForm as HydratedHeaterShakerFormData)
+
+    case 'magnet':
+      return getHasFieldErrors(hydratedForm as HydratedMagnetFormData)
+
+    case 'moveLabware':
+      return getHasFieldErrors(hydratedForm as HydratedMoveLabwareFormData)
+
+    case 'moveLiquid':
+      return getHasFieldErrors(hydratedForm as HydratedMoveLiquidFormData)
+
+    case 'pause':
+      return getHasFieldErrors(hydratedForm as HydratedPauseFormData)
+
+    case 'temperature':
+      return getHasFieldErrors(hydratedForm as HydratedTemperatureFormData)
+
+    default:
+      return false
+  }
 }
-// TODO type with hydrated form type
+
 export const _hasFormLevelErrors = (
-  hydratedForm: FormData,
+  hydratedForm: HydratedFormData,
   invariantContext: InvariantContext
 ): boolean => {
-  if (_formLevelErrors(hydratedForm).length > 0) return true
+  if (
+    _formLevelErrors(hydratedForm, invariantContext.moduleEntities).length > 0
+  )
+    return true
 
   if (
     hydratedForm.stepType === 'thermocycler' &&
@@ -603,9 +688,8 @@ export const _hasFormLevelErrors = (
   }
   return false
 }
-// TODO type with hydrated form type
 export const _formHasErrors = (
-  hydratedForm: FormData,
+  hydratedForm: HydratedFormData,
   invariantContext: InvariantContext
 ): boolean => {
   return (
@@ -620,34 +704,33 @@ export const getInvariantContext: Selector<
   getLabwareEntities,
   getModuleEntities,
   getPipetteEntities,
+  getLiquidEntities,
   getAdditionalEquipmentEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
   featureFlagSelectors.getAllowAllTipracks,
-  featureFlagSelectors.getEnableAbsorbanceReader,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    liquidEntities,
     additionalEquipmentEntities,
     disableModuleRestrictions,
-    allowAllTipracks,
-    enableAbsorbanceReader
+    allowAllTipracks
   ) => ({
     labwareEntities,
     moduleEntities,
     pipetteEntities,
+    liquidEntities,
     additionalEquipmentEntities,
     config: {
       OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
-      OT_PD_ENABLE_ABSORBANCE_READER: Boolean(enableAbsorbanceReader),
     },
   })
 )
-// TODO(IL, 2020-03-24) type this as Selector<HydratedFormData>. See #3161
 export const getHydratedUnsavedForm: Selector<
   BaseState,
-  FormData | null
+  HydratedFormData | null
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
@@ -679,13 +762,20 @@ export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
 export const getFormLevelErrorsForUnsavedForm: Selector<
   BaseState,
   StepFormErrors
-> = createSelector(getHydratedUnsavedForm, hydratedForm => {
-  if (!hydratedForm) return []
+> = createSelector(
+  getHydratedUnsavedForm,
+  getInvariantContext,
+  (hydratedForm, invariantContext) => {
+    if (!hydratedForm) return []
 
-  const errors = _formLevelErrors(hydratedForm)
+    const errors = _formLevelErrors(
+      hydratedForm,
+      invariantContext.moduleEntities
+    )
 
-  return errors
-})
+    return errors
+  }
+)
 export const getCurrentFormCanBeSaved: Selector<
   BaseState,
   boolean

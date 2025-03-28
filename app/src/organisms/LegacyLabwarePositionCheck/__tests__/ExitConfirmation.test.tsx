@@ -29,7 +29,7 @@ describe('ExitConfirmation', () => {
     render(props)
     screen.getByText('Exit before completing Labware Position Check?')
     screen.getByText(
-      'If you exit now, all labware offsets will be discarded. This cannot be undone.'
+      "If you exit now, only the labware offsets you've confirmed will be applied to this run."
     )
     screen.getByRole('button', { name: 'Exit' })
     screen.getByRole('button', { name: 'Go back' })
@@ -48,7 +48,7 @@ describe('ExitConfirmation', () => {
     })
     screen.getByText('Remove the calibration probe before exiting')
     screen.getByText(
-      'If you exit now, all labware offsets will be discarded. This cannot be undone.'
+      "If you exit now, only the labware offsets you've confirmed will be applied to this run."
     )
     screen.getByRole('button', { name: 'Remove calibration probe' })
     screen.getByRole('button', { name: 'Go back' })

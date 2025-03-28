@@ -39,7 +39,7 @@ lint: lint-js lint-py
 .PHONY: lib-js
 lib-js: export NODE_ENV := production
 lib-js:
-	NODE_OPTIONS=--openssl-legacy-provider yarn vite build
+	yarn vite build
 
 .PHONY: build-ts
 build-ts:

@@ -4,7 +4,6 @@ import {
   ALIGN_CENTER,
   CURSOR_DEFAULT,
   CURSOR_POINTER,
-  FLEX_MAX_CONTENT,
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_START,
@@ -62,8 +61,8 @@ interface ButtonProps {
 
 const StyledButton = styled.button<ButtonProps>`
   border: none;
-  width: ${FLEX_MAX_CONTENT};
-  height: ${FLEX_MAX_CONTENT};
+  width: 100%;
+  height: 100%;
   cursor: ${CURSOR_POINTER};
   background-color: ${COLORS.blue30};
   border-radius: ${BORDERS.borderRadius8};

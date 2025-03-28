@@ -1,17 +1,18 @@
-import type * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 import { SendButton } from '../index'
 
+import type { ComponentProps } from 'react'
+
 const mockHandleClick = vi.fn()
-const render = (props: React.ComponentProps<typeof SendButton>) => {
+const render = (props: ComponentProps<typeof SendButton>) => {
   return renderWithProviders(<SendButton {...props} />)
 }
 
 describe('SendButton', () => {
-  let props: React.ComponentProps<typeof SendButton>
+  let props: ComponentProps<typeof SendButton>
 
   beforeEach(() => {
     props = {

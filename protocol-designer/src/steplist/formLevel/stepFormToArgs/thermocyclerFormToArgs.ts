@@ -5,7 +5,7 @@ import type {
   ThermocyclerStateStepArgs,
 } from '@opentrons/step-generation'
 import type {
-  FormData,
+  HydratedThermocyclerFormData,
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
@@ -47,14 +47,14 @@ const _flattenProfileSteps = (args: {
 }
 
 export const thermocyclerFormToArgs = (
-  formData: FormData
+  formData: HydratedThermocyclerFormData
 ): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs | null => {
   const { thermocyclerFormType } = formData
 
   switch (thermocyclerFormType) {
     case THERMOCYCLER_STATE: {
       return {
-        module: formData.moduleId,
+        moduleId: formData.moduleId,
         commandCreatorFnName: THERMOCYCLER_STATE,
         blockTargetTemp:
           formData.blockIsActive && formData.blockTargetTemp !== null
@@ -75,7 +75,7 @@ export const thermocyclerFormToArgs = (
       })
 
       return {
-        module: formData.moduleId,
+        moduleId: formData.moduleId,
         commandCreatorFnName: THERMOCYCLER_PROFILE,
         blockTargetTempHold:
           formData.blockIsActiveHold && formData.blockTargetTempHold !== null

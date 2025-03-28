@@ -472,8 +472,9 @@ class TouchTipCommand(TypedDict):
     payload: TouchTipCommandPayload
 
 
-class AirGapCommandPayload(TextOnlyPayload):
-    pass
+class AirGapCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    volume: Union[float, None]
+    height: Union[float, None]
 
 
 class AirGapCommand(TypedDict):

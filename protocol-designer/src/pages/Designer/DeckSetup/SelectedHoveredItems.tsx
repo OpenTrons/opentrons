@@ -106,6 +106,30 @@ export const SelectedHoveredItems = (
   const labwareInfos: DeckLabelProps[] = []
 
   if (
+    (hoveredLabware != null ||
+      selectedLabwareDefUri === hoveredLabware ||
+      selectedNestedLabwareDefUri === hoveredLabware) &&
+    hoveredLabwareDef != null
+  ) {
+    const hoverlLabwareLabel = {
+      text: hoveredLabwareDef.metadata.displayName,
+      isSelected: false,
+      isLast: true,
+      isZoomed: true,
+    }
+    labwareInfos.push(hoverlLabwareLabel)
+  }
+
+  if (selectedNestedLabwareDef != null && hoveredLabware == null) {
+    const selectedNestedLabwareLabel = {
+      text: selectedNestedLabwareDef.metadata.displayName,
+      isSelected: true,
+      isLast: hoveredLabware == null,
+      isZoomed: true,
+    }
+    labwareInfos.push(selectedNestedLabwareLabel)
+  }
+  if (
     selectedLabwareDefUri != null &&
     (hoveredLabware == null || hoveredLabware !== selectedLabwareDefUri)
   ) {
@@ -118,29 +142,6 @@ export const SelectedHoveredItems = (
       isZoomed: true,
     }
     labwareInfos.push(selectedLabwareLabel)
-  }
-  if (selectedNestedLabwareDef != null && hoveredLabware == null) {
-    const selectedNestedLabwareLabel = {
-      text: selectedNestedLabwareDef.metadata.displayName,
-      isSelected: true,
-      isLast: hoveredLabware == null,
-      isZoomed: true,
-    }
-    labwareInfos.push(selectedNestedLabwareLabel)
-  }
-  if (
-    (hoveredLabware != null ||
-      selectedLabwareDefUri === hoveredLabware ||
-      selectedNestedLabwareDefUri === hoveredLabware) &&
-    hoveredLabwareDef != null
-  ) {
-    const hoverLabelLabel = {
-      text: hoveredLabwareDef.metadata.displayName,
-      isSelected: false,
-      isLast: true,
-      isZoomed: true,
-    }
-    labwareInfos.push(hoverLabelLabel)
   }
 
   return (
@@ -199,6 +200,7 @@ export const SelectedHoveredItems = (
         slotPosition={slotPosition}
         moduleModel={selectedModuleModel}
         hoveredLabware={hoveredLabware}
+        showLabel={selectedNestedLabwareDef == null}
       />
       <SelectedLabwareRender
         labwareOnDeck={matchingSelectedNestedLabwareOnDeck}
@@ -208,8 +210,7 @@ export const SelectedHoveredItems = (
         hoveredLabware={hoveredLabware}
         nestedLabwareInfo={[
           {
-            text:
-              selectedNestedLabwareDef?.metadata.displayName ?? 'unknown name',
+            text: selectedLabwareDef?.metadata.displayName ?? 'unknown name',
             isSelected: true,
             isLast: true,
             isZoomed: true,

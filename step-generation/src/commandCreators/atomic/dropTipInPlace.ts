@@ -1,10 +1,8 @@
 import { uuid } from '../../utils'
 import type { CommandCreator } from '../../types'
-export interface DropTipInPlaceArgs {
-  pipetteId: string
-}
+import type { DropTipInPlaceParams } from '@opentrons/shared-data'
 
-export const dropTipInPlace: CommandCreator<DropTipInPlaceArgs> = (
+export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
   args,
   invariantContext,
   prevRobotState

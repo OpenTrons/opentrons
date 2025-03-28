@@ -83,13 +83,14 @@
         "thermocyclerModuleType",
         "heaterShakerModuleType",
         "magneticBlockType",
-        "absorbanceReaderType"
+        "absorbanceReaderType",
+        "flexStackerModuleType"
       ],
       "type": "string"
     },
     "model": {
       "type": "string",
-      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader)V[0-9]+$"
+      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock|absorbanceReader|flexStackerModule)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {
@@ -109,7 +110,9 @@
         "footprintXDimension": { "type": "number" },
         "footprintYDimension": { "type": "number" },
         "labwareInterfaceXDimension": { "type": "number" },
-        "labwareInterfaceYDimension": { "type": "number" }
+        "labwareInterfaceYDimension": { "type": "number" },
+        "maxStackerFillHeight": { "type": "number" },
+        "maxStackerRetrievableHeight": { "type": "number" }
       }
     },
     "cornerOffsetFromSlot": {

@@ -1,3 +1,5 @@
+import type { FC } from 'react'
+
 /** assistant: ChatGPT API, user: user */
 type Role = 'assistant' | 'user'
 
@@ -57,7 +59,7 @@ export interface RouteProps {
   /** the component rendered by a route match
    * drop developed components into slots held by placeholder div components
    * */
-  Component: React.FC
+  Component: FC
   /** a route/page name to render in the nav bar
    */
   name: string

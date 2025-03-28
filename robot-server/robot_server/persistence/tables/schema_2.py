@@ -62,7 +62,6 @@ analysis_table = sqlalchemy.Table(
     sqlalchemy.Column(
         "completed_analysis",
         # Stores a pickled dict. See CompletedAnalysisStore.
-        # TODO(mm, 2023-08-30): Remove this. See https://opentrons.atlassian.net/browse/RSS-98.
         sqlalchemy.LargeBinary,
         nullable=False,
     ),

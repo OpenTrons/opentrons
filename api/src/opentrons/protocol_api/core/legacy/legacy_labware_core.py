@@ -6,7 +6,7 @@ from opentrons.protocols.api_support.tip_tracker import TipTracker
 
 from opentrons.types import DeckSlotName, Location, Point, NozzleMapInterface
 
-from opentrons_shared_data.labware.types import LabwareParameters, LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareParameters2, LabwareDefinition2
 
 from ..._liquid import Liquid
 from ..labware import AbstractLabware, LabwareLoadParams
@@ -36,7 +36,11 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
 
     def __init__(
         self,
-        definition: LabwareDefinition,
+        # We need labware schema 2, specifically, because schema 3 changes how positions
+        # are calculated, and we don't attempt to handle that here in
+        # `opentrons.protocol_api.core.legacy`. We do handle it in
+        # `opentrons.protocol_api.core.engine` and `opentrons.protocol_engine`.
+        definition: LabwareDefinition2,
         parent: Location,
         label: Optional[str] = None,
     ) -> None:
@@ -106,10 +110,10 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
     def set_name(self, new_name: str) -> None:
         self._name = new_name
 
-    def get_definition(self) -> LabwareDefinition:
+    def get_definition(self) -> LabwareDefinition2:
         return self._definition
 
-    def get_parameters(self) -> LabwareParameters:
+    def get_parameters(self) -> LabwareParameters2:
         return self._parameters
 
     def get_quirks(self) -> List[str]:

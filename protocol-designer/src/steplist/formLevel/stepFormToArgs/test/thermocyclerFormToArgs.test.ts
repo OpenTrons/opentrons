@@ -6,12 +6,12 @@ import type {
   ThermocyclerStateStepArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
-import type { FormData } from '../../../../form-types'
+import type { HydratedThermocyclerFormData } from '../../../../form-types'
 const tcModuleId = 'tcModuleId'
 
 describe('thermocyclerFormToArgs', () => {
   const testCases: Array<{
-    formData: FormData
+    formData: HydratedThermocyclerFormData
     expected: ThermocyclerStateStepArgs | ThermocyclerProfileStepArgs
     testName: string
   }> = [
@@ -21,8 +21,6 @@ describe('thermocyclerFormToArgs', () => {
         ...getDefaultsForStepType('thermocycler'),
         stepType: 'thermocycler',
         id: 'testId',
-        description: 'some description',
-
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_STATE,
         blockIsActive: true,
@@ -30,11 +28,22 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActive: true,
         lidTargetTemp: '40',
         lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        blockTargetTempHold: null,
+        lidTargetTempHold: null,
+        orderedProfileItems: [],
+        profileItemsById: {},
+        profileTargetLidTemp: null,
+        profileVolume: '10',
+        stepName: 'mock name',
+        stepDetails: 'mock details',
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_STATE,
 
-        module: tcModuleId,
+        moduleId: tcModuleId,
         blockTargetTemp: 45,
         lidTargetTemp: 40,
         lidOpen: false,
@@ -46,7 +55,6 @@ describe('thermocyclerFormToArgs', () => {
         ...getDefaultsForStepType('thermocycler'),
         stepType: 'thermocycler',
         id: 'testId',
-        description: 'some description',
 
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_STATE,
@@ -55,11 +63,22 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActive: true,
         lidTargetTemp: '40',
         lidOpen: false,
+        blockIsActiveHold: false,
+        lidIsActiveHold: false,
+        lidOpenHold: false,
+        blockTargetTempHold: null,
+        lidTargetTempHold: null,
+        orderedProfileItems: [],
+        profileItemsById: {},
+        profileTargetLidTemp: null,
+        profileVolume: '10',
+        stepName: 'mock name',
+        stepDetails: 'mock details',
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_STATE,
 
-        module: tcModuleId,
+        moduleId: tcModuleId,
         blockTargetTemp: null,
         lidTargetTemp: 40,
         lidOpen: false,
@@ -71,11 +90,14 @@ describe('thermocyclerFormToArgs', () => {
         ...getDefaultsForStepType('thermocycler'),
         stepType: 'thermocycler',
         id: 'testId',
-        description: 'some description',
-
+        stepName: 'mock name',
+        stepDetails: 'mock details',
         moduleId: tcModuleId,
         thermocyclerFormType: THERMOCYCLER_PROFILE,
-
+        blockTargetTemp: '9999',
+        lidIsActive: true,
+        lidTargetTemp: '40',
+        lidOpen: false,
         profileVolume: '4',
         profileTargetLidTemp: '40',
         orderedProfileItems: ['profileItem1', 'profileItem2'],
@@ -117,10 +139,11 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActiveHold: true,
         lidTargetTempHold: '5',
         lidOpenHold: true,
+        blockIsActive: false,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
-        module: tcModuleId,
+        moduleId: tcModuleId,
 
         blockTargetTempHold: null,
         lidOpenHold: true,

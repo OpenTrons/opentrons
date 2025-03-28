@@ -126,8 +126,10 @@ async def test_sim_state(subject: modules.Thermocycler) -> None:
     assert subject.target is None
     assert subject.status == "idle"
     assert subject.live_data["status"] == subject.status
-    assert subject.live_data["data"]["currentTemp"] == subject.temperature
-    assert subject.live_data["data"]["targetTemp"] == subject.target
+    live_data = subject.live_data["data"]
+    assert modules.ModuleDataValidator.is_thermocycler_data(live_data)
+    assert live_data["currentTemp"] == subject.temperature
+    assert live_data["targetTemp"] == subject.target
     status = subject.device_info
     assert status["serial"] == "dummySerialTC"
     assert status["model"] == "dummyModelTC"

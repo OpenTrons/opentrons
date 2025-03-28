@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
+import styled from 'styled-components'
 import {
   RESPONSIVENESS,
   SPACING,
@@ -7,7 +8,6 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import { css } from 'styled-components'
 import { ProbeNotAttached } from '/app/organisms/PipetteWizardFlows/ProbeNotAttached'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
@@ -28,6 +28,21 @@ import type {
   RegisterPositionAction,
   WorkingOffset,
 } from './types'
+
+const StyledVideo = styled.video`
+  padding-top: ${SPACING.spacing4};
+  width: 100%;
+  min-height: 18rem;
+`
+
+const StyledBody = styled(LegacyStyledText)`
+  ${TYPOGRAPHY.pRegular};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-size: 1.275rem;
+    line-height: 1.75rem;
+  }
+`
 
 interface AttachProbeProps extends AttachProbeStep {
   protocolData: CompletedProtocolAnalysis
@@ -155,42 +170,24 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
       rightHandBody={
-        <video
-          css={css`
-            padding-top: ${SPACING.spacing4};
-            width: 100%;
-            min-height: 18rem;
-          `}
-          autoPlay={true}
-          loop={true}
-          controls={false}
-        >
+        <StyledVideo autoPlay loop controls={false}>
           <source src={probeVideoSrc} />
-        </video>
+        </StyledVideo>
       }
       bodyText={
-        <LegacyStyledText css={BODY_STYLE}>
+        <StyledBody>
           <Trans
             t={t}
-            i18nKey={'install_probe'}
+            i18nKey={'legacy_install_probe'}
             values={{ location: probeLocation }}
             components={{
               bold: <strong />,
             }}
           />
-        </LegacyStyledText>
+        </StyledBody>
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
       proceed={handleProbeAttached}
     />
   )
 }
-
-export const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`

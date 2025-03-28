@@ -141,9 +141,9 @@ class CompletedAnalysis(BaseModel):
 
     # Fields that should match local analysis:
     robotType: Optional[RobotType] = Field(
-        # robotType is deliberately typed as a Literal instead of an Enum.
-        # It's a bad idea at the moment to store enums in robot-server's database.
-        # https://opentrons.atlassian.net/browse/RSS-98
+        # robotType was typed as a Literal instead of an Enum because it was a bad idea
+        # at the time to store enums in robot-server's database
+        # (https://opentrons.atlassian.net/browse/RSS-98).
         default=None,  # default=None to fit objects that were stored before this field existed.
         description=(
             "The type of robot that this protocol can run on."

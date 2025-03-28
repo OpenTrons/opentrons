@@ -41,6 +41,15 @@ def copy_rows_unmodified(
         dest_connection.execute(insert, row)
 
 
+def copy_contents(source_dir: Path, dest_dir: Path) -> None:
+    """Copy the contents of one directory to another (assumed to be empty)."""
+    for item in source_dir.iterdir():
+        if item.is_dir():
+            shutil.copytree(src=item, dst=dest_dir / item.name)
+        else:
+            shutil.copy(src=item, dst=dest_dir / item.name)
+
+
 def copy_if_exists(src: Path, dst: Path) -> None:
     """Like `shutil.copy()`, but no-op if `src` doesn't exist."""
     try:

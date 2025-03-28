@@ -1,4 +1,5 @@
 """A Protocol-Engine-friendly wrapper for opentrons.motion_planning.deck_conflict."""
+
 from __future__ import annotations
 import itertools
 import logging
@@ -24,7 +25,9 @@ from opentrons.protocol_engine import (
     ModuleLocation,
     OnLabwareLocation,
     AddressableAreaLocation,
+    InStackerHopperLocation,
     OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
 from opentrons.types import DeckSlotName, StagingSlotName, Point
@@ -245,7 +248,11 @@ def _map_labware(
         # TODO(jbl 2023-06-08) check if we need to do any logic here or if this is correct
         return None
 
-    elif location_from_engine == OFF_DECK_LOCATION:
+    elif (
+        location_from_engine == OFF_DECK_LOCATION
+        or location_from_engine == SYSTEM_LOCATION
+        or isinstance(location_from_engine, InStackerHopperLocation)
+    ):
         # This labware is off-deck. Exclude it from conflict checking.
         # todo(mm, 2023-02-23): Move this logic into wrapped_deck_conflict.
         return None
@@ -296,6 +303,9 @@ def _map_module(
                 is_semi_configuration=False,
             ),
         )
+    elif module_type == ModuleType.FLEX_STACKER:
+        # TODO: This is a placeholder. We need to implement this.
+        return None
     else:
         return (
             mapped_location,

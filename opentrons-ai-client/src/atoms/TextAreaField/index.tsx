@@ -1,22 +1,30 @@
+import { forwardRef } from 'react'
+import styled, { css } from 'styled-components'
 import {
-  TYPOGRAPHY,
-  useHoverTooltip,
-  RESPONSIVENESS,
-  SPACING,
-  COLORS,
-  BORDERS,
-  Flex,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  StyledText,
+  Flex,
   Icon,
-  Tooltip,
+  RESPONSIVENESS,
+  SPACING,
+  StyledText,
   TEXT_ALIGN_RIGHT,
+  Tooltip,
+  TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
+
+import type {
+  ChangeEventHandler,
+  FocusEvent,
+  MouseEvent,
+  MutableRefObject,
+  ReactNode,
+} from 'react'
 import type { IconName } from '@opentrons/components'
-import * as React from 'react'
-import styled, { css } from 'styled-components'
 
 export const INPUT_TYPE_NUMBER = 'number' as const
 export const LEGACY_INPUT_TYPE_TEXT = 'text' as const
@@ -27,7 +35,7 @@ export interface TextAreaFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
   /** change handler */
-  onChange?: React.ChangeEventHandler<HTMLTextAreaElement>
+  onChange?: ChangeEventHandler<HTMLTextAreaElement>
   /** name of field in form */
   name?: string
   /** optional ID of <textarea> element */
@@ -35,7 +43,7 @@ export interface TextAreaFieldProps {
   /** placeholder text */
   placeholder?: string
   /** optional suffix component, appears to the right of textarea text */
-  units?: React.ReactNode
+  units?: ReactNode
   /** current value of text in box, defaults to '' */
   value?: string | number | null
   /** if included, TextAreaField will use error style and display error instead of caption */
@@ -47,11 +55,11 @@ export interface TextAreaFieldProps {
   /** optional caption. hidden when `error` is given */
   caption?: string | null
   /** mouse click handler */
-  onClick?: (event: React.MouseEvent<HTMLTextAreaElement>) => unknown
+  onClick?: (event: MouseEvent<HTMLTextAreaElement>) => unknown
   /** focus handler */
-  onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => unknown
+  onFocus?: (event: FocusEvent<HTMLTextAreaElement>) => unknown
   /** blur handler */
-  onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => unknown
+  onBlur?: (event: FocusEvent<HTMLTextAreaElement>) => unknown
   /** makes textarea field read-only */
   readOnly?: boolean
   /** html tabindex property */
@@ -68,7 +76,7 @@ export interface TextAreaFieldProps {
     | typeof TYPOGRAPHY.textAlignLeft
     | typeof TYPOGRAPHY.textAlignCenter
   /** react useRef to control textarea field instead of react event */
-  ref?: React.MutableRefObject<HTMLTextAreaElement | null>
+  ref?: MutableRefObject<HTMLTextAreaElement | null>
   /** optional IconName to display icon aligned to left of textarea field */
   leftIcon?: IconName
   /** if true, show delete icon aligned to right of textarea field */
@@ -85,7 +93,7 @@ export interface TextAreaFieldProps {
   height?: string
 }
 
-export const TextAreaField = React.forwardRef<
+export const TextAreaField = forwardRef<
   HTMLTextAreaElement,
   TextAreaFieldProps
 >(

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+"""Generate a JSON schema representing the server's settings."""
+
 from sys import argv
 from robot_server.settings import RobotServerSettings
 

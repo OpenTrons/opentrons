@@ -16,14 +16,15 @@ import {
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_RELATIVE,
   SPACING,
+  getCommandTextData,
+  CommandText,
   LegacyStyledText,
   TYPOGRAPHY,
   StyledText,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { CommandText, CommandIcon } from '/app/molecules/Command'
-import { getCommandTextData } from '/app/local-resources/commands'
+import { CommandIcon } from '/app/molecules/Command'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'

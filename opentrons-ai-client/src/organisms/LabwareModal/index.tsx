@@ -1,3 +1,4 @@
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -14,12 +15,13 @@ import {
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { getLabwareDefURI } from '@opentrons/shared-data'
-import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { reduce } from 'lodash'
 import { ListButtonCheckbox } from '../../atoms/ListButtonCheckbox/ListButtonCheckbox'
 import { LABWARES_FIELD_NAME } from '../LabwareLiquidsSection'
 import { getOnlyLatestDefs } from '../../resources/utils'
+
+import type { ChangeEvent } from 'react'
 import type { DisplayLabware } from '../LabwareLiquidsSection'
 import type {
   LabwareDefByDefURI,
@@ -45,11 +47,9 @@ export function LabwareModal({
   const { t } = useTranslation('create_protocol')
   const { watch, setValue } = useFormContext()
   const [searchTerm, setSearchTerm] = useState<string>('')
-  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
-    null
-  )
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const labwares: DisplayLabware[] = watch(LABWARES_FIELD_NAME) ?? []
-  const [selectedLabwares, setSelectedLabwares] = React.useState<string[]>(
+  const [selectedLabwares, setSelectedLabwares] = useState<string[]>(
     labwares.map(lw => lw.labwareURI)
   )
 
@@ -61,7 +61,7 @@ export function LabwareModal({
   const labwareByCategory: Record<
     string,
     LabwareDefinition2[]
-  > = React.useMemo(() => {
+  > = useMemo(() => {
     return reduce<LabwareDefByDefURI, Record<string, LabwareDefinition2[]>>(
       defs,
       (acc, def: typeof defs[keyof typeof defs]) => {
@@ -118,7 +118,7 @@ export function LabwareModal({
                   </StyledText>
                   <InputField
                     value={searchTerm}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
                       setSearchTerm(e.target.value)
                     }}
                     placeholder={t('search_for_labware_placeholder')}
@@ -166,7 +166,7 @@ export function LabwareModal({
                                   )
                                   if (isMatch) {
                                     return (
-                                      <React.Fragment
+                                      <Fragment
                                         key={`${index}_${category}_${loadName}`}
                                       >
                                         <ListButtonCheckbox
@@ -195,7 +195,7 @@ export function LabwareModal({
                                             labwareURI
                                           )}
                                         />
-                                      </React.Fragment>
+                                      </Fragment>
                                     )
                                   }
                                 }

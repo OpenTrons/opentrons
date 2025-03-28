@@ -1,6 +1,6 @@
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import { COLUMN } from '@opentrons/shared-data'
+import { COLUMN, SINGLE } from '@opentrons/shared-data'
 import {
   splitLiquid,
   mergeLiquid,
@@ -44,7 +44,12 @@ export function dispenseUpdateLiquidState(
   } = args
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
-  const channels = nozzles === COLUMN ? 8 : pipetteSpec.channels
+  let channels = pipetteSpec.channels
+  if (nozzles === COLUMN) {
+    channels = 8
+  } else if (nozzles === SINGLE) {
+    channels = 1
+  }
   const trashId = Object.values(
     invariantContext.additionalEquipmentEntities
   ).find(aE => aE.name === 'wasteChute' || aE.name === 'trashBin')?.id

@@ -1,13 +1,13 @@
 [tool.black]
 line-length = 140
-target-version = ['py312']
+target-version = ['py310']
 
 [tool.ruff]
 # Like Black
 line-length = 140
 # Like Black
 indent-width = 4
-target-version = "py312"
+target-version = "py310"
 exclude = ["files"]
 src = ["*.py", "api", "tests"]
 

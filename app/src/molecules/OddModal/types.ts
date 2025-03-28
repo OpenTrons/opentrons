@@ -9,4 +9,5 @@ export interface OddModalHeaderBaseProps extends StyleProps {
   hasExitIcon?: boolean
   iconName?: IconName
   iconColor?: string
+  tagText?: string
 }

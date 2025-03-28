@@ -115,7 +115,6 @@ export function useRecoveryFullCommandText(
 ): string | null {
   const { commandTextData, stepNumber } = props
 
-  // TODO TOME: I think you are looking one command to far, for some reason.
   const relevantCmdIdx = stepNumber ?? -1
   const relevantCmd = commandTextData?.commands[relevantCmdIdx - 1] ?? null
 

@@ -29,8 +29,10 @@ import {
   SOURCE_LABWARE,
   getInitialRobotStateWithOffDeckLabwareStandard,
 } from '../fixtures'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type {
+  LabwareDefinition2,
+  AspDispAirgapParams,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../'
 
 const fixtureTiprack10ul = tip10 as LabwareDefinition2
@@ -38,6 +40,7 @@ const fixtureTiprack1000ul = tip1000 as LabwareDefinition2
 const FLEX_PIPETTE = 'p1000_single_flex'
 const FlexPipetteNameSpecs = getPipetteSpecsV2(FLEX_PIPETTE)
 
+vi.mock('../utils/absorbanceReaderCollision')
 vi.mock('../utils/thermocyclerPipetteCollision')
 vi.mock('../utils/heaterShakerCollision')
 
@@ -52,7 +55,10 @@ describe('aspirate', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
     flowRateAndOffsets = {
       flowRate: 6,
-      offsetFromBottomMm: 5,
+      wellLocation: {
+        origin: 'bottom',
+        offset: { z: 5, y: 0, x: 0 },
+      },
     }
   })
   afterEach(() => {
@@ -62,14 +68,12 @@ describe('aspirate', () => {
     const params = {
       ...({
         ...flowRateAndOffsets,
-        pipette: DEFAULT_PIPETTE,
+        pipetteId: DEFAULT_PIPETTE,
         volume: 50,
-        labware: SOURCE_LABWARE,
-        well: 'A1',
+        labwareId: SOURCE_LABWARE,
+        wellName: 'A1',
       } as AspDispAirgapParams),
       tipRack: 'tiprack1Id',
-      xOffset: 0,
-      yOffset: 0,
       nozzles: null,
     }
     const result = aspirate(params, invariantContext, robotStateWithTip)
@@ -94,6 +98,14 @@ describe('aspirate', () => {
         },
       },
     ])
+    expect(getSuccessResult(result).python).toBe(
+      `
+mockPythonName.aspirate(
+    volume=50,
+    location=mockPythonName["A1"].bottom(z=5),
+    rate=6 / mockPythonName.flow_rate.aspirate,
+)`.trimStart()
+    )
   })
   it('aspirate with volume > tip max volume should throw error', () => {
     invariantContext.pipetteEntities[DEFAULT_PIPETTE].tiprackDefURI = [
@@ -106,14 +118,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 201,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tiprack1Id',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -136,14 +146,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 301,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -159,14 +167,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: 'badPipette',
+          pipetteId: 'badPipette',
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -179,14 +185,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -202,14 +206,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: 'problemaaticLabwareId',
-          well: 'A1',
+          labwareId: 'problemaaticLabwareId',
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -229,14 +231,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -264,14 +264,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -299,14 +297,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -340,14 +336,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -375,14 +369,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -416,14 +408,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -447,14 +437,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -477,14 +465,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -508,14 +494,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,
@@ -540,14 +524,12 @@ describe('aspirate', () => {
       {
         ...({
           ...flowRateAndOffsets,
-          pipette: DEFAULT_PIPETTE,
+          pipetteId: DEFAULT_PIPETTE,
           volume: 50,
-          labware: SOURCE_LABWARE,
-          well: 'A1',
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
         } as AspDispAirgapParams),
         tipRack: 'tipRack',
-        xOffset: 0,
-        yOffset: 0,
         nozzles: null,
       },
       invariantContext,

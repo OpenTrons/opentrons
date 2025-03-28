@@ -2,10 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, beforeEach, vi, expect } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
-import {
-  opentrons96PcrAdapterV1,
-  getTopLabwareInfo,
-} from '@opentrons/shared-data'
+import { opentrons96PcrAdapterV1 } from '@opentrons/shared-data'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -16,32 +13,21 @@ import {
   mockTemperatureModule,
   mockThermocycler,
 } from '/app/redux/modules/__fixtures__'
-import { getLocationInfoNames } from '/app/transformations/commands'
 import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
 import { SecureLabwareModal } from '../SecureLabwareModal'
 import { LabwareListItem } from '../LabwareListItem'
 
 import type { ComponentProps } from 'react'
 import type {
-  LoadLabwareRunTimeCommand,
   ModuleModel,
   ModuleType,
   LabwareDefinition2,
-  LoadModuleRunTimeCommand,
 } from '@opentrons/shared-data'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { ModuleRenderInfoForProtocol } from '/app/resources/runs'
 
 vi.mock('../SecureLabwareModal')
-vi.mock('/app/transformations/commands')
 vi.mock('@opentrons/react-api-client')
-vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actualSharedData = await importOriginal<typeof getTopLabwareInfo>()
-  return {
-    ...actualSharedData,
-    getTopLabwareInfo: vi.fn(),
-  }
-})
 
 const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition2
 const mockAdapterId = 'mockAdapterId'
@@ -100,27 +86,21 @@ describe('LabwareListItem', () => {
     vi.mocked(useCreateLiveCommandMutation).mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-    vi.mocked(getLocationInfoNames).mockReturnValue({
-      slotName: '7',
-      labwareName: 'Mock Labware Definition',
-      labwareNickname: 'nickName',
-      labwareQuantity: 1,
-    })
-    vi.mocked(getTopLabwareInfo).mockReturnValue({
-      topLabwareId: '1',
-      topLabwareDefinition: mockLabwareDef,
-    })
   })
 
   it('renders the correct info for a thermocycler (OT2), clicking on secure labware instructions opens the modal', () => {
     render({
-      commands: [],
-      nickName: mockNickName,
-      labwareId: '7',
-      definition: mockLabwareDef,
-      initialLocation: { moduleId: mockModuleId },
-      moduleModel: 'thermocyclerModuleV1' as ModuleModel,
-      moduleLocation: mockModuleSlot,
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: mockNickName,
+          definitionUri: 'mockDefUri',
+        },
+        {
+          moduleId: 'thermocyclerModuleId',
+          moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+        },
+      ],
       extraAttentionModules: ['thermocyclerModuleType'],
       attachedModuleInfo: {
         [mockModuleId]: ({
@@ -131,25 +111,31 @@ describe('LabwareListItem', () => {
         } as any) as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
+      slotName: '7,8,10,11',
+      onClick: vi.fn(),
+      labwareByLiquidId: {},
     })
-    screen.getByText('Mock Labware Definition')
     screen.getByText('nickName')
-    screen.getByText('Thermocycler Module GEN1')
-    screen.getByText('7,8,10,11')
+    screen.getByTestId('DeckInfoLabel_ot-thermocycler')
+    screen.getByTestId('slot_info_7,8,10,11')
     const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
     screen.getByText('mock secure labware modal')
-    screen.getByText('nickName')
   })
 
   it('renders the correct info for a thermocycler (OT3)', () => {
     render({
-      commands: [],
-      nickName: mockNickName,
-      definition: mockLabwareDef,
-      initialLocation: { moduleId: mockModuleId },
-      moduleModel: 'thermocyclerModuleV1' as ModuleModel,
-      moduleLocation: mockModuleSlot,
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: mockNickName,
+          definitionUri: 'mockDefUri',
+        },
+        {
+          moduleId: 'thermocyclerModuleId',
+          moduleModel: 'thermocyclerModuleV1' as ModuleModel,
+        },
+      ],
       extraAttentionModules: ['thermocyclerModuleType'],
       attachedModuleInfo: {
         [mockModuleId]: ({
@@ -160,20 +146,28 @@ describe('LabwareListItem', () => {
         } as any) as ModuleRenderInfoForProtocol,
       },
       isFlex: true,
+      slotName: 'A1+B1',
+      onClick: vi.fn(),
     })
-    screen.getByText('Mock Labware Definition')
-    screen.getByText('A1+B1')
-    screen.getByText('Thermocycler Module GEN1')
+    screen.getByText(mockNickName)
+    screen.getByTestId('DeckInfoLabel_ot-thermocycler')
+    screen.getByTestId('DeckInfoLabel_A1+B1')
   })
 
   it('renders the correct info for a labware on top of a magnetic module', () => {
     render({
-      commands: [],
-      nickName: mockNickName,
-      definition: mockLabwareDef,
-      initialLocation: { moduleId: mockModuleId },
-      moduleModel: 'magneticModuleV1' as ModuleModel,
-      moduleLocation: mockModuleSlot,
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: mockNickName,
+          definitionUri: 'mockDefUri',
+        },
+        {
+          moduleId: 'magneticModuleId',
+          moduleModel: 'magneticModuleV1' as ModuleModel,
+        },
+      ],
+      slotName: mockModuleSlot.slotName,
       extraAttentionModules: ['magneticModuleType'],
       attachedModuleInfo: {
         [mockModuleId]: ({
@@ -190,25 +184,30 @@ describe('LabwareListItem', () => {
         } as any) as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
+      onClick: vi.fn(),
     })
-    screen.getByText('Mock Labware Definition')
+    screen.getByText(mockNickName)
+    screen.getByTestId('DeckInfoLabel_ot-magnet-v2')
     screen.getByTestId('slot_info_7')
-    screen.getByTestId('DeckInfoLabel_stacked')
-    screen.getByText('Magnetic Module GEN1')
     const button = screen.getByText('Secure labware instructions')
     fireEvent.click(button)
     screen.getByText('mock secure labware modal')
-    screen.getByText('nickName')
   })
 
   it('renders the correct info for a labware on top of a temperature module', () => {
     render({
-      commands: [],
-      nickName: mockNickName,
-      definition: mockLabwareDef,
-      initialLocation: { moduleId: mockModuleId },
-      moduleModel: 'temperatureModuleV1' as ModuleModel,
-      moduleLocation: mockModuleSlot,
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: mockNickName,
+          definitionUri: 'mockDefUri',
+        },
+        {
+          moduleId: 'temperatureModuleId',
+          moduleModel: 'temperatureModuleV1' as ModuleModel,
+        },
+      ],
+      slotName: mockModuleSlot.slotName,
       extraAttentionModules: [],
       attachedModuleInfo: {
         [mockModuleId]: ({
@@ -224,49 +223,32 @@ describe('LabwareListItem', () => {
         } as any) as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
+      onClick: vi.fn(),
     })
-    screen.getByText('Mock Labware Definition')
+    screen.getByText(mockNickName)
+    screen.getByTestId('DeckInfoLabel_ot-temperature-v2')
     screen.getByTestId('slot_info_7')
-    screen.getByTestId('DeckInfoLabel_stacked')
-    screen.getByText('Temperature Module GEN1')
-    screen.getByText('nickName')
   })
 
   it('renders the correct info for a labware on an adapter on top of a temperature module', () => {
-    const mockAdapterLoadCommand: LoadLabwareRunTimeCommand = {
-      commandType: 'loadLabware',
-      params: {
-        location: { moduleId: mockModuleId },
-      },
-      result: {
-        labwareId: mockAdapterId,
-        definition: mockAdapterDef,
-      },
-      offsets: {
-        x: 0,
-        y: 1,
-        z: 1.2,
-      },
-    } as any
-    const mockModuleLoadCommand: LoadModuleRunTimeCommand = {
-      commandType: 'loadModule',
-      params: {
-        moduleId: mockModuleId,
-        location: { slotName: '7' },
-        model: 'temperatureModuleV2',
-      },
-      result: {
-        moduleId: mockModuleId,
-      },
-    } as any
-
     render({
-      commands: [mockAdapterLoadCommand, mockModuleLoadCommand],
-      nickName: mockNickName,
-      definition: mockLabwareDef,
-      initialLocation: { labwareId: mockAdapterId },
-      moduleModel: 'temperatureModuleV2' as ModuleModel,
-      moduleLocation: mockModuleSlot,
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: mockNickName,
+          definitionUri: 'mockDefUri',
+        },
+        {
+          labwareId: mockAdapterId,
+          displayName: mockAdapterDef.metadata.displayName,
+          definitionUri: 'mockDefUri2',
+        },
+        {
+          moduleId: 'temperatureModuleId',
+          moduleModel: 'temperatureModuleV2' as ModuleModel,
+        },
+      ],
+      slotName: '7',
       extraAttentionModules: [],
       attachedModuleInfo: {
         [mockModuleId]: ({
@@ -282,65 +264,55 @@ describe('LabwareListItem', () => {
         } as any) as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
+      onClick: vi.fn(),
     })
-    screen.getByText('Mock Labware Definition')
-    screen.getAllByText('7')
-    screen.getByText('Temperature Module GEN2')
-    screen.getByText('Mock Labware Definition')
-    screen.getByText('nickName')
+    screen.getByText(mockNickName)
+    screen.getByTestId('slot_info_7')
+    screen.getByTestId('DeckInfoLabel_ot-temperature-v2')
+    screen.getByTestId('DeckInfoLabel_stacked')
+    screen.getByText(mockAdapterDef.metadata.displayName)
   })
 
   it('renders the correct info for a labware on an adapter on the deck', () => {
-    const mockAdapterLoadCommand: LoadLabwareRunTimeCommand = {
-      commandType: 'loadLabware',
-      params: {
-        location: { slotName: 'A2' },
-      },
-      result: {
-        labwareId: mockAdapterId,
-        definition: mockAdapterDef,
-      },
-      offsets: {
-        x: 0,
-        y: 1,
-        z: 1.2,
-      },
-    } as any
-    vi.mocked(getLocationInfoNames).mockReturnValue({
-      slotName: 'A2',
-      labwareName: 'Mock Labware Name',
-      labwareNickname: 'labware nick name',
-      labwareQuantity: 1,
-      adapterName: 'mock adapter name',
-    })
-
     render({
-      commands: [mockAdapterLoadCommand],
-      nickName: 'mock adapter nick name',
-      definition: mockLabwareDef,
-      initialLocation: { labwareId: mockAdapterId },
-      moduleModel: null,
-      moduleLocation: null,
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: 'labware nick name',
+          definitionUri: 'mockDefUri',
+        },
+        {
+          labwareId: mockAdapterId,
+          displayName: 'mock adapter nick name',
+          definitionUri: 'mockDefUri2',
+        },
+      ],
+      slotName: 'A2',
       extraAttentionModules: [],
       attachedModuleInfo: {},
-      isFlex: false,
-      labwareId: '5',
+      isFlex: true,
+      onClick: vi.fn(),
     })
-    screen.getByText('Mock Labware Name')
     screen.getByText('labware nick name')
-    screen.getByText('A2')
-    screen.getByText('mock adapter name')
+    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByTestId('DeckInfoLabel_stacked')
     screen.getByText('mock adapter nick name')
   })
 
   it('renders the correct info for a labware on top of a heater shaker', () => {
     render({
-      nickName: mockNickName,
-      commands: [],
-      definition: mockLabwareDef,
-      initialLocation: { moduleId: mockModuleId },
-      moduleModel: 'heaterShakerModuleV1' as ModuleModel,
-      moduleLocation: mockModuleSlot,
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: mockNickName,
+          definitionUri: 'mockDefUri',
+        },
+        {
+          moduleId: mockModuleId,
+          moduleModel: 'heaterShakerModuleV1' as ModuleModel,
+        },
+      ],
+      slotName: mockModuleSlot.slotName,
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {
         [mockModuleId]: ({
@@ -356,12 +328,11 @@ describe('LabwareListItem', () => {
         } as any) as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
+      onClick: vi.fn(),
     })
-    screen.getByText('Mock Labware Definition')
+    screen.getByText(mockNickName)
+    screen.getByTestId('DeckInfoLabel_ot-heater-shaker')
     screen.getByTestId('slot_info_7')
-    screen.getByText('Heater-Shaker Module GEN1')
-    screen.getByText('nickName')
-    screen.getByText('To add labware, use the toggle to control the latch')
     screen.getByText('Labware Latch')
     screen.getByText('Secure')
     const button = screen.getByLabelText('heater_shaker_7_latch_toggle')
@@ -377,19 +348,172 @@ describe('LabwareListItem', () => {
   })
 
   it('renders the correct info for an off deck labware', () => {
-    vi.mocked(getTopLabwareInfo)
     render({
-      nickName: null,
-      definition: mockLabwareDef,
-      initialLocation: 'offDeck',
-      commands: [],
-      moduleModel: null,
-      moduleLocation: null,
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: mockLabwareDef.metadata.displayName,
+          definitionUri: 'mockDefUri',
+        },
+      ],
+      slotName: 'offDeck',
       extraAttentionModules: [],
       attachedModuleInfo: {},
       isFlex: false,
+      onClick: vi.fn(),
     })
     screen.getByText('Mock Labware Definition')
     screen.getByTestId('slot_info_OFF DECK')
+  })
+  it('renders the correct info for labware with a lid', () => {
+    render({
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: 'tiprack displayName',
+          definitionUri: 'mockDefUri',
+          lidDisplayName: 'tiprack lid',
+          lidId: '4',
+        },
+      ],
+      slotName: 'A2',
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isFlex: true,
+      onClick: vi.fn(),
+    })
+    screen.getByText('tiprack displayName')
+    screen.getByText('With tiprack lid')
+    screen.getByTestId('DeckInfoLabel_A2')
+  })
+  it('renders the correct info for stack of like labware', () => {
+    render({
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: 'tc lid',
+          definitionUri: 'mockDefUri',
+        },
+        {
+          labwareId: '8',
+          displayName: 'tc lid',
+          definitionUri: 'mockDefUri',
+        },
+        {
+          labwareId: '9',
+          displayName: 'tc lid',
+          definitionUri: 'mockDefUri',
+        },
+      ],
+      slotName: 'A2',
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isFlex: true,
+      onClick: vi.fn(),
+    })
+    screen.getByText('tc lid')
+    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByTestId('DeckInfoLabel_stacked')
+    screen.getByText('Quantity: 3')
+  })
+  it('renders the correct info for labware with one liquids', () => {
+    render({
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: 'mock wellplate name',
+          definitionUri: 'mockDefUri',
+        },
+      ],
+      slotName: 'A2',
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isFlex: true,
+      onClick: vi.fn(),
+      labwareByLiquidId: {
+        '123': [
+          {
+            labwareId: '7',
+            volumeByWell: {},
+          },
+        ],
+      },
+    })
+    screen.getByText('mock wellplate name')
+    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByText('1 liquid')
+  })
+  it('renders the correct info for labware with multiple liquids', () => {
+    render({
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: 'mock wellplate name',
+          definitionUri: 'mockDefUri',
+        },
+      ],
+      slotName: 'A2',
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isFlex: true,
+      onClick: vi.fn(),
+      labwareByLiquidId: {
+        '123': [
+          {
+            labwareId: '7',
+            volumeByWell: {},
+          },
+        ],
+        '56': [
+          {
+            labwareId: '7',
+            volumeByWell: {},
+          },
+        ],
+      },
+    })
+    screen.getByText('mock wellplate name')
+    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByText('2 liquids')
+  })
+  it('renders the correct info for stack of varied labware with liquids', () => {
+    render({
+      stackedItems: [
+        {
+          labwareId: '7',
+          displayName: 'mock wellplate name',
+          definitionUri: 'mockDefUri',
+        },
+        {
+          labwareId: '5',
+          displayName: 'mock wellplate name',
+          definitionUri: 'mockDefUri',
+        },
+      ],
+      slotName: 'A2',
+      extraAttentionModules: [],
+      attachedModuleInfo: {},
+      isFlex: true,
+      onClick: vi.fn(),
+      labwareByLiquidId: {
+        '123': [
+          {
+            labwareId: '7',
+            volumeByWell: {},
+          },
+        ],
+        '56': [
+          {
+            labwareId: '7',
+            volumeByWell: {},
+          },
+        ],
+      },
+    })
+    screen.getByText('mock wellplate name')
+    screen.getByTestId('DeckInfoLabel_stacked')
+    screen.getByTestId('DeckInfoLabel_A2')
+    screen.getByText('Quantity: 2')
+    screen.getByText('Multiple liquid layouts')
   })
 })

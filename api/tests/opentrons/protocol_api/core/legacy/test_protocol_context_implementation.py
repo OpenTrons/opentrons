@@ -5,7 +5,7 @@ from typing import Any, Dict, cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.labware.types import LabwareDefinition2 as LabwareDefDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.module.types import ModuleDefinitionV3
 
@@ -204,6 +204,7 @@ def test_load_labware(
     labware_definition_dict = cast(
         LabwareDefDict,
         {
+            "schemaVersion": 2,
             "namespace": "super cool namespace",
             "parameters": {"loadName": "super cool load name"},
             "version": 42,
@@ -301,6 +302,7 @@ def test_load_labware_on_module(
     labware_definition_dict = cast(
         LabwareDefDict,
         {
+            "schemaVersion": 2,
             "namespace": "super cool namespace",
             "parameters": {"loadName": "super cool load name"},
             "version": 42,

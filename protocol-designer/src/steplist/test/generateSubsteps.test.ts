@@ -12,10 +12,6 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   RobotState,
   InvariantContext,
-  SetTemperatureArgs,
-  EngageMagnetArgs,
-  DisengageMagnetArgs,
-  DeactivateTemperatureArgs,
   ThermocyclerStateStepArgs,
 } from '../../../../step-generation/src/types'
 import type { StepArgsAndErrors, LabwareNamesByModuleId } from '../types'
@@ -114,34 +110,6 @@ describe('generateSubstepItem', () => {
       )
 
       expect(result).toBeNull()
-    })
-  })
-
-  it('delay command returns pause substep data', () => {
-    const stepArgsAndErrors: StepArgsAndErrors = {
-      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
-      errors: {},
-      // @ts-expect-error(sa, 2021-6-15): stepArgs missing name and description
-      stepArgs: {
-        commandCreatorFnName: 'delay',
-        message: 'test',
-        wait: true,
-      },
-    }
-    // @ts-expect-error(sa, 2021-6-15): missing parameters to make valid robot state
-    const robotState = makeInitialRobotState({ invariantContext })
-
-    const result = generateSubstepItem(
-      stepArgsAndErrors,
-      invariantContext,
-      robotState,
-      stepId,
-      labwareNamesByModuleId
-    )
-
-    expect(result).toEqual({
-      substepType: 'pause',
-      pauseStepArgs: stepArgsAndErrors.stepArgs,
     })
   })
 
@@ -396,13 +364,12 @@ describe('generateSubstepItem', () => {
         volume: 50,
         times: 2,
         touchTip: false,
-        touchTipMmFromBottom: 5,
+        touchTipMmFromTop: -5,
         changeTip: 'always',
         blowoutLocation: null,
         blowoutFlowRateUlSec: 3,
         blowoutOffsetFromTopMm: 3,
-        aspirateOffsetFromBottomMm: 4,
-        dispenseOffsetFromBottomMm: 10,
+        offsetFromBottomMm: 4,
         aspirateFlowRateUlSec: 5,
         dispenseFlowRateUlSec: 5,
         dropTipLocation: FIXED_TRASH_ID,
@@ -547,158 +514,9 @@ describe('generateSubstepItem', () => {
     expect(result).toEqual(expected)
   })
 
-  it('engageMagnet returns substep data with engage = true', () => {
-    const engageMagnetArgs: EngageMagnetArgs = {
-      module: 'magnet123',
-      commandCreatorFnName: 'engageMagnet',
-      // @ts-expect-error(sa, 2021-6-15): message should be string or undefined
-      message: null,
-    }
-    const stepArgsAndErrors: StepArgsAndErrors = {
-      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
-      errors: {},
-      stepArgs: engageMagnetArgs,
-    }
-
-    const result = generateSubstepItem(
-      stepArgsAndErrors,
-      invariantContext,
-      robotState,
-      stepId,
-      labwareNamesByModuleId
-    )
-
-    expect(result).toEqual({
-      substepType: 'magnet',
-      engage: true,
-      labwareNickname: 'mag nickname',
-      message: null,
-    })
-  })
-
-  it('disengageMagnet returns substep data with engage = false', () => {
-    const disengageMagnetArgs: DisengageMagnetArgs = {
-      module: 'magnet123',
-      commandCreatorFnName: 'disengageMagnet',
-      // @ts-expect-error(sa, 2021-6-15): message cannot be null
-      message: null,
-    }
-    const stepArgsAndErrors: StepArgsAndErrors = {
-      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
-      errors: {},
-      stepArgs: disengageMagnetArgs,
-    }
-
-    const result = generateSubstepItem(
-      stepArgsAndErrors,
-      invariantContext,
-      robotState,
-      stepId,
-      labwareNamesByModuleId
-    )
-
-    expect(result).toEqual({
-      substepType: 'magnet',
-      engage: false,
-      labwareNickname: 'mag nickname',
-      message: null,
-    })
-  })
-
-  it('setTemperature returns substep data with temperature', () => {
-    const setTempArgs: SetTemperatureArgs = {
-      module: 'tempId',
-      commandCreatorFnName: 'setTemperature',
-      targetTemperature: 45,
-      // @ts-expect-error(sa, 2021-6-15): message cannot be null
-      message: null,
-    }
-    const stepArgsAndErrors: StepArgsAndErrors = {
-      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
-      errors: {},
-      stepArgs: setTempArgs,
-    }
-
-    const result = generateSubstepItem(
-      stepArgsAndErrors,
-      invariantContext,
-      robotState,
-      stepId,
-      labwareNamesByModuleId
-    )
-
-    expect(result).toEqual({
-      substepType: 'temperature',
-      temperature: 45,
-      labwareNickname: 'temp nickname',
-      message: null,
-      moduleId: 'tempId',
-    })
-  })
-
-  it('setTemperature returns temperature when 0', () => {
-    const setTempArgs: SetTemperatureArgs = {
-      module: 'tempId',
-      commandCreatorFnName: 'setTemperature',
-      targetTemperature: 0,
-      // @ts-expect-error(sa, 2021-6-15): message cannot be null
-      message: null,
-    }
-    const stepArgsAndErrors: StepArgsAndErrors = {
-      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
-      errors: {},
-      stepArgs: setTempArgs,
-    }
-
-    const result = generateSubstepItem(
-      stepArgsAndErrors,
-      invariantContext,
-      robotState,
-      stepId,
-      labwareNamesByModuleId
-    )
-
-    expect(result).toEqual({
-      substepType: 'temperature',
-      temperature: 0,
-      labwareNickname: 'temp nickname',
-      message: null,
-      moduleId: 'tempId',
-    })
-  })
-
-  it('deactivateTemperature returns substep data with null temp', () => {
-    const deactivateTempArgs: DeactivateTemperatureArgs = {
-      module: 'tempId',
-      commandCreatorFnName: 'deactivateTemperature',
-      // @ts-expect-error(sa, 2021-6-15): message cannot be null
-      message: null,
-    }
-    const stepArgsAndErrors: StepArgsAndErrors = {
-      // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
-      errors: {},
-      stepArgs: deactivateTempArgs,
-    }
-    const result = generateSubstepItem(
-      stepArgsAndErrors,
-      invariantContext,
-      robotState,
-      stepId,
-      labwareNamesByModuleId
-    )
-
-    expect(result).toEqual({
-      substepType: 'temperature',
-      temperature: null,
-      labwareNickname: 'temp nickname',
-      message: null,
-      moduleId: 'tempId',
-    })
-  })
-
   it('thermocyclerState returns substep data', () => {
     const ThermocyclerStateArgs: ThermocyclerStateStepArgs = {
-      module: 'thermocyclerModuleId',
+      moduleId: 'thermocyclerModuleId',
       commandCreatorFnName: THERMOCYCLER_STATE,
       message: 'a message',
       blockTargetTemp: 44,

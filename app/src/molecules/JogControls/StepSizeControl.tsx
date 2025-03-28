@@ -25,7 +25,8 @@ import type { MouseEvent } from 'react'
 import type { StepSize } from './types'
 
 const JUMP_SIZE_SUBTITLE = '- / +'
-const JUMP_SIZE_ICON_STYLE = css`
+
+const StyledIcon = styled(Icon)`
   flex-shrink: 0;
 `
 
@@ -77,6 +78,7 @@ const DEFAULT_BUTTON_STYLE = css`
     color: ${COLORS.grey40};
   }
 `
+
 const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
   color: ${COLORS.blue50};
@@ -88,11 +90,13 @@ const ACTIVE_BUTTON_STYLE = css`
     outline: 0;
   }
 `
+
 interface StepSizeControlProps {
   stepSizes: StepSize[]
   currentStepSize: StepSize
   setCurrentStepSize: (stepSize: StepSize) => void
 }
+
 export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
   const { t } = useTranslation(['robot_calibration'])
@@ -125,7 +129,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
       >
         <Flex flexDirection={DIRECTION_COLUMN} flex="1">
           <Flex flexDirection={DIRECTION_ROW}>
-            <Icon name="jump-size" width="1.2rem" css={JUMP_SIZE_ICON_STYLE} />
+            <StyledIcon name="jump-size" width="1.2rem" />
             <LegacyStyledText
               textTransform={TEXT_TRANSFORM_CAPITALIZE}
               css={TYPOGRAPHY.pSemiBold}

@@ -14,6 +14,7 @@ from .pipetting_common import (
     FlowRateMixin,
     BaseLiquidHandlingResult,
     OverpressureError,
+    DEFAULT_CORRECTION_VOLUME,
 )
 from .command import (
     AbstractCommandImpl,
@@ -84,9 +85,8 @@ class AirGapInPlaceImplementation(
             PipetteNotReadyToAirGapError: pipette plunger is not ready.
         """
         ready_to_aspirate = self._pipetting.get_is_ready_to_aspirate(
-            pipette_id=params.pipetteId,
+            pipette_id=params.pipetteId
         )
-
         if not ready_to_aspirate:
             raise PipetteNotReadyToAspirateError(
                 "Pipette cannot air gap in place because of a previous blow out."
@@ -103,6 +103,7 @@ class AirGapInPlaceImplementation(
                 volume=params.volume,
                 flow_rate=params.flowRate,
                 command_note_adder=self._command_note_adder,
+                correction_volume=params.correctionVolume or DEFAULT_CORRECTION_VOLUME,
             )
         except PipetteOverpressureError as e:
             return DefinedErrorData(

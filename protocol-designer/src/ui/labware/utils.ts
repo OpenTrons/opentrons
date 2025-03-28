@@ -39,25 +39,27 @@ function resolveSlotLocation(
   }
 }
 
-export function getLabwareLatestSlot(
+export function getLabwareLatestSlotFromCurrentStepIndex(
   initialDeckSetup: InitialDeckSetup,
   savedStepForms: SavedStepFormState,
   labwareId: string,
-  robotType: RobotType
+  robotType: RobotType,
+  filteredSavedStepFormIds: string[]
 ): string | null {
   const { modules, labware, additionalEquipmentOnDeck } = initialDeckSetup
   const initialSlot = labware[labwareId]?.slot
   const hasWasteChute = getHasWasteChute(additionalEquipmentOnDeck)
 
-  //  latest moveLabware step related to labwareId
-  const moveLabwareStep = Object.values(savedStepForms)
+  //  latest moveLabware step related to labwareId at given index
+  const moveLabwareStepId = filteredSavedStepFormIds
     .filter(
-      state =>
-        state.stepType === 'moveLabware' &&
-        labwareId != null &&
-        labwareId === state.labware
+      id =>
+        savedStepForms[id].stepType === 'moveLabware' &&
+        savedStepForms[id].labware === labwareId
     )
-    .reverse()[0]
+    .pop()
+  const moveLabwareStep =
+    moveLabwareStepId != null ? savedStepForms[moveLabwareStepId] : null
 
   if (
     hasWasteChute &&

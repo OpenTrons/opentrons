@@ -5,7 +5,7 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 import { getModuleInitialLoadInfo } from '/app/transformations/commands'
-import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition2,
@@ -67,7 +67,10 @@ export const getTiprackIdsInOrder = (
           ...tipRackLocations.map(loc => ({
             definition: labwareDef,
             labwareId: labwareId,
-            slot: loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : '',
+            slot:
+              loc !== 'offDeck' && loc !== 'systemLocation' && 'slotName' in loc
+                ? loc.slotName
+                : '',
           })),
         ]
       }
@@ -125,7 +128,10 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
         ...tipRackLocations.map(loc => ({
           labwareId: tipRackId,
           definition,
-          slot: loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : '',
+          slot:
+            loc !== 'offDeck' && loc !== 'systemLocation' && 'slotName' in loc
+              ? loc.slotName
+              : '',
         })),
       ]
     }, [])
@@ -164,7 +170,7 @@ export const getLabwareIdsInOrder = (
         ...acc,
         ...labwareLocations.reduce<LabwareToOrder[]>((innerAcc, loc) => {
           let slot = ''
-          if (loc === 'offDeck') {
+          if (loc === 'offDeck' || loc === 'systemLocation') {
             slot = 'offDeck'
           } else if ('moduleId' in loc) {
             slot = getModuleInitialLoadInfo(loc.moduleId, commands).location
@@ -176,7 +182,10 @@ export const getLabwareIdsInOrder = (
                 command.result?.labwareId === loc.labwareId
             )
             const adapterLocation = matchingAdapter?.params.location
-            if (adapterLocation === 'offDeck') {
+            if (
+              adapterLocation === 'offDeck' ||
+              adapterLocation === 'systemLocation'
+            ) {
               slot = 'offDeck'
             } else if (
               adapterLocation != null &&

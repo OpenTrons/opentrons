@@ -53,7 +53,7 @@ export function getLocationInfoNames(
     loadLabwareCommands
   )
 
-  if (labwareLocation === 'offDeck') {
+  if (labwareLocation === 'offDeck' || labwareLocation === 'systemLocation') {
     return { slotName: 'Off deck', labwareName, labwareQuantity }
   } else if ('slotName' in labwareLocation) {
     return { slotName: labwareLocation.slotName, labwareName, labwareQuantity }
@@ -91,6 +91,7 @@ export function getLocationInfoNames(
       return { slotName: '', labwareName: labwareName, labwareQuantity }
     } else if (
       loadedAdapterCommand?.params.location !== 'offDeck' &&
+      loadedAdapterCommand?.params.location !== 'systemLocation' &&
       'slotName' in loadedAdapterCommand?.params.location
     ) {
       return {
@@ -104,6 +105,7 @@ export function getLocationInfoNames(
       }
     } else if (
       loadedAdapterCommand?.params.location !== 'offDeck' &&
+      loadedAdapterCommand?.params.location !== 'systemLocation' &&
       'addressableAreaName' in loadedAdapterCommand?.params.location
     ) {
       return {
@@ -117,6 +119,7 @@ export function getLocationInfoNames(
       }
     } else if (
       loadedAdapterCommand?.params.location !== 'offDeck' &&
+      loadedAdapterCommand?.params.location !== 'systemLocation' &&
       'moduleId' in loadedAdapterCommand?.params.location
     ) {
       const moduleId = loadedAdapterCommand?.params.location.moduleId

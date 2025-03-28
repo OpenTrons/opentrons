@@ -638,6 +638,11 @@ def get_error_info(file_results: Dict[str, Any]) -> Dict[str, Any]:
                     recoverable_errors.get(error_type, 0) + 1
                 )
     # Get run-ending error info
+    module_dict = {
+        "heatershaker": "heaterShakerModuleV1",
+        "thermocycler": "thermocyclerModuleV2",
+        "temperature module": "temperatureModuleV2",
+    }
     try:
         run_command_error = commands_of_run[-1]["error"]
         error_type = run_command_error.get("errorType", "")
@@ -647,6 +652,17 @@ def get_error_info(file_results: Dict[str, Any]) -> Dict[str, Any]:
         error_instrument = run_command_error.get("errorInfo", {}).get(
             "node", run_command_error.get("errorInfo", {}).get("port", "")
         )
+        if "gripper" in error_instrument:
+            # get gripper serial number
+            error_instrument = file_results["extension"]
+        else:
+            # get module serial number
+            for module in module_dict.keys():
+                if module in error_instrument:
+                    for module_list in file_results["modules"]:
+                        model = module_list["model"]
+                        if model == module_dict[module]:
+                            error_instrument = module_list["serialNumber"]
     except (IndexError, KeyError):
         try:
             error_details = file_results.get("errors", [{}])[0]

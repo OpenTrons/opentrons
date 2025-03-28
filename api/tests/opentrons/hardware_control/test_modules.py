@@ -8,6 +8,7 @@ import pytest
 
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
+from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 from opentrons.hardware_control.modules.types import (
     BundledFirmware,
     ModuleModel,
@@ -16,6 +17,7 @@ from opentrons.hardware_control.modules.types import (
     HeaterShakerModuleModel,
     ThermocyclerModuleModel,
     AbsorbanceReaderModel,
+    FlexStackerModuleModel,
     ModuleType,
 )
 from opentrons.hardware_control.modules import (
@@ -48,6 +50,9 @@ async def test_get_modules_simulating() -> None:
         ],
         "absorbancereader": [
             SimulatingModule(serial_number="555", model="absorbanceReaderV1")
+        ],
+        "flexstacker": [
+            SimulatingModule(serial_number="656", model="flexStackerModuleV1")
         ],
     }
     api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
@@ -110,6 +115,7 @@ async def test_module_caching() -> None:
         (ThermocyclerModuleModel.THERMOCYCLER_V1, Thermocycler),
         (HeaterShakerModuleModel.HEATER_SHAKER_V1, HeaterShaker),
         (AbsorbanceReaderModel.ABSORBANCE_READER_V1, AbsorbanceReader),
+        (FlexStackerModuleModel.FLEX_STACKER_V1, FlexStacker),
     ],
 )
 async def test_create_simulating_module(
@@ -259,7 +265,28 @@ async def mod_absorbancereader() -> AsyncIterator[AbstractModule]:
     await absorbancereader.cleanup()
 
 
-async def test_module_update_integration(
+@pytest.fixture
+async def mod_flexstacker() -> AsyncIterator[AbstractModule]:
+    usb_port = USBPort(
+        name="",
+        hub=False,
+        port_number=0,
+        device_path="/dev/ot_module_sim_flexstacker0",
+    )
+
+    flexstacker = await build_module(
+        port="/dev/ot_module_sim_flexstacker0",
+        usb_port=usb_port,
+        type=ModuleType.FLEX_STACKER,
+        simulating=True,
+        hw_control_loop=asyncio.get_running_loop(),
+        execution_manager=ExecutionManager(),
+    )
+    yield flexstacker
+    await flexstacker.cleanup()
+
+
+async def test_module_update_integration(  # noqa: C901
     monkeypatch: pytest.MonkeyPatch,
     mod_tempdeck: AbstractModule,
     mod_magdeck: AbstractModule,
@@ -267,6 +294,7 @@ async def test_module_update_integration(
     mod_heatershaker: AbstractModule,
     mod_thermocycler_gen2: AbstractModule,
     mod_absorbancereader: AbstractModule,
+    mod_flexstacker: AbstractModule,
 ) -> None:
     from opentrons.hardware_control import modules
 
@@ -362,6 +390,7 @@ async def test_module_update_integration(
     upload_via_dfu_mock.assert_called_once_with(
         "df11", "fake_fw_file_path", bootloader_kwargs
     )
+    upload_via_dfu_mock.reset_mock()
 
     # Test absorbancereader update with byonoy library
     bootloader_kwargs["module"] = mod_absorbancereader
@@ -372,6 +401,20 @@ async def test_module_update_integration(
     await modules.update_firmware(mod_absorbancereader, "fake_fw_file_path")
     byonoy_update_firmware_mock.assert_called_once_with("fake_fw_file_path")
     assert not mod_absorbancereader.updating
+
+    # test flex stacker update with dfu bootloader
+    async def mock_find_dfu_device_fs2(pid: str, expected_device_count: int) -> str:
+        if expected_device_count == 3:
+            return "df11"
+        return "none"
+
+    monkeypatch.setattr(modules.update, "find_dfu_device", mock_find_dfu_device_fs2)
+
+    bootloader_kwargs["module"] = mod_flexstacker
+    await modules.update_firmware(mod_flexstacker, "fake_fw_file_path")
+    upload_via_dfu_mock.assert_called_once_with(
+        "df11", "fake_fw_file_path", bootloader_kwargs
+    )
 
 
 async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> None:
@@ -391,6 +434,9 @@ async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
 
     dummy_abs_file = Path(tmpdir) / "absorbance-96@v1.0.2.byoup"
     dummy_abs_file.write_text("hello")
+
+    dummy_fs_file = Path(tmpdir) / "flex-stacker@v7.0.0.bin"
+    dummy_fs_file.write_text("hello")
 
     dummy_bogus_file = Path(tmpdir) / "thermoshaker@v6.6.6.bin"
     dummy_bogus_file.write_text("hello")
@@ -414,6 +460,9 @@ async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
         "absorbancereader": [
             SimulatingModule(serial_number="555", model="absorbanceReaderV1")
         ],
+        "flexstacker": [
+            SimulatingModule(serial_number="656", model="flexStackerModuleV1")
+        ],
     }
 
     api = await API.build_hardware_simulator(attached_modules=mods)
@@ -433,6 +482,9 @@ async def test_get_bundled_fw(monkeypatch: pytest.MonkeyPatch, tmpdir: Path) -> 
     )
     assert api.attached_modules[4].bundled_fw == BundledFirmware(
         version="1.0.2", path=dummy_abs_file
+    )
+    assert api.attached_modules[5].bundled_fw == BundledFirmware(
+        version="7.0.0", path=dummy_fs_file
     )
     for m in api.attached_modules:
         await m.cleanup()

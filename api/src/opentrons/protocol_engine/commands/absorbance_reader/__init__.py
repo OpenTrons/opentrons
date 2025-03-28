@@ -33,7 +33,6 @@ from .read import (
 
 
 __all__ = [
-    "MoveLidResult",
     # absorbanace_reader/closeLid
     "CloseLidCommandType",
     "CloseLidParams",

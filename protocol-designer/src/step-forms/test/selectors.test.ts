@@ -8,7 +8,11 @@ import {
 } from '../selectors'
 import { getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
-import type { FormData } from '../../form-types'
+import type {
+  FormData,
+  HydratedPauseFormData,
+  HydratedThermocyclerFormData,
+} from '../../form-types'
 
 vi.mock('../../steplist/fieldLevel')
 vi.mock('../utils/getProfileItemsHaveErrors')
@@ -18,13 +22,12 @@ beforeEach(() => {
 })
 describe('_hasFieldLevelErrors', () => {
   it('should return true if form is "thermocycler", has "profileItemsById" field, and _getProfileItemsHaveErrors returns true', () => {
-    // @ts-expect-error(sa, 2021-6-14): missing id
-    const formData: FormData = {
+    const formData: HydratedThermocyclerFormData = {
       stepType: 'thermocycler',
       profileItemsById: {
         foo: 'abc',
       },
-    }
+    } as any
     vi.mocked(getProfileItemsHaveErrors).mockImplementation(profileItems => {
       expect(profileItems).toEqual(formData.profileItemsById)
       return true
@@ -37,32 +40,44 @@ describe('_hasFieldLevelErrors', () => {
   })
   const testCases = [
     {
-      testName: 'should return true if form has field errors',
-      mockGetFieldErrorsReturn: ['some error'],
+      testName:
+        'should return true if form has field errors (pauseTemperature < 4)',
+      mockGetFieldErrorsReturn: ['Temperature must be 4 or higher'],
       expected: true,
+      formDataOverride: { pauseTemperature: '3' },
     },
     {
       testName: 'should return false if form has no field errors',
       mockGetFieldErrorsReturn: [],
       expected: false,
+      formDataOverride: { pauseTemperature: '5' },
     },
   ]
-  testCases.forEach(({ testName, mockGetFieldErrorsReturn, expected }) => {
-    it(testName, () => {
-      vi.mocked(getFieldErrors).mockImplementation((name, value) => {
-        expect(name).toEqual('blah')
-        expect(value).toEqual('spam')
-        return mockGetFieldErrorsReturn
+
+  testCases.forEach(
+    ({ testName, expected, formDataOverride, mockGetFieldErrorsReturn }) => {
+      it(testName, () => {
+        vi.mocked(getFieldErrors).mockReturnValue(
+          formDataOverride.pauseTemperature === '3'
+            ? mockGetFieldErrorsReturn
+            : []
+        )
+
+        const formData: HydratedPauseFormData = {
+          stepType: 'pause',
+          pauseAction: 'untilTemperature',
+          stepName: 'pause',
+          stepDetails: 'pause stepdetails',
+          id: 'mock id',
+          pauseTemperature: formDataOverride.pauseTemperature,
+        }
+
+        const result = _hasFieldLevelErrors(formData)
+
+        expect(result).toBe(expected)
       })
-      const formData: any = {
-        blah: 'spam',
-      }
-
-      const result = _hasFieldLevelErrors(formData)
-
-      expect(result).toBe(expected)
-    })
-  })
+    }
+  )
 })
 describe('getEquippedPipetteOptions', () => {
   it('appends mount to pipette dropdown when pipettes are same model', () => {

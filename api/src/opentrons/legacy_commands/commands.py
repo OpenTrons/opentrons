@@ -234,9 +234,25 @@ def touch_tip(instrument: InstrumentContext) -> command_types.TouchTipCommand:
     }
 
 
-def air_gap() -> command_types.AirGapCommand:
-    text = "Air gap"
-    return {"name": command_types.AIR_GAP, "payload": {"text": text}}
+def air_gap(
+    instrument: InstrumentContext,
+    volume: float | None,
+    height: float | None,
+) -> command_types.AirGapCommand:
+    text = (
+        "Air gap"
+        + (f" of {volume} uL" if volume is not None else "")
+        + (f" at height {height}" if height is not None else "")
+    )
+    return {
+        "name": command_types.AIR_GAP,
+        "payload": {
+            "instrument": instrument,
+            "volume": volume,
+            "height": height,
+            "text": text,
+        },
+    }
 
 
 def return_tip() -> command_types.ReturnTipCommand:

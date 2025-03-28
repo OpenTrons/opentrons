@@ -13,7 +13,7 @@ def refine_characters(prompt: str) -> str:
         and certain special characters like backticks replaced with single quotes.
 
     Example:
-    >>> refine_characters("Transfer `10μ`")
+    >>> refine_characters("Transfer `10µ`")
     'Transfer '10m''
     """
 
@@ -29,7 +29,7 @@ def refine_characters(prompt: str) -> str:
         "ι": "i",
         "κ": "k",
         "λ": "l",
-        "μ": "m",
+        "µ": "m",
         "ν": "n",
         "ξ": "x",
         "ο": "o",

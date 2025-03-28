@@ -11,6 +11,7 @@ export const CATEGORY_LABELS_BY_CATEGORY = {
   other: 'Other',
   adapter: 'Adapter',
   lid: 'Lid',
+  system: 'System',
 }
 
 export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
@@ -24,6 +25,7 @@ export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
   lid: 'Lid',
   trash: 'Trashes',
   other: 'Other',
+  system: 'System',
 }
 
 export const WELL_TYPE_BY_CATEGORY = {

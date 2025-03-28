@@ -77,6 +77,7 @@ export function ThermocyclerTools(props: StepFormProps): JSX.Element {
         showFormErrors={showFormErrors}
         visibleFormErrors={visibleFormErrors}
         focusedField={focusedField}
+        paddingY={SPACING.spacing16}
       />
     )
   } else {

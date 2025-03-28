@@ -27,6 +27,7 @@ class DispenseSettings(LiquidSettings):
     """Dispense Settings."""
 
     blow_out_submerged: float  # microliters
+    blow_out_flow_rate: float  # ul/s
 
 
 @dataclass
@@ -89,6 +90,9 @@ def interpolate(
             ),
             blow_out_submerged=_interp(
                 a.dispense.blow_out_submerged, b.dispense.blow_out_submerged
+            ),
+            blow_out_flow_rate=_interp(
+                a.dispense.blow_out_flow_rate, b.dispense.blow_out_flow_rate
             ),
         ),
     )

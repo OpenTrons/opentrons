@@ -1,9 +1,7 @@
-import { getWellsDepth } from '@opentrons/shared-data'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
 import {
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+  DEFAULT_MM_OFFSET_FROM_BOTTOM,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
@@ -17,11 +15,10 @@ import type {
 } from '@opentrons/step-generation'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
-type MoveLiquidFields = HydratedMoveLiquidFormData['fields']
 
 // NOTE(sa, 2020-08-11): leaving this as fn so it can be expanded later for dispense air gap
 export function getAirGapData(
-  hydratedFormData: MoveLiquidFields,
+  hydratedFormData: HydratedMoveLiquidFormData,
   checkboxField: 'aspirate_airGap_checkbox' | 'dispense_airGap_checkbox',
   volumeField: 'aspirate_airGap_volume' | 'dispense_airGap_volume'
 ): number | null {
@@ -67,8 +64,7 @@ export const moveLiquidFormToArgs = (
     hydratedFormData.stepType === 'moveLiquid',
     `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`
   )
-  const fields = hydratedFormData.fields
-  const pipetteId = fields.pipette.id
+  const pipetteId = hydratedFormData.pipette.id
   const {
     volume,
     aspirate_labware: sourceLabware,
@@ -84,12 +80,12 @@ export const moveLiquidFormToArgs = (
     aspirate_y_position,
     dispense_y_position,
     blowout_z_offset,
-  } = fields
+  } = hydratedFormData
   let sourceWells = getOrderedWells(
-    fields.aspirate_wells,
+    hydratedFormData.aspirate_wells,
     sourceLabware.def,
-    fields.aspirate_wellOrder_first,
-    fields.aspirate_wellOrder_second
+    hydratedFormData.aspirate_wellOrder_first,
+    hydratedFormData.aspirate_wellOrder_second
   )
 
   const isDispensingIntoDisposalLocation =
@@ -108,8 +104,8 @@ export const moveLiquidFormToArgs = (
       ? getOrderedWells(
           dispWells,
           def,
-          fields.dispense_wellOrder_first,
-          fields.dispense_wellOrder_second
+          hydratedFormData.dispense_wellOrder_first,
+          hydratedFormData.dispense_wellOrder_second
         )
       : null
 
@@ -124,53 +120,61 @@ export const moveLiquidFormToArgs = (
       }
     }
   }
-  const wellDepth =
-    'def' in destLabware && destWells != null
-      ? getWellsDepth(destLabware.def, destWells)
-      : 0
 
-  const disposalVolume = fields.disposalVolume_checkbox
-    ? fields.disposalVolume_volume
+  const disposalVolume = hydratedFormData.disposalVolume_checkbox
+    ? hydratedFormData.disposalVolume_volume
     : null
-  const touchTipAfterAspirate = Boolean(fields.aspirate_touchTip_checkbox)
-  const touchTipAfterAspirateOffsetMmFromBottom =
-    fields.aspirate_touchTip_mmFromBottom ||
-    getWellsDepth(fields.aspirate_labware.def, sourceWells) +
-      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
-  const touchTipAfterDispense = Boolean(fields.dispense_touchTip_checkbox)
-  const touchTipAfterDispenseOffsetMmFromBottom =
-    fields.dispense_touchTip_mmFromBottom ||
-    wellDepth + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterAspirate = Boolean(
+    hydratedFormData.aspirate_touchTip_checkbox
+  )
+  const touchTipAfterAspirateOffsetMmFromTop =
+    hydratedFormData.aspirate_touchTip_mmFromTop ??
+    DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterAspirateSpeed =
+    hydratedFormData.aspirate_touchTip_speed ?? null
+  const touchTipAfterAspirateMmFromEdge =
+    hydratedFormData.aspirate_touchTip_mmFromEdge ?? null
+  const touchTipAfterDispense = Boolean(
+    hydratedFormData.dispense_touchTip_checkbox
+  )
+  const touchTipAfterDispenseOffsetMmFromTop =
+    hydratedFormData.dispense_touchTip_mmFromTop ??
+    DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
+  const touchTipAfterDispenseSpeed =
+    hydratedFormData.aspirate_touchTip_speed ?? null
+  const touchTipAfterDispenseMmFromEdge =
+    hydratedFormData.dispense_touchTip_mmFromEdge ?? null
+
   const mixBeforeAspirate = getMixData(
-    fields,
+    hydratedFormData,
     'aspirate_mix_checkbox',
     'aspirate_mix_volume',
     'aspirate_mix_times'
   )
   const mixInDestination = getMixData(
-    fields,
+    hydratedFormData,
     'dispense_mix_checkbox',
     'dispense_mix_volume',
     'dispense_mix_times'
   )
   const aspirateDelay = getMoveLiquidDelayData(
-    fields,
+    hydratedFormData,
     'aspirate_delay_checkbox',
     'aspirate_delay_seconds',
     'aspirate_delay_mmFromBottom'
   )
   const dispenseDelay = getMoveLiquidDelayData(
-    fields,
+    hydratedFormData,
     'dispense_delay_checkbox',
     'dispense_delay_seconds',
     'dispense_delay_mmFromBottom'
   )
   const blowoutLocation =
-    (fields.blowout_checkbox && fields.blowout_location) ||
-    (fields.disposalVolume_checkbox &&
+    (hydratedFormData.blowout_checkbox && hydratedFormData.blowout_location) ||
+    (hydratedFormData.disposalVolume_checkbox &&
       path === 'multiDispense' &&
-      fields.disposalVolume_volume &&
-      fields.blowout_location) ||
+      hydratedFormData.disposalVolume_volume &&
+      hydratedFormData.blowout_location) ||
     null
 
   const blowoutOffsetFromTopMm =
@@ -178,18 +182,18 @@ export const moveLiquidFormToArgs = (
       ? blowout_z_offset ?? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
       : DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
   const aspirateAirGapVolume = getAirGapData(
-    fields,
+    hydratedFormData,
     'aspirate_airGap_checkbox',
     'aspirate_airGap_volume'
   )
   const dispenseAirGapVolume = getAirGapData(
-    fields,
+    hydratedFormData,
     'dispense_airGap_checkbox',
     'dispense_airGap_volume'
   )
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
-    fields.pipette,
-    fields.volume,
+    hydratedFormData.pipette,
+    hydratedFormData.volume,
     tipRack
   )
   const commonFields = {
@@ -199,30 +203,34 @@ export const moveLiquidFormToArgs = (
     destLabware: destLabware.id,
     tipRack: tipRack,
     aspirateFlowRateUlSec:
-      fields.aspirate_flowRate ||
+      hydratedFormData.aspirate_flowRate ||
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
     dispenseFlowRateUlSec:
-      fields.dispense_flowRate ||
+      hydratedFormData.dispense_flowRate ||
       matchingTipLiquidSpecs.defaultDispenseFlowRate.default,
     aspirateOffsetFromBottomMm:
-      fields.aspirate_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+      hydratedFormData.aspirate_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM,
     dispenseOffsetFromBottomMm:
-      fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+      hydratedFormData.dispense_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM,
     blowoutFlowRateUlSec:
-      fields.blowout_flowRate ||
+      hydratedFormData.blowout_flowRate ||
       matchingTipLiquidSpecs.defaultBlowOutFlowRate.default,
     blowoutOffsetFromTopMm,
-    changeTip: fields.changeTip,
-    preWetTip: Boolean(fields.preWetTip),
+    changeTip: hydratedFormData.changeTip,
+    preWetTip: Boolean(hydratedFormData.preWetTip),
     aspirateDelay,
     dispenseDelay,
     aspirateAirGapVolume,
     dispenseAirGapVolume,
     touchTipAfterAspirate,
-    touchTipAfterAspirateOffsetMmFromBottom,
+    touchTipAfterAspirateOffsetMmFromTop,
+    touchTipAfterAspirateSpeed,
+    touchTipAfterAspirateMmFromEdge,
     touchTipAfterDispense,
-    touchTipAfterDispenseOffsetMmFromBottom,
-    description: hydratedFormData.description,
+    touchTipAfterDispenseOffsetMmFromTop,
+    touchTipAfterDispenseSpeed,
+    touchTipAfterDispenseMmFromEdge,
+    description: hydratedFormData.stepDetails,
     name: hydratedFormData.stepName,
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation,
@@ -231,6 +239,13 @@ export const moveLiquidFormToArgs = (
     aspirateYOffset: aspirate_y_position ?? 0,
     dispenseXOffset: dispense_x_position ?? 0,
     dispenseYOffset: dispense_y_position ?? 0,
+    aspirateSubmergeSpeed: hydratedFormData.aspirate_submerge_speed,
+    aspirateRetractSpeed: hydratedFormData.aspirate_submerge_speed,
+    dispenseSubmergeSpeed: hydratedFormData.dispense_submerge_speed,
+    dispenseRetractSpeed: hydratedFormData.dispense_submerge_speed,
+    aspirateRetractXOffset: hydratedFormData.aspirate_retract_x_position,
+    aspirateRetractYOffset: hydratedFormData.aspirate_retract_y_position,
+    aspirateRetractZOffset: hydratedFormData.aspirate_retract_mmFromBottom,
   }
   console.assert(
     sourceWellsUnordered.length > 0,
@@ -286,7 +301,7 @@ export const moveLiquidFormToArgs = (
         commandCreatorFnName: 'distribute',
         disposalVolume,
         // distribute needs blowout location field because disposal volume checkbox might be checked without blowout checkbox being checked
-        blowoutLocation: fields.blowout_location,
+        blowoutLocation: hydratedFormData.blowout_location,
         mixBeforeAspirate,
         sourceWell: sourceWells[0],
         // cannot distribute into a waste chute so if destWells is null

@@ -7,6 +7,7 @@ import thermocyclerModuleV2 from '../module/definitions/3/thermocyclerModuleV2.j
 import heaterShakerModuleV1 from '../module/definitions/3/heaterShakerModuleV1.json'
 import magneticBlockV1 from '../module/definitions/3/magneticBlockV1.json'
 import absorbanceReaderV1 from '../module/definitions/3/absorbanceReaderV1.json'
+import flexStackerModuleV1 from '../module/definitions/3/flexStackerModuleV1.json'
 
 import {
   MAGDECK,
@@ -21,6 +22,7 @@ import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_V1,
   ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_V1,
 } from './constants'
 
 import type {
@@ -60,6 +62,9 @@ export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDefinition => {
 
     case ABSORBANCE_READER_V1:
       return (absorbanceReaderV1 as unknown) as ModuleDefinition
+
+    case FLEX_STACKER_MODULE_V1:
+      return (flexStackerModuleV1 as unknown) as ModuleDefinition
 
     default:
       throw new Error(`Invalid module model ${moduleModel as string}`)

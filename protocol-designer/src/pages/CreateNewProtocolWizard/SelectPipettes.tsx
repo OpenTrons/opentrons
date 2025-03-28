@@ -21,6 +21,7 @@ import {
   DISPLAY_FLEX,
   DISPLAY_INLINE_BLOCK,
   EmptySelectorButton,
+  FLEX_MAX_CONTENT,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -36,13 +37,15 @@ import { getAllowAllTipracks } from '../../feature-flags/selectors'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { setFeatureFlags } from '../../feature-flags/actions'
 import { createCustomTiprackDef } from '../../labware-defs/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
-import { IncompatibleTipsModal, PipetteInfoItem } from '../../organisms'
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
+import {
+  IncompatibleTipsModal,
+  PipetteInfoItem,
+} from '../../components/organisms'
+import { HandleEnter, LINK_BUTTON_STYLE } from '../../components/atoms'
 import { WizardBody } from './WizardBody'
 import { PIPETTE_GENS, PIPETTE_TYPES, PIPETTE_VOLUMES } from './constants'
 import { getTiprackOptions } from './utils'
-import { HandleEnter } from '../../atoms/HandleEnter'
 import { removeOpentronsPhrases } from '../../utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
@@ -115,8 +118,10 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
     (page === 'add' &&
       pipettesByMount[mount].tiprackDefURI == null &&
       noPipette) ||
-    (pipettesByMount.left.tiprackDefURI == null &&
-      pipettesByMount.right.tiprackDefURI == null)
+    ((pipettesByMount.left.tiprackDefURI == null ||
+      pipettesByMount.left.tiprackDefURI.length === 0) &&
+      (pipettesByMount.right.tiprackDefURI == null ||
+        pipettesByMount.right.tiprackDefURI.length === 0))
 
   const targetPipetteMount =
     pipettesByMount.left.pipetteName == null ||
@@ -135,11 +140,15 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
     }
   }
 
+  const clearPipettes = (): void => {
+    resetFields()
+    setValue(`pipettesByMount.${mount}.pipetteName`, undefined)
+    setValue(`pipettesByMount.${mount}.tiprackDefURI`, undefined)
+  }
+
   const handleGoBack = (): void => {
     if (page === 'add') {
-      resetFields()
-      setValue(`pipettesByMount.${mount}.pipetteName`, undefined)
-      setValue(`pipettesByMount.${mount}.tiprackDefURI`, undefined)
+      clearPipettes()
       if (
         pipettesByMount.left.pipetteName != null ||
         pipettesByMount.left.tiprackDefURI != null ||
@@ -152,7 +161,8 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
       }
     }
     if (page === 'overview') {
-      setPage('add')
+      clearPipettes()
+      goBack(1)
     }
   }
 
@@ -171,6 +181,17 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
   } else if (page === 'add' && hasAPipette) {
     subHeader = t('which_pipette_second')
   }
+
+  useEffect(() => {
+    if (
+      pipettesByMount.left.pipetteName != null ||
+      pipettesByMount.left.tiprackDefURI != null ||
+      pipettesByMount.right.pipetteName != null ||
+      pipettesByMount.right.tiprackDefURI != null
+    ) {
+      setPage('overview')
+    }
+  }, [])
 
   return (
     <>
@@ -547,16 +568,18 @@ export function SelectPipettes(props: WizardTileProps): JSX.Element | null {
                     pipettesByMount.right.pipetteName != null &&
                     pipettesByMount.left.tiprackDefURI != null &&
                     pipettesByMount.right.tiprackDefURI != null) ? null : (
-                    <EmptySelectorButton
-                      onClick={() => {
-                        setPage('add')
-                        setMount(targetPipetteMount)
-                        resetFields()
-                      }}
-                      text={t('add_pipette')}
-                      textAlignment="left"
-                      iconName="plus"
-                    />
+                    <Flex width={FLEX_MAX_CONTENT}>
+                      <EmptySelectorButton
+                        onClick={() => {
+                          setPage('add')
+                          setMount(targetPipetteMount)
+                          resetFields()
+                        }}
+                        text={t('add_pipette')}
+                        textAlignment="left"
+                        iconName="plus"
+                      />
+                    </Flex>
                   )}
                 </>
               </Flex>

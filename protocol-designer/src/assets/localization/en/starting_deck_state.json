@@ -49,7 +49,7 @@
   "onDeck": "On deck",
   "one_item": "No more than 1 {{hardware}} allowed on the deck at one time",
   "only_display_rec": "Only display recommended labware",
-  "plate_reader_no_labware": "Labware cannot be loaded onto a plate reader. You can move labware onto the plate reader when building your protocol",
+  "plate_reader_no_labware": "Load labware onto Absorbance Plate Reader using a move step",
   "protocol_starting_deck": "Protocol starting deck",
   "read_more_gen1_gen2": "Read more about the differences between GEN1 and GEN2 Magnetic Modules",
   "rename_lab": "Rename labware",
@@ -59,10 +59,13 @@
   "tc_slots_occupied_flex": "The Thermocycler needs slots A1 and B1. Slot A1 is occupied",
   "tc_slots_occupied_ot2": "The Thermocycler needs slots 7, 8, 10, and 11. One or more of those slots is occupied",
   "tipRack": "Tip racks",
+  "trash_no_labware": "Cannot load labware into Trash Bin",
   "trash_required": "A trash bin or waste chute is required",
   "tubeRack": "Tube racks",
+  "two_item": "No more than 2 {{hardware}} allowed on the deck at one time",
   "untitled_protocol": "Untitled protocol",
   "upload_custom_labware": "Upload custom labware",
+  "waste_chute_no_labware": "Cannot load labware into Waste Chute",
   "we_added_hardware": "We've added your deck hardware!",
   "wellPlate": "Well plates"
 }

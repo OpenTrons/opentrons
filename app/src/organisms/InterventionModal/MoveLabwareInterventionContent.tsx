@@ -19,6 +19,8 @@ import {
   LegacyStyledText,
   TEXT_TRANSFORM_UPPERCASE,
   TYPOGRAPHY,
+  getLoadedLabware,
+  getLoadedModule,
 } from '@opentrons/components'
 import {
   OT2_ROBOT_TYPE,
@@ -38,8 +40,6 @@ import {
   getModuleModelFromRunData,
 } from './utils'
 import { Divider } from '/app/atoms/structure'
-import { getLoadedModule } from '/app/local-resources/modules'
-import { getLoadedLabware } from '/app/local-resources/labware'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type {
@@ -256,7 +256,7 @@ function LabwareDisplayLocation(
   const { t } = useTranslation('protocol_command_text')
   const { protocolData, location, robotType } = props
   let displayLocation: string = ''
-  if (location === 'offDeck') {
+  if (location === 'offDeck' || location === 'systemLocation') {
     // TODO(BC, 08/28/23): remove this string cast after update i18next to >23 (see https://www.i18next.com/overview/typescript#argument-of-type-defaulttfuncreturn-is-not-assignable-to-parameter-of-type-xyz)
     displayLocation = String(t('offdeck'))
   } else if ('slotName' in location) {
@@ -291,7 +291,10 @@ function LabwareDisplayLocation(
     )
     if (adapter == null) {
       console.warn('labware is located on an unknown adapter')
-    } else if (adapter.location === 'offDeck') {
+    } else if (
+      adapter.location === 'offDeck' ||
+      adapter.location === 'systemLocation'
+    ) {
       displayLocation = t('off_deck')
     } else if ('slotName' in adapter.location) {
       displayLocation = adapter.location.slotName

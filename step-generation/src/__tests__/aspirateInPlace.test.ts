@@ -5,8 +5,8 @@ import {
   getSuccessResult,
 } from '../fixtures'
 import { aspirateInPlace } from '../commandCreators/atomic'
+import type { AspirateInPlaceParams } from '@opentrons/shared-data'
 import type { RobotState, InvariantContext } from '../types'
-import type { AspirateInPlaceArgs } from '../commandCreators/atomic/aspirateInPlace'
 
 describe('aspirateInPlace', () => {
   let invariantContext: InvariantContext
@@ -20,7 +20,7 @@ describe('aspirateInPlace', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   })
   it('aspirate in place', () => {
-    const params: AspirateInPlaceArgs = {
+    const params: AspirateInPlaceParams = {
       pipetteId: mockId,
       flowRate: mockFlowRate,
       volume: mockVolume,

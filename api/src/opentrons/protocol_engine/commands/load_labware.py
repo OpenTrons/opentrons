@@ -1,25 +1,28 @@
 """Load labware command request, result, and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
-from typing_extensions import Literal
+from typing_extensions import Literal, TypeGuard
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..errors import LabwareIsNotAllowedInLocationError
 from ..resources import labware_validation, fixture_validation
 from ..types import (
-    LabwareLocation,
+    LoadableLabwareLocation,
     ModuleLocation,
     ModuleModel,
     OnLabwareLocation,
     DeckSlotLocation,
     AddressableAreaLocation,
+    LoadedModule,
 )
 
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .labware_handling_common import LabwarePositionResultMixin
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
 
@@ -38,7 +41,7 @@ def _remove_default(s: dict[str, Any]) -> None:
 class LoadLabwareParams(BaseModel):
     """Payload required to load a labware into a slot."""
 
-    location: LabwareLocation = Field(
+    location: LoadableLabwareLocation = Field(
         ...,
         description="Location the labware should be loaded into.",
     )
@@ -71,29 +74,12 @@ class LoadLabwareParams(BaseModel):
     )
 
 
-class LoadLabwareResult(BaseModel):
+class LoadLabwareResult(LabwarePositionResultMixin):
     """Result data from the execution of a LoadLabware command."""
 
-    labwareId: str = Field(
-        ...,
-        description="An ID to reference this labware in subsequent commands.",
-    )
     definition: LabwareDefinition = Field(
         ...,
         description="The full definition data for this labware.",
-    )
-    offsetId: Optional[str] = Field(
-        # Default `None` instead of `...` so this field shows up as non-required in
-        # OpenAPI. The server is allowed to omit it or make it null.
-        None,
-        description=(
-            "An ID referencing the labware offset that will apply"
-            " to the newly-placed labware."
-            " This offset will be in effect until the labware is moved"
-            " with a `moveLabware` command."
-            " Null or undefined means no offset applies,"
-            " so the default of (0, 0, 0) will be used."
-        ),
     )
 
 
@@ -107,6 +93,15 @@ class LoadLabwareImplementation(
     ) -> None:
         self._equipment = equipment
         self._state_view = state_view
+
+    def _is_loading_to_module(
+        self, location: LoadableLabwareLocation, module_model: ModuleModel
+    ) -> TypeGuard[ModuleLocation]:
+        if not isinstance(location, ModuleLocation):
+            return False
+
+        module: LoadedModule = self._state_view.modules.get(location.moduleId)
+        return module.model == module_model
 
     async def execute(
         self, params: LoadLabwareParams
@@ -148,6 +143,7 @@ class LoadLabwareImplementation(
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
             params.location
         )
+
         loaded_labware = await self._equipment.load_labware(
             load_name=params.loadName,
             namespace=params.namespace,
@@ -164,34 +160,38 @@ class LoadLabwareImplementation(
             display_name=params.displayName,
         )
 
-        # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
-        #   on the definition. In practice this will not cause any issues since they will raise protocol ending
-        #   exception, but for correctness should be refactored to do this check beforehand.
         if isinstance(verified_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=loaded_labware.definition,
                 bottom_labware_id=verified_location.labwareId,
             )
             # Validate load location is valid for lids
-            if (
-                labware_validation.validate_definition_is_lid(
-                    definition=loaded_labware.definition
-                )
-                and loaded_labware.definition.compatibleParentLabware is not None
-                and self._state_view.labware.get_load_name(verified_location.labwareId)
-                not in loaded_labware.definition.compatibleParentLabware
+            if labware_validation.validate_definition_is_lid(
+                definition=loaded_labware.definition
             ):
-                raise ValueError(
-                    f"Labware Lid {params.loadName} may not be loaded on parent labware {self._state_view.labware.get_display_name(verified_location.labwareId)}."
+                # This parent is assumed to be compatible, unless the lid enumerates
+                # all its compatible parents and this parent is missing from the list.
+                parent_is_incompatible = (
+                    loaded_labware.definition.compatibleParentLabware is not None
+                    and self._state_view.labware.get_load_name(
+                        verified_location.labwareId
+                    )
+                    not in loaded_labware.definition.compatibleParentLabware
                 )
 
+                if parent_is_incompatible:
+                    raise ValueError(
+                        f"Labware Lid {params.loadName} may not be loaded on parent labware"
+                        f" {self._state_view.labware.get_display_name(verified_location.labwareId)}."
+                    )
+
         # Validate labware for the absorbance reader
-        elif isinstance(params.location, ModuleLocation):
-            module = self._state_view.modules.get(params.location.moduleId)
-            if module is not None and module.model == ModuleModel.ABSORBANCE_READER_V1:
-                self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
-                    loaded_labware.definition
-                )
+        if self._is_loading_to_module(
+            params.location, ModuleModel.ABSORBANCE_READER_V1
+        ):
+            self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
+                loaded_labware.definition
+            )
 
         self._state_view.labware.raise_if_labware_cannot_be_ondeck(
             location=params.location, labware_definition=loaded_labware.definition
@@ -202,6 +202,9 @@ class LoadLabwareImplementation(
                 labwareId=loaded_labware.labware_id,
                 definition=loaded_labware.definition,
                 offsetId=loaded_labware.offsetId,
+                locationSequence=self._state_view.geometry.get_predicted_location_sequence(
+                    verified_location,
+                ),
             ),
             state_update=state_update,
         )

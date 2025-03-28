@@ -53,7 +53,7 @@ To simulate your code, you’ll need [Python 3\.10](https://www.python.org/downl
 
 Before running a protocol, you’ll want to have the right kind of hardware and labware ready for your Flex or OT\-2\.
 
-- **Flex users** should review Chapter 2: Installation and Relocation in the [instruction manual](https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Manual.pdf). Specifically, see the pipette information in the “Instrument Installation and Calibration” section. You can use either a 1\-channel or 8\-channel pipette for this tutorial. Most Flex code examples will use a [Flex 1\-Channel 1000 μL pipette](https://shop.opentrons.com/opentrons-flex-1-channel-pipette/).
+- **Flex users** should review Chapter 2: Installation and Relocation in the [instruction manual](https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Manual.pdf). Specifically, see the pipette information in the “Instrument Installation and Calibration” section. You can use either a 1\-channel or 8\-channel pipette for this tutorial. Most Flex code examples will use a [Flex 1\-Channel 1000 µL pipette](https://shop.opentrons.com/opentrons-flex-1-channel-pipette/).
 - **OT\-2 users** should review the robot setup and pipette information on the [Get Started page](https://support.opentrons.com/s/ot2-get-started). Specifically, see [attaching pipettes](https://support.opentrons.com/s/article/Get-started-Attach-pipettes) and [initial calibration](https://support.opentrons.com/s/article/Get-started-Calibrate-the-deck). You can use either a single\-channel or 8\-channel pipette for this tutorial. Most OT\-2 code examples will use a [P300 Single\-Channel GEN2](https://shop.opentrons.com/single-channel-electronic-pipette-p20/) pipette.
 
 The Flex and OT\-2 use similar labware for serial dilution. The tutorial code will use the labware listed in the table below, but as long as you have labware of each type you can modify the code to run with your labware.
@@ -1643,9 +1643,9 @@ The Temperature Module supports these 96\-well block and labware combinations fo
 
 | 96\-well block contents    | API Load Name                                        |
 | -------------------------- | ---------------------------------------------------- |
-| Bio\-Rad well plate 200 μL | `opentrons_96_aluminumblock_biorad_wellplate_200uL`  |
-| Generic PCR strip 200 μL   | `opentrons_96_aluminumblock_generic_pcr_strip_200uL` |
-| NEST well plate 100 μL     | `opentrons_96_aluminumblock_nest_wellplate_100uL`    |
+| Bio\-Rad well plate 200 µL | `opentrons_96_aluminumblock_biorad_wellplate_200uL`  |
+| Generic PCR strip 200 µL   | `opentrons_96_aluminumblock_generic_pcr_strip_200uL` |
+| NEST well plate 100 µL     | `opentrons_96_aluminumblock_nest_wellplate_100uL`    |
 
 This command loads the same physical adapter and labware as the example in the Standalone Adapters section above, but it is also compatible with earlier API versions:
 
@@ -3756,7 +3756,7 @@ One reason to set `new_tip="always"` is to avoid cross\-contamination between we
 
 [`transfer()`](index.html#opentrons.protocol_api.InstrumentContext.transfer 'opentrons.protocol_api.InstrumentContext.transfer') will pick up a new tip before _every_ aspirate when `new_tip="always"`. This includes when [tip refilling](index.html#complex-tip-refilling) requires multiple aspirations from a single source well.
 
-[`distribute()`](index.html#opentrons.protocol_api.InstrumentContext.distribute 'opentrons.protocol_api.InstrumentContext.distribute') and [`consolidate()`](index.html#opentrons.protocol_api.InstrumentContext.consolidate 'opentrons.protocol_api.InstrumentContext.consolidate') only pick up one tip, even when `new_tip="always"`. For example, this distribute command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 μL):
+[`distribute()`](index.html#opentrons.protocol_api.InstrumentContext.distribute 'opentrons.protocol_api.InstrumentContext.distribute') and [`consolidate()`](index.html#opentrons.protocol_api.InstrumentContext.consolidate 'opentrons.protocol_api.InstrumentContext.consolidate') only pick up one tip, even when `new_tip="always"`. For example, this distribute command returns to the source well a second time, because the amount to be distributed (400 µL total plus disposal volume) exceeds the pipette capacity (300 µL):
 
 ```
 pipette.distribute(

@@ -23,6 +23,8 @@ interface ProbeNotAttachedProps {
   isOnDevice: boolean
 }
 
+// TODO(jh 01-07-25): This component is utilized by other flows. Let's hoist it out of PipetteWizardFlows.
+
 export const ProbeNotAttached = (
   props: ProbeNotAttachedProps
 ): JSX.Element | null => {

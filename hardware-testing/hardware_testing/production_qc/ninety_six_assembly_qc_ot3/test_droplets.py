@@ -129,7 +129,7 @@ async def aspirate_and_wait(
     await api.move_to(
         OT3Mount.LEFT, reservoir + Point(z=DEPTH_INTO_RESERVOIR_FOR_DISPENSE)
     )
-    await api.dispense(OT3Mount.LEFT)
+    await api.dispense(OT3Mount.LEFT, is_full_dispense=True)
     return result, duration_seconds
 
 

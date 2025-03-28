@@ -86,3 +86,20 @@ You have the option to specify one or many protocols to run the analyses on. Thi
 ### Updating the snapshots locally
 
 - `make snapshot-test-update-local` - this target builds the base image, builds the local code into the base image, then runs the analyses battery against the image you just created, updating the snapshots by passing the `--update-snapshots` flag to the test
+
+### Add some protocols to the analyses battery
+
+> The below instructions avoid needing docker and executing snapshot tests locally.
+
+1. create new protocol file(s) in the [files/protocols](./files/protocols) directory following the naming convention in [files/README.md](./files/README.md)
+1. add the protocol(s) to the [protocols.py](./automation/data/protocols.py)
+1. `make format` (make sure you have followed setup instructions)
+1. commit and push your branch
+1. open a PR and add the label `gen-analyses-snapshot-pr`
+1. when the snapshot fails because your new protocols don't have snapshots a PR will be created that heals.
+1. merge the healing PR if the snapshots are as expected
+1. get a review and merge! 🎉 now your protocols are a part of the test
+
+### Add a protocol with overrides to the analyses battery
+
+> TODO when we have a more straight forward example

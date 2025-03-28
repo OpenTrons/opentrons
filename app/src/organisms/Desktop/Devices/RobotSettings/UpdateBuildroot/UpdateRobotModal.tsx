@@ -14,6 +14,7 @@ import {
   Modal,
   NewPrimaryBtn,
   NewSecondaryBtn,
+  ReleaseNotes,
   SPACING,
   Tooltip,
   useHoverTooltip,
@@ -28,8 +29,8 @@ import {
   DOWNGRADE,
   getRobotUpdateVersion,
 } from '/app/redux/robot-update'
+import { useIsOEMMode } from '/app/resources/robot-settings'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
-import { ReleaseNotes } from '/app/molecules/ReleaseNotes'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 
@@ -73,6 +74,7 @@ export function UpdateRobotModal({
 }: UpdateRobotModalProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const { t } = useTranslation('device_settings')
+  const isOEMMode = useIsOEMMode()
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   // TODO(jh 08-29-2023): revisit reasons that are/are not captured by this selector.
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
@@ -159,7 +161,7 @@ export function UpdateRobotModal({
         <UpdateAppBanner type="informing" marginBottom={SPACING.spacing8}>
           {t('update_requires_restarting_robot')}
         </UpdateAppBanner>
-        <ReleaseNotes source={releaseNotes} />
+        <ReleaseNotes source={releaseNotes} isOEMMode={isOEMMode} />
       </Flex>
     </Modal>
   )

@@ -58,6 +58,7 @@ from .types import (
     SubSystem,
     SubSystemState,
     HardwareFeatureFlags,
+    TipScrapeType,
 )
 from . import modules
 from .robot_calibration import (
@@ -1040,6 +1041,7 @@ class API(
         mount: top_types.Mount,
         volume: Optional[float] = None,
         rate: float = 1.0,
+        correction_volume: float = 0.0,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette.
@@ -1074,6 +1076,8 @@ class API(
         volume: Optional[float] = None,
         rate: float = 1.0,
         push_out: Optional[float] = None,
+        correction_volume: float = 0.0,
+        is_full_dispense: bool = False,
     ) -> None:
         """
         Dispense a volume of liquid in microliters(uL) using this pipette.
@@ -1253,6 +1257,7 @@ class API(
         mount: top_types.Mount,
         home_after: bool = True,
         ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
         spec, _ = self.plan_check_drop_tip(mount, home_after)
 

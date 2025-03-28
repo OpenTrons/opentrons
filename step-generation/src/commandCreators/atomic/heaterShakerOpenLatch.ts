@@ -1,6 +1,6 @@
 import * as errorCreators from '../../errorCreators'
 import { getIsTallLabwareEastWestOfHeaterShaker, uuid } from '../../utils'
-import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
 const LEFT_SLOTS = ['1', '4', '7', '10']
@@ -9,10 +9,10 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
   invariantContext,
   prevRobotState
 ) => {
+  const { pipetteEntities, labwareEntities, moduleEntities } = invariantContext
   const heaterShakerSlot = prevRobotState.modules[args.moduleId].slot
-  const firstPipetteId = Object.keys(invariantContext.pipetteEntities)[0]
-  const firstPipetteSpec =
-    invariantContext.pipetteEntities[firstPipetteId]?.spec
+  const firstPipetteId = Object.keys(pipetteEntities)[0]
+  const firstPipetteSpec = pipetteEntities[firstPipetteId]?.spec
 
   const isFlexPipette =
     (firstPipetteSpec?.displayCategory === 'FLEX' ||
@@ -23,7 +23,7 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
     !isFlexPipette &&
     getIsTallLabwareEastWestOfHeaterShaker(
       prevRobotState.labware,
-      invariantContext.labwareEntities,
+      labwareEntities,
       heaterShakerSlot
     )
   ) {
@@ -33,6 +33,8 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
       errors: [errorCreators.tallLabwareEastWestOfHeaterShaker(leftOrRight)],
     }
   }
+  const pythonName = moduleEntities[args.moduleId].pythonName
+
   return {
     commands: [
       {
@@ -43,5 +45,6 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
         },
       },
     ],
+    python: `${pythonName}.open_labware_latch()`,
   }
 }

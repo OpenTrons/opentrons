@@ -277,18 +277,21 @@ describe('Max dispense well volume', () => {
           def: fixture24Tuberack as LabwareDefinition2,
           id: 'mockId',
           labwareDefURI: 'mockURI',
+          pythonName: 'mockPythonName',
         },
         aspirate_mmFromBottom: null,
         labware: {
           def: fixture24Tuberack as LabwareDefinition2,
           id: 'mockId',
           labwareDefURI: 'mockURI',
+          pythonName: 'mockPythonName',
         },
         mix_mmFromBottom: 0.5,
         dispense_labware: {
           def: fixture24Tuberack as LabwareDefinition2,
           id: 'mockId',
           labwareDefURI: 'mockURI',
+          pythonName: 'mockPythonName',
         },
         dispense_mmFromBottom: null,
       }
@@ -311,16 +314,19 @@ describe('Max dispense well volume', () => {
         def: fixture96Plate as LabwareDefinition2,
         id: 'mockId',
         labwareDefURI: 'mockURI',
+        pythonName: 'mockPythonName',
       }
       fields.labware = {
         def: fixture96Plate as LabwareDefinition2,
         id: 'mockId',
         labwareDefURI: 'mockURI',
+        pythonName: 'mockPythonName',
       }
       fields.dispense_labware = {
         def: fixture96Plate as LabwareDefinition2,
         id: 'mockId',
         labwareDefURI: 'mockURI',
+        pythonName: 'mockPythonName',
       }
       expect(tipPositionInTube(fields)).toBe(null)
       expect(mixTipPositionInTube(fields)).toBe(null)

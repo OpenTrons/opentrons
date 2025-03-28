@@ -17,6 +17,10 @@ from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
 if TYPE_CHECKING:
     from _pytest.mark import ParameterSet
 
+
+pytestmark = pytest.mark.slow
+
+
 # Allow plenty of time for database migrations, which can take a while in our CI runners.
 _STARTUP_TIMEOUT = 60
 
@@ -49,6 +53,7 @@ class Snapshot:
 
     version: str
     expected_protocol_count: int
+    expected_labware_offset_count: int
     expected_runs: List[Union[Run, BadRun]]
     protocols_with_no_analyses: List[str] = field(default_factory=list)
 
@@ -67,6 +72,7 @@ class Snapshot:
 flex_dev_compat_snapshot = Snapshot(
     version="ot3_v0.14.0_python_validation",
     expected_protocol_count=1,
+    expected_labware_offset_count=0,
     expected_runs=[Run("305b0cca-fc78-4853-b113-40ac4c30cd8f", 1)],
 )
 
@@ -76,6 +82,7 @@ snapshots: List[ParameterSet] = [
         Snapshot(
             version="v6.0.1",
             expected_protocol_count=4,
+            expected_labware_offset_count=0,
             expected_runs=[
                 Run("7bc1f20d-3925-4aa2-b200-82906112816f", 23),
                 Run("1b00190c-013f-463d-b371-5bf49b6ad61f", 16),
@@ -90,6 +97,7 @@ snapshots: List[ParameterSet] = [
         Snapshot(
             version="v6.1.0",
             expected_protocol_count=2,
+            expected_labware_offset_count=13,
             expected_runs=[
                 Run("a4338d46-96af-4e23-877d-1d79227a0946", 147),
                 Run("efc7374f-2e64-45ea-83fe-bd7a55f2699e", 205),
@@ -101,6 +109,7 @@ snapshots: List[ParameterSet] = [
         Snapshot(
             version="v6.2.0",
             expected_protocol_count=2,
+            expected_labware_offset_count=0,
             expected_runs=[
                 Run("199b991d-db3c-49ff-9b4f-905118c10685", 125),
                 Run("25a66ec6-2137-4680-8a94-d53c0e2a7488", 87),
@@ -112,6 +121,7 @@ snapshots: List[ParameterSet] = [
         Snapshot(
             version="v6.2.0_large",
             expected_protocol_count=17,
+            expected_labware_offset_count=15,
             expected_runs=[
                 Run("eeb17dc0-1878-432a-bf3f-33e7d3023b8d", 218),
                 Run("917cf0f8-8b79-47ab-a407-918c182eb6df", 125),
@@ -144,6 +154,7 @@ snapshots: List[ParameterSet] = [
         Snapshot(
             version="v7.1.1",
             expected_protocol_count=10,
+            expected_labware_offset_count=146,
             expected_runs=[
                 Run("69fe2d6f-3bda-4dfb-800b-cd93017d1cbd", 4634),
                 BadRun("04ec9eda-19b2-4850-9148-d28112565b37", 0),
@@ -245,6 +256,11 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
             # Ideally, we would also fetch full commands via
             # `GET /runs/{run_id}/commands/{command_id}`.
             # We skip it for performance. Adds ~10+ seconds
+
+            all_labware_offsets = (await robot_client.get_labware_offsets()).json()[
+                "data"
+            ]
+            assert len(all_labware_offsets) == snapshot.expected_labware_offset_count
 
 
 # TODO(mm, 2023-08-12): We can remove this test when we remove special handling for these

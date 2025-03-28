@@ -14,7 +14,7 @@ import {
   getMixData,
 } from '../moveLiquidFormToArgs'
 import { getOrderedWells } from '../../../utils'
-import { DEFAULT_MM_FROM_BOTTOM_ASPIRATE } from '../../../../constants'
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '../../../../constants'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   HydratedMoveLiquidFormData,
@@ -42,75 +42,72 @@ describe('move liquid step form -> command creator args', () => {
       stepType: 'moveLiquid',
       stepName: 'Test Step',
       description: null,
-
-      fields: {
-        pipette: {
-          id: 'pipetteId',
-          spec: fixtureP10SingleV2Specs,
-          tiprackLabwareDef: [
-            {
-              parameters: {
-                tipLength: 10,
-                loadName: 'mockTiprack',
-              },
-              metadata: {
-                displayName: 'mock display name',
-              },
+      pipette: {
+        id: 'pipetteId',
+        spec: fixtureP10SingleV2Specs,
+        tiprackLabwareDef: [
+          {
+            parameters: {
+              tipLength: 10,
+              loadName: 'mockTiprack',
             },
-          ] as any,
-        } as any,
-        volume: 10,
-        path: 'single',
-        changeTip: 'always',
-        aspirate_labware: {
-          id: 'sourceLabwareId',
-          // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
-          type: sourceLabwareType,
-          def: sourceLabwareDef,
-        },
-        tipRack: 'mockTiprack',
-        aspirate_wells: [ASPIRATE_WELL],
-        aspirate_wellOrder_first: 'l2r',
-        aspirate_wellOrder_second: 't2b',
-        aspirate_flowRate: null,
-        aspirate_mmFromBottom: null,
-        aspirate_touchTip_checkbox: false,
-        aspirate_touchTip_mmFromBottom: null,
-        aspirate_mix_checkbox: false,
-        aspirate_mix_volume: null,
-        aspirate_mix_times: null,
-        aspirate_delay_checkbox: false,
-        aspirate_delay_seconds: null,
-        aspirate_delay_mmFromBottom: null,
-
-        dispense_labware: {
-          id: 'destLabwareId',
-          // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
-          type: destLabwareType,
-          def: destLabwareDef,
-        },
-        dispense_wells: [DISPENSE_WELL],
-        dispense_wellOrder_first: 'r2l',
-        dispense_wellOrder_second: 'b2t',
-        dispense_flowRate: null,
-        dispense_mmFromBottom: null,
-        dispense_touchTip_checkbox: false,
-        dispense_touchTip_mmFromBottom: null,
-        dispense_mix_checkbox: false,
-        dispense_mix_volume: null,
-        dispense_mix_times: null,
-        dispense_delay_checkbox: false,
-        dispense_delay_seconds: null,
-        dispense_delay_mmFromBottom: null,
-
-        aspirate_wells_grouped: false,
-        preWetTip: false,
-        disposalVolume_checkbox: false,
-        disposalVolume_volume: null,
-        disposalVolume_location: null,
-        blowout_checkbox: false,
-        blowout_location: null,
+            metadata: {
+              displayName: 'mock display name',
+            },
+          },
+        ] as any,
+      } as any,
+      volume: 10,
+      path: 'single',
+      changeTip: 'always',
+      aspirate_labware: {
+        id: 'sourceLabwareId',
+        // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
+        type: sourceLabwareType,
+        def: sourceLabwareDef,
       },
+      tipRack: 'mockTiprack',
+      aspirate_wells: [ASPIRATE_WELL],
+      aspirate_wellOrder_first: 'l2r',
+      aspirate_wellOrder_second: 't2b',
+      aspirate_flowRate: null,
+      aspirate_mmFromBottom: null,
+      aspirate_touchTip_checkbox: false,
+      aspirate_touchTip_mmFromTop: null,
+      aspirate_mix_checkbox: false,
+      aspirate_mix_volume: null,
+      aspirate_mix_times: null,
+      aspirate_delay_checkbox: false,
+      aspirate_delay_seconds: null,
+      aspirate_delay_mmFromBottom: null,
+
+      dispense_labware: {
+        id: 'destLabwareId',
+        // @ts-expect-error(sa, 2021-6-15): type does not exist on LabwareEntity
+        type: destLabwareType,
+        def: destLabwareDef,
+      },
+      dispense_wells: [DISPENSE_WELL],
+      dispense_wellOrder_first: 'r2l',
+      dispense_wellOrder_second: 'b2t',
+      dispense_flowRate: null,
+      dispense_mmFromBottom: null,
+      dispense_touchTip_checkbox: false,
+      dispense_touchTip_mmFromTop: null,
+      dispense_mix_checkbox: false,
+      dispense_mix_volume: null,
+      dispense_mix_times: null,
+      dispense_delay_checkbox: false,
+      dispense_delay_seconds: null,
+      dispense_delay_mmFromBottom: null,
+
+      aspirate_wells_grouped: false,
+      preWetTip: false,
+      disposalVolume_checkbox: false,
+      disposalVolume_volume: null,
+      disposalVolume_location: null,
+      blowout_checkbox: false,
+      blowout_location: null,
     }
   })
 
@@ -139,13 +136,10 @@ describe('move liquid step form -> command creator args', () => {
   it('moveLiquidFormToArgs calls getOrderedWells only for aspirate when dispensing is into a waste chute', () => {
     moveLiquidFormToArgs({
       ...hydratedForm,
-      fields: {
-        ...hydratedForm.fields,
-        dispense_labware: {
-          id: 'destLabwareId',
-          name: 'wasteChute',
-          location: 'cutoutD3',
-        },
+      dispense_labware: {
+        id: 'destLabwareId',
+        name: 'wasteChute',
+        location: 'cutoutD3',
       },
     })
 
@@ -183,26 +177,26 @@ describe('move liquid step form -> command creator args', () => {
     // TOUCH TIPS
     {
       checkboxField: 'aspirate_touchTip_checkbox',
-      formFields: { aspirate_touchTip_mmFromBottom: 101 },
+      formFields: { aspirate_touchTip_mmFromTop: -11 },
       expectedArgsUnchecked: {
         touchTipAfterAspirate: false,
-        touchTipAfterAspirateOffsetMmFromBottom: 101,
+        touchTipAfterAspirateOffsetMmFromTop: -11,
       },
       expectedArgsChecked: {
         touchTipAfterAspirate: true,
-        touchTipAfterAspirateOffsetMmFromBottom: 101,
+        touchTipAfterAspirateOffsetMmFromTop: -11,
       },
     },
     {
       checkboxField: 'dispense_touchTip_checkbox',
-      formFields: { dispense_touchTip_mmFromBottom: 42 },
+      formFields: { dispense_touchTip_mmFromTop: -22 },
       expectedArgsUnchecked: {
         touchTipAfterDispense: false,
-        touchTipAfterDispenseOffsetMmFromBottom: 42,
+        touchTipAfterDispenseOffsetMmFromTop: -22,
       },
       expectedArgsChecked: {
         touchTipAfterDispense: true,
-        touchTipAfterDispenseOffsetMmFromBottom: 42,
+        touchTipAfterDispenseOffsetMmFromTop: -22,
       },
     },
     // MIXES
@@ -235,7 +229,7 @@ describe('move liquid step form -> command creator args', () => {
       expectedArgsChecked: {
         aspirateDelay: {
           seconds: 11,
-          mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+          mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
         },
       },
     },
@@ -278,22 +272,17 @@ describe('move liquid step form -> command creator args', () => {
         expect(
           moveLiquidFormToArgs({
             ...hydratedForm,
-            fields: {
-              ...hydratedForm.fields,
-              [checkboxField]: false,
-              ...formFields,
-            },
+
+            [checkboxField]: false,
+            ...formFields,
           })
         ).toMatchObject(expectedArgsUnchecked)
 
         expect(
           moveLiquidFormToArgs({
             ...hydratedForm,
-            fields: {
-              ...hydratedForm.fields,
-              [checkboxField]: true,
-              ...formFields,
-            },
+            [checkboxField]: true,
+            ...formFields,
           })
         ).toMatchObject(expectedArgsChecked)
       })
@@ -313,11 +302,9 @@ describe('move liquid step form -> command creator args', () => {
     it('disposal volume works when checkbox true', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          ...disposalVolumeFields,
-          disposalVolume_checkbox: true,
-        },
+
+        ...disposalVolumeFields,
+        disposalVolume_checkbox: true,
       })
 
       expect(result).toMatchObject({
@@ -328,11 +315,9 @@ describe('move liquid step form -> command creator args', () => {
     it('blowout location works when checkbox true', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          ...disposalVolumeFields,
-          blowout_checkbox: true,
-        },
+
+        ...disposalVolumeFields,
+        blowout_checkbox: true,
       })
 
       expect(result).toMatchObject({
@@ -343,11 +328,9 @@ describe('move liquid step form -> command creator args', () => {
     it('disposal volume fields ignored when checkbox false', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          ...disposalVolumeFields,
-          disposalVolume_checkbox: false,
-        },
+
+        ...disposalVolumeFields,
+        disposalVolume_checkbox: false,
       })
 
       expect(result).toMatchObject({
@@ -358,12 +341,10 @@ describe('move liquid step form -> command creator args', () => {
     it('disposal volume overrides blowout', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          ...disposalVolumeFields,
-          disposalVolume_checkbox: true,
-          blowout_checkbox: true,
-        },
+
+        ...disposalVolumeFields,
+        disposalVolume_checkbox: true,
+        blowout_checkbox: true,
       })
 
       expect(result).toMatchObject({
@@ -375,12 +356,10 @@ describe('move liquid step form -> command creator args', () => {
     it('fallback to blowout when disposal volume unchecked', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          ...disposalVolumeFields,
-          disposalVolume_checkbox: false,
-          blowout_checkbox: true,
-        },
+
+        ...disposalVolumeFields,
+        disposalVolume_checkbox: false,
+        blowout_checkbox: true,
       })
 
       expect(result).toMatchObject({
@@ -392,12 +371,10 @@ describe('move liquid step form -> command creator args', () => {
     it('should blow out into the destination when checkbox is true and blowout location is destination', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
-        fields: {
-          ...hydratedForm.fields,
-          ...disposalVolumeFields,
-          blowout_checkbox: true,
-          blowout_location: DEST_WELL_BLOWOUT_DESTINATION,
-        },
+
+        ...disposalVolumeFields,
+        blowout_checkbox: true,
+        blowout_location: DEST_WELL_BLOWOUT_DESTINATION,
       })
 
       expect(result).toMatchObject({

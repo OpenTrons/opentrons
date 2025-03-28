@@ -1,31 +1,33 @@
 import { describe, it, expect } from 'vitest'
 import { _castForm } from '../index'
-import type { FormData } from '../../../../form-types'
-
-// NOTE(IL, 2020-09-24): I think the real solution to validating the
-// output of hydration/casting is static typing as per #3161
-// Because if we forget to change the value casters when adding/modifying fields,
-// and we also forget to modify these tests covering the value casters, these tests
-// won't catch any problems.
+import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
+import type {
+  HydratedMagnetFormData,
+  HydratedMixFormData,
+  HydratedMoveLiquidFormData,
+  HydratedPauseFormData,
+  HydratedTemperatureFormData,
+  HydratedThermocyclerFormData,
+} from '../../../../form-types'
 
 describe('form casting', () => {
   it('should cast moveLiquid form fields', () => {
-    const input: FormData = {
+    const input: HydratedMoveLiquidFormData = {
       id: 'stepId',
       stepType: 'moveLiquid',
       stepName: 'transfer',
       stepDetails: 'some details',
       aspirate_airGap_checkbox: false,
-      aspirate_airGap_volume: '1',
+      aspirate_airGap_volume: 1,
       aspirate_delay_checkbox: false,
-      aspirate_delay_mmFromBottom: '1',
-      aspirate_delay_seconds: '1',
-      aspirate_flowRate: null,
-      aspirate_labware: 'FAKE_LABWARE_DEF',
+      aspirate_delay_mmFromBottom: 1,
+      aspirate_delay_seconds: 1,
+      aspirate_flowRate: 50,
+      aspirate_labware: {} as LabwareEntity,
       aspirate_mix_checkbox: false,
-      aspirate_mix_times: null,
-      aspirate_mix_volume: null,
-      aspirate_mmFromBottom: '1',
+      aspirate_mix_times: 0,
+      aspirate_mix_volume: 0,
+      aspirate_mmFromBottom: 1,
       aspirate_touchTip_checkbox: false,
       aspirate_wellOrder_first: 't2b',
       aspirate_wellOrder_second: 'l2r',
@@ -35,66 +37,75 @@ describe('form casting', () => {
       blowout_location: 'fixedTrash',
       changeTip: 'always',
       dispense_delay_checkbox: false,
-      dispense_delay_mmFromBottom: '0.5',
-      dispense_delay_seconds: '1',
+      dispense_delay_mmFromBottom: 0.5,
+      dispense_delay_seconds: 1,
       dispense_flowRate: null,
-      dispense_labware: 'FAKE_LABWARE_DEF',
+      dispense_labware: {} as LabwareEntity,
       dispense_mix_checkbox: false,
-      dispense_mix_times: null,
-      dispense_mix_volume: null,
-      dispense_mmFromBottom: '0.5',
+      dispense_mix_times: 0,
+      dispense_mix_volume: 0,
+      dispense_mmFromBottom: 0.5,
       dispense_touchTip_checkbox: false,
       dispense_wellOrder_first: 't2b',
       dispense_wellOrder_second: 'l2r',
       dispense_wells: ['A1'],
       disposalVolume_checkbox: true,
-      disposalVolume_volume: '1',
+      disposalVolume_volume: 1,
       path: 'single',
-      pipette: 'FAKE_PIPETTE',
+      pipette: {} as PipetteEntity,
       preWetTip: false,
-      volume: '5',
-      meta: {},
+      volume: 5,
+      dispense_airGap_checkbox: false,
+      dropTip_location: 'some location',
+      nozzles: null,
+      tipRack: 'some tiprack',
+      liquidClassesSupported: true,
+      aspirate_retract_position_reference: 'well-bottom',
+      aspirate_submerge_mmFromBottom: 1,
+      aspirate_submerge_x_position: 0,
+      aspirate_submerge_y_position: 0,
+      aspirate_position_reference: 'well-top',
+      dispense_retract_position_reference: 'well-bottom',
+      dispense_submerge_mmFromBottom: 4,
+      dispense_submerge_x_position: 1,
+      dispense_submerge_y_position: -1,
+      dispense_position_reference: 'well-bottom',
     }
     expect(_castForm(input)).toEqual({
       ...input,
-      aspirate_airGap_volume: 1,
-      aspirate_delay_mmFromBottom: 1,
-      aspirate_delay_seconds: 1,
       aspirate_mix_times: 0,
       aspirate_mix_volume: 0,
-      aspirate_mmFromBottom: 1,
-      dispense_delay_mmFromBottom: 0.5,
-      dispense_delay_seconds: 1,
       dispense_mix_times: 0,
       dispense_mix_volume: 0,
-      dispense_mmFromBottom: 0.5,
-      disposalVolume_volume: 1,
-      volume: 5,
     })
   })
 
   it('should cast mix form fields', () => {
-    const input: FormData = {
+    const input: HydratedMixFormData = {
       id: 'stepId',
       stepType: 'mix',
       stepName: 'mix',
       stepDetails: '',
       changeTip: 'always',
-      labware: 'FAKE_LABWARE_DEF',
+      labware: {} as LabwareEntity,
       mix_wellOrder_first: 't2b',
       mix_wellOrder_second: 'l2r',
       blowout_checkbox: false,
       blowout_location: 'fixedTrash',
       mix_mmFromBottom: 0.5,
-      pipette: 'FAKE_PIPETTE',
-      volume: '5',
+      pipette: {} as PipetteEntity,
+      volume: 5,
       wells: ['A1', 'A2'],
-      times: '2',
-      meta: {},
+      times: 2,
       aspirate_delay_checkbox: true,
       dispense_delay_checkbox: false,
-      aspirate_delay_seconds: '2',
-      dispense_delay_seconds: '1',
+      aspirate_delay_seconds: 2,
+      dispense_delay_seconds: 1,
+      dropTip_location: 'some location',
+      mix_touchTip_checkbox: false,
+      nozzles: null,
+      tipRack: 'some tiprack',
+      liquidClassesSupported: true,
     }
 
     expect(_castForm(input)).toEqual({
@@ -108,25 +119,16 @@ describe('form casting', () => {
   })
 
   it('should cast pause form fields', () => {
-    const input: FormData = {
+    const input: HydratedPauseFormData = {
       id: 'stepId',
       stepType: 'pause',
       stepName: 'pause',
       stepDetails: '',
       pauseAction: 'untilTime',
-      pauseHour: '1',
-      pauseMinute: '2',
-      pauseSecond: '3',
+      pauseTime: '100',
       pauseMessage: 'some message',
       moduleId: 'someModuleId',
-      pauseTemperature: null,
-      meta: {
-        module: {
-          id: 'someModuleId',
-          type: 'temperatureModuleType',
-          model: 'temperatureModuleV2',
-        },
-      },
+      pauseTemperature: '0',
     }
 
     // NOTE: pauseHour + pauseMinute + pauseSecond aren't cast to number
@@ -137,7 +139,7 @@ describe('form casting', () => {
   })
 
   it('should cast magnet form fields', () => {
-    const input: FormData = {
+    const input: HydratedMagnetFormData = {
       id: 'stepId',
       stepType: 'magnet',
       stepName: 'magnet',
@@ -145,20 +147,13 @@ describe('form casting', () => {
       moduleId: 'someModuleId',
       magnetAction: 'engage',
       engageHeight: '12',
-      meta: {
-        module: {
-          id: 'someModuleId',
-          type: 'magneticModuleType',
-          model: 'magneticModuleV2',
-        },
-      },
     }
 
     expect(_castForm(input)).toEqual({ ...input, engageHeight: 12 })
   })
 
   it('should cast temperature form fields', () => {
-    const input: FormData = {
+    const input: HydratedTemperatureFormData = {
       id: 'stepId',
       stepType: 'temperature',
       stepName: 'temperature',
@@ -166,13 +161,6 @@ describe('form casting', () => {
       moduleId: 'someModuleId',
       setTemperature: 'true',
       targetTemperature: '24',
-      meta: {
-        module: {
-          id: 'someModuleId',
-          type: 'temperatureModuleType',
-          model: 'temperatureModuleV2',
-        },
-      },
     }
     expect(_castForm(input)).toEqual({
       ...input,
@@ -181,7 +169,7 @@ describe('form casting', () => {
   })
 
   it('should cast thermocycler form fields', () => {
-    const input: FormData = {
+    const input: HydratedThermocyclerFormData = {
       id: 'stepId',
       stepType: 'thermocycler',
       stepName: 'thermocycler',
@@ -201,14 +189,7 @@ describe('form casting', () => {
       blockTargetTempHold: null,
       lidIsActiveHold: false,
       lidTargetTempHold: null,
-      lidOpenHold: null,
-      meta: {
-        module: {
-          id: 'someModuleId',
-          type: 'thermocyclerModuleType',
-          model: 'thermocyclerModuleV1',
-        },
-      },
+      lidOpenHold: false,
     }
     expect(_castForm(input)).toEqual({
       ...input,

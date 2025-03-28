@@ -7,14 +7,17 @@ import {
   HEATERSHAKER_MODULE_V1,
   fixture96Plate,
 } from '@opentrons/shared-data'
+import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 import { i18n } from '../../../../assets/localization'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { deleteContainer } from '../../../../labware-ingred/actions'
-import { useKitchen } from '../../../../organisms/Kitchen/hooks'
-import { deleteModule } from '../../../../step-forms/actions'
-import { getAdditionalEquipment } from '../../../../step-forms/selectors'
+import { useKitchen } from '../../../../components/organisms/Kitchen/hooks'
+import { deleteModule } from '../../../../modules'
+import {
+  getAdditionalEquipment,
+  getSavedStepForms,
+} from '../../../../step-forms/selectors'
 import { getRobotType } from '../../../../file-data/selectors'
-import { getEnableAbsorbanceReader } from '../../../../feature-flags/selectors'
 import { deleteDeckFixture } from '../../../../step-forms/actions/additionalItems'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { getDismissedHints } from '../../../../tutorial/selectors'
@@ -30,12 +33,12 @@ vi.mock('../../../../feature-flags/selectors')
 vi.mock('../../../../file-data/selectors')
 vi.mock('../../../../top-selectors/labware-locations')
 vi.mock('../../../../labware-ingred/actions')
-vi.mock('../../../../step-forms/actions')
+vi.mock('../../../../modules')
 vi.mock('../../../../step-forms/actions/additionalItems')
 vi.mock('../../../../labware-ingred/selectors')
 vi.mock('../../../../tutorial/selectors')
 vi.mock('../../../../step-forms/selectors')
-vi.mock('../../../../organisms/Kitchen/hooks')
+vi.mock('../../../../components/organisms/Kitchen/hooks')
 const render = (props: ComponentProps<typeof DeckSetupTools>) => {
   return renderWithProviders(<DeckSetupTools {...props} />, {
     i18nInstance: i18n,
@@ -65,13 +68,13 @@ describe('DeckSetupTools', () => {
     })
     vi.mocked(LabwareTools).mockReturnValue(<div>mock labware tools</div>)
     vi.mocked(getRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
-    vi.mocked(getEnableAbsorbanceReader).mockReturnValue(true)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       labware: {},
       modules: {},
       additionalEquipmentOnDeck: {},
       pipettes: {},
     })
+    vi.mocked(getSavedStepForms).mockReturnValue({})
     vi.mocked(getDismissedHints).mockReturnValue([])
     vi.mocked(getAdditionalEquipment).mockReturnValue({})
     vi.mocked(useKitchen).mockReturnValue({
@@ -96,9 +99,10 @@ describe('DeckSetupTools', () => {
     screen.getByText('Magnetic Block GEN1')
     screen.getByText('Temperature Module GEN2')
     screen.getByText('Staging area')
-    screen.getByText('Waste chute')
+    screen.getByText('Waste Chute')
     screen.getByText('Trash Bin')
-    screen.getByText('Waste chute and staging area slot')
+    screen.getByText('Waste Chute with Staging Area')
+    screen.getByText('Magnetic Block GEN1 with Staging Area')
   })
   it('should render the labware tab', () => {
     render(props)
@@ -123,12 +127,14 @@ describe('DeckSetupTools', () => {
           id: 'labId',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
         lab2: {
           slot: 'labId',
           id: 'labId2',
           labwareDefURI: 'mockUri',
           def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'mockPythonName',
         },
       },
       pipettes: {},
@@ -139,6 +145,7 @@ describe('DeckSetupTools', () => {
           id: 'modId',
           slot: 'D3',
           moduleState: {} as any,
+          pythonName: 'mockPythonName',
         },
       },
       additionalEquipmentOnDeck: {
@@ -173,13 +180,17 @@ describe('DeckSetupTools', () => {
       selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
     })
     render(props)
-    fireEvent.click(screen.getByText('Waste chute and staging area slot'))
+    fireEvent.click(screen.getByText('Waste Chute with Staging Area'))
     fireEvent.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()
   })
   it('should save plate reader if gripper configured', () => {
     vi.mocked(getAdditionalEquipment).mockReturnValue({
-      gripperUri: { name: 'gripper', id: 'gripperId' },
+      gripperUri: {
+        name: 'gripper',
+        id: 'gripperId',
+        location: GRIPPER_LOCATION,
+      },
     })
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedLabwareDefUri: null,
@@ -191,18 +202,5 @@ describe('DeckSetupTools', () => {
     render(props)
     fireEvent.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()
-  })
-  it('should prevent saving plate reader and make toast if gripper not configured', () => {
-    vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
-      selectedLabwareDefUri: null,
-      selectedNestedLabwareDefUri: null,
-      selectedFixture: null,
-      selectedModuleModel: ABSORBANCE_READER_V1,
-      selectedSlot: { slot: 'D3', cutout: 'cutoutD3' },
-    })
-    render(props)
-    fireEvent.click(screen.getByText('Done'))
-    expect(props.onCloseClick).not.toHaveBeenCalled()
-    expect(mockMakeSnackbar).toHaveBeenCalled()
   })
 })

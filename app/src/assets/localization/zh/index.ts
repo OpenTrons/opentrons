@@ -3,7 +3,6 @@ import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
 import branded from './branded.json'
 import change_pipette from './change_pipette.json'
-import protocol_command_text from './protocol_command_text.json'
 import device_details from './device_details.json'
 import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
@@ -28,27 +27,29 @@ import run_details from './run_details.json'
 import top_navigation from './top_navigation.json'
 import error_recovery from './error_recovery.json'
 import incompatible_modules from './incompatible_modules.json'
+import protocol_command_text from './protocol_command_text.json'
 
 export const zh = {
-  shared,
   anonymous,
   app_settings,
   branded,
   change_pipette,
-  protocol_command_text,
   device_details,
   device_settings,
   devices_landing,
   drop_tip_wizard,
+  error_recovery,
   firmware_update,
   gripper_wizard_flows,
   heater_shaker,
+  incompatible_modules,
   instruments_dashboard,
   labware_details,
   labware_landing,
   labware_position_check,
   module_wizard_flows,
   pipette_wizard_flows,
+  protocol_command_text,
   protocol_details,
   protocol_info,
   protocol_list,
@@ -57,7 +58,6 @@ export const zh = {
   robot_calibration,
   robot_controls,
   run_details,
+  shared,
   top_navigation,
-  error_recovery,
-  incompatible_modules,
 }

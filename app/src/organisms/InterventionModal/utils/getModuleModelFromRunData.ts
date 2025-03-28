@@ -1,4 +1,4 @@
-import { getLoadedModule } from '/app/local-resources/modules'
+import { getLoadedModule } from '@opentrons/components'
 
 import type { RunData } from '@opentrons/api-client'
 import type { ModuleModel } from '@opentrons/shared-data'

@@ -1,12 +1,9 @@
 import {
   FLEX_ROBOT_TYPE,
-  getLabwareDisplayName,
   getSimplestDeckConfigForProtocol,
-  getTopLabwareInfo,
 } from '@opentrons/shared-data'
 
 import { BaseDeck } from '../BaseDeck'
-import { LabwareInfo } from './LabwareInfo'
 import { getStandardDeckViewLayerBlockList } from './utils'
 import { getLabwareInfoByLiquidId } from './utils/getLabwareInfoByLiquidId'
 import { getTopMostLabwareInSlots } from './utils/getLabwareInSlots'
@@ -16,42 +13,22 @@ import { getWellFillFromLabwareId } from './utils/getWellFillFromLabwareId'
 import type { ComponentProps } from 'react'
 import type {
   CompletedProtocolAnalysis,
-  LabwareDefinition2,
   ProtocolAnalysisOutput,
-  RunTimeCommand,
-  LoadLabwareRunTimeCommand,
 } from '@opentrons/shared-data'
 
 export * from './utils/getStandardDeckViewLayerBlockList'
-
+export * from './types'
 interface ProtocolDeckProps {
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
-  /** defaults to false, when set labware nicknames will appear on top level labware. If no nickname specified in protocol, falls back to labware definition display name */
-  showLabwareInfo?: boolean
-  /** optional labware click handler, highlights labware */
-  handleLabwareClick?: (
-    labwareDef: LabwareDefinition2,
-    labwareId: string
-  ) => void
   /** extra props to pass through to BaseDeck component */
   baseDeckProps?: Partial<ComponentProps<typeof BaseDeck>>
 }
 
 export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
-  const {
-    protocolAnalysis,
-    baseDeckProps,
-    handleLabwareClick,
-    showLabwareInfo = false,
-  } = props
+  const { protocolAnalysis, baseDeckProps } = props
 
   if (protocolAnalysis == null || (protocolAnalysis?.errors ?? []).length > 0)
     return null
-  const commands: RunTimeCommand[] = protocolAnalysis.commands
-  const loadLabwareCommands = commands?.filter(
-    (command): command is LoadLabwareRunTimeCommand =>
-      command.commandType === 'loadLabware'
-  )
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
@@ -59,18 +36,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
 
   const modulesInSlots = getModulesInSlots(protocolAnalysis)
   const modulesOnDeck = modulesInSlots.map(
-    ({
-      moduleModel,
-      moduleLocation,
-      nestedLabwareId,
-      nestedLabwareDef,
-      nestedLabwareNickName,
-    }) => {
-      const { topLabwareId, topLabwareDefinition } = getTopLabwareInfo(
-        nestedLabwareId ?? '',
-        loadLabwareCommands
-      )
-
+    ({ moduleModel, moduleLocation, nestedLabwareId, nestedLabwareDef }) => {
       return {
         moduleModel,
         moduleLocation,
@@ -80,54 +46,14 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
           protocolAnalysis.liquids,
           labwareByLiquidId
         ),
-        moduleChildren:
-          showLabwareInfo &&
-          nestedLabwareDef != null &&
-          !(nestedLabwareDef.allowedRoles ?? []).includes('adapter') ? (
-            <LabwareInfo def={nestedLabwareDef}>
-              {nestedLabwareNickName ?? getLabwareDisplayName(nestedLabwareDef)}
-            </LabwareInfo>
-          ) : null,
-        highlightLabware: handleLabwareClick != null,
-        highlightShadowLabware:
-          handleLabwareClick != null &&
-          topLabwareDefinition != null &&
-          topLabwareId != null,
-        onLabwareClick:
-          handleLabwareClick != null &&
-          topLabwareDefinition != null &&
-          topLabwareId != null
-            ? () => {
-                handleLabwareClick(topLabwareDefinition, topLabwareId)
-              }
-            : undefined,
-        stacked:
-          handleLabwareClick != null &&
-          topLabwareDefinition != null &&
-          topLabwareId != null,
       }
     }
   )
 
-  // this function gets the top labware assuming a stack of max 2 labware
+  // this function gets the top most labware
   const topMostLabwareInSlots = getTopMostLabwareInSlots(protocolAnalysis)
   const labwareOnDeck = topMostLabwareInSlots.map(
-    ({ labwareId, labwareDef, labwareNickName, location }) => {
-      // this gets the very top of the stack in case there is a stack
-      // of many like items, such as TC lids
-      const { topLabwareId, topLabwareDefinition } = getTopLabwareInfo(
-        labwareId,
-        loadLabwareCommands
-      )
-      const isLabwareInStack = protocolAnalysis?.commands.some(
-        command =>
-          command.commandType === 'loadLabware' &&
-          command.result?.labwareId === labwareId &&
-          typeof command.params.location === 'object' &&
-          ('moduleId' in command.params.location ||
-            'labwareId' in command.params.location)
-      )
-
+    ({ labwareId, labwareDef, location }) => {
       return {
         definition: labwareDef,
         labwareLocation: location,
@@ -136,20 +62,6 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
           protocolAnalysis.liquids,
           labwareByLiquidId
         ),
-        labwareChildren: showLabwareInfo ? (
-          <LabwareInfo def={labwareDef}>
-            {labwareNickName ?? getLabwareDisplayName(labwareDef)}
-          </LabwareInfo>
-        ) : null,
-        highlight: handleLabwareClick != null,
-        highlightShadow: handleLabwareClick != null && isLabwareInStack,
-        onLabwareClick:
-          handleLabwareClick != null && topLabwareDefinition != null
-            ? () => {
-                handleLabwareClick(topLabwareDefinition, topLabwareId)
-              }
-            : undefined,
-        stacked: handleLabwareClick != null && isLabwareInStack,
       }
     }
   )

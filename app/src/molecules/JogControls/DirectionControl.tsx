@@ -397,7 +397,8 @@ const ARROW_BUTTON_STYLES = css`
     }
   }
 `
-const ARROW_ICON_STYLES = css`
+
+const StyledIcon = styled(Icon)`
   height: 1.125rem;
   width: 1.125rem;
 
@@ -427,21 +428,19 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
 
   return (
     <Box css={ARROW_GRID_STYLES}>
-      {controls.map(
-        ({ bearing, iconName, axis, sign, gridColumn, keyName, disabled }) => (
-          <PrimaryButton
-            key={bearing}
-            onClick={() => jog(axis, sign, stepSize)}
-            css={ARROW_BUTTON_STYLES}
-            title={bearing}
-            gridArea={keyName}
-            alignSelf={BUTTON_ALIGN_BY_KEY_NAME[keyName] ?? 'center'}
-            disabled={disabled}
-          >
-            <Icon css={ARROW_ICON_STYLES} name={iconName} />
-          </PrimaryButton>
-        )
-      )}
+      {controls.map(({ bearing, iconName, axis, sign, keyName, disabled }) => (
+        <PrimaryButton
+          key={bearing}
+          onClick={() => jog(axis, sign, stepSize)}
+          css={ARROW_BUTTON_STYLES}
+          title={bearing}
+          gridArea={keyName}
+          alignSelf={BUTTON_ALIGN_BY_KEY_NAME[keyName] ?? 'center'}
+          disabled={disabled}
+        >
+          <StyledIcon name={iconName} />
+        </PrimaryButton>
+      ))}
     </Box>
   )
 }

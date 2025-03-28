@@ -14,6 +14,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   ModalShell,
+  getLabwareDefinitionsFromCommands,
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
@@ -30,7 +31,6 @@ import { getTopPortalEl } from '/app/App/portal'
 import { SmallButton } from '/app/atoms/buttons'
 import { CALIBRATION_PROBE } from '/app/organisms/PipetteWizardFlows/constants'
 import { TerseOffsetTable } from '../ResultsSummary'
-import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { Dispatch } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
@@ -108,7 +108,7 @@ export const IntroScreen = (props: {
       body={
         <Trans
           t={t}
-          i18nKey="labware_position_check_description"
+          i18nKey="legacy_labware_position_check_description"
           components={{ block: <LegacyStyledText as="p" /> }}
         />
       }

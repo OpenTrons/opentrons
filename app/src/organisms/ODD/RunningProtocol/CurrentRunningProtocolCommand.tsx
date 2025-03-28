@@ -16,12 +16,12 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  getCommandTextData,
+  CommandText,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
-import { CommandText } from '/app/molecules/Command'
 import { RunTimer } from '/app/molecules/RunTimer'
-import { getCommandTextData } from '/app/local-resources/commands'
 import { PlayPauseButton } from './PlayPauseButton'
 import { StopButton } from './StopButton'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'

@@ -76,7 +76,7 @@ describe('pipette data accessors', () => {
         backlashDistance: 0.1,
         channels: 1,
         displayCategory: 'FLEX',
-        displayName: 'Flex 1-Channel 1000 μL',
+        displayName: 'Flex 1-Channel 1000 µL',
         dropTipConfigurations: { plungerEject: { current: 1, speed: 15 } },
         liquids: {
           default: {

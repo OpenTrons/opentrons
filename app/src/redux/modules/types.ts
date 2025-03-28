@@ -10,6 +10,8 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  FlexStackerModuleModel,
 } from '@opentrons/shared-data'
 
 import type { ModuleOffset } from '@opentrons/api-client'
@@ -72,12 +74,20 @@ export interface AbsorbanceReaderModule extends CommonModuleInfo {
   moduleOffset?: ModuleOffset
 }
 
+export interface FlexStackerModule extends CommonModuleInfo {
+  moduleType: typeof FLEX_STACKER_MODULE_TYPE
+  moduleModel: FlexStackerModuleModel
+  data: ApiTypes.FlexStackerData
+  moduleOffset?: ModuleOffset
+}
+
 export type AttachedModule =
   | TemperatureModule
   | MagneticModule
   | ThermocyclerModule
   | HeaterShakerModule
   | AbsorbanceReaderModule
+  | FlexStackerModule
 // action object types
 
 export interface MatchedModule {

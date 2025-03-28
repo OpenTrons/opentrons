@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "Flex 8-Channel 50 μL",
+  "displayName": "Flex 8-Channel 50 µL",
   "model": "p50",
   "displayCategory": "FLEX",
   "validNozzleMaps": {

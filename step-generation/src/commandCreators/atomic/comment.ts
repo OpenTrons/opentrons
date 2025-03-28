@@ -1,8 +1,8 @@
-import { uuid } from '../../utils'
-import type { CommentCreateCommand } from '@opentrons/shared-data'
+import { uuid, formatPyStr, PROTOCOL_CONTEXT_NAME } from '../../utils'
+import type { CommentParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-export const comment: CommandCreator<CommentCreateCommand['params']> = (
+export const comment: CommandCreator<CommentParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -18,7 +18,9 @@ export const comment: CommandCreator<CommentCreateCommand['params']> = (
       },
     },
   ]
+  const python = `${PROTOCOL_CONTEXT_NAME}.comment(${formatPyStr(message)})`
   return {
     commands,
+    python,
   }
 }

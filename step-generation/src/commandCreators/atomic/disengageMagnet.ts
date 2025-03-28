@@ -2,15 +2,17 @@ import assert from 'assert'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
 import * as errorCreators from '../../errorCreators'
-import type { CommandCreator, DisengageMagnetArgs } from '../../types'
+import type { ModuleOnlyParams } from '@opentrons/shared-data'
+import type { CommandCreator } from '../../types'
 
 /** Disengage magnet of specified magnetic module. */
-export const disengageMagnet: CommandCreator<DisengageMagnetArgs> = (
+export const disengageMagnet: CommandCreator<ModuleOnlyParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { module: moduleId } = args
+  const { moduleId } = args
+  const { moduleEntities } = invariantContext
   const commandType = 'magneticModule/disengage'
 
   if (moduleId === null) {
@@ -20,9 +22,12 @@ export const disengageMagnet: CommandCreator<DisengageMagnetArgs> = (
   }
 
   assert(
-    invariantContext.moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
-    `expected module ${moduleId} to be magdeck, got ${invariantContext.moduleEntities[moduleId]?.type}`
+    moduleEntities[moduleId]?.type === MAGNETIC_MODULE_TYPE,
+    `expected module ${moduleId} to be magdeck, got ${moduleEntities[moduleId]?.type}`
   )
+
+  const pythonName = moduleEntities[moduleId].pythonName
+
   return {
     commands: [
       {
@@ -33,5 +38,6 @@ export const disengageMagnet: CommandCreator<DisengageMagnetArgs> = (
         },
       },
     ],
+    python: `${pythonName}.disengage()`,
   }
 }

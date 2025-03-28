@@ -34,7 +34,7 @@ export type ErrorChecker = (value: unknown) => string | null
 export const requiredField: ErrorChecker = (value: unknown) =>
   !value ? FIELD_ERRORS.REQUIRED : null
 export const isTimeFormat: ErrorChecker = (value: unknown): string | null => {
-  const timeRegex = new RegExp(/^\d{1,2}:\d{1,2}:\d{1,2}$/g)
+  const timeRegex = new RegExp(/^\d{1,2}:(?:[0-5]?\d):(?:[0-5]?\d)$/g)
   return (typeof value === 'string' && timeRegex.test(value)) || !value
     ? null
     : FIELD_ERRORS.BAD_TIME_HMS
@@ -42,7 +42,7 @@ export const isTimeFormat: ErrorChecker = (value: unknown): string | null => {
 export const isTimeFormatMinutesSeconds: ErrorChecker = (
   value: unknown
 ): string | null => {
-  const timeRegex = new RegExp(/^\d{1,2}:\d{1,2}$/g)
+  const timeRegex = new RegExp(/^\d+:[0-5]?\d$/g)
   return (typeof value === 'string' && timeRegex.test(value)) || !value
     ? null
     : FIELD_ERRORS.BAD_TIME_MS

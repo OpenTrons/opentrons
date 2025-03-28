@@ -7,19 +7,19 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 
-import type { ModuleIconName } from '../../icons'
+import type { IconName, ModuleIconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
 interface DeckLabelProps extends StyleProps {
   /** deck label to display */
   deckLabel: string
-  iconName?: undefined
+  iconName?: IconName
 }
 
 interface HardwareIconProps extends StyleProps {
   /** hardware icon name */
   iconName: ModuleIconName | 'stacked'
-  deckLabel?: undefined
+  deckLabel?: string
 }
 
 // type union requires one of deckLabel or iconName, but not both

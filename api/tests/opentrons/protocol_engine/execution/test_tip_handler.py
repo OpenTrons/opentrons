@@ -8,10 +8,9 @@ from contextlib import nullcontext as does_not_raise
 
 from opentrons.types import Mount, MountType, Point
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import TipStateType
+from opentrons.hardware_control.types import TipStateType, TipScrapeType
 from opentrons.hardware_control.protocols.types import OT2RobotType, FlexRobotType
 
-from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import TipGeometry, TipPresenceStatus
 from opentrons.protocol_engine.resources import LabwareDataProvider
@@ -19,6 +18,10 @@ from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
     CommandParameterLimitViolated,
+)
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
 )
 from opentrons.protocol_engine.execution.tip_handler import (
     HardwareTipHandler,
@@ -52,7 +55,7 @@ def mock_labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
 @pytest.fixture
 def tip_rack_definition() -> LabwareDefinition:
     """Get a tip rack defintion value object."""
-    return LabwareDefinition.model_construct(namespace="test", version=42)  # type: ignore[call-arg]
+    return LabwareDefinition2.model_construct(namespace="test", version=42)  # type: ignore[call-arg]
 
 
 MOCK_MAP = NozzleMap.build(
@@ -258,7 +261,10 @@ async def test_drop_tip(
 
     decoy.verify(
         await mock_hardware_api.tip_drop_moves(
-            mount=Mount.RIGHT, ignore_plunger=False, home_after=True
+            mount=Mount.RIGHT,
+            ignore_plunger=False,
+            home_after=True,
+            scrape_type=TipScrapeType.NONE,
         )
     )
     decoy.verify(mock_hardware_api.remove_tip(mount=Mount.RIGHT))

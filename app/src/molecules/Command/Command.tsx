@@ -9,9 +9,9 @@ import {
   BORDERS,
   SPACING,
   RESPONSIVENESS,
+  CommandText,
 } from '@opentrons/components'
 
-import { CommandText } from './CommandText'
 import { CommandIcon } from './CommandIcon'
 import { Skeleton } from '/app/atoms/Skeleton'
 
@@ -20,8 +20,7 @@ import type {
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandTextData } from '/app/local-resources/commands'
-import type { StyleProps } from '@opentrons/components'
+import type { CommandTextData, StyleProps } from '@opentrons/components'
 
 export type CommandState = NonSkeletonCommandState | 'loading'
 export type NonSkeletonCommandState = 'current' | 'failed' | 'future'

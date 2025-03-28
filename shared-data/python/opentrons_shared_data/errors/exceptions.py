@@ -383,6 +383,28 @@ class StallOrCollisionDetectedError(RoboticsControlError):
         )
 
 
+class FlexStackerStallError(RoboticsControlError):
+    """An error indicating that a stall or collision occurred in the flex stacker."""
+
+    def __init__(
+        self,
+        serial: str,
+        axis: str,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, str]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FlexStackerStallError."""
+        self.serial = serial
+        self.axis = axis
+        super().__init__(
+            ErrorCodes.FLEX_STACKER_STALL_OR_COLLISION_DETECTED,
+            message,
+            detail,
+            wrapping,
+        )
+
+
 class MotionPlanningFailureError(RoboticsControlError):
     """An error indicating that motion planning failed."""
 

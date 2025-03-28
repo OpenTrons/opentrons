@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { i18n } from '/app/i18n'
 import { renderWithProviders } from '/app/__testing-utils__'
-import { getResetConfigOptions, resetConfig } from '/app/redux/robot-admin'
+import { resetConfig } from '/app/redux/robot-admin'
 import { useDispatchApiRequest } from '/app/redux/robot-api'
 
 import { DeviceReset } from '../DeviceReset'
@@ -13,39 +13,6 @@ import type { DispatchApiRequestType } from '/app/redux/robot-api'
 
 vi.mock('/app/redux/robot-admin')
 vi.mock('/app/redux/robot-api')
-
-const mockResetConfigOptions = [
-  {
-    id: 'pipetteOffsetCalibrations',
-    name: 'pipette calibration FooBar',
-    description: 'pipette calibration fooBar description',
-  },
-  {
-    id: 'gripperOffsetCalibrations',
-    name: 'gripper calibration FooBar',
-    description: 'runsHistory fooBar description',
-  },
-  {
-    id: 'runsHistory',
-    name: 'RunsHistory FooBar',
-    description: 'runsHistory fooBar description',
-  },
-  {
-    id: 'bootScripts',
-    name: 'Boot Scripts FooBar',
-    description: 'bootScripts fooBar description',
-  },
-  {
-    id: 'moduleCalibration',
-    name: 'Module Calibration FooBar',
-    description: 'moduleCalibration fooBar description',
-  },
-  {
-    id: 'authorizedKeys',
-    name: 'SSH Keys Foo',
-    description: 'SSH Keys foo description',
-  },
-]
 
 const render = (props: ComponentProps<typeof DeviceReset>) => {
   return renderWithProviders(
@@ -64,7 +31,6 @@ describe('DeviceReset', () => {
       robotName: 'mockRobot',
       setCurrentOption: vi.fn(),
     }
-    vi.mocked(getResetConfigOptions).mockReturnValue(mockResetConfigOptions)
     dispatchApiRequest = vi.fn()
     vi.mocked(useDispatchApiRequest).mockReturnValue([dispatchApiRequest, []])
   })
@@ -81,7 +47,7 @@ describe('DeviceReset', () => {
       'Clears calibrations, protocols, and all settings except robot name and network settings.'
     )
     expect(
-      screen.queryByText('Clear the ssh authorized keys')
+      screen.queryByText('authorized') // as in "SSH authorized keys"
     ).not.toBeInTheDocument()
     expect(screen.getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
   })

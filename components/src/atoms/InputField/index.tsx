@@ -357,7 +357,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             <StyledText
               desktopStyle="bodyDefaultRegular"
               css={FORM_BOTTOM_SPACE_STYLE}
-              color={COLORS.grey60}
+              color={hasError ? COLORS.red50 : COLORS.grey60}
             >
               {props.caption}
             </StyledText>

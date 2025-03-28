@@ -15,7 +15,7 @@ import type {
   TemperatureParams,
   TCProfileParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
-import type { CommandCreator } from '../types'
+import type { CommandCreator, ModuleEntities } from '../types'
 
 const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for these command creators
@@ -23,27 +23,36 @@ const getRobotInitialState = (): any => {
 }
 
 // neither should InvariantContext
-const invariantContext: any = {}
+let invariantContext: any = {}
 const module: ModuleOnlyParams['module'] = 'someTCModuleId'
 const temperature: TemperatureParams['temperature'] = 42
 const holdTime: AtomicProfileStep['holdTime'] = 10
 const volume: TCProfileParams['volume'] = 10
 const profile = [
   {
-    temperature,
-    holdTime,
+    celsius: temperature,
+    holdSeconds: holdTime,
   },
 ]
+invariantContext = {
+  ...invariantContext,
+  moduleEntities: {
+    [module]: {
+      id: module,
+      type: 'thermocyclerModuleType',
+      model: 'thermocyclerModuleV1',
+      pythonName: 'mock_thermocycler',
+    },
+  } as ModuleEntities,
+}
 describe('thermocycler atomic commands', () => {
-  // NOTE(IL, 2020-05-11): splitting these into different arrays based on type of args
-  // the command creator takes, so tests are type-safe
   const testCasesSetBlock = [
     {
       commandCreator: thermocyclerSetTargetBlockTemperature,
       expectedType: 'thermocycler/setTargetBlockTemperature',
       params: {
-        module,
-        temperature,
+        moduleId: module,
+        celsius: temperature,
       },
     },
   ]
@@ -52,22 +61,22 @@ describe('thermocycler atomic commands', () => {
       commandCreator: thermocyclerSetTargetLidTemperature,
       expectedType: 'thermocycler/setTargetLidTemperature',
       params: {
-        module,
-        temperature,
+        moduleId: module,
+        celsius: temperature,
       },
     },
     {
       commandCreator: thermocyclerWaitForBlockTemperature,
       expectedType: 'thermocycler/waitForBlockTemperature',
       params: {
-        module,
+        moduleId: module,
       },
     },
     {
       commandCreator: thermocyclerWaitForLidTemperature,
       expectedType: 'thermocycler/waitForLidTemperature',
       params: {
-        module,
+        moduleId: module,
       },
     },
   ]
@@ -76,28 +85,28 @@ describe('thermocycler atomic commands', () => {
       commandCreator: thermocyclerDeactivateBlock,
       expectedType: 'thermocycler/deactivateBlock',
       params: {
-        module,
+        moduleId: module,
       },
     },
     {
       commandCreator: thermocyclerDeactivateLid,
       expectedType: 'thermocycler/deactivateLid',
       params: {
-        module,
+        moduleId: module,
       },
     },
     {
       commandCreator: thermocyclerCloseLid,
       expectedType: 'thermocycler/closeLid',
       params: {
-        module,
+        moduleId: module,
       },
     },
     {
       commandCreator: thermocyclerOpenLid,
       expectedType: 'thermocycler/openLid',
       params: {
-        module,
+        moduleId: module,
       },
     },
   ]
@@ -106,9 +115,9 @@ describe('thermocycler atomic commands', () => {
       commandCreator: thermocyclerRunProfile,
       expectedType: 'thermocycler/runProfile',
       params: {
-        module,
+        moduleId: module,
         profile,
-        volume,
+        blockMaxVolumeUl: volume,
       },
     },
   ]
@@ -124,38 +133,22 @@ describe('thermocycler atomic commands', () => {
   }): void => {
     it(`creates a single "${expectedType}" command with the given params`, () => {
       const robotInitialState = getRobotInitialState()
+
+      // Use params directly from the test case
       const result = commandCreator(params, invariantContext, robotInitialState)
       const res = getSuccessResult(result)
-      const v6Params = {
-        ...params,
-        moduleId: params.module,
-        celsius: params.temperature,
-      }
-      delete v6Params.module
-      delete v6Params.temperature
-      if (v6Params.profile != null) {
-        v6Params.profile = v6Params.profile.map(
-          (profileItem: { temperature: number; holdTime: number }) => ({
-            celsius: profileItem.temperature,
-            holdSeconds: profileItem.holdTime,
-          })
-        )
-      }
-      if (v6Params.volume != null) {
-        v6Params.blockMaxVolumeUl = v6Params.volume
-        delete v6Params.volume
-      }
+
       expect(res.commands).toEqual([
         {
           commandType: expectedType,
           key: expect.any(String),
-          params: v6Params,
+          params,
         },
       ])
     })
   }
 
-  // run all the test testCases
+  // Run all test cases
   testCasesSetBlock.forEach(testParams)
   testCasesWithTempParam.forEach(testParams)
   testCasesModuleOnly.forEach(testParams)

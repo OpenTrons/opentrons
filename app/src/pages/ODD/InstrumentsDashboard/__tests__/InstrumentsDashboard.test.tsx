@@ -118,9 +118,9 @@ describe('InstrumentsDashboard', () => {
   it('should render mount info for all attached mounts', () => {
     render('/instruments')
     screen.getByText('left Mount')
-    screen.getByText('Flex 1-Channel 1000 μL')
+    screen.getByText('Flex 1-Channel 1000 µL')
     screen.getByText('right Mount')
-    screen.getByText('Flex 1-Channel 50 μL')
+    screen.getByText('Flex 1-Channel 50 µL')
     screen.getByText('extension Mount')
     screen.getByText('Flex Gripper')
   })

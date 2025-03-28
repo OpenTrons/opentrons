@@ -10,12 +10,11 @@ import {
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-
+import { getLabwareLocation } from '@opentrons/components'
 import {
   getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
 } from '/app/organisms/InterventionModal/utils'
-import { getLabwareLocation } from '/app/local-resources/labware'
 
 import type { Run } from '@opentrons/api-client'
 import type {
@@ -408,7 +407,11 @@ export function getSlotNameAndLwLocFrom(
       robotType: FLEX_ROBOT_TYPE,
     })?.slotName ?? null
 
-  if (location == null || location === 'offDeck') {
+  if (
+    location == null ||
+    location === 'offDeck' ||
+    location === 'systemLocation'
+  ) {
     return [null, null]
   } else if ('moduleId' in location) {
     if (excludeModules) {

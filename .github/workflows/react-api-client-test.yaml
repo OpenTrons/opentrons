@@ -34,7 +34,7 @@ jobs:
   js-unit-test:
     name: 'api-client and react-api-client unit tests'
     timeout-minutes: 30
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
       - uses: 'actions/setup-node@v4'

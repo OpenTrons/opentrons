@@ -1,7 +1,7 @@
-import type { HydratedFormdata } from '../../../form-types'
+import type { HydratedHeaterShakerFormData } from '../../../form-types'
 
 export function getDisabledFieldsHeaterShaker(
-  hydratedForm: HydratedFormdata
+  hydratedForm: HydratedHeaterShakerFormData
 ): Set<string> {
   const disabled: Set<string> = new Set()
 

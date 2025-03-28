@@ -1,17 +1,18 @@
-import type * as React from 'react'
 import { describe, it, vi, beforeEach, expect } from 'vitest'
 import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '../../../__testing-utils__'
 
 import { Accordion } from '../index'
 
+import type { ComponentProps } from 'react'
+
 const mockHandleClick = vi.fn()
-const render = (props: React.ComponentProps<typeof Accordion>) => {
+const render = (props: ComponentProps<typeof Accordion>) => {
   return renderWithProviders(<Accordion {...props} />)
 }
 
 describe('Accordion', () => {
-  let props: React.ComponentProps<typeof Accordion>
+  let props: ComponentProps<typeof Accordion>
 
   beforeEach(() => {
     props = {

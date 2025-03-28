@@ -3,14 +3,16 @@ import pick from 'lodash/pick'
 import {
   getWellsForTips,
   getNextRobotStateAndWarningsSingleCommand,
+  getCutoutIdByAddressableArea,
 } from '@opentrons/step-generation'
 import {
   FLEX_ROBOT_TYPE,
   ALL,
   COLUMN,
   OT2_ROBOT_TYPE,
+  SINGLE,
 } from '@opentrons/shared-data'
-import { getCutoutIdByAddressableArea } from '../utils'
+
 import type { Channels } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -107,12 +109,14 @@ export const substepTimelineSingleChannel = (
         invariantContext,
         acc.prevRobotState
       ).robotState
-
       if (
         command.commandType === 'aspirate' ||
         command.commandType === 'dispense'
       ) {
-        const { wellName, volume, labwareId } = command.params
+        if ('meta' in command && command?.meta?.isAirGap) {
+          return acc
+        }
+        const { volume, wellName, labwareId } = command.params
 
         const wellInfo = {
           labwareId,
@@ -121,6 +125,7 @@ export const substepTimelineSingleChannel = (
             acc.prevRobotState.liquidState.labware[labwareId][wellName],
           postIngreds: nextRobotState.liquidState.labware[labwareId][wellName],
         }
+
         return {
           ...acc,
           timeline: [
@@ -247,17 +252,22 @@ export const substepTimelineMultiChannel = (
         command.commandType === 'aspirate' ||
         command.commandType === 'dispense'
       ) {
-        const { wellName, volume, labwareId } = command.params
+        if ('meta' in command && command?.meta?.isAirGap) {
+          return acc
+        }
+        const { volume, wellName, labwareId } = command.params
         const labwareDef =
           invariantContext.labwareEntities[labwareId] != null
             ? invariantContext.labwareEntities[labwareId].def
             : null
 
         let numChannels = channels
-        if (nozzles === ALL) {
+        if (nozzles === ALL && channels !== 8) {
           numChannels = 96
         } else if (nozzles === COLUMN) {
           numChannels = 8
+        } else if (nozzles === SINGLE) {
+          numChannels = 1
         }
         const wellsForTips =
           numChannels &&
@@ -277,6 +287,7 @@ export const substepTimelineMultiChannel = (
             ? pick(nextRobotState.liquidState.labware[labwareId], wellsForTips)
             : {},
         }
+
         return {
           ...acc,
           timeline: [

@@ -7,9 +7,8 @@ import {
   TEMPERATURE_MODULE_V2,
   getModuleDef2,
 } from '@opentrons/shared-data'
-
+import { getLabwareLocation } from '@opentrons/components'
 import { mockPickUpTipLabware } from '../../__fixtures__'
-import { getLabwareLocation } from '/app/local-resources/labware'
 import {
   getIsLabwareMatch,
   getSlotNameAndLwLocFrom,
@@ -31,7 +30,7 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getModuleDef2: vi.fn(),
   }
 })
-vi.mock('/app/local-resources/labware')
+vi.mock('@opentrons/components')
 
 describe('getRunCurrentModulesOnDeck', () => {
   const mockLabwareDef: LabwareDefinition2 = {

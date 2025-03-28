@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import last from 'lodash/last'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch, useSelector } from 'react-redux'
@@ -27,7 +26,6 @@ import {
 import {
   useCreateRunMutation,
   useHost,
-  useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
@@ -40,17 +38,12 @@ import {
 import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
-import {
-  getApplyHistoricOffsets,
-  getPinnedQuickTransferIds,
-  updateConfigValue,
-} from '/app/redux/config'
+import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
 import {
   ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
   ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
 } from '/app/redux/analytics'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
@@ -328,27 +321,6 @@ export function QuickTransferDetails(): JSX.Element | null {
   let pinnedTransferIds = useSelector(getPinnedQuickTransferIds) ?? []
   const pinned = pinnedTransferIds.includes(transferId)
 
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
-    transferId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolRecord != null }
-  )
-
-  const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
-  // I'd love to skip scraping altogether if we aren't applying
-  // conditional offsets, but React won't let us use hooks conditionally.
-  // So, we'll scrape regardless and just toss them if we don't need them.
-  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
-    mostRecentAnalysis ?? null
-  ).map(({ vector, location, definitionUri }) => ({
-    vector,
-    location,
-    definitionUri,
-  }))
-  const labwareOffsets = shouldApplyOffsets ? scrapedLabwareOffsets : []
-
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
@@ -374,7 +346,7 @@ export function QuickTransferDetails(): JSX.Element | null {
     )
   }
   const handleRunTransfer = (): void => {
-    createRun({ protocolId: transferId, labwareOffsets })
+    createRun({ protocolId: transferId })
   }
   const [
     showConfirmDeleteTransfer,

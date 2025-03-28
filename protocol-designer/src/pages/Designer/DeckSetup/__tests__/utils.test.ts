@@ -11,15 +11,19 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import { getModuleModelsBySlot, getDeckErrors } from '../utils'
+import {
+  getDeckErrors,
+  getModuleModelsBySlot,
+  getSVGContainerWidth,
+} from '../utils'
 import { FLEX_MODULE_MODELS, OT2_MODULE_MODELS } from '../constants'
 
 describe('getModuleModelsBySlot', () => {
   it('renders no modules for ot-2 middle slot', () => {
-    expect(getModuleModelsBySlot(false, OT2_ROBOT_TYPE, '5')).toEqual([])
+    expect(getModuleModelsBySlot(OT2_ROBOT_TYPE, '5')).toEqual([])
   })
   it('renders all ot-2 modules for slot 7', () => {
-    expect(getModuleModelsBySlot(false, OT2_ROBOT_TYPE, '7')).toEqual(
+    expect(getModuleModelsBySlot(OT2_ROBOT_TYPE, '7')).toEqual(
       OT2_MODULE_MODELS
     )
   })
@@ -28,7 +32,7 @@ describe('getModuleModelsBySlot', () => {
       model =>
         model !== THERMOCYCLER_MODULE_V1 && model !== THERMOCYCLER_MODULE_V2
     )
-    expect(getModuleModelsBySlot(false, OT2_ROBOT_TYPE, '1')).toEqual(noTC)
+    expect(getModuleModelsBySlot(OT2_ROBOT_TYPE, '1')).toEqual(noTC)
   })
   it('renders ot-2 modules minus thermocyclers & heater-shaker for slot 9', () => {
     const noTCAndHS = OT2_MODULE_MODELS.filter(
@@ -37,15 +41,15 @@ describe('getModuleModelsBySlot', () => {
         model !== THERMOCYCLER_MODULE_V2 &&
         model !== HEATERSHAKER_MODULE_V1
     )
-    expect(getModuleModelsBySlot(false, OT2_ROBOT_TYPE, '9')).toEqual(noTCAndHS)
+    expect(getModuleModelsBySlot(OT2_ROBOT_TYPE, '9')).toEqual(noTCAndHS)
   })
   it('renders flex modules for middle slots', () => {
-    expect(getModuleModelsBySlot(false, FLEX_ROBOT_TYPE, 'B2')).toEqual([
+    expect(getModuleModelsBySlot(FLEX_ROBOT_TYPE, 'B2')).toEqual([
       MAGNETIC_BLOCK_V1,
     ])
   })
   it('renders all flex modules for B1', () => {
-    expect(getModuleModelsBySlot(true, FLEX_ROBOT_TYPE, 'B1')).toEqual(
+    expect(getModuleModelsBySlot(FLEX_ROBOT_TYPE, 'B1')).toEqual(
       FLEX_MODULE_MODELS.filter(model => model !== ABSORBANCE_READER_V1)
     )
   })
@@ -54,7 +58,7 @@ describe('getModuleModelsBySlot', () => {
       model =>
         model !== THERMOCYCLER_MODULE_V2 && model !== ABSORBANCE_READER_V1
     )
-    expect(getModuleModelsBySlot(true, FLEX_ROBOT_TYPE, 'C1')).toEqual(noTC)
+    expect(getModuleModelsBySlot(FLEX_ROBOT_TYPE, 'C1')).toEqual(noTC)
   })
 })
 
@@ -80,6 +84,7 @@ describe('getDeckErrors', () => {
             id: 'mockId',
             slot: '4',
             moduleState: {} as any,
+            pythonName: 'mockPythonName',
           },
         },
         selectedSlot: '1',
@@ -99,6 +104,7 @@ describe('getDeckErrors', () => {
             id: 'mockId',
             slot: '4',
             moduleState: {} as any,
+            pythonName: 'mockPythonName',
           },
         },
         selectedSlot: '1',
@@ -107,5 +113,37 @@ describe('getDeckErrors', () => {
         robotType: OT2_ROBOT_TYPE,
       })
     ).toEqual('heater_shaker_adjacent_to')
+  })
+})
+
+describe('getSVGContainerWidth', () => {
+  it('returns 78.5% for OT2 robot type, startingDeck tab, and not zoomed', () => {
+    const result = getSVGContainerWidth(OT2_ROBOT_TYPE, 'startingDeck', false)
+    expect(result).toBe('78.5%')
+  })
+
+  it('returns 70% for non-OT2 robot type, not zoomed, and tab not protocolSteps', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'anotherTab', false)
+    expect(result).toBe('70%')
+  })
+
+  it('returns 100% for OT2 robot type, startingDeck tab, and zoomed', () => {
+    const result = getSVGContainerWidth(OT2_ROBOT_TYPE, 'startingDeck', true)
+    expect(result).toBe('100%')
+  })
+
+  it('returns 100% for non-OT2 robot type and zoomed', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'anotherTab', true)
+    expect(result).toBe('100%')
+  })
+
+  it('returns 100% for OT2 robot type and tab other than startingDeck or protocolSteps', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'protocolSteps', false)
+    expect(result).toBe('100%')
+  })
+
+  it('returns 100% for non-OT2 robot type and tab protocolSteps', () => {
+    const result = getSVGContainerWidth(FLEX_ROBOT_TYPE, 'protocolSteps', false)
+    expect(result).toBe('100%')
   })
 })

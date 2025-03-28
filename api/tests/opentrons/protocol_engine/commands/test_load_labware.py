@@ -1,4 +1,5 @@
 """Test load labware commands."""
+
 import inspect
 from typing import Optional
 from unittest.mock import sentinel
@@ -6,8 +7,9 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 from opentrons.types import DeckSlotName
-from opentrons.protocols.models import LabwareDefinition
 
 from opentrons.protocol_engine.errors import (
     LabwareIsNotAllowedInLocationError,
@@ -17,8 +19,10 @@ from opentrons.protocol_engine.errors import (
 from opentrons.protocol_engine.types import (
     AddressableAreaLocation,
     DeckSlotLocation,
-    LabwareLocation,
+    LoadableLabwareLocation,
     OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OnAddressableAreaLocationSequenceComponent,
 )
 from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
 from opentrons.protocol_engine.resources import labware_validation
@@ -60,7 +64,7 @@ async def test_load_labware_on_slot_or_addressable_area(
     equipment: EquipmentHandler,
     state_view: StateView,
     display_name: Optional[str],
-    location: LabwareLocation,
+    location: LoadableLabwareLocation,
     expected_addressable_area_name: str,
 ) -> None:
     """A LoadLabware command should have an execution implementation."""
@@ -72,6 +76,17 @@ async def test_load_labware_on_slot_or_addressable_area(
         namespace="opentrons-test",
         version=1,
         displayName=display_name,
+    )
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(
+            sentinel.validated_empty_location
+        )
+    ).then_return(
+        [
+            OnAddressableAreaLocationSequenceComponent(
+                addressableAreaName=expected_addressable_area_name,
+            )
+        ]
     )
 
     decoy.when(state_view.geometry.ensure_location_not_occupied(location)).then_return(
@@ -89,7 +104,7 @@ async def test_load_labware_on_slot_or_addressable_area(
         LoadedLabwareData(
             labware_id="labware-id",
             definition=well_plate_def,
-            offsetId="labware-offset-id",
+            offsetId=None,
         )
     )
 
@@ -103,13 +118,18 @@ async def test_load_labware_on_slot_or_addressable_area(
         public=LoadLabwareResult(
             labwareId="labware-id",
             definition=well_plate_def,
-            offsetId="labware-offset-id",
+            offsetId=None,
+            locationSequence=[
+                OnAddressableAreaLocationSequenceComponent(
+                    addressableAreaName=expected_addressable_area_name,
+                )
+            ],
         ),
         state_update=StateUpdate(
             loaded_labware=LoadedLabwareUpdate(
                 labware_id="labware-id",
                 definition=well_plate_def,
-                offset_id="labware-offset-id",
+                offset_id=None,
                 new_location=sentinel.validated_empty_location,
                 display_name=display_name,
             ),
@@ -179,6 +199,18 @@ async def test_load_labware_on_labware(
             offsetId="labware-offset-id",
         )
     )
+    decoy.when(
+        state_view.geometry.get_predicted_location_sequence(
+            OnLabwareLocation(labwareId="another-labware-id")
+        )
+    ).then_return(
+        [
+            OnLabwareLocationSequenceComponent(
+                labwareId="other-labware-id", lidId=None
+            ),
+            OnAddressableAreaLocationSequenceComponent(addressableAreaName="A3"),
+        ]
+    )
 
     decoy.when(
         labware_validation.validate_definition_is_labware(well_plate_def)
@@ -190,6 +222,12 @@ async def test_load_labware_on_labware(
             labwareId="labware-id",
             definition=well_plate_def,
             offsetId="labware-offset-id",
+            locationSequence=[
+                OnLabwareLocationSequenceComponent(
+                    labwareId="other-labware-id", lidId=None
+                ),
+                OnAddressableAreaLocationSequenceComponent(addressableAreaName="A3"),
+            ],
         ),
         state_update=StateUpdate(
             loaded_labware=LoadedLabwareUpdate(

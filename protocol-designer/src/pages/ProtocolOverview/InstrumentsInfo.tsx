@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import {
+  ALIGN_CENTER,
   Btn,
   COLORS,
   DIRECTION_COLUMN,
@@ -14,7 +15,7 @@ import {
 } from '@opentrons/components'
 import { getPipetteSpecsV2, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { LINK_BUTTON_STYLE } from '../../atoms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
@@ -77,7 +78,7 @@ export function InstrumentsInfo({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
         <StyledText desktopStyle="headingSmallBold">
           {t('instruments')}
         </StyledText>
@@ -96,7 +97,7 @@ export function InstrumentsInfo({
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <ListItem type="noActive" key={`ProtocolOverview_robotType`}>
+        <ListItem type="default" key={`ProtocolOverview_robotType`}>
           <ListItemDescriptor
             type="large"
             description={
@@ -118,7 +119,7 @@ export function InstrumentsInfo({
             }
           />
         </ListItem>
-        <ListItem type="noActive" key={`ProtocolOverview_left`}>
+        <ListItem type="default" key={`ProtocolOverview_left`}>
           <ListItemDescriptor
             type="large"
             description={
@@ -135,7 +136,7 @@ export function InstrumentsInfo({
           />
         </ListItem>
         {!has96Channel ? (
-          <ListItem type="noActive" key={`ProtocolOverview_right`}>
+          <ListItem type="default" key={`ProtocolOverview_right`}>
             <ListItemDescriptor
               type="large"
               description={
@@ -153,7 +154,7 @@ export function InstrumentsInfo({
           </ListItem>
         ) : null}
         {robotType === FLEX_ROBOT_TYPE ? (
-          <ListItem type="noActive" key={`ProtocolOverview_gripper`}>
+          <ListItem type="default" key={`ProtocolOverview_gripper`}>
             <ListItemDescriptor
               type="large"
               description={

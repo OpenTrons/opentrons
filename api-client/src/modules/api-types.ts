@@ -10,6 +10,7 @@ interface PhysicalPort {
   port: number
   hub: boolean
   portGroup: PortGroup
+  hubPort?: number
 }
 
 type ModuleOffsetSource =
@@ -86,6 +87,14 @@ export interface AbsorbanceReaderData {
   sampleWavelength: number | null
   status: AbsorbanceReaderStatus
 }
+export interface FlexStackerData {
+  latchState: 'opened' | 'closed' | 'unknown'
+  platformState: 'extended' | 'retracted' | 'unknown'
+  hopperDoorState: 'opened' | 'closed' | 'unknown'
+  axisStateX: 'extended' | 'retracted' | 'unknown'
+  axisStateZ: 'extended' | 'retracted' | 'unknown'
+  status: FlexStackerStatus
+}
 
 export type TemperatureStatus =
   | 'idle'
@@ -120,3 +129,5 @@ export type LatchStatus =
   | 'unknown'
 
 export type AbsorbanceReaderStatus = 'idle' | 'measuring' | 'error'
+
+export type FlexStackerStatus = 'idle' | 'dispensing' | 'storing' | 'error'

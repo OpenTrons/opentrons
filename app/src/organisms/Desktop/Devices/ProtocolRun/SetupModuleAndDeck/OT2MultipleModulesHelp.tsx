@@ -9,11 +9,11 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  LegacyStyledText,
   Link,
+  Modal,
   PrimaryButton,
   SPACING,
-  Modal,
-  LegacyStyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getTopPortalEl } from '/app/App/portal'

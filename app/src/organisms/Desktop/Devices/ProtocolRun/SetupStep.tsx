@@ -11,6 +11,7 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  NO_WRAP,
   OVERFLOW_HIDDEN,
   SPACING,
   StyledText,
@@ -26,6 +27,8 @@ interface SetupStepProps {
   title: ReactNode
   /** always shown text that provides a one sentence explanation of the contents */
   description: string
+  /* element to be shown beneath the description, if any. */
+  descriptionElement: ReactNode
   /** callback that should toggle the expanded state (managed by parent) */
   toggleExpanded: () => void
   /** contents to be shown only when expanded */
@@ -34,29 +37,11 @@ interface SetupStepProps {
   rightElement: ReactNode
 }
 
-const EXPANDED_STYLE = css`
-  transition: grid-template-rows 300ms ease-in, visibility 400ms ease;
-  grid-template-rows: 1fr;
-  visibility: visible;
-`
-const COLLAPSED_STYLE = css`
-  transition: grid-template-rows 500ms ease-out, visibility 600ms ease;
-  grid-template-rows: 0fr;
-  visibility: hidden;
-`
-const ACCORDION_STYLE = css`
-  border-radius: 50%;
-  &:hover {
-    background: ${COLORS.grey30};
-  }
-  &:active {
-    background: ${COLORS.grey35};
-  }
-`
 export function SetupStep({
   expanded,
   title,
   description,
+  descriptionElement,
   toggleExpanded,
   children,
   rightElement,
@@ -75,11 +60,10 @@ export function SetupStep({
             onClick={toggleExpanded}
             gridGap={SPACING.spacing40}
           >
-            <Flex flexDirection={DIRECTION_COLUMN}>
+            <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
               <StyledText
                 color={COLORS.black90}
                 desktopStyle="bodyLargeSemiBold"
-                marginBottom={SPACING.spacing4}
                 id={`CollapsibleStep_${String(title)}`}
               >
                 {title}
@@ -91,8 +75,9 @@ export function SetupStep({
               >
                 {description}
               </StyledText>
+              {descriptionElement}
             </Flex>
-            <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
+            <Flex css={RIGHT_CONTENT_CONTAINER_STYLE}>
               {rightElement}
               <Icon
                 color={COLORS.black90}
@@ -114,3 +99,28 @@ export function SetupStep({
     </Flex>
   )
 }
+
+const EXPANDED_STYLE = css`
+  transition: grid-template-rows 300ms ease-in, visibility 400ms ease;
+  grid-template-rows: 1fr;
+  visibility: visible;
+`
+const COLLAPSED_STYLE = css`
+  transition: grid-template-rows 500ms ease-out, visibility 600ms ease;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+`
+const ACCORDION_STYLE = css`
+  border-radius: 50%;
+  &:hover {
+    background: ${COLORS.grey30};
+  }
+  &:active {
+    background: ${COLORS.grey35};
+  }
+`
+
+const RIGHT_CONTENT_CONTAINER_STYLE = css`
+  align-items: ${ALIGN_CENTER};
+  text-wrap: ${NO_WRAP};
+`

@@ -17,11 +17,7 @@ import {
   getFileMetadata,
   getRobotStateTimeline,
 } from '../file-data/selectors'
-import {
-  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
-  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-  FIXED_TRASH_ID,
-} from '../constants'
+import { DEFAULT_MM_OFFSET_FROM_BOTTOM, FIXED_TRASH_ID } from '../constants'
 import { trackEvent } from './mixpanel'
 import { getHasOptedIn } from './selectors'
 import { flattenNestedProperties } from './utils/flattenNestedProperties'
@@ -169,12 +165,12 @@ export const reduxActionToAnalyticsEvent = (
               blowoutFlowRate: stepArgModified.blowoutFlowRateUlSec,
               aspirateOffsetFromBottomMm:
                 stepArgModified.aspirateOffsetFromBottomMm ===
-                DEFAULT_MM_FROM_BOTTOM_ASPIRATE
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
                   ? DEFAULT_VALUE
                   : stepArgModified.aspirateOffsetFromBottomMm,
               dispenseOffsetFromBottomMm:
                 stepArgModified.dispenseOffsetFromBottomMm ===
-                DEFAULT_MM_FROM_BOTTOM_DISPENSE
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
                   ? DEFAULT_VALUE
                   : stepArgModified.dispenseOffsetFromBottomMm,
               aspirateXOffset:
@@ -212,32 +208,19 @@ export const reduxActionToAnalyticsEvent = (
               dispenseFlowRate:
                 stepArgModified.dispenseFlowRateUlSec ?? DEFAULT_VALUE,
               blowoutFlowRate: stepArgModified.blowoutFlowRateUlSec,
-              aspirateOffsetFromBottomMm:
-                stepArgModified.aspirateOffsetFromBottomMm ===
-                DEFAULT_MM_FROM_BOTTOM_ASPIRATE
+              offsetFromBottomMm:
+                stepArgModified.offsetFromBottomMm ===
+                DEFAULT_MM_OFFSET_FROM_BOTTOM
                   ? DEFAULT_VALUE
-                  : stepArgModified.aspirateOffsetFromBottomMm,
-              dispenseOffsetFromBottomMm:
-                stepArgModified.dispenseOffsetFromBottomMm ===
-                DEFAULT_MM_FROM_BOTTOM_DISPENSE
+                  : stepArgModified.offsetFromBottomMm,
+              xOffset:
+                stepArgModified.xOffset === 0
                   ? DEFAULT_VALUE
-                  : stepArgModified.dispenseOffsetFromBottomMm,
-              aspirateXOffset:
-                stepArgModified.aspirateXOffset === 0
+                  : stepArgModified.xOffset,
+              yOffset:
+                stepArgModified.yOffset === 0
                   ? DEFAULT_VALUE
-                  : stepArgModified.aspirateXOffset,
-              aspirateYOffset:
-                stepArgModified.aspirateYOffset === 0
-                  ? DEFAULT_VALUE
-                  : stepArgModified.aspirateYOffset,
-              dispenseXOffset:
-                stepArgModified.dispenseXOffset === 0
-                  ? DEFAULT_VALUE
-                  : stepArgModified.dispenseXOffset,
-              dispenseYOffset:
-                stepArgModified.dispenseYOffset === 0
-                  ? DEFAULT_VALUE
-                  : stepArgModified.dispenseYOffset,
+                  : stepArgModified.yOffset,
               ...additionalProperties,
             },
           }
@@ -405,6 +388,7 @@ export const reduxActionToAnalyticsEvent = (
           )) ||
         (command.commandType === 'moveLabware' &&
           command.params.newLocation !== 'offDeck' &&
+          command.params.newLocation !== 'systemLocation' &&
           'addressableAreaName' in command.params.newLocation &&
           command.params.newLocation.addressableAreaName ===
             'gripperWasteChute')
@@ -421,10 +405,12 @@ export const reduxActionToAnalyticsEvent = (
           command =>
             (command.commandType === 'loadLabware' &&
               command.params.location !== 'offDeck' &&
+              command.params.location !== 'systemLocation' &&
               'addressableAreaName' in command.params.location &&
               command.params.location.addressableAreaName === location) ||
             (command.commandType === 'moveLabware' &&
               command.params.newLocation !== 'offDeck' &&
+              command.params.newLocation !== 'systemLocation' &&
               'addressableAreaName' in command.params.newLocation &&
               command.params.newLocation.addressableAreaName === location)
         )

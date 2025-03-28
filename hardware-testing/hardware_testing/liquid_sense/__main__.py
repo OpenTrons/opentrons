@@ -38,6 +38,7 @@ from .post_process import process_csv_directory, process_google_sheet
 from hardware_testing.protocols.liquid_sense_lpc import (
     liquid_sense_ot3_p50_single_vial,
     liquid_sense_ot3_p50_multi_vial,
+    liquid_sense_ot3_p200_96_vial,
     liquid_sense_ot3_p1000_96_vial,
     liquid_sense_ot3_p1000_single_vial,
     liquid_sense_ot3_p1000_multi_vial,
@@ -53,7 +54,7 @@ except ImportError:
 
 CREDENTIALS_PATH = "/var/lib/jupyter/notebooks/abr.json"
 
-API_LEVEL = "2.18"
+API_LEVEL = "2.21"
 
 LABWARE_OFFSETS: List[LabwareOffset] = []
 
@@ -75,6 +76,9 @@ LIQUID_SENSE_CFG: Dict[int, Dict[int, Any]] = {
         1: liquid_sense_ot3_p50_single_vial,
         8: liquid_sense_ot3_p50_multi_vial,
     },
+    200: {
+        96: liquid_sense_ot3_p200_96_vial,
+    },
     1000: {
         1: liquid_sense_ot3_p1000_single_vial,
         8: liquid_sense_ot3_p1000_multi_vial,
@@ -92,6 +96,7 @@ PIPETTE_MODEL_NAME = {
         8: "p1000_multi_flex",
         96: "p1000_96_flex",
     },
+    200: {96: "p200_96_flex"},
 }
 
 
@@ -188,8 +193,10 @@ class RunArgs:
         if args.tip == 0:
             if args.pipette == 1000:
                 tip_volumes: List[int] = [50, 200, 1000]
-            else:
+            elif args.pipette == 50:
                 tip_volumes = [50]
+            else:
+                tip_volumes = [20, 50, 200]
         else:
             tip_volumes = [args.tip]
 
@@ -265,22 +272,24 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
+    parser.add_argument("--pipette", type=int, choices=[50, 200, 1000], required=True)
     parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
-    parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
+    parser.add_argument("--tip", type=int, choices=[0, 20, 50, 200, 1000], default=0)
     parser.add_argument("--return-tip", action="store_true")
-    parser.add_argument("--trials", type=int, default=7)
-    parser.add_argument("--trials-before-jog", type=int, default=7)
+    parser.add_argument("--trials", type=int, default=10)
+    parser.add_argument("--trials-before-jog", type=int, default=10)
     parser.add_argument("--z-speed", type=float, default=5)
     parser.add_argument("--aspirate", action="store_true")
-    parser.add_argument("--plunger-speed", type=float, default=15)
+    parser.add_argument("--plunger-speed", type=float, default=5)
     parser.add_argument("--no-multi-pass", action="store_true")
     parser.add_argument("--wet", action="store_true")
     parser.add_argument("--starting-tip", type=str, default="A1")
     parser.add_argument("--test-well", type=str, default="A1")
     parser.add_argument("--p-solo-time", type=float, default=0)
-    parser.add_argument("--google-sheet-name", type=str, default="LLD-Shared-Data")
+    parser.add_argument(
+        "--google-sheet-name", type=str, default="LLD-Shared-Data-96ch-200ul"
+    )
     parser.add_argument(
         "--gd-parent-folder", type=str, default="1b2V85fDPA0tNqjEhyHOGCWRZYgn8KsGf"
     )

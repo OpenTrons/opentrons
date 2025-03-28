@@ -1,12 +1,8 @@
 import { uuid } from '../../utils'
 import type { CommandCreator } from '../../types'
-export interface AspirateInPlaceArgs {
-  pipetteId: string
-  volume: number
-  flowRate: number
-}
+import type { AspirateInPlaceParams } from '@opentrons/shared-data'
 
-export const aspirateInPlace: CommandCreator<AspirateInPlaceArgs> = (
+export const aspirateInPlace: CommandCreator<AspirateInPlaceParams> = (
   args,
   invariantContext,
   prevRobotState

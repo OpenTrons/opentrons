@@ -9,6 +9,7 @@ describe('labwareModuleCompatibility', () => {
       id: 'abcef123',
       slot: '3',
       def: fixture_96_plate as LabwareDefinition2,
+      pythonName: 'mockPythonName',
     }
     it('returns true when labware is inside custom labwares obj', () => {
       const customLabwares = {

@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import map from 'lodash/map'
 
 import {
   BaseDeck,
+  getWellFillFromLabwareId,
+  getLabwareInfoByLiquidId,
   Flex,
   Box,
   DIRECTION_COLUMN,
@@ -12,27 +13,23 @@ import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
   getSimplestDeckConfigForProtocol,
-  getTopLabwareInfo,
+  getAllDefinitions,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { getLabwareSetupItemGroups } from '/app/transformations/commands'
+import { getStackedItemsOnStartingDeck } from '/app/transformations/commands'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
-import {
-  getProtocolModulesInfo,
-  getLabwareRenderInfo,
-} from '/app/transformations/analysis'
-import { LabwareStackModal } from '/app/molecules/LabwareStackModal'
+import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { OffDeckLabwareList } from './OffDeckLabwareList'
+import { SlotDetailModal } from './SlotDetailModal'
 
 import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
-  LoadLabwareRunTimeCommand,
-  RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { ModuleInStack, StackItem } from '/app/transformations/commands'
 
 interface SetupLabwareMapProps {
   runId: string
@@ -43,34 +40,59 @@ export function SetupLabwareMap({
   runId,
   protocolAnalysis,
 }: SetupLabwareMapProps): JSX.Element | null {
-  // early return null if no protocol analysis
-  const [
-    labwareStackDetailsLabwareId,
-    setLabwareStackDetailsLabwareId,
-  ] = useState<string | null>(null)
+  const [selectedStack, setSelectedStack] = useState<{
+    slotName: string
+    stack: StackItem[]
+  } | null>(null)
   const [hoverLabwareId, setHoverLabwareId] = useState<string | null>(null)
-
-  if (protocolAnalysis == null) return null
-
-  const commands: RunTimeCommand[] = protocolAnalysis.commands
-  const loadLabwareCommands = commands?.filter(
-    (command): command is LoadLabwareRunTimeCommand =>
-      command.commandType === 'loadLabware'
+  const startingDeck = getStackedItemsOnStartingDeck(
+    protocolAnalysis?.commands ?? [],
+    protocolAnalysis?.labware ?? [],
+    protocolAnalysis?.modules ?? []
   )
+  const offDeckItems = Object.keys(startingDeck).includes('offDeck')
+    ? startingDeck.offDeck
+    : null
+
+  // early return null if no protocol analysis
+  if (protocolAnalysis == null) return null
 
   const robotType = protocolAnalysis.robotType ?? FLEX_ROBOT_TYPE
   const deckDef = getDeckDefFromRobotType(robotType)
-
+  const labwareByLiquidId = getLabwareInfoByLiquidId(protocolAnalysis.commands)
   const protocolModulesInfo = getProtocolModulesInfo(protocolAnalysis, deckDef)
-
   const modulesOnDeck = protocolModulesInfo.map(module => {
-    const isLabwareStacked =
-      module.nestedLabwareId != null && module.nestedLabwareDef != null
-    const {
+    const slotAndStackOnModule = Object.entries(
+      startingDeck
+    ).find(([key, value]) =>
+      value.some(
+        (stackItem): stackItem is ModuleInStack =>
+          'moduleId' in stackItem && stackItem.moduleId === module.moduleId
+      )
+    )
+    const slotName = slotAndStackOnModule?.[0]
+    const stackOnModule = slotAndStackOnModule?.[1]
+
+    const topLabwareInfo = stackOnModule != null ? stackOnModule[0] : null
+    const topLabwareDefinition =
+      topLabwareInfo != null && 'labwareId' in topLabwareInfo
+        ? getAllDefinitions()[topLabwareInfo.definitionUri]
+        : null
+    const topLabwareId =
+      topLabwareInfo != null && 'labwareId' in topLabwareInfo
+        ? topLabwareInfo.labwareId
+        : ''
+    const topLabwareDisplayName =
+      topLabwareInfo != null && 'labwareId' in topLabwareInfo
+        ? topLabwareInfo.displayName
+        : ''
+
+    const isLabwareStacked = stackOnModule != null && stackOnModule.length > 2
+    const wellFill = getWellFillFromLabwareId(
       topLabwareId,
-      topLabwareDefinition,
-      topLabwareDisplayName,
-    } = getTopLabwareInfo(module.nestedLabwareId ?? '', loadLabwareCommands)
+      protocolAnalysis.liquids,
+      labwareByLiquidId
+    )
 
     return {
       moduleModel: module.moduleDef.model,
@@ -81,15 +103,18 @@ export function SetupLabwareMap({
           : {},
 
       nestedLabwareDef: topLabwareDefinition,
+      nestedLabwareWellFill: wellFill,
       highlightLabware: hoverLabwareId === topLabwareId,
-      highlightShadowLabware: hoverLabwareId === topLabwareId,
       stacked: isLabwareStacked,
       moduleChildren: (
         // open modal
         <g
           onClick={() => {
-            if (topLabwareDefinition != null && topLabwareId != null) {
-              setLabwareStackDetailsLabwareId(topLabwareId)
+            if (stackOnModule != null) {
+              setSelectedStack({
+                slotName: slotName ?? module.slotName,
+                stack: stackOnModule,
+              })
             }
           }}
           onMouseEnter={() => {
@@ -100,13 +125,13 @@ export function SetupLabwareMap({
           onMouseLeave={() => {
             setHoverLabwareId(null)
           }}
-          cursor="pointer"
+          cursor={'pointer'}
         >
-          {topLabwareDefinition != null && topLabwareId != null ? (
+          {topLabwareDefinition != null && topLabwareInfo != null ? (
             <LabwareInfoOverlay
               definition={topLabwareDefinition}
               labwareId={topLabwareId}
-              displayName={topLabwareDisplayName ?? null}
+              displayName={topLabwareDisplayName}
               runId={runId}
             />
           ) : null}
@@ -115,36 +140,51 @@ export function SetupLabwareMap({
     }
   })
 
-  const { offDeckItems } = getLabwareSetupItemGroups(commands)
-
   const deckConfig = getSimplestDeckConfigForProtocol(protocolAnalysis)
 
-  const labwareRenderInfo = getLabwareRenderInfo(protocolAnalysis, deckDef)
+  const labwareOnDeck: Array<LabwareOnDeck | null> = Object.entries(
+    startingDeck
+  )
+    .filter(
+      ([key, value]) =>
+        key !== 'offDeck' &&
+        !value.some(
+          (stackItem): stackItem is ModuleInStack => 'moduleId' in stackItem
+        )
+    )
+    .map(([slotName, stackedItems]) => {
+      const topLabwareInfo = stackedItems[0]
+      const topLabwareDefinition =
+        topLabwareInfo != null && 'labwareId' in topLabwareInfo
+          ? getAllDefinitions()[topLabwareInfo.definitionUri]
+          : null
+      const topLabwareId =
+        topLabwareInfo != null && 'labwareId' in topLabwareInfo
+          ? topLabwareInfo.labwareId
+          : ''
+      const topLabwareDisplayName =
+        topLabwareInfo != null && 'labwareId' in topLabwareInfo
+          ? topLabwareInfo.displayName
+          : ''
+      const isLabwareInStack = stackedItems.length > 1
+      const wellFill = getWellFillFromLabwareId(
+        topLabwareId ?? '',
+        protocolAnalysis.liquids,
+        labwareByLiquidId
+      )
 
-  const labwareOnDeck: Array<LabwareOnDeck | null> = map(
-    labwareRenderInfo,
-    ({ slotName }, labwareId) => {
-      const {
-        topLabwareId,
-        topLabwareDefinition,
-        topLabwareDisplayName,
-      } = getTopLabwareInfo(labwareId, loadLabwareCommands)
-      const isLabwareInStack = labwareId !== topLabwareId
       return topLabwareDefinition != null
         ? {
             labwareLocation: { slotName },
             definition: topLabwareDefinition,
-            highlight: isLabwareInStack && hoverLabwareId === topLabwareId,
-            highlightShadow:
-              isLabwareInStack && hoverLabwareId === topLabwareId,
+            highlight: hoverLabwareId === topLabwareId,
             stacked: isLabwareInStack,
+            wellFill: wellFill,
             labwareChildren: (
               <g
-                cursor={isLabwareInStack ? 'pointer' : ''}
+                cursor={'pointer'}
                 onClick={() => {
-                  if (isLabwareInStack) {
-                    setLabwareStackDetailsLabwareId(topLabwareId)
-                  }
+                  setSelectedStack({ slotName: slotName, stack: stackedItems })
                 }}
                 onMouseEnter={() => {
                   if (topLabwareDefinition != null && topLabwareId != null) {
@@ -167,13 +207,11 @@ export function SetupLabwareMap({
             ),
           }
         : null
-    }
-  )
+    })
 
   const labwareOnDeckFiltered: LabwareOnDeck[] = labwareOnDeck.filter(
     (labware): labware is LabwareOnDeck => labware != null
   )
-
   return (
     <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
       <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16}>
@@ -186,22 +224,26 @@ export function SetupLabwareMap({
             modulesOnDeck={modulesOnDeck}
           />
         </Box>
-        <OffDeckLabwareList
-          labwareItems={offDeckItems}
-          isFlex={robotType === FLEX_ROBOT_TYPE}
-          commands={commands}
-        />
+        {offDeckItems != null ? (
+          <OffDeckLabwareList
+            labwareItems={offDeckItems}
+            isFlex={robotType === FLEX_ROBOT_TYPE}
+            setSelectedStack={setSelectedStack}
+          />
+        ) : null}
       </Flex>
-      {labwareStackDetailsLabwareId != null && (
-        <LabwareStackModal
-          labwareIdTop={labwareStackDetailsLabwareId}
-          commands={commands}
+      {selectedStack != null ? (
+        <SlotDetailModal
+          stackedItems={selectedStack.stack}
+          slotName={selectedStack.slotName}
+          labwareByLiquidId={labwareByLiquidId}
+          mostRecentAnalysis={protocolAnalysis}
           closeModal={() => {
-            setLabwareStackDetailsLabwareId(null)
+            setSelectedStack(null)
           }}
-          robotType={robotType}
+          isFlex={robotType === FLEX_ROBOT_TYPE}
         />
-      )}
+      ) : null}
     </Flex>
   )
 }

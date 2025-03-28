@@ -89,8 +89,8 @@ export function configureStore(): StoreType {
     /* preloadedState, */
     composeEnhancers(
       applyMiddleware(
-        thunk,
         timelineMiddleware as Middleware<BaseState, Record<string, any>, any>,
+        thunk,
         trackEventMiddleware as Middleware<BaseState, Record<string, any>, any>
       )
     ) as StoreEnhancer<unknown, unknown>

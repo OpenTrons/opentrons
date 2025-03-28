@@ -1,6 +1,9 @@
 {
   "add_liquid": "Add liquid",
   "add": "Add",
+  "apply_liquid_classes": "Apply liquid class settings for this transfer",
+  "assigned_liquid": "Assigned to {{liquidName}}",
+  "clear_selected_wells": "Clear selected wells",
   "clear_wells": "Clear wells",
   "click_and_drag": "Click and drag to select wells",
   "define_liquid": "Define a liquid",
@@ -8,12 +11,17 @@
   "delete_liquid": "Delete liquid",
   "description": "Description",
   "display_color": "Color",
+  "dont_use_liquid_class": "Don't use a liquid class",
+  "liquid_required": "Liquid required",
   "liquid_volume": "Liquid volume by well",
+  "liquid_volume_nonzero": "Liquid volume must be larger than zero",
+  "liquid_volume_required": "Liquid volume required",
   "liquid": "Liquid",
   "liquid_class": {
     "title": "Liquid class",
     "tooltip": "Applies predefined pipetting settings to transfer and mix steps using this liquid"
   },
+  "liquid_class_name_description": "{{displayName}} ({{description}})",
   "liquids_added": "Liquids added",
   "liquids": "Liquids",
   "microliters": "µL",
@@ -21,6 +29,7 @@
   "no_liquids_added": "No liquids added",
   "no_liquids_defined": "No liquids defined",
   "save": "Save",
+  "save_or_cancel": "Save or cancel changes to proceed",
   "select_wells_to_add": "Select wells to add liquid",
   "well": "Well"
 }

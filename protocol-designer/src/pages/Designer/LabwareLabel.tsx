@@ -30,13 +30,13 @@ export const LabwareLabel = (props: LabwareLabelProps): JSX.Element => {
   const [labelContainerHeight, setLabelContainerHeight] = useState(0)
 
   const deckLabels = [
-    ...nestedLabwareInfo,
     {
       text: labelText,
       isSelected: isSelected,
       isLast: isLast,
       isZoomed: designerTab === 'startingDeck',
     },
+    ...nestedLabwareInfo,
   ]
 
   useEffect(() => {

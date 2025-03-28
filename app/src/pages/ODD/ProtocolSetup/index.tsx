@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import first from 'lodash/first'
+import { css } from 'styled-components'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
@@ -46,7 +47,6 @@ import {
   ProtocolSetupDeckConfiguration,
   ProtocolSetupInstruments,
   ProtocolSetupLabware,
-  ProtocolSetupLiquids,
   ProtocolSetupModulesAndDeck,
   ProtocolSetupOffsets,
   ProtocolSetupStep,
@@ -56,7 +56,6 @@ import {
   getIncompleteInstrumentCount,
   ViewOnlyParameters,
 } from '/app/organisms/ODD/ProtocolSetup'
-import { useLaunchLegacyLPC } from '/app/organisms/LegacyLabwarePositionCheck/useLaunchLegacyLPC'
 import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -67,10 +66,9 @@ import {
   ANALYTICS_PROTOCOL_RUN_ACTION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { getIsHeaterShakerAttached, useFeatureFlag } from '/app/redux/config'
+import { getIsHeaterShakerAttached } from '/app/redux/config'
 import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 import { ConfirmSetupStepsCompleteModal } from './ConfirmSetupStepsCompleteModal'
-import { getLatestCurrentOffsets } from '/app/transformations/runs'
 import { CloseButton, PlayButton } from './Buttons'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
@@ -88,13 +86,28 @@ import {
   useRequiredProtocolHardwareFromAnalysis,
   useMissingProtocolHardwareFromAnalysis,
 } from '/app/transformations/commands'
+import { useLPCFlows } from '/app/organisms/LabwarePositionCheck'
+import {
+  OFFSETS_CONFLICT,
+  selectAreOffsetsApplied,
+  selectCountMissingLSOffsetsWithoutDefault,
+  selectIsAnyNecessaryDefaultOffsetMissing,
+  selectOffsetSource,
+  selectTotalCountLocationSpecificOffsets,
+} from '/app/redux/protocol-runs'
+import { LabwareOffsetsConflictModal } from '/app/organisms/LabwareOffsetsConflictModal'
+import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { Run } from '@opentrons/api-client'
 import type { CutoutFixtureId, CutoutId } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
-import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
+import type {
+  SetupScreens,
+  ProtocolSetupStepProps,
+} from '/app/organisms/ODD/ProtocolSetup'
 import type {
   ProtocolHardware,
   ProtocolFixture,
@@ -112,8 +125,8 @@ interface PrepareToRunProps {
   robotName: string
   runRecord: Run | null
   labwareConfirmed: boolean
-  liquidsConfirmed: boolean
   offsetsConfirmed: boolean
+  isLPCInitializing: boolean
 }
 
 function PrepareToRun({
@@ -124,8 +137,8 @@ function PrepareToRun({
   robotName,
   runRecord,
   labwareConfirmed,
-  liquidsConfirmed,
   offsetsConfirmed,
+  isLPCInitializing,
   confirmStepsComplete,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
@@ -250,6 +263,7 @@ function PrepareToRun({
   const isLoading =
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
+    isLPCInitializing ||
     (protocolHasModules && attachedModules == null)
 
   const speccedInstrumentCount =
@@ -332,25 +346,18 @@ function PrepareToRun({
     areModulesReady && areFixturesReady && !isLocationConflict
       ? 'ready'
       : 'not ready'
-  // Liquids information
-  const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
-  const areLiquidsInProtocol = liquidsInProtocol.length > 0
 
   const isReadyToRun =
-    incompleteInstrumentCount === 0 && areModulesReady && areFixturesReady
+    incompleteInstrumentCount === 0 &&
+    areModulesReady &&
+    areFixturesReady &&
+    offsetsConfirmed
   const onPlay = (): void => {
     if (isDoorOpen) {
       makeSnackbar(t('shared:close_robot_door') as string)
     } else {
       if (isReadyToRun) {
-        if (
-          runStatus === RUN_STATUS_IDLE &&
-          !(
-            labwareConfirmed &&
-            offsetsConfirmed &&
-            (liquidsConfirmed || !areLiquidsInProtocol)
-          )
-        ) {
+        if (runStatus === RUN_STATUS_IDLE && !labwareConfirmed) {
           confirmStepsComplete()
         } else if (runStatus === RUN_STATUS_IDLE && isHeaterShakerInProtocol) {
           confirmAttachment()
@@ -476,9 +483,43 @@ function PrepareToRun({
       ? t('additional_labware', { count: additionalLabwareCount })
       : null
 
-  const latestCurrentOffsets = getLatestCurrentOffsets(
-    runRecord?.data?.labwareOffsets ?? []
+  const totalOffsets = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
   )
+  const numMissingLSOffsets = useSelector(
+    selectCountMissingLSOffsetsWithoutDefault(runId)
+  )
+  const isAnyNecessaryDefaultOffsetMissing = useSelector(
+    selectIsAnyNecessaryDefaultOffsetMissing(runId)
+  )
+
+  const lpcSetupStepProps = (): Pick<
+    ProtocolSetupStepProps,
+    'detail' | 'status' | 'interactionDisabled'
+  > => {
+    if (totalOffsets === 0) {
+      return {
+        detail: t('offsets_not_required'),
+        status: 'ready',
+        interactionDisabled: true,
+      }
+    } else if (offsetsConfirmed) {
+      return {
+        detail: t('num_offsets_applied', { num: totalOffsets }),
+        status: 'ready',
+      }
+    } else if (isAnyNecessaryDefaultOffsetMissing) {
+      return {
+        detail: t('num_missing_offsets', { num: numMissingLSOffsets }),
+        status: 'not ready',
+      }
+    } else {
+      return {
+        detail: t('offsets_not_applied'),
+        status: 'not ready',
+      }
+    }
+  }
 
   const { data: doorStatus } = useDoorQuery({
     refetchInterval: FETCH_DURATION_MS,
@@ -565,6 +606,16 @@ function PrepareToRun({
           <>
             <ProtocolSetupStep
               onClickSetupStep={() => {
+                setSetupScreen('view only parameters')
+              }}
+              title={t('parameters')}
+              detail={parametersDetail}
+              subDetail={null}
+              status="ready"
+              interactionDisabled={!hasRunTimeParameters}
+            />
+            <ProtocolSetupStep
+              onClickSetupStep={() => {
                 setSetupScreen('instruments')
               }}
               title={t('instruments')}
@@ -589,50 +640,17 @@ function PrepareToRun({
                 setSetupScreen('offsets')
               }}
               title={t('labware_position_check')}
-              detail={t('recommended')}
-              subDetail={
-                latestCurrentOffsets.length > 0
-                  ? t('offsets_applied', { count: latestCurrentOffsets.length })
-                  : null
-              }
-              status={offsetsConfirmed ? 'ready' : 'general'}
-            />
-            <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('view only parameters')
-              }}
-              title={t('parameters')}
-              detail={parametersDetail}
-              subDetail={null}
-              status="ready"
-              interactionDisabled={!hasRunTimeParameters}
+              {...lpcSetupStepProps()}
             />
             <ProtocolSetupStep
               onClickSetupStep={() => {
                 setSetupScreen('labware')
               }}
-              title={i18n.format(t('labware'), 'capitalize')}
+              title={t('labware_liquids_setup_step_title')}
               detail={labwareDetail}
               subDetail={labwareSubDetail}
               status={labwareConfirmed ? 'ready' : 'general'}
               disabled={labwareDetail == null}
-            />
-            <ProtocolSetupStep
-              onClickSetupStep={() => {
-                setSetupScreen('liquids')
-              }}
-              title={i18n.format(t('liquids'), 'capitalize')}
-              status={
-                liquidsConfirmed || !areLiquidsInProtocol ? 'ready' : 'general'
-              }
-              detail={
-                areLiquidsInProtocol
-                  ? t('initial_liquids_num', {
-                      count: liquidsInProtocol.length,
-                    })
-                  : t('liquids_not_in_setup')
-              }
-              interactionDisabled={!areLiquidsInProtocol}
             />
           </>
         ) : (
@@ -654,11 +672,12 @@ function PrepareToRun({
   )
 }
 
+const MAINTENANCE_RUN_POLL_MS = 5000
+
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
-  const isNewLpc = useFeatureFlag('lpcRedesign')
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const { t } = useTranslation(['protocol_setup'])
@@ -686,6 +705,9 @@ export function ProtocolSetup(): JSX.Element {
     isPollingForCompletedAnalysis,
     setIsPollingForCompletedAnalysis,
   ] = useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
+  const isMaintenanceRunActive =
+    useNotifyCurrentMaintenanceRun({ refetchInterval: MAINTENANCE_RUN_POLL_MS })
+      .data?.data.id != null
 
   const {
     data: mostRecentAnalysis = null,
@@ -697,8 +719,6 @@ export function ProtocolSetup(): JSX.Element {
       refetchInterval: ANALYSIS_POLL_MS,
     }
   )
-
-  const areLiquidsInProtocol = (mostRecentAnalysis?.liquids?.length ?? 0) > 0
 
   useEffect(() => {
     if (mostRecentAnalysis?.status === 'completed') {
@@ -735,13 +755,6 @@ export function ProtocolSetup(): JSX.Element {
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name ??
     ''
-
-  const { launchLegacyLPC, LegacyLPCWizard } = useLaunchLegacyLPC(
-    runId,
-    robotType,
-    protocolName
-  )
-
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
@@ -773,23 +786,23 @@ export function ProtocolSetup(): JSX.Element {
   >([])
   // TODO(jh 10-31-24): Refactor the below to utilize useMissingStepsModal.
   const [labwareConfirmed, setLabwareConfirmed] = useState<boolean>(false)
-  const [liquidsConfirmed, setLiquidsConfirmed] = useState<boolean>(false)
-  const [offsetsConfirmed, setOffsetsConfirmed] = useState<boolean>(false)
+  const offsetsConfirmed = useSelector(selectAreOffsetsApplied(runId))
   const missingSteps = [
-    !offsetsConfirmed ? t('applied_labware_offsets') : null,
     !labwareConfirmed ? t('labware_placement') : null,
-    !liquidsConfirmed && areLiquidsInProtocol ? t('liquids') : null,
   ].filter(s => s != null)
   const {
     confirm: confirmMissingSteps,
     showConfirmation: showMissingStepsConfirmation,
     cancel: cancelExitMissingStepsConfirmation,
-  } = useConditionalConfirm(
-    handleProceedToRunClick,
-    !(labwareConfirmed && liquidsConfirmed && offsetsConfirmed)
-  )
+  } = useConditionalConfirm(handleProceedToRunClick, !labwareConfirmed)
   const runStatus = useRunStatus(runId)
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
+  const lpcLaunchProps = useLPCFlows({
+    runId,
+    robotType,
+    protocolName,
+  })
+  const offsetSource = useSelector(selectOffsetSource(runId))
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = useState<SetupScreens>('prepare to run')
@@ -804,8 +817,8 @@ export function ProtocolSetup(): JSX.Element {
         robotName={robotName}
         runRecord={runRecord ?? null}
         labwareConfirmed={labwareConfirmed}
-        liquidsConfirmed={liquidsConfirmed}
         offsetsConfirmed={offsetsConfirmed}
+        isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
       />
     ),
     instruments: (
@@ -822,13 +835,11 @@ export function ProtocolSetup(): JSX.Element {
     offsets: (
       <ProtocolSetupOffsets
         runId={runId}
+        runRecord={runRecord}
+        lpcLaunchProps={lpcLaunchProps}
         setSetupScreen={setSetupScreen}
         lpcDisabledReason={lpcDisabledReason}
-        launchLPC={launchLegacyLPC}
-        LPCWizard={LegacyLPCWizard}
         isConfirmed={offsetsConfirmed}
-        setIsConfirmed={setOffsetsConfirmed}
-        isNewLpc={isNewLpc}
       />
     ),
     labware: (
@@ -837,14 +848,6 @@ export function ProtocolSetup(): JSX.Element {
         setSetupScreen={setSetupScreen}
         isConfirmed={labwareConfirmed}
         setIsConfirmed={setLabwareConfirmed}
-      />
-    ),
-    liquids: (
-      <ProtocolSetupLiquids
-        runId={runId}
-        setSetupScreen={setSetupScreen}
-        isConfirmed={liquidsConfirmed}
-        setIsConfirmed={setLiquidsConfirmed}
       />
     ),
     'deck configuration': (
@@ -889,16 +892,32 @@ export function ProtocolSetup(): JSX.Element {
           onConfirmClick={handleProceedToRunClick}
         />
       ) : null}
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        padding={
-          setupScreen === 'prepare to run'
-            ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
-            : `${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`
-        }
-      >
+      {offsetSource === OFFSETS_CONFLICT && !isMaintenanceRunActive ? (
+        <LabwareOffsetsConflictModal runId={runId} isOnDevice={true} />
+      ) : null}
+      <Flex css={buildSetupScreenStyle(setupScreen)}>
         {setupComponentByScreen[setupScreen]}
       </Flex>
     </>
   )
+}
+
+const buildSetupScreenStyle = (
+  setupScreen: SetupScreens
+): FlattenSimpleInterpolation => {
+  const paddingStyle = (): string => {
+    switch (setupScreen) {
+      case 'prepare to run':
+        return `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+      case 'offsets':
+        return ''
+      default:
+        return `${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`
+    }
+  }
+
+  return css`
+    flex-direction: ${DIRECTION_COLUMN};
+    padding: ${paddingStyle()};
+  `
 }

@@ -1,9 +1,9 @@
 import { DEST_WELL_BLOWOUT_DESTINATION } from '@opentrons/step-generation'
-import type { HydratedFormdata } from '../../../form-types'
+import type { HydratedMixFormData } from '../../../form-types'
 // NOTE: expects that '_checkbox' fields are implemented so that
 // when checkbox is disabled, its dependent fields are hidden
 export function getDisabledFieldsMixForm(
-  hydratedForm: HydratedFormdata
+  hydratedForm: HydratedMixFormData
 ): Set<string> {
   const disabled: Set<string> = new Set()
 
@@ -23,7 +23,11 @@ export function getDisabledFieldsMixForm(
     disabled.add('dispense_flowRate')
   }
 
-  if (!hydratedForm.labware?.isTouchTipAllowed) {
+  if (
+    hydratedForm.labware != null &&
+    'isTouchTipAllowed' in hydratedForm.labware &&
+    !hydratedForm.labware?.isTouchTipAllowed
+  ) {
     disabled.add('mix_touchTip_checkbox')
   }
 

@@ -55,12 +55,12 @@ same behavior as before.
 The P20 Single GEN2 is back-compatible with the P10 Single in this regard. If your protocol
 specifies an ``instruments.P10_Single`` and your robot has an ``instruments.P20_Single_GEN2``
 attached, you can run your protocol, and the robot will act as if the maximum volume of the P20
-Single GEN2 is 10 μl.
+Single GEN2 is 10 µl.
 
 If you have a P50 Single specified in your protocol, there is no automatic backwards compatibility.
 If you want to use a Gen2 Pipette, you must change your protocol to load either a P300 Single GEN2
-(if you are using volumes between 20 and 50 μl) or a P20 Single GEN2 (if you are using volumes
-below 20 μl).
+(if you are using volumes between 20 and 50 µl) or a P20 Single GEN2 (if you are using volumes
+below 20 µl).
 
 
 Plunger Flow Rates
@@ -99,92 +99,92 @@ The given defaults for every pipette model is the following:
 P10_Single
 ----------
 
-- Aspirate Default: 5 μl/s
-- Dispense Default: 10 μl/s
-- Blow Out Default: 1000 μl/s
-- Minimum Volume: 1 μl
-- Maximum Volume: 10 μl
+- Aspirate Default: 5 µl/s
+- Dispense Default: 10 µl/s
+- Blow Out Default: 1000 µl/s
+- Minimum Volume: 1 µl
+- Maximum Volume: 10 µl
 
 P10_Multi
 ---------
 
-- Aspirate Default: 5 μl/s
-- Dispense Default: 10 μl/s
-- Blow Out Default: 1000 μl/s
-- Minimum Volume: 1 μl
-- Maximum Volume: 10 μl
+- Aspirate Default: 5 µl/s
+- Dispense Default: 10 µl/s
+- Blow Out Default: 1000 µl/s
+- Minimum Volume: 1 µl
+- Maximum Volume: 10 µl
 
 P50_Single
 ----------
 
-- Aspirate Default: 25 μl/s
-- Dispense Default: 50 μl/s
-- Blow Out Default: 1000 μl/s
-- Minimum Volume: 5 μl
-- Maximum Volume: 50 μl
+- Aspirate Default: 25 µl/s
+- Dispense Default: 50 µl/s
+- Blow Out Default: 1000 µl/s
+- Minimum Volume: 5 µl
+- Maximum Volume: 50 µl
 
 P50_Multi
 ---------
 
-- Aspirate Default: 25 μl/s
-- Dispense Default: 50 μl/s
-- Blow Out Default: 1000 μl/s
-- Minimum Volume: 5 μl
-- Maximum Volume: 50 μl
+- Aspirate Default: 25 µl/s
+- Dispense Default: 50 µl/s
+- Blow Out Default: 1000 µl/s
+- Minimum Volume: 5 µl
+- Maximum Volume: 50 µl
 
 P300_Single
 -----------
 
-- Aspirate Default: 150 μl/s
-- Dispense Default: 300 μl/s
-- Blow Out Default: 1000 μl/s
-- Minimum Volume: 30 μl
-- Maximum Volume: 300 μl
+- Aspirate Default: 150 µl/s
+- Dispense Default: 300 µl/s
+- Blow Out Default: 1000 µl/s
+- Minimum Volume: 30 µl
+- Maximum Volume: 300 µl
 
 P300_Multi
 ----------
 
-- Aspirate Default: 150 μl/s
-- Dispense Default: 300 μl/s
-- Blow Out Default: 1000 μl/s
-- Minimum Volume: 30 μl
-- Maximum Volume: 300 μl
+- Aspirate Default: 150 µl/s
+- Dispense Default: 300 µl/s
+- Blow Out Default: 1000 µl/s
+- Minimum Volume: 30 µl
+- Maximum Volume: 300 µl
 
 P1000_Single
 ------------
 
-- Aspirate Default: 500 μl/s
-- Dispense Default: 1000 μl/s
-- Blow Out Default: 1000 μl/s
-- Minimum Volume: 100 μl
-- Maximum Volume: 1000 μl
+- Aspirate Default: 500 µl/s
+- Dispense Default: 1000 µl/s
+- Blow Out Default: 1000 µl/s
+- Minimum Volume: 100 µl
+- Maximum Volume: 1000 µl
 
 P20_Single_GEN2
 ---------------
 
-- Aspirate Default: 3.78 μl/s
-- Dispense Default: 3.78 μl/s
-- Blow Out Default: 3.78 μl/s
-- Minimum Volume: 1 μl
-- Maximum Volume: 20 μl
+- Aspirate Default: 3.78 µl/s
+- Dispense Default: 3.78 µl/s
+- Blow Out Default: 3.78 µl/s
+- Minimum Volume: 1 µl
+- Maximum Volume: 20 µl
 
 P300_Single_GEN2
 ----------------
 
-- Aspirate Default: 46.43 μl/s
-- Dispense Default: 46.43 μl/s
-- Blow Out Default: 46.43 μl/s
-- Minimum Volume: 20 μl
-- Maximum Volume: 300 μl
+- Aspirate Default: 46.43 µl/s
+- Dispense Default: 46.43 µl/s
+- Blow Out Default: 46.43 µl/s
+- Minimum Volume: 20 µl
+- Maximum Volume: 300 µl
 
 P1000_Single_GEN2
 -----------------
 
-- Aspirate Default: 137.35 μl/s
-- Dispense Default: 137.35 μl/s
-- Blow Out Default: 137.35 μl/s
-- Minimum Volume: 100 μl
-- Maximum Volume: 1000 μl
+- Aspirate Default: 137.35 µl/s
+- Dispense Default: 137.35 µl/s
+- Blow Out Default: 137.35 µl/s
+- Minimum Volume: 100 µl
+- Maximum Volume: 1000 µl
 
 Old Pipette Constructor
 =======================

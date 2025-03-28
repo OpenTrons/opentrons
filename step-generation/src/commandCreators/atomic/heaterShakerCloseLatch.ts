@@ -1,11 +1,12 @@
 import { uuid } from '../../utils'
-import type { ModuleOnlyParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 export const heaterShakerCloseLatch: CommandCreator<ModuleOnlyParams> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
+  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
   return {
     commands: [
       {
@@ -16,5 +17,6 @@ export const heaterShakerCloseLatch: CommandCreator<ModuleOnlyParams> = (
         },
       },
     ],
+    python: `${pythonName}.close_labware_latch()`,
   }
 }

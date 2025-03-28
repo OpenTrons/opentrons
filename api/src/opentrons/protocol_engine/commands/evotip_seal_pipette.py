@@ -7,8 +7,7 @@ from opentrons.types import MountType
 from opentrons.protocol_engine.types import MotorAxis
 from typing_extensions import Literal
 
-from opentrons.protocol_engine.errors import UnsupportedLabwareForActionError
-from ..resources import ModelUtils, labware_validation
+from ..resources import ModelUtils
 from ..types import PickUpTipWellLocation, FluidKind, AspiratedFluid
 from .pipetting_common import (
     PipetteIdMixin,
@@ -44,7 +43,7 @@ EvotipSealPipetteCommandType = Literal["evotipSealPipette"]
 _PREP_DISTANCE_DEFAULT = 8.25
 _PRESS_DISTANCE_DEFAULT = 3.5
 _EJECTOR_PUSH_MM_DEFAULT = 7.0
-_SAFE_TOP_VOLUME = 400
+_SAFE_TOP_VOLUME = 1000
 
 
 class TipPickUpParams(BaseModel):
@@ -216,12 +215,6 @@ class EvotipSealPipetteImplementation(
         pipette_id = params.pipetteId
         labware_id = params.labwareId
         well_name = params.wellName
-
-        labware_definition = self._state_view.labware.get_definition(params.labwareId)
-        if not labware_validation.is_evotips(labware_definition.parameters.loadName):
-            raise UnsupportedLabwareForActionError(
-                f"Cannot use command: `EvotipSealPipette` with labware: {labware_definition.parameters.loadName}"
-            )
 
         well_location = self._state_view.geometry.convert_pick_up_tip_well_location(
             well_location=params.wellLocation

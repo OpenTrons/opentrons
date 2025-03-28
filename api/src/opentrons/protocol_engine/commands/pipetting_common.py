@@ -1,8 +1,8 @@
 """Common pipetting command base models."""
 
 from __future__ import annotations
-from typing import Literal, Tuple, TYPE_CHECKING
-
+from typing import Literal, Tuple, TYPE_CHECKING, Optional
+import numpy
 from typing_extensions import TypedDict
 from pydantic import BaseModel, Field
 
@@ -18,6 +18,10 @@ if TYPE_CHECKING:
     from ..execution.pipetting import PipettingHandler
     from ..resources import ModelUtils
     from ..notes import CommandNoteAdder
+
+
+DEFAULT_CORRECTION_VOLUME = 0.0
+"""Default correction volume (uL) for any aspirate/ dispense volume."""
 
 
 class PipetteIdMixin(BaseModel):
@@ -41,6 +45,10 @@ class AspirateVolumeMixin(BaseModel):
         " There is some tolerance for floating point rounding errors.",
         ge=0,
     )
+    correctionVolume: Optional[float] = Field(
+        None,
+        description="The correction volume in uL.",
+    )
 
 
 class DispenseVolumeMixin(BaseModel):
@@ -52,6 +60,10 @@ class DispenseVolumeMixin(BaseModel):
         " Must not be greater than the currently aspirated volume."
         " There is some tolerance for floating point rounding errors.",
         ge=0,
+    )
+    correctionVolume: Optional[float] = Field(
+        None,
+        description="The correction volume in uL.",
     )
 
 
@@ -176,15 +188,66 @@ async def aspirate_in_place(
     pipette_id: str,
     volume: float,
     flow_rate: float,
+    correction_volume: float,
     location_if_error: ErrorLocationInfo,
     command_note_adder: CommandNoteAdder,
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
 ) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[OverpressureError]:
-    """Execute an aspirate in place microoperation."""
+    """Execute an aspirate in place micro-operation."""
     try:
         volume_aspirated = await pipetting.aspirate_in_place(
             pipette_id=pipette_id,
+            volume=volume,
+            flow_rate=flow_rate,
+            command_note_adder=command_note_adder,
+            correction_volume=correction_volume,
+        )
+    except PipetteOverpressureError as e:
+        return DefinedErrorData(
+            public=OverpressureError(
+                id=model_utils.generate_id(),
+                createdAt=model_utils.get_timestamp(),
+                wrappedErrors=[
+                    ErrorOccurrence.from_failed(
+                        id=model_utils.generate_id(),
+                        createdAt=model_utils.get_timestamp(),
+                        error=e,
+                    )
+                ],
+                errorInfo=location_if_error,
+            ),
+            state_update=StateUpdate().set_fluid_unknown(pipette_id=pipette_id),
+        )
+    else:
+        return SuccessData(
+            public=BaseLiquidHandlingResult(
+                volume=volume_aspirated,
+            ),
+            state_update=StateUpdate().set_fluid_aspirated(
+                pipette_id=pipette_id,
+                fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=volume_aspirated),
+            ),
+        )
+
+
+async def aspirate_while_tracking(
+    pipette_id: str,
+    labware_id: str,
+    well_name: str,
+    volume: float,
+    flow_rate: float,
+    location_if_error: ErrorLocationInfo,
+    command_note_adder: CommandNoteAdder,
+    pipetting: PipettingHandler,
+    model_utils: ModelUtils,
+) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[OverpressureError]:
+    """Execute an aspirate while tracking microoperation."""
+    try:
+        volume_aspirated = await pipetting.aspirate_while_tracking(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
             volume=volume,
             flow_rate=flow_rate,
             command_note_adder=command_note_adder,
@@ -217,8 +280,10 @@ async def aspirate_in_place(
         )
 
 
-async def dispense_in_place(
+async def dispense_while_tracking(
     pipette_id: str,
+    labware_id: str,
+    well_name: str,
     volume: float,
     flow_rate: float,
     push_out: float | None,
@@ -226,13 +291,22 @@ async def dispense_in_place(
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
 ) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[OverpressureError]:
-    """Dispense-in-place as a microoperation."""
+    """Execute an dispense while tracking microoperation."""
+    # The current volume won't be none since it passed validation
+    current_volume = (
+        pipetting.get_state_view().pipettes.get_aspirated_volume(pipette_id) or 0.0
+    )
+    is_full_dispense = bool(numpy.isclose(current_volume - volume, 0))
+    ready = push_out == 0 if push_out is not None else not is_full_dispense
     try:
-        volume = await pipetting.dispense_in_place(
+        volume_dispensed = await pipetting.dispense_while_tracking(
             pipette_id=pipette_id,
+            labware_id=labware_id,
+            well_name=well_name,
             volume=volume,
             flow_rate=flow_rate,
             push_out=push_out,
+            is_full_dispense=is_full_dispense,
         )
     except PipetteOverpressureError as e:
         return DefinedErrorData(
@@ -248,13 +322,81 @@ async def dispense_in_place(
                 ],
                 errorInfo=location_if_error,
             ),
-            state_update=StateUpdate().set_fluid_unknown(pipette_id=pipette_id),
+            state_update=StateUpdate()
+            .set_fluid_unknown(pipette_id=pipette_id)
+            .set_pipette_ready_to_aspirate(
+                pipette_id=pipette_id, ready_to_aspirate=False
+            ),
+        )
+    else:
+        return SuccessData(
+            public=BaseLiquidHandlingResult(
+                volume=volume_dispensed,
+            ),
+            state_update=StateUpdate()
+            .set_fluid_ejected(
+                pipette_id=pipette_id,
+                volume=volume_dispensed,
+            )
+            .set_pipette_ready_to_aspirate(
+                pipette_id=pipette_id, ready_to_aspirate=ready
+            ),
+        )
+
+
+async def dispense_in_place(
+    pipette_id: str,
+    volume: float,
+    flow_rate: float,
+    push_out: float | None,
+    correction_volume: float,
+    location_if_error: ErrorLocationInfo,
+    pipetting: PipettingHandler,
+    model_utils: ModelUtils,
+) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[OverpressureError]:
+    """Dispense-in-place as a micro-operation."""
+    # The current volume won't be none since it passed validation
+    current_volume = (
+        pipetting.get_state_view().pipettes.get_aspirated_volume(pipette_id) or 0.0
+    )
+    is_full_dispense = bool(numpy.isclose(current_volume - volume, 0))
+    ready: bool = push_out == 0 if push_out is not None else not is_full_dispense
+    try:
+        volume = await pipetting.dispense_in_place(
+            pipette_id=pipette_id,
+            volume=volume,
+            flow_rate=flow_rate,
+            push_out=push_out,
+            is_full_dispense=is_full_dispense,
+            correction_volume=correction_volume,
+        )
+    except PipetteOverpressureError as e:
+        return DefinedErrorData(
+            public=OverpressureError(
+                id=model_utils.generate_id(),
+                createdAt=model_utils.get_timestamp(),
+                wrappedErrors=[
+                    ErrorOccurrence.from_failed(
+                        id=model_utils.generate_id(),
+                        createdAt=model_utils.get_timestamp(),
+                        error=e,
+                    )
+                ],
+                errorInfo=location_if_error,
+            ),
+            state_update=StateUpdate()
+            .set_fluid_unknown(pipette_id=pipette_id)
+            .set_pipette_ready_to_aspirate(
+                pipette_id=pipette_id, ready_to_aspirate=False
+            ),
         )
     else:
         return SuccessData(
             public=BaseLiquidHandlingResult(volume=volume),
-            state_update=StateUpdate().set_fluid_ejected(
-                pipette_id=pipette_id, volume=volume
+            state_update=StateUpdate()
+            .set_fluid_ejected(pipette_id=pipette_id, volume=volume)
+            .set_pipette_ready_to_aspirate(
+                pipette_id=pipette_id, ready_to_aspirate=ready
             ),
         )
 
@@ -290,3 +432,8 @@ async def blow_out_in_place(
             public=EmptyResult(),
             state_update=StateUpdate().set_fluid_empty(pipette_id=pipette_id),
         )
+
+
+async def increase_evo_disp_count(pipette_id: str, pipetting: PipettingHandler) -> None:
+    """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
+    await pipetting.increase_evo_disp_count(pipette_id)

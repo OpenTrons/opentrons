@@ -1,12 +1,15 @@
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
-import type { AspirateInPlaceArgs } from '../commandCreators/atomic/aspirateInPlace'
-import type { BlowOutInPlaceArgs } from '../commandCreators/atomic/blowOutInPlace'
-import type { DispenseInPlaceArgs } from '../commandCreators/atomic/dispenseInPlace'
-import type { DropTipInPlaceArgs } from '../commandCreators/atomic/dropTipInPlace'
+
+import type {
+  AspirateInPlaceParams,
+  BlowoutInPlaceParams,
+  DispenseInPlaceParams,
+  DropTipInPlaceParams,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export const forAspirateInPlace = (
-  params: AspirateInPlaceArgs,
+  params: AspirateInPlaceParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -15,7 +18,7 @@ export const forAspirateInPlace = (
 }
 
 export const forDispenseInPlace = (
-  params: DispenseInPlaceArgs,
+  params: DispenseInPlaceParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -32,7 +35,7 @@ export const forDispenseInPlace = (
 }
 
 export const forBlowOutInPlace = (
-  params: BlowOutInPlaceArgs,
+  params: BlowoutInPlaceParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
@@ -48,7 +51,7 @@ export const forBlowOutInPlace = (
 }
 
 export const forDropTipInPlace = (
-  params: DropTipInPlaceArgs,
+  params: DropTipInPlaceParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {

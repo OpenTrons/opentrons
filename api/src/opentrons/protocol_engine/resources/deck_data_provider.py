@@ -10,7 +10,7 @@ from opentrons_shared_data.deck import (
     DEFAULT_DECK_DEFINITION_VERSION,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons.protocols.models import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.types import DeckSlotName
 
 from ..types import (

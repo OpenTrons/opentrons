@@ -1,5 +1,6 @@
 import { makeWellSetHelpers, getLabwareDefURI } from '@opentrons/shared-data'
 import { getAllDefinitions as getAllLatestDefValues } from '/app/local-resources/labware'
+import { QUICK_TRANSFER_INCOMPATIBLE_LABWARE } from '../constants'
 
 import type { PipetteV2Specs, WellSetHelpers } from '@opentrons/shared-data'
 
@@ -15,7 +16,14 @@ export function generateCompatibleLabwareForPipette(
       if (
         definition.allowedRoles != null &&
         (definition.allowedRoles.includes('adapter') ||
-          definition.allowedRoles.includes('lid'))
+          definition.allowedRoles.includes('lid') ||
+          definition.allowedRoles.includes('system'))
+      ) {
+        return acc
+      } else if (
+        QUICK_TRANSFER_INCOMPATIBLE_LABWARE.includes(
+          getLabwareDefURI(definition)
+        )
       ) {
         return acc
       } else if (pipetteSpecs.channels === 1) {

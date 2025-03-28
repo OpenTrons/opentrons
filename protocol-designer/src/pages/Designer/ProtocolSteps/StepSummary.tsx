@@ -3,23 +3,31 @@ import { Trans, useTranslation } from 'react-i18next'
 import first from 'lodash/first'
 import flatten from 'lodash/flatten'
 import last from 'lodash/last'
+import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   ListItem,
+  NO_WRAP,
   SPACING,
   StyledText,
   Tag,
+  WRAP,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  WASTE_CHUTE_CUTOUT,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
   getModuleEntities,
 } from '../../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
-import { LINE_CLAMP_TEXT_STYLE } from '../../../atoms'
+import { LINE_CLAMP_TEXT_STYLE } from '../../../components/atoms'
+import { formatTime } from '../utils'
+
 import type { FormData } from '../../../form-types'
 
 interface StyledTransProps {
@@ -32,20 +40,23 @@ function StyledTrans(props: StyledTransProps): JSX.Element {
   const { i18nKey, tagText, values } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
   return (
-    <Flex
-      gridGap={SPACING.spacing4}
-      alignItems={ALIGN_CENTER}
-      css={`
-        flex-wrap: wrap;
-        word-break: break-word;
-      `}
-    >
+    <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER} flexWrap={WRAP}>
       <Trans
         t={t}
         i18nKey={i18nKey}
         components={{
-          text: <StyledText desktopStyle="bodyDefaultRegular" />,
-          semiBoldText: <StyledText desktopStyle="bodyDefaultSemiBold" />,
+          text: (
+            <StyledText
+              desktopStyle="bodyDefaultRegular"
+              style={{ whiteSpace: NO_WRAP }}
+            />
+          ),
+          semiBoldText: (
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              style={{ whiteSpace: NO_WRAP }}
+            />
+          ),
           tag: <Tag type="default" text={tagText ?? ''} />,
         }}
         values={values}
@@ -53,7 +64,6 @@ function StyledTrans(props: StyledTransProps): JSX.Element {
     </Flex>
   )
 }
-
 const getWellsForStepSummary = (
   targetWells: string[],
   labwareWells: string[]
@@ -79,6 +89,7 @@ interface StepSummaryProps {
 export function StepSummary(props: StepSummaryProps): JSX.Element | null {
   const { currentStep, stepDetails } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
+  const unknownModule = t('unkonwn_module')
   const labwareNicknamesById = useSelector(getLabwareNicknamesById)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
@@ -92,7 +103,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
   const { stepType } = currentStep
   let stepSummaryContent: JSX.Element | null = null
   switch (stepType) {
-    case 'mix':
+    case 'mix': {
       const {
         labware: mixLabwareId,
         volume: mixVolume,
@@ -103,7 +114,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       const mixLabwareDisplayName = labwareNicknamesById[mixLabwareId]
       const mixWellsDisplay = getWellsForStepSummary(
         mix_wells as string[],
-        flatten(labwareEntities[mixLabware].def.ordering)
+        flatten(labwareEntities[mixLabware]?.def.ordering)
       )
 
       stepSummaryContent = (
@@ -118,15 +129,17 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         />
       )
       break
-    case 'magnet':
+    }
+
+    case 'magnet': {
       const {
         moduleId: magneticModuleId,
         engageHeight,
         magnetAction,
       } = currentStep
-      const magneticModuleDisplayName = getModuleDisplayName(
-        modules[magneticModuleId].model
-      )
+      const moduleModel = modules[magneticModuleId]?.model
+      const magneticModuleDisplayName =
+        moduleModel != null ? getModuleDisplayName(moduleModel) : unknownModule
       stepSummaryContent =
         magnetAction === 'engage' ? (
           <StyledTrans
@@ -141,7 +154,9 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           />
         )
       break
-    case 'thermocycler':
+    }
+
+    case 'thermocycler': {
       const {
         lidIsActive,
         lidTargetTemp,
@@ -156,66 +171,60 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       } = currentStep
       stepSummaryContent =
         thermocyclerFormType === 'thermocyclerState' ? (
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+          <StepSummaryContainer>
             {blockIsActive ? (
               <StyledTrans
                 i18nKey="protocol_steps:thermocycler_module.thermocycler_state.block"
                 tagText={`${blockTargetTemp}${t('application:units.degrees')}`}
               />
             ) : null}
-            <Flex gridGap={SPACING.spacing20} alignItems={ALIGN_CENTER}>
-              {lidIsActive ? (
-                <StyledTrans
-                  i18nKey="protocol_steps:thermocycler_module.thermocycler_state.lid_temperature"
-                  tagText={`${lidTargetTemp}${t('application:units.degrees')}`}
-                />
-              ) : null}
+            {lidIsActive ? (
               <StyledTrans
-                i18nKey="protocol_steps:thermocycler_module.thermocycler_state.lid_position"
-                tagText={t(
-                  `protocol_steps:thermocycler_module.lid_position.${
-                    lidOpen ? 'open' : 'closed'
-                  }`
-                )}
+                i18nKey="protocol_steps:thermocycler_module.thermocycler_state.lid_temperature"
+                tagText={`${lidTargetTemp}${t('application:units.degrees')}`}
               />
-            </Flex>
-          </Flex>
+            ) : null}
+            <StyledTrans
+              i18nKey="protocol_steps:thermocycler_module.thermocycler_state.lid_position"
+              tagText={t(
+                `protocol_steps:thermocycler_module.lid_position.${
+                  lidOpen ? 'open' : 'closed'
+                }`
+              )}
+            />
+          </StepSummaryContainer>
         ) : (
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-            <Flex gridGap={SPACING.spacing20}>
-              <StyledTrans
-                i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.volume"
-                tagText={`${profileVolume} ${t(
-                  'application:units.microliter'
-                )}`}
-              />
-              <StyledTrans
-                i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.lid_temperature"
-                tagText={`${profileTargetLidTemp}${t(
-                  'application:units.degrees'
-                )}`}
-              />
-            </Flex>
-            <Flex gridGap={SPACING.spacing20}>
-              <StyledTrans
-                i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.block"
-                tagText={`${blockTargetTempHold}${t(
-                  'application:units.degrees'
-                )}`}
-              />
-              <StyledTrans
-                i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.lid_position"
-                tagText={t(
-                  `protocol_steps:thermocycler_module.lid_position.${
-                    lidOpenHold ? 'open' : 'closed'
-                  }`
-                )}
-              />
-            </Flex>
-          </Flex>
+          <StepSummaryContainer>
+            <StyledTrans
+              i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.volume"
+              tagText={`${profileVolume} ${t('application:units.microliter')}`}
+            />
+            <StyledTrans
+              i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.lid_temperature"
+              tagText={`${profileTargetLidTemp}${t(
+                'application:units.degrees'
+              )}`}
+            />
+            <StyledTrans
+              i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.block"
+              tagText={`${blockTargetTempHold}${t(
+                'application:units.degrees'
+              )}`}
+            />
+            <StyledTrans
+              i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.lid_position"
+              tagText={t(
+                `protocol_steps:thermocycler_module.lid_position.${
+                  lidOpenHold ? 'open' : 'closed'
+                }`
+              )}
+            />
+          </StepSummaryContainer>
         )
       break
-    case 'pause':
+    }
+
+    case 'pause': {
       const {
         moduleId: pauseModuleId,
         pauseAction,
@@ -231,9 +240,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           )
           break
         case 'untilTemperature':
-          const pauseModuleDisplayName = getModuleDisplayName(
-            modules[pauseModuleId].model
-          )
+          const moduleModel = modules[pauseModuleId]?.model
+          const pauseModuleDisplayName =
+            modules[pauseModuleId]?.model != null
+              ? getModuleDisplayName(moduleModel)
+              : unknownModule
           stepSummaryContent = (
             <StyledTrans
               i18nKey="protocol_steps:pause.untilTemperature"
@@ -246,36 +257,43 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           stepSummaryContent = (
             <StyledTrans
               i18nKey={t('protocol_steps:pause.untilTime')}
-              tagText={pauseTime}
+              tagText={formatTime(pauseTime as string)}
             />
           )
           break
       }
       break
-    case 'temperature':
+    }
+
+    case 'temperature': {
       const {
         moduleId: tempModuleId,
         setTemperature,
         targetTemperature,
       } = currentStep
-      const isDeactivating = setTemperature === 'false'
-      const tempModuleDisplayName = getModuleDisplayName(
-        modules[tempModuleId].model
-      )
-      stepSummaryContent = isDeactivating ? (
-        <StyledTrans
-          i18nKey={'protocol_steps:temperature_module.deactivated'}
-          values={{ module: tempModuleDisplayName }}
-        />
-      ) : (
+      const isSettingTemperature =
+        setTemperature != null && JSON.parse(String(setTemperature ?? false))
+      const moduleModel = modules[tempModuleId]?.model
+      const tempModuleDisplayName =
+        moduleModel != null
+          ? getModuleDisplayName(modules[tempModuleId]?.model)
+          : unknownModule
+      stepSummaryContent = isSettingTemperature ? (
         <StyledTrans
           i18nKey={'protocol_steps:temperature_module.active'}
           tagText={`${targetTemperature}${t('application:units.degrees')}`}
           values={{ module: tempModuleDisplayName }}
         />
+      ) : (
+        <StyledTrans
+          i18nKey={'protocol_steps:temperature_module.deactivated'}
+          values={{ module: tempModuleDisplayName }}
+        />
       )
       break
-    case 'moveLabware':
+    }
+
+    case 'moveLabware': {
       const { labware, newLocation, useGripper } = currentStep
       const labwareName = labwareNicknamesById[labware]
       let newLocationName = newLocation
@@ -285,6 +303,8 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         newLocationName = labwareNicknamesById[newLocation]
       } else if (newLocation === 'offDeck') {
         newLocationName = t('off_deck')
+      } else if (newLocation === WASTE_CHUTE_CUTOUT) {
+        newLocationName = t('shared:wasteChute')
       }
       stepSummaryContent = (
         <StyledTrans
@@ -300,7 +320,9 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         />
       )
       break
-    case 'moveLiquid':
+    }
+
+    case 'moveLiquid': {
       let moveLiquidType
       const {
         aspirate_labware,
@@ -353,7 +375,9 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       )
 
       break
-    case 'heaterShaker':
+    }
+
+    case 'heaterShaker': {
       const {
         latchOpen,
         heaterShakerTimer,
@@ -361,65 +385,65 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         targetHeaterShakerTemperature,
         targetSpeed,
       } = currentStep
-      const moduleDisplayName = getModuleDisplayName(
-        modules[heaterShakerModuleId].model
-      )
+      const moduleModel = modules[heaterShakerModuleId]?.model
+      const moduleDisplayName =
+        moduleModel != null ? getModuleDisplayName(moduleModel) : unknownModule
       stepSummaryContent = (
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <Flex gridGap={SPACING.spacing20} alignItems={ALIGN_CENTER}>
+        <StepSummaryContainer>
+          <StyledTrans
+            i18nKey="protocol_steps:heater_shaker.active.temperature"
+            values={{ module: moduleDisplayName }}
+            tagText={
+              targetHeaterShakerTemperature
+                ? `${targetHeaterShakerTemperature}${t(
+                    'application:units.degrees'
+                  )}`
+                : t('protocol_steps:heater_shaker.active.ambient')
+            }
+          />
+          {targetSpeed ? (
             <StyledTrans
-              i18nKey="protocol_steps:heater_shaker.active.temperature"
-              values={{ module: moduleDisplayName }}
-              tagText={
-                targetHeaterShakerTemperature
-                  ? `${targetHeaterShakerTemperature}${t(
-                      'application:units.degrees'
-                    )}`
-                  : t('protocol_steps:heater_shaker.active.ambient')
-              }
+              i18nKey="protocol_steps:heater_shaker.active.shake"
+              tagText={`${targetSpeed}${t('application:units.rpm')}`}
             />
-            {targetSpeed ? (
-              <StyledTrans
-                i18nKey="protocol_steps:heater_shaker.active.shake"
-                tagText={`${targetSpeed}${t('application:units.rpm')}`}
-              />
-            ) : null}
-          </Flex>
-          <Flex gridGap={SPACING.spacing20}>
-            {heaterShakerTimer ? (
-              <StyledTrans
-                i18nKey="protocol_steps:heater_shaker.active.time"
-                tagText={heaterShakerTimer}
-              />
-            ) : null}
+          ) : null}
+          {heaterShakerTimer ? (
             <StyledTrans
-              i18nKey="protocol_steps:heater_shaker.active.latch"
-              tagText={t(
-                latchOpen
-                  ? 'protocol_steps:heater_shaker.latch.open'
-                  : 'protocol_steps:heater_shaker.latch.closed'
-              )}
+              i18nKey="protocol_steps:heater_shaker.active.time"
+              tagText={formatTime(heaterShakerTimer as string)}
             />
-          </Flex>
-        </Flex>
+          ) : null}
+          <StyledTrans
+            i18nKey="protocol_steps:heater_shaker.active.latch"
+            tagText={t(
+              latchOpen
+                ? 'protocol_steps:heater_shaker.latch.open'
+                : 'protocol_steps:heater_shaker.latch.closed'
+            )}
+          />
+        </StepSummaryContainer>
       )
       break
+    }
+
     default:
       stepSummaryContent = null
   }
+
   return stepSummaryContent != null || stepDetails != null ? (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
       width="100%"
+      height="100%"
     >
       {stepSummaryContent != null ? (
-        <ListItem type="noActive">
+        <ListItem type="default">
           <Flex padding={SPACING.spacing12}>{stepSummaryContent}</Flex>
         </ListItem>
       ) : null}
       {stepDetails != null && stepDetails !== '' ? (
-        <ListItem type="noActive">
+        <ListItem type="default">
           <Flex padding={SPACING.spacing12}>
             <StyledText
               desktopStyle="bodyDefaultRegular"
@@ -433,3 +457,9 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     </Flex>
   ) : null
 }
+
+const StepSummaryContainer = styled(Flex)`
+  flex-wrap: ${WRAP};
+  gap: ${SPACING.spacing20};
+  row-gap: ${SPACING.spacing4};
+`

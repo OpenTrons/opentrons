@@ -1,0 +1,44 @@
+{
+  "ordering": [],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": ["999-00254"],
+    "links": [
+      "https://opentrons.com/products/opentrons-flex-evotip-adapter-set/"
+    ]
+  },
+  "metadata": {
+    "displayName": "Opentrons Flex Evotip Tall Adapter",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 130.5,
+    "yDimension": 98,
+    "zDimension": 67.5
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "parameters": {
+    "format": "96Standard",
+    "quirks": ["stackingMaxFive"],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "evotip_flex_tall_adapter"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "allowedRoles": ["adapter"],
+  "cornerOffsetFromSlot": {
+    "x": -0.19,
+    "y": -0.19,
+    "z": 0
+  }
+}

@@ -24,6 +24,7 @@ import {
   NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -206,7 +207,8 @@ function ModuleTableItem({
   } else if (
     isModuleReady &&
     (module.attachedModuleMatch?.moduleOffset?.last_modified != null ||
-      module.attachedModuleMatch?.moduleType === ABSORBANCE_READER_TYPE)
+      module.attachedModuleMatch?.moduleType === ABSORBANCE_READER_TYPE ||
+      module.attachedModuleMatch?.moduleType === FLEX_STACKER_MODULE_TYPE)
   ) {
     moduleStatus = (
       <Chip
@@ -269,8 +271,9 @@ function ModuleTableItem({
         backgroundColor={
           isModuleReady &&
           (module.attachedModuleMatch?.moduleOffset?.last_modified != null ||
+            module.attachedModuleMatch?.moduleType === ABSORBANCE_READER_TYPE ||
             module.attachedModuleMatch?.moduleType ===
-              ABSORBANCE_READER_TYPE) &&
+              FLEX_STACKER_MODULE_TYPE) &&
           conflictedFixture == null
             ? COLORS.green35
             : isNonConnectingModule && conflictedFixture == null

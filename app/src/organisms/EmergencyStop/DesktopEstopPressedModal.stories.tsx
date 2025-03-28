@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { configReducer } from '/app/redux/config/reducer'
+import { configReducer } from '../../redux/config/reducer'
 import { EstopPressedModal } from '.'
 
 import type { Store, StoreEnhancer } from 'redux'

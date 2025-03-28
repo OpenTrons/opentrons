@@ -41,7 +41,10 @@ interface StepOverflowMenuProps {
   confirmDelete: () => void
   confirmMultiDelete: () => void
   multiSelectItemIds: string[] | null
+  sidebarWidth: number // adjust the position of the overflow menu
 }
+
+const POSITION_ADJUSTMENT = 4
 
 export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
   const {
@@ -53,6 +56,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     confirmDelete,
     confirmMultiDelete,
     multiSelectItemIds,
+    sidebarWidth,
   } = props
   const { t } = useTranslation('protocol_steps')
   const singleEditFormHasUnsavedChanges = useSelector(
@@ -101,7 +105,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
         ref={menuRootRef}
         zIndex={12}
         top={top}
-        left="18.75rem"
+        left={sidebarWidth - POSITION_ADJUSTMENT} // the space between kebab menu button and overflow menu is 8px
         position={POSITION_ABSOLUTE}
         whiteSpace={NO_WRAP}
         borderRadius={BORDERS.borderRadius8}

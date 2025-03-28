@@ -2,7 +2,6 @@ import { getModuleDef2 } from '@opentrons/shared-data'
 
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
-import { constructInvariantContextFromRunCommands } from './constructInvariantContextFromRunCommands'
 import { makeInitialRobotState } from './misc'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -21,9 +20,9 @@ interface ResultingTimelineFrame {
   invariantContext: InvariantContext
 }
 export function getResultingTimelineFrameFromRunCommands(
-  commands: RunTimeCommand[]
+  commands: RunTimeCommand[],
+  invariantContext: InvariantContext
 ): ResultingTimelineFrame {
-  const invariantContext = constructInvariantContextFromRunCommands(commands)
   const pipetteLocations = commands.reduce<RobotState['pipettes']>(
     (acc, command) => {
       if (command.commandType === 'loadPipette' && command.result != null) {
@@ -43,7 +42,10 @@ export function getResultingTimelineFrameFromRunCommands(
     (acc, command) => {
       if (command.commandType === 'loadLabware' && command.result != null) {
         let slot
-        if (command.params.location === 'offDeck') {
+        if (
+          command.params.location === 'offDeck' ||
+          command.params.location === 'systemLocation'
+        ) {
           slot = command.params.location
         } else if ('slotName' in command.params.location) {
           slot = command.params.location.slotName
@@ -81,6 +83,7 @@ export function getResultingTimelineFrameFromRunCommands(
     },
     {}
   )
+
   const initialRobotState = makeInitialRobotState({
     invariantContext,
     labwareLocations,

@@ -16,6 +16,7 @@ import {
   CURSOR_DEFAULT,
 } from '@opentrons/components'
 
+import type { MouseEvent, ReactNode } from 'react'
 interface AccordionProps {
   id?: string
   handleClick: () => void
@@ -23,7 +24,7 @@ interface AccordionProps {
   isCompleted?: boolean
   disabled?: boolean
   heading?: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 const ACCORDION = 'accordion'
@@ -42,7 +43,7 @@ export function Accordion({
 }: AccordionProps): JSX.Element {
   const contentRef = useRef<HTMLDivElement>(null)
 
-  const handleContainerClick = (e: React.MouseEvent): void => {
+  const handleContainerClick = (e: MouseEvent): void => {
     if (
       (e.target as HTMLElement).tagName !== 'BUTTON' &&
       !disabled &&
@@ -52,7 +53,7 @@ export function Accordion({
     }
   }
 
-  const handleButtonClick = (e: React.MouseEvent): void => {
+  const handleButtonClick = (e: MouseEvent): void => {
     if (!isOpen && !disabled) {
       e.stopPropagation()
       handleClick()

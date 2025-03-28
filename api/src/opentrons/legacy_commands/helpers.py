@@ -78,3 +78,18 @@ def stringify_labware_movement_command(
     destination_text = _stringify_labware_movement_location(destination)
     gripper_text = " with gripper" if use_gripper else ""
     return f"Moving {source_labware_text} to {destination_text}{gripper_text}"
+
+
+def stringify_lid_movement_command(
+    source: Union[
+        DeckLocation, OffDeckType, Labware, ModuleContext, WasteChute, TrashBin
+    ],
+    destination: Union[
+        DeckLocation, OffDeckType, Labware, ModuleContext, WasteChute, TrashBin
+    ],
+    use_gripper: bool,
+) -> str:
+    source_labware_text = _stringify_labware_movement_location(source)
+    destination_text = _stringify_labware_movement_location(destination)
+    gripper_text = " with gripper" if use_gripper else ""
+    return f"Moving lid from {source_labware_text} to {destination_text}{gripper_text}"

@@ -15,9 +15,11 @@ from hardware_testing.gravimetric.tips import get_unused_tips
 from hardware_testing.data import ui, get_testing_data_directory
 from opentrons.hardware_control.types import (
     InstrumentProbeType,
+    PipetteSensorId,
     OT3Mount,
     Axis,
     top_types,
+    PipetteSensorResponseQueue,
 )
 from opentrons.hardware_control.dev_types import PipetteDict
 
@@ -420,6 +422,7 @@ def _run_trial(
         probes.append(InstrumentProbeType.SECONDARY)
         probe_target = InstrumentProbeType.BOTH
     data_files: Dict[InstrumentProbeType, str] = {}
+    data_capture: PipetteSensorResponseQueue = PipetteSensorResponseQueue()
     for probe in probes:
         data_filename = f"pressure_sensor_data-trial{trial}-tip{tip}-{probe.name}.csv"
         data_file = f"{data_dir}/{run_args.name}/{run_args.run_id}/{data_filename}"
@@ -456,8 +459,42 @@ def _run_trial(
     run_args.recorder.set_sample_tag(f"trial-{trial}-{tip}ul")
     # TODO add in stuff for secondary probe
     try:
-        height = hw_api.liquid_probe(hw_mount, z_distance, lps, probe_target)
+        height = hw_api.liquid_probe(
+            hw_mount, z_distance, lps, probe_target, response_queue=data_capture
+        )
         result: LLDResult = LLDResult.success
+        # write the data files that used to be made automatically
+        if not run_args.ctx.is_simulating():
+            for probe in probes:
+                sensor_id = (
+                    PipetteSensorId.S0
+                    if probe == InstrumentProbeType.PRIMARY
+                    else PipetteSensorId.S1
+                )
+                as_dict = data_capture.get_nowait()
+                data = [d.to_float() for d in as_dict[sensor_id]]
+                with open(data_files[probe], "w") as d_file:
+                    writer = csv.writer(d_file)
+                    writer.writerow(
+                        [
+                            "time(s)",
+                            "Pressure(pascals)",
+                            "z_velocity(mm/s)",
+                            "plunger_velocity(mm/s)",
+                            "threshold(pascals)",
+                        ]
+                    )
+                    writer.writerow(
+                        [
+                            "0",
+                            "0",
+                            f"{run_args.z_speed}",
+                            f"{plunger_speed}",
+                            f"{lqid_cfg['sensor_threshold_pascals']}",
+                        ]
+                    )
+                    for i in range(len(data)):
+                        writer.writerow([f"{i*0.004}", f"{data[i]}"])
         if not run_args.ctx.is_simulating():
             for probe in data_files:
                 if _test_for_blockage(data_files[probe], lps.sensor_threshold_pascals):

@@ -1,6 +1,6 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "FLEX 8-Channel EM 1000 μL",
+  "displayName": "FLEX 8-Channel EM 1000 µL",
   "model": "p1000",
   "displayCategory": "FLEX",
   "validNozzleMaps": {

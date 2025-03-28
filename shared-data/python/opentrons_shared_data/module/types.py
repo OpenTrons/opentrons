@@ -19,6 +19,7 @@ ThermocyclerModuleType = Literal["thermocyclerModuleType"]
 HeaterShakerModuleType = Literal["heaterShakerModuleType"]
 MagneticBlockType = Literal["magneticBlockType"]
 AbsorbanceReaderType = Literal["absorbanceReaderType"]
+FlexStackerModuleType = Literal["flexStackerModuleType"]
 
 ModuleType = Union[
     MagneticModuleType,
@@ -27,6 +28,7 @@ ModuleType = Union[
     HeaterShakerModuleType,
     MagneticBlockType,
     AbsorbanceReaderType,
+    FlexStackerModuleType,
 ]
 
 MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
@@ -35,6 +37,7 @@ ThermocyclerModuleModel = Literal["thermocyclerModuleV1", "thermocyclerModuleV2"
 HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
 MagneticBlockModel = Literal["magneticBlockV1"]
 AbsorbanceReaderModel = Literal["absorbanceReaderV1"]
+FlexStackerModuleModel = Literal["flexStackerModuleV1"]
 
 ModuleModel = Union[
     MagneticModuleModel,
@@ -43,6 +46,7 @@ ModuleModel = Union[
     HeaterShakerModuleModel,
     MagneticBlockModel,
     AbsorbanceReaderModel,
+    FlexStackerModuleModel,
 ]
 
 ModuleSlotTransform = TypedDict(
@@ -65,6 +69,8 @@ ModuleDimensions = TypedDict(
         "footprintYDimension": float,
         "labwareInterfaceXDimension": float,
         "labwareInterfaceYDimension": float,
+        "maxStackerFillHeight": float,
+        "maxStackerRetrievableHeight": float,
     },
     total=False,
 )

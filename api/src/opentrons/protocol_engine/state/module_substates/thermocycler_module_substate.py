@@ -19,6 +19,7 @@ from opentrons.drivers.thermocycler.driver import (
     LID_TARGET_MIN,
     LID_TARGET_MAX,
 )
+from opentrons.hardware_control.modules import ModuleData, ModuleDataValidator
 
 ThermocyclerModuleId = NewType("ThermocyclerModuleId", str)
 
@@ -141,3 +142,22 @@ class ThermocyclerModuleSubState:
                 f"Module {self.module_id} does not have a target block temperature set."
             )
         return target
+
+    @classmethod
+    def from_live_data(
+        cls, module_id: ThermocyclerModuleId, data: ModuleData | None
+    ) -> "ThermocyclerModuleSubState":
+        """Create a ThermocyclerModuleSubState from live data."""
+        if ModuleDataValidator.is_thermocycler_data(data):
+            return cls(
+                module_id=module_id,
+                is_lid_open=data["lid"] == "open",
+                target_block_temperature=data["targetTemp"],
+                target_lid_temperature=data["lidTarget"],
+            )
+        return cls(
+            module_id=module_id,
+            is_lid_open=False,
+            target_block_temperature=None,
+            target_lid_temperature=None,
+        )

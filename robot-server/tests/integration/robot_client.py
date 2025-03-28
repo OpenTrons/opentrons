@@ -384,6 +384,12 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_labware_offsets(self) -> Response:
+        # Filter query parameters omitted for simplicity. This currently returns all offsets.
+        response = await self.httpx_client.get(url=f"{self.base_url}/labwareOffsets")
+        response.raise_for_status()
+        return response
+
     async def delete_all_labware_offsets(self) -> Response:
         response = await self.httpx_client.delete(url=f"{self.base_url}/labwareOffsets")
         response.raise_for_status()

@@ -1,0 +1,13 @@
+name: 'Set Complex Environment Variables'
+description: Composite action using github-script to set complex environment variables.
+inputs: {}
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Set complex environment variables'
+      id: set-vars
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+          buildComplexEnvVars(core, context)

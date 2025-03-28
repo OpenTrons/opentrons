@@ -7,8 +7,6 @@ import { useHoverTooltip } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { useLPCSuccessToast } from '../../../hooks/useLPCSuccessToast'
-import { LegacyLabwarePositionCheck } from '/app/organisms/LegacyLabwarePositionCheck'
 import { getModuleTypesThatRequireExtraAttention } from '../../utils/getModuleTypesThatRequireExtraAttention'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { SetupLabwareList } from '../SetupLabwareList'
@@ -35,7 +33,6 @@ vi.mock('/app/organisms/LegacyLabwarePositionCheck')
 vi.mock('../../utils/getModuleTypesThatRequireExtraAttention')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/config')
-vi.mock('../../../hooks/useLPCSuccessToast')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
 
@@ -68,19 +65,12 @@ describe('SetupLabware', () => {
       .calledWith(expect.anything())
       .thenReturn([])
 
-    vi.mocked(LegacyLabwarePositionCheck).mockReturnValue(
-      <div>mock Labware Position Check</div>
-    )
     when(vi.mocked(useUnmatchedModulesForProtocol))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
         missingModuleIds: [],
         remainingAttachedModules: [],
       })
-
-    when(vi.mocked(useLPCSuccessToast))
-      .calledWith()
-      .thenReturn({ setIsShowingLPCSuccessToast: vi.fn() })
 
     when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
@@ -104,14 +94,14 @@ describe('SetupLabware', () => {
     vi.resetAllMocks()
   })
 
-  it('should render the list view, clicking the toggle button will turn to map view', () => {
+  it('should render the map view, clicking the toggle button will turn to list view', () => {
     render()
-    screen.getByText('mock setup labware list')
-    screen.getByRole('button', { name: 'List View' })
-    screen.getByRole('button', { name: 'Confirm placements' })
-    const mapView = screen.getByRole('button', { name: 'Map View' })
-    fireEvent.click(mapView)
     screen.getByText('mock setup labware map')
+    screen.getByRole('button', { name: 'Map View' })
+    screen.getByRole('button', { name: 'Confirm placements' })
+    const listView = screen.getByRole('button', { name: 'List View' })
+    fireEvent.click(listView)
+    screen.getByText('mock setup labware list')
   })
 
   it('disables the confirmation button if the run has already started', () => {

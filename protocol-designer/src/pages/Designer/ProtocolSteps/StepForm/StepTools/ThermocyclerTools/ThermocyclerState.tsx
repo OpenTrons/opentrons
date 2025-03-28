@@ -9,7 +9,7 @@ import {
 import {
   ToggleExpandStepFormField,
   ToggleStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
 import type { FormData } from '../../../../../../form-types'
@@ -24,6 +24,7 @@ interface ThermocyclerStateProps {
   visibleFormErrors: StepFormErrors
   showFormErrors?: boolean
   focusedField?: string | null
+  paddingY?: string
 }
 
 export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
@@ -33,6 +34,7 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
     formData,
     isHold = false,
     visibleFormErrors,
+    paddingY = '0',
   } = props
   const { i18n, t } = useTranslation(['application', 'form'])
 
@@ -64,8 +66,7 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing4}
-      paddingX={SPACING.spacing16}
-      paddingTop={SPACING.spacing16}
+      padding={`${paddingY} ${SPACING.spacing16}`}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <StyledText desktopStyle="bodyDefaultSemiBold">

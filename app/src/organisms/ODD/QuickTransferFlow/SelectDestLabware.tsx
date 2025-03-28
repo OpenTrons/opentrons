@@ -118,7 +118,10 @@ export function SelectDestLabware(
               }}
               buttonLabel={t('source_labware_c2')}
               buttonValue="source-labware-c2"
-              subButtonLabel={state.source.metadata.displayName}
+              buttonSubLabel={{
+                label: state.source.metadata.displayName,
+                align: 'vertical',
+              }}
             />
           ) : null}
           {compatibleLabwareDefinitions?.map(definition => {

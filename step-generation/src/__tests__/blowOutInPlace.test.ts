@@ -6,7 +6,7 @@ import {
   getSuccessResult,
 } from '../fixtures'
 import type { RobotState, InvariantContext } from '../types'
-import type { BlowOutInPlaceArgs } from '../commandCreators/atomic/blowOutInPlace'
+import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
 
 describe('blowOutInPlace', () => {
   let invariantContext: InvariantContext
@@ -19,7 +19,7 @@ describe('blowOutInPlace', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   })
   it('blowOut in place', () => {
-    const params: BlowOutInPlaceArgs = {
+    const params: BlowoutInPlaceParams = {
       pipetteId: mockId,
       flowRate: mockFlowRate,
     }

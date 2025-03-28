@@ -10,7 +10,7 @@ export function forMoveLabware(
   const { robotState } = robotStateAndWarnings
 
   let newLocationString = ''
-  if (newLocation === 'offDeck') {
+  if (newLocation === 'offDeck' || newLocation === 'systemLocation') {
     newLocationString = newLocation
   } else if ('moduleId' in newLocation) {
     newLocationString = newLocation.moduleId

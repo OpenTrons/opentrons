@@ -11,13 +11,13 @@ import {
 
 import { Command, CommandIndex } from '../Command'
 
-import type { CommandTextData } from '/app/local-resources/commands'
-import type { NonSkeletonCommandState } from '../Command'
 import type {
   LabwareDefinition2,
   RobotType,
   RunTimeCommand,
 } from '@opentrons/shared-data'
+import type { CommandTextData } from '@opentrons/components'
+import type { NonSkeletonCommandState } from '../Command'
 
 export interface CommandWithIndex {
   index: number | undefined

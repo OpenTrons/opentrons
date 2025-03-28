@@ -92,6 +92,8 @@ async def test_aspirate_implementation_no_prep(
         True
     )
 
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
+
     decoy.when(
         state_view.geometry.get_nozzles_per_well(
             labware_id=labware_id,
@@ -126,6 +128,7 @@ async def test_aspirate_implementation_no_prep(
             volume=50,
             flow_rate=1.23,
             command_note_adder=mock_command_note_adder,
+            correction_volume=0.0,
         ),
     ).then_return(50)
 
@@ -184,6 +187,7 @@ async def test_aspirate_implementation_with_prep(
         False
     )
 
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(False)
     decoy.when(
         state_view.geometry.get_nozzles_per_well(
             labware_id=labware_id,
@@ -236,6 +240,7 @@ async def test_aspirate_implementation_with_prep(
             volume=volume,
             flow_rate=flow_rate,
             command_note_adder=mock_command_note_adder,
+            correction_volume=0.0,
         ),
     ).then_return(volume)
 
@@ -292,6 +297,7 @@ async def test_aspirate_raises_volume_error(
         True
     )
 
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
     decoy.when(
         state_view.geometry.get_nozzles_per_well(
             labware_id=labware_id,
@@ -326,6 +332,7 @@ async def test_aspirate_raises_volume_error(
             volume=50,
             flow_rate=1.23,
             command_note_adder=mock_command_note_adder,
+            correction_volume=0.0,
         )
     ).then_raise(AssertionError("blah blah"))
 
@@ -381,6 +388,7 @@ async def test_overpressure_error(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)).then_return(
         True
     )
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     decoy.when(
         await movement.move_to_well(
@@ -402,6 +410,7 @@ async def test_overpressure_error(
             volume=50,
             flow_rate=1.23,
             command_note_adder=mock_command_note_adder,
+            correction_volume=0.0,
         ),
     ).then_raise(PipetteOverpressureError())
 
@@ -481,6 +490,7 @@ async def test_aspirate_implementation_meniscus(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)).then_return(
         True
     )
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     decoy.when(
         await movement.move_to_well(
@@ -502,6 +512,7 @@ async def test_aspirate_implementation_meniscus(
             volume=50,
             flow_rate=1.23,
             command_note_adder=mock_command_note_adder,
+            correction_volume=0,
         ),
     ).then_return(50)
 
@@ -551,6 +562,7 @@ async def test_stall_during_final_movement(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)).then_return(
         True
     )
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     params = AspirateParams(
         pipetteId=pipette_id,
@@ -596,6 +608,7 @@ async def test_stall_during_preparation(
     pipetting: PipettingHandler,
     subject: AspirateImplementation,
     model_utils: ModelUtils,
+    state_view: StateView,
 ) -> None:
     """It should propagate a stall error that happens during the prepare-to-aspirate part."""
     pipette_id = "pipette-id"
@@ -620,6 +633,7 @@ async def test_stall_during_preparation(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)).then_return(
         False
     )
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(False)
 
     decoy.when(
         await movement.move_to_well(
@@ -680,6 +694,7 @@ async def test_overpressure_during_preparation(
     decoy.when(pipetting.get_is_ready_to_aspirate(pipette_id=pipette_id)).then_return(
         False
     )
+    decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(False)
 
     retry_location = Point(1, 2, 3)
     decoy.when(

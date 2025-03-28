@@ -15,7 +15,7 @@ import {
 import {
   DropdownStepFormField,
   ToggleExpandStepFormField,
-} from '../../../../../../molecules'
+} from '../../../../../../components/molecules'
 import { getModuleEntities } from '../../../../../../step-forms/selectors'
 import { getFormErrorsMappedToField, getFormLevelError } from '../../utils'
 
@@ -28,7 +28,7 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const moduleEntities = useSelector(getModuleEntities)
   const defaultEngageHeight = useSelector(getMagnetLabwareEngageHeight)
 
-  const moduleModel = moduleEntities[formData.moduleId].model
+  const moduleModel = moduleEntities[formData.moduleId]?.model
 
   const mmUnits = t('units.millimeter')
   const isGen1 = moduleModel === MAGNETIC_MODULE_V1
@@ -54,14 +54,19 @@ export function MagnetTools(props: StepFormProps): JSX.Element {
   const mappedErrorsToField = getFormErrorsMappedToField(visibleFormErrors)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingY={SPACING.spacing16}
+      gridGap={SPACING.spacing12}
+    >
       <DropdownStepFormField
         {...propsForFields.moduleId}
         options={moduleLabwareOptions}
         title={t('protocol_steps:module')}
+        errorToShow={getFormLevelError('moduleId', mappedErrorsToField)}
       />
       <Divider marginY="0" />
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing16}>
         <ToggleExpandStepFormField
           {...propsForFields.engageHeight}
           toggleValue={propsForFields.magnetAction.value}

@@ -86,14 +86,14 @@ describe('ApplicationSection', () => {
 
     const leftMount = screen.getAllByText('Choose pipette')[0]
     fireEvent.click(leftMount)
-    fireEvent.click(screen.getByText('Flex 1-Channel 50 μL'))
+    fireEvent.click(screen.getByText('Flex 1-Channel 50 µL'))
 
     const rightMount = screen.getByText('Choose pipette')
     fireEvent.click(rightMount)
     fireEvent.click(screen.getByText('None'))
 
     await waitFor(() => {
-      expect(screen.getByText('Flex 1-Channel 50 μL')).toBeInTheDocument()
+      expect(screen.getByText('Flex 1-Channel 50 µL')).toBeInTheDocument()
     })
     expect(screen.getByText('None')).toBeInTheDocument()
 
@@ -129,11 +129,11 @@ describe('ApplicationSection', () => {
 
     const leftMount = screen.getAllByText('Choose pipette')[0]
     fireEvent.click(leftMount)
-    fireEvent.click(screen.getByText('Flex 1-Channel 50 μL'))
+    fireEvent.click(screen.getByText('Flex 1-Channel 50 µL'))
 
     const rightMount = screen.getByText('Choose pipette')
     fireEvent.click(rightMount)
-    fireEvent.click(screen.getByText('Flex 8-Channel 50 μL'))
+    fireEvent.click(screen.getByText('Flex 8-Channel 50 µL'))
 
     await waitFor(() => {
       expect(screen.getByText('form is valid')).toBeInTheDocument()

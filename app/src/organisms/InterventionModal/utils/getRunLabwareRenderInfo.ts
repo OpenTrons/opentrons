@@ -38,7 +38,7 @@ export function getRunLabwareRenderInfo(
         return acc
       }
 
-      if (location !== 'offDeck') {
+      if (location !== 'offDeck' && location !== 'systemLocation') {
         const slotName =
           'addressableAreaName' in location
             ? location.addressableAreaName

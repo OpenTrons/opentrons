@@ -64,7 +64,7 @@ function getLabwareCoordinates({
   loadedModules: LoadedModule[]
   loadedLabware: LoadedLabware[]
 }): Coordinates | null {
-  if (location === 'offDeck') {
+  if (location === 'offDeck' || location === 'systemLocation') {
     return null
   } else if ('labwareId' in location) {
     const loadedAdapter = loadedLabware.find(l => l.id === location.labwareId)
@@ -73,6 +73,7 @@ function getLabwareCoordinates({
 
     if (
       loadedAdapterLocation === 'offDeck' ||
+      loadedAdapterLocation === 'systemLocation' ||
       'labwareId' in loadedAdapterLocation
     )
       return null
@@ -159,6 +160,7 @@ export function MoveLabwareOnDeck(
 
   const initialSlotId =
     initialLabwareLocation === 'offDeck' ||
+    initialLabwareLocation === 'systemLocation' ||
     !('slotName' in initialLabwareLocation)
       ? deckDef.locations.addressableAreas[1].id
       : initialLabwareLocation.slotName

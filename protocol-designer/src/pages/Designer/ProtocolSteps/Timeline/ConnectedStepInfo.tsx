@@ -19,7 +19,7 @@ import {
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-} from '../../../../organisms'
+} from '../../../../components/organisms'
 import { stepIconsByType } from '../../../../form-types'
 import {
   hoverOnStep,
@@ -42,7 +42,7 @@ import type {
 } from '../../../../ui/steps'
 import type { StepIdType } from '../../../../form-types'
 import type { BaseState, ThunkAction } from '../../../../types'
-import type { DeleteModalType } from '../../../../organisms'
+import type { DeleteModalType } from '../../../../components/organisms'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
@@ -62,7 +62,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     setOpenedOverflowMenuId,
     sidebarWidth,
   } = props
-  const { t } = useTranslation('application')
+  const { i18n, t } = useTranslation('application')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const stepIds = useSelector(getOrderedStepIds)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
@@ -227,7 +227,8 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         onMouseEnter={highlightStep}
         iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
         title={`${stepNumber}. ${
-          step.stepName || t(`stepType.${step.stepType}`)
+          i18n.format(step.stepName, 'titleCase') ||
+          t(`stepType.${step.stepType}`)
         }`}
         dragHovered={dragHovered}
         sidebarWidth={sidebarWidth}

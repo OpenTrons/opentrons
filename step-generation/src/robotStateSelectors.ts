@@ -1,15 +1,18 @@
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
 import min from 'lodash/min'
 import {
-  getTiprackVolume,
-  getLabwareDefURI,
-  THERMOCYCLER_MODULE_TYPE,
-  orderWells,
-  COLUMN,
+  ABSORBANCE_READER_TYPE,
   ALL,
+  COLUMN,
+  getLabwareDefURI,
+  getTiprackVolume,
+  orderWells,
+  THERMOCYCLER_MODULE_TYPE,
+  SINGLE,
 } from '@opentrons/shared-data'
 import { COLUMN_4_SLOTS } from './constants'
 import type {
+  AbsorbanceReaderState,
   InvariantContext,
   ModuleTemporalProperties,
   RobotState,
@@ -60,7 +63,7 @@ export function _getNextTip(args: {
   const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
-  if (pipetteChannels === 1) {
+  if (pipetteChannels === 1 || nozzles === SINGLE) {
     const well = orderedWells.find(hasTip)
     return well || null
   }
@@ -229,6 +232,17 @@ export const thermocyclerStateGetter = (
 ): ThermocyclerModuleState | null => {
   const hardwareModule = robotState.modules[moduleId]?.moduleState
   return hardwareModule && hardwareModule.type === THERMOCYCLER_MODULE_TYPE
+    ? hardwareModule
+    : null
+}
+
+// TODO: refactor this and above utility into one
+export const absorbanceReaderStateGetter = (
+  robotState: RobotState,
+  moduleId: string
+): AbsorbanceReaderState | null => {
+  const hardwareModule = robotState.modules[moduleId]?.moduleState
+  return hardwareModule && hardwareModule.type === ABSORBANCE_READER_TYPE
     ? hardwareModule
     : null
 }

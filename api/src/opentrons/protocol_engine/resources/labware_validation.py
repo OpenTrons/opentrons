@@ -1,7 +1,9 @@
 """Validation file for labware role and location checking functions."""
 
-from opentrons_shared_data.labware.labware_definition import LabwareRole
-from opentrons.protocols.models import LabwareDefinition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareRole,
+)
 
 
 def is_flex_trash(load_name: str) -> bool:
@@ -14,9 +16,9 @@ def is_absorbance_reader_lid(load_name: str) -> bool:
     return load_name == "opentrons_flex_lid_absorbance_plate_reader_module"
 
 
-def is_evotips(load_name: str) -> bool:
-    """Check if a labware is an evotips tiprack."""
-    return load_name == "evotips_opentrons_96_labware"
+def is_lid_stack(load_name: str) -> bool:
+    """Check if a labware object is a system lid stack object."""
+    return load_name == "protocol_engine_lid_stack_object"
 
 
 def validate_definition_is_labware(definition: LabwareDefinition) -> bool:

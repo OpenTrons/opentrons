@@ -7,8 +7,8 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
 } from '../fixtures'
+import type { DropTipInPlaceParams } from '@opentrons/shared-data'
 import type { RobotState, InvariantContext } from '../types'
-import type { DropTipInPlaceArgs } from '../commandCreators/atomic/dropTipInPlace'
 
 const p300SingleId = DEFAULT_PIPETTE
 
@@ -26,7 +26,7 @@ describe('dropTipInPlace', () => {
     initialRobotState.tipState.pipettes = {
       [p300SingleId]: true,
     }
-    const params: DropTipInPlaceArgs = {
+    const params: DropTipInPlaceParams = {
       pipetteId: DEFAULT_PIPETTE,
     }
     const result = dropTipInPlace(params, invariantContext, robotStateWithTip)

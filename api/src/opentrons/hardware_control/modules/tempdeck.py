@@ -195,9 +195,13 @@ class TempDeck(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> types.LiveData:
+        data: types.TemperatureModuleData = {
+            "currentTemp": self.temperature,
+            "targetTemp": self.target,
+        }
         return {
             "status": self.status,
-            "data": {"currentTemp": self.temperature, "targetTemp": self.target},
+            "data": data,
         }
 
     @property

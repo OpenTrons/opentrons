@@ -10,6 +10,7 @@ from opentrons.hardware_control.modules import (
     MagneticStatus,
     TemperatureStatus,
     HeaterShakerStatus,
+    types as hc_types,
 )
 
 
@@ -174,22 +175,21 @@ def test_maps_magnetic_module_data(
     ],
 )
 @pytest.mark.parametrize(
-    "input_data",
+    "status,data",
     [
-        {"status": "idle", "data": {"currentTemp": 42.0, "targetTemp": None}},
-        {
-            "status": "holding at target",
-            "data": {"currentTemp": 84.0, "targetTemp": 84.0},
-        },
+        ("idle", {"currentTemp": 42.0, "targetTemp": None}),
+        ("holding at target", {"currentTemp": 84.0, "targetTemp": 84.0}),
     ],
 )
 def test_maps_temperature_module_data(
     input_model: str,
     deck_type: DeckType,
     expected_compatible: bool,
-    input_data: LiveData,
+    status: str,
+    data: hc_types.TemperatureModuleData,
 ) -> None:
     """It should map hardware data to a magnetic module."""
+    input_data: LiveData = {"status": status, "data": data}
     module_identity = ModuleIdentity(
         module_id="module-id",
         serial_number="serial-number",
@@ -236,9 +236,9 @@ def test_maps_temperature_module_data(
         ),
         moduleOffset=ModuleCalibrationData(offset=Vec3f(x=0.0, y=0.0, z=0.0)),
         data=TemperatureModuleData(
-            status=TemperatureStatus(input_data["status"]),
-            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]
-            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]
+            status=TemperatureStatus(status),
+            currentTemperature=data["currentTemp"],
+            targetTemperature=data["targetTemp"],
         ),
     )
 
@@ -253,11 +253,11 @@ def test_maps_temperature_module_data(
     ],
 )
 @pytest.mark.parametrize(
-    "input_data",
+    "status,data",
     [
-        {
-            "status": "idle",
-            "data": {
+        (
+            "idle",
+            {
                 "lid": "open",
                 "lidTarget": None,
                 "lidTemp": None,
@@ -271,10 +271,10 @@ def test_maps_temperature_module_data(
                 "currentStepIndex": None,
                 "totalStepCount": None,
             },
-        },
-        {
-            "status": "heating",
-            "data": {
+        ),
+        (
+            "heating",
+            {
                 "lid": "open",
                 "lidTarget": 1,
                 "lidTemp": 2,
@@ -288,16 +288,18 @@ def test_maps_temperature_module_data(
                 "currentStepIndex": 9,
                 "totalStepCount": 10,
             },
-        },
+        ),
     ],
 )
 def test_maps_thermocycler_module_data(
     input_model: str,
     deck_type: DeckType,
     expected_compatible: bool,
-    input_data: LiveData,
+    status: str,
+    data: hc_types.ThermocyclerData,
 ) -> None:
     """It should map hardware data to a magnetic module."""
+    input_data: LiveData = {"status": status, "data": data}
     module_identity = ModuleIdentity(
         module_id="module-id",
         serial_number="serial-number",
@@ -344,19 +346,19 @@ def test_maps_thermocycler_module_data(
         ),
         moduleOffset=ModuleCalibrationData(offset=Vec3f(x=0.0, y=0.0, z=0.0)),
         data=ThermocyclerModuleData(
-            status=TemperatureStatus(input_data["status"]),
-            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]
-            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]
-            lidStatus=input_data["data"]["lid"],  # type: ignore[arg-type]
-            lidTemperatureStatus=input_data["data"]["lidTempStatus"],  # type: ignore[arg-type]
-            lidTemperature=input_data["data"]["lidTemp"],  # type: ignore[arg-type]
-            lidTargetTemperature=input_data["data"]["lidTarget"],  # type: ignore[arg-type]
-            holdTime=input_data["data"]["holdTime"],  # type: ignore[arg-type]
-            rampRate=input_data["data"]["rampRate"],  # type: ignore[arg-type]
-            currentCycleIndex=input_data["data"]["currentCycleIndex"],  # type: ignore[arg-type]
-            totalCycleCount=input_data["data"]["totalCycleCount"],  # type: ignore[arg-type]
-            currentStepIndex=input_data["data"]["currentStepIndex"],  # type: ignore[arg-type]
-            totalStepCount=input_data["data"]["totalStepCount"],  # type: ignore[arg-type]
+            status=TemperatureStatus(status),
+            currentTemperature=data["currentTemp"],
+            targetTemperature=data["targetTemp"],
+            lidStatus=data["lid"],  # type: ignore[arg-type]
+            lidTemperatureStatus=data["lidTempStatus"],  # type: ignore[arg-type]
+            lidTemperature=data["lidTemp"],
+            lidTargetTemperature=data["lidTarget"],
+            holdTime=data["holdTime"],
+            rampRate=data["rampRate"],
+            currentCycleIndex=data["currentCycleIndex"],
+            totalCycleCount=data["totalCycleCount"],
+            currentStepIndex=data["currentStepIndex"],
+            totalStepCount=data["totalStepCount"],
         ),
     )
 
@@ -369,11 +371,11 @@ def test_maps_thermocycler_module_data(
     ],
 )
 @pytest.mark.parametrize(
-    "input_data",
+    "status,data",
     [
-        {
-            "status": "idle",
-            "data": {
+        (
+            "idle",
+            {
                 "temperatureStatus": "idle",
                 "speedStatus": "idle",
                 "labwareLatchStatus": "idle_open",
@@ -383,10 +385,10 @@ def test_maps_thermocycler_module_data(
                 "targetSpeed": None,
                 "errorDetails": None,
             },
-        },
-        {
-            "status": "running",
-            "data": {
+        ),
+        (
+            "running",
+            {
                 "temperatureStatus": "heating",
                 "speedStatus": "speeding up",
                 "labwareLatchStatus": "idle_closed",
@@ -396,13 +398,14 @@ def test_maps_thermocycler_module_data(
                 "targetSpeed": 9001,
                 "errorDetails": "oh no",
             },
-        },
+        ),
     ],
 )
 def test_maps_heater_shaker_module_data(
-    input_model: str, deck_type: DeckType, input_data: LiveData
+    input_model: str, deck_type: DeckType, status: str, data: hc_types.HeaterShakerData
 ) -> None:
     """It should map hardware data to a magnetic module."""
+    input_data: LiveData = {"status": status, "data": data}
     module_identity = ModuleIdentity(
         module_id="module-id",
         serial_number="serial-number",
@@ -449,14 +452,14 @@ def test_maps_heater_shaker_module_data(
         ),
         moduleOffset=ModuleCalibrationData(offset=Vec3f(x=0.0, y=0.0, z=0.0)),
         data=HeaterShakerModuleData(
-            status=HeaterShakerStatus(input_data["status"]),
-            labwareLatchStatus=input_data["data"]["labwareLatchStatus"],  # type: ignore[arg-type]
-            speedStatus=input_data["data"]["speedStatus"],  # type: ignore[arg-type]
-            currentSpeed=input_data["data"]["currentSpeed"],  # type: ignore[arg-type]
-            targetSpeed=input_data["data"]["targetSpeed"],  # type: ignore[arg-type]
-            temperatureStatus=input_data["data"]["temperatureStatus"],  # type: ignore[arg-type]
-            currentTemperature=input_data["data"]["currentTemp"],  # type: ignore[arg-type]
-            targetTemperature=input_data["data"]["targetTemp"],  # type: ignore[arg-type]
-            errorDetails=input_data["data"]["errorDetails"],  # type: ignore[arg-type]
+            status=HeaterShakerStatus(status),
+            labwareLatchStatus=data["labwareLatchStatus"],  # type: ignore[arg-type]
+            speedStatus=data["speedStatus"],  # type: ignore[arg-type]
+            currentSpeed=data["currentSpeed"],
+            targetSpeed=data["targetSpeed"],
+            temperatureStatus=data["temperatureStatus"],  # type: ignore[arg-type]
+            currentTemperature=data["currentTemp"],
+            targetTemperature=data["targetTemp"],
+            errorDetails=data["errorDetails"],
         ),
     )

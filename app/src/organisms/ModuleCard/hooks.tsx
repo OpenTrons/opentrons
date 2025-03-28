@@ -369,6 +369,15 @@ export function useModuleOverflowMenu(
         onClick: handleAboutClick,
       },
     ],
+    flexStackerModuleType: [
+      {
+        setSetting: t('overflow_menu_about'),
+        isSecondary: false,
+        isSettingDisabled: false,
+        menuButtons: [],
+        onClick: handleAboutClick,
+      },
+    ],
   }
 
   return {

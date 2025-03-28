@@ -171,10 +171,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
           <NavbarIcon name="gear" />
         </NavIconLink>
         <IconLink href={SALESFORCE_HELP_LINK} external>
-          <NavbarIcon
-            data-testid="Navbar_helpLink"
-            name="question-mark-circle"
-          />
+          <NavbarIcon data-testid="Navbar_helpLink" name="help" />
         </IconLink>
       </Flex>
     </Flex>

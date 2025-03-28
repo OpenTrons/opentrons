@@ -1,11 +1,12 @@
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
+import startCase from 'lodash/startCase'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { ALL, COLUMN } from '@opentrons/shared-data'
+import { SINGLE } from '@opentrons/shared-data'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import {
   getDisabledFields,
@@ -24,6 +25,7 @@ import type {
   StepFieldName,
   StepType,
   PathOption,
+  HydratedFormData,
 } from '../../../../form-types'
 import type { FormError } from '../../../../steplist/formLevel'
 import type { NozzleType } from '../../../../types'
@@ -211,13 +213,17 @@ export function getLabwareFieldForPositioningField(
 ): StepFieldName {
   const fieldMap: Record<StepFieldName, StepFieldName> = {
     aspirate_mmFromBottom: 'aspirate_labware',
-    aspirate_touchTip_mmFromBottom: 'aspirate_labware',
+    aspirate_touchTip_mmFromTop: 'aspirate_labware',
     aspirate_delay_mmFromBottom: 'aspirate_labware',
     dispense_mmFromBottom: 'dispense_labware',
-    dispense_touchTip_mmFromBottom: 'dispense_labware',
+    dispense_touchTip_mmFromTop: 'dispense_labware',
     dispense_delay_mmFromBottom: 'dispense_labware',
     mix_mmFromBottom: 'labware',
-    mix_touchTip_mmFromBottom: 'labware',
+    mix_touchTip_mmFromTop: 'labware',
+    aspirate_retract_mmFromBottom: 'aspirate_labware',
+    dispense_retract_mmFromBottom: 'dispense_labware',
+    aspirate_submerge_mmFromBottom: 'aspirate_labware',
+    dispense_submerge_mmFromBottom: 'dispense_labware',
   }
   return fieldMap[name]
 }
@@ -227,12 +233,10 @@ export const getNozzleType = (
   nozzles: string | null
 ): NozzleType | null => {
   const is8Channel = pipette != null && pipette.spec.channels === 8
-  if (is8Channel) {
+  if (is8Channel && nozzles !== SINGLE) {
     return '8-channel'
-  } else if (nozzles === COLUMN) {
-    return COLUMN
-  } else if (nozzles === ALL) {
-    return ALL
+  } else if (nozzles != null) {
+    return nozzles as NozzleType
   } else {
     return null
   }
@@ -253,7 +257,7 @@ export const makeSingleEditFieldProps = (
   focusHandlers: FocusHandlers,
   formData: FormData,
   handleChangeFormInput: (name: string, value: unknown) => void,
-  hydratedForm: { [key: string]: any }, //  TODO: create real HydratedFormData type
+  hydratedForm: HydratedFormData,
   t: any
 ): FieldPropsByName => {
   const { dirtyFields, blur, focusedField, focus } = focusHandlers
@@ -338,6 +342,9 @@ export const getSaveStepSnackbarText = (
 }
 
 export const capitalizeFirstLetter = (stepName: string): string => {
+  // Note - this is a special case
+  if (stepName === 'absorbance plate reader') return startCase(stepName)
+
   // Note - check is for heater-shaker
   if (stepName.includes('-')) {
     return stepName
@@ -349,7 +356,7 @@ export const capitalizeFirstLetter = (stepName: string): string => {
   }
 }
 
-type ErrorMappedToField = Record<string, FormError>
+export type ErrorMappedToField = Record<string, FormError>
 
 export const getFormErrorsMappedToField = (
   formErrors: StepFormErrors

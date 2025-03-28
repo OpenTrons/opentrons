@@ -206,7 +206,9 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 
       border: ${buttonType === 'stroke'
         ? `2px solid ${COLORS.blue55}`
-        : `${computedBorderStyle()}`};
+        : buttonType === 'primary'
+        ? `4px solid ${COLORS.blue55}`
+        : computedBorderStyle()};
     }
 
     &:focus-visible {
@@ -217,14 +219,14 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
       color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .disabledBackgroundColor};
-      border: none;
+      border: 4px solid ${COLORS.grey35};
     }
 
     &[aria-disabled='true'] {
       color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType].disabledColor};
       background-color: ${LARGE_BUTTON_PROPS_BY_TYPE[buttonType]
         .disabledBackgroundColor};
-      border: none;
+      border: 4px solid ${COLORS.grey35};
     }
 
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
@@ -311,8 +313,8 @@ export function LargeButton(props: LargeButtonProps): JSX.Element {
 }
 
 const ICON_STYLE = css`
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 5rem;
     height: 5rem;

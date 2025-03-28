@@ -4,7 +4,7 @@ import logging
 import json
 import os
 from pathlib import Path
-from typing import Any, AnyStr, Dict, Optional, Union, List, Sequence, Literal
+from typing import Any, AnyStr, Dict, Mapping, Optional, Union, List, Sequence, Literal
 
 import jsonschema  # type: ignore
 
@@ -46,8 +46,8 @@ def get_labware_definition(
     load_name: str,
     namespace: Optional[str] = None,
     version: Optional[int] = None,
-    bundled_defs: Optional[Dict[str, LabwareDefinition]] = None,
-    extra_defs: Optional[Dict[str, LabwareDefinition]] = None,
+    bundled_defs: Optional[Mapping[str, LabwareDefinition]] = None,
+    extra_defs: Optional[Mapping[str, LabwareDefinition]] = None,
 ) -> LabwareDefinition:
     """
     Look up and return a definition by load_name + namespace + version and
@@ -154,8 +154,7 @@ def verify_definition(  # noqa: C901
     If the definition is invalid, an exception is raised; otherwise parse the
     json and return the valid definition.
 
-    :raises json.JsonDecodeError: If the definition is not valid json
-    :raises jsonschema.ValidationError: If the definition is not valid.
+    :raises NotALabwareError:
     :returns: The parsed definition
     """
     schemata_by_version = {
@@ -191,7 +190,7 @@ def verify_definition(  # noqa: C901
 
 
 def _get_labware_definition_from_bundle(
-    bundled_labware: Dict[str, LabwareDefinition],
+    bundled_labware: Mapping[str, LabwareDefinition],
     load_name: str,
     namespace: Optional[str] = None,
     version: Optional[int] = None,

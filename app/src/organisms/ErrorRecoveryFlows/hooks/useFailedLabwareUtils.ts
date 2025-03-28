@@ -8,15 +8,17 @@ import {
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
-
-import { ERROR_KINDS } from '../constants'
-import { getErrorKind } from '../utils'
 import {
   getLoadedLabware,
   getLabwareDisplayLocation,
-} from '/app/local-resources/labware'
+} from '@opentrons/components'
+import { ERROR_KINDS } from '../constants'
+import { getErrorKind } from '../utils'
 
-import type { WellGroup } from '@opentrons/components'
+import type {
+  DisplayLocationSlotOnlyParams,
+  WellGroup,
+} from '@opentrons/components'
 import type { CommandsData, PipetteData, Run } from '@opentrons/api-client'
 import type {
   LabwareDefinition2,
@@ -28,7 +30,6 @@ import type {
   MoveLabwareRunTimeCommand,
   LabwareLocation,
 } from '@opentrons/shared-data'
-import type { DisplayLocationSlotOnlyParams } from '/app/local-resources/labware'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 
@@ -286,7 +287,7 @@ export function getFailedCmdRelevantLabware(
   const failedLWURI = runRecord?.data.labware.find(
     labware => labware.id === recentRelevantFailedLabwareCmd?.params.labwareId
   )?.definitionUri
-  if (failedLWURI != null) {
+  if (failedLWURI != null && Object.keys(lwDefsByURI).includes(failedLWURI)) {
     return {
       name: getLabwareDisplayName(lwDefsByURI[failedLWURI]),
       nickname: labwareNickname,

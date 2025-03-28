@@ -8,9 +8,8 @@ Summary of changes from schema 4:
 
 from pathlib import Path
 from contextlib import ExitStack
-import shutil
 
-from ._util import add_column
+from ._util import add_column, copy_contents
 from ..database import sql_engine_ctx
 from ..file_and_directory_names import DB_FILE
 from ..tables import schema_5
@@ -21,11 +20,8 @@ class Migration4to5(Migration):  # noqa: D101
     def migrate(self, source_dir: Path, dest_dir: Path) -> None:
         """Migrate the persistence directory from schema 4 to 5."""
         # Copy over all existing directories and files to new version
-        for item in source_dir.iterdir():
-            if item.is_dir():
-                shutil.copytree(src=item, dst=dest_dir / item.name)
-            else:
-                shutil.copy(src=item, dst=dest_dir / item.name)
+        copy_contents(source_dir=source_dir, dest_dir=dest_dir)
+
         dest_db_file = dest_dir / DB_FILE
 
         # Append the new column to existing protocols in v4 database

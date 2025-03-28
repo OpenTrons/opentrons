@@ -105,3 +105,21 @@ export const getSlotInformation = (
     matchingLabwareFor4thColumn: matchingLabware,
   }
 }
+
+export const formatTime = (input: string): string => {
+  const timeParts = input.split(':')
+  if (timeParts.length === 3) {
+    const [hours, minutes, seconds] = timeParts
+    return [
+      hours.toString().padStart(2, '0'),
+      minutes.toString().padStart(2, '0'),
+      seconds.toString().padStart(2, '0'),
+    ].join(':')
+  } else {
+    const [minutes, seconds] = timeParts
+    return [
+      minutes.toString().padStart(2, '0'),
+      seconds.toString().padStart(2, '0'),
+    ].join(':')
+  }
+}

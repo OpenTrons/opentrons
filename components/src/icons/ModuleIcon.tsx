@@ -6,6 +6,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type { ModuleType } from '@opentrons/shared-data'
@@ -18,6 +19,7 @@ export type ModuleIconName =
   | 'ot-magnet-v2'
   | 'ot-thermocycler'
   | 'ot-absorbance'
+  | 'stacked'
 
 export const MODULE_ICON_NAME_BY_TYPE: {
   [type in ModuleType]: ModuleIconName
@@ -28,6 +30,7 @@ export const MODULE_ICON_NAME_BY_TYPE: {
   [MAGNETIC_MODULE_TYPE]: 'ot-magnet-v2',
   [THERMOCYCLER_MODULE_TYPE]: 'ot-thermocycler',
   [ABSORBANCE_READER_TYPE]: 'ot-absorbance',
+  [FLEX_STACKER_MODULE_TYPE]: 'stacked',
 }
 
 interface ModuleIconProps extends StyleProps {

@@ -1,4 +1,5 @@
 """Core module control interfaces."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -379,3 +380,45 @@ class AbstractAbsorbanceReaderCore(AbstractModuleCore):
     @abstractmethod
     def is_lid_on(self) -> bool:
         """Return True if the Absorbance Reader's lid is currently closed."""
+
+
+class AbstractFlexStackerCore(AbstractModuleCore):
+    """Core control interface for an attached Flex Stacker."""
+
+    MODULE_TYPE: ClassVar = ModuleType.FLEX_STACKER
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+
+    @abstractmethod
+    def retrieve(self) -> None:
+        """Release a labware from the hopper to the staging slot."""
+
+    @abstractmethod
+    def store(self) -> None:
+        """Store a labware in the stacker hopper."""
+
+    @abstractmethod
+    def fill(self, message: str, count: int | None) -> None:
+        """Pause the protocol to allow for filling the stacker."""
+
+    @abstractmethod
+    def empty(self, message: str) -> None:
+        """Pause the protocol to allow for emptying the stacker."""
+
+    @abstractmethod
+    def set_stored_labware(
+        self,
+        main_load_name: str,
+        main_namespace: str | None,
+        main_version: int | None,
+        lid_load_name: str | None,
+        lid_namespace: str | None,
+        lid_version: int | None,
+        adapter_load_name: str | None,
+        adapter_namespace: str | None,
+        adapter_version: int | None,
+        count: int | None,
+    ) -> None:
+        """Configure the kind of labware that the stacker stores."""

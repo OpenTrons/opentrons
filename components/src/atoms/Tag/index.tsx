@@ -2,13 +2,13 @@ import { css } from 'styled-components'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW, FLEX_MAX_CONTENT } from '../../styles'
-import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { Icon } from '../../icons'
-import { LegacyStyledText } from '../StyledText'
+import { StyledText } from '../StyledText'
 
 import type { IconName } from '../../icons'
 
-export type TagType = 'default' | 'interactive' | 'branded'
+export type TagType = 'default' | 'interactive' | 'branded' | 'onColor'
 
 export interface TagProps {
   /** Tag content */
@@ -40,6 +40,10 @@ const TAG_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.blue50,
     color: COLORS.white,
   },
+  onColor: {
+    backgroundColor: COLORS.white,
+    color: COLORS.black90,
+  },
 }
 
 export function Tag(props: TagProps): JSX.Element {
@@ -48,7 +52,7 @@ export function Tag(props: TagProps): JSX.Element {
   const DEFAULT_CONTAINER_STYLE = css`
     padding: ${SPACING.spacing2} ${SPACING.spacing8};
     border-radius: ${BORDERS.borderRadius4};
-    width: ${shrinkToContent ? FLEX_MAX_CONTENT : 'none'};
+    width: ${shrinkToContent ? FLEX_MAX_CONTENT : 'inherit'};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       border-radius: ${BORDERS.borderRadius8};
       padding: ${SPACING.spacing8} ${SPACING.spacing12};
@@ -67,18 +71,11 @@ export function Tag(props: TagProps): JSX.Element {
   `
 
   const ICON_STYLE = css`
-    width: 0.75rem;
-    height: 0.875rem;
+    width: ${SPACING.spacing16};
+    height: ${SPACING.spacing16};
     @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
-  `
-
-  const TEXT_STYLE = css`
-    ${TYPOGRAPHY.h3Regular}
-    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-      ${TYPOGRAPHY.bodyTextRegular}
+      width: ${SPACING.spacing24};
+      height: ${SPACING.spacing24};
     }
   `
 
@@ -103,7 +100,9 @@ export function Tag(props: TagProps): JSX.Element {
           css={ICON_STYLE}
         />
       ) : null}
-      <LegacyStyledText css={TEXT_STYLE}>{text}</LegacyStyledText>
+      <StyledText desktopStyle="bodyDefaultRegular" oddStyle="bodyTextRegular">
+        {text}
+      </StyledText>
       {iconName != null && iconPosition === 'right' ? (
         <Icon
           name={iconName}

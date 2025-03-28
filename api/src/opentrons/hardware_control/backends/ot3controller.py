@@ -216,6 +216,7 @@ from .types import HWStopCondition
 from .flex_protocol import FlexBackend
 from .status_bar_state import StatusBarStateController
 from opentrons_hardware.sensors.types import SensorDataType
+from opentrons_hardware.sensors.utils import send_evo_dispense_count_increase
 
 log = logging.getLogger(__name__)
 
@@ -1397,7 +1398,11 @@ class OT3Controller(FlexBackend):
             return
 
         if hasattr(self, "_event_watcher"):
-            if loop.is_running() and self._event_watcher:
+            if (
+                loop.is_running()
+                and self._event_watcher
+                and not self._event_watcher.closed
+            ):
                 self._event_watcher.close()
 
         messenger = getattr(self, "_messenger", None)
@@ -1824,3 +1829,9 @@ class OT3Controller(FlexBackend):
         """This is something we only use in the simulator.
         It is required so that PE simulations using ot3api don't break."""
         pass
+
+    async def increase_evo_disp_count(self, mount: OT3Mount) -> None:
+        """Tell a pipette to increase it's evo-tip-dispense-count in eeprom."""
+        await send_evo_dispense_count_increase(
+            self._messenger, sensor_node_for_pipette(OT3Mount(mount.value))
+        )

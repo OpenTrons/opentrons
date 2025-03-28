@@ -38,7 +38,11 @@ export function getLabwareSetupItemGroups(
         if (definition == null) return acc
         let moduleModel = null
         let moduleLocation = null
-        if (location !== 'offDeck' && 'moduleId' in location) {
+        if (
+          location !== 'offDeck' &&
+          location !== 'systemLocation' &&
+          'moduleId' in location
+        ) {
           const loadModuleCommand = commands.find(
             (c): c is LoadModuleRunTimeCommand =>
               c.commandType === 'loadModule' &&

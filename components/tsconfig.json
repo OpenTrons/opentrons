@@ -2,7 +2,13 @@
   "extends": "../tsconfig-base.json",
   "references": [
     {
+      "path": "./tsconfig-data.json"
+    },
+    {
       "path": "../shared-data"
+    },
+    {
+      "path": "../step-generation"
     }
   ],
   "compilerOptions": {

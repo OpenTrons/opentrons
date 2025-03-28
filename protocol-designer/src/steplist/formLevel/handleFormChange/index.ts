@@ -1,3 +1,4 @@
+import { dependentFieldsUpdateAbsorbanceReader } from './dependentFieldsUpdateAbsorbanceReader'
 import { dependentFieldsUpdateMoveLiquid } from './dependentFieldsUpdateMoveLiquid'
 import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
 import { dependentFieldsUpdateMagnet } from './dependentFieldsUpdateMagnet'
@@ -70,6 +71,14 @@ export function handleFormChange(
 
   if (rawForm.stepType === 'pause') {
     const dependentFieldsPatch = dependentFieldsUpdatePause(patch, rawForm)
+    return { ...patch, ...dependentFieldsPatch }
+  }
+
+  if (rawForm.stepType === 'absorbanceReader') {
+    const dependentFieldsPatch = dependentFieldsUpdateAbsorbanceReader(
+      patch,
+      rawForm
+    )
     return { ...patch, ...dependentFieldsPatch }
   }
 

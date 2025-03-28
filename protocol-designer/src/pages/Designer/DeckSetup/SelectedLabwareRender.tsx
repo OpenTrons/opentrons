@@ -1,4 +1,4 @@
-import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../organisms'
+import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
 import { LabwareLabel } from '../LabwareLabel'
 import { LabwareRenderOnDeck } from './LabwareRenderOnDeck'
 import type { DeckLabelProps } from '@opentrons/components'
@@ -16,6 +16,7 @@ interface SelectedLabwareRenderProps {
   hoveredLabware: string | null
   labwareOnDeck?: LabwareOnDeck
   nestedLabwareInfo?: DeckLabelProps[] | undefined
+  showLabel?: boolean
 }
 export function SelectedLabwareRender(
   props: SelectedLabwareRenderProps
@@ -27,6 +28,7 @@ export function SelectedLabwareRender(
     moduleModel,
     hoveredLabware,
     nestedLabwareInfo,
+    showLabel = true,
   } = props
 
   return (labwareOnDeck != null || labwareDef != null) &&
@@ -48,9 +50,9 @@ export function SelectedLabwareRender(
           labwareOnDeck={labwareOnDeck}
         />
       ) : null}
-      {labwareDef != null ? (
+      {labwareDef != null && showLabel ? (
         <LabwareLabel
-          isLast={true}
+          isLast
           isSelected={true}
           labwareDef={labwareDef}
           position={slotPosition}

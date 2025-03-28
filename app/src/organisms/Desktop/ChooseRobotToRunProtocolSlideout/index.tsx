@@ -20,6 +20,7 @@ import {
   useUploadCsvFileMutation,
   ApiHostProvider,
 } from '@opentrons/react-api-client'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { OPENTRONS_USB } from '/app/redux/discovery'
@@ -33,7 +34,7 @@ import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOf
 import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
-import { useFeatureFlag } from '/app/redux/config'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import type { MouseEventHandler } from 'react'
 import type { StyleProps } from '@opentrons/components'
@@ -68,8 +69,9 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     setSelectedRobot,
   } = props
   const navigate = useNavigate()
-  const isNewLpc = useFeatureFlag('lpcRedesign')
-  const [shouldApplyOffsets, setShouldApplyOffsets] = useState<boolean>(true)
+  const isFlex =
+    useRobotType(selectedRobot?.displayName ?? '') === FLEX_ROBOT_TYPE
+  const [shouldApplyOffsets, setShouldApplyOffsets] = useState<boolean>(isFlex)
   const {
     protocolKey,
     srcFileNames,
@@ -96,6 +98,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
 
   const offsetCandidates = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis,
+    isFlex,
     null
   )
 
@@ -221,7 +224,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     </PrimaryButton>
   )
 
-  const offsetsComponent = isNewLpc ? null : (
+  const offsetsComponent = isFlex ? null : (
     <LegacyApplyHistoricOffsets
       offsetCandidates={offsetCandidates}
       shouldApplyOffsets={shouldApplyOffsets}

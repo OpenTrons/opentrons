@@ -8,7 +8,6 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipRemovalError,
     UnsupportedHardwareCommand,
 )
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -37,12 +36,13 @@ from .config import Clearances
 from .disposal_locations import TrashBin, WasteChute
 from ._nozzle_layout import NozzleLayout
 from ._liquid import LiquidClass
+from ._transfer_liquid_validation import verify_and_normalize_transfer_args
 from . import labware, validation
-from ..config import feature_flags
 from ..protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
     TransferTipPolicyV2Type,
 )
+from ..protocol_engine.types.liquid_level_detection import LiquidTrackingType
 
 _DEFAULT_ASPIRATE_CLEARANCE = 1.0
 _DEFAULT_DISPENSE_CLEARANCE = 1.0
@@ -65,6 +65,7 @@ _PARTIAL_NOZZLE_CONFIGURATION_SINGLE_ROW_PARTIAL_COLUMN_ADDED_IN = APIVersion(2,
 """The version after which partial nozzle configurations of single, row, and partial column layouts became available."""
 _AIR_GAP_TRACKING_ADDED_IN = APIVersion(2, 22)
 """The version after which air gaps should be implemented with a separate call instead of an aspirate for better liquid volume tracking."""
+
 
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
 
@@ -166,6 +167,11 @@ class InstrumentContext(publisher.CommandPublisher):
     def default_speed(self, speed: float) -> None:
         self._core.set_default_speed(speed)
 
+    @requires_version(2, 21)
+    def get_minimum_liquid_sense_height(self) -> float:
+        """Get the minimum allowed height for liquid-level detection."""
+        return self._core.get_minimum_liquid_sense_height()
+
     @requires_version(2, 0)
     def aspirate(
         self,
@@ -226,7 +232,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         move_to_location: types.Location
         well: Optional[labware.Well] = None
-        is_meniscus: Optional[bool] = None
         last_location = self._get_last_location_by_api_version()
         try:
             target = validation.validate_location(
@@ -244,7 +249,7 @@ class InstrumentContext(publisher.CommandPublisher):
             raise ValueError(
                 "Trash Bin and Waste Chute are not acceptable location parameters for Aspirate commands."
             )
-        move_to_location, well, is_meniscus = self._handle_aspirate_target(
+        move_to_location, well, meniscus_tracking = self._handle_aspirate_target(
             target=target
         )
         if self.api_version >= APIVersion(2, 11):
@@ -266,6 +271,7 @@ class InstrumentContext(publisher.CommandPublisher):
             and self.liquid_presence_detection
             and self._core.nozzle_configuration_valid_for_lld()
             and self._core.get_current_volume() == 0
+            and self._core.get_has_clean_tip()
         ):
             self._raise_if_pressure_not_supported_by_pipette()
             self.require_liquid_presence(well=well)
@@ -287,13 +293,13 @@ class InstrumentContext(publisher.CommandPublisher):
                 rate=rate,
                 flow_rate=flow_rate,
                 in_place=target.in_place,
-                is_meniscus=is_meniscus,
+                meniscus_tracking=meniscus_tracking,
             )
 
         return self
 
     @requires_version(2, 0)
-    def dispense(  # noqa: C901
+    def dispense(
         self,
         volume: Optional[float] = None,
         location: Optional[
@@ -360,7 +366,10 @@ class InstrumentContext(publisher.CommandPublisher):
         :param push_out: Continue past the plunger bottom to help ensure all liquid
                          leaves the tip. Measured in µL. The default value is ``None``.
 
-                         See :ref:`push-out-dispense` for details.
+                         When not specified or set to ``None``, the plunger moves by a non-zero default amount.
+
+
+                         For a table of default values, see :ref:`push-out-dispense`.
         :type push_out: float
 
         :returns: This instance.
@@ -389,8 +398,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume, location if location else "current position", rate
             )
         )
-        well: Optional[labware.Well] = None
-        is_meniscus: Optional[bool] = None
         last_location = self._get_last_location_by_api_version()
 
         try:
@@ -404,29 +411,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 "aspirate) must previously have been called so the robot "
                 "knows where it is."
             ) from e
-
-        if isinstance(target, validation.WellTarget):
-            well = target.well
-            if target.location:
-                move_to_location = target.location
-                is_meniscus = target.location.is_meniscus
-            elif well.parent._core.is_fixed_trash():
-                move_to_location = target.well.top()
-            else:
-                move_to_location = target.well.bottom(
-                    z=self._well_bottom_clearances.dispense
-                )
-        if isinstance(target, validation.PointTarget):
-            move_to_location = target.location
-
-        if self.api_version >= APIVersion(2, 11) and not isinstance(
-            target, (TrashBin, WasteChute)
-        ):
-            instrument.validate_takes_liquid(
-                location=move_to_location,
-                reject_module=self.api_version >= APIVersion(2, 13),
-                reject_adapter=self.api_version >= APIVersion(2, 15),
-            )
 
         if self.api_version >= APIVersion(2, 16):
             c_vol = self._core.get_current_volume() if volume is None else volume
@@ -454,8 +438,20 @@ class InstrumentContext(publisher.CommandPublisher):
                     flow_rate=flow_rate,
                     in_place=False,
                     push_out=push_out,
+                    meniscus_tracking=None,
                 )
             return self
+
+        move_to_location, well, meniscus_tracking = self._handle_dispense_target(
+            target=target
+        )
+
+        if self.api_version >= APIVersion(2, 11):
+            instrument.validate_takes_liquid(
+                location=move_to_location,
+                reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
+            )
 
         with publisher.publish_context(
             broker=self.broker,
@@ -475,7 +471,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 flow_rate=flow_rate,
                 in_place=target.in_place,
                 push_out=push_out,
-                is_meniscus=is_meniscus,
+                meniscus_tracking=meniscus_tracking,
             )
 
         return self
@@ -756,18 +752,20 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance.
 
+        Both ``volume`` and ``height`` are optional, but if you want to specify only
+        ``height`` you must do it as a keyword argument:
+        ``pipette.air_gap(height=2)``. If you call ``air_gap`` with a single,
+        unnamed argument, it will always be interpreted as a volume.
+
         .. note::
 
-            Both ``volume`` and ``height`` are optional, but if you want to specify only
-            ``height`` you must do it as a keyword argument:
-            ``pipette.air_gap(height=2)``. If you call ``air_gap`` with a single,
-            unnamed argument, it will always be interpreted as a volume.
-
-        .. TODO: restore this as a note block for 2.22 docs
-           Before API version 2.22, this function was implemented as an aspirate, and
+           In API version 2.21 and earlier, this function was implemented as an aspirate, and
            dispensing into a well would add the air gap volume to the liquid tracked in
-           the well. At or above API version 2.22, air gap volume is not counted as liquid
+           the well. In API version 2.22 and later, air gap volume is not tracked as liquid
            when dispensing into a well.
+
+        .. versionchanged:: 2.22
+            No longer implemented as an aspirate.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("air_gap", self.name, self.mount)
@@ -1509,6 +1507,7 @@ class InstrumentContext(publisher.CommandPublisher):
         for cmd in plan:
             getattr(self, cmd["method"])(*cmd["args"], **cmd["kwargs"])
 
+    @requires_version(2, 23)
     def transfer_liquid(
         self,
         liquid_class: LiquidClass,
@@ -1520,96 +1519,195 @@ class InstrumentContext(publisher.CommandPublisher):
             labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
         ],
         new_tip: TransferTipPolicyV2Type = "once",
-        tip_drop_location: Optional[
+        trash_location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
-        ] = None,  # Maybe call this 'tip_drop_location' which is similar to PD
+        ] = None,
+        return_tip: bool = False,
+        visit_every_well: bool = False,
     ) -> InstrumentContext:
         """Transfer liquid from source to dest using the specified liquid class properties.
 
         TODO: Add args description.
-        """
-        if not feature_flags.allow_liquid_classes(
-            robot_type=RobotTypeEnum.robot_literal_to_enum(
-                self._protocol_core.robot_type
-            )
-        ):
-            raise NotImplementedError("This method is not implemented.")
 
-        flat_sources_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(
-            source
+        :meta private:
+        """
+        transfer_args = verify_and_normalize_transfer_args(
+            source=source,
+            dest=dest,
+            tip_policy=new_tip,
+            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            tip_racks=self._tip_racks,
+            nozzle_map=self._core.get_nozzle_map(),
+            target_all_wells=visit_every_well,
+            current_volume=self.current_volume,
+            trash_location=(
+                trash_location if trash_location is not None else self.trash_container
+            ),
         )
-        flat_dests_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(dest)
-        for well in flat_sources_list + flat_dests_list:
-            instrument.validate_takes_liquid(
-                location=well.top(),
-                reject_module=True,
-                reject_adapter=True,
-            )
-        if len(flat_sources_list) != len(flat_dests_list):
+        if len(transfer_args.sources_list) != len(transfer_args.destinations_list):
             raise ValueError(
                 "Sources and destinations should be of the same length in order to perform a transfer."
                 " To transfer liquid from one source to many destinations, use 'distribute_liquid',"
                 " to transfer liquid onto one destinations from many sources, use 'consolidate_liquid'."
             )
 
-        valid_new_tip = validation.ensure_new_tip_policy(new_tip)
-        if valid_new_tip == TransferTipPolicyV2.NEVER:
-            if self._last_tip_picked_up_from is None:
-                raise RuntimeError(
-                    "Pipette has no tip attached to perform transfer."
-                    " Either do a pick_up_tip beforehand or specify a new_tip parameter"
-                    " of 'once' or 'always'."
-                )
-            else:
-                tiprack = self._last_tip_picked_up_from.parent
-        else:
-            tiprack, well = labware.next_available_tip(
-                starting_tip=self.starting_tip,
-                tip_racks=self.tip_racks,
-                channels=self.active_channels,
-                nozzle_map=self._core.get_nozzle_map(),
-            )
-        if self.current_volume != 0:
-            raise RuntimeError(
-                "A transfer on a liquid class cannot start with liquid already in the tip."
-                " Ensure that all previously aspirated liquid is dispensed before starting"
-                " a new transfer."
-            )
-
-        _trash_location: Union[types.Location, labware.Well, TrashBin, WasteChute]
-        if tip_drop_location is None:
-            saved_trash = self.trash_container
-            if isinstance(saved_trash, labware.Labware):
-                _trash_location = saved_trash.wells()[0]
-            else:
-                _trash_location = saved_trash
-        else:
-            _trash_location = tip_drop_location
-
-        checked_trash_location = (
-            validation.ensure_valid_tip_drop_location_for_transfer_v2(
-                tip_drop_location=_trash_location
-            )
-        )
-        liquid_class_id = self._core.load_liquid_class(
-            liquid_class=liquid_class,
-            pipette_load_name=self.name,
-            tiprack_uri=tiprack.uri,
-        )
-
         self._core.transfer_liquid(
-            liquid_class_id=liquid_class_id,
+            liquid_class=liquid_class,
             volume=volume,
-            source=[well._core for well in flat_sources_list],
-            dest=[well._core for well in flat_dests_list],
-            new_tip=valid_new_tip,
+            source=[
+                (types.Location(types.Point(), labware=well), well._core)
+                for well in transfer_args.sources_list
+            ],
+            dest=[
+                (types.Location(types.Point(), labware=well), well._core)
+                for well in transfer_args.destinations_list
+            ],
+            new_tip=transfer_args.tip_policy,
+            tip_racks=[
+                (types.Location(types.Point(), labware=rack), rack._core)
+                for rack in transfer_args.tip_racks
+            ],
+            trash_location=transfer_args.trash_location,
+            return_tip=return_tip,
+        )
+        return self
+
+    @requires_version(2, 23)
+    def distribute_liquid(
+        self,
+        liquid_class: LiquidClass,
+        volume: float,
+        source: Union[labware.Well, Sequence[labware.Well]],
+        dest: Union[
+            labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
+        ],
+        new_tip: TransferTipPolicyV2Type = "once",
+        trash_location: Optional[
+            Union[types.Location, labware.Well, TrashBin, WasteChute]
+        ] = None,
+        return_tip: bool = False,
+        visit_every_well: bool = False,
+    ) -> InstrumentContext:
+        """
+        Distribute liquid from a single source to multiple destinations
+        using the specified liquid class properties.
+
+        TODO: Add args description.
+
+        :meta private:
+        """
+        transfer_args = verify_and_normalize_transfer_args(
+            source=source,
+            dest=dest,
+            tip_policy=new_tip,
+            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            tip_racks=self._tip_racks,
+            nozzle_map=self._core.get_nozzle_map(),
+            target_all_wells=visit_every_well,
+            current_volume=self.current_volume,
             trash_location=(
-                checked_trash_location._core
-                if isinstance(checked_trash_location, labware.Well)
-                else checked_trash_location
+                trash_location if trash_location is not None else self.trash_container
             ),
         )
+        if len(transfer_args.sources_list) != 1:
+            raise ValueError(
+                f"Source should be a single well (or resolve to a single transfer for multi-channel) "
+                f"but received {transfer_args.sources_list}."
+            )
+        if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
+            raise RuntimeError(
+                'Tip transfer policy "per source" incompatible with distribute.'
+            )
 
+        verified_source = transfer_args.sources_list[0]
+        self._core.distribute_liquid(
+            liquid_class=liquid_class,
+            volume=volume,
+            source=(
+                types.Location(types.Point(), labware=verified_source),
+                verified_source._core,
+            ),
+            dest=[
+                (types.Location(types.Point(), labware=well), well._core)
+                for well in transfer_args.destinations_list
+            ],
+            new_tip=transfer_args.tip_policy,
+            tip_racks=[
+                (types.Location(types.Point(), labware=rack), rack._core)
+                for rack in transfer_args.tip_racks
+            ],
+            trash_location=transfer_args.trash_location,
+            return_tip=return_tip,
+        )
+        return self
+
+    @requires_version(2, 23)
+    def consolidate_liquid(
+        self,
+        liquid_class: LiquidClass,
+        volume: float,
+        source: Union[
+            labware.Well, Sequence[labware.Well], Sequence[Sequence[labware.Well]]
+        ],
+        dest: Union[labware.Well, Sequence[labware.Well]],
+        new_tip: TransferTipPolicyV2Type = "once",
+        trash_location: Optional[
+            Union[types.Location, labware.Well, TrashBin, WasteChute]
+        ] = None,
+        return_tip: bool = False,
+        visit_every_well: bool = False,
+    ) -> InstrumentContext:
+        """
+        Consolidate liquid from multiple sources to a single destination
+        using the specified liquid class properties.
+
+        TODO: Add args description.
+
+        :meta private:
+        """
+        transfer_args = verify_and_normalize_transfer_args(
+            source=source,
+            dest=dest,
+            tip_policy=new_tip,
+            last_tip_picked_up_from=self._last_tip_picked_up_from,
+            tip_racks=self._tip_racks,
+            nozzle_map=self._core.get_nozzle_map(),
+            target_all_wells=visit_every_well,
+            current_volume=self.current_volume,
+            trash_location=(
+                trash_location if trash_location is not None else self.trash_container
+            ),
+        )
+        if len(transfer_args.destinations_list) != 1:
+            raise ValueError(
+                f"Destination should be a single well (or resolve to a single transfer for multi-channel) "
+                f"but received {transfer_args.destinations_list}."
+            )
+        if transfer_args.tip_policy == TransferTipPolicyV2.PER_SOURCE:
+            raise RuntimeError(
+                'Tip transfer policy "per source" incompatible with consolidate.'
+            )
+
+        verified_dest = transfer_args.destinations_list[0]
+        self._core.consolidate_liquid(
+            liquid_class=liquid_class,
+            volume=volume,
+            source=[
+                (types.Location(types.Point(), labware=well), well._core)
+                for well in transfer_args.sources_list
+            ],
+            dest=(
+                types.Location(types.Point(), labware=verified_dest),
+                verified_dest._core,
+            ),
+            new_tip=transfer_args.tip_policy,
+            tip_racks=[
+                (types.Location(types.Point(), labware=rack), rack._core)
+                for rack in transfer_args.tip_racks
+            ],
+            trash_location=transfer_args.trash_location,
+            return_tip=return_tip,
+        )
         return self
 
     @requires_version(2, 0)
@@ -1998,7 +2096,15 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 0)
     def name(self) -> str:
         """
-        The name string for the pipette (e.g., ``"p300_single"``).
+        The name string for the pipette.
+
+        From API version 2.15 to 2.22, this property returned an internal name for Flex
+        pipettes. (e.g., ``"p1000_single_flex"``).
+
+        .. TODO uncomment when 2.23 is ready
+          In API version 2.23 and later, this property returns the Python Protocol API
+          :ref:`load name <new-pipette-models>` of Flex pipettes (e.g.,
+          ``"flex_1channel_1000"``).
         """
         return self._core.get_pipette_name()
 
@@ -2411,7 +2517,7 @@ class InstrumentContext(publisher.CommandPublisher):
         self._core.liquid_probe_with_recovery(well._core, loc)
 
     @requires_version(2, 20)
-    def measure_liquid_height(self, well: labware.Well) -> float:
+    def measure_liquid_height(self, well: labware.Well) -> LiquidTrackingType:
         """Check the height of the liquid within a well.
 
         :returns: The height, in mm, of the liquid from the deck.
@@ -2422,8 +2528,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         self._raise_if_pressure_not_supported_by_pipette()
         loc = well.top()
-        height = self._core.liquid_probe_without_recovery(well._core, loc)
-        return height
+        return self._core.liquid_probe_without_recovery(well._core, loc)
 
     def _raise_if_configuration_not_supported_by_pipette(
         self, style: NozzleLayout
@@ -2448,24 +2553,41 @@ class InstrumentContext(publisher.CommandPublisher):
             )
 
     def _handle_aspirate_target(
-        self, target: validation.ValidTarget
-    ) -> tuple[types.Location, Optional[labware.Well], Optional[bool]]:
-        move_to_location: types.Location
-        well: Optional[labware.Well] = None
-        is_meniscus: Optional[bool] = None
+        self, target: Union[validation.WellTarget, validation.PointTarget]
+    ) -> tuple[
+        types.Location, Optional[labware.Well], Optional[types.MeniscusTrackingTarget]
+    ]:
         if isinstance(target, validation.WellTarget):
-            well = target.well
             if target.location:
-                move_to_location = target.location
-                is_meniscus = target.location.is_meniscus
+                return target.location, target.well, target.location.meniscus_tracking
 
             else:
-                move_to_location = target.well.bottom(
-                    z=self._well_bottom_clearances.aspirate
+                return (
+                    target.well.bottom(z=self._well_bottom_clearances.aspirate),
+                    target.well,
+                    None,
                 )
         if isinstance(target, validation.PointTarget):
-            move_to_location = target.location
-        return (move_to_location, well, is_meniscus)
+            return target.location, None, None
+
+    def _handle_dispense_target(
+        self, target: Union[validation.WellTarget, validation.PointTarget]
+    ) -> tuple[
+        types.Location, Optional[labware.Well], Optional[types.MeniscusTrackingTarget]
+    ]:
+        if isinstance(target, validation.WellTarget):
+            if target.location:
+                return target.location, target.well, target.location.meniscus_tracking
+            elif target.well.parent._core.is_fixed_trash():
+                return target.well.top(), target.well, None
+            else:
+                return (
+                    target.well.bottom(z=self._well_bottom_clearances.dispense),
+                    target.well,
+                    None,
+                )
+        if isinstance(target, validation.PointTarget):
+            return target.location, None, None
 
 
 class AutoProbeDisable:

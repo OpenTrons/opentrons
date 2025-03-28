@@ -112,6 +112,20 @@ class AbstractProtocol(
         ...
 
     @abstractmethod
+    def load_labware_to_flex_stacker_hopper(
+        self,
+        module_core: ModuleCoreType,
+        load_name: str,
+        quantity: int,
+        label: Optional[str],
+        namespace: Optional[str],
+        version: Optional[int],
+        lid: Optional[str],
+    ) -> None:
+        """Load one or more labware with or without a lid to the flex stacker hopper."""
+        ...
+
+    @abstractmethod
     def move_labware(
         self,
         labware_core: LabwareCoreType,
@@ -129,6 +143,25 @@ class AbstractProtocol(
         pick_up_offset: Optional[Tuple[float, float, float]],
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
+        ...
+
+    @abstractmethod
+    def move_lid(
+        self,
+        source_location: Union[DeckSlotName, StagingSlotName, LabwareCoreType],
+        new_location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            LabwareCoreType,
+            OffDeckType,
+            WasteChute,
+            TrashBin,
+        ],
+        use_gripper: bool,
+        pause_for_manual_move: bool,
+        pick_up_offset: Optional[Tuple[float, float, float]],
+        drop_offset: Optional[Tuple[float, float, float]],
+    ) -> LabwareCoreType | None:
         ...
 
     @abstractmethod

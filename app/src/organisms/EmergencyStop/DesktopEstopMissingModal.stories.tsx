@@ -2,7 +2,7 @@ import type * as React from 'react'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-import { configReducer } from '/app/redux/config/reducer'
+import { configReducer } from '../../redux/config/reducer'
 import { EstopMissingModal } from '.'
 
 import type { Store, StoreEnhancer } from 'redux'

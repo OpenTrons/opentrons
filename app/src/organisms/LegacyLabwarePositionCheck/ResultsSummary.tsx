@@ -1,5 +1,5 @@
-import { useMemo, Fragment } from 'react'
-import styled, { css } from 'styled-components'
+import { Fragment } from 'react'
+import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import isEqual from 'lodash/isEqual'
 import { useTranslation } from 'react-i18next'
@@ -7,9 +7,8 @@ import {
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
-  getVectorDifference,
-  getVectorSum,
   IDENTITY_VECTOR,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { NeedHelpLink } from '/app/molecules/OT2CalibrationNeedHelpLink'
 import {
@@ -29,17 +28,16 @@ import {
   SPACING,
   LegacyStyledText,
   TYPOGRAPHY,
+  getLabwareDefinitionsFromCommands,
   DIRECTION_ROW,
 } from '@opentrons/components'
-import { PythonLabwareOffsetSnippet } from '/app/molecules/PythonLabwareOffsetSnippet'
+import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
 import {
   getIsLabwareOffsetCodeSnippetsOn,
   getIsOnDevice,
 } from '/app/redux/config'
 import { SmallButton } from '/app/atoms/buttons'
-import { LabwareOffsetTabs } from '/app/organisms/LabwareOffsetTabs'
-import { getCurrentOffsetForLabwareInLocation } from '/app/transformations/analysis'
-import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
+import { LegacyLabwareOffsetTabs } from '/app/organisms/LegacyLabwareOffsetTabs'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 
 import type {
@@ -48,7 +46,7 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   LabwareOffset,
-  LabwareOffsetCreateData,
+  LegacyLabwareOffsetCreateData,
 } from '@opentrons/api-client'
 import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type { TFunction } from 'i18next'
@@ -60,9 +58,9 @@ interface ResultsSummaryProps extends ResultsSummaryStep {
   protocolData: CompletedProtocolAnalysis
   workingOffsets: WorkingOffset[]
   existingOffsets: LabwareOffset[]
-  handleApplyOffsets: (offsets: LabwareOffsetCreateData[]) => void
-  isApplyingOffsets: boolean
-  isDeletingMaintenanceRun: boolean
+  allAppliedOffsets: LegacyLabwareOffsetCreateData[]
+  onCloseClick: () => void
+  isDeletingMaintenanceRun?: boolean
 }
 export const ResultsSummary = (
   props: ResultsSummaryProps
@@ -70,83 +68,48 @@ export const ResultsSummary = (
   const { i18n, t } = useTranslation('labware_position_check')
   const {
     protocolData,
-    workingOffsets,
-    handleApplyOffsets,
-    existingOffsets,
-    isApplyingOffsets,
+    allAppliedOffsets,
+    onCloseClick,
     isDeletingMaintenanceRun,
   } = props
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
   )
-  const isSubmittingAndClosing = isApplyingOffsets || isDeletingMaintenanceRun
+  const isSubmittingAndClosing = isDeletingMaintenanceRun
   const isLabwareOffsetCodeSnippetsOn = useSelector(
     getIsLabwareOffsetCodeSnippetsOn
   )
   const isOnDevice = useSelector(getIsOnDevice)
 
-  const offsetsToApply = useMemo(() => {
-    return workingOffsets.map<LabwareOffsetCreateData>(
-      ({ initialPosition, finalPosition, labwareId, location }) => {
-        const definitionUri =
-          protocolData.labware.find(l => l.id === labwareId)?.definitionUri ??
-          null
-        if (
-          finalPosition == null ||
-          initialPosition == null ||
-          definitionUri == null
-        ) {
-          throw new Error(
-            `cannot create offset for labware with id ${labwareId}, in location ${JSON.stringify(
-              location
-            )}, with initial position ${String(
-              initialPosition
-            )}, and final position ${String(finalPosition)}`
-          )
-        }
-
-        const existingOffset =
-          getCurrentOffsetForLabwareInLocation(
-            existingOffsets,
-            definitionUri,
-            location
-          )?.vector ?? IDENTITY_VECTOR
-        const vector = getVectorSum(
-          existingOffset,
-          getVectorDifference(finalPosition, initialPosition)
-        )
-        return { definitionUri, location, vector }
-      }
-    )
-  }, [workingOffsets])
-
   const TableComponent = isOnDevice ? (
     <TerseOffsetTable
-      offsets={offsetsToApply}
+      offsets={allAppliedOffsets}
       labwareDefinitions={labwareDefinitions}
     />
   ) : (
     <OffsetTable
-      offsets={offsetsToApply}
+      offsets={allAppliedOffsets}
       labwareDefinitions={labwareDefinitions}
     />
   )
   const JupyterSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="jupyter"
-      labwareOffsets={offsetsToApply}
+      labwareOffsets={allAppliedOffsets}
       commands={protocolData?.commands ?? []}
       labware={protocolData?.labware ?? []}
       modules={protocolData?.modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
   const CommandLineSnippet = (
-    <PythonLabwareOffsetSnippet
+    <LabwareOffsetSnippet
       mode="cli"
-      labwareOffsets={offsetsToApply}
+      labwareOffsets={allAppliedOffsets}
       commands={protocolData?.commands ?? []}
       labware={protocolData?.labware ?? []}
       modules={protocolData?.modules ?? []}
+      robotType={OT2_ROBOT_TYPE}
     />
   )
 
@@ -157,24 +120,10 @@ export const ResultsSummary = (
       padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        maxHeight="20rem"
-        css={css`
-          overflow-y: ${OVERFLOW_AUTO};
-          &::-webkit-scrollbar {
-            width: 0.75rem;
-            background-color: transparent;
-          }
-          &::-webkit-scrollbar-thumb {
-            background: ${COLORS.grey50};
-            border-radius: 11px;
-          }
-        `}
-      >
+      <ScrollContainer flexDirection={DIRECTION_COLUMN} maxHeight="20rem">
         <Header>{t('new_labware_offset_data')}</Header>
         {isLabwareOffsetCodeSnippetsOn ? (
-          <LabwareOffsetTabs
+          <LegacyLabwareOffsetTabs
             TableComponent={TableComponent}
             JupyterComponent={JupyterSnippet}
             CommandLineComponent={CommandLineSnippet}
@@ -183,17 +132,14 @@ export const ResultsSummary = (
         ) : (
           TableComponent
         )}
-      </Flex>
+      </ScrollContainer>
       {isOnDevice ? (
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          onClick={() => {
-            handleApplyOffsets(offsetsToApply)
-          }}
-          buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
+          buttonText={i18n.format(t('complete'), 'capitalize')}
           iconName={isSubmittingAndClosing ? 'ot-spinner' : null}
           iconPlacement={isSubmittingAndClosing ? 'startIcon' : null}
-          disabled={isSubmittingAndClosing}
+          onClick={onCloseClick}
         />
       ) : (
         <Flex
@@ -204,12 +150,10 @@ export const ResultsSummary = (
         >
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
           <PrimaryButton
-            onClick={() => {
-              handleApplyOffsets(offsetsToApply)
-            }}
+            onClick={onCloseClick}
             disabled={isSubmittingAndClosing}
           >
-            <Flex>
+            <Flex alignItems={ALIGN_CENTER}>
               {isSubmittingAndClosing ? (
                 <Icon
                   size="1rem"
@@ -219,7 +163,7 @@ export const ResultsSummary = (
                 />
               ) : null}
               <LegacyStyledText>
-                {i18n.format(t('apply_offsets'), 'capitalize')}
+                {i18n.format(t('complete'), 'capitalize')}
               </LegacyStyledText>
             </Flex>
           </PrimaryButton>
@@ -262,8 +206,28 @@ const Header = styled.h1`
   }
 `
 
+const LeftRoundedTableDatum = styled(TableDatum)`
+  border-radius: ${BORDERS.borderRadius4} 0 0 ${BORDERS.borderRadius4};
+`
+
+const RightRoundedTableDatum = styled(TableDatum)`
+  border-radius: 0 ${BORDERS.borderRadius4} ${BORDERS.borderRadius4} 0;
+`
+
+const ScrollContainer = styled(Flex)`
+  overflow-y: ${OVERFLOW_AUTO};
+  &::-webkit-scrollbar {
+    width: 0.75rem;
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${COLORS.grey50};
+    border-radius: 11px;
+  }
+`
+
 interface OffsetTableProps {
-  offsets: LabwareOffsetCreateData[]
+  offsets: LegacyLabwareOffsetCreateData[]
   labwareDefinitions: LabwareDefinition2[]
 }
 
@@ -276,7 +240,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
         <tr>
           <TableHeader>{t('location')}</TableHeader>
           <TableHeader>{t('labware')}</TableHeader>
-          <TableHeader>{t('labware_offset_data')}</TableHeader>
+          <TableHeader>{t('legacy_labware_offset_data')}</TableHeader>
         </tr>
       </thead>
 
@@ -290,12 +254,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
 
           return (
             <TableRow key={index}>
-              <TableDatum
-                css={`
-                  border-radius: ${BORDERS.borderRadius4} 0 0
-                    ${BORDERS.borderRadius4};
-                `}
-              >
+              <LeftRoundedTableDatum>
                 <LegacyStyledText
                   as="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -307,16 +266,11 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                     i18n
                   )}
                 </LegacyStyledText>
-              </TableDatum>
+              </LeftRoundedTableDatum>
               <TableDatum>
                 <LegacyStyledText as="p">{labwareDisplayName}</LegacyStyledText>
               </TableDatum>
-              <TableDatum
-                css={`
-                  border-radius: 0 ${BORDERS.borderRadius4}
-                    ${BORDERS.borderRadius4} 0;
-                `}
-              >
+              <RightRoundedTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
                   <LegacyStyledText>{t('no_labware_offsets')}</LegacyStyledText>
                 ) : (
@@ -338,7 +292,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                     ))}
                   </Flex>
                 )}
-              </TableDatum>
+              </RightRoundedTableDatum>
             </TableRow>
           )
         })}

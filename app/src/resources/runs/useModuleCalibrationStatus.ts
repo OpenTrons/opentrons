@@ -2,6 +2,7 @@ import omitBy from 'lodash/omitBy'
 import {
   MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useModuleRenderInfoForProtocolById } from './useModuleRenderInfoForProtocolById'
@@ -17,7 +18,8 @@ export function useModuleCalibrationStatus(
     useModuleRenderInfoForProtocolById(runId),
     moduleRenderInfo =>
       moduleRenderInfo.moduleDef.moduleType === MAGNETIC_BLOCK_TYPE ||
-      moduleRenderInfo.moduleDef.moduleType === ABSORBANCE_READER_TYPE
+      moduleRenderInfo.moduleDef.moduleType === ABSORBANCE_READER_TYPE ||
+      moduleRenderInfo.moduleDef.moduleType === FLEX_STACKER_MODULE_TYPE
   )
 
   // only check module calibration for Flex

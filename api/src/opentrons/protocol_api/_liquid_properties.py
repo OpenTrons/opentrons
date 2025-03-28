@@ -83,7 +83,10 @@ class LiquidHandlingPropertyByVolume:
         )
 
 
-@dataclass
+# We use slots for this dataclass (and the rest of liquid properties) to prevent dynamic creation of attributes
+# not defined in the class, not for any performance reasons. This is so that mistyping properties when overriding
+# values will cause the protocol to fail analysis, rather than silently passing.
+@dataclass(slots=True)
 class DelayProperties:
 
     _enabled: bool
@@ -118,7 +121,7 @@ class DelayProperties:
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class TouchTipProperties:
 
     _enabled: bool
@@ -157,7 +160,7 @@ class TouchTipProperties:
     @mm_to_edge.setter
     def mm_to_edge(self, new_mm: float) -> None:
         validated_mm = validation.ensure_float(new_mm)
-        self._z_offset = validated_mm
+        self._mm_to_edge = validated_mm
 
     @property
     def speed(self) -> Optional[float]:
@@ -165,7 +168,7 @@ class TouchTipProperties:
 
     @speed.setter
     def speed(self, new_speed: float) -> None:
-        validated_speed = validation.ensure_positive_float(new_speed)
+        validated_speed = validation.ensure_greater_than_zero_float(new_speed)
         self._speed = validated_speed
 
     def _get_shared_data_params(self) -> Optional[SharedDataTouchTipParams]:
@@ -190,7 +193,7 @@ class TouchTipProperties:
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class MixProperties:
 
     _enabled: bool
@@ -223,7 +226,7 @@ class MixProperties:
 
     @volume.setter
     def volume(self, new_volume: float) -> None:
-        validated_volume = validation.ensure_positive_float(new_volume)
+        validated_volume = validation.ensure_greater_than_zero_float(new_volume)
         self._volume = validated_volume
 
     def _get_shared_data_params(self) -> Optional[SharedDataMixParams]:
@@ -243,7 +246,7 @@ class MixProperties:
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class BlowoutProperties:
 
     _enabled: bool
@@ -277,7 +280,7 @@ class BlowoutProperties:
 
     @flow_rate.setter
     def flow_rate(self, new_flow_rate: float) -> None:
-        validated_flow_rate = validation.ensure_positive_float(new_flow_rate)
+        validated_flow_rate = validation.ensure_greater_than_zero_float(new_flow_rate)
         self._flow_rate = validated_flow_rate
 
     def _get_shared_data_params(self) -> Optional[SharedDataBlowoutParams]:
@@ -297,7 +300,7 @@ class BlowoutProperties:
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class SubmergeRetractCommon:
 
     _position_reference: PositionReference
@@ -336,10 +339,8 @@ class SubmergeRetractCommon:
         return self._delay
 
 
-@dataclass
+@dataclass(slots=True)
 class Submerge(SubmergeRetractCommon):
-    ...
-
     def as_shared_data_model(self) -> SharedDataSubmerge:
         return SharedDataSubmerge(
             positionReference=self._position_reference,
@@ -349,7 +350,7 @@ class Submerge(SubmergeRetractCommon):
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class RetractAspirate(SubmergeRetractCommon):
 
     _air_gap_by_volume: LiquidHandlingPropertyByVolume
@@ -374,7 +375,7 @@ class RetractAspirate(SubmergeRetractCommon):
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class RetractDispense(SubmergeRetractCommon):
 
     _air_gap_by_volume: LiquidHandlingPropertyByVolume
@@ -405,7 +406,7 @@ class RetractDispense(SubmergeRetractCommon):
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class BaseLiquidHandlingProperties:
 
     _submerge: Submerge
@@ -449,7 +450,7 @@ class BaseLiquidHandlingProperties:
         return self._delay
 
 
-@dataclass
+@dataclass(slots=True)
 class AspirateProperties(BaseLiquidHandlingProperties):
 
     _retract: RetractAspirate
@@ -487,7 +488,7 @@ class AspirateProperties(BaseLiquidHandlingProperties):
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class SingleDispenseProperties(BaseLiquidHandlingProperties):
 
     _retract: RetractDispense
@@ -520,7 +521,7 @@ class SingleDispenseProperties(BaseLiquidHandlingProperties):
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class MultiDispenseProperties(BaseLiquidHandlingProperties):
 
     _retract: RetractDispense
@@ -553,7 +554,7 @@ class MultiDispenseProperties(BaseLiquidHandlingProperties):
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class TransferProperties:
     _aspirate: AspirateProperties
     _dispense: SingleDispenseProperties

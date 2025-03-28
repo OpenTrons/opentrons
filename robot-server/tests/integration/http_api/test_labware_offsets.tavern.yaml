@@ -12,11 +12,17 @@ stages:
       json:
         data:
           definitionUri: definitionUri1
-          location:
-            slotName: A1
-            definitionUri: testNamespace/testLoadName/123
-            moduleModel: thermocyclerModuleV2
-          vector: { x: 1, y: 1, z: 1 }
+          locationSequence:
+            - kind: onLabware
+              labwareUri: testNamespace/testLoadName/123
+            - kind: onModule
+              moduleModel: thermocyclerModuleV2
+            - kind: onAddressableArea
+              addressableAreaName: A1
+          vector:
+            x: 1
+            y: 1
+            z: 1
     response:
       status_code: 201
       json:
@@ -24,11 +30,17 @@ stages:
           id: !anystr
           createdAt: !anystr
           definitionUri: definitionUri1
-          location:
-            slotName: A1
-            definitionUri: testNamespace/testLoadName/123
-            moduleModel: thermocyclerModuleV2
-          vector: { x: 1, y: 1, z: 1 }
+          locationSequence:
+            - kind: onLabware
+              labwareUri: testNamespace/testLoadName/123
+            - kind: onModule
+              moduleModel: thermocyclerModuleV2
+            - kind: onAddressableArea
+              addressableAreaName: A1
+          vector:
+            x: 1
+            y: 1
+            z: 1
       save:
         json:
           offset_1_data: data
@@ -41,9 +53,13 @@ stages:
       json:
         data:
           definitionUri: definitionUri2
-          location:
-            slotName: A2
-          vector: { x: 2, y: 2, z: 2 }
+          locationSequence:
+            - kind: onAddressableArea
+              addressableAreaName: A2
+          vector:
+            x: 2
+            y: 2
+            z: 2
     response:
       status_code: 201
       save:
@@ -57,9 +73,13 @@ stages:
       json:
         data:
           definitionUri: definitionUri3
-          location:
-            slotName: A3
-          vector: { x: 3, y: 3, z: 3 }
+          locationSequence:
+            - kind: onAddressableArea
+              addressableAreaName: A3
+          vector:
+            x: 3
+            y: 3
+            z: 3
     response:
       status_code: 201
       save:
@@ -81,10 +101,16 @@ stages:
           totalLength: 3
 
   # Just a basic test here. More complicated tests for the filters belong in the unit tests.
-  - name: Test getting labware offsets with a filter
+  - name: Test searching for labware offsets with a filter
     request:
-      url: '{ot3_server_base_url}/labwareOffsets?locationSlotName=A2'
-      method: GET
+      url: '{ot3_server_base_url}/labwareOffsets/searches'
+      method: POST
+      json:
+        data:
+          filters:
+            - locationSequence:
+                - kind: onAddressableArea
+                  addressableAreaName: A2
     response:
       json:
         data:
@@ -92,6 +118,23 @@ stages:
         meta:
           cursor: 0
           totalLength: 1
+
+  # This behavior, as opposed to returning all results, is beneficial for edge cases
+  # like protocols without any labware. The client can naively search for all the
+  # labware in the protocol (an empty list) without accidentally blowing up the server.
+  - name: Test that an empty search query returns no results
+    request:
+      url: '{ot3_server_base_url}/labwareOffsets/searches'
+      method: POST
+      json:
+        data:
+          filters: []
+    response:
+      json:
+        data: []
+        meta:
+          cursor: 0
+          totalLength: 0
 
   - name: Delete a labware offset
     request:
@@ -129,3 +172,85 @@ stages:
         meta:
           cursor: 0
           totalLength: 0
+
+---
+test_name: Test POSTing multiple offsets in a single request
+
+marks:
+  - usefixtures:
+      - ot3_server_base_url
+
+stages:
+  - name: POST multiple offsets and check the response
+    request:
+      method: POST
+      url: '{ot3_server_base_url}/labwareOffsets'
+      json:
+        data:
+          - definitionUri: testNamespace/loadName1/1
+            locationSequence:
+              - kind: onAddressableArea
+                addressableAreaName: A1
+            vector:
+              x: 1
+              y: 1
+              z: 1
+          - definitionUri: testNamespace/loadName2/1
+            locationSequence:
+              - kind: onAddressableArea
+                addressableAreaName: A2
+            vector:
+              x: 2
+              y: 2
+              z: 2
+    response:
+      status_code: 201
+      json:
+        data:
+          - id: !anystr
+            createdAt: !anystr
+            definitionUri: testNamespace/loadName1/1
+            locationSequence:
+              - kind: onAddressableArea
+                addressableAreaName: A1
+            vector:
+              x: 1
+              y: 1
+              z: 1
+          - id: !anystr
+            createdAt: !anystr
+            definitionUri: testNamespace/loadName2/1
+            locationSequence:
+              - kind: onAddressableArea
+                addressableAreaName: A2
+            vector:
+              x: 2
+              y: 2
+              z: 2
+      save:
+        json:
+          offset_1_data: data[0]
+          offset_2_data: data[1]
+
+  - name: POST an empty list of offsets and check the response
+    request:
+      method: POST
+      url: '{ot3_server_base_url}/labwareOffsets'
+      json:
+        data: []
+    response:
+      status_code: 201
+      json:
+        data: []
+
+  - name: Make sure all offsets got stored
+    request:
+      url: '{ot3_server_base_url}/labwareOffsets'
+    response:
+      json:
+        data:
+          - !force_format_include '{offset_1_data}'
+          - !force_format_include '{offset_2_data}'
+        meta:
+          cursor: 0
+          totalLength: 2

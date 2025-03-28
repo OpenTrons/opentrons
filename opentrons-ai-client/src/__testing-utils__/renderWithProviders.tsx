@@ -1,28 +1,35 @@
 // render using targetted component using @testing-library/react
 // with wrapping providers for i18next and redux
-import type * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { I18nextProvider } from 'react-i18next'
 import { render } from '@testing-library/react'
 
-import type { RenderOptions, RenderResult } from '@testing-library/react'
 import { useHydrateAtoms } from 'jotai/utils'
 import { Provider } from 'jotai'
 
+import type {
+  ComponentProps,
+  ComponentType,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+} from 'react'
+import type { RenderOptions, RenderResult } from '@testing-library/react'
+
 interface HydrateAtomsProps {
   initialValues: Array<[any, any]>
-  children: React.ReactNode
+  children: ReactNode
 }
 
 interface TestProviderProps {
   initialValues: Array<[any, any]>
-  children: React.ReactNode
+  children: ReactNode
 }
 
 const HydrateAtoms = ({
   initialValues,
   children,
-}: HydrateAtomsProps): React.ReactNode => {
+}: HydrateAtomsProps): ReactNode => {
   useHydrateAtoms(initialValues)
   return children
 }
@@ -30,7 +37,7 @@ const HydrateAtoms = ({
 export const TestProvider = ({
   initialValues,
   children,
-}: TestProviderProps): React.ReactNode => (
+}: TestProviderProps): ReactNode => (
   <Provider>
     <HydrateAtoms initialValues={initialValues}>{children}</HydrateAtoms>
   </Provider>
@@ -38,19 +45,19 @@ export const TestProvider = ({
 
 export interface RenderWithProvidersOptions extends RenderOptions {
   initialValues?: Array<[any, any]>
-  i18nInstance: React.ComponentProps<typeof I18nextProvider>['i18n']
+  i18nInstance: ComponentProps<typeof I18nextProvider>['i18n']
 }
 
 export function renderWithProviders(
-  Component: React.ReactElement,
+  Component: ReactElement,
   options?: RenderWithProvidersOptions
 ): RenderResult {
   const { i18nInstance = null, initialValues = [] } = options ?? {}
 
   const queryClient = new QueryClient()
 
-  const ProviderWrapper: React.ComponentType<
-    React.PropsWithChildren<Record<string, unknown>>
+  const ProviderWrapper: ComponentType<
+    PropsWithChildren<Record<string, unknown>>
   > = ({ children }) => {
     const BaseWrapper = (
       <QueryClientProvider client={queryClient}>

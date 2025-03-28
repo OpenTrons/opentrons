@@ -10,7 +10,7 @@ on:
 
 jobs:
   create-release:
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     name: 'Create changelogs and release'
     steps:
       # this could be improved by replacing this checkout with something like

@@ -8,20 +8,21 @@ import {
   DIRECTION_COLUMN,
   EmptySelectorButton,
   Flex,
+  FLEX_MAX_CONTENT,
   ListItem,
   SPACING,
   StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { WizardBody } from './WizardBody'
 import {
   AdditionalEquipmentDiagram,
   getNumOptions,
   getNumSlotsAvailable,
 } from './utils'
-import { HandleEnter } from '../../atoms/HandleEnter'
+import { HandleEnter } from '../../components/atoms'
 import { PDListItemCustomize as ListItemCustomize } from './PDListItemCustomize'
 
 import type { DropdownBorder } from '@opentrons/components'
@@ -70,6 +71,15 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
         subHeader={t('fixtures_replace')}
         disabled={!hasTrash}
         goBack={() => {
+          // Note this is avoid the following case issue.
+          // https://github.com/Opentrons/opentrons/pull/17344#pullrequestreview-2576591908
+          setValue(
+            'additionalEquipment',
+            additionalEquipment.filter(
+              ae => ae === 'gripper' || ae === 'trashBin'
+            )
+          )
+
           goBack(1)
         }}
         proceed={handleProceed}
@@ -90,23 +100,24 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                 )
 
                 return (
-                  <EmptySelectorButton
-                    disabled={numSlotsAvailable === 0}
-                    key={equipment}
-                    textAlignment={TYPOGRAPHY.textAlignLeft}
-                    iconName="plus"
-                    text={t(`${equipment}`)}
-                    onClick={() => {
-                      if (numSlotsAvailable === 0) {
-                        makeSnackbar(t('slots_limit_reached') as string)
-                      } else {
-                        setValue('additionalEquipment', [
-                          ...additionalEquipment,
-                          equipment,
-                        ])
-                      }
-                    }}
-                  />
+                  <Flex width={FLEX_MAX_CONTENT} key={equipment}>
+                    <EmptySelectorButton
+                      disabled={numSlotsAvailable === 0}
+                      textAlignment={TYPOGRAPHY.textAlignLeft}
+                      iconName="plus"
+                      text={t(`${equipment}`)}
+                      onClick={() => {
+                        if (numSlotsAvailable === 0) {
+                          makeSnackbar(t('slots_limit_reached') as string)
+                        } else {
+                          setValue('additionalEquipment', [
+                            ...additionalEquipment,
+                            equipment,
+                          ])
+                        }
+                      }}
+                    />
+                  </Flex>
                 )
               })}
             </Flex>
@@ -135,11 +146,18 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                   filterOptions: getNumOptions(
                     numSlotsAvailable >= MAX_SLOTS
                       ? MAX_SLOTS
-                      : numSlotsAvailable + numStagingAreas
+                      : numSlotsAvailable
                   ),
                   onClick: (value: string) => {
                     const inputNum = parseInt(value)
-                    let updatedStagingAreas = [...additionalEquipment]
+                    const currentStagingAreas = additionalEquipment.filter(
+                      additional => additional === 'stagingArea'
+                    )
+                    const otherEquipment = additionalEquipment.filter(
+                      additional => additional !== 'stagingArea'
+                    )
+                    let updatedStagingAreas = currentStagingAreas
+                    // let updatedStagingAreas = [...additionalEquipment]
 
                     if (inputNum > numStagingAreas) {
                       const difference = inputNum - numStagingAreas
@@ -148,17 +166,20 @@ export function SelectFixtures(props: WizardTileProps): JSX.Element | null {
                         ...Array(difference).fill(ae),
                       ]
                     } else {
-                      updatedStagingAreas = updatedStagingAreas.slice(
+                      updatedStagingAreas = currentStagingAreas.slice(
                         0,
                         inputNum
                       )
                     }
 
-                    setValue('additionalEquipment', updatedStagingAreas)
+                    setValue('additionalEquipment', [
+                      ...otherEquipment,
+                      ...updatedStagingAreas,
+                    ])
                   },
                 }
                 return (
-                  <ListItem type="noActive" key={ae}>
+                  <ListItem type="default" key={ae}>
                     <ListItemCustomize
                       linkText={t('remove')}
                       onClick={() => {

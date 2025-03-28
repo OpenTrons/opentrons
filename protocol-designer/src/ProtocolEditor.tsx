@@ -9,7 +9,7 @@ import {
   OVERFLOW_AUTO,
 } from '@opentrons/components'
 import { ProtocolRoutes } from './ProtocolRoutes'
-import { PortalRoot } from './organisms'
+import { PortalRoot } from './components/organisms'
 import { getEnableReactScan } from './feature-flags/selectors'
 
 export function ProtocolEditor(): JSX.Element {
@@ -38,7 +38,7 @@ export function ProtocolEditor(): JSX.Element {
         id="protocol-editor"
       >
         <PortalRoot />
-        <Flex flexDirection={DIRECTION_COLUMN}>
+        <Flex flexDirection={DIRECTION_COLUMN} height="100%">
           <HashRouter>
             <ProtocolRoutes />
           </HashRouter>

@@ -1,27 +1,28 @@
 import { Flex } from '../../primitives'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
 import { Tag as TagComponent } from './index'
+import { ICON_DATA_BY_NAME } from '../../icons/icon-data'
 import type { Meta, StoryObj } from '@storybook/react'
 
 const meta: Meta<typeof TagComponent> = {
-  title: 'Library/Atoms/Tag',
+  title: 'Helix/Atoms/Tag',
   argTypes: {
     type: {
-      options: ['default', 'interactive', 'branded'],
+      options: ['default', 'interactive', 'branded', 'onColor'],
       control: {
         type: 'select',
       },
     },
-    //  TODO(jr, 6/18/24): make iconName and iconPosition selectable when we have real examples
-    //  used in the app
     iconName: {
-      table: {
-        disable: true,
+      options: Object.keys(ICON_DATA_BY_NAME),
+      control: {
+        type: 'select',
       },
     },
     iconPosition: {
-      table: {
-        disable: true,
+      options: ['left', 'right'],
+      control: {
+        type: 'select',
       },
     },
   },

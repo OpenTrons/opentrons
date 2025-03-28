@@ -15,6 +15,7 @@ import {
   POSITION_ABSOLUTE,
   ALIGN_FLEX_END,
   SPACING,
+  getLabwareDefinitionsFromCommands,
   useSwipe,
 } from '@opentrons/components'
 import {
@@ -57,7 +58,6 @@ import {
   useErrorRecoveryFlows,
   ErrorRecoveryFlows,
 } from '/app/organisms/ErrorRecoveryFlows'
-import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { OnDeviceRouteParams } from '/app/App/types'
 

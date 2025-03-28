@@ -362,27 +362,6 @@ export function generateSubstepItem(
 
   const { stepArgs } = stepArgsAndErrors
 
-  if (stepArgs.commandCreatorFnName === 'delay') {
-    return {
-      substepType: 'pause',
-      pauseStepArgs: stepArgs,
-    }
-  }
-
-  if (stepArgs.commandCreatorFnName === 'moveLabware') {
-    return {
-      substepType: 'moveLabware',
-      moveLabwareArgs: stepArgs,
-    }
-  }
-
-  if (stepArgs.commandCreatorFnName === 'comment') {
-    return {
-      substepType: 'comment',
-      commentStepArgs: stepArgs,
-    }
-  }
-
   if (
     stepArgs.commandCreatorFnName === 'consolidate' ||
     stepArgs.commandCreatorFnName === 'distribute' ||
@@ -397,52 +376,11 @@ export function generateSubstepItem(
     })
   }
 
-  const labwareNames = stepArgs.module
-    ? labwareNamesByModuleId[stepArgs.module]
-    : null
-
-  if (
-    stepArgs.commandCreatorFnName === 'disengageMagnet' ||
-    stepArgs.commandCreatorFnName === 'engageMagnet'
-  ) {
-    return {
-      substepType: 'magnet',
-      engage: stepArgs.commandCreatorFnName === 'engageMagnet',
-      labwareNickname: labwareNames?.nickname,
-      message: stepArgs.message,
-    }
-  }
-
-  if (
-    stepArgs.commandCreatorFnName === 'setTemperature' ||
-    stepArgs.commandCreatorFnName === 'deactivateTemperature'
-  ) {
-    const temperature =
-      stepArgs.commandCreatorFnName === 'setTemperature'
-        ? stepArgs.targetTemperature
-        : null
-    return {
-      substepType: 'temperature',
-      temperature: temperature,
-      labwareNickname: labwareNames?.nickname,
-      message: stepArgs.message,
-      moduleId: stepArgs.module,
-    }
-  }
-
-  if (stepArgs.commandCreatorFnName === 'waitForTemperature') {
-    const moduleId = stepArgs.module
-    const { type } = invariantContext.moduleEntities[moduleId as string]
-    return {
-      substepType: 'waitForTemperature',
-      temperature: stepArgs.temperature,
-      labwareNickname: labwareNames?.nickname,
-      message: stepArgs.message,
-      moduleType: type,
-    }
-  }
-
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_PROFILE) {
+    const labwareNames = stepArgs.moduleId
+      ? labwareNamesByModuleId[stepArgs.moduleId]
+      : null
+
     const {
       blockTargetTempHold,
       lidOpenHold,
@@ -468,6 +406,10 @@ export function generateSubstepItem(
   }
 
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_STATE) {
+    const labwareNames = stepArgs.moduleId
+      ? labwareNamesByModuleId[stepArgs.moduleId]
+      : null
+
     return {
       substepType: THERMOCYCLER_STATE,
       labwareNickname: labwareNames?.nickname,
@@ -477,24 +419,5 @@ export function generateSubstepItem(
       message: stepArgs.message,
     }
   }
-
-  if (stepArgs.commandCreatorFnName === 'heaterShaker') {
-    return {
-      substepType: 'heaterShaker',
-      labwareNickname: labwareNames?.nickname,
-      targetSpeed: stepArgs.rpm,
-      targetHeaterShakerTemperature: stepArgs.targetTemperature,
-      latchOpen: stepArgs.latchOpen,
-      heaterShakerTimerMinutes: stepArgs.timerMinutes,
-      heaterShakerTimerSeconds: stepArgs.timerSeconds,
-    }
-  }
-
-  console.warn(
-    "generateSubsteps doesn't support commandCreatorFnName: ",
-    // @ts-expect-error(sa, 2021-6-14): I don't think this case can ever happen, so stepArgs.commandCreatorFnName gets never typed
-    stepArgs.commandCreatorFnName,
-    stepId
-  )
   return null
 }

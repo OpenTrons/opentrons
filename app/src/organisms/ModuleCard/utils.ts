@@ -12,12 +12,15 @@ import heaterShakerModule from '/app/assets/images/heater_shaker_module_transpar
 import thermoModuleGen2Closed from '/app/assets/images/thermocycler_gen_2_closed.png'
 import thermoModuleGen2Opened from '/app/assets/images/thermocycler_gen_2_opened.png'
 import absorbanceReader from '/app/assets/images/opentrons_plate_reader.png'
+// TODO (sb, 1/25): add correct flex stacker asset when it exits
+import flexStacker from '/app/assets/images/FLEX.png'
 
 import type { AttachedModule } from '/app/redux/modules/types'
 
 export function getModuleCardImage(attachedModule: AttachedModule): string {
   //  TODO(jr, 9/22/22): add images for V1 of magneticModule and temperatureModule
   switch (attachedModule.moduleModel) {
+    // TODO: Add correct image for flex stacker
     case 'magneticModuleV1':
     case 'magneticModuleV2':
       return magneticModule
@@ -40,6 +43,8 @@ export function getModuleCardImage(attachedModule: AttachedModule): string {
       }
     case 'absorbanceReaderV1':
       return absorbanceReader
+    case 'flexStackerModuleV1':
+      return flexStacker
     //  this should never be reached
     default:
       return 'unknown module model, this is an error'

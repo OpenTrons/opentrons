@@ -12,7 +12,7 @@ The lab task that you'll automate in this tutorial is serial dilution: taking a 
 
 Before running a protocol, you'll want to have the right kind of hardware and labware ready for your Flex or OT-2.
 
-- **Flex users** Most Flex code examples will use a Flex 1-Channel 1000 μL pipette.
+- **Flex users** Most Flex code examples will use a Flex 1-Channel 1000 µL pipette.
 - **OT-2 users** You can use either a single-channel or 8-channel pipette for this tutorial. Most OT-2 code examples will use a P300 Single-Channel GEN2 pipette.
 
 The Flex and OT-2 use similar labware for serial dilution. The tutorial code will use the labware listed in the table below, but as long as you have labware of each type you can modify the code to run with your labware.

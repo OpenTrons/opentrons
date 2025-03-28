@@ -62,9 +62,7 @@ export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
 // special ID for invisible deck setup step-form
 export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
-// TODO: Ian 2019-06-13 don't keep these as hard-coded static values (see #3587)
-export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
-export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 1
+export const DEFAULT_MM_OFFSET_FROM_BOTTOM = 1
 // NOTE: in the negative Z direction, to go down from top
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
 export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
@@ -91,6 +89,7 @@ export const MIN_TC_DURATION_SECONDS = 0
 export const MAX_TC_DURATION_SECONDS = 60
 export const MIN_TC_PROFILE_VOLUME = 0
 export const MAX_TC_PROFILE_VOLUME = 100
+// @ts-expect-error Flex stacker not yet supported in PD
 export const MODELS_FOR_MODULE_TYPE: Record<
   ModuleType,
   Array<{
@@ -149,6 +148,7 @@ export const MODELS_FOR_MODULE_TYPE: Record<
   ],
 }
 
+// @ts-expect-error Flex stacker not yet supported in PD
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: Record<ModuleType, ModuleModel> = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V2,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V2,
@@ -175,3 +175,25 @@ export const STAGING_AREA_CUTOUTS_ORDERED: CutoutId[] = [
   'cutoutD3',
   'cutoutA3',
 ]
+
+// Values for absorbance reader
+export const ABSORBANCE_READER_INITIALIZE_MODE_SINGLE = 'single'
+export const ABSORBANCE_READER_INITIALIZE_MODE_MULTI = 'multi'
+export const ABSORBANCE_READER_INITIALIZE: 'absorbanceReaderInitialize' =
+  'absorbanceReaderInitialize'
+export const ABSORBANCE_READER_READ: 'absorbanceReaderRead' =
+  'absorbanceReaderRead'
+export const ABSORBANCE_READER_LID: 'absorbanceReaderLid' =
+  'absorbanceReaderLid'
+export const ABSORBANCE_READER_MIN_WAVELENGTH_NM = 350
+export const ABSORBANCE_READER_MAX_WAVELENGTH_NM = 1000
+export const ABSORBANCE_READER_COLOR_BY_WAVELENGTH: Record<number, string> = {
+  450: 'Blue',
+  562: 'Green',
+  600: 'Orange',
+  650: 'Red',
+}
+
+export const OFFDECK: 'offDeck' = 'offDeck'
+
+export const PROTOCOL_DESIGNER_SOURCE: 'Protocol Designer' = 'Protocol Designer' // protocolSource for tracking analytics in the app

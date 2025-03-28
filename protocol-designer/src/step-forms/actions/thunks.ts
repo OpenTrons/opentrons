@@ -1,12 +1,21 @@
 import { createContainer } from '../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import { uuid } from '../../utils'
+import { changeSavedStepForm } from '../../steplist/actions'
 
-import type { DeckSlotId } from '@opentrons/shared-data'
+import type {
+  DeckSlotId,
+  ModuleModel,
+  ModuleType,
+} from '@opentrons/shared-data'
 import type { ThunkAction } from '../../types'
 import type {
   CreateContainerAction,
   RenameLabwareAction,
 } from '../../labware-ingred/actions'
+import type { CreateModuleAction } from './modules'
+import type { ChangeSavedStepFormAction } from '../../steplist/actions'
+import type { FormData } from '../../form-types'
 
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId
@@ -36,4 +45,48 @@ export const createContainerAboveModule: (
         nestedLabwareDefURI == null ? undefined : labwareDefURI,
     })
   )
+}
+
+interface ModuleAndChangeFormArgs {
+  slot: DeckSlotId
+  type: ModuleType
+  model: ModuleModel
+  moduleSteps: FormData[]
+  pauseSteps: FormData[]
+}
+export const createModuleEntityAndChangeForm: (
+  args: ModuleAndChangeFormArgs
+) => ThunkAction<CreateModuleAction | ChangeSavedStepFormAction> = args => (
+  dispatch,
+  getState
+) => {
+  const { slot, model, type, moduleSteps, pauseSteps } = args
+  const moduleId = `${uuid()}:${type}`
+
+  dispatch({
+    type: 'CREATE_MODULE',
+    payload: { slot, model, type, id: moduleId },
+  })
+
+  //  if steps are created with the module that has been regenerated, migrate them to use the correct moduleId
+  moduleSteps.forEach(step => {
+    dispatch(
+      changeSavedStepForm({
+        stepId: step.id,
+        update: {
+          moduleId,
+        },
+      })
+    )
+  })
+  pauseSteps.forEach(step => {
+    dispatch(
+      changeSavedStepForm({
+        stepId: step.id,
+        update: {
+          moduleId,
+        },
+      })
+    )
+  })
 }

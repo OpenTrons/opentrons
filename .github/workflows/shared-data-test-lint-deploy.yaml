@@ -44,7 +44,7 @@ jobs:
   python-lint:
     name: 'shared-data package python lint'
     timeout-minutes: 10
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -112,7 +112,7 @@ jobs:
 
   js-test:
     name: 'shared-data JS tests'
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     timeout-minutes: 30
     steps:
       - uses: 'actions/checkout@v4'
@@ -149,7 +149,7 @@ jobs:
   python-deploy:
     name: 'shared-data package deploy'
     needs: [python-test]
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
     steps:
       - uses: 'actions/checkout@v4'

@@ -5,10 +5,12 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 
+import type { MouseEvent } from 'react'
+
 export function ResizeBar({
   handleMouseDown,
 }: {
-  handleMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void
+  handleMouseDown: (e: MouseEvent<HTMLDivElement>) => void
 }): JSX.Element {
   return (
     <div

@@ -1,8 +1,11 @@
 import { useTranslation } from 'react-i18next'
 
-import { Flex, DISPLAY_INLINE, StyledText } from '@opentrons/components'
-
-import { CommandText } from '/app/molecules/Command'
+import {
+  Flex,
+  DISPLAY_INLINE,
+  StyledText,
+  CommandText,
+} from '@opentrons/components'
 
 import type { ComponentProps } from 'react'
 import type { StyleProps } from '@opentrons/components'

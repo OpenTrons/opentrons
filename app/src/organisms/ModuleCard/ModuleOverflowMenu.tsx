@@ -17,6 +17,7 @@ import {
   MODULE_MODELS_OT2_ONLY,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
@@ -121,6 +122,7 @@ export const ModuleOverflowMenu = (
       <MenuList>
         {isFlex &&
         module.moduleType !== ABSORBANCE_READER_TYPE &&
+        module.moduleType !== FLEX_STACKER_MODULE_TYPE &&
         !MODULE_MODELS_OT2_ONLY.some(
           modModel => modModel === module.moduleModel
         ) ? (

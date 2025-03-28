@@ -3,7 +3,8 @@
 from typing import List, Optional, cast, Dict
 
 from opentrons_shared_data.labware.types import (
-    LabwareParameters as LabwareParametersDict,
+    LabwareParameters2 as LabwareParameters2Dict,
+    LabwareParameters3 as LabwareParameters3Dict,
     LabwareDefinition as LabwareDefinitionDict,
 )
 
@@ -27,6 +28,9 @@ from ..._liquid import Liquid
 from ..labware import AbstractLabware, LabwareLoadParams
 
 from .well import WellCore
+
+
+_LabwareParametersDict = LabwareParameters2Dict | LabwareParameters3Dict
 
 
 class LabwareCore(AbstractLabware[WellCore]):
@@ -96,9 +100,9 @@ class LabwareCore(AbstractLabware[WellCore]):
             LabwareDefinitionDict, self._definition.model_dump(exclude_none=True)
         )
 
-    def get_parameters(self) -> LabwareParametersDict:
+    def get_parameters(self) -> _LabwareParametersDict:
         return cast(
-            LabwareParametersDict,
+            _LabwareParametersDict,
             self._definition.parameters.model_dump(exclude_none=True),
         )
 
@@ -122,7 +126,7 @@ class LabwareCore(AbstractLabware[WellCore]):
 
         request = LabwareOffsetCreate.model_construct(
             definitionUri=self.get_uri(),
-            location=offset_location,
+            locationSequence=offset_location,
             vector=LabwareOffsetVector(x=delta.x, y=delta.y, z=delta.z),
         )
         self._engine_client.add_labware_offset(request)

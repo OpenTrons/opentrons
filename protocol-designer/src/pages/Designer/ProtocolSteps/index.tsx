@@ -31,7 +31,7 @@ import {
   getHoveredTerminalItemId,
 } from '../../../ui/steps/selectors'
 import { DeckSetupContainer } from '../DeckSetup'
-import { OffDeck } from '../Offdeck'
+import { OffDeck } from '../OffDeck'
 import { SubStepsToolbox } from './Timeline'
 import { StepForm } from './StepForm'
 import { StepSummary } from './StepSummary'
@@ -40,10 +40,10 @@ import {
   getDesignerTab,
   getRobotStateTimeline,
 } from '../../../file-data/selectors'
-import { TimelineAlerts } from '../../../organisms'
+import { TimelineAlerts } from '../../../components/organisms'
 import { DraggableSidebar } from './DraggableSidebar'
 
-const CONTENT_MAX_WIDTH = '44.6704375rem'
+const CONTENT_MAX_WIDTH = '46.9375rem'
 
 export function ProtocolSteps(): JSX.Element {
   const { i18n, t } = useTranslation('starting_deck_state')
@@ -52,14 +52,15 @@ export function ProtocolSteps(): JSX.Element {
   const hoveredTerminalItem = useSelector(getHoveredTerminalItemId)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selectedSubstep = useSelector(getSelectedSubstep)
-  const enableHoyKeyDisplay = useSelector(getEnableHotKeysDisplay)
+  const enableHotKeyDisplay = useSelector(getEnableHotKeysDisplay)
   const tab = useSelector(getDesignerTab)
   const leftString = t('onDeck')
   const rightString = t('offDeck')
   const [deckView, setDeckView] = useState<
     typeof leftString | typeof rightString
   >(leftString)
-  const [targetWidth, setTargetWidth] = useState<number>(350)
+  // Note (02/03/25:kk) use DrraggableSidebar's initial width
+  const [targetWidth, setTargetWidth] = useState<number>(235)
 
   const currentHoveredStepId = useSelector(getHoveredStepId)
   const currentSelectedStepId = useSelector(getSelectedStepId)
@@ -74,20 +75,18 @@ export function ProtocolSteps(): JSX.Element {
   const { errors: timelineErrors } = useSelector(getRobotStateTimeline)
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
-  const showTimelineAlerts =
-    hasTimelineErrors && tab === 'protocolSteps' && formData == null
+  const showTimelineAlerts = hasTimelineErrors && tab === 'protocolSteps'
   const stepDetails = currentStep?.stepDetails ?? null
 
   return (
     <Flex
       backgroundColor={COLORS.grey10}
       height="calc(100vh - 4rem)"
-      minHeight={FLEX_MAX_CONTENT}
       width="100%"
-      padding={SPACING.spacing12}
-      gridGap={SPACING.spacing16}
+      minHeight={FLEX_MAX_CONTENT}
+      id="container"
     >
-      <Flex flex="1" height="100%">
+      <Flex height="100%" padding={SPACING.spacing12}>
         <DraggableSidebar setTargetWidth={setTargetWidth} />
       </Flex>
       <Flex
@@ -96,20 +95,33 @@ export function ProtocolSteps(): JSX.Element {
         gridGap={SPACING.spacing16}
         flex="2.85"
         paddingTop={showTimelineAlerts ? '0' : SPACING.spacing24}
+        height="100%"
         position={POSITION_RELATIVE}
       >
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing16}
-          maxWidth={CONTENT_MAX_WIDTH}
+          gridGap={SPACING.spacing24}
+          width={CONTENT_MAX_WIDTH}
+          height="100%"
+          justifyContent={JUSTIFY_CENTER}
+          paddingY={SPACING.spacing120}
         >
           {showTimelineAlerts ? (
-            <TimelineAlerts justifyContent={JUSTIFY_CENTER} width="100%" />
+            <TimelineAlerts
+              justifyContent={JUSTIFY_CENTER}
+              width="100%"
+              flexDirection={DIRECTION_COLUMN}
+              gridGap={SPACING.spacing4}
+            />
           ) : null}
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            alignItems={ALIGN_CENTER}
+            height="2.25rem"
+          >
             {currentStep != null && hoveredTerminalItem == null ? (
               <StyledText desktopStyle="headingSmallBold">
-                {i18n.format(currentStep.stepName, 'capitalize')}
+                {i18n.format(currentStep.stepName, 'titleCase')}
               </StyledText>
             ) : null}
             {(hoveredTerminalItem != null || selectedTerminalItem != null) &&
@@ -131,21 +143,30 @@ export function ProtocolSteps(): JSX.Element {
               }}
             />
           </Flex>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing16}
+            height="100%"
+          >
             {deckView === leftString ? (
               <DeckSetupContainer tab="protocolSteps" />
             ) : (
               <OffDeck tab="protocolSteps" />
             )}
-            {formData == null ? (
+            {/* avoid shifting the deck view container */}
+            <Flex
+              height="5.5rem"
+              opacity={formData == null ? 1 : 0}
+              id="summary container"
+            >
               <StepSummary
                 currentStep={currentStep}
                 stepDetails={stepDetails}
               />
-            ) : null}
+            </Flex>
           </Flex>
         </Flex>
-        {enableHoyKeyDisplay ? (
+        {enableHotKeyDisplay ? (
           <Flex
             position={POSITION_FIXED}
             left={`calc(1.5rem + ${targetWidth}px)`}
@@ -174,7 +195,10 @@ export function ProtocolSteps(): JSX.Element {
       {formData == null && selectedSubstep ? (
         <SubStepsToolbox stepId={selectedSubstep} />
       ) : null}
-      <StepForm />
+      <Flex padding={SPACING.spacing12}>
+        <StepForm />
+      </Flex>
+
       {isMultiSelectMode ? <BatchEditToolbox /> : null}
     </Flex>
   )

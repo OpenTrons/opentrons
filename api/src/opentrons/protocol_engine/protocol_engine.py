@@ -1,29 +1,32 @@
 """ProtocolEngine class definition."""
+
 from contextlib import AsyncExitStack
 from logging import getLogger
 from typing import Dict, Optional, Union, AsyncGenerator, Callable
-from opentrons.protocol_engine.actions.actions import (
-    ResumeFromRecoveryAction,
-    SetErrorRecoveryPolicyAction,
-)
 
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
-from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons_shared_data.errors import (
     ErrorCodes,
     EnumeratedError,
 )
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
+
+from .actions.actions import (
+    ResumeFromRecoveryAction,
+    SetErrorRecoveryPolicyAction,
+)
 from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
 from .errors.exceptions import EStopActivatedError
 from .error_recovery_policy import ErrorRecoveryPolicy
-from . import commands, slot_standardization
+from . import commands, slot_standardization, labware_offset_standardization
 from .resources import ModelUtils, ModuleDataProvider, FileProvider
 from .types import (
     LabwareOffset,
     LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
     LabwareUri,
     ModuleModel,
     Liquid,
@@ -516,15 +519,21 @@ class ProtocolEngine:
             )
         )
 
-    def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
+    def add_labware_offset(
+        self, request: LabwareOffsetCreate | LegacyLabwareOffsetCreate
+    ) -> LabwareOffset:
         """Add a new labware offset and return it.
 
         The added offset will apply to subsequent `LoadLabwareCommand`s.
 
         To retrieve offsets later, see `.state_view.labware`.
         """
-        request = slot_standardization.standardize_labware_offset(
-            request, self.state_view.config.robot_type
+        internal_request = (
+            labware_offset_standardization.standardize_labware_offset_create(
+                request,
+                self.state_view.config.robot_type,
+                self.state_view.addressable_areas.deck_definition,
+            )
         )
 
         labware_offset_id = self._model_utils.generate_id()
@@ -533,7 +542,7 @@ class ProtocolEngine:
             AddLabwareOffsetAction(
                 labware_offset_id=labware_offset_id,
                 created_at=created_at,
-                request=request,
+                request=internal_request,
             )
         )
         return self.state_view.labware.get_labware_offset(

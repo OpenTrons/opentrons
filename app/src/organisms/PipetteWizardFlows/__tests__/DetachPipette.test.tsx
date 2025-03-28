@@ -52,7 +52,7 @@ describe('DetachPipette', () => {
   })
   it('returns the correct information, buttons work as expected for single mount pipettes', () => {
     render(props)
-    screen.getByText('Loosen screws and detach Flex 1-Channel 1000 μL')
+    screen.getByText('Loosen screws and detach Flex 1-Channel 1000 µL')
     screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
@@ -83,7 +83,7 @@ describe('DetachPipette', () => {
       },
     }
     render(props)
-    screen.getByText('Loosen screws and detach Flex 96-Channel 1000 μL')
+    screen.getByText('Loosen screws and detach Flex 96-Channel 1000 µL')
     screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
@@ -113,7 +113,7 @@ describe('DetachPipette', () => {
       selectedPipette: NINETY_SIX_CHANNEL,
     }
     render(props)
-    screen.getByText('Loosen screws and detach Flex 1-Channel 1000 μL')
+    screen.getByText('Loosen screws and detach Flex 1-Channel 1000 µL')
     screen.getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )

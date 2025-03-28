@@ -1,10 +1,15 @@
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { Icon } from '../icons'
 import { Box, Btn, Flex } from '../primitives'
-import { LegacyStyledText } from '../atoms'
-import { ALIGN_CENTER, JUSTIFY_CENTER, JUSTIFY_SPACE_BETWEEN } from '../styles'
-import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
+import { StyledText } from '../atoms'
+import {
+  ALIGN_CENTER,
+  DISPLAY_FLEX,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+} from '../styles'
+import { SPACING } from '../ui-style-constants'
 import { COLORS } from '../helix-design-system'
 
 import type { MouseEventHandler, ReactNode } from 'react'
@@ -15,27 +20,12 @@ export interface ModalHeaderProps {
   onClose?: MouseEventHandler
   titleElement1?: JSX.Element
   titleElement2?: JSX.Element
+  tagElement?: JSX.Element
   backgroundColor?: string
   color?: string
   icon?: IconProps
   closeButton?: ReactNode
 }
-
-const closeIconStyles = css`
-  display: flex;
-  justify-content: ${JUSTIFY_CENTER};
-  align-items: ${ALIGN_CENTER};
-  border-radius: 0.875rem;
-  width: 1.625rem;
-  height: 1.625rem;
-  &:hover {
-    background-color: ${COLORS.grey30};
-  }
-
-  &:active {
-    background-color: ${COLORS.grey35};
-  }
-`
 
 export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
   const {
@@ -45,35 +35,29 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
     titleElement1,
     titleElement2,
     backgroundColor,
-    color,
+    tagElement,
+    color = COLORS.black90,
     closeButton,
   } = props
   return (
     <>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        paddingX={SPACING.spacing24}
-        paddingY={SPACING.spacing16}
+      <StyledModalHeader
         backgroundColor={backgroundColor}
         data-testid="Modal_header"
+        role="heading"
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
           {icon != null && <Icon {...icon} data-testid="Modal_header_icon" />}
           {titleElement1}
           {titleElement2}
-          {/* TODO (nd: 08/07/2024) Convert to StyledText once designs are resolved */}
-          <LegacyStyledText
-            as="h3"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={color}
-          >
+          <StyledText color={color} desktopStyle="bodyLargeSemiBold">
             {title}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
-        {closeButton != null
-          ? closeButton
-          : onClose != null && (
+        <Flex gridGap={SPACING.spacing4}>
+          {tagElement}
+          {closeButton != null ||
+            (onClose != null && (
               <Btn
                 onClick={onClose}
                 css={closeIconStyles}
@@ -88,14 +72,39 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
                   color={color}
                 />
               </Btn>
-            )}
-      </Flex>
-      <Box
-        borderBottom={`1px solid ${COLORS.grey30}`}
-        marginY="0"
-        width="100%"
-        data-testid="divider"
-      />
+            ))}
+        </Flex>
+      </StyledModalHeader>
+      <StyledDivider data-testid="divider" />
     </>
   )
 }
+
+const StyledModalHeader = styled(Flex)`
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  align-items: ${ALIGN_CENTER};
+  background-color: ${props => props.backgroundColor};
+`
+
+const StyledDivider = styled(Box)`
+  border-bottom: 1px solid ${COLORS.grey30};
+  margin: 0;
+  width: 100%;
+`
+
+const closeIconStyles = css`
+  display: ${DISPLAY_FLEX};
+  justify-content: ${JUSTIFY_CENTER};
+  align-items: ${ALIGN_CENTER};
+  border-radius: 0.875rem;
+  width: 1.625rem;
+  height: 1.625rem;
+  &:hover {
+    background-color: ${COLORS.grey30};
+  }
+
+  &:active {
+    background-color: ${COLORS.grey35};
+  }
+`

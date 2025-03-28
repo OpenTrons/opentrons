@@ -1,52 +1,45 @@
-import type * as React from 'react'
+import { PrimaryButton, StyledText } from '../atoms'
+import { SPACING } from '../ui-style-constants'
+import { Flex, STYLE_PROPS } from '../primitives'
+import { JUSTIFY_END } from '../styles'
+import { Modal as ModalComponent } from './Modal'
 
-import { LegacyStyledText } from '../atoms'
-import { SPACING, TYPOGRAPHY } from '../ui-style-constants'
-import { PrimaryBtn } from '../primitives'
-import { COLORS } from '../helix-design-system'
-import { Modal } from './Modal'
+import type { Meta, StoryObj } from '@storybook/react'
 
-import type { Story, Meta } from '@storybook/react'
-
-export default {
-  title: 'Library/Molecules/modals/Modal',
-  component: Modal,
-} as Meta
-
-const Template: Story<React.ComponentProps<typeof Modal>> = args => (
-  <Modal {...args} />
-)
+const meta: Meta<typeof ModalComponent> = {
+  title: 'Helix/Molecules/Modal',
+  component: ModalComponent,
+  argTypes: {
+    // Disable all StyleProps
+    ...Object.fromEntries(
+      [...STYLE_PROPS, 'as', 'ref', 'theme', 'forwardedAs'].map(prop => [
+        prop,
+        { table: { disable: true } },
+      ])
+    ),
+  },
+}
+export default meta
+type Story = StoryObj<typeof ModalComponent>
+const bodyText = 'Modal body goes here'
 
 const Children = (
-  <>
-    <LegacyStyledText
-      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      fontSize={TYPOGRAPHY.fontSizeP}
-      paddingTop={SPACING.spacing4}
-    >
-      {'Modal body goes here'}
-    </LegacyStyledText>
-
-    <PrimaryBtn
-      backgroundColor={COLORS.blue50}
-      marginTop="28rem"
-      textTransform={TYPOGRAPHY.textTransformNone}
-    >
-      <LegacyStyledText
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-        fontSize={TYPOGRAPHY.fontSizeP}
-      >
-        {'btn text'}
-      </LegacyStyledText>
-    </PrimaryBtn>
-  </>
+  <StyledText desktopStyle="bodyDefaultRegular">{bodyText}</StyledText>
 )
 
-export const Primary = Template.bind({})
-Primary.args = {
-  type: 'info',
-  onClose: () => {},
-  closeOnOutsideClick: false,
-  title: 'Modal Title',
-  children: Children,
+const Footer = (
+  <Flex justifyContent={JUSTIFY_END} padding={SPACING.spacing24}>
+    <PrimaryButton onClick={() => {}}>{'btn text'}</PrimaryButton>
+  </Flex>
+)
+
+export const Modal: Story = {
+  args: {
+    type: 'info',
+    onClose: () => {},
+    closeOnOutsideClick: false,
+    title: 'Modal Title',
+    children: Children,
+    footer: Footer,
+  },
 }

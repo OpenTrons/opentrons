@@ -157,7 +157,19 @@
       },
       "POSSIBLE_PIPETTE_COLLISION": {
         "title": "Pipette collisions likely",
-        "body": "There is a possibility that the pipette will collide with the adjascent labware or module for partial tip pick up."
+        "body": "There is a possibility that the pipette will collide with the adjacent labware or module for partial tip pick up."
+      },
+      "ABSORBANCE_READER_NO_INITIALIZATION": {
+        "title": "Missing Absorbance Plate Reader initialization step",
+        "body": "This step tries to read labware without initializing the Absorbance Plate Reader first. Initialize the Absorbance Plate Reader module or remove this step in order to proceed."
+      },
+      "ABSORBANCE_READER_LID_CLOSED": {
+        "title": "Absorbance Plate Reader Module lid closed",
+        "body": "This step tries to use labware in the Absorbance Plate Reader. Open the lid before this step."
+      },
+      "ABSORBANCE_READER_NO_GRIPPER": {
+        "title": "Cannot save Absorbance Plate Reader step without gripper",
+        "body": "This step requires the gripper to open or close the Absorbance Plate Reader lid. Add a gripper or remove this step to proceed."
       }
     },
     "warning": {
@@ -255,7 +267,7 @@
       "unused_pipette_content": {
         "heading": "Protocol has unused pipette",
         "body1": "The {{pipette}} on {{mount}} mount is currently not used in any step. You won't be able to run this protocol unless this pipette is attached to your robot.",
-        "body1_96ch": "The Flex 8-Channel 1000 μL is currently not used in any step. You won't be able to run this protocol unless this pipette is attached to your robot.",
+        "body1_96ch": "The Flex 8-Channel 1000 µL is currently not used in any step. You won't be able to run this protocol unless this pipette is attached to your robot.",
         "body2": "If you don’t intend to use the pipette, remove it from your protocol."
       },
       "unused_staging_area_content": {

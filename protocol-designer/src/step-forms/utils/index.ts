@@ -11,12 +11,13 @@ import {
   FLEX_ROBOT_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { getCutoutIdByAddressableArea } from '@opentrons/step-generation'
 import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../../constants'
 import { hydrateField } from '../../steplist/fieldLevel'
-import { getCutoutIdByAddressableArea } from '../../utils'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
   AddressableAreaName,
+  CreateCommand,
   CutoutId,
   DeckSlotId,
   LoadLabwareCreateCommand,
@@ -31,11 +32,9 @@ import type {
   PipetteEntity,
   PipetteEntities,
   InvariantContext,
-  ModuleEntity,
 } from '@opentrons/step-generation'
 import type { DeckSlot } from '../../types'
-import type { FormData } from '../../form-types'
-import type { PDProtocolFile } from '../../file-types'
+import type { FormData, HydratedFormData } from '../../form-types'
 import type {
   AdditionalEquipmentOnDeck,
   InitialDeckSetup,
@@ -133,23 +132,27 @@ export function getDeckItemIdInSlot(
 }
 export function denormalizePipetteEntities(
   pipetteInvariantProperties: NormalizedPipetteById,
-  labwareDefs: LabwareDefByDefURI
+  labwareDefs: LabwareDefByDefURI,
+  pipetteLocationUpdate: Record<string, string>
 ): PipetteEntities {
   return reduce(
     pipetteInvariantProperties,
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
       const spec = getPipetteSpecsV2(pipette.name)
-
       if (!spec) {
         throw new Error(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
         )
       }
+      const is96Channel = spec.channels === 96
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,
         tiprackLabwareDef: pipette.tiprackDefURI.map(def => labwareDefs[def]),
+        pythonName: is96Channel
+          ? 'pipette'
+          : `pipette_${pipetteLocationUpdate[pipetteId]}`,
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },
@@ -187,13 +190,16 @@ export const getSlotIdsBlockedBySpanningForThermocycler = (
   return []
 }
 
-//  TODO(jr, 3/13/24): refactor this util it is messy and confusing
+//  TODO(ja, 3/7/25): this util is very outdated, much of it is probably
+//  not even in use. we should refactor this!!!
 export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string,
   /* we don't always want to count the slot as full if there is a staging area present
      since labware/wasteChute can still go on top of staging areas  **/
-  includeStagingAreas?: boolean
+  includeStagingAreas?: boolean,
+  /* optional disallowing for additionalEquipmentAreas or not **/
+  discountAdditionalEquipmentAreas?: boolean
 ): boolean => {
   //   special-casing the TC's slot A1 for the Flex
   if (
@@ -233,6 +239,9 @@ export const getSlotIsEmpty = (
       return additionalEquipment.location?.includes(slot) && includeStaging
     }
   })
+  const additionalEquipment = discountAdditionalEquipmentAreas
+    ? []
+    : filteredAdditionalEquipmentOnDeck
   return (
     [
       ...values(initialDeckSetup.modules).filter(
@@ -246,7 +255,7 @@ export const getSlotIsEmpty = (
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
-      ...filteredAdditionalEquipmentOnDeck,
+      ...additionalEquipment,
     ].length === 0
   )
 }
@@ -284,40 +293,20 @@ export const getIsModuleOnDeck = (
   return moduleIds.some(moduleId => modules[moduleId]?.type === moduleType)
 }
 
-const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
-  return state.moduleEntities[id]
-}
-
-// TODO: Ian 2019-01-25 type with hydrated form type, see #3161
 export function getHydratedForm(
   rawForm: FormData,
   invariantContext: InvariantContext
-): FormData {
+): HydratedFormData {
   const hydratedForm = mapValues(rawForm, (value, name) =>
     hydrateField(invariantContext, name, value as string)
   )
-  // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
-  // It's confusing that pipette is an ID string before this,
-  // but a PipetteEntity object after this.
-  // For `moduleId` field, it would be surprising to be a ModuleEntity!
-  // Consider nesting all additional fields under 'meta' key,
-  // following what we're doing with 'module'.
-  // See #3161
-  hydratedForm.meta = {}
-
-  if (rawForm?.moduleId != null) {
-    // @ts-expect-error(sa, 2021-6-14): type this properly in #3161
-    hydratedForm.meta.module = getModuleEntity(
-      invariantContext,
-      rawForm.moduleId as string
-    )
-  }
-  // @ts-expect-error(sa, 2021-6-14):type this properly in #3161
+  //  @ts-expect-error because hydrateField doesn't hydrate every formField type
+  //  need to udpate to hdyrate every field, will do this in a followup
   return hydratedForm
 }
 
 export const getUnoccupiedSlotForTrash = (
-  file: PDProtocolFile,
+  commands: CreateCommand[],
   hasWasteChuteCommands: boolean,
   stagingAreaSlotNames: AddressableAreaName[]
 ): string => {
@@ -329,7 +318,7 @@ export const getUnoccupiedSlotForTrash = (
       FLEX_ROBOT_TYPE
     )
   )
-  const allLoadLabwareSlotNames = Object.values(file.commands)
+  const allLoadLabwareSlotNames = Object.values(commands)
     .filter(
       (command): command is LoadLabwareCreateCommand =>
         command.commandType === 'loadLabware'
@@ -338,6 +327,7 @@ export const getUnoccupiedSlotForTrash = (
       const location = command.params.location
       if (
         location !== 'offDeck' &&
+        location !== 'systemLocation' &&
         location !== null &&
         'slotName' in location
       ) {
@@ -346,7 +336,7 @@ export const getUnoccupiedSlotForTrash = (
       return acc
     }, [])
 
-  const allLoadModuleSlotNames = Object.values(file.commands)
+  const allLoadModuleSlotNames = Object.values(commands)
     .filter(
       (command): command is LoadModuleCreateCommand =>
         command.commandType === 'loadModule'
@@ -360,7 +350,7 @@ export const getUnoccupiedSlotForTrash = (
       }
     })
 
-  const allMoveLabwareLocations = Object.values(file.commands)
+  const allMoveLabwareLocations = Object.values(commands)
     .filter(
       (command): command is MoveLabwareCreateCommand =>
         command.commandType === 'moveLabware'
@@ -369,6 +359,7 @@ export const getUnoccupiedSlotForTrash = (
       const newLocation = command.params.newLocation
       if (
         newLocation !== 'offDeck' &&
+        newLocation !== 'systemLocation' &&
         newLocation !== null &&
         'slotName' in newLocation
       ) {

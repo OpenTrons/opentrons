@@ -38,6 +38,7 @@ type ModuleImg = {
   }
 }
 
+// @ts-expect-error Flex stacker not yet supported in PD
 const MODULE_IMG_BY_TYPE: ModuleImg = {
   [MAGNETIC_MODULE_TYPE]: {
     [MAGNETIC_MODULE_V1]: magdeck_gen1,

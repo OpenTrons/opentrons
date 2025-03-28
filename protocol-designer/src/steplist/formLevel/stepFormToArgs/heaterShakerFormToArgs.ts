@@ -12,6 +12,8 @@ export const heaterShakerFormToArgs = (
     targetSpeed,
     setShake,
     latchOpen,
+    stepDetails,
+    stepName,
   } = formData
   console.assert(
     setHeaterShakerTemperature
@@ -36,7 +38,9 @@ export const heaterShakerFormToArgs = (
 
   return {
     commandCreatorFnName: 'heaterShaker',
-    module: moduleId,
+    name: stepName,
+    description: stepDetails,
+    moduleId,
     targetTemperature: targetTemperature,
     rpm: targetShake,
     latchOpen: latchOpen,

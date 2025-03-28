@@ -145,7 +145,18 @@ def mock_messenger(can_message_notifier: MockCanMessageNotifier) -> mock.AsyncMo
 
 @pytest.fixture
 def mock_can_driver(mock_messenger: mock.AsyncMock) -> AbstractCanDriver:
-    return mock.AsyncMock(spec=AbstractCanDriver)
+    driver = mock.AsyncMock(spec=AbstractCanDriver)
+
+    # ignoring this type error because this is a very weird function that will in fact
+    # do nothing, but has to have the yield in there for the compiler to make it a
+    # generator function
+    async def _fake_message_retrieve(d):  # type: ignore[no-untyped-def]
+        while True:
+            await asyncio.sleep(1)
+        yield
+
+    driver.__aiter__ = _fake_message_retrieve
+    return driver
 
 
 @pytest.fixture
@@ -160,15 +171,19 @@ def mock_eeprom_driver() -> EEPROMDriver:
 
 
 @pytest.fixture
-def controller(
+async def controller(
     mock_config: OT3Config,
     mock_can_driver: AbstractCanDriver,
     mock_eeprom_driver: EEPROMDriver,
-) -> OT3Controller:
-    with (mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO")):
-        return OT3Controller(
+) -> AsyncIterator[OT3Controller]:
+    with mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"):
+        controller = OT3Controller(
             mock_config, mock_can_driver, eeprom_driver=mock_eeprom_driver
         )
+        try:
+            yield controller
+        finally:
+            await controller.clean_up()
 
 
 @pytest.fixture

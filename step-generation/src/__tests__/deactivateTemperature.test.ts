@@ -1,14 +1,10 @@
 import { beforeEach, describe, it, expect } from 'vitest'
 import { getStateAndContextTempTCModules } from '../fixtures'
 import { deactivateTemperature } from '../commandCreators/atomic/deactivateTemperature'
-import type {
-  InvariantContext,
-  RobotState,
-  DeactivateTemperatureArgs,
-} from '../types'
+import type { InvariantContext, RobotState } from '../types'
+import type { ModuleOnlyParams } from '@opentrons/shared-data'
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
-const commandCreatorFnName = 'deactivateTemperature'
 let invariantContext: InvariantContext
 let robotState: RobotState
 beforeEach(() => {
@@ -42,6 +38,7 @@ describe('deactivateTemperature', () => {
             },
           },
         ],
+        python: 'mock_temperature_module_1.deactivate()',
       },
     },
     {
@@ -57,9 +54,8 @@ describe('deactivateTemperature', () => {
   ]
   testCases.forEach(({ expected, moduleId, testName }) => {
     it(testName, () => {
-      const args: DeactivateTemperatureArgs = {
-        module: moduleId,
-        commandCreatorFnName,
+      const args: ModuleOnlyParams = {
+        moduleId: moduleId ?? '',
       }
       const result = deactivateTemperature(args, invariantContext, robotState)
       expect(result).toEqual(expected)

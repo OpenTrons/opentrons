@@ -26,9 +26,12 @@ from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.execution import MovementHandler, GantryMover, TipHandler
-from opentrons.protocols.models import LabwareDefinition
 
 from opentrons_shared_data.labware import load_definition
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    labware_definition_type_adapter,
+)
 
 from opentrons.types import Point
 
@@ -88,8 +91,8 @@ def test_drop_tip_params_default_origin() -> None:
 def evotips_definition() -> LabwareDefinition:
     """A fixturee of the evotips definition."""
     # TODO (chb 2025-01-29): When we migrate all labware to v3 we can clean this up
-    return LabwareDefinition.model_validate(
-        load_definition("evotips_opentrons_96_labware", 1)
+    return labware_definition_type_adapter.validate_python(
+        load_definition("evotip_flex_96_labware", 1)
     )
 
 

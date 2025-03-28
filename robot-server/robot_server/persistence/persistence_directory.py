@@ -1,6 +1,5 @@
 """Create or reset the server's persistence directory."""
 
-
 from pathlib import Path
 from logging import getLogger
 from shutil import rmtree
@@ -11,7 +10,16 @@ from typing_extensions import Final
 from anyio import Path as AsyncPath, to_thread
 
 from ._folder_migrator import MigrationOrchestrator
-from ._migrations import up_to_3, v3_to_v4, v4_to_v5, v5_to_v6, v6_to_v7, v7_to_v8
+from ._migrations import (
+    up_to_3,
+    v3_to_v4,
+    v4_to_v5,
+    v5_to_v6,
+    v6_to_v7,
+    v7_to_v8,
+    v8_to_v9,
+    v9_to_v10,
+)
 from .file_and_directory_names import LATEST_VERSION_DIRECTORY
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-robot-server-"
@@ -46,7 +54,7 @@ class PersistenceResetter:
 def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
     """Return a `MigrationOrchestrator` configured for robot-server production use.
 
-    Production code should not use this directly.
+    Production code should not use this directly. Use `prepare_active_subdirectory()` instead.
     This is currently exposed only for tests.
     """
     return MigrationOrchestrator(
@@ -60,7 +68,9 @@ def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
             # schema that was never released to the public. It may be present on
             # internal robots.
             v6_to_v7.Migration6to7(subdirectory="7.1"),
-            v7_to_v8.Migration7to8(subdirectory=LATEST_VERSION_DIRECTORY),
+            v7_to_v8.Migration7to8(subdirectory="8"),
+            v8_to_v9.Migration8to9(subdirectory="9"),
+            v9_to_v10.Migration9to10(subdirectory=LATEST_VERSION_DIRECTORY),
         ],
         temp_file_prefix="temp-",
     )

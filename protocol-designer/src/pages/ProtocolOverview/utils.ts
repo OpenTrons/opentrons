@@ -61,11 +61,6 @@ export const getUnusedStagingAreas = (
   const stagingAreaCutoutIds = Object.values(additionalEquipment)
     .filter(equipment => equipment?.name === 'stagingArea')
     .map(equipment => {
-      if (equipment.location == null) {
-        console.error(
-          `expected to find staging area slot location with id ${equipment.id} but could not.`
-        )
-      }
       return equipment.location ?? ''
     })
 
@@ -80,10 +75,12 @@ export const getUnusedStagingAreas = (
         command =>
           (command.commandType === 'loadLabware' &&
             command.params.location !== 'offDeck' &&
+            command.params.location !== 'systemLocation' &&
             'addressableAreaName' in command.params.location &&
             command.params.location.addressableAreaName === location) ||
           (command.commandType === 'moveLabware' &&
             command.params.newLocation !== 'offDeck' &&
+            command.params.newLocation !== 'systemLocation' &&
             'addressableAreaName' in command.params.newLocation &&
             command.params.newLocation.addressableAreaName === location)
       )
@@ -131,6 +128,7 @@ export const getUnusedTrash = (
               )) ||
             (command.commandType === 'moveLabware' &&
               command.params.newLocation !== 'offDeck' &&
+              command.params.newLocation !== 'systemLocation' &&
               'addressableAreaName' in command.params.newLocation &&
               command.params.newLocation.addressableAreaName ===
                 'gripperWasteChute')

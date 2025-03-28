@@ -42,6 +42,7 @@ describe('ReturnTip', () => {
       tipPickUpOffset: null,
       isRobotMoving: false,
       robotType: FLEX_ROBOT_TYPE,
+      onSkip: vi.fn(),
     }
     vi.mocked(useProtocolMetadata).mockReturnValue({
       robotType: 'OT-3 Standard',

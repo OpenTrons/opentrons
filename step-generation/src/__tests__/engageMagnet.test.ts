@@ -8,7 +8,6 @@ import { engageMagnet } from '../commandCreators/atomic/engageMagnet'
 import type { InvariantContext, RobotState } from '../types'
 
 const moduleId = 'magneticModuleId'
-const commandCreatorFnName = 'engageMagnet'
 describe('engageMagnet', () => {
   let invariantContext: InvariantContext
   let robotState: RobotState
@@ -18,6 +17,7 @@ describe('engageMagnet', () => {
       id: moduleId,
       type: MAGNETIC_MODULE_TYPE,
       model: MAGNETIC_MODULE_V1,
+      pythonName: 'mock_magnetic_module_1',
     }
     robotState = getInitialRobotStateStandard(invariantContext)
     robotState.modules[moduleId] = {
@@ -29,13 +29,11 @@ describe('engageMagnet', () => {
     }
   })
   it('creates engage magnet command', () => {
-    const module = moduleId
-    const engageHeight = 2
+    const height = 2
     const result = engageMagnet(
       {
-        commandCreatorFnName,
-        module,
-        engageHeight,
+        moduleId,
+        height,
       },
       invariantContext,
       robotState
@@ -46,11 +44,12 @@ describe('engageMagnet', () => {
           commandType: 'magneticModule/engage',
           key: expect.any(String),
           params: {
-            moduleId: module,
-            height: engageHeight,
+            moduleId,
+            height,
           },
         },
       ],
+      python: `mock_magnetic_module_1.engage(height_from_base=${height})`,
     })
   })
 })

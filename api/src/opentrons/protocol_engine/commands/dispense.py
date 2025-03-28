@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Union, Any
 from typing_extensions import Literal
 
-
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
 
@@ -16,6 +15,7 @@ from .pipetting_common import (
     BaseLiquidHandlingResult,
     OverpressureError,
     dispense_in_place,
+    DEFAULT_CORRECTION_VOLUME,
 )
 from .movement_common import (
     LiquidHandlingWellLocationMixin,
@@ -100,6 +100,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            operation_volume=volume,
         )
         if isinstance(move_result, DefinedErrorData):
             return move_result
@@ -117,6 +118,7 @@ class DispenseImplementation(AbstractCommandImpl[DispenseParams, _ExecuteReturn]
             },
             pipetting=self._pipetting,
             model_utils=self._model_utils,
+            correction_volume=params.correctionVolume or DEFAULT_CORRECTION_VOLUME,
         )
 
         if isinstance(dispense_result, DefinedErrorData):

@@ -5,41 +5,44 @@ import {
   PAUSE_UNTIL_TIME,
 } from '../../../../constants'
 import { pauseFormToArgs } from '../pauseFormToArgs'
-import type { FormData } from '../../../../form-types'
+import type { HydratedPauseFormData } from '../../../../form-types'
 
 describe('pauseFormToArgs', () => {
   it('returns waitForTemperature command creator when form specifies pause until temp', () => {
-    const formData: FormData = {
+    const formData: HydratedPauseFormData = {
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_TEMP,
       pauseTemperature: '20',
       pauseMessage: 'pause message',
       moduleId: 'some_id',
-      pauseTime: null,
+      stepName: 'pause step',
+      stepDetails: 'some details',
     }
     const expected = {
       commandCreatorFnName: 'waitForTemperature',
-      temperature: 20,
+      celsius: 20,
       message: 'pause message',
-      module: 'some_id',
+      name: 'pause step',
+      description: 'some details',
+      moduleId: 'some_id',
     }
     expect(pauseFormToArgs(formData)).toEqual(expected)
   })
   it('returns delay command creator when form specifies pause until resume', () => {
-    const formData: FormData = {
+    const formData: HydratedPauseFormData = {
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_RESUME,
-      description: 'some description',
       pauseMessage: 'some message',
+      stepName: 'pause step',
+      stepDetails: 'some details',
     }
     const expected = {
       commandCreatorFnName: 'delay',
-      name: `Pause ${formData.id}`,
-      description: 'some description',
-      wait: true,
+      name: 'pause step',
       message: 'some message',
+      description: 'some details',
       meta: {
         hours: 0,
         minutes: 0,
@@ -50,20 +53,21 @@ describe('pauseFormToArgs', () => {
   })
 
   it('returns delay command creator when form specifies pause until time', () => {
-    const formData: FormData = {
+    const formData: HydratedPauseFormData = {
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_TIME,
-      description: 'some description',
       pauseMessage: 'some message',
       pauseTime: '01:20:05',
+      stepName: 'pause step',
+      stepDetails: 'some details',
     }
     const expected = {
       commandCreatorFnName: 'delay',
-      name: `Pause ${formData.id}`,
-      description: 'some description',
-      wait: 3600 + 20 * 60 + 5,
+      name: 'pause step',
+      seconds: 3600 + 20 * 60 + 5,
       message: 'some message',
+      description: 'some details',
       meta: {
         hours: 1,
         minutes: 20,

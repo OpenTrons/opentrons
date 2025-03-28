@@ -196,9 +196,13 @@ class MagDeck(mod_abc.AbstractModule):
 
     @property
     def live_data(self) -> types.LiveData:
+        data: types.MagneticModuleData = {
+            "engaged": self.engaged,
+            "height": self.current_height,
+        }
         return {
             "status": self.status,
-            "data": {"engaged": self.engaged, "height": self.current_height},
+            "data": data,
         }
 
     @property

@@ -274,17 +274,20 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                 innerProps={innerProps}
               >
                 {nestedLabwareDef != null ? (
-                  <LabwareRender
-                    definition={nestedLabwareDef}
-                    onLabwareClick={onLabwareClick}
-                    wellFill={nestedLabwareWellFill}
-                    shouldRotateAdapterOrientation={
-                      inferModuleOrientationFromXCoordinate(slotPosition[0]) ===
-                        'left' && moduleModel === HEATERSHAKER_MODULE_V1
-                    }
-                    highlight={highlightLabware}
-                    highlightShadow={highlightShadowLabware}
-                  />
+                  <g cursor={onLabwareClick != null ? 'pointer' : ''}>
+                    <LabwareRender
+                      definition={nestedLabwareDef}
+                      onLabwareClick={onLabwareClick}
+                      wellFill={nestedLabwareWellFill}
+                      shouldRotateAdapterOrientation={
+                        inferModuleOrientationFromXCoordinate(
+                          slotPosition[0]
+                        ) === 'left' && moduleModel === HEATERSHAKER_MODULE_V1
+                      }
+                      highlight={highlightLabware}
+                      highlightShadow={highlightShadowLabware}
+                    />
+                  </g>
                 ) : null}
                 {moduleChildren}
               </Module>
@@ -305,6 +308,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           }) => {
             if (
               labwareLocation === 'offDeck' ||
+              labwareLocation === 'systemLocation' ||
               !('slotName' in labwareLocation) ||
               // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===
@@ -380,6 +384,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           ({ labwareLocation, definition, stacked = false }) => {
             if (
               labwareLocation === 'offDeck' ||
+              labwareLocation === 'systemLocation' ||
               !('slotName' in labwareLocation) ||
               // for legacy protocols that list fixed trash as a labware, do not render
               definition.parameters.loadName ===

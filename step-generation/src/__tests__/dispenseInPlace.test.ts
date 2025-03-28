@@ -6,7 +6,7 @@ import {
 } from '../fixtures'
 import { dispenseInPlace } from '../commandCreators/atomic'
 import type { RobotState, InvariantContext } from '../types'
-import type { DispenseInPlaceArgs } from '../commandCreators/atomic/dispenseInPlace'
+import type { DispenseInPlaceParams } from '@opentrons/shared-data'
 
 describe('dispenseInPlace', () => {
   let invariantContext: InvariantContext
@@ -20,7 +20,7 @@ describe('dispenseInPlace', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   })
   it('dispense in place', () => {
-    const params: DispenseInPlaceArgs = {
+    const params: DispenseInPlaceParams = {
       pipetteId: mockId,
       flowRate: mockFlowRate,
       volume: mockVolume,

@@ -677,7 +677,7 @@ class MoveScheduler:
             log.error(f"received error trying to execute move group: {str(error)}")
 
         expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
-        full_timeout = max(5.0, self._durations[group_id - self._start_at_index] * 2)
+        full_timeout = max(10.0, self._durations[group_id - self._start_at_index] * 2)
         start_time = time.time()
 
         try:

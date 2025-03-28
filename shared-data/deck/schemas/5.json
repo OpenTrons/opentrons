@@ -142,7 +142,13 @@
                   "movableTrash",
                   "fixedTrash",
                   "wasteChute",
-                  "lidDock"
+                  "lidDock",
+                  "heaterShaker",
+                  "magneticBlock",
+                  "temperatureModule",
+                  "thermocycler",
+                  "absorbanceReader",
+                  "flexStacker"
                 ]
               },
               "offsetFromCutoutFixture": {

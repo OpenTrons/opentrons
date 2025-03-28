@@ -8,6 +8,7 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
+  CommandText,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   DISPLAY_NONE,
@@ -18,6 +19,7 @@ import {
   POSITION_FIXED,
   PrimaryButton,
   SPACING,
+  getLabwareDefinitionsFromCommands,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -28,10 +30,9 @@ import {
   useMostRecentCompletedAnalysis,
   useLastRunCommand,
 } from '/app/resources/runs'
-import { CommandText, CommandIcon } from '/app/molecules/Command'
+import { CommandIcon } from '/app/molecules/Command'
 import { Divider } from '/app/atoms/structure'
 import { NAV_BAR_WIDTH } from '/app/App/constants'
-import { getLabwareDefinitionsFromCommands } from '/app/local-resources/labware'
 
 import type { ForwardedRef } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'

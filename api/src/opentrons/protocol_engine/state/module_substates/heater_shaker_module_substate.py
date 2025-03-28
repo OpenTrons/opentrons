@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from typing import NewType, Optional
 
+from opentrons.hardware_control.modules import ModuleDataValidator, ModuleData
 from opentrons.protocol_engine.types import (
     TemperatureRange,
     SpeedRange,
@@ -89,3 +90,24 @@ class HeaterShakerModuleSubState:
             raise CannotPerformModuleAction(
                 "Heater-Shaker cannot open its labware latch while it is shaking."
             )
+
+    @classmethod
+    def from_live_data(
+        cls, module_id: HeaterShakerModuleId, data: ModuleData | None
+    ) -> "HeaterShakerModuleSubState":
+        """Create a HeaterShakerModuleSubState from live data."""
+        if ModuleDataValidator.is_heater_shaker_data(data):
+            return cls(
+                module_id=module_id,
+                labware_latch_status=HeaterShakerLatchStatus.CLOSED
+                if data["labwareLatchStatus"] == "idle_closed"
+                else HeaterShakerLatchStatus.OPEN,
+                is_plate_shaking=data["targetSpeed"] is not None,
+                plate_target_temperature=data["targetTemp"],
+            )
+        return cls(
+            module_id=module_id,
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        )

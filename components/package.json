@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/step-generation": "link:../step-generation",
     "@popperjs/core": "2.1.1",
     "@react-spring/types": "9.6.1",
     "@react-spring/web": "9.6.1",
@@ -32,11 +33,14 @@
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
     "interactjs": "^1.10.27",
+    "i18next": "^19.8.3",
     "lodash": "4.17.21",
     "react-i18next": "14.0.0",
+    "react-markdown": "9.0.3",
     "react-popper": "1.0.0",
     "react-remove-scroll": "2.4.3",
     "react-select": "5.4.0",
+    "react-viewport-list": "6.3.0",
     "redux": "4.0.5",
     "styled-components": "5.3.6"
   },

@@ -4,7 +4,11 @@ from typing import Optional, Dict
 from typing_extensions import Protocol as TypingProtocol
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import FailedTipStateCheck, InstrumentProbeType
+from opentrons.hardware_control.types import (
+    FailedTipStateCheck,
+    InstrumentProbeType,
+    TipScrapeType,
+)
 from opentrons.protocol_engine.errors.exceptions import PickUpTipTipNotAttachedError
 from opentrons.types import Mount, NozzleConfigurationType
 
@@ -82,6 +86,7 @@ class TipHandler(TypingProtocol):
         home_after: Optional[bool],
         do_not_ignore_tip_presence: bool = True,
         ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
         """Drop the attached tip into the current location.
 
@@ -279,19 +284,22 @@ class HardwareTipHandler(TipHandler):
         home_after: Optional[bool],
         do_not_ignore_tip_presence: bool = True,
         ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
         """See documentation on abstract base class."""
         hw_mount = self._get_hw_mount(pipette_id)
 
         # Let the hardware controller handle defaulting home_after since its behavior
         # differs between machines
+        kwargs = {}
         if home_after is not None:
-            kwargs = {"home_after": home_after}
-        else:
-            kwargs = {}
+            kwargs["home_after"] = home_after
 
         await self._hardware_api.tip_drop_moves(
-            mount=hw_mount, ignore_plunger=ignore_plunger, **kwargs
+            mount=hw_mount,
+            ignore_plunger=ignore_plunger,
+            scrape_type=scrape_type,
+            **kwargs,
         )
 
         if do_not_ignore_tip_presence:
@@ -445,6 +453,7 @@ class VirtualTipHandler(TipHandler):
         home_after: Optional[bool],
         do_not_ignore_tip_presence: bool = True,
         ignore_plunger: bool = False,
+        scrape_type: TipScrapeType = TipScrapeType.NONE,
     ) -> None:
         """Pick up a tip at the current location using a virtual pipette.
 

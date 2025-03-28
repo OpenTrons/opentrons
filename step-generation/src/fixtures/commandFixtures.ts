@@ -7,6 +7,7 @@ import {
   DEFAULT_BLOWOUT_WELL,
   DEST_LABWARE,
 } from './data'
+import { AIR_GAP_OFFSET_FROM_TOP } from '../constants'
 import { ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA } from '@opentrons/shared-data'
 
 import type {
@@ -56,7 +57,7 @@ export const BLOWOUT_FLOW_RATE = 2.3
 export const ASPIRATE_OFFSET_FROM_BOTTOM_MM = 3.1
 export const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
 export const BLOWOUT_OFFSET_FROM_TOP_MM = 3.3
-const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
+const TOUCH_TIP_OFFSET_FROM_TOP_MM = -3.4
 interface FlowRateAndOffsetParamsTransferlike {
   aspirateFlowRateUlSec: number
   dispenseFlowRateUlSec: number
@@ -64,8 +65,8 @@ interface FlowRateAndOffsetParamsTransferlike {
   aspirateOffsetFromBottomMm: number
   dispenseOffsetFromBottomMm: number
   blowoutOffsetFromTopMm: number
-  touchTipAfterAspirateOffsetMmFromBottom: number
-  touchTipAfterDispenseOffsetMmFromBottom: number
+  touchTipAfterAspirateOffsetMmFromTop: number
+  touchTipAfterDispenseOffsetMmFromTop: number
 }
 export const getFlowRateAndOffsetParamsTransferLike = (): FlowRateAndOffsetParamsTransferlike => ({
   aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
@@ -75,8 +76,8 @@ export const getFlowRateAndOffsetParamsTransferLike = (): FlowRateAndOffsetParam
   dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
   blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
   // for consolidate/distribute/transfer only
-  touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
-  touchTipAfterDispenseOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+  touchTipAfterAspirateOffsetMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
+  touchTipAfterDispenseOffsetMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
 })
 interface FlowRateAndOffsetParamsMix {
   aspirateFlowRateUlSec: number
@@ -85,7 +86,7 @@ interface FlowRateAndOffsetParamsMix {
   aspirateOffsetFromBottomMm: number
   dispenseOffsetFromBottomMm: number
   blowoutOffsetFromTopMm: number
-  touchTipMmFromBottom: number
+  touchTipMmFromTop: number
 }
 export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => ({
   aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
@@ -95,22 +96,12 @@ export const getFlowRateAndOffsetParamsMix = (): FlowRateAndOffsetParamsMix => (
   dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
   blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
   // for mix only
-  touchTipMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+  touchTipMmFromTop: TOUCH_TIP_OFFSET_FROM_TOP_MM,
 })
 type MakeAspDispHelper<P> = (
   bakedParams?: Partial<P>
 ) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
-type MakeAirGapHelper<P> = (
-  bakedParams: Partial<P> & {
-    wellLocation: {
-      origin: 'bottom'
-      offset: {
-        z: number
-      }
-    }
-  }
-) => (well: string, volume: number, params?: Partial<P>) => CreateCommand
-type MakeDispenseAirGapHelper<P> = MakeAirGapHelper<P>
+
 const _defaultAspirateParams = {
   pipetteId: DEFAULT_PIPETTE,
   labwareId: SOURCE_LABWARE,
@@ -139,23 +130,54 @@ export const makeAspirateHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     ...params,
   },
 })
-export const makeAirGapHelper: MakeAirGapHelper<AspDispAirgapParams> = bakedParams => (
-  wellName,
-  volume,
-  params
-) => ({
-  commandType: 'aspirate',
-  meta: AIR_GAP_META,
+export const makeMoveToWellHelper = (wellName: string, labwareId?: string) => ({
+  commandType: 'moveToWell',
   key: expect.any(String),
   params: {
-    ..._defaultAspirateParams,
-    ...bakedParams,
+    pipetteId: DEFAULT_PIPETTE,
+    labwareId: labwareId ?? SOURCE_LABWARE,
     wellName,
-    volume,
-    flowRate: ASPIRATE_FLOW_RATE,
-    ...params,
+    wellLocation: {
+      origin: 'top',
+      offset: {
+        x: 0,
+        y: 0,
+        z: AIR_GAP_OFFSET_FROM_TOP,
+      },
+    },
   },
 })
+export const makeAirGapAfterAspirateHelper = (
+  volume: number,
+  flowRate?: number
+) => ({
+  commandType: 'airGapInPlace',
+  key: expect.any(String),
+  params: {
+    pipetteId: DEFAULT_PIPETTE,
+    volume,
+    flowRate: flowRate ?? ASPIRATE_FLOW_RATE,
+  },
+})
+export const makeAirGapHelper = (volume: number, flowRate?: number) => [
+  {
+    commandType: 'prepareToAspirate',
+    key: expect.any(String),
+    params: {
+      pipetteId: DEFAULT_PIPETTE,
+    },
+  },
+  {
+    commandType: 'airGapInPlace',
+    key: expect.any(String),
+    params: {
+      pipetteId: DEFAULT_PIPETTE,
+      volume,
+      flowRate: flowRate ?? ASPIRATE_FLOW_RATE,
+    },
+  },
+]
+
 export const blowoutHelper = (
   labware: string,
   params?: Partial<BlowoutParams>
@@ -224,19 +246,26 @@ export const makeDispenseHelper: MakeAspDispHelper<AspDispAirgapParams> = bakedP
     ...params,
   },
 })
-export const makeDispenseAirGapHelper: MakeDispenseAirGapHelper<AspDispAirgapParams> = bakedParams => (
-  wellName,
-  volume,
-  params
-) => ({
+export const makeDispenseAirGapHelper = (
+  wellName: string,
+  volume: number
+): CreateCommand => ({
   commandType: 'dispense',
   key: expect.any(String),
   params: {
-    ..._defaultDispenseParams,
-    ...bakedParams,
+    pipetteId: DEFAULT_PIPETTE,
+    labwareId: DEST_LABWARE,
+    wellLocation: {
+      origin: 'top' as const,
+      offset: {
+        y: 0,
+        x: 0,
+        z: 1,
+      },
+    },
+    flowRate: DISPENSE_FLOW_RATE,
     wellName,
     volume,
-    ...params,
   },
   meta: AIR_GAP_META,
 })
@@ -244,9 +273,9 @@ const _defaultTouchTipParams = {
   pipetteId: DEFAULT_PIPETTE,
   labwareId: SOURCE_LABWARE,
   wellLocation: {
-    origin: 'bottom' as const,
+    origin: 'top' as const,
     offset: {
-      z: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+      z: TOUCH_TIP_OFFSET_FROM_TOP_MM,
     },
   },
 }
@@ -261,18 +290,25 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   key: expect.any(String),
   params: { ..._defaultTouchTipParams, ...bakedParams, wellName, ...params },
 })
-export const delayCommand = (seconds: number): CreateCommand => ({
+export const delayCommand = (
+  seconds: number,
+  message?: string
+): CreateCommand => ({
   commandType: 'waitForDuration',
   key: expect.any(String),
   params: {
     seconds: seconds,
+    message,
   },
 })
 export const delayWithOffset = (
   wellName: string,
   labwareId: string,
   seconds?: number,
-  zOffset?: number
+  zOffset?: number,
+  forceDirect?: boolean,
+  minimumZHeight?: number,
+  message?: string
 ): CreateCommand[] => [
   {
     commandType: 'moveToWell',
@@ -289,6 +325,8 @@ export const delayWithOffset = (
           z: zOffset || 14,
         },
       },
+      forceDirect,
+      minimumZHeight,
     },
   },
   {
@@ -296,6 +334,7 @@ export const delayWithOffset = (
     key: expect.any(String),
     params: {
       seconds: seconds ?? 12,
+      message,
     },
   },
 ]

@@ -27,9 +27,11 @@ const render = (props: ComponentProps<typeof PickUpTip>) => {
 describe('PickUpTip', () => {
   let props: ComponentProps<typeof PickUpTip>
   let mockChainRunCommands: Mock
+  let mockCalculateAndApplyOffset: Mock
 
   beforeEach(() => {
     mockChainRunCommands = vi.fn().mockImplementation(() => Promise.resolve())
+    mockCalculateAndApplyOffset = vi.fn()
     vi.mocked(getIsOnDevice).mockReturnValue(false)
     props = {
       section: SECTIONS.PICK_UP_TIP,
@@ -49,6 +51,9 @@ describe('PickUpTip', () => {
       robotType: FLEX_ROBOT_TYPE,
       protocolHasModules: false,
       currentStepIndex: 1,
+      onSkip: vi.fn(),
+      isApplyingOffsets: false,
+      calculateAndApplyOffset: mockCalculateAndApplyOffset,
     }
     vi.mocked(useProtocolMetadata).mockReturnValue({
       robotType: 'OT-3 Standard',
@@ -250,10 +255,16 @@ describe('PickUpTip', () => {
         ],
         false
       )
+
       screen.getByRole('heading', {
         name: 'Did pipette pick up tip successfully?',
       })
     })
+
+    await waitFor(() => {
+      expect(mockCalculateAndApplyOffset).toHaveBeenCalled()
+    })
+
     const tryAgain = screen.getByRole('button', { name: 'Try again' })
     fireEvent.click(tryAgain)
     await new Promise((resolve, reject) => setTimeout(resolve))
@@ -365,6 +376,11 @@ describe('PickUpTip', () => {
         name: 'Did pipette pick up tip successfully?',
       })
     })
+
+    await waitFor(() => {
+      expect(mockCalculateAndApplyOffset).toHaveBeenCalled()
+    })
+
     const yesButton = screen.getByRole('button', { name: 'Yes' })
     fireEvent.click(yesButton)
     await new Promise((resolve, reject) => setTimeout(resolve))

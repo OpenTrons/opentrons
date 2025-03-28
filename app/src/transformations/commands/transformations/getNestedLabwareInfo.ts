@@ -21,13 +21,17 @@ export function getNestedLabwareInfo(
     (command): command is LoadLabwareRunTimeCommand =>
       command.commandType === 'loadLabware' &&
       command.params.location !== 'offDeck' &&
+      command.params.location !== 'systemLocation' &&
       'labwareId' in command.params.location &&
       command.params.location.labwareId === labwareSetupItem.labwareId
   )
   if (nestedLabware == null) return null
 
   let sharedSlotId: string = ''
-  if (labwareSetupItem.initialLocation !== 'offDeck') {
+  if (
+    labwareSetupItem.initialLocation !== 'offDeck' &&
+    labwareSetupItem.initialLocation !== 'systemLocation'
+  ) {
     const adapterLocation = labwareSetupItem.initialLocation
     if ('slotName' in adapterLocation) {
       sharedSlotId = adapterLocation.slotName

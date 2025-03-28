@@ -1,13 +1,17 @@
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { useEffect, useRef, useState } from 'react'
+import { PromptPreview } from '../../molecules/PromptPreview'
+import { useForm, FormProvider } from 'react-hook-form'
+import { useAtom } from 'jotai'
+
 import {
   Flex,
   JUSTIFY_SPACE_EVENLY,
   POSITION_RELATIVE,
   SPACING,
 } from '@opentrons/components'
-import { useTranslation } from 'react-i18next'
-import { useEffect, useRef, useState } from 'react'
-import { PromptPreview } from '../../molecules/PromptPreview'
-import { useForm, FormProvider } from 'react-hook-form'
+
 import {
   chatDataAtom,
   chatHistoryAtom,
@@ -16,17 +20,18 @@ import {
   headerWithMeterAtom,
   updateProtocolChatAtom,
 } from '../../resources/atoms'
-import { useAtom } from 'jotai'
+
 import { ProtocolSectionsContainer } from '../../organisms/ProtocolSectionsContainer'
 import {
   generateChatPrompt,
   generatePromptPreviewData,
 } from '../../resources/utils/createProtocolUtils'
-import type { DisplayModules } from '../../organisms/ModulesSection'
-import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
-import { useNavigate } from 'react-router-dom'
 import { useTrackEvent } from '../../resources/hooks/useTrackEvent'
 import { ResizeBar } from '../../atoms/ResizeBar'
+
+import type { MouseEvent } from 'react'
+import type { DisplayModules } from '../../organisms/ModulesSection'
+import type { DisplayLabware } from '../../organisms/LabwareLiquidsSection'
 
 export interface CreateProtocolFormData {
   application: {
@@ -164,9 +169,7 @@ export function CreateProtocol(): JSX.Element | null {
     return currentSection > 0 ? currentSection / TOTAL_STEPS : 0
   }
 
-  function handleMouseDown(
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ): void {
+  function handleMouseDown(e: MouseEvent<HTMLDivElement, MouseEvent>): void {
     setIsResizing(true)
     setInitialMouseX(e.clientX)
     setInitialLeftWidth(leftWidth)

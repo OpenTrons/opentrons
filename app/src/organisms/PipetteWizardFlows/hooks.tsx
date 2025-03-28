@@ -90,10 +90,14 @@ export function usePipetteFlowWizardHeaderText(
       )
     } else if (
       attachedPipettes[LEFT]?.data.channels === 96 &&
-      mountPipette?.pipetteName !== 'p1000_96'
+      mountPipette?.pipetteName !== 'p1000_96' &&
+      mountPipette?.pipetteName !== 'p200_96'
     ) {
       return t('detach_96_attach_mount', { mount: capitalizedMount })
-    } else if (leftPipette?.pipetteName === 'p1000_96') {
+    } else if (
+      leftPipette?.pipetteName === 'p1000_96' ||
+      leftPipette?.pipetteName === 'p200_96'
+    ) {
       if (isGantryEmpty) {
         return t('attach_96_channel')
       } else if (

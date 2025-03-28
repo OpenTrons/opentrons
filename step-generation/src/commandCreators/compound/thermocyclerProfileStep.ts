@@ -20,7 +20,7 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
     blockTargetTempHold,
     lidTargetTempHold,
     lidOpenHold,
-    module: moduleId,
+    moduleId,
     profileSteps,
     profileTargetLidTemp,
     profileVolume,
@@ -38,7 +38,7 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
   if (thermocyclerState.lidOpen !== false) {
     commandCreators.push(
       curryCommandCreator(thermocyclerCloseLid, {
-        module: moduleId,
+        moduleId,
       })
     )
   }
@@ -46,30 +46,32 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
   if (profileTargetLidTemp !== thermocyclerState.lidTargetTemp) {
     commandCreators.push(
       curryCommandCreator(thermocyclerSetTargetLidTemperature, {
-        module: moduleId,
-        temperature: profileTargetLidTemp,
+        moduleId,
+        celsius: profileTargetLidTemp,
       })
     )
     commandCreators.push(
       curryCommandCreator(thermocyclerWaitForLidTemperature, {
-        module: moduleId,
-        temperature: profileTargetLidTemp,
+        moduleId,
       })
     )
   }
 
   commandCreators.push(
     curryCommandCreator(thermocyclerRunProfile, {
-      module: moduleId,
-      profile: profileSteps,
-      volume: profileVolume,
+      moduleId,
+      profile: profileSteps.map(step => ({
+        celsius: step.temperature,
+        holdSeconds: step.holdTime,
+      })),
+      blockMaxVolumeUl: profileVolume,
     })
   )
 
   commandCreators.push(
     curryCommandCreator(thermocyclerStateStep, {
       commandCreatorFnName: 'thermocyclerState',
-      module: moduleId,
+      moduleId: moduleId,
       blockTargetTemp: blockTargetTempHold,
       lidTargetTemp: lidTargetTempHold,
       lidOpen: lidOpenHold,

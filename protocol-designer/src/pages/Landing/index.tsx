@@ -8,7 +8,6 @@ import {
   COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
-  EndUserAgreementFooter,
   Flex,
   INFO_TOAST,
   JUSTIFY_CENTER,
@@ -17,15 +16,20 @@ import {
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { LINK_BUTTON_STYLE } from '../../atoms'
-import { AnnouncementModal } from '../../organisms'
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
+import { EndUserAgreementFooter } from '../../components/molecules'
+import { AnnouncementModal } from '../../components/organisms'
 import { actions as loadFileActions } from '../../load-file'
 import { getFileMetadata } from '../../file-data/selectors'
 import { toggleNewProtocolModal } from '../../navigation/actions'
-import { useKitchen } from '../../organisms/Kitchen/hooks'
+import { useKitchen } from '../../components/organisms/Kitchen/hooks'
 import { getHasOptedIn } from '../../analytics/selectors'
-import { useAnnouncements } from '../../organisms/AnnouncementModal/announcements'
-import { getLocalStorageItem, localStorageAnnouncementKey } from '../../persist'
+import { useAnnouncements } from '../../components/organisms/AnnouncementModal/announcements'
+import {
+  getLocalStorageItem,
+  localStorageAnnouncementKey,
+  setLocalStorageItem,
+} from '../../persist'
 import welcomeImage from '../../assets/images/welcome_page.png'
 
 import type { ChangeEvent, ComponentProps } from 'react'
@@ -39,7 +43,7 @@ export function Landing(): JSX.Element {
   const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
     false
   )
-  const { hasOptedIn } = useSelector(getHasOptedIn)
+  const { hasOptedIn, appVersion } = useSelector(getHasOptedIn)
   const { bakeToast, eatToast } = useKitchen()
   const announcements = useAnnouncements()
   const lastAnnouncement = announcements[announcements.length - 1]
@@ -52,7 +56,11 @@ export function Landing(): JSX.Element {
     hasOptedIn != null
 
   useEffect(() => {
-    if (userHasNotSeenAnnouncement) {
+    if (
+      userHasNotSeenAnnouncement &&
+      appVersion != null &&
+      hasOptedIn != null
+    ) {
       const toastId = bakeToast(
         t('learn_more', { version: process.env.OT_PD_VERSION }) as string,
         INFO_TOAST,
@@ -60,6 +68,9 @@ export function Landing(): JSX.Element {
           heading: t('updated_protocol_designer'),
           closeButton: true,
           linkText: t('view_release_notes'),
+          onClose: () => {
+            setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
+          },
           onLinkClick: () => {
             eatToast(toastId)
             setShowAnnouncementModal(true)
@@ -69,7 +80,7 @@ export function Landing(): JSX.Element {
         }
       )
     }
-  }, [userHasNotSeenAnnouncement])
+  }, [userHasNotSeenAnnouncement, appVersion, hasOptedIn])
 
   useEffect(() => {
     if (metadata?.created != null) {
@@ -138,7 +149,7 @@ export function Landing(): JSX.Element {
         <StyledLabel>
           <Flex css={LINK_BUTTON_STYLE}>
             <StyledText desktopStyle="bodyLargeRegular">
-              {t('edit_existing')}
+              {t('import_existing_protocol')}
             </StyledText>
           </Flex>
           <input type="file" onChange={loadFile} />

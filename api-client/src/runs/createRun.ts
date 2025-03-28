@@ -4,14 +4,15 @@ import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 import type {
   Run,
-  LabwareOffsetCreateData,
+  LegacyLabwareOffsetCreateData,
   RunTimeParameterValuesCreateData,
   RunTimeParameterFilesCreateData,
+  LabwareOffsetCreateData,
 } from './types'
 
 export interface CreateRunData {
   protocolId?: string
-  labwareOffsets?: LabwareOffsetCreateData[]
+  labwareOffsets?: LegacyLabwareOffsetCreateData[] | LabwareOffsetCreateData[]
   runTimeParameterValues?: RunTimeParameterValuesCreateData
   runTimeParameterFiles?: RunTimeParameterFilesCreateData
 }
