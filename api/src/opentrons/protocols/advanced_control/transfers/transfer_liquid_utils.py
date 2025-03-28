@@ -129,7 +129,8 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
         targets.reverse()
 
     for well in targets:
-        # If we have an active wells that are covered by a target well already, check if the well is in that list
+        # If we have wells that are covered by the pipette's nozzles while primary nozzle is over
+        # a target well that aren't accounted for, check if the current well is in that list
         if active_wells_covered:
             if well.parent != active_labware:
                 raise ValueError(
@@ -139,10 +140,10 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
 
             if well.well_name in active_wells_covered:
                 active_wells_covered.remove(well.well_name)
-            # If it's a 384 well plate, contiguous wells are not covered by the initial target well.
-            # To support these kinds of transfers given a list of contiguous wells, allow another
-            # target well (or up to 4 total for a full 96-tip config) and add those wells to list
-            # of covered wells
+            # If it's a 384 well plate, contiguous wells are not covered by the pipette targeting the
+            # initial target well. To support these kinds of transfers given a list of contiguous wells,
+            # allow another target well (or up to 4 total for a full 96-tip config) and add those wells
+            # to the list of covered wells
             elif labware_format == "384Standard" and (
                 alternate_384_well_coverage_count == 0
                 or (
@@ -169,9 +170,9 @@ def _group_wells_for_nozzle_configuration(  # noqa: C901
                     "Could not resolve wells provided to pipette's nozzle configuration. "
                     "Please ensure wells are ordered to match pipette's nozzle layout."
                 )
-        # We have no active wells covered so add a new target well and list of covered wells to check
+        # If we have no active wells covered to account for, add a new target well and list of covered wells to check
         else:
-            # If the labware is not a 96 or 384 well plate, don't group it and move on to the next well
+            # If the labware is not a 96 or 384 well plate, add this well to the final result and move on to the next
             labware_format = well.parent.parameters["format"]
             if labware_format != "96Standard" and labware_format != "384Standard":
                 grouped_wells.append(well)
