@@ -86,7 +86,6 @@ export enum SetupLocators {
   button = 'button',
   svg = 'svg',
   exist = 'exist',
-  StepOptionsTestIDThreeDots = 'button.Btn-sc-o3dtr1-0.OverflowBtn___StyledBtn-sc-1mslfxo-0', //NOTE: locator
   AspirateCheckbox = 'div.Checkbox___StyledFlex3-sc-1mvp7vt-0.gZwGCw.btdgeU', //NOTE: locator
 }
 
@@ -344,15 +343,6 @@ export const SetupSteps = {
     },
   }),
 
-  ChoseDeckSlotC2Labware: (): StepThunk => ({
-    call: () => {
-      chooseDeckSlot('C2')
-        .find('.Box-sc-8ozbhb-0.kIDovv') //NOTE: ??
-        .find('a[role="button"]')
-        .contains(RegexSetupContent.slotText)
-        .click({ force: true })
-    },
-  }),
   /**
    * Choose deck slot.
    */
@@ -411,7 +401,6 @@ export const SetupSteps = {
   ChoseDeckSlotWithLabware: (deckslot: string): StepThunk => ({
     call: () => {
       chooseDeckSlot(deckslot)
-        .find('.Box-sc-8ozbhb-0.kIDovv') //NOTE: ??
         .find('a[role="button"]')
         .contains(RegexSetupContent.slotText)
         .click({ force: true })
@@ -510,10 +499,10 @@ export const SetupSteps = {
    */
   LiquidDropdown: (): StepThunk => ({
     call: () => {
-      cy.get(SetupLocators.LiquidsDropdown)
-        .should('be.visible').click()
+      cy.get(SetupLocators.LiquidsDropdown).should('be.visible').click()
     },
   }),
+  // cy.contains('p', 'Choose option').closest('div[tabindex="0"]').click()
 
   /**
    * Select "My liquid!" from the dropdown.
@@ -778,9 +767,9 @@ export const SetupSteps = {
     },
   }),
 
-  DeleteSteps: (): StepThunk => ({
+  DeleteSteps: (stepNumStepType: string): StepThunk => ({
     call: () => {
-      cy.get(SetupLocators.StepOptionsTestIDThreeDots).click()
+      cy.contains(stepNumStepType).parent().next('button').click()
       cy.contains('Delete step').click()
       cy.contains('button', 'Delete step').click()
     },

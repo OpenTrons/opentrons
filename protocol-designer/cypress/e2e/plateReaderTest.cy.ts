@@ -1,4 +1,8 @@
-import { SetupSteps, SetupVerifications } from '../support/SetupSteps'
+import {
+  SetupSteps,
+  SetupVerifications,
+  CompositeSetupSteps,
+} from '../support/SetupSteps'
 import { ModuleSteps, ModuleVerifications } from '../support/ModuleSteps'
 import { UniversalSteps } from '../support/UniversalSteps'
 import { StepBuilder } from '../support/StepBuilder'
@@ -44,11 +48,9 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.Confirm())
     steps.add(SetupSteps.EditProtocolA())
-    steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
-    steps.add(SetupSteps.AddHardwareLabware())
-    steps.add(SetupSteps.ClickLabwareHeader())
-    steps.add(SetupSteps.ClickWellPlatesSection())
-    steps.add(SetupSteps.SelectLabwareByDisplayName('Bio-Rad 96 Well Plate'))
+    steps.add(
+      CompositeSetupSteps.AddLabwareToDeckSlot('C3', 'Bio-Rad 96 Well Plate')
+    )
     steps.add(SetupSteps.ChoseDeckSlotWithLabware('C3'))
     steps.add(SetupSteps.AddLiquid())
     steps.add(SetupSteps.ClickLiquidButton())
@@ -81,7 +83,7 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(SetupSteps.Save())
     steps.add(ModuleVerifications.NoMoveToPlateReaderWhenClosed())
     // You can't move to Plate Reader while it's closed
-    steps.add(SetupSteps.DeleteSteps())
+    steps.add(SetupSteps.DeleteSteps('1. Move'))
     steps.add(SetupSteps.AddStep())
     steps.add(ModuleSteps.StartPlateReaderStep())
     steps.add(ModuleVerifications.PlateReaderPart1NoInitilization())
@@ -91,7 +93,6 @@ describe('Plate Reader Happy Path Single-Wavelength', () => {
     steps.add(ModuleSteps.DefineInitilizationSingleCheckAll())
     steps.add(ModuleSteps.DefineCustomWavelegthSingle('300'))
     steps.add(SetupSteps.Save())
-
     steps.execute()
   })
 })
