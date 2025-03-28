@@ -266,6 +266,28 @@ def create_tip_size_parameter(parameters: ParameterContext) -> None:
     )
 
 
+def create_all_deck_slot_parameters(parameters: ParameterContext) -> None:
+    """Create parameters for all deck slots."""
+    deck_slots = [f"{letter}{number}" for letter in "ABCD" for number in range(1, 4)]
+    for deck_slot in deck_slots:
+        parameters.add_bool(
+            variable_name=deck_slot, display_name=f"Slot {deck_slot}", default=True
+        )
+    # WHAT TO COPY PASTE IN PROTOCOL
+    # slot_a1 = protocol.params.A1 # type: ignore[attr-defined]
+    # slot_a2 = protocol.params.A2 # type: ignore[attr-defined]
+    # slot_a3 = protocol.params.A3 # type: ignore[attr-defined]
+    # slot_b1 = protocol.params.B1 # type: ignore[attr-defined]
+    # slot_b2 = protocol.params.B2 # type: ignore[attr-defined]
+    # slot_b3 = protocol.params.B3 # type: ignore[attr-defined]
+    # slot_c1 = protocol.params.C1 # type: ignore[attr-defined]
+    # slot_c2 = protocol.params.C2 # type: ignore[attr-defined]
+    # slot_c3 = protocol.params.C3 # type: ignore[attr-defined]
+    # slot_d1 = protocol.params.D1 # type: ignore[attr-defined]
+    # slot_d2 = protocol.params.D2 # type: ignore[attr-defined]
+    # slot_d3 = protocol.params.D3 # type: ignore[attr-defined]
+
+
 def create_dot_bottom_parameter(parameters: ParameterContext) -> None:
     """Create parameter for dot bottom value."""
     parameters.add_float(
