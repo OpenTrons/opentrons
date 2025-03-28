@@ -15,7 +15,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def run(protocol: ProtocolContext) -> None:
-    """Runts protocol."""
+    """Runs protocol."""
     tip_rack_type = protocol.params.tip_size  # type: ignore[attr-defined]
     pipette_mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     pipette_type_left = protocol.params.left_mount  # type: ignore[attr-defined]
