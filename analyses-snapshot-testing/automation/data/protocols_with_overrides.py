@@ -107,3 +107,122 @@ class ProtocolsWithOverrides:
             "drop_tip_with_location",
         ],
     )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid.py
+    Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_transfer_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+            # new 3/26/2025
+            "50_exceeds",
+            "50_filter_exceeds",
+            "200_exceeds",
+            "200_filter_exceeds",
+            "1000_exceeds",
+            "1000_filter_exceeds",
+        ],
+    )
+
+    # Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid.py
+    # https://opentrons.atlassian.net/browse/AUTH-1619
+    Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_distribute_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            # "1000_filter", Bug
+            # new 3/26/2025
+            "50_under",
+            "50_filter_under",
+            "200_under",
+            "200_filter_under",
+        ],
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid.py
+
+    Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_96_HappyPath_Overrides_consolidate_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_under",
+            "50_filter",
+            "50_filter_exceeds",
+            "200",
+            "200_exceeds",
+            "200_filter",
+            "200_filter_under",
+            "1000",
+            "1000_under",
+            "1000_filter",
+            "1000_filter_exceeds",
+        ],
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_transfer_liquid.py
+
+    Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_transfer_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_transfer_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+        ],
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid.py
+
+    Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_consolidate_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            "50",
+            "50_filter",
+            "200",
+            "200_filter",
+            "1000",
+            "1000_filter",
+        ],
+    )
+
+    # analyses-snapshot-testing/files/protocols/Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_distribute_liquid.py
+    # https://opentrons.atlassian.net/browse/AUTH-1602
+    Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_distribute_liquid: ProtocolWithOverrides = ProtocolWithOverrides(
+        file_stem="Flex_S_v2_23_P1000_8ch_None_HappyPath_Overrides_distribute_liquid",
+        file_extension="py",
+        robot="Flex",
+        override_variable_name="key",
+        overrides=[
+            # "50",
+            "50_filter",
+            "200",
+            # "200_filter",
+            # "1000",
+            "1000_filter",
+        ],
+    )
