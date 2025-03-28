@@ -7,6 +7,7 @@ if "OT_SYSTEM_VERSION" not in environ:
 
 import argparse
 import asyncio
+import subprocess
 from pathlib import Path
 from typing import Tuple
 
@@ -42,6 +43,8 @@ async def _main(cfg: TestConfig) -> None:
     report, stacker = await build_stacker_report(cfg.simulate)
 
     if not cfg.simulate:
+        print("Stopping the robot server")
+        subprocess.run(["systemctl stop opentrons-robot-server"], shell=True)
         # Perform initial checks before starting tests
         # 1. estop should not be pressed
         # 2. platform should be removed
@@ -75,6 +78,11 @@ async def _main(cfg: TestConfig) -> None:
     ui.print_title("DONE")
     report.save_to_disk()
     report.print_results()
+
+    # Restart the robot server
+    if not cfg.simulate:
+        print("Starting the robot server")
+        subprocess.run(["systemctl restart opentrons-robot-server &"], shell=True)
 
 
 if __name__ == "__main__":

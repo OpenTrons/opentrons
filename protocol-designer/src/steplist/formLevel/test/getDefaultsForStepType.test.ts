@@ -86,6 +86,8 @@ describe('getDefaultsForStepType', () => {
         preWetTip: false,
         pushOut_checkbox: null,
         pushOut_volume: null,
+        conditioning_checkbox: false,
+        conditioning_volume: null,
 
         aspirate_airGap_checkbox: false,
         aspirate_airGap_volume: null,

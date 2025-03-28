@@ -1,9 +1,10 @@
 """Executor for liquid class based complex commands."""
 from __future__ import annotations
 
+import logging
 from copy import deepcopy
 from enum import Enum
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional, Union, Literal
 from dataclasses import dataclass, field
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
@@ -11,6 +12,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
     BlowoutLocation,
 )
+from opentrons_shared_data.pipette.types import LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
 
 from opentrons.protocol_api._liquid_properties import (
     Submerge,
@@ -22,11 +24,19 @@ from opentrons.protocol_api._liquid_properties import (
 )
 from opentrons.protocol_engine.errors import TouchTipDisabledError
 from opentrons.types import Location, Point
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    LocationCheckDescriptors,
+)
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as tx_utils,
+)
 
 if TYPE_CHECKING:
     from .well import WellCore
     from .instrument import InstrumentCore
     from ... import TrashBin, WasteChute
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -121,6 +131,8 @@ class TransferComponentsExecutor:
     def submerge(
         self,
         submerge_properties: Submerge,
+        post_submerge_action: Literal["aspirate", "dispense"],
+        volume_for_pipette_mode_configuration: Optional[float],
     ) -> None:
         """Execute submerge steps.
 
@@ -131,7 +143,6 @@ class TransferComponentsExecutor:
         2. move to aspirate position at desired speed
         3. delay
         """
-        # TODO: compare submerge start position and aspirate position and raise error if incompatible
         submerge_start_point = absolute_point_from_position_reference_and_offset(
             well=self._target_well,
             position_reference=submerge_properties.position_reference,
@@ -140,6 +151,46 @@ class TransferComponentsExecutor:
         submerge_start_location = Location(
             point=submerge_start_point, labware=self._target_location.labware
         )
+        prep_before_moving_to_submerge = (
+            post_submerge_action == "aspirate"
+            and volume_for_pipette_mode_configuration is not None
+        )
+        if prep_before_moving_to_submerge:
+            # Move to the tip probe start position
+            self._instrument.move_to(
+                location=Location(
+                    point=self._target_well.get_top(
+                        LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z
+                    ),
+                    labware=self._target_location.labware,
+                ),
+                well_core=self._target_well,
+                force_direct=False,
+                minimum_z_height=None,
+                speed=None,
+            )
+            self._remove_air_gap(location=submerge_start_location)
+            if (
+                self._transfer_type != TransferType.MANY_TO_ONE
+                and self._instrument.get_liquid_presence_detection()
+            ):
+                self._instrument.liquid_probe_with_recovery(
+                    well_core=self._target_well, loc=submerge_start_location
+                )
+            # TODO: do volume configuration + prepare for aspirate only if the mode needs to be changed
+            self._instrument.configure_for_volume(volume_for_pipette_mode_configuration)  # type: ignore[arg-type]
+            self._instrument.prepare_to_aspirate()
+
+        tx_utils.raise_if_location_inside_liquid(
+            location=submerge_start_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=LocationCheckDescriptors(
+                location_type="submerge start",
+                pipetting_action=post_submerge_action,
+            ),
+            logger=log,
+        )
         self._instrument.move_to(
             location=submerge_start_location,
             well_core=self._target_well,
@@ -147,7 +198,8 @@ class TransferComponentsExecutor:
             minimum_z_height=None,
             speed=None,
         )
-        self._remove_air_gap(location=submerge_start_location)
+        if not prep_before_moving_to_submerge:
+            self._remove_air_gap(location=submerge_start_location)
         self._instrument.move_to(
             location=self._target_location,
             well_core=self._target_well,
@@ -291,6 +343,16 @@ class TransferComponentsExecutor:
         retract_location = Location(
             retract_point, labware=self._target_location.labware
         )
+        tx_utils.raise_if_location_inside_liquid(
+            location=retract_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="aspirate",
+            ),
+            logger=log,
+        )
         self._instrument.move_to(
             location=retract_location,
             well_core=self._target_well,
@@ -378,6 +440,16 @@ class TransferComponentsExecutor:
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
+        )
+        tx_utils.raise_if_location_inside_liquid(
+            location=retract_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="dispense",
+            ),
+            logger=log,
         )
         self._instrument.move_to(
             location=retract_location,
@@ -508,6 +580,16 @@ class TransferComponentsExecutor:
         )
         retract_location = Location(
             retract_point, labware=self._target_location.labware
+        )
+        tx_utils.raise_if_location_inside_liquid(
+            location=retract_location,
+            well_location=self._target_location,
+            well_core=self._target_well,
+            location_check_descriptors=LocationCheckDescriptors(
+                location_type="retract end",
+                pipetting_action="dispense",
+            ),
+            logger=log,
         )
         self._instrument.move_to(
             location=retract_location,

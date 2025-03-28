@@ -8,14 +8,16 @@ import {
 import type { ComponentProps } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
-interface OffsetVectorProps extends StyleProps {
+interface LegacyOffsetVectorProps extends StyleProps {
   x: number
   y: number
   z: number
   as?: ComponentProps<typeof LegacyStyledText>['as']
 }
 
-export function OffsetVector(props: OffsetVectorProps): JSX.Element {
+export function LegacyOffsetVector(
+  props: LegacyOffsetVectorProps
+): JSX.Element {
   const { x, y, z, as = 'h6', ...styleProps } = props
   return (
     <Flex {...styleProps}>

@@ -29,10 +29,15 @@ import type {
   PipetteEntities,
   LabwareEntities,
   RobotState,
-  AdditionalEquipmentEntities,
+  TrashBinEntities,
+  WasteChuteEntities,
 } from '@opentrons/step-generation'
 
-type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
+export type MoveLiquidStepArgs =
+  | ConsolidateArgs
+  | DistributeArgs
+  | TransferArgs
+  | null
 
 const uuid: () => string = uuidv1
 const adapter96ChannelDefUri = 'opentrons/opentrons_flex_96_tiprack_adapter/1'
@@ -155,7 +160,8 @@ function getInvariantContextAndRobotState(
       },
     }
   }
-  let additionalEquipmentEntities: AdditionalEquipmentEntities = {}
+  let trashBinEntities: TrashBinEntities = {}
+  let wasteChuteEntities: WasteChuteEntities = {}
 
   if (
     quickTransferState.dropTipLocation.cutoutFixtureId ===
@@ -163,9 +169,8 @@ function getInvariantContextAndRobotState(
   ) {
     const trashLocation = quickTransferState.dropTipLocation.cutoutId
     const trashId = `${uuid()}_trashBin`
-    additionalEquipmentEntities = {
+    trashBinEntities = {
       [trashId]: {
-        name: 'trashBin',
         id: trashId,
         location: trashLocation,
         pythonName: pythonTrashBinName,
@@ -179,15 +184,14 @@ function getInvariantContextAndRobotState(
     quickTransferState.blowOut?.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
   ) {
     const trashLocation = quickTransferState.blowOut.cutoutId
-    const isSameTrash = Object.values(additionalEquipmentEntities).some(
+    const isSameTrash = Object.values(trashBinEntities).some(
       entity => entity.location === trashLocation
     )
     if (!isSameTrash) {
       const trashId = `${uuid()}_trashBin`
-      additionalEquipmentEntities = {
-        ...additionalEquipmentEntities,
+      trashBinEntities = {
+        ...trashBinEntities,
         [trashId]: {
-          name: 'trashBin',
           id: trashId,
           location: trashLocation,
           pythonName: pythonTrashBinName,
@@ -203,10 +207,8 @@ function getInvariantContextAndRobotState(
   ) {
     const wasteChuteLocation = quickTransferState.dropTipLocation.cutoutId
     const wasteChuteId = `${uuid()}_wasteChute`
-    additionalEquipmentEntities = {
-      ...additionalEquipmentEntities,
+    wasteChuteEntities = {
       [wasteChuteId]: {
-        name: 'wasteChute',
         id: wasteChuteId,
         location: wasteChuteLocation,
         pythonName: pythonWasteChuteName,
@@ -220,15 +222,13 @@ function getInvariantContextAndRobotState(
     WASTE_CHUTE_FIXTURES.includes(quickTransferState.blowOut.cutoutFixtureId)
   ) {
     const wasteChuteLocation = quickTransferState.dropTipLocation.cutoutId
-    const isSameChute = Object.values(additionalEquipmentEntities).some(
+    const isSameChute = Object.values(wasteChuteEntities).some(
       entity => entity.location === wasteChuteLocation
     )
     if (!isSameChute) {
       const wasteChuteId = `${uuid()}_wasteChute`
-      additionalEquipmentEntities = {
-        ...additionalEquipmentEntities,
+      wasteChuteEntities = {
         [wasteChuteId]: {
-          name: 'wasteChute',
           id: wasteChuteId,
           location: wasteChuteLocation,
           pythonName: pythonWasteChuteName,
@@ -240,7 +240,10 @@ function getInvariantContextAndRobotState(
     labwareEntities,
     moduleEntities: {},
     pipetteEntities,
-    additionalEquipmentEntities,
+    wasteChuteEntities,
+    trashBinEntities,
+    stagingAreaEntities: {},
+    gripperEntities: {},
     liquidEntities: {},
     config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: false },
   }
@@ -298,23 +301,38 @@ export function generateQuickTransferArgs(
     quickTransferState.blowOut !== 'dest_well' &&
     'cutoutId' in quickTransferState.blowOut
   ) {
-    const entity = Object.values(
-      invariantContext.additionalEquipmentEntities
+    const trashBinEntity = Object.values(
+      invariantContext.trashBinEntities
     ).find(entity => {
       const blowoutObject = quickTransferState.blowOut as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
+    const wasteChuteEntity = Object.values(
+      invariantContext.wasteChuteEntities
+    ).find(entity => {
+      const blowoutObject = quickTransferState.blowOut as CutoutConfig
+      return entity.location === blowoutObject.cutoutId
+    })
+    const entity = trashBinEntity != null ? trashBinEntity : wasteChuteEntity
     blowoutLocation = entity?.id
   } else {
     blowoutLocation = quickTransferState.blowOut
   }
 
-  const dropTipLocationEntity = Object.values(
-    invariantContext.additionalEquipmentEntities
+  const dropTipTrashBinLocationEntity = Object.values(
+    invariantContext.trashBinEntities
   ).find(
     entity => entity.location === quickTransferState.dropTipLocation.cutoutId
   )
-  const dropTipLocation = dropTipLocationEntity?.id ?? ''
+  const dropTipWasteChuteLocationEntity = Object.values(
+    invariantContext.wasteChuteEntities
+  ).find(
+    entity => entity.location === quickTransferState.dropTipLocation.cutoutId
+  )
+  const dropTipLocation =
+    dropTipTrashBinLocationEntity?.id ??
+    dropTipWasteChuteLocationEntity?.id ??
+    ''
 
   const tipType = getTipTypeFromTipRackDefinition(quickTransferState.tipRack)
   const flowRatesForSupportedTip =

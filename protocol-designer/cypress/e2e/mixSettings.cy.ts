@@ -3,6 +3,7 @@ import { UniversalSteps } from '../support/UniversalSteps'
 import { TestFilePath, getTestFile } from '../support/TestFiles'
 import { verifyImportProtocolPage } from '../support/Import'
 import { StepBuilder } from '../support/StepBuilder'
+import { SetupSteps } from '../support/SetupSteps'
 
 describe('Redesigned Mixing Steps - Happy Path', () => {
   beforeEach(() => {
@@ -25,6 +26,7 @@ describe('Redesigned Mixing Steps - Happy Path', () => {
     steps.add(MixSteps.SelectLabware())
     steps.add(MixSteps.SelectWellInputField())
     steps.add(MixVerifications.WellSelectPopout())
+    steps.add(SetupSteps.WellSelector(['A1', 'A2']))
     steps.add(UniversalSteps.Snapshot())
     steps.add(MixSteps.Save())
     steps.add(MixSteps.EnterVolume())

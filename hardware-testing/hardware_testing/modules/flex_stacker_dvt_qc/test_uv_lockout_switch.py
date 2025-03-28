@@ -28,8 +28,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         ui.get_user_ready("Open the hopper door")
         door_open = not await stacker._driver.get_hopper_door_closed()
         if door_open:
-            ui.print_info("Meausre between J1 and J4")
-            open = not ui.get_user_answer("Is there continuity (closed circuit)?")
+            open = ui.get_user_answer("Is the UV lockout LED off?")
             # circuit should be open
             report(
                 section,
@@ -45,7 +44,7 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
         ui.get_user_ready("Close the hopper door")
         door_closed = await stacker._driver.get_hopper_door_closed()
         if door_closed:
-            closed = ui.get_user_answer("Is there continuity (closed circuit)?")
+            closed = ui.get_user_answer("Is the UV lockout LED on?")
             report(
                 section,
                 "closed-door-closed-circuit",

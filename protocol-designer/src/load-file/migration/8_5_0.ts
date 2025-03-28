@@ -142,6 +142,8 @@ export const migrateFile = (
           pushOut_checkbox:
             defaultPushOutVolume != null && defaultPushOutVolume > 0,
           pushOut_volume: defaultPushOutVolume,
+          conditioning_checkbox: false,
+          conditioning_volume: null,
         },
       }
     }

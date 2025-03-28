@@ -33,6 +33,7 @@ describe('LeftColumnLabwareInfo', () => {
         },
       } as any,
       type: 'location',
+      layout: 'default',
       bannerText: 'MOCK_BANNER_TEXT',
     }
 

@@ -79,7 +79,8 @@ const MOCK_INITIAL_ROBOT_STATE = {
   liquidState: {
     pipettes: {},
     labware: {},
-    additionalEquipment: {},
+    trashBins: {},
+    wasteChute: {},
   },
   tipState: {
     pipettes: {},

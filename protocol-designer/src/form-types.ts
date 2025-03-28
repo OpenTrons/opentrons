@@ -14,10 +14,11 @@ import type {
   NozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
-  AdditionalEquipmentEntity,
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
+  TrashBinEntity,
+  WasteChuteEntity,
 } from '@opentrons/step-generation'
 export type StepIdType = string
 export type StepFieldName = string
@@ -231,6 +232,25 @@ export type BlankForm = AnnotationFields & {
   id: StepIdType
 }
 
+export interface LabwareEntityWithTouchTip extends LabwareEntity {
+  isTouchTipAllowed: boolean
+}
+
+interface WasteChuteEntityWithTouchTip extends WasteChuteEntity {
+  isTouchTipAllowed: boolean
+  name: 'wasteChute'
+}
+
+interface TrashBinEntityWithTouchTip extends TrashBinEntity {
+  isTouchTipAllowed: boolean
+  name: 'trashBin'
+}
+
+export type LabwareOrAdditionalEquipmentEntity =
+  | LabwareEntityWithTouchTip
+  | WasteChuteEntityWithTouchTip
+  | TrashBinEntityWithTouchTip
+
 export interface HydratedMoveLiquidFormData extends AnnotationFields {
   id: string
   stepType: 'moveLiquid'
@@ -246,7 +266,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   changeTip: ChangeTipOptions
   dispense_airGap_checkbox: boolean
   dispense_delay_checkbox: boolean
-  dispense_labware: LabwareEntity | AdditionalEquipmentEntity
+  dispense_labware: LabwareOrAdditionalEquipmentEntity
   dispense_mix_checkbox: boolean
   dispense_touchTip_checkbox: boolean
   dispense_wellOrder_first: WellOrderOption
@@ -260,6 +280,8 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   pipette: PipetteEntity
   tipRack: string
   volume: number
+  pushOut_volume: number | null
+  pushOut_checkbox: boolean
   aspirate_airGap_volume?: number | null
   aspirate_delay_mmFromBottom?: number | null
   aspirate_delay_seconds?: number | null
@@ -288,6 +310,8 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   blowout_flowRate?: number | null
   blowout_location?: string | null
   blowout_z_offset?: number | null
+  conditioning_checkbox: boolean | null
+  conditioning_volume: number | null
   dispense_airGap_volume?: number | null
   dispense_delay_mmFromBottom?: number | null
   dispense_delay_seconds?: number | null
@@ -341,7 +365,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   dispense_delay_checkbox: boolean
   dropTip_location: string
   id: string
-  labware: LabwareEntity
+  labware: LabwareEntityWithTouchTip
   liquidClassesSupported: boolean
   mix_touchTip_checkbox: boolean
   mix_wellOrder_first: WellOrderOption

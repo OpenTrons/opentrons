@@ -795,6 +795,47 @@
       "title": "CloseLabwareLatchParams",
       "type": "object"
     },
+    "CloseLatchCreate": {
+      "description": "A request to execute a Flex Stacker CloseLatch command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/closeLatch",
+          "default": "flexStacker/closeLatch",
+          "enum": ["flexStacker/closeLatch"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CloseLatchParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CloseLatchCreate",
+      "type": "object"
+    },
+    "CloseLatchParams": {
+      "description": "The parameters defining how a stacker should close its latch.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "CloseLatchParams",
+      "type": "object"
+    },
     "ColumnNozzleLayoutConfiguration": {
       "description": "Information required for nozzle configurations of type ROW and COLUMN.",
       "properties": {
@@ -4024,6 +4065,47 @@
       "title": "OpenLabwareLatchParams",
       "type": "object"
     },
+    "OpenLatchCreate": {
+      "description": "A request to execute a Flex Stacker OpenLatch command.",
+      "properties": {
+        "commandType": {
+          "const": "flexStacker/openLatch",
+          "default": "flexStacker/openLatch",
+          "enum": ["flexStacker/openLatch"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/OpenLatchParams"
+        }
+      },
+      "required": ["params"],
+      "title": "OpenLatchCreate",
+      "type": "object"
+    },
+    "OpenLatchParams": {
+      "description": "The parameters defining how a stacker should open its latch.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "OpenLatchParams",
+      "type": "object"
+    },
     "PickUpTipCreate": {
       "description": "Pick up tip command creation request model.",
       "properties": {
@@ -5754,6 +5836,67 @@
       "title": "UnsafeEngageAxesParams",
       "type": "object"
     },
+    "UnsafeManualRetrieveCreate": {
+      "description": "A request to execute a Flex Stacker manual retrieve command.",
+      "properties": {
+        "commandType": {
+          "const": "unsafe/manualRetrieve",
+          "default": "unsafe/manualRetrieve",
+          "enum": ["unsafe/manualRetrieve"],
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/UnsafeManualRetrieveParams"
+        }
+      },
+      "required": ["params"],
+      "title": "UnsafeManualRetrieveCreate",
+      "type": "object"
+    },
+    "UnsafeManualRetrieveParams": {
+      "description": "Input parameters for a labware retrieval command.",
+      "properties": {
+        "adapterId": {
+          "description": "An optional ID to assign to an adapter. If None, an ID will be generated.",
+          "title": "Adapterid",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "An optional user-specified display name or label for this labware.",
+          "title": "Displayname",
+          "type": "string"
+        },
+        "labwareId": {
+          "description": "An optional ID to assign to this labware. If None, an ID will be generated.",
+          "title": "Labwareid",
+          "type": "string"
+        },
+        "lidId": {
+          "description": "An optional ID to assign to a lid. If None, an ID will be generated.",
+          "title": "Lidid",
+          "type": "string"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Flex Stacker.",
+          "title": "Moduleid",
+          "type": "string"
+        }
+      },
+      "required": ["moduleId"],
+      "title": "UnsafeManualRetrieveParams",
+      "type": "object"
+    },
     "UnsafePlaceLabwareCreate": {
       "description": "UnsafePlaceLabware command request model.",
       "properties": {
@@ -6629,8 +6772,10 @@
       "evotipDispense": "#/$defs/EvotipDispenseCreate",
       "evotipSealPipette": "#/$defs/EvotipSealPipetteCreate",
       "evotipUnsealPipette": "#/$defs/EvotipUnsealPipetteCreate",
+      "flexStacker/closeLatch": "#/$defs/CloseLatchCreate",
       "flexStacker/empty": "#/$defs/EmptyCreate",
       "flexStacker/fill": "#/$defs/FillCreate",
+      "flexStacker/openLatch": "#/$defs/OpenLatchCreate",
       "flexStacker/prepareShuttle": "#/$defs/PrepareShuttleCreate",
       "flexStacker/retrieve": "#/$defs/RetrieveCreate",
       "flexStacker/setStoredLabware": "#/$defs/SetStoredLabwareCreate",
@@ -6692,6 +6837,7 @@
       "unsafe/blowOutInPlace": "#/$defs/UnsafeBlowOutInPlaceCreate",
       "unsafe/dropTipInPlace": "#/$defs/UnsafeDropTipInPlaceCreate",
       "unsafe/engageAxes": "#/$defs/UnsafeEngageAxesCreate",
+      "unsafe/manualRetrieve": "#/$defs/UnsafeManualRetrieveCreate",
       "unsafe/placeLabware": "#/$defs/UnsafePlaceLabwareCreate",
       "unsafe/ungripLabware": "#/$defs/UnsafeUngripLabwareCreate",
       "unsafe/updatePositionEstimators": "#/$defs/UpdatePositionEstimatorsCreate",
@@ -6937,6 +7083,12 @@
       "$ref": "#/$defs/EmptyCreate"
     },
     {
+      "$ref": "#/$defs/CloseLatchCreate"
+    },
+    {
+      "$ref": "#/$defs/OpenLatchCreate"
+    },
+    {
       "$ref": "#/$defs/PrepareShuttleCreate"
     },
     {
@@ -6968,6 +7120,9 @@
     },
     {
       "$ref": "#/$defs/UnsafePlaceLabwareCreate"
+    },
+    {
+      "$ref": "#/$defs/UnsafeManualRetrieveCreate"
     },
     {
       "$ref": "#/$defs/MoveAxesRelativeCreate"

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { round } from 'lodash'
@@ -27,11 +28,14 @@ import {
   ToggleStepFormField,
 } from '../../../../../../components/molecules'
 import {
-  getAdditionalEquipmentEntities,
+  getInvariantContext,
   getLabwareEntities,
   getPipetteEntities,
 } from '../../../../../../step-forms/selectors'
-import { getMaxPushOutVolume } from '../../../../../../utils'
+import {
+  getMaxConditioningVolume,
+  getMaxPushOutVolume,
+} from '../../../../../../utils'
 import {
   getBlowoutLocationOptionsForForm,
   getFormErrorsMappedToField,
@@ -68,29 +72,27 @@ export const SecondStepsMoveLiquidTools = ({
 }: SecondStepsMoveLiquidToolsProps): JSX.Element => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
   const labwares = useSelector(getLabwareEntities)
-  const additionalEquipmentEntities = useSelector(
-    getAdditionalEquipmentEntities
+  const { trashBinEntities, wasteChuteEntities } = useSelector(
+    getInvariantContext
   )
   const enableLiquidClasses = useSelector(getEnableLiquidClasses)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
   const addFieldNamePrefix = addPrefix(tab)
   const isWasteChuteSelected =
     propsForFields.dispense_labware?.value != null
-      ? additionalEquipmentEntities[
-          String(propsForFields.dispense_labware.value)
-        ]?.name === 'wasteChute'
+      ? wasteChuteEntities[String(propsForFields.dispense_labware.value)] !=
+        null
       : false
   const isTrashBinSelected =
     propsForFields.dispense_labware?.value != null
-      ? additionalEquipmentEntities[
-          String(propsForFields.dispense_labware.value)
-        ]?.name === 'trashBin'
+      ? trashBinEntities[String(propsForFields.dispense_labware.value)] != null
       : false
   const destinationLabwareType =
     formData.dispense_labware != null
       ? getTrashOrLabware(
           labwares,
-          additionalEquipmentEntities,
+          wasteChuteEntities,
+          trashBinEntities,
           formData.dispense_labware as string
         )
       : null
@@ -153,7 +155,25 @@ export const SecondStepsMoveLiquidTools = ({
     Number(formData.volume),
     pipetteSpec
   )
-
+  const maxConditioningVolume = useMemo(
+    () =>
+      getMaxConditioningVolume({
+        transferVolume: Number(formData.volume),
+        disposalVolume:
+          formData.disposalVolume_checkbox === true
+            ? Number(formData.disposalVolume_volume)
+            : 0,
+        pipetteSpecs: pipetteSpec,
+        labwareEntities: labwares,
+        tiprackDefUri: formData.tipRack,
+      }),
+    [
+      formData.transferVolume,
+      formData.disposalVolume_volume,
+      formData.pipette,
+      formData.tipRack,
+    ]
+  )
   const minXYDimension = isDestinationTrash
     ? null
     : getMinXYDimension(labwares[formData[`${tab}_labware`]]?.def, ['A1'])
@@ -277,20 +297,9 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.mix.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_mix_checkbox`].value}
-          isChecked={propsForFields[`${tab}_mix_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_mix_checkbox`].updateValue
-          }
-          tooltipText={
-            tab === 'dispense'
-              ? dispenseMixDisabledTooltipText
-              : propsForFields.aspirate_mix_checkbox.tooltipContent
-          }
-          disabled={
-            tab === 'dispense'
-              ? isDestinationTrash || formData.path === 'multiDispense'
-              : formData.path === 'multiAspirate'
+          fieldProps={propsForFields[`${tab}_mix_checkbox`]}
+          tooltipOverride={
+            tab === 'dispense' ? dispenseMixDisabledTooltipText : null
           }
         >
           {formData[`${tab}_mix_checkbox`] === true ? (
@@ -330,10 +339,7 @@ export const SecondStepsMoveLiquidTools = ({
               t('form:step_edit_form.field.pushOut.title'),
               'capitalize'
             )}
-            checkboxValue={propsForFields.pushOut_checkbox.value}
-            isChecked={propsForFields.pushOut_checkbox.value === true}
-            checkboxUpdateValue={propsForFields.pushOut_checkbox.updateValue}
-            tooltipText={propsForFields.pushOut_checkbox.tooltipContent}
+            fieldProps={propsForFields.pushOut_checkbox}
           >
             {formData.pushOut_checkbox === true ? (
               <InputStepFormField
@@ -361,12 +367,7 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.delay.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_delay_checkbox`].value}
-          isChecked={propsForFields[`${tab}_delay_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_delay_checkbox`].updateValue
-          }
-          tooltipText={propsForFields[`${tab}_delay_checkbox`].tooltipContent}
+          fieldProps={propsForFields[`${tab}_delay_checkbox`]}
         >
           {formData[`${tab}_delay_checkbox`] === true ? (
             <Flex
@@ -388,20 +389,38 @@ export const SecondStepsMoveLiquidTools = ({
             </Flex>
           ) : null}
         </CheckboxExpandStepFormField>
+        {tab === 'dispense' && formData.path === 'multiDispense' ? (
+          <CheckboxExpandStepFormField
+            title={t('form:step_edit_form.field.conditioning.title')}
+            fieldProps={propsForFields.conditioning_checkbox}
+          >
+            {formData.conditioning_checkbox === true ? (
+              <InputStepFormField
+                title={t(
+                  'form:step_edit_form.field.conditioning.conditioning_volume.label'
+                )}
+                caption={t(
+                  'form:step_edit_form.field.conditioning.conditioning_volume.caption',
+                  { min: 0, max: maxConditioningVolume }
+                )}
+                padding="0"
+                {...propsForFields.conditioning_volume}
+                showTooltip={false}
+                errorToShow={getFormLevelError(
+                  'conditioning_volume',
+                  mappedErrorsToField
+                )}
+              />
+            ) : null}
+          </CheckboxExpandStepFormField>
+        ) : null}
         {tab === 'dispense' ? (
           <CheckboxExpandStepFormField
             title={i18n.format(
               t('form:step_edit_form.field.blowout.label'),
               'capitalize'
             )}
-            checkboxValue={propsForFields.blowout_checkbox.value}
-            isChecked={propsForFields.blowout_checkbox.value === true}
-            checkboxUpdateValue={propsForFields.blowout_checkbox.updateValue}
-            tooltipText={propsForFields.blowout_checkbox.tooltipContent}
-            disabled={
-              formData.path === 'multiDispense' &&
-              formData.disposalVolume_checkbox
-            }
+            fieldProps={propsForFields.blowout_checkbox}
           >
             {formData.blowout_checkbox === true ? (
               <Flex
@@ -441,15 +460,7 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.touchTip.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_touchTip_checkbox`].value}
-          isChecked={propsForFields[`${tab}_touchTip_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_touchTip_checkbox`].updateValue
-          }
-          tooltipText={
-            propsForFields[`${tab}_touchTip_checkbox`].tooltipContent
-          }
-          disabled={propsForFields[`${tab}_touchTip_checkbox`].disabled}
+          fieldProps={propsForFields[`${tab}_touchTip_checkbox`]}
         >
           {formData[`${tab}_touchTip_checkbox`] === true ? (
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing10}>
@@ -505,12 +516,7 @@ export const SecondStepsMoveLiquidTools = ({
             t('form:step_edit_form.field.airGap.label'),
             'capitalize'
           )}
-          checkboxValue={propsForFields[`${tab}_airGap_checkbox`].value}
-          isChecked={propsForFields[`${tab}_airGap_checkbox`].value === true}
-          checkboxUpdateValue={
-            propsForFields[`${tab}_airGap_checkbox`].updateValue
-          }
-          tooltipText={propsForFields[`${tab}_airGap_checkbox`].tooltipContent}
+          fieldProps={propsForFields[`${tab}_airGap_checkbox`]}
         >
           {formData[`${tab}_airGap_checkbox`] === true ? (
             <InputStepFormField

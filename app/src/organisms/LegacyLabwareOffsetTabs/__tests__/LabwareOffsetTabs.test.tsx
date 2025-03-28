@@ -2,7 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { LabwareOffsetTabs } from '..'
+import { LegacyLabwareOffsetTabs } from '..'
 
 const mockTableComponent = <div>Table Component</div>
 const mockJupyterComponent = <div>Jupyter Component</div>
@@ -10,7 +10,7 @@ const mockCLIComponent = <div>CLI Component</div>
 
 const render = () => {
   return renderWithProviders(
-    <LabwareOffsetTabs
+    <LegacyLabwareOffsetTabs
       TableComponent={mockTableComponent}
       JupyterComponent={mockJupyterComponent}
       CommandLineComponent={mockCLIComponent}

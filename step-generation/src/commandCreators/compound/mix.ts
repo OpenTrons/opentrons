@@ -10,7 +10,6 @@ import {
   curryCommandCreator,
   reduceCommandCreators,
   getIsSafePipetteMovement,
-  getHasWasteChute,
   curryWithoutPython,
   formatPyStr,
   formatPyWellLocation,
@@ -230,9 +229,8 @@ export const mix: CommandCreator<MixArgs> = (
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot
-  const hasWasteChute = getHasWasteChute(
-    invariantContext.additionalEquipmentEntities
-  )
+  const hasWasteChute =
+    Object.keys(invariantContext.wasteChuteEntities).length > 0
 
   if (
     hasWasteChute &&
@@ -243,7 +241,8 @@ export const mix: CommandCreator<MixArgs> = (
 
   if (
     !dropTipLocation ||
-    !invariantContext.additionalEquipmentEntities[dropTipLocation]
+    (invariantContext.wasteChuteEntities[dropTipLocation] == null &&
+      invariantContext.trashBinEntities[dropTipLocation] == null)
   ) {
     return { errors: [errorCreators.dropTipLocationDoesNotExist()] }
   }

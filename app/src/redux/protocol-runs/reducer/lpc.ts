@@ -23,6 +23,7 @@ import {
 } from '../constants'
 import {
   clearAllWorkingOffsets,
+  getNextStepIdx,
   goBackToPreviousHandleLwSubstep,
   handleApplyWorkingOffsets,
   proceedToNextHandleLwSubstep,
@@ -38,7 +39,6 @@ import type {
   SelectedLwOverview,
 } from '../types'
 
-// TODO(jh, 03-10-25): Move some of these reducer case transformations to dedicated transform fns for clarity.
 // TODO(jh, 01-17-25): A lot of this state should live above the LPC slice, in the general protocolRuns slice instead.
 //  We should make selectors for that state, too!
 export function LPCReducer(
@@ -52,35 +52,13 @@ export function LPCReducer(
   } else {
     switch (action.type) {
       case PROCEED_STEP: {
-        const {
-          currentStepIndex,
-          lastStepIndices,
-          totalStepCount,
-        } = state.steps
-        const { toStep } = action.payload
-
-        const newStepIdx = (): number => {
-          if (toStep == null) {
-            return currentStepIndex + 1 < totalStepCount
-              ? currentStepIndex + 1
-              : currentStepIndex
-          } else {
-            const newIdx = LPC_STEPS.findIndex(step => step === toStep)
-
-            if (newIdx === -1) {
-              console.error(`Unexpected routing to step: ${toStep}`)
-              return 0
-            } else {
-              return newIdx
-            }
-          }
-        }
+        const { currentStepIndex, lastStepIndices } = state.steps
 
         return {
           ...state,
           steps: {
             ...state.steps,
-            currentStepIndex: newStepIdx(),
+            currentStepIndex: getNextStepIdx(action, state.steps),
             lastStepIndices: [...(lastStepIndices ?? []), currentStepIndex],
           },
         }

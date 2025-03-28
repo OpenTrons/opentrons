@@ -14,10 +14,9 @@ vi.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 const wasteChuteId = 'wasteChuteId'
 const invariantContext: InvariantContext = {
   ...makeContext(),
-  additionalEquipmentEntities: {
+  wasteChuteEntities: {
     [wasteChuteId]: {
       id: wasteChuteId,
-      name: 'wasteChute',
       pythonName: 'mock_waste_chute_1',
       location: WASTE_CHUTE_CUTOUT,
     },

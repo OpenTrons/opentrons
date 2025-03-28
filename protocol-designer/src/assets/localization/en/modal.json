@@ -79,7 +79,7 @@
       "body7": "Removing ability to dispense to off-deck labware or move off-deck labware with a gripper",
       "body8": "Removing quantity dropdown from all modules during the Flex setup flow to reduce deck setup conflicts",
       "body9": "All protocols now require Opentrons App version 8.3.0+ to run.",
-      "body10": "For more information, see the <link1>Protocol Designer Instruction Manual</link1> or the <link2>Release Notes.</link2>."
+      "body10": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
     }
   },
   "labware_selection": {
@@ -197,6 +197,7 @@
   "review_file_details": "Review file details",
   "robot_type": "Robot Type",
   "staging_areas": "Staging area slots",
+  "view_full_release_notes": "View full release notes",
   "upload_tiprack": "Upload a custom tiprack to select its definition",
   "upload": "Upload",
   "well_order": {

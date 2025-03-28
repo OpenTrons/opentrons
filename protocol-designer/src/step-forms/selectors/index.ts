@@ -40,6 +40,11 @@ import type {
   ModuleEntities,
   PipetteEntities,
   LiquidEntities,
+  StagingAreaEntities,
+  AdditionalEquipmentEntity,
+  TrashBinEntities,
+  WasteChuteEntities,
+  GripperEntities,
 } from '@opentrons/step-generation'
 import type { PipetteName, LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -583,9 +588,15 @@ export const getBatchEditFormHasUnsavedChanges: Selector<
 
 const _formLevelErrors = (
   hydratedForm: HydratedFormData,
-  moduleEntities: ModuleEntities
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities
 ): StepFormErrors => {
-  return getFormErrors(hydratedForm.stepType, hydratedForm, moduleEntities)
+  return getFormErrors(
+    hydratedForm.stepType,
+    hydratedForm,
+    moduleEntities,
+    labwareEntities
+  )
 }
 
 const _dynamicFieldFormErrors = (
@@ -668,7 +679,11 @@ export const _hasFormLevelErrors = (
   invariantContext: InvariantContext
 ): boolean => {
   if (
-    _formLevelErrors(hydratedForm, invariantContext.moduleEntities).length > 0
+    _formLevelErrors(
+      hydratedForm,
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
+    ).length > 0
   )
     return true
 
@@ -716,17 +731,75 @@ export const getInvariantContext: Selector<
     additionalEquipmentEntities,
     disableModuleRestrictions,
     allowAllTipracks
-  ) => ({
-    labwareEntities,
-    moduleEntities,
-    pipetteEntities,
-    liquidEntities,
-    additionalEquipmentEntities,
-    config: {
-      OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
-      OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
-    },
-  })
+  ) => {
+    const stagingAreaEntities = Object.values(
+      additionalEquipmentEntities
+    ).reduce((acc: StagingAreaEntities, entity: AdditionalEquipmentEntity) => {
+      if (entity.name === 'stagingArea') {
+        acc[entity.id] = { id: entity.id, location: entity.location }
+        return acc
+      } else {
+        return acc
+      }
+    }, {})
+    const trashBinEntities = Object.values(additionalEquipmentEntities).reduce(
+      (acc: TrashBinEntities, entity: AdditionalEquipmentEntity) => {
+        if (entity.name === 'trashBin' && entity.pythonName != null) {
+          acc[entity.id] = {
+            id: entity.id,
+            location: entity.location,
+            pythonName: entity.pythonName,
+          }
+          return acc
+        } else {
+          return acc
+        }
+      },
+      {}
+    )
+    const wasteChuteEntities = Object.values(
+      additionalEquipmentEntities
+    ).reduce((acc: WasteChuteEntities, entity: AdditionalEquipmentEntity) => {
+      if (entity.name === 'wasteChute' && entity.pythonName != null) {
+        acc[entity.id] = {
+          id: entity.id,
+          pythonName: entity.pythonName,
+          location: entity.location,
+        }
+        return acc
+      } else {
+        return acc
+      }
+    }, {})
+    const gripperEntities = Object.values(additionalEquipmentEntities).reduce(
+      (acc: GripperEntities, entity: AdditionalEquipmentEntity) => {
+        if (entity.name === 'gripper') {
+          acc[entity.id] = {
+            id: entity.id,
+          }
+          return acc
+        } else {
+          return acc
+        }
+      },
+      {}
+    )
+
+    return {
+      labwareEntities,
+      moduleEntities,
+      pipetteEntities,
+      liquidEntities,
+      trashBinEntities,
+      wasteChuteEntities,
+      stagingAreaEntities,
+      gripperEntities,
+      config: {
+        OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
+        OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
+      },
+    }
+  }
 )
 export const getHydratedUnsavedForm: Selector<
   BaseState,
@@ -770,7 +843,8 @@ export const getFormLevelErrorsForUnsavedForm: Selector<
 
     const errors = _formLevelErrors(
       hydratedForm,
-      invariantContext.moduleEntities
+      invariantContext.moduleEntities,
+      invariantContext.labwareEntities
     )
 
     return errors

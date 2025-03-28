@@ -16,7 +16,6 @@ from .utils import NUMBER_OF_BINS, NUMBER_OF_ZONES
 from opentrons.drivers.flex_stacker.types import (
     Direction,
     StackerAxis,
-    LEDPattern,
     TOFSensor,
 )
 
@@ -95,10 +94,8 @@ async def test_tof_sensors_labware_detection(
 
 async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     """Run."""
-    # Reset LEDs to off
     if not stacker._simulating:
         ui.get_user_ready("Make sure both TOF sensors are installed.")
-        await stacker._driver.set_led(0, pattern=LEDPattern.STATIC)
 
     print("Homing stacker X and Z axis.")
     await stacker.home_axis(StackerAxis.X, Direction.EXTEND)
@@ -134,3 +131,4 @@ async def run(stacker: FlexStacker, report: CSVReport, section: str) -> None:
     await test_tof_sensors_labware_detection(
         stacker, report, section, TOFSensor.Z, "tiprack"
     )
+    ui.get_user_ready("Please remove all labware from the stacker.")
