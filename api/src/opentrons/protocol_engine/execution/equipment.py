@@ -224,7 +224,6 @@ class EquipmentHandler:
         """Load a pool of labware from already-found definitions."""
         adapter_labware: LoadedLabware | None = None
         lid_labware: LoadedLabware | None = None
-        # CASEY NOTE: REREAD AND CLEANUP THIS WHOLE THING
         adapter_lw = None
         labware_by_id: dict[str, LoadedLabware] = {}
         if pool_adapter_definition is not None:
