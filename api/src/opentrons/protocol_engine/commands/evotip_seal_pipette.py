@@ -40,9 +40,12 @@ if TYPE_CHECKING:
 
 
 EvotipSealPipetteCommandType = Literal["evotipSealPipette"]
-_PREP_DISTANCE_DEFAULT = 8.25
-_PRESS_DISTANCE_DEFAULT = 3.5
-_EJECTOR_PUSH_MM_DEFAULT = 7.0
+_CAM_PREP_DISTANCE_DEFAULT = 8.25
+_CAM_PRESS_DISTANCE_DEFAULT = 3.5
+_CAM_EJECTOR_PUSH_MM_DEFAULT = 7.0
+_PRESS_FIT_PREP_DISTANCE_DEFAULT = 0
+_PRESS_FIT_PRESS_DISTANCE_DEFAULT = -10.0
+_PRESS_FIT_EJECTOR_PUSH_MM_DEFAULT = 0
 _SAFE_TOP_VOLUME = 1000
 
 
@@ -244,29 +247,28 @@ class EvotipSealPipetteImplementation(
         channels = self._state_view.tips.get_pipette_active_channels(pipette_id)
         mount = self._state_view.pipettes.get_mount(pipette_id)
         tip_pick_up_params = params.tipPickUpParams
-        if tip_pick_up_params is None:
-            tip_pick_up_params = TipPickUpParams(
-                prepDistance=_PREP_DISTANCE_DEFAULT,
-                pressDistance=_PRESS_DISTANCE_DEFAULT,
-                ejectorPushMm=_EJECTOR_PUSH_MM_DEFAULT,
-            )
 
-        if channels != 96:
-            await self.relative_pickup_tip(
-                tip_pick_up_params=tip_pick_up_params,
-                mount=mount,
-            )
-        elif channels == 96:
+        if channels == 96:
+            if tip_pick_up_params is None:
+                tip_pick_up_params = TipPickUpParams(
+                    prepDistance=_CAM_PREP_DISTANCE_DEFAULT,
+                    pressDistance=_CAM_PRESS_DISTANCE_DEFAULT,
+                    ejectorPushMm=_CAM_EJECTOR_PUSH_MM_DEFAULT,
+                )
             await self.cam_action_relative_pickup_tip(
                 tip_pick_up_params=tip_pick_up_params,
                 mount=mount,
             )
         else:
-            tip_geometry = await self._tip_handler.pick_up_tip(
-                pipette_id=pipette_id,
-                labware_id=labware_id,
-                well_name=well_name,
-                do_not_ignore_tip_presence=True,
+            if tip_pick_up_params is None:
+                tip_pick_up_params = TipPickUpParams(
+                    prepDistance=_PRESS_FIT_PREP_DISTANCE_DEFAULT,
+                    pressDistance=_PRESS_FIT_PRESS_DISTANCE_DEFAULT,
+                    ejectorPushMm=_PRESS_FIT_EJECTOR_PUSH_MM_DEFAULT,
+                )
+            await self.relative_pickup_tip(
+                tip_pick_up_params=tip_pick_up_params,
+                mount=mount,
             )
 
         # cache_tip
