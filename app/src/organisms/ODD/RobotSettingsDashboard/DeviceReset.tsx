@@ -54,6 +54,7 @@ interface DisplayedResetOptionState extends Record<string, boolean> {
   pipetteOffsetCalibrations: boolean
   gripperOffsetCalibrations: boolean
   moduleCalibration: boolean
+  labwareOffsets: boolean
   runsHistory: boolean
 }
 
@@ -61,6 +62,7 @@ const targetOptionsOrder: Array<keyof DisplayedResetOptionState> = [
   'pipetteOffsetCalibrations',
   'gripperOffsetCalibrations',
   'moduleCalibration',
+  'labwareOffsets',
   'runsHistory',
 ]
 
@@ -111,6 +113,7 @@ export function DeviceReset({
     pipetteOffsetCalibrations: false,
     gripperOffsetCalibrations: false,
     moduleCalibration: false,
+    labwareOffsets: false,
     runsHistory: false,
   })
   const [dispatchRequest] = useDispatchApiRequest()
@@ -139,6 +142,9 @@ export function DeviceReset({
         break
       case 'moduleCalibration':
         optionText = t('clear_option_module_calibration')
+        break
+      case 'labwareOffsets':
+        optionText = t('clear_option_labware_offsets')
         break
       case 'runsHistory':
         optionText = t('clear_option_runs_history')
@@ -235,12 +241,14 @@ export function DeviceReset({
                       pipetteOffsetCalibrations: false,
                       gripperOffsetCalibrations: false,
                       moduleCalibration: false,
+                      labwareOffsets: false,
                       runsHistory: false,
                     }
                   : {
                       pipetteOffsetCalibrations: true,
                       gripperOffsetCalibrations: true,
                       moduleCalibration: true,
+                      labwareOffsets: true,
                       runsHistory: true,
                     }
               )

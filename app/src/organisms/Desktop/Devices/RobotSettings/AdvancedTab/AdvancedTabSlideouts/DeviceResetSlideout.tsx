@@ -309,7 +309,7 @@ export function DeviceResetSlideout({
                 marginBottom={SPACING.spacing8}
               >
                 <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-                  {t('protocol_run_history')}
+                  {t('protocol_run_data')}
                 </LegacyStyledText>
                 <Link
                   role="button"
@@ -319,15 +319,30 @@ export function DeviceResetSlideout({
                   {t('download')}
                 </Link>
               </Flex>
-              <CheckboxField
-                onChange={() => {
-                  const options = cloneDeep(displayedOptions)
-                  options.common.runsHistory = !options.common.runsHistory
-                  setDisplayedOptions(options)
-                }}
-                value={displayedOptions.common.runsHistory}
-                label={t('clear_option_runs_history')}
-              />
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={-SPACING.spacing4}
+              >
+                <CheckboxField
+                  onChange={() => {
+                    const options = cloneDeep(displayedOptions)
+                    options.common.runsHistory = !options.common.runsHistory
+                    setDisplayedOptions(options)
+                  }}
+                  value={displayedOptions.common.runsHistory}
+                  label={t('clear_option_runs_history')}
+                />
+                <CheckboxField
+                  onChange={() => {
+                    const options = cloneDeep(displayedOptions)
+                    options.common.labwareOffsets = !options.common
+                      .labwareOffsets
+                    setDisplayedOptions(options)
+                  }}
+                  value={displayedOptions.common.labwareOffsets}
+                  label={t('clear_option_labware_offsets')}
+                />
+              </Flex>
             </Box>
             <Box>
               <LegacyStyledText
@@ -382,6 +397,7 @@ interface DisplayedResetOptionState {
     bootScripts: boolean
     authorizedKeys: boolean
     pipetteOffsetCalibrations: boolean
+    labwareOffsets: boolean
   }
   ot2Only: {
     deckCalibration: boolean
@@ -399,6 +415,7 @@ const ALL_DESELECTED: DisplayedResetOptionState = {
     bootScripts: false,
     authorizedKeys: false,
     pipetteOffsetCalibrations: false,
+    labwareOffsets: false,
   },
   ot2Only: {
     deckCalibration: false,
@@ -416,6 +433,7 @@ const ALL_SELECTED: DisplayedResetOptionState = {
     bootScripts: true,
     authorizedKeys: true,
     pipetteOffsetCalibrations: true,
+    labwareOffsets: true,
   },
   ot2Only: {
     deckCalibration: true,
