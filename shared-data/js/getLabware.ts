@@ -44,8 +44,6 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_ot3_96_tiprack_1000ul',
   'opentrons_ot3_96_tiprack_50ul',
   'opentrons_flex_lid_absorbance_plate_reader_module',
-  // temporarily blocking tiprack lids until stacker launches
-  'opentrons_flex_tiprack_lid',
   // temporarily blocking 20 uL Flex tip racks until they launch
   'opentrons_flex_96_tiprack_20ul',
   'opentrons_flex_96_filtertiprack_20ul',
